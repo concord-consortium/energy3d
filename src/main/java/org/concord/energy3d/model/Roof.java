@@ -547,8 +547,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh outlineMesh = (Mesh) roofPartNode.getChild(4);
 
-				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
-				final int totalVertices = convexHull.size();
+				final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
+				int totalVertices = outlinePoints.size();
+				for (final HousePart part : children)
+					if (part instanceof Window)
+						totalVertices += 8;
 
 				final FloatBuffer buf;
 				if (outlineMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
@@ -560,13 +563,27 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					outlineMesh.getMeshData().setVertexBuffer(buf);
 				}
 
-				for (int i = 0; i < convexHull.size(); i++) {
-					final ReadOnlyVector3 p1 = convexHull.get(i);
-					final ReadOnlyVector3 p2 = convexHull.get((i + 1) % convexHull.size());
+				// draw roof outline
+				for (int i = 0; i < outlinePoints.size(); i++) {
+					final ReadOnlyVector3 p1 = outlinePoints.get(i);
+					final ReadOnlyVector3 p2 = outlinePoints.get((i + 1) % outlinePoints.size());
 
 					buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 					buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				}
+				
+				// draw skylights outline
+				final int[] windowIndices= new int[] {0, 2, 3, 1};
+				for (final HousePart part : children)
+					if (part instanceof Window && part.isDrawable())
+						for (int i = 0; i < part.getPoints().size(); i++) {
+							final ReadOnlyVector3 p1 = part.getAbsPoint(windowIndices[i]);
+							final ReadOnlyVector3 p2 = part.getAbsPoint(windowIndices[(i + 1)% part.getPoints().size()]);
+
+							buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+							buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+						}
+
 				buf.limit(buf.position());
 				outlineMesh.getMeshData().updateVertexCount();
 				outlineMesh.updateModelBound();

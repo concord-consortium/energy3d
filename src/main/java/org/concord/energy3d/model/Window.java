@@ -1,6 +1,5 @@
 package org.concord.energy3d.model;
 
-import java.awt.Component;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +10,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
-import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
-import org.poly2tri.geometry.polygon.PolygonPoint;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -28,7 +25,6 @@ import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
@@ -62,9 +58,7 @@ public class Window extends HousePart implements Thermalizable {
 		label1 = Annotation.makeNewLabel();
 		super.init();
 		mesh = new Mesh("Window");
-		// mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		// mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
 		mesh.setModelBound(new BoundingBox());
 		mesh.getSceneHints().setCullHint(CullHint.Always);
 
@@ -105,7 +99,7 @@ public class Window extends HousePart implements Thermalizable {
 		} else
 			return;
 
-		final ArrayList<Vector3> orgPoints = new ArrayList<Vector3>(points.size()); // (ArrayList<Vector3>) ObjectCloner.deepCopy(points);
+		final ArrayList<Vector3> orgPoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 v : points)
 			orgPoints.add(v.clone());
 
@@ -140,22 +134,6 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(0).set(toRelative(Util.closestPoint(p1, v, p2, u)));
 				points.get(3).set(toRelative(Util.closestPoint(p1, u, p2, v)));
 			}
-			
-//			for (int i = 0; i < points.size(); i++) {
-//				final PickResults pickResults = new PrimitivePickResults();
-//				PickingUtil.findPick(container.getRoot(), new Ray3(getAbsPoint(i).multiplyLocal(1, 1, 0), Vector3.UNIT_Z), pickResults, false);
-//				if (pickResults.getNumber() > 0)
-//					points.get(i).setZ(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).getZ());
-//			}
-//			points.get(0).setX(0.51);
-//			points.get(0).setY(0.6);
-//			points.get(1).setX(0.51);
-//			points.get(1).setY(0.7);
-//			points.get(2).setX(0.6);
-//			points.get(2).setY(0.6);
-//			points.get(3).setX(0.6);
-//			points.get(3).setY(0.7);
-			
 		}
 
 		if (isFirstPointInserted())

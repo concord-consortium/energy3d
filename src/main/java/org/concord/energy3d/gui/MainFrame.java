@@ -69,13 +69,12 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
-import org.concord.energy3d.scene.Scene.Unit;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
-import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
+import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
@@ -120,11 +119,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem saveasMenuItem;
 	private JMenu viewMenu;
 	private JMenu analysisMenu;
-	private JMenu unitsMenu;
-	private JRadioButtonMenuItem metersMenuItem;
-	private JRadioButtonMenuItem centimetersMenuItem;
-	private JRadioButtonMenuItem inchesMenuItem;
-	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem annualEnergyAnalysisMenuItem;
@@ -969,16 +963,6 @@ public class MainFrame extends JFrame {
 		return viewMenu;
 	}
 
-	private JMenu getUnitsMenu() {
-		if (unitsMenu == null) {
-			unitsMenu = new JMenu("Units");
-			unitsMenu.add(getMetersMenuItem());
-			unitsMenu.add(getCentimetersMenuItem());
-			unitsMenu.add(getInchesMenuItem());
-		}
-		return unitsMenu;
-	}
-
 	public JCheckBoxMenuItem getAxesMenuItem() {
 		if (axesMenuItem == null) {
 			axesMenuItem = new JCheckBoxMenuItem("Axes", true);
@@ -1021,49 +1005,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return shadowMenuItem;
-	}
-
-	private JRadioButtonMenuItem getMetersMenuItem() {
-		if (metersMenuItem == null) {
-			metersMenuItem = new JRadioButtonMenuItem("Meters (m)");
-			metersMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setUnit(Unit.Meter);
-				}
-			});
-			buttonGroup.add(metersMenuItem);
-			metersMenuItem.setSelected(true);
-		}
-		return metersMenuItem;
-	}
-
-	private JRadioButtonMenuItem getCentimetersMenuItem() {
-		if (centimetersMenuItem == null) {
-			centimetersMenuItem = new JRadioButtonMenuItem("Centimeters (cm)");
-			centimetersMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setUnit(Unit.Centimeter);
-				}
-			});
-			buttonGroup.add(centimetersMenuItem);
-		}
-		return centimetersMenuItem;
-	}
-
-	private JRadioButtonMenuItem getInchesMenuItem() {
-		if (inchesMenuItem == null) {
-			inchesMenuItem = new JRadioButtonMenuItem("Inches (\")");
-			inchesMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setUnit(Unit.Inches);
-				}
-			});
-			buttonGroup.add(inchesMenuItem);
-		}
-		return inchesMenuItem;
 	}
 
 	private JMenuItem getRescaleMenuItem() {

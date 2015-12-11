@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -19,30 +17,24 @@ import org.poly2tri.geometry.primitives.Point;
 import org.poly2tri.transform.coordinate.AnyToXYTransform;
 import org.poly2tri.transform.coordinate.CoordinateTransform;
 import org.poly2tri.transform.coordinate.XYToAnyTransform;
-import org.poly2tri.triangulation.TriangulationPoint;
 import org.poly2tri.triangulation.point.TPoint;
-import org.poly2tri.triangulation.point.ardor3d.ArdorVector3PolygonPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.LineSegment3;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -53,12 +45,10 @@ public class MeshLib {
 		final Vector3 key = new Vector3();
 		final ArrayList<ReadOnlyVector3> vertices = new ArrayList<ReadOnlyVector3>();
 		final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
-		final ArrayList<Vector2> textures = new ArrayList<Vector2>();
 	}
 
 	public static void groupByPlanner(final Mesh mesh, final Node root, final List<List<ReadOnlyVector3>> holes) {
 		final ArrayList<GroupData> groups = extractGroups(mesh);
-//		computeHorizontalTextureCoords(groups);
 		createMeshes(root, groups);
 		applyHoles(root, holes);
 	}
@@ -145,46 +135,6 @@ public class MeshLib {
 		}
 	}
 
-	private static void computeHorizontalTextureCoords(final ArrayList<GroupData> groups) {
-		for (final GroupData group : groups) {
-			final ReadOnlyVector3 normal = group.normals.get(0);
-
-			final Matrix3 matrix = toXYMatrix(normal);
-
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
-			double minV = Double.MAX_VALUE;
-			for (int i = 0; i < group.vertices.size(); i++) {
-				final Vector3 p = group.vertices.get(i).clone();
-				matrix.applyPost(p, p);
-				final double v = p.getZ() * scale;
-				final double u = p.getX() * scale;
-				group.textures.add(new Vector2(u, v));
-				if (minV > v)
-					minV = v;
-			}
-
-			for (final Vector2 t : group.textures)
-				t.addLocal(0, -minV);
-		}
-	}
-
-	private static Matrix3 toXYMatrix(final ReadOnlyVector3 normal) {
-		final Vector3 n1 = new Vector3(normal.getX(), normal.getY(), 0).normalizeLocal();
-		double angleZ = n1.smallestAngleBetween(Vector3.NEG_UNIT_Y);
-
-		if (n1.dot(Vector3.UNIT_X) > 0)
-			angleZ = -angleZ;
-
-		final Matrix3 matrixZ = new Matrix3().fromAngles(0, 0, angleZ);
-
-		final Vector3 n2 = new Vector3();
-		matrixZ.applyPost(normal, n2);
-		final double angleX = n2.smallestAngleBetween(Vector3.NEG_UNIT_Y);
-
-		final Matrix3 matrix = new Matrix3().fromAngles(angleX, 0, 0).multiplyLocal(matrixZ);
-		return matrix;
-	}
-
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
 		root.detachAllChildren();
 		int meshIndex = 0;
@@ -193,7 +143,6 @@ public class MeshLib {
 			final Mesh mesh = new Mesh("Roof Mesh #" + meshIndex);
 			final Mesh meshWithHoles = new Mesh("Roof Mesh #" + meshIndex);
 			mesh.setVisible(false);
-//			mesh.setRenderState(HousePart.offsetState);
 			mesh.setModelBound(new BoundingBox());
 			meshWithHoles.setModelBound(new BoundingBox());
 			meshWithHoles.getSceneHints().setAllPickingHints(false);
@@ -201,7 +150,6 @@ public class MeshLib {
 
 			final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
 			Util.initHousePartLabel(label);
-//			label.setTranslation(group.key);
 			label.getSceneHints().setCullHint(CullHint.Always);
 
 			final Mesh wireframeMesh = new Line("Roof (wireframe)");
@@ -245,36 +193,14 @@ public class MeshLib {
 			}
 			center.multiplyLocal(1.0 / group.vertices.size());
 			label.setTranslation(center.add(normal.multiply(0.1, null), null));
-
-//			buf = mesh.getMeshData().getNormalBuffer();
-//			n = group.normals.size();
-//			buf = BufferUtils.createVector3Buffer(n);
-//			mesh.getMeshData().setNormalBuffer(buf);
-//			for (final ReadOnlyVector3 v : group.normals)
-//				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
-
-//			buf = mesh.getMeshData().getTextureBuffer(0);
-//			n = group.textures.size();
-//			buf = BufferUtils.createVector2Buffer(n);
-//			mesh.getMeshData().setTextureBuffer(buf, 0);
-//			for (final Vector2 v : group.textures)
-//				buf.put(v.getXf()).put(v.getYf());
-
-			mesh.getMeshData().updateVertexCount();
-//			CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
+			
 			mesh.updateModelBound();
-
 			meshIndex++;
 		}
 	}
 	
 	private static void applyHoles(Node root, List<List<ReadOnlyVector3>> holes) {		
 		for (final Spatial roofPart : root.getChildren()) {
-//			if (root.getChild(2) != roofPart) {
-//				roofPart.getSceneHints().setCullHint(CullHint.Always);
-//				continue;
-//			}
-//			Spatial roofPart = root.getChild(3);
 			final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
 			final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 			final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
@@ -339,53 +265,14 @@ public class MeshLib {
 						break;
 					}
 				}
-				if (!outside) {
-//					holePolygon.add(holePolygon.get(0));
+				if (!outside)
 					polygon.addHole(new PolygonWithHoles(holePolygon));
-				}
 			}
 			
-//			fillMeshWithPolygon(mesh, polygon, null, true, o, v, u);
-//			mesh.setVisible(false);
 			final Mesh meshWithHoles = (Mesh) ((Node)roofPart).getChild(6);
-//			((Node)roofPart).attachChild(newMesh);
 			fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u, false);
 		}
 	}		
-
-	public static void addConvexWireframe(final FloatBuffer wireframeVertexBuffer, final FloatBuffer vertexBuffer) {
-		vertexBuffer.rewind();
-		final Vector3 leftVertex = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
-		while (vertexBuffer.hasRemaining()) {
-			final double x = vertexBuffer.get();
-			if (x < leftVertex.getX())
-				leftVertex.set(x, vertexBuffer.get(), vertexBuffer.get());
-			else
-				vertexBuffer.position(vertexBuffer.position() + 2);
-		}
-
-		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
-		final Vector3 pointOnHull = new Vector3(leftVertex);
-		final Vector3 endpoint = new Vector3();
-		final Vector3 sj = new Vector3();
-		do {
-			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
-			endpoint.set(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
-			for (int j = 1; j <= vertexBuffer.limit() / 3 - 1; j++) {
-				sj.set(vertexBuffer.get(j * 3), vertexBuffer.get(j * 3 + 1), vertexBuffer.get(j * 3 + 2));
-				// if (S[j] is on left of line from P[i] to endpoint)
-				final double dot = normal.cross(endpoint.subtract(pointOnHull, null), null).dot(sj.subtract(pointOnHull, null));
-				if (!sj.equals(pointOnHull) && dot > 0)
-					endpoint.set(sj); // found greater left turn, update
-										// endpoint
-				else if (!sj.equals(pointOnHull) && dot == 0 && sj.distance(pointOnHull) > endpoint.distance(pointOnHull))
-					endpoint.set(sj); // found greater left turn, update
-										// endpoint
-			}
-			pointOnHull.set(endpoint);
-			wireframeVertexBuffer.put(pointOnHull.getXf()).put(pointOnHull.getYf()).put(pointOnHull.getZf());
-		} while (!endpoint.equals(leftVertex));
-	}
 
 	public static ArrayList<ReadOnlyVector3> computeOutline(final FloatBuffer buf) {
 		final Map<LineSegment3, Boolean> visitMap = new HashMap<LineSegment3, Boolean>();
@@ -517,20 +404,7 @@ public class MeshLib {
 			}
 		}
 
-		try {
-			Poly2Tri.triangulate(polygon);
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("---------------------------");
-			for (final Point p : polygon.getPoints())
-				System.out.println(p.getX() + "\t" + p.getY());
-			for (final Polygon hole : polygon.getHoles()) {
-				System.out.println("--Hole-----");
-				for (final Point p : hole.getPoints())
-					System.out.println(p.getX() + "\t" + p.getY());
-			}
-//			System.exit(0);
-		}
+		Poly2Tri.triangulate(polygon);
 		if (fromXY == null)
 			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 		else
