@@ -15,6 +15,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -74,8 +75,9 @@ public class DesignReplay extends PlayControl {
 						@Override
 						public Object call() throws Exception {
 							Scene.initSceneNow();
-							Scene.getInstance().redrawAllNow();
+							Scene.getInstance().redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
 							Scene.initEnergy();
+							Scene.getInstance().redrawAll(); // need to call this to at least redraw the overhangs
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 							EnergyPanel.getInstance().update();
 							EventQueue.invokeLater(new Runnable() {
@@ -86,6 +88,11 @@ public class DesignReplay extends PlayControl {
 									if (p instanceof Foundation) {
 										EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
 										EnergyPanel.getInstance().validate();
+									}
+									if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
+										MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
+										SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+										SceneManager.getInstance().resetCamera();
 									}
 								}
 							});
