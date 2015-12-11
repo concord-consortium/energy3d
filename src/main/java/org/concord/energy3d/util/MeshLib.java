@@ -209,14 +209,22 @@ public class MeshLib {
 			final ArrayList<ReadOnlyVector3> points3D = computeOutline(mesh.getMeshData().getVertexBuffer());			
 			final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
 			
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
 			final ReadOnlyVector3 firstPoint = points3D.get(0);
+			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
+			final TPoint o;
+			final TPoint u;
+			final TPoint v;			
+			if (normal.dot(Vector3.UNIT_Z) == 1) {
+				o = new TPoint(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ());				
+				u = new TPoint(1/scale, 0, 0);
+				v = new TPoint(0, 1/scale, 0);				
+			} else {
 			final ReadOnlyVector3 u3 = Vector3.UNIT_Z.cross(normal, null).normalizeLocal();
 			final ReadOnlyVector3 ou3 = u3.divide(scale, null).add(firstPoint, null);
 			final ReadOnlyVector3 ov3 = normal.cross(u3, null).divideLocal(scale).addLocal(firstPoint);
-			final TPoint o = new TPoint(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ());
-			final TPoint u = new TPoint(ou3.getX(), ou3.getY(), ou3.getZ());
-			final TPoint v = new TPoint(ov3.getX(), ov3.getY(), ov3.getZ());
+			o = new TPoint(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ());
+			u = new TPoint(ou3.getX(), ou3.getY(), ou3.getZ());
+			v = new TPoint(ov3.getX(), ov3.getY(), ov3.getZ());
 			
 			toXY.transform(o);
 			toXY.transform(u);
@@ -224,6 +232,7 @@ public class MeshLib {
 			
 			u.set(u.getX() - o.getX(), u.getY() - o.getY(), 0);
 			v.set(v.getX() - o.getX(), v.getY() - o.getY(), 0);
+			}
 			
 			final Vector2 o2 = new Vector2(firstPoint.getX(), firstPoint.getY());
 			final Vector2 ou2 = o2.add(new Vector2(u.getX(), u.getY()), null);
