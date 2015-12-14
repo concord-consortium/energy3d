@@ -386,20 +386,25 @@ public class MeshLib {
 
 		/* remove holes that collide with polygon or other holes */
 		if (polygon.getHoles() != null) {
+			final Map<Polygon, Object> skipHoles = new HashMap<Polygon, Object>();
 			for (final Polygon hole : polygon.getHoles())
 				for (final Point p : hole.getPoints())
 					if (!Util.insidePolygon(p, polygon.getPoints())) {
-						polygon.getHoles().remove(hole);
+						skipHoles.put(hole, null);
 						break;
 					}
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
+				if (skipHoles.containsKey(hole1))
+					continue;
 				for (int j = i + 1; j < polygon.getHoles().size(); j++) {
 					final Polygon hole2 = polygon.getHoles().get(j);
+					if (skipHoles.containsKey(hole2))
+						continue;
 					boolean found = false;
 					for (final Point p : hole2.getPoints())
 						if (Util.insidePolygon(p, hole1.getPoints())) {
-							polygon.getHoles().remove(hole2);
+							skipHoles.put(hole2, null);
 							found = true;
 							break;
 						}
@@ -416,7 +421,7 @@ public class MeshLib {
 								final Point l2p2 = hole2.getPoints().get((i2 + 1) % n2);
 								final Line2D line2 = new Line2D.Double(l2p1.getX(), l2p1.getY(), l2p2.getX(), l2p2.getY());
 								if (line2.intersectsLine(line1)) {
-									polygon.getHoles().remove(hole2);
+									skipHoles.put(hole2, null);
 									found = true;
 									break;
 								}
@@ -427,6 +432,8 @@ public class MeshLib {
 					}
 				}
 			}
+			for (final Polygon hole : skipHoles.keySet())
+				polygon.getHoles().remove(hole);
 		}
 
 		Poly2Tri.triangulate(polygon);
