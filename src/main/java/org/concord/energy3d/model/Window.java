@@ -32,21 +32,23 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart implements Thermalizable {
-
+	private static final long serialVersionUID = 1L;
 	public static final int NO_MUNTIN_BAR = -1;
 	public static final int MORE_MUNTIN_BARS = 0;
 	public static final int MEDIUM_MUNTIN_BARS = 1;
 	public static final int LESS_MUNTIN_BARS = 2;
-
-	private static final long serialVersionUID = 1L;
 	private transient BMText label1;
 	private transient Line bars;
+	private transient int roofIndex;
 	private int style = MORE_MUNTIN_BARS;
 
-	// range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
+	// range: 0.25-0.80 (we choose 0.5 by default) -
+	// http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
 	private double solarHeatGainCoefficient = 0.5;
-	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double uValue = 2.0; // default is IECC code for Massachusetts
+									// (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh =
+													// 3.6MJ)
 	private ReadOnlyVector3 roofNormal;
 
 	public Window() {
@@ -104,7 +106,7 @@ public class Window extends HousePart implements Thermalizable {
 			orgPoints.add(v.clone());
 
 		points.get(index).set(p);
-		
+
 		if (container instanceof Roof)
 			extendToRoof(index, false);
 
@@ -125,12 +127,12 @@ public class Window extends HousePart implements Thermalizable {
 			final Vector3 v = roofNormal.cross(u, null);
 			if (index == 0 || index == 3) {
 				final Vector3 p0 = getAbsPoint(0);
-				final Vector3 p3 = getAbsPoint(3);				
+				final Vector3 p3 = getAbsPoint(3);
 				points.get(1).set(toRelative(Util.closestPoint(p0, v, p3, u)));
 				points.get(2).set(toRelative(Util.closestPoint(p0, u, p3, v)));
 			} else {
 				final Vector3 p1 = getAbsPoint(1);
-				final Vector3 p2 = getAbsPoint(2);				
+				final Vector3 p2 = getAbsPoint(2);
 				points.get(0).set(toRelative(Util.closestPoint(p1, v, p2, u)));
 				points.get(3).set(toRelative(Util.closestPoint(p1, u, p2, v)));
 			}
@@ -354,14 +356,14 @@ public class Window extends HousePart implements Thermalizable {
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
 		final List<Vector3> orgPoints = new ArrayList<Vector3>(points.size());
 		for (int i = 0; i < points.size(); i++)
-			orgPoints.add(points.get(i));				
+			orgPoints.add(points.get(i));
 
 		final ReadOnlyVector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 newP = houseMoveStartPoints.get(i).add(d_rel, null);
 			points.set(i, newP);
 		}
-		
+
 		if (container instanceof Roof)
 			for (int i = 0; i < points.size(); i++)
 				extendToRoof(i, true);
@@ -375,7 +377,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	}
 
-	private void extendToRoof(int pointIndex, boolean updateRoofNormal) {
+	private void extendToRoof(final int pointIndex, final boolean updateRoofNormal) {
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(container.getRoot(), new Ray3(getAbsPoint(pointIndex).multiplyLocal(1, 1, 0), Vector3.UNIT_Z), pickResults, false);
 		if (pickResults.getNumber() > 0) {
@@ -414,29 +416,30 @@ public class Window extends HousePart implements Thermalizable {
 			area = 0.0;
 	}
 
-	public void moveTo(HousePart target) {
-		double w1 = target.getAbsPoint(0).distance(target.getAbsPoint(2));
-		double h1 = target.getAbsPoint(0).distance(target.getAbsPoint(1));
-		double w2 = container.getAbsPoint(0).distance(container.getAbsPoint(2));
-		double h2 = container.getAbsPoint(0).distance(container.getAbsPoint(1));
-		double ratioW = w2 / w1;
-		double ratioH = h2 / h1;
-		Vector3 v0 = points.get(0);
-		Vector3 v1 = points.get(1);
+	public void moveTo(final HousePart target) {
+		final double w1 = target.getAbsPoint(0).distance(target.getAbsPoint(2));
+		final double h1 = target.getAbsPoint(0).distance(target.getAbsPoint(1));
+		final double w2 = container.getAbsPoint(0).distance(container.getAbsPoint(2));
+		final double h2 = container.getAbsPoint(0).distance(container.getAbsPoint(1));
+		final double ratioW = w2 / w1;
+		final double ratioH = h2 / h1;
+		final Vector3 v0 = points.get(0);
+		final Vector3 v1 = points.get(1);
 		v1.setX(v0.getX() + (v1.getX() - v0.getX()) * ratioW);
 		v1.setY(v0.getY() + (v1.getY() - v0.getY()) * ratioW);
 		v1.setZ(v0.getZ() + (v1.getZ() - v0.getZ()) * ratioH);
-		Vector3 v2 = points.get(2);
+		final Vector3 v2 = points.get(2);
 		v2.setX(v0.getX() + (v2.getX() - v0.getX()) * ratioW);
 		v2.setY(v0.getY() + (v2.getY() - v0.getY()) * ratioW);
 		v2.setZ(v0.getZ() + (v2.getZ() - v0.getZ()) * ratioH);
-		Vector3 v3 = points.get(3);
+		final Vector3 v3 = points.get(3);
 		v3.setX(v0.getX() + (v3.getX() - v0.getX()) * ratioW);
 		v3.setY(v0.getY() + (v3.getY() - v0.getY()) * ratioW);
 		v3.setZ(v0.getZ() + (v3.getZ() - v0.getZ()) * ratioH);
 		setContainer(target);
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return true;
 	}
@@ -444,8 +447,8 @@ public class Window extends HousePart implements Thermalizable {
 	/** tolerance is a fraction relative to the width of a solar panel */
 	private boolean overlap(double tolerance) {
 		tolerance *= getAbsPoint(0).distance(getAbsPoint(2));
-		Vector3 center = getAbsCenter();
-		for (HousePart p : Scene.getInstance().getParts()) {
+		final Vector3 center = getAbsCenter();
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Window && p != this && p.getContainer() == container) {
 				if (p.getAbsCenter().distance(center) < tolerance)
 					return true;
@@ -454,15 +457,21 @@ public class Window extends HousePart implements Thermalizable {
 		return false;
 	}
 
-	public HousePart copy(boolean check) {
-		Window c = (Window) super.copy(false);
+	@Override
+	public HousePart copy(final boolean check) {
+		final Window c = (Window) super.copy(false);
 		if (check) {
-			double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-			double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give it a small gap
-			int n = c.getPoints().size();
+			final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
+			final double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give
+																						// it
+																						// a
+																						// small
+																						// gap
+			final int n = c.getPoints().size();
 			for (int i = 0; i < n; i++) {
-				double newX = points.get(i).getX() + shift;
-				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
+				final double newX = points.get(i).getX() + shift;
+				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if
+																// out of range
 					return null;
 			}
 			for (int i = 0; i < n; i++) {
@@ -476,18 +485,22 @@ public class Window extends HousePart implements Thermalizable {
 		return c;
 	}
 
+	@Override
 	public void setUValue(final double uValue) {
 		this.uValue = uValue;
 	}
 
+	@Override
 	public double getUValue() {
 		return uValue;
 	}
 
+	@Override
 	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
 		this.volumetricHeatCapacity = volumetricHeatCapacity;
 	}
 
+	@Override
 	public double getVolumetricHeatCapacity() {
 		return volumetricHeatCapacity;
 	}
@@ -495,5 +508,13 @@ public class Window extends HousePart implements Thermalizable {
 	@Override
 	protected HousePart getContainerRelative() {
 		return container instanceof Roof ? container.getContainerRelative() : container;
+	}
+
+	public void setRoofIndex(final int index) {
+		this.roofIndex = index;
+	}
+
+	public int getRoofIndex() {
+		return roofIndex;
 	}
 }

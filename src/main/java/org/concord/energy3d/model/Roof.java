@@ -68,8 +68,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	private transient HousePart previousContainer;
 	protected Map<Integer, List<Wall>> gableEditPointToWallMap = null;
 	private double overhangLength = 2.0;
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
-	private double uValue = 0.15; // default is R38 (IECC for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6
+													// MJ)
+	private double uValue = 0.15; // default is R38 (IECC for Massachusetts:
+									// https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -128,16 +130,19 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	/** Do not call: For UNDO only */
-	public void setGableEditPointToWallMap(Map<Integer, List<Wall>> m) {
+	public void setGableEditPointToWallMap(final Map<Integer, List<Wall>> m) {
 		gableEditPointToWallMap = new HashMap<Integer, List<Wall>>();
-		for (Map.Entry<Integer, List<Wall>> entry : m.entrySet()) {
+		for (final Map.Entry<Integer, List<Wall>> entry : m.entrySet()) {
 			gableEditPointToWallMap.put(entry.getKey(), new ArrayList<Wall>(entry.getValue()));
 		}
 	}
 
 	@Override
 	protected void drawMesh() {
-		/* undo the effect of wall stretch on all walls if roof is moved to new walls */
+		/*
+		 * undo the effect of wall stretch on all walls if roof is moved to new
+		 * walls
+		 */
 		if (previousContainer != container) {
 			previousContainer = container;
 			for (final Wall wall : walls) {
@@ -164,14 +169,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			orgPoints.add(p.clone());
 		wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
 		drawRoof();
-		int roofPartIndex = 0;
-		synchronized (roofPartsRoot.getChildren()) {
-			for (final Spatial child : roofPartsRoot.getChildren()) {
-				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-				mesh.setUserData(new UserData(this, roofPartIndex, false));
-				roofPartIndex++;
-			}
-		}
 		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
 		drawDashLines();
@@ -185,35 +182,22 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null, false);
-		List<List<ReadOnlyVector3>> holes = new ArrayList<List<ReadOnlyVector3>>();
-		for (HousePart part : children) {
-			if (part instanceof Window && part.isDrawable()) {
-				final ArrayList<ReadOnlyVector3> hole = new ArrayList<ReadOnlyVector3>();
-				hole.add(part.getAbsPoint(0).multiplyLocal(1, 1, 0));
-				hole.add(part.getAbsPoint(2).multiplyLocal(1, 1, 0));
-				hole.add(part.getAbsPoint(3).multiplyLocal(1, 1, 0));
-				hole.add(part.getAbsPoint(1).multiplyLocal(1, 1, 0));
-				holes.add(hole);
+		final List<Window> windows = new ArrayList<Window>();
+		for (final HousePart part : children)
+			if (part instanceof Window && part.isDrawable())
+				windows.add((Window) part);
+		MeshLib.groupByPlanner(mesh, roofPartsRoot, windows);
+		hideGableRoofParts();
+		int roofPartIndex = 0;
+		synchronized (roofPartsRoot.getChildren()) {
+			for (final Spatial child : roofPartsRoot.getChildren()) {
+				final Mesh mesh = (Mesh) ((Node) child).getChild(0);
+				mesh.setUserData(new UserData(this, roofPartIndex, false));
+				roofPartIndex++;
 			}
 		}
-//		holes.add(new ArrayList<ReadOnlyVector3>());
-//		holes.get(0).add(new Vector3(-5, 5, 0));
-//		holes.get(0).add(new Vector3(-20, 24, 0));
-//		holes.get(0).add(new Vector3(-30, 24, 0));
-//		holes.get(0).add(new Vector3(-5, 5, 0));
-//		holes.get(0).add(new Vector3(-0, 24, 0));
-//		holes.get(0).add(new Vector3(-30, 24, 0));
-//		holes.get(0).add(new Vector3(0, 0, 0));
-//		holes.get(0).add(new Vector3(0, 10, 0));
-//		holes.get(0).add(new Vector3(10, 10, 0));		
-		
-//		holePolygon.add(new PolygonPoint(-10, 5, 39.474810643661));
-//		holePolygon.add(new PolygonPoint(10, 5, 39.474810643661));
-//		holePolygon.add(new PolygonPoint(10, 10, 39.474810643661));
-//		holePolygon.add(new PolygonPoint(-10, 10, 39.474810643661));
-		MeshLib.groupByPlanner(mesh, roofPartsRoot, holes);
+		MeshLib.applyHoles(roofPartsRoot, windows);
 		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
-		hideGableRoofParts();
 	}
 
 	protected void drawWalls() {
@@ -246,7 +230,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				}
 			}
 		} else
-			synchronized (roofPartsRoot.getChildren()) { // To avoid ConcurrentModificationException
+			synchronized (roofPartsRoot.getChildren()) { // To avoid
+															// ConcurrentModificationException
 				for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 					final Node roofPartNode = (Node) roofPart;
 					final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
@@ -423,9 +408,13 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			wallUpperPoints.add(p);
 			wallNormals.add(normal.clone());
 		} else {
-			// calculate wall normal in such a way to help in drawing overhang of roofs
+			// calculate wall normal in such a way to help in drawing overhang
+			// of roofs
 			final ReadOnlyVector3 currentNormal = wallNormals.get(index);
-			final double d = 1.0 / MathUtils.cos(currentNormal.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
+			final double d = 1.0 / MathUtils.cos(currentNormal.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming
+																													// thickness
+																													// is
+																													// 1
 			final Vector3 newNormal = currentNormal.add(normal, null).normalizeLocal().multiplyLocal(d);
 			wallNormals.set(index, newNormal);
 		}
@@ -547,7 +536,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh outlineMesh = (Mesh) roofPartNode.getChild(4);
 
-				final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer());
+				final Mesh mesh = (Mesh) roofPartNode.getChild(0);
+				final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
 				int totalVertices = outlinePoints.size();
 				for (final HousePart part : children)
 					if (part instanceof Window)
@@ -571,14 +561,14 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 					buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 				}
-				
+
 				// draw skylights outline
-				final int[] windowIndices= new int[] {0, 2, 3, 1};
+				final int[] windowIndices = new int[] { 0, 2, 3, 1 };
 				for (final HousePart part : children)
-					if (part instanceof Window && part.isDrawable())
+					if (part instanceof Window && part.isDrawable() && ((Window) part).getRoofIndex() == ((UserData) mesh.getUserData()).getIndex())
 						for (int i = 0; i < part.getPoints().size(); i++) {
 							final ReadOnlyVector3 p1 = part.getAbsPoint(windowIndices[i]);
-							final ReadOnlyVector3 p2 = part.getAbsPoint(windowIndices[(i + 1)% part.getPoints().size()]);
+							final ReadOnlyVector3 p2 = part.getAbsPoint(windowIndices[(i + 1) % part.getPoints().size()]);
 
 							buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 							buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
@@ -665,7 +655,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			for (final ReadOnlyVector3 roofPartMeshUpperPoint : roofPartMeshUpperPoints) {
 				double smallestDistanceToEditPoint = Double.MAX_VALUE;
 				int nearestEditPointIndex = -1;
-				// select the nearest point so that one edit point per upper mesh point is selected
+				// select the nearest point so that one edit point per upper
+				// mesh point is selected
 				for (int i = 0; i < points.size(); i++) {
 					final Vector3 editPoint = getAbsPoint(i);
 					final double distanceToEditPoint = roofPartMeshUpperPoint.distance(editPoint);
@@ -815,7 +806,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (gableEditPointToWallMap == null)
 			return;
 
-		/* Two Options: hide using estimating direction with wall. Or, hide using roof part number (it be wrong)) */
+		/*
+		 * Two Options: hide using estimating direction with wall. Or, hide
+		 * using roof part number (it be wrong))
+		 */
 		for (final List<Wall> walls : gableEditPointToWallMap.values())
 			for (final HousePart wall : walls) {
 				final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
@@ -877,7 +871,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	public void delete() {
 		super.delete();
 		for (final Wall wall : walls) {
-			// if the wall doesn't already have another roof on top of it (it's possible when the user replaces an old roof with a new roof)
+			// if the wall doesn't already have another roof on top of it (it's
+			// possible when the user replaces an old roof with a new roof)
 			if (wall.getRoof() == this)
 				wall.setRoof(null);
 			wall.draw();
@@ -998,9 +993,13 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		double maxZ = 0;
 		for (final ReadOnlyVector3 p : wallUpperPoints)
 			maxZ = Math.max(maxZ, p.getZ());
-		// to make height relative to container wall so that applyHeight() runs the same way
+		// to make height relative to container wall so that applyHeight() runs
+		// the same way
 		height = 15.0 + maxZ - container.getPoints().get(1).getZ();
-		// height = height + maxZ - container.getPoints().get(1).getZ(); // avoid this because it will result in increasing height when hovering mouse from one wall contain to another before fully inserting the roof
+		// height = height + maxZ - container.getPoints().get(1).getZ(); //
+		// avoid this because it will result in increasing height when hovering
+		// mouse from one wall contain to another before fully inserting the
+		// roof
 	}
 
 	public void applyHeight() {
@@ -1130,7 +1129,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isDrawable() {
-		/* if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time */
+		/*
+		 * if wallUpperPoints is null then it has not been drawn yet so we
+		 * assume wallUpperPoints size is okay otherwise all roofs would be
+		 * invalid at init time
+		 */
 		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
 
@@ -1224,6 +1227,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				wallList.remove(wall);
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return false;
 	}
@@ -1236,18 +1240,22 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		this.overhangLength = overhangLength;
 	}
 
+	@Override
 	public void setUValue(final double uValue) {
 		this.uValue = uValue;
 	}
 
+	@Override
 	public double getUValue() {
 		return uValue;
 	}
 
+	@Override
 	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
 		this.volumetricHeatCapacity = volumetricHeatCapacity;
 	}
 
+	@Override
 	public double getVolumetricHeatCapacity() {
 		return volumetricHeatCapacity;
 	}
