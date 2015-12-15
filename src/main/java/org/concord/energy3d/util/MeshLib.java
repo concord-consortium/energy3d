@@ -1,6 +1,8 @@
 package org.concord.energy3d.util;
 
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -386,13 +388,17 @@ public class MeshLib {
 
 		/* remove holes that collide with polygon or other holes */
 		if (polygon.getHoles() != null) {
+			// ensure polygon doesn't collide with holes
+			final Path2D polygonPath = Util.makePath2D(polygon.getPoints());
 			final Map<Polygon, Object> skipHoles = new HashMap<Polygon, Object>();
-			for (final Polygon hole : polygon.getHoles())
+			for (final Polygon hole : polygon.getHoles()) {
 				for (final Point p : hole.getPoints())
-					if (!Util.insidePolygon(p, polygon.getPoints())) {
+					if (!polygonPath.contains(new Point2D.Double(p.getX(), p.getY()))) {
 						skipHoles.put(hole, null);
 						break;
 					}
+			}
+			// ensure holes don't collide with eachother
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
 				if (skipHoles.containsKey(hole1))
@@ -452,5 +458,21 @@ public class MeshLib {
 			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1.0, o, u, v);
 		mesh.getMeshData().updateVertexCount();
 		mesh.updateModelBound();
+	}
+
+	private static Vector3 computeCenter(final Polygon polygon) {
+		final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
+		final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
+		for (final Point p : polygon.getPoints()) {
+			if (p.getX() < min.getX())
+				min.setX(p.getX());
+			if (p.getY() < min.getY())
+				min.setY(p.getY());
+			if (p.getX() > max.getX())
+				max.setX(p.getX());
+			if (p.getY() > max.getY())
+				max.setY(p.getY());
+		}
+		return new Vector3((min.getX() + max.getX()) / 2, (min.getY() + max.getY()) / 2, 0);
 	}
 }

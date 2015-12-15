@@ -6,6 +6,8 @@ import java.awt.Desktop;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.net.URI;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -48,9 +50,12 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 public class Util {
 
 	/**
-	 * platform-independent check for Windows' equivalent of right click of mouse button. This can be used as an alternative as MouseEvent.isPopupTrigger(), which requires checking within both mousePressed() and mouseReleased() methods.
+	 * platform-independent check for Windows' equivalent of right click of
+	 * mouse button. This can be used as an alternative as
+	 * MouseEvent.isPopupTrigger(), which requires checking within both
+	 * mousePressed() and mouseReleased() methods.
 	 */
-	public static boolean isRightClick(MouseEvent e) {
+	public static boolean isRightClick(final MouseEvent e) {
 		if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0)
 			return true;
 		if (System.getProperty("os.name").startsWith("Mac") && e.isControlDown())
@@ -58,15 +63,15 @@ public class Util {
 		return false;
 	}
 
-	public static double toUsUValue(double siUValue) {
+	public static double toUsUValue(final double siUValue) {
 		return siUValue / 5.67826;
 	}
 
-	public static double toSiRValue(double usRValue) {
+	public static double toSiRValue(final double usRValue) {
 		return usRValue / 5.67826;
 	}
 
-	public static double toUsRValue(double siUValue) {
+	public static double toUsRValue(final double siUValue) {
 		return 5.67826 / siUValue;
 	}
 
@@ -130,42 +135,60 @@ public class Util {
 		else
 			return true;
 	}
-	
+
 	public static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
-		int counter = 0;
-		int i;
-		double xinters;
-		Point p1, p2;
+		final Path2D path = makePath2D(polygon);
 
-		final int n = polygon.size();
-		p1 = polygon.get(0);
-		for (i = 1; i <= n; i++) {
-			p2 = polygon.get(i % n);
-			if (p.getY() > Math.min(p1.getY(), p2.getY())) {
-				if (p.getY() <= Math.max(p1.getY(), p2.getY())) {
-					if (p.getX() <= Math.max(p1.getX(), p2.getX())) {
-						if (p1.getY() != p2.getY()) {
-							xinters = (p.getY() - p1.getY()) * (p2.getX() - p1.getX()) / (p2.getY() - p1.getY()) + p1.getX();
-							if (p1.getX() == p2.getX() || p.getX() <= xinters)
-								counter++;
-						}
-					}
-				}
-			}
-			p1 = p2;
+		return path.contains(new Point2D.Double(p.getX(), p.getY()));
+
+		// int counter = 0;
+		// double xinters;
+		// Point p1, p2;
+		//
+		// final int n = polygon.size();
+		// p1 = polygon.get(0);
+		// for (int i = 1; i <= n; i++) {
+		// p2 = polygon.get(i % n);
+		// if (p.getY() > Math.min(p1.getY(), p2.getY())) {
+		// if (p.getY() <= Math.max(p1.getY(), p2.getY())) {
+		// if (p.getX() <= Math.max(p1.getX(), p2.getX())) {
+		// if (p1.getY() != p2.getY()) {
+		// xinters = (p.getY() - p1.getY()) * (p2.getX() - p1.getX()) /
+		// (p2.getY() - p1.getY()) + p1.getX();
+		// if (p1.getX() == p2.getX() || p.getX() <= xinters)
+		// counter++;
+		// }
+		// }
+		// }
+		// }
+		// p1 = p2;
+		// }
+		//
+		// if (counter % 2 == 0)
+		// return false;
+		// else
+		// return true;
+	}
+
+	public static Path2D makePath2D(final List<? extends Point> polygon) {
+		final Path2D path = new Path2D.Double();
+		path.moveTo(polygon.get(0).getX(), polygon.get(0).getY());
+		for (int i = 1; i < polygon.size(); i++) {
+			final Point point = polygon.get(i);
+			path.lineTo(point.getX(), point.getY());
 		}
-
-		if (counter % 2 == 0)
-			return false;
-		else
-			return true;
+		path.closePath();
+		return path;
 	}
 
 	private static double area(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
 		return Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0);
 	}
 
-	/* A function to check whether point P(x, y) lies inside the triangle formed by A(x1, y1), B(x2, y2) and C(x3, y3) */
+	/*
+	 * A function to check whether point P(x, y) lies inside the triangle formed
+	 * by A(x1, y1), B(x2, y2) and C(x3, y3)
+	 */
 	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3) {
 		final double A = area(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 		final double A1 = area(p.getX(), p.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
@@ -216,30 +239,49 @@ public class Util {
 		else if (limitToLineSegment && t > 1.0)
 			return p2.clone();
 		else
-			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
+			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t
+																		// * (w
+																		// - v);
 	}
 
 	public static double projectPointOnLineScale(final ReadOnlyVector2 point, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2) {
 		final double l2 = p1.distanceSquared(p2);
 		if (l2 == 0.0)
 			return 0.0;
-		final double t = point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p - v, w - v) / l2;
+		final double t = point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p
+																					// -
+																					// v,
+																					// w
+																					// -
+																					// v)
+																					// /
+																					// l2;
 		return t;
 	}
 
-	/* This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis */
+	/*
+	 * This is automatically evaluated as either 2D projection on xy plane or 1D
+	 * projection on z axis
+	 */
 	public static Vector3 projectPointOnLine(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final boolean limitToLineSegment) {
-		// return projectPointOnLine(new Vector2(point.getX(), point.getY()), new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()), false);
+		// return projectPointOnLine(new Vector2(point.getX(), point.getY()),
+		// new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()),
+		// false);
 		final double t = projectPointOnLineScale(point, p1, p2);
 		if (limitToLineSegment && t < 0.0)
 			return p1.clone();
 		else if (limitToLineSegment && t > 1.0)
 			return p2.clone();
 		else
-			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
+			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t
+																		// * (w
+																		// - v);
 	}
 
-	/* This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis */
+	/*
+	 * This is automatically evaluated as either 2D projection on xy plane or 1D
+	 * projection on z axis
+	 */
 	public static double projectPointOnLineScale(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {
 		final boolean isHorizontal = Util.isZero(p2.subtract(p1, null).normalizeLocal().getZ());
 		if (isHorizontal)
@@ -326,7 +368,8 @@ public class Util {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
 	}
 
-	// This is called by DesignReplay to suppress the error dialog when we replay a design process
+	// This is called by DesignReplay to suppress the error dialog when we
+	// replay a design process
 	public static boolean suppressReportError = false;
 
 	public static void reportError(final Throwable e) {
@@ -369,7 +412,10 @@ public class Util {
 		return path.substring(i + 1, path.length());
 	}
 
-	/** This method sets the selection state of a button visually without invoking its ItemListeners and ActionListeners */
+	/**
+	 * This method sets the selection state of a button visually without
+	 * invoking its ItemListeners and ActionListeners
+	 */
 	public static void selectSilently(final AbstractButton button, final boolean selected) {
 		final ItemListener[] itemListeners = button.getItemListeners();
 		final ActionListener[] actionListeners = button.getActionListeners();
@@ -384,7 +430,10 @@ public class Util {
 			button.addActionListener(x);
 	}
 
-	/** This method sets the selection state of a combo box visually without invoking its ItemListeners and ActionListeners */
+	/**
+	 * This method sets the selection state of a combo box visually without
+	 * invoking its ItemListeners and ActionListeners
+	 */
 	public static void selectSilently(final JComboBox<?> comboBox, final int selectedIndex) {
 		final ItemListener[] itemListeners = comboBox.getItemListeners();
 		final ActionListener[] actionListeners = comboBox.getActionListeners();
@@ -399,7 +448,10 @@ public class Util {
 			comboBox.addActionListener(x);
 	}
 
-	/** This method sets the selection state of a combo box visually without invoking its ItemListeners and ActionListeners */
+	/**
+	 * This method sets the selection state of a combo box visually without
+	 * invoking its ItemListeners and ActionListeners
+	 */
 	public static void selectSilently(final JComboBox<?> comboBox, final Object item) {
 		final ItemListener[] itemListeners = comboBox.getItemListeners();
 		final ActionListener[] actionListeners = comboBox.getActionListeners();
@@ -414,18 +466,21 @@ public class Util {
 			comboBox.addActionListener(x);
 	}
 
-	/** This method sets the value of a spinner visually without invoking its ChangeListeners */
+	/**
+	 * This method sets the value of a spinner visually without invoking its
+	 * ChangeListeners
+	 */
 	public static void setSilently(final JSpinner spinner, final Object value) {
 		final ChangeListener[] changeListeners = spinner.getChangeListeners();
 		for (final ChangeListener x : changeListeners)
 			spinner.removeChangeListener(x);
 		spinner.setValue(value);
-		JComponent editor = spinner.getEditor();
+		final JComponent editor = spinner.getEditor();
 		if (editor instanceof JSpinner.DateEditor) {
-			JSpinner.DateEditor dateEditor = (JSpinner.DateEditor) editor;
+			final JSpinner.DateEditor dateEditor = (JSpinner.DateEditor) editor;
 			dateEditor.getTextField().setText(dateEditor.getFormat().format(value));
 		} else if (editor instanceof JSpinner.NumberEditor) {
-			JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor) editor;
+			final JSpinner.NumberEditor numberEditor = (JSpinner.NumberEditor) editor;
 			numberEditor.getTextField().setText(numberEditor.getFormat().format(value));
 		} else {
 			((DefaultEditor) spinner.getEditor()).getTextField().setText("" + value);
@@ -434,7 +489,10 @@ public class Util {
 			spinner.addChangeListener(x);
 	}
 
-	/** This method sets the value of a slider visually without invoking its ChangeListeners */
+	/**
+	 * This method sets the value of a slider visually without invoking its
+	 * ChangeListeners
+	 */
 	public static void setSilently(final JSlider slider, final int value) {
 		final ChangeListener[] changeListeners = slider.getChangeListeners();
 		for (final ChangeListener x : changeListeners)
@@ -444,9 +502,12 @@ public class Util {
 			slider.addChangeListener(x);
 	}
 
-	/** This method sets the text of a text component without invoking its DocumentListeners */
+	/**
+	 * This method sets the text of a text component without invoking its
+	 * DocumentListeners
+	 */
 	public static void setSilently(final JTextComponent tc, final String text) {
-		AbstractDocument doc = (AbstractDocument) tc.getDocument();
+		final AbstractDocument doc = (AbstractDocument) tc.getDocument();
 		final DocumentListener[] documentListeners = doc.getDocumentListeners();
 		for (final DocumentListener x : documentListeners)
 			doc.removeDocumentListener(x);
@@ -485,9 +546,12 @@ public class Util {
 			return 0; // a degenerate polygon
 
 		// select largest abs coordinate to ignore for projection
-		ax = (normal.getX() > 0 ? normal.getX() : -normal.getX()); // abs x-coord
-		ay = (normal.getY() > 0 ? normal.getY() : -normal.getY()); // abs y-coord
-		az = (normal.getZ() > 0 ? normal.getZ() : -normal.getZ()); // abs z-coord
+		ax = (normal.getX() > 0 ? normal.getX() : -normal.getX()); // abs
+																	// x-coord
+		ay = (normal.getY() > 0 ? normal.getY() : -normal.getY()); // abs
+																	// y-coord
+		az = (normal.getZ() > 0 ? normal.getZ() : -normal.getZ()); // abs
+																	// z-coord
 
 		coord = 3; // ignore z-coord
 		if (ax > ay) {
@@ -552,7 +616,10 @@ public class Util {
 		return area;
 	}
 
-	/** Approximately calculate the center of a mesh using the averange of all the triangle vertices */
+	/**
+	 * Approximately calculate the center of a mesh using the averange of all
+	 * the triangle vertices
+	 */
 	public static Vector3 computeCenter(final Mesh mesh) {
 		double x = 0, y = 0, z = 0;
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
