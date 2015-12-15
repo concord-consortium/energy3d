@@ -21,7 +21,6 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -40,16 +39,12 @@ public class Window extends HousePart implements Thermalizable {
 	private transient BMText label1;
 	private transient Line bars;
 	private transient int roofIndex;
-	private int style = MORE_MUNTIN_BARS;
 
-	// range: 0.25-0.80 (we choose 0.5 by default) -
-	// http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
-	private double solarHeatGainCoefficient = 0.5;
-	private double uValue = 2.0; // default is IECC code for Massachusetts
-									// (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh =
-													// 3.6MJ)
 	private ReadOnlyVector3 roofNormal;
+	private double solarHeatGainCoefficient = 0.5; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
+	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6MJ)
+	private int style = MORE_MUNTIN_BARS;
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -76,7 +71,6 @@ public class Window extends HousePart implements Thermalizable {
 		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);
-
 	}
 
 	@Override
@@ -273,14 +267,18 @@ public class Window extends HousePart implements Thermalizable {
 		double xy = cornerXY.length();
 		if (reversedFace)
 			xy = v02.length() - xy;
-		label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (getAbsPoint(i0).getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
 
-		final ReadOnlyTransform trans = container.getRoot().getTransform();
-		final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getNormal(), null);
-		label1.setTranslation(getAbsPoint(i0));
-		label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
+		// final ReadOnlyTransform trans = container.getRoot().getTransform();
+		// final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getNormal(), null);
+		final ReadOnlyVector3 faceDirection = getNormal();
+		if (container instanceof Wall) {
+			label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (getAbsPoint(i0).getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
+			label1.setTranslation(getAbsPoint(i0));
+			label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
+		}
 
-		final Vector3 center = trans.applyForward(getCenter(), null);
+		// final Vector3 center = trans.applyForward(getCenter(), null);
+		final ReadOnlyVector3 center = getCenter();
 		final float lineWidth = original == null ? 1f : 2f;
 
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
@@ -294,7 +292,8 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public ReadOnlyVector3 getCenter() {
-		return bars.getModelBound().getCenter();
+		// return bars.getModelBound().getCenter();
+		return mesh.getModelBound().getCenter();
 	}
 
 	@Override

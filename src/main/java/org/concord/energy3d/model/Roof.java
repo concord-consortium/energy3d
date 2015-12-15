@@ -68,10 +68,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	private transient HousePart previousContainer;
 	protected Map<Integer, List<Wall>> gableEditPointToWallMap = null;
 	private double overhangLength = 2.0;
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6
-													// MJ)
-	private double uValue = 0.15; // default is R38 (IECC for Massachusetts:
-									// https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double uValue = 0.15; // default is R38 (IECC for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -140,8 +138,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	@Override
 	protected void drawMesh() {
 		/*
-		 * undo the effect of wall stretch on all walls if roof is moved to new
-		 * walls
+		 * undo the effect of wall stretch on all walls if roof is moved to new walls
 		 */
 		if (previousContainer != container) {
 			previousContainer = container;
@@ -807,8 +804,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			return;
 
 		/*
-		 * Two Options: hide using estimating direction with wall. Or, hide
-		 * using roof part number (it be wrong))
+		 * Two Options: hide using estimating direction with wall. Or, hide using roof part number (it be wrong))
 		 */
 		for (final List<Wall> walls : gableEditPointToWallMap.values())
 			for (final HousePart wall : walls) {
@@ -1130,9 +1126,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	@Override
 	public boolean isDrawable() {
 		/*
-		 * if wallUpperPoints is null then it has not been drawn yet so we
-		 * assume wallUpperPoints size is okay otherwise all roofs would be
-		 * invalid at init time
+		 * if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time
 		 */
 		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
