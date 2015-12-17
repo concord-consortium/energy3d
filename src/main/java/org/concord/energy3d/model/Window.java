@@ -41,9 +41,13 @@ public class Window extends HousePart implements Thermalizable {
 	private transient int roofIndex;
 
 	private ReadOnlyVector3 roofNormal;
-	private double solarHeatGainCoefficient = 0.5; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
-	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6MJ)
+	private double solarHeatGainCoefficient = 0.5; // range: 0.25-0.80 (we
+													// choose 0.5 by default) -
+													// http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
+	private double uValue = 2.0; // default is IECC code for Massachusetts
+									// (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh =
+													// 3.6MJ)
 	private int style = MORE_MUNTIN_BARS;
 
 	public Window() {
@@ -117,8 +121,9 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
 			}
 		} else {
-			final Vector3 u = Vector3.UNIT_Z.cross(roofNormal, null);
-			final Vector3 v = roofNormal.cross(u, null);
+			final boolean isFlat = Vector3.UNIT_Z.equals(roofNormal);
+			final ReadOnlyVector3 u = isFlat ? Vector3.UNIT_X : Vector3.UNIT_Z.cross(roofNormal, null);
+			final ReadOnlyVector3 v = isFlat ? Vector3.UNIT_Y : roofNormal.cross(u, null);
 			if (index == 0 || index == 3) {
 				final Vector3 p0 = getAbsPoint(0);
 				final Vector3 p3 = getAbsPoint(3);
@@ -236,58 +241,58 @@ public class Window extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 v02 = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null);
 
 		final boolean reversedFace = v02.normalize(null).crossLocal(container.getNormal()).dot(Vector3.NEG_UNIT_Z) < 0.0;
-		final boolean reversedH;
-		if (points.get(0).getX() > points.get(2).getX())
-			reversedH = !reversedFace;
-		else
-			reversedH = reversedFace;
-		final boolean reversedV = getAbsPoint(0).getZ() > getAbsPoint(1).getZ();
-
-		final int i0, i1, i2;
-		if (reversedH && reversedV) {
-			i0 = 3;
-			i2 = 1;
-			i1 = 2;
-		} else if (reversedH) {
-			i0 = 2;
-			i1 = 3;
-			i2 = 0;
-		} else if (reversedV) {
-			i0 = 1;
-			i1 = 0;
-			i2 = 3;
-		} else {
-			i0 = 0;
-			i1 = 1;
-			i2 = 2;
+		Vector3 p0 = getAbsPoint(0);
+		Vector3 p1 = getAbsPoint(1);
+		Vector3 p2 = getAbsPoint(2);
+		Vector3 p3 = getAbsPoint(3);
+		final int vIndex = getNormal().equals(Vector3.UNIT_Z) ? 1 : 2;
+		if (!Util.isEqual(p0.getValue(vIndex), p2.getValue(vIndex))) {
+			final Vector3 tmp = p0;
+			p0 = p2;
+			p2 = p3;
+			p3 = p1;
+			p1 = tmp;
 		}
-
-		final Vector3 cornerXY = getAbsPoint(i0).subtract(container.getAbsPoint(0), null);
+		if (p0.getValue(vIndex) > p1.getValue(vIndex)) {
+			swap(p0, p1);
+			swap(p2, p3);
+		}
+		final Vector3 p01 = p1.subtract(p0, null).normalizeLocal();
+		if (p2.subtract(p0, null).normalizeLocal().dot(p01.cross(getNormal(), null)) < 0) {
+			swap(p0, p2);
+			swap(p1, p3);
+		}
+		final Vector3 cornerXY = p0.subtract(container.getAbsPoint(0), null);
 		cornerXY.setZ(0);
 		double xy = cornerXY.length();
 		if (reversedFace)
 			xy = v02.length() - xy;
 
-		// final ReadOnlyTransform trans = container.getRoot().getTransform();
-		// final ReadOnlyVector3 faceDirection = trans.applyForwardVector(container.getNormal(), null);
 		final ReadOnlyVector3 faceDirection = getNormal();
 		if (container instanceof Wall) {
-			label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (getAbsPoint(i0).getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
-			label1.setTranslation(getAbsPoint(i0));
+			label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (p0.getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
+			label1.setTranslation(p0);
 			label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
 		}
 
-		// final Vector3 center = trans.applyForward(getCenter(), null);
 		final ReadOnlyVector3 center = getCenter();
 		final float lineWidth = original == null ? 1f : 2f;
 
 		SizeAnnotation annot = fetchSizeAnnot(annotCounter++);
-		annot.setRange(getAbsPoint(i0), getAbsPoint(i1), center, faceDirection, false, Align.Center, true, true, false);
+		annot.setRange(p0, p1, center, faceDirection, false, Align.Center, true, true, false);
 		annot.setLineWidth(lineWidth);
 
 		annot = fetchSizeAnnot(annotCounter++);
-		annot.setRange(getAbsPoint(i0), getAbsPoint(i2), center, faceDirection, false, Align.Center, true, false, false);
+		annot.setRange(p0, p2, center, faceDirection, false, Align.Center, true, false, false);
 		annot.setLineWidth(lineWidth);
+	}
+
+	private void swap(final Vector3 v1, final Vector3 v2) {
+		final Vector3 tmp = Vector3.fetchTempInstance();
+		tmp.set(v1);
+		v1.set(v2);
+		v2.set(tmp);
+		Vector3.releaseTempInstance(tmp);
 	}
 
 	@Override

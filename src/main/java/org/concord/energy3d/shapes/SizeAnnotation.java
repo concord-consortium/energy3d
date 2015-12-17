@@ -80,6 +80,10 @@ public class SizeAnnotation extends Annotation {
 		final Vector3 ydir = faceDirection.normalize(null);
 		final Vector3 zdir = ydir.cross(xdir, null).normalizeLocal();
 		zdir.cross(ydir, xdir);
+		if (zdir.dot(Vector3.UNIT_Z) < 0) {
+			zdir.negateLocal();
+			xdir.negateLocal();
+		}
 		final Matrix3 matrix = new Matrix3().fromAxes(xdir, ydir, zdir);
 		label.setRotation(matrix);
 
