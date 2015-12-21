@@ -10,19 +10,13 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
-import com.ardor3d.intersection.PickData;
-import com.ardor3d.intersection.PickResults;
-import com.ardor3d.intersection.PickingUtil;
-import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -93,38 +87,16 @@ public class SolarPanel extends HousePart {
 		}
 	}
 
-	private void computeNormal() {
-		if (container == null)
-			return;
-		if (container instanceof Roof) {
-			final PickResults pickResults = new PrimitivePickResults();
-			final Ray3 ray = new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
-			PickingUtil.findPick(container.getRoot(), ray, pickResults);
-			if (pickResults.getNumber() != 0) {
-				final PickData pickData = pickResults.getPickData(0);
-				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
-				points.get(0).setZ(p.getZ() + 0.4);
-				final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
-				final int roofPartIndex = userData.getIndex();
-				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
-			}
-		} else {
-			normal = container.getNormal();
-		}
-		if (normal == null)
-			normal = Vector3.UNIT_Z;
-	}
-
 	@Override
 	protected void drawMesh() {
 		if (container == null)
 			return;
 
-		computeNormal();
+		normal = computeNormalAndExtendToRoof();
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(Vector3.ZERO, WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
+		surround.setData(new Vector3(0, 0, 0.05), WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -232,10 +204,11 @@ public class SolarPanel extends HousePart {
 		// this method is left empty on purpose -- don't draw heat flux
 	}
 
-	public void moveTo(HousePart target) {
+	public void moveTo(final HousePart target) {
 		setContainer(target);
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return true;
 	}
@@ -243,8 +216,8 @@ public class SolarPanel extends HousePart {
 	/** tolerance is a fraction relative to the width of a solar panel */
 	private boolean overlap(double tolerance) {
 		tolerance *= WIDTH / Scene.getInstance().getAnnotationScale();
-		Vector3 center = getAbsCenter();
-		for (HousePart p : Scene.getInstance().getParts()) {
+		final Vector3 center = getAbsCenter();
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarPanel && p != this && p.getContainer() == container) {
 				if (p.getAbsCenter().distance(center) < tolerance)
 					return true;
@@ -253,26 +226,27 @@ public class SolarPanel extends HousePart {
 		return false;
 	}
 
-	public HousePart copy(boolean check) {
-		SolarPanel c = (SolarPanel) super.copy(false);
+	@Override
+	public HousePart copy(final boolean check) {
+		final SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {
-			c.computeNormal();
+			c.computeNormalAndExtendToRoof();
 			if (container instanceof Roof) {
 				if (normal == null) {
 					// don't remove this error message just in case this happens again
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Normal of solar panel [" + c + "] is null. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-				Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+				final Vector3 d = normal.cross(Vector3.UNIT_Z, null);
 				d.normalizeLocal();
 				if (Util.isZero(d.length()))
 					d.set(1, 0, 0);
-				Vector3 d0 = d.clone();
+				final Vector3 d0 = d.clone();
 				d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
 				d.addLocal(getContainerRelative().getPoints().get(0));
-				Vector3 v = toRelative(d);
-				Vector3 originalCenter = Scene.getInstance().getOriginalCopy().getAbsCenter();
-				double s = Math.signum(container.getAbsCenter().subtractLocal(originalCenter).dot(d0));
+				final Vector3 v = toRelative(d);
+				final Vector3 originalCenter = Scene.getInstance().getOriginalCopy().getAbsCenter();
+				final double s = Math.signum(container.getAbsCenter().subtractLocal(originalCenter).dot(d0));
 				c.points.get(0).setX(points.get(0).getX() + s * v.getX());
 				c.points.get(0).setY(points.get(0).getY() + s * v.getY());
 				c.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
@@ -285,9 +259,9 @@ public class SolarPanel extends HousePart {
 					return null;
 				}
 			} else if (container instanceof Wall) {
-				double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-				double shift = WIDTH / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
-				double newX = points.get(0).getX() + s * shift;
+				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
+				final double shift = WIDTH / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
+				final double newX = points.get(0).getX() + s * shift;
 				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;
 				c.points.get(0).setX(newX);

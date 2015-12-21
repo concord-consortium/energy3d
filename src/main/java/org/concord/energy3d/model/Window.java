@@ -14,17 +14,12 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.intersection.PickResults;
-import com.ardor3d.intersection.PickingUtil;
-import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
-import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -40,14 +35,10 @@ public class Window extends HousePart implements Thermalizable {
 	private transient Line bars;
 	private transient int roofIndex;
 
-	private ReadOnlyVector3 roofNormal;
-	private double solarHeatGainCoefficient = 0.5; // range: 0.25-0.80 (we
-													// choose 0.5 by default) -
-													// http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
-	private double uValue = 2.0; // default is IECC code for Massachusetts
-									// (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh =
-													// 3.6MJ)
+	private ReadOnlyVector3 normal;
+	private double solarHeatGainCoefficient = 0.5; // range: 0.25-0.80 (we choose 0.5 by default) - http://www.energystar.gov/index.cfm?c=windows_doors.pr_ind_tested
+	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6MJ)
 	private int style = MORE_MUNTIN_BARS;
 
 	public Window() {
@@ -106,12 +97,12 @@ public class Window extends HousePart implements Thermalizable {
 		points.get(index).set(p);
 
 		if (container instanceof Roof)
-			extendToRoof(index, false);
+			computeNormalAndExtendToRoof();
 
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
 			if (container instanceof Roof)
-				roofNormal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
+				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
 		} else if (container instanceof Wall) {
 			if (index == 0 || index == 3) {
 				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
@@ -121,9 +112,9 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
 			}
 		} else {
-			final boolean isFlat = Vector3.UNIT_Z.equals(roofNormal);
-			final ReadOnlyVector3 u = isFlat ? Vector3.UNIT_X : Vector3.UNIT_Z.cross(roofNormal, null);
-			final ReadOnlyVector3 v = isFlat ? Vector3.UNIT_Y : roofNormal.cross(u, null);
+			final boolean isFlat = Vector3.UNIT_Z.equals(normal);
+			final ReadOnlyVector3 u = isFlat ? Vector3.UNIT_X : Vector3.UNIT_Z.cross(normal, null);
+			final ReadOnlyVector3 v = isFlat ? Vector3.UNIT_Y : normal.cross(u, null);
 			if (index == 0 || index == 3) {
 				final Vector3 p0 = getAbsPoint(0);
 				final Vector3 p3 = getAbsPoint(3);
@@ -155,6 +146,9 @@ public class Window extends HousePart implements Thermalizable {
 	protected void drawMesh() {
 		if (points.size() < 4)
 			return;
+
+		normal = computeNormalAndExtendToRoof();
+		updateEditShapes();
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
@@ -351,10 +345,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public ReadOnlyVector3 getNormal() {
-		if (container instanceof Roof)
-			return roofNormal;
-		else
-			return container.getNormal();
+		return normal;
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
@@ -368,10 +359,6 @@ public class Window extends HousePart implements Thermalizable {
 			points.set(i, newP);
 		}
 
-		if (container instanceof Roof)
-			for (int i = 0; i < points.size(); i++)
-				extendToRoof(i, true);
-
 		if (container instanceof Wall && !((Wall) container).fits(this))
 			for (int i = 0; i < points.size(); i++)
 				points.set(i, orgPoints.get(i));
@@ -379,16 +366,6 @@ public class Window extends HousePart implements Thermalizable {
 		draw();
 		container.draw();
 
-	}
-
-	private void extendToRoof(final int pointIndex, final boolean updateRoofNormal) {
-		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(container.getRoot(), new Ray3(getAbsPoint(pointIndex).multiplyLocal(1, 1, 0), Vector3.UNIT_Z), pickResults, false);
-		if (pickResults.getNumber() > 0) {
-			points.get(pointIndex).setZ(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).getZ());
-			if (updateRoofNormal)
-				roofNormal = (ReadOnlyVector3) ((Spatial) pickResults.getPickData(0).getTarget()).getParent().getUserData();
-		}
 	}
 
 	public void setStyle(final int style) {

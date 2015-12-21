@@ -460,19 +460,4 @@ public class MeshLib {
 		mesh.updateModelBound();
 	}
 
-	private static Vector3 computeCenter(final Polygon polygon) {
-		final Vector2 min = new Vector2(Double.MAX_VALUE, Double.MAX_VALUE);
-		final Vector2 max = new Vector2(Double.MIN_VALUE, Double.MIN_VALUE);
-		for (final Point p : polygon.getPoints()) {
-			if (p.getX() < min.getX())
-				min.setX(p.getX());
-			if (p.getY() < min.getY())
-				min.setY(p.getY());
-			if (p.getX() > max.getX())
-				max.setX(p.getX());
-			if (p.getY() > max.getY())
-				max.setY(p.getY());
-		}
-		return new Vector3((min.getX() + max.getX()) / 2, (min.getY() + max.getY()) / 2, 0);
-	}
 }

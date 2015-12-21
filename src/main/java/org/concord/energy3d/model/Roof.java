@@ -1016,6 +1016,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		}
 
 		drawChildren();
+		drawOutline(); // because drawing children will extend their edit points to roof
 
 		if (container != null)
 			setEditPointsVisible(true);

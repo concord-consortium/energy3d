@@ -27,9 +27,14 @@ import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.intersection.PickData;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -54,10 +59,10 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
-/* 
- * This class should have been called a more generic name than its current one. New classes that have nothing to do with a house have to inherit from this class 
- * because of the binary serialization used to save state (hence its name cannot be changed). 
- * 
+/*
+ * This class should have been called a more generic name than its current one. New classes that have nothing to do with a house have to inherit from this class
+ * because of the binary serialization used to save state (hence its name cannot be changed).
+ *
  */
 
 public abstract class HousePart implements Serializable {
@@ -776,7 +781,7 @@ public abstract class HousePart implements Serializable {
 		return texture;
 	}
 
-	public void setContainer(HousePart container) {
+	public void setContainer(final HousePart container) {
 		this.container = container;
 	}
 
@@ -987,7 +992,7 @@ public abstract class HousePart implements Serializable {
 		double heat = 0;
 		double a;
 		if (this instanceof Foundation) {
-			double[] buildingGeometry = ((Foundation) this).getBuildingGeometry();
+			final double[] buildingGeometry = ((Foundation) this).getBuildingGeometry();
 			a = buildingGeometry != null ? buildingGeometry[1] : area;
 		} else {
 			a = area;
@@ -1110,8 +1115,8 @@ public abstract class HousePart implements Serializable {
 
 	public abstract boolean isCopyable();
 
-	public HousePart copy(boolean check) {
-		HousePart c = (HousePart) ObjectCloner.deepCopy(this);
+	public HousePart copy(final boolean check) {
+		final HousePart c = (HousePart) ObjectCloner.deepCopy(this);
 		c.container = this.container;
 		c.id = Scene.getInstance().nextID();
 		return c;
@@ -1119,14 +1124,37 @@ public abstract class HousePart implements Serializable {
 
 	public Vector3 getAbsCenter() {
 		double x = 0, y = 0, z = 0;
-		int n = points.size();
+		final int n = points.size();
 		for (int i = 0; i < n; i++) {
-			Vector3 v = getAbsPoint(i);
+			final Vector3 v = getAbsPoint(i);
 			x += v.getX();
 			y += v.getY();
 			z += v.getZ();
 		}
 		return new Vector3(x / n, y / n, z / n);
+	}
+
+	protected ReadOnlyVector3 computeNormalAndExtendToRoof() {
+		if (container == null)
+			return null;
+		ReadOnlyVector3 normal = null;
+		if (container instanceof Roof) {
+			for (int i = 0; i < points.size(); i++) {
+				final PickResults pickResults = new PrimitivePickResults();
+				final Ray3 ray = new Ray3(getAbsPoint(i).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
+				PickingUtil.findPick(container.getRoot(), ray, pickResults);
+				if (pickResults.getNumber() != 0) {
+					final PickData pickData = pickResults.getPickData(0);
+					final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
+					points.get(i).setZ(p.getZ());
+					final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
+					final int roofPartIndex = userData.getIndex();
+					normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
+				}
+			}
+		} else
+			normal = container.getNormal();
+		return normal;
 	}
 
 }
