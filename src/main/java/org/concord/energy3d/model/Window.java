@@ -14,10 +14,13 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
@@ -52,7 +55,12 @@ public class Window extends HousePart implements Thermalizable {
 		mesh = new Mesh("Window");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.setModelBound(new BoundingBox());
-		mesh.getSceneHints().setCullHint(CullHint.Always);
+		final BlendState blend = new BlendState();
+		blend.setBlendEnabled(true);
+		blend.setTestEnabled(true);
+		mesh.setRenderState(blend);
+		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.8f));
 
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
@@ -146,6 +154,8 @@ public class Window extends HousePart implements Thermalizable {
 	protected void drawMesh() {
 		if (points.size() < 4)
 			return;
+
+		mesh.setVisible(container instanceof Roof);
 
 		normal = computeNormalAndExtendToRoof();
 		updateEditShapes();
