@@ -163,16 +163,17 @@ public class Window extends HousePart implements Thermalizable {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		{
-			ReadOnlyVector3 p = getAbsPoint(0);
+			final Vector3 halfThickness = container instanceof Roof ? new Vector3() : ((Wall) container).getThicknessNormal().multiply(0.6, null);
+			ReadOnlyVector3 p = getAbsPoint(0).addLocal(halfThickness);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(2);
+			p = getAbsPoint(2).addLocal(halfThickness);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(1);
+			p = getAbsPoint(1).addLocal(halfThickness);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(2);
+			p = getAbsPoint(2).addLocal(halfThickness);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = getAbsPoint(3);
+			p = getAbsPoint(3).addLocal(halfThickness);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		mesh.updateModelBound();

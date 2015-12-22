@@ -1137,7 +1137,7 @@ public abstract class HousePart implements Serializable {
 	protected ReadOnlyVector3 computeNormalAndExtendToRoof() {
 		if (container == null)
 			return null;
-		ReadOnlyVector3 normal = null;
+		ReadOnlyVector3 normal = Vector3.UNIT_Z;
 		if (container instanceof Roof) {
 			for (int i = 0; i < points.size(); i++) {
 				final PickResults pickResults = new PrimitivePickResults();

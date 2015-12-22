@@ -447,12 +447,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			initCamera();
 			return false;
 		}
-		float[] f = new float[2];
+		final float[] f = new float[2];
 		((JoglSwingCanvas) canvas).getRequestedSurfaceScale(f);
+		setWindowsVisible(false);
 		passManager.renderPasses(renderer);
 		try {
-			if (!Heliodon.getInstance().isNightTime())
+			if (!Heliodon.getInstance().isNightTime()) {
 				shadowPass.renderPass(renderer);
+			}
 		} catch (final Throwable e) {
 			e.printStackTrace();
 			if (shadowPass.isEnabled()) {
@@ -460,9 +462,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				shadowPass.setEnabled(false);
 			}
 		}
+		setWindowsVisible(true);
+		passManager.renderPasses(renderer);
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
 		return true;
+	}
+
+	private void setWindowsVisible(final boolean visible) {
+		land.setVisible(!visible);
+		for (final HousePart part : Scene.getInstance().getParts())
+			if (part instanceof Window)
+				part.getMesh().setVisible(visible);
+			else
+				part.getRoot().getSceneHints().setCullHint(visible ? CullHint.Always : CullHint.Inherit);
 	}
 
 	public void initCamera() {
@@ -683,9 +696,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}));
 
 			((Component) canvas).addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e) {
+				@Override
+				public void mouseClicked(final MouseEvent e) {
 					if (Util.isRightClick(e)) {
-						JPanel cp = MainPanel.getInstance().getCanvasPanel();
+						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
 						mouseRightClicked(e.getX(), cp.getHeight() - e.getY());
 					}
 				}
@@ -1263,8 +1277,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 			if (pick != null) {
 				if (selectedHousePart instanceof Foundation) {
-					Foundation foundation = (Foundation) selectedHousePart;
-					Vector3 pickPoint = pick.getPoint().clone();
+					final Foundation foundation = (Foundation) selectedHousePart;
+					final Vector3 pickPoint = pick.getPoint().clone();
 					// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
 					final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 					foundation.move(d, houseMovePoints);
@@ -1297,7 +1311,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 		mouseState = null;
 
-		Component canvasComponent = (Component) canvas;
+		final Component canvasComponent = (Component) canvas;
 		if (operation == Operation.SELECT && !zoomLock) {
 			if (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human) {
 				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
@@ -1401,7 +1415,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							selectedHousePart.setEditPointsVisible(true);
 					}
 					EnergyPanel.getInstance().updateGraphs();
-					JPanel cp = MainPanel.getInstance().getCanvasPanel();
+					final JPanel cp = MainPanel.getInstance().getCanvasPanel();
 					PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 				}
 				return null;
@@ -1586,17 +1600,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			taskManager.update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					RemovePartCommand command = new RemovePartCommand(selectedHousePart);
+					final RemovePartCommand command = new RemovePartCommand(selectedHousePart);
 					if (selectedHousePart instanceof Wall) { // undo/redo a gable roof
-						Roof roof = ((Wall) selectedHousePart).getRoof();
+						final Roof roof = ((Wall) selectedHousePart).getRoof();
 						if (roof != null) {
-							List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
+							final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
 							if (roof.getGableEditPointToWallMap() != null)
 								gableInfo.add(roof.getGableEditPointToWallMap());
 							command.setGableInfo(gableInfo);
 						}
 					} else if (selectedHousePart instanceof Foundation) { // undo/redo all the gable roofs
-						List<Roof> roofs = new ArrayList<Roof>();
+						final List<Roof> roofs = new ArrayList<Roof>();
 						for (final HousePart part : Scene.getInstance().getParts()) {
 							if (part instanceof Wall) {
 								for (final HousePart child : part.getChildren()) {
@@ -1606,8 +1620,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							}
 						}
 						if (!roofs.isEmpty()) {
-							List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
-							for (Roof r : roofs) {
+							final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
+							for (final Roof r : roofs) {
 								if (r.getGableEditPointToWallMap() != null)
 									gableInfo.add(r.getGableEditPointToWallMap());
 							}
@@ -1741,7 +1755,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		this.refreshOnlyMode = refreshOnlyMode;
 	}
 
-	private boolean onLand(int x, int y) {
+	private boolean onLand(final int x, final int y) {
 		return SelectUtil.pickPart(x, y, land) != null;
 	}
 
@@ -1757,9 +1771,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	Vector3 getPickedLocationOnWall() {
 		if (pasteMouseState != null) {
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Wall) {
-				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), (Wall) selectedPart);
+				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
 				if (pick != null)
 					return pick.getPoint().clone();
 			}
@@ -1770,9 +1784,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	Vector3 getPickedLocationOnRoof() {
 		if (pasteMouseState != null) {
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Roof) {
-				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), (Roof) selectedPart);
+				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
 				if (pick != null)
 					return pick.getPoint().clone();
 			}
@@ -1781,7 +1795,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
-	public void computeEnergyView(boolean b) {
+	public void computeEnergyView(final boolean b) {
 		setHeatFluxDaily(true);
 		setSolarHeatMap(b);
 		setHeatFluxVectorsVisible(b);
