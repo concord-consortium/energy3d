@@ -23,6 +23,7 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -34,6 +35,7 @@ public class Window extends HousePart implements Thermalizable {
 	public static final int MORE_MUNTIN_BARS = 0;
 	public static final int MEDIUM_MUNTIN_BARS = 1;
 	public static final int LESS_MUNTIN_BARS = 2;
+	private transient Mesh collisionMesh;
 	private transient BMText label1;
 	private transient Line bars;
 	private transient int roofIndex;
@@ -60,10 +62,16 @@ public class Window extends HousePart implements Thermalizable {
 		blend.setTestEnabled(true);
 		mesh.setRenderState(blend);
 		mesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.8f));
-
-		mesh.setUserData(new UserData(this));
+		mesh.setDefaultColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
+		mesh.getSceneHints().setAllPickingHints(false);
 		root.attachChild(mesh);
+
+		collisionMesh = new Mesh("Window Collision");
+		collisionMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		collisionMesh.setVisible(false);
+		collisionMesh.setUserData(new UserData(this));
+		collisionMesh.setModelBound(new BoundingBox());
+		root.attachChild(collisionMesh);
 
 		label1.setAlign(Align.SouthWest);
 		root.attachChild(label1);
@@ -160,10 +168,10 @@ public class Window extends HousePart implements Thermalizable {
 		normal = computeNormalAndExtendToRoof();
 		updateEditShapes();
 
-		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		vertexBuffer.rewind();
 		{
-			final Vector3 halfThickness = container instanceof Roof ? new Vector3() : ((Wall) container).getThicknessNormal().multiply(0.6, null);
+			final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+			vertexBuffer.rewind();
+			final Vector3 halfThickness = container instanceof Roof ? new Vector3() : getNormal().multiply(-0.6, null);
 			ReadOnlyVector3 p = getAbsPoint(0).addLocal(halfThickness);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			p = getAbsPoint(2).addLocal(halfThickness);
@@ -176,15 +184,35 @@ public class Window extends HousePart implements Thermalizable {
 			p = getAbsPoint(3).addLocal(halfThickness);
 			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
+
+		{
+			final FloatBuffer vertexBuffer = collisionMesh.getMeshData().getVertexBuffer();
+			vertexBuffer.rewind();
+			final Vector3 halfThickness = getNormal().multiply(0.1, null);
+			ReadOnlyVector3 p = getAbsPoint(0).addLocal(halfThickness);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(2).addLocal(halfThickness);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(1).addLocal(halfThickness);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(2).addLocal(halfThickness);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = getAbsPoint(3).addLocal(halfThickness);
+			vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+
 		mesh.updateModelBound();
+		collisionMesh.updateModelBound();
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.updateCollisionTree(collisionMesh);
 
 		if (container instanceof Roof || style == NO_MUNTIN_BAR || isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
 			bars.getSceneHints().setCullHint(CullHint.Always);
 		else {
 			final double divisionLength = 3.0 + style * 3.0;
 			bars.getSceneHints().setCullHint(CullHint.Inherit);
-			final Vector3 halfThickness = ((Wall) container).getThicknessNormal().multiply(0.5, null);
+			final Vector3 halfThickness = getNormal().multiply(-0.5, null);
 			FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
 			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / divisionLength);
 			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / divisionLength);
@@ -243,9 +271,6 @@ public class Window extends HousePart implements Thermalizable {
 			return;
 		int annotCounter = 0;
 
-		final ReadOnlyVector3 v02 = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null);
-
-		final boolean reversedFace = v02.normalize(null).crossLocal(container.getNormal()).dot(Vector3.NEG_UNIT_Z) < 0.0;
 		Vector3 p0 = getAbsPoint(0);
 		Vector3 p1 = getAbsPoint(1);
 		Vector3 p2 = getAbsPoint(2);
@@ -269,12 +294,14 @@ public class Window extends HousePart implements Thermalizable {
 		}
 		final Vector3 cornerXY = p0.subtract(container.getAbsPoint(0), null);
 		cornerXY.setZ(0);
-		double xy = cornerXY.length();
-		if (reversedFace)
-			xy = v02.length() - xy;
 
 		final ReadOnlyVector3 faceDirection = getNormal();
 		if (container instanceof Wall) {
+			final ReadOnlyVector3 v02 = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null);
+			final boolean reversedFace = v02.normalize(null).crossLocal(container.getNormal()).dot(Vector3.NEG_UNIT_Z) < 0.0;
+			double xy = cornerXY.length();
+			if (reversedFace)
+				xy = v02.length() - xy;
 			label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (p0.getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
 			label1.setTranslation(p0);
 			label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
@@ -454,16 +481,11 @@ public class Window extends HousePart implements Thermalizable {
 		final Window c = (Window) super.copy(false);
 		if (check) {
 			final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-			final double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give
-																						// it
-																						// a
-																						// small
-																						// gap
+			final double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give it a small gap
 			final int n = c.getPoints().size();
 			for (int i = 0; i < n; i++) {
 				final double newX = points.get(i).getX() + shift;
-				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if
-																// out of range
+				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;
 			}
 			for (int i = 0; i < n; i++) {
@@ -508,5 +530,10 @@ public class Window extends HousePart implements Thermalizable {
 
 	public int getRoofIndex() {
 		return roofIndex;
+	}
+
+	@Override
+	public Spatial getCollisionSpatial() {
+		return collisionMesh;
 	}
 }
