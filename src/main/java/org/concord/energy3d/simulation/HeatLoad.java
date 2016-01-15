@@ -90,7 +90,7 @@ public class HeatLoad {
 							final double uValue = getUValue(part);
 							if (Util.isZero(uValue))
 								continue;
-							double heatloss = roof.getArea(mesh) * uValue * deltaT / 1000.0 / 60 * timeStep;
+							double heatloss = roof.getAreaWithoutOverhang(mesh) * uValue * deltaT / 1000.0 / 60 * timeStep;
 							// if the lowest outside temperature is high enough, there is no need to turn on the heater hence no heat loss
 							if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY)
 								heatloss = 0;

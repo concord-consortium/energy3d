@@ -480,20 +480,54 @@ public class Window extends HousePart implements Thermalizable {
 	public HousePart copy(final boolean check) {
 		final Window c = (Window) super.copy(false);
 		if (check) {
-			final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-			final double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give it a small gap
-			final int n = c.getPoints().size();
-			for (int i = 0; i < n; i++) {
-				final double newX = points.get(i).getX() + shift;
-				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
+			if (container instanceof Wall) {
+				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
+				final double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give it a small gap
+				System.out.println("********"+shift);
+				final int n = c.getPoints().size();
+				for (int i = 0; i < n; i++) {
+					final double newX = points.get(i).getX() + shift;
+					if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
+						return null;
+				}
+				for (int i = 0; i < n; i++) {
+					c.points.get(i).setX(points.get(i).getX() + shift);
+				}
+				if (c.overlap(0.1)) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
-			}
-			for (int i = 0; i < n; i++) {
-				c.points.get(i).setX(points.get(i).getX() + shift);
-			}
-			if (c.overlap(0.1)) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
-				return null;
+				}
+			} else if (container instanceof Roof) {
+				if (normal == null) {
+					// don't remove this error message just in case this happens again
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Normal of window [" + c + "] is null. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				}
+				final Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+				d.normalizeLocal();
+				if (Util.isZero(d.length()))
+					d.set(1, 0, 0);
+				final Vector3 d0 = d.clone();
+				final double shift = points.get(0).distance(points.get(2)) + 0.01; // give it a small gap
+				d.multiplyLocal(shift);
+				d.addLocal(getContainerRelative().getPoints().get(0));
+				final Vector3 v = toRelative(d);
+				final Vector3 originalCenter = Scene.getInstance().getOriginalCopy().getAbsCenter();
+				final double s = Math.signum(container.getAbsCenter().subtractLocal(originalCenter).dot(d0));
+				final int n = c.getPoints().size();
+				for (int i = 0; i < n; i++) {
+					c.points.get(i).setX(points.get(i).getX() + s * v.getX());
+					c.points.get(i).setY(points.get(i).getY() + s * v.getY());
+					c.points.get(i).setZ(points.get(i).getZ() + s * v.getZ());
+				}
+				if (!((Roof) c.container).insideWallsPolygon(c.getAbsCenter())) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a window outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				}
+				if (c.overlap(0.1)) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				}
 			}
 		}
 		return c;

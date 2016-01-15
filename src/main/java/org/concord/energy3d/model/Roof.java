@@ -60,7 +60,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	protected transient Node roofPartsRoot;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
-	private transient Map<Mesh, Double> areaByPart;
+	private transient Map<Mesh, Double> areaByPartWithoutOverhang;
+	private transient Map<Mesh, Double> areaByPartWithOverhang;
 	private transient List<ReadOnlyVector3> wallUpperPoints;
 	private transient List<ReadOnlyVector3> wallNormals;
 	private transient List<Wall> walls;
@@ -1028,32 +1029,38 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (container == null || isFrozen())
 			return;
 
-		if (areaByPart == null)
-			areaByPart = new HashMap<Mesh, Double>();
+		if (areaByPartWithOverhang == null)
+			areaByPartWithOverhang = new HashMap<Mesh, Double>();
 		else
-			areaByPart.clear();
+			areaByPartWithOverhang.clear();
+
+		if (areaByPartWithoutOverhang == null)
+			areaByPartWithoutOverhang = new HashMap<Mesh, Double>();
+		else
+			areaByPartWithoutOverhang.clear();
 
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			final Node roofPartNode = (Node) roofPart;
 			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
+			areaByPartWithOverhang.put(roofPartMesh, Util.computeArea(roofPartMesh));
 			final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
 			final Vector3 p = new Vector3();
 			if (overhangLength <= OVERHANG_MIN) {
-				final double area = Util.computeArea(roofPartMesh);
-				areaByPart.put(roofPartMesh, area);
-				this.area += area;
+				final double a = Util.computeArea(roofPartMesh);
+				areaByPartWithoutOverhang.put(roofPartMesh, a);
+				area += a;
 			} else {
 				final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
 				if (result.isEmpty()) {
 					vertexBuffer.rewind();
 					p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					final double area;
+					final double a;
 					if (Util.insidePolygon(p, wallUpperPointsWithoutOverhang))
-						area = Util.computeArea(roofPartMesh);
+						a = Util.computeArea(roofPartMesh);
 					else
-						area = 0;
-					areaByPart.put(roofPartMesh, area);
-					this.area += area;
+						a = 0;
+					areaByPartWithoutOverhang.put(roofPartMesh, a);
+					area += a;
 				} else {
 					// if (roofPartsRoot.getNumberOfChildren() > 1) {
 					double highPointZ = Double.NEGATIVE_INFINITY;
@@ -1092,33 +1099,35 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					}
 					result.add(result.get(0));
 					final double annotationScale = Scene.getInstance().getAnnotationScale();
-					final double area = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
-
-					areaByPart.put(roofPartMesh, area);
-					this.area += area;
+					final double a = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
+					areaByPartWithoutOverhang.put(roofPartMesh, a);
+					this.area += a;
 				}
 				// }
 			}
 		}
-		// System.out.println("Total Area = " + this.area);
 	}
 
 	public double getAreaWithOverhang() {
+		if (areaByPartWithOverhang == null)
+			return 0;
 		double a = 0;
 		synchronized (roofPartsRoot) {
 			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-				a += Util.computeArea(roofPartMesh);
+				Double d = areaByPartWithOverhang.get(roofPartMesh);
+				if (d != null)
+					a += d;
 			}
 		}
 		return a;
 	}
 
-	public double getArea(final Mesh mesh) {
-		if (areaByPart == null)
+	public double getAreaWithoutOverhang(final Mesh mesh) {
+		if (areaByPartWithoutOverhang == null)
 			return 0;
-		final Double d = areaByPart.get(mesh);
+		final Double d = areaByPartWithoutOverhang.get(mesh);
 		if (d == null)
 			return 0;
 		return d;
@@ -1149,12 +1158,12 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {
 				for (final double x : heatLossArray)
 					heat += x;
-				heat /= getArea(mesh) * heatLossArray.length;
+				heat /= getAreaWithoutOverhang(mesh) * heatLossArray.length;
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
 				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
 				heat = heatLossArray[hourOfDay * 4] + heatLossArray[hourOfDay * 4 + 1] + heatLossArray[hourOfDay * 4 + 2] + heatLossArray[hourOfDay * 4 + 3];
-				heat /= 4 * getArea(mesh);
+				heat /= 4 * getAreaWithoutOverhang(mesh);
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);
 			}
 		}

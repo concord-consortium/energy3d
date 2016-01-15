@@ -190,22 +190,17 @@ public class Scene implements Serializable {
 				instance.redrawAll(); // need to call this to at least redraw the overhangs
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				EnergyPanel.getInstance().update();
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						EnergyPanel.getInstance().clearAllGraphs();
-						HousePart p = SceneManager.getInstance().getSelectedPart();
-						if (p instanceof Foundation) {
-							EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
-							EnergyPanel.getInstance().validate();
-						}
-						if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
-							MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
-							SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-							SceneManager.getInstance().resetCamera();
-						}
-					}
-				});
+				if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
+					MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
+					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+					SceneManager.getInstance().resetCamera();
+				}
+				EnergyPanel.getInstance().clearAllGraphs();
+				HousePart p = SceneManager.getInstance().getSelectedPart();
+				if (p instanceof Foundation) {
+					EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
+					EnergyPanel.getInstance().validate();
+				}
 				return null;
 			}
 		});
