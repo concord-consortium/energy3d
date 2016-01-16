@@ -463,7 +463,7 @@ public class Window extends HousePart implements Thermalizable {
 		return true;
 	}
 
-	/** tolerance is a fraction relative to the width of a solar panel */
+	/** tolerance is a fraction relative to the width of a window */
 	private boolean overlap(double tolerance) {
 		tolerance *= getAbsPoint(0).distance(getAbsPoint(2));
 		final Vector3 center = getAbsCenter();
@@ -519,7 +519,15 @@ public class Window extends HousePart implements Thermalizable {
 					c.points.get(i).setY(points.get(i).getY() + s * v.getY());
 					c.points.get(i).setZ(points.get(i).getZ() + s * v.getZ());
 				}
-				if (!((Roof) c.container).insideWallsPolygon(c.getAbsCenter())) {
+				Roof roof = (Roof) c.container;
+				boolean outsideWalls = false;
+				for (int i = 0; i < n; i++) {
+					if (!roof.insideWallsPolygon(c.getAbsPoint(i))) {
+						outsideWalls = true;
+						break;
+					}
+				}
+				if (outsideWalls) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a window outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}

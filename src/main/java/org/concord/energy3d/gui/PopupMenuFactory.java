@@ -281,7 +281,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForWindow == null) {
 
-			popupMenuForWindow = createPopupMenu(true, null);
+			popupMenuForWindow = createPopupMenu(true, true, null);
 
 			final JMenu muntinMenu = new JMenu("Muntins");
 
@@ -463,7 +463,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForWall = createPopupMenu(false, new Runnable() {
+			popupMenuForWall = createPopupMenu(false, false, new Runnable() {
 				@Override
 				public void run() {
 					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
@@ -534,11 +534,11 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForRoof = createPopupMenu(false, new Runnable() {
+			popupMenuForRoof = createPopupMenu(false, false, new Runnable() {
 				@Override
 				public void run() {
 					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
-					miPaste.setEnabled(copyBuffer instanceof SolarPanel);
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Window);
 				}
 			});
 
@@ -557,7 +557,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForDoor() {
 
 		if (popupMenuForDoor == null) {
-			popupMenuForDoor = createPopupMenu(false, null);
+			popupMenuForDoor = createPopupMenu(false, false, null);
 			popupMenuForDoor.addSeparator();
 			popupMenuForDoor.add(colorAction);
 			popupMenuForDoor.add(createInsulationMenuItem(true));
@@ -616,7 +616,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForFoundation = createPopupMenu(false, new Runnable() {
+			popupMenuForFoundation = createPopupMenu(false, true, new Runnable() {
 				@Override
 				public void run() {
 					HousePart p = SceneManager.getInstance().getSelectedPart();
@@ -645,7 +645,7 @@ public class PopupMenuFactory {
 
 	private static JPopupMenu getPopupMenuForSensor() {
 		if (popupMenuForSensor == null) {
-			popupMenuForSensor = createPopupMenu(false, null);
+			popupMenuForSensor = createPopupMenu(false, false, null);
 		}
 		return popupMenuForSensor;
 	}
@@ -654,7 +654,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			popupMenuForSolarPanel = createPopupMenu(true, null);
+			popupMenuForSolarPanel = createPopupMenu(true, true, null);
 
 			final JMenuItem miEff = new JMenuItem("Energy Conversion Efficiency...");
 			miEff.addActionListener(new ActionListener() {
@@ -748,7 +748,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForTree = createPopupMenu(true, new Runnable() {
+			popupMenuForTree = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
 					HousePart p = SceneManager.getInstance().getSelectedPart();
@@ -772,7 +772,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForHuman() {
 
 		if (popupMenuForHuman == null) {
-			popupMenuForHuman = createPopupMenu(true, null);
+			popupMenuForHuman = createPopupMenu(true, true, null);
 		}
 		return popupMenuForHuman;
 
@@ -1032,7 +1032,7 @@ public class PopupMenuFactory {
 		return mi;
 	}
 
-	private static JPopupMenu createPopupMenu(boolean hasCopyMenu, final Runnable runWhenBecomingVisible) {
+	private static JPopupMenu createPopupMenu(boolean hasCopyMenu, boolean pastable, final Runnable runWhenBecomingVisible) {
 
 		final JMenuItem miInfo = new JMenuItem();
 		miInfo.setEnabled(false);
@@ -1062,7 +1062,7 @@ public class PopupMenuFactory {
 
 		});
 
-		final JMenuItem miCut = new JMenuItem("Cut");
+		final JMenuItem miCut = new JMenuItem(pastable ? "Cut" : "Delete");
 		miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 		miCut.addActionListener(new ActionListener() {
 			@Override
