@@ -118,12 +118,12 @@ public class SolarRadiation {
 		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor) {
-				Spatial s = part.getRadiationCollisionSpatial();
+				final Spatial s = part.getRadiationCollisionSpatial();
 				collidables.add(s);
 				collidablesToParts.put(s, part);
 			} else if (part instanceof Roof) {
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					Spatial s = ((Node) roofPart).getChild(0);
+					final Spatial s = ((Node) roofPart).getChild(6);
 					collidables.add(s);
 					collidablesToParts.put(s, part);
 				}
@@ -196,8 +196,11 @@ public class SolarRadiation {
 				p.setY((row - rows / 2) * step + step / 2.0);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
-				for (final Spatial spatial : collidables)
+				for (final Spatial spatial : collidables) {
 					PickingUtil.findPick(spatial, pickRay, pickResults, false);
+					if (pickResults.getNumber() != 0)
+						break;
+				}
 				if (pickResults.getNumber() == 0) {
 					data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? totalRadiation * absorption : totalRadiation;
 				} else { // if shaded, it still receives indirect radiation
@@ -220,7 +223,7 @@ public class SolarRadiation {
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
-		double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
+		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -252,28 +255,19 @@ public class SolarRadiation {
 				final PickResults pickResults = new PrimitivePickResults();
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
-					boolean collision = false;
-					Window collisionWindow = null;
 					for (final Spatial spatial : collidables) {
 						if (spatial != collisionMesh) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 							if (pickResults.getNumber() != 0) {
-								collision = true;
-								HousePart collidableOwner = collidablesToParts.get(spatial);
-								if (collidableOwner instanceof Window) {
-									collisionWindow = (Window) collidableOwner;
-								}
+								final HousePart collidableOwner = collidablesToParts.get(spatial);
+								if (collidableOwner instanceof Window)
+									radiation += directRadiation * ((Window) collidableOwner).getSolarHeatGainCoefficient();
 								break;
 							}
 						}
 					}
-					if (collision) {
-						if (collisionWindow != null) {
-							radiation += directRadiation * collisionWindow.getSolarHeatGainCoefficient();
-						}
-					} else {
+					if (pickResults.getNumber() == 0)
 						radiation += directRadiation;
-					}
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
 				if (data.solarPotential != null)
@@ -321,20 +315,17 @@ public class SolarRadiation {
 				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
-				final PickResults pickResults = new PrimitivePickResults();
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
-					boolean collision = false;
+					final PickResults pickResults = new PrimitivePickResults();
 					for (final Spatial spatial : collidables) {
 						if (spatial != collisionMesh) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
-							if (pickResults.getNumber() != 0) {
-								collision = true;
+							if (pickResults.getNumber() != 0)
 								break;
-							}
 						}
 					}
-					if (!collision)
+					if (pickResults.getNumber() == 0)
 						radiation += directRadiation;
 				}
 
@@ -577,7 +568,7 @@ public class SolarRadiation {
 				final double[] passiveSolar = new double[n];
 				final double[] photovoltaic = new double[n];
 				for (int i = 0; i < n; i++) {
-					double groundHeatLoss = foundation.getHeatLoss()[i];
+					final double groundHeatLoss = foundation.getHeatLoss()[i];
 					// In most cases, the inside temperature is always higher than the ground temperature. In this winter, this adds to heating load, but in the summer, this reduces cooling load.
 					// In other words, geothermal energy is good in hot conditions. This is similar to passive solar energy, which is good in the winter but bad in the summer.
 					if (groundHeatLoss > 0) {
@@ -642,7 +633,7 @@ public class SolarRadiation {
 
 	}
 
-	public void computeEnergyAtHour(int hour) {
+	public void computeEnergyAtHour(final int hour) {
 
 		final Calendar today = Heliodon.getInstance().getCalender();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -652,15 +643,15 @@ public class SolarRadiation {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
-				int n = (int) Math.round(60.0 / timeStep);
+				final int n = (int) Math.round(60.0 / timeStep);
 				final double[] heatLoss = new double[n];
 				final double[] passiveSolar = new double[n];
 				final double[] photovoltaic = new double[n];
-				int t0 = n * hour;
+				final int t0 = n * hour;
 				for (int i = 0; i < n; i++) {
-					double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
+					final double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
 					if (groundHeatLoss > 0) {
-						double thermostat = Scene.getInstance().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY));
+						final double thermostat = Scene.getInstance().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY));
 						if (outsideTemperature >= thermostat) {
 							heatLoss[i] -= groundHeatLoss;
 						}

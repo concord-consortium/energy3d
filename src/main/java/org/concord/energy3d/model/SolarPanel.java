@@ -92,7 +92,7 @@ public class SolarPanel extends HousePart {
 		if (container == null)
 			return;
 
-		normal = computeNormalAndExtendToRoof();
+		normal = computeNormalAndKeepOnRoof();
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -230,7 +230,7 @@ public class SolarPanel extends HousePart {
 	public HousePart copy(final boolean check) {
 		final SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {
-			c.computeNormalAndExtendToRoof();
+			c.computeNormalAndKeepOnRoof();
 			if (container instanceof Roof) {
 				if (normal == null) {
 					// don't remove this error message just in case this happens again

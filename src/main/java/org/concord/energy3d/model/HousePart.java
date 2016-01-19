@@ -1134,7 +1134,7 @@ public abstract class HousePart implements Serializable {
 		return new Vector3(x / n, y / n, z / n);
 	}
 
-	protected ReadOnlyVector3 computeNormalAndExtendToRoof() {
+	protected ReadOnlyVector3 computeNormalAndKeepOnRoof() {
 		if (container == null)
 			return null;
 		ReadOnlyVector3 normal = Vector3.UNIT_Z;
@@ -1142,7 +1142,11 @@ public abstract class HousePart implements Serializable {
 			for (int i = 0; i < points.size(); i++) {
 				final PickResults pickResults = new PrimitivePickResults();
 				final Ray3 ray = new Ray3(getAbsPoint(i).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
-				PickingUtil.findPick(container.getCollisionSpatial(), ray, pickResults, false);
+				for (final Spatial roofPart : ((Roof) container).getRoofPartsRoot().getChildren()) {
+					PickingUtil.findPick(((Node) roofPart).getChild(0), ray, pickResults, false);
+					if (pickResults.getNumber() != 0)
+						break;
+				}
 				if (pickResults.getNumber() != 0) {
 					final PickData pickData = pickResults.getPickData(0);
 					final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);

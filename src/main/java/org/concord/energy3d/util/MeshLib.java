@@ -147,7 +147,6 @@ public class MeshLib {
 			mesh.setVisible(false);
 			mesh.setModelBound(new BoundingBox());
 			meshWithHoles.setModelBound(new BoundingBox());
-			meshWithHoles.getSceneHints().setAllPickingHints(false);
 			meshWithHoles.setRenderState(HousePart.offsetState);
 
 			final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);

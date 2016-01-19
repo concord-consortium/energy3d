@@ -62,10 +62,10 @@ import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.HeatLoad;
+import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.undo.ChangeCityCommand;
@@ -184,7 +184,7 @@ public class EnergyPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
 					heliodon.setDate((Date) dateSpinner.getValue());
-					Calendar c = heliodon.getCalender();
+					final Calendar c = heliodon.getCalender();
 					Util.setSilently(insideTemperatureSpinner, Scene.getInstance().getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)));
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setDate(c.getTime());
@@ -265,7 +265,7 @@ public class EnergyPanel extends JPanel {
 				SceneManager.getInstance().getUndoManager().addEdit(new ChangeTimeCommand());
 				final Heliodon heliodon = Heliodon.getInstance();
 				heliodon.setTime((Date) timeSpinner.getValue());
-				Calendar c = heliodon.getCalender();
+				final Calendar c = heliodon.getCalender();
 				Scene.getInstance().setDate(c.getTime());
 				Util.setSilently(insideTemperatureSpinner, Scene.getInstance().getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)));
 				updateWeatherData();
@@ -333,8 +333,8 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand());
-				Calendar c = Heliodon.getInstance().getCalender();
-				int i = (int) Double.parseDouble(insideTemperatureSpinner.getValue().toString());
+				final Calendar c = Heliodon.getInstance().getCalender();
+				final int i = (int) Double.parseDouble(insideTemperatureSpinner.getValue().toString());
 				Scene.getInstance().getThermostat().setTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY), i);
 				if (disableActionsRequester == null)
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -474,10 +474,10 @@ public class EnergyPanel extends JPanel {
 		graphTabbedPane = new JTabbedPane();
 		graphTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
-			public void stateChanged(ChangeEvent e) {
+			public void stateChanged(final ChangeEvent e) {
 				if (graphTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
 					if (SceneManager.getInstance().getSolarHeatMap()) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) {
 							EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
 						} else {
@@ -568,11 +568,12 @@ public class EnergyPanel extends JPanel {
 							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 						EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
+							@Override
 							public void run() {
 								progress(0);
 								if (SceneManager.getInstance().getSolarHeatMap()) {
 									EnergyPanel.getInstance().getGraphTabbedPane().setSelectedComponent(EnergyPanel.getInstance().getDailyEnergyGraph());
-									HousePart p = SceneManager.getInstance().getSelectedPart();
+									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
 										dailyEnergyGraph.addGraph((Foundation) p);
 									}
@@ -599,7 +600,7 @@ public class EnergyPanel extends JPanel {
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 				SolarRadiation.getInstance().compute();
-				Calendar c = (Calendar) Heliodon.getInstance().getCalender().clone();
+				final Calendar c = (Calendar) Heliodon.getInstance().getCalender().clone();
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
@@ -787,7 +788,7 @@ public class EnergyPanel extends JPanel {
 				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale()));
 				partProperty3TextField.setText(twoDecimals.format(v.getZ() * Scene.getInstance().getAnnotationScale()));
 			} else if (selectedPart instanceof Tree) {
-				Tree tree = (Tree) selectedPart;
+				final Tree tree = (Tree) selectedPart;
 				partProperty1TextField.setText(twoDecimals.format(tree.getWidth() * Scene.getInstance().getAnnotationScale()));
 				partProperty2TextField.setText(twoDecimals.format(tree.getHeight() * Scene.getInstance().getAnnotationScale()));
 				partProperty3TextField.setText(tree.getTreeName());
@@ -873,7 +874,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateBudgetBar() {
-		DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Cost (";
 		t += specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$";
 		t += ")";
@@ -884,7 +885,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateAreaBar() {
-		DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Area (";
 		if (specs.isAreaEnabled())
 			t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea());
@@ -897,7 +898,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateHeightBar() {
-		DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Height (";
 		if (specs.isHeightEnabled())
 			t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight());
@@ -909,7 +910,7 @@ public class EnergyPanel extends JPanel {
 		heightBar.repaint();
 	}
 
-	public void showHeatMapContrastSlider(boolean b) {
+	public void showHeatMapContrastSlider(final boolean b) {
 		if (b)
 			dataPanel.add(heatMapPanel);
 		else
@@ -919,7 +920,12 @@ public class EnergyPanel extends JPanel {
 
 	public void turnOffCompute() {
 		if (SceneManager.getInstance().getSolarHeatMap())
-			MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+				}
+			});
 		int numberOfHouses = 0;
 		synchronized (SceneManager.getInstance()) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
@@ -940,9 +946,9 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateGraphs() {
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) {
-			Foundation foundation = (Foundation) selectedPart;
+			final Foundation foundation = (Foundation) selectedPart;
 			constructionCostGraph.addGraph(foundation);
 			if (SceneManager.getInstance().getSolarHeatMap())
 				dailyEnergyGraph.addGraph(foundation);

@@ -647,8 +647,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			for (final ReadOnlyVector3 roofPartMeshUpperPoint : roofPartMeshUpperPoints) {
 				double smallestDistanceToEditPoint = Double.MAX_VALUE;
 				int nearestEditPointIndex = -1;
-				// select the nearest point so that one edit point per upper
-				// mesh point is selected
+				// select the nearest point so that one edit point per upper mesh point is selected
 				for (int i = 0; i < points.size(); i++) {
 					final Vector3 editPoint = getAbsPoint(i);
 					final double distanceToEditPoint = roofPartMeshUpperPoint.distance(editPoint);
@@ -1105,7 +1104,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 				final Node roofPartNode = (Node) roofPart;
 				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-				Double d = areaByPartWithOverhang.get(roofPartMesh);
+				final Double d = areaByPartWithOverhang.get(roofPartMesh);
 				if (d != null)
 					a += d;
 			}
