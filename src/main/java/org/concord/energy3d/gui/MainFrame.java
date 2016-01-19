@@ -180,6 +180,7 @@ public class MainFrame extends JFrame {
 	private final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
+	private JMenuItem removeAllFloorsMenuItem;
 	private JMenuItem removeAllSolarPanelsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
 	private JMenuItem removeAllTreesMenuItem;
@@ -1346,6 +1347,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getRemoveAllSolarPanelsMenuItem());
 			editMenu.add(getRemoveAllTreesMenuItem());
 			editMenu.add(getRemoveAllRoofsMenuItem());
+			editMenu.add(getRemoveAllFloorsMenuItem());
 			if (!Config.isRestrictMode()) {
 				editMenu.add(getRemoveAllLocksMenuItem());
 				editMenu.addSeparator();
@@ -1965,6 +1967,25 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllRoofsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllFloorsMenuItem() {
+		if (removeAllFloorsMenuItem == null) {
+			removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
+			removeAllFloorsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeAllFloors();
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+					});
+				}
+			});
+		}
+		return removeAllFloorsMenuItem;
 	}
 
 	private JMenuItem getRemoveAllSolarPanelsMenuItem() {

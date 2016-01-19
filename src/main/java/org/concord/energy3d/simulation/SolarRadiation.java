@@ -245,7 +245,7 @@ public class SolarRadiation {
 				final ReadOnlyVector3 p = data.v.multiply(solarStep / 2.0 + row * solarStep, null).addLocal(pU).add(offset, null);
 				final double h;
 				if (row == data.rows - 1)
-					h = data.p1.subtract(data.p0, null).length() - (row * solarStep);
+					h = data.p1.subtract(data.p0, null).length() - row * solarStep;
 				else
 					h = solarStep;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
@@ -541,7 +541,7 @@ public class SolarRadiation {
 	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof Wall || part instanceof Window || part instanceof SolarPanel || part instanceof Sensor)
+			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Sensor)
 				applyTexture(part.getRadiationMesh());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {

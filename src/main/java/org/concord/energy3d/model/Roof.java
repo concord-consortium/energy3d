@@ -138,9 +138,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	@Override
 	protected void drawMesh() {
-		/*
-		 * undo the effect of wall stretch on all walls if roof is moved to new walls
-		 */
+		// undo the effect of wall stretch on all walls if roof is moved to new walls
 		if (previousContainer != container) {
 			previousContainer = container;
 			for (final Wall wall : walls) {
@@ -406,13 +404,9 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			wallUpperPoints.add(p);
 			wallNormals.add(normal.clone());
 		} else {
-			// calculate wall normal in such a way to help in drawing overhang
-			// of roofs
+			// calculate wall normal in such a way to help in drawing overhang of roofs
 			final ReadOnlyVector3 currentNormal = wallNormals.get(index);
-			final double d = 1.0 / MathUtils.cos(currentNormal.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming
-																													// thickness
-																													// is
-																													// 1
+			final double d = 1.0 / MathUtils.cos(currentNormal.normalize(null).smallestAngleBetween(normal) / 2.0); // assuming thickness is 1
 			final Vector3 newNormal = currentNormal.add(normal, null).normalizeLocal().multiplyLocal(d);
 			wallNormals.set(index, newNormal);
 		}
@@ -804,9 +798,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (gableEditPointToWallMap == null)
 			return;
 
-		/*
-		 * Two Options: hide using estimating direction with wall. Or, hide using roof part number (it be wrong))
-		 */
+		// Two Options: hide using estimating direction with wall. Or, hide using roof part number (it be wrong))
 		for (final List<Wall> walls : gableEditPointToWallMap.values())
 			for (final HousePart wall : walls) {
 				final Vector3[] base_i = { wall.getAbsPoint(0), wall.getAbsPoint(2) };
@@ -868,8 +860,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	public void delete() {
 		super.delete();
 		for (final Wall wall : walls) {
-			// if the wall doesn't already have another roof on top of it (it's
-			// possible when the user replaces an old roof with a new roof)
+			// if the wall doesn't already have another roof on top of it (it's possible when the user replaces an old roof with a new roof)
 			if (wall.getRoof() == this)
 				wall.setRoof(null);
 			wall.draw();
@@ -990,13 +981,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		double maxZ = 0;
 		for (final ReadOnlyVector3 p : wallUpperPoints)
 			maxZ = Math.max(maxZ, p.getZ());
-		// to make height relative to container wall so that applyHeight() runs
-		// the same way
+		// to make height relative to container wall so that applyHeight() runs the same way
 		height = 15.0 + maxZ - container.getPoints().get(1).getZ();
-		// height = height + maxZ - container.getPoints().get(1).getZ(); //
+		// height = height + maxZ - container.getPoints().get(1).getZ();
 		// avoid this because it will result in increasing height when hovering
-		// mouse from one wall contain to another before fully inserting the
-		// roof
+		// mouse from one wall contain to another before fully inserting the roof
 	}
 
 	public void applyHeight() {
@@ -1135,9 +1124,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isDrawable() {
-		/*
-		 * if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time
-		 */
+		// if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time
 		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
 
