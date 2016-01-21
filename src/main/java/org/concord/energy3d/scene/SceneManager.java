@@ -996,6 +996,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void executeOperation() {
 		operationFlag = false;
+		MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 		if (selectedHousePart != null) {
 			if (selectedHousePart.isDrawCompleted())
 				selectedHousePart.setEditPointsVisible(false);

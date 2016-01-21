@@ -196,7 +196,7 @@ public class Scene implements Serializable {
 					SceneManager.getInstance().resetCamera();
 				}
 				EnergyPanel.getInstance().clearAllGraphs();
-				HousePart p = SceneManager.getInstance().getSelectedPart();
+				final HousePart p = SceneManager.getInstance().getSelectedPart();
 				if (p instanceof Foundation) {
 					EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
 					EnergyPanel.getInstance().validate();
@@ -474,7 +474,7 @@ public class Scene implements Serializable {
 	private void upgradeSceneToNewVersion() {
 		if (textureMode == null) {
 			textureMode = TextureMode.Full;
-			for (HousePart p : parts) {
+			for (final HousePart p : parts) {
 				if (p instanceof Roof) {
 					((Roof) p).setOverhangLength(0.2);
 				}
@@ -602,9 +602,9 @@ public class Scene implements Serializable {
 		housePart.delete();
 	}
 
-	private static void setIdOfChildren(HousePart p) {
-		ArrayList<HousePart> children = p.getChildren();
-		for (HousePart c : children) {
+	private static void setIdOfChildren(final HousePart p) {
+		final ArrayList<HousePart> children = p.getChildren();
+		for (final HousePart c : children) {
 			c.setId(Scene.getInstance().nextID());
 			if (!c.getChildren().isEmpty()) {
 				setIdOfChildren(c);
@@ -612,7 +612,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setCopyBuffer(HousePart p) {
+	public void setCopyBuffer(final HousePart p) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		// exclude the following types of house parts
 		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) {
@@ -636,7 +636,7 @@ public class Scene implements Serializable {
 			return;
 		if (copyBuffer instanceof Foundation) // copying a foundation copies the entire building above it, which requires a different treatment elsewhere
 			return;
-		HousePart c = copyBuffer.copy(true);
+		final HousePart c = copyBuffer.copy(true);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
 			return;
 		add(c, true);
@@ -649,10 +649,10 @@ public class Scene implements Serializable {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		if (copyBuffer == null)
 			return;
-		HousePart c = copyBuffer.copy(false);
+		final HousePart c = copyBuffer.copy(false);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
 			return;
-		Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
+		final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
 		if (position == null)
 			return;
 		if (c instanceof Tree || c instanceof Human) {
@@ -661,8 +661,8 @@ public class Scene implements Serializable {
 			copyBuffer = c;
 			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
 		} else if (c instanceof Foundation) { // pasting a foundation also clones the building above it
-			Vector3 shift = position.subtractLocal(c.getAbsCenter()).multiplyLocal(1, 1, 0);
-			int n = c.getPoints().size();
+			final Vector3 shift = position.subtractLocal(c.getAbsCenter()).multiplyLocal(1, 1, 0);
+			final int n = c.getPoints().size();
 			for (int i = 0; i < n; i++) {
 				c.getPoints().get(i).addLocal(shift);
 			}
@@ -675,20 +675,20 @@ public class Scene implements Serializable {
 
 	public void pasteToPickedLocationOnWall() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (!(selectedPart instanceof Wall))
 			return;
 		if (copyBuffer == null)
 			return;
 		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a wall
 			return;
-		HousePart c = copyBuffer.copy(false);
+		final HousePart c = copyBuffer.copy(false);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
 			return;
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnWall();
 		if (position == null)
 			return;
-		Wall wall = (Wall) selectedPart;
+		final Wall wall = (Wall) selectedPart;
 		if (c instanceof Window) { // windows can be pasted to a different wall
 			if (wall != c.getContainer()) {
 				((Window) c).moveTo(wall);
@@ -699,26 +699,26 @@ public class Scene implements Serializable {
 			}
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
-		Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
 		position = position.subtractLocal(center);
-		int n = c.getPoints().size();
+		final int n = c.getPoints().size();
 		for (int i = 0; i < n; i++) {
-			Vector3 v = c.getPoints().get(i);
+			final Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
 		}
 		// out of boundary check
-		List<Vector3> polygon = wall.getWallPolygonPoints();
-		List<Vector3> relativePolygon = new ArrayList<Vector3>();
-		for (Vector3 p : polygon) {
+		final List<Vector3> polygon = wall.getWallPolygonPoints();
+		final List<Vector3> relativePolygon = new ArrayList<Vector3>();
+		for (final Vector3 p : polygon) {
 			relativePolygon.add(c.toRelative(p));
 		}
-		for (Vector3 p : relativePolygon) {
-			double y = p.getY();
+		for (final Vector3 p : relativePolygon) {
+			final double y = p.getY();
 			p.setY(p.getZ());
 			p.setZ(y);
 		}
 		for (int i = 0; i < n; i++) {
-			Vector3 v = c.getPoints().get(i);
+			final Vector3 v = c.getPoints().get(i);
 			if (!Util.insidePolygon(new Vector3(v.getX(), v.getZ(), v.getY()), relativePolygon)) // reject it if out of range
 				return;
 		}
@@ -733,24 +733,24 @@ public class Scene implements Serializable {
 			return;
 		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a roof
 			return;
-		HousePart c = copyBuffer.copy(false);
+		final HousePart c = copyBuffer.copy(false);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
 			return;
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnRoof();
 		if (position == null)
 			return;
 		if (c instanceof SolarPanel) { // solar panels can be pasted to a different parent
-			HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Roof && selectedPart != c.getContainer()) {
 				((SolarPanel) c).moveTo(selectedPart);
 			}
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
-		Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
 		position = position.subtractLocal(center);
-		int n = c.getPoints().size();
+		final int n = c.getPoints().size();
 		for (int i = 0; i < n; i++) {
-			Vector3 v = c.getPoints().get(i);
+			final Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
 		}
 		add(c, true);
@@ -955,9 +955,9 @@ public class Scene implements Serializable {
 
 	public void removeAllSolarPanels() {
 		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
-			Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
 				if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation)
 					panels.add(part);
@@ -984,9 +984,9 @@ public class Scene implements Serializable {
 
 	public void removeAllWindows() {
 		final ArrayList<HousePart> windows = new ArrayList<HousePart>();
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
-			Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
 				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation)
 					windows.add(part);
@@ -1128,7 +1128,7 @@ public class Scene implements Serializable {
 	}
 
 	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public void setPartColorOfBuilding(Foundation foundation, Operation operation, ReadOnlyColorRGBA color) {
+	public void setPartColorOfBuilding(final Foundation foundation, final Operation operation, final ReadOnlyColorRGBA color) {
 		switch (operation) {
 		case DRAW_FOUNDATION:
 			foundation.setColor(color);
@@ -1163,7 +1163,7 @@ public class Scene implements Serializable {
 	}
 
 	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public ReadOnlyColorRGBA getPartColorOfBuilding(Foundation foundation, Operation operation) {
+	public ReadOnlyColorRGBA getPartColorOfBuilding(final Foundation foundation, final Operation operation) {
 		switch (operation) {
 		case DRAW_FOUNDATION:
 			return foundation.getColor();
@@ -1197,8 +1197,8 @@ public class Scene implements Serializable {
 		return null;
 	}
 
-	public List<HousePart> getHousePartsOfSameTypeInBuilding(HousePart x) {
-		List<HousePart> list = new ArrayList<HousePart>();
+	public List<HousePart> getHousePartsOfSameTypeInBuilding(final HousePart x) {
+		final List<HousePart> list = new ArrayList<HousePart>();
 		if (x instanceof Foundation) {
 			list.add(x);
 		} else {
@@ -1210,7 +1210,7 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setUValuesOfSameTypeInBuilding(HousePart x, double uValue) {
+	public void setUValuesOfSameTypeInBuilding(final HousePart x, final double uValue) {
 		if (x instanceof Thermalizable) {
 			if (x instanceof Foundation) {
 				((Foundation) x).setUValue(uValue);
@@ -1223,8 +1223,8 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public List<Window> getWindowsOnWall(Wall wall) {
-		List<Window> list = new ArrayList<Window>();
+	public List<Window> getWindowsOnWall(final Wall wall) {
+		final List<Window> list = new ArrayList<Window>();
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getContainer() == wall)
 				list.add((Window) p);
@@ -1232,15 +1232,15 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setWindowShgcOnWall(Wall wall, double shgc) {
+	public void setWindowShgcOnWall(final Wall wall, final double shgc) {
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getContainer() == wall)
 				((Window) p).setSolarHeatGainCoefficient(shgc);
 		}
 	}
 
-	public List<Window> getWindowsOfBuilding(Foundation foundation) {
-		List<Window> list = new ArrayList<Window>();
+	public List<Window> getWindowsOfBuilding(final Foundation foundation) {
+		final List<Window> list = new ArrayList<Window>();
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == foundation)
 				list.add((Window) p);
@@ -1248,15 +1248,15 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setWindowShgcOfBuilding(Foundation foundation, double shgc) {
+	public void setWindowShgcOfBuilding(final Foundation foundation, final double shgc) {
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == foundation)
 				((Window) p).setSolarHeatGainCoefficient(shgc);
 		}
 	}
 
-	public List<SolarPanel> getSolarPanelsOfBuilding(Foundation foundation) {
-		List<SolarPanel> list = new ArrayList<SolarPanel>();
+	public List<SolarPanel> getSolarPanelsOfBuilding(final Foundation foundation) {
+		final List<SolarPanel> list = new ArrayList<SolarPanel>();
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
 				list.add((SolarPanel) p);
@@ -1264,7 +1264,7 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setSolarPanelEfficiencyOfBuilding(Foundation foundation, double eff) {
+	public void setSolarPanelEfficiencyOfBuilding(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
 				((SolarPanel) p).setEfficiency(eff);
@@ -1307,7 +1307,7 @@ public class Scene implements Serializable {
 		return false;
 	}
 
-	public void setCity(String city) {
+	public void setCity(final String city) {
 		this.city = city;
 	}
 
@@ -1315,7 +1315,7 @@ public class Scene implements Serializable {
 		return city;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(final Date date) {
 		if (calendar != null)
 			calendar.setTime(date);
 	}
@@ -1352,7 +1352,7 @@ public class Scene implements Serializable {
 		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
 	}
 
-	public void setSolarHeatMapColorContrast(int solarContrast) {
+	public void setSolarHeatMapColorContrast(final int solarContrast) {
 		this.solarContrast = solarContrast;
 	}
 
