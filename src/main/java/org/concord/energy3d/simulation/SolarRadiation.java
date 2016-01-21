@@ -99,8 +99,10 @@ public class SolarRadiation {
 			part.setSolarPotential(new double[MINUTES_OF_DAY / timeStep]);
 		maxValue = 1;
 		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
-		for (final HousePart part : Scene.getInstance().getParts())
-			part.drawHeatFlux();
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part.isDrawCompleted())
+				part.drawHeatFlux();
+		}
 	}
 
 	public double[] getSolarPotential(final Mesh mesh) {

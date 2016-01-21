@@ -729,6 +729,12 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null && !selectedPart.isDrawCompleted()) {
+						Scene.getInstance().remove(selectedPart, true);
+						SceneManager.getInstance().setSelectedPart(null);
+					}
+					selectButton.setSelected(true);
 					if (energyViewButton.isSelected()) {
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {
