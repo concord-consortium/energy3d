@@ -570,7 +570,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(new AnimateSunCommand());
 					SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
 					if (shadowButton.isSelected())
-						SceneManager.getInstance().setShading(true);
+						SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
