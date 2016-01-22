@@ -388,9 +388,9 @@ public class MainPanel extends JPanel {
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/select.png")));
 			selectButton.setFocusable(false);
-			selectButton.addItemListener(new ItemListener() {
+			selectButton.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(final ItemEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -593,7 +593,7 @@ public class MainPanel extends JPanel {
 						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
 						mainFrame.getEditMenu().setEnabled(!previewButton.isSelected());
 					}
-					deselect();
+					defaultTool();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -602,9 +602,9 @@ public class MainPanel extends JPanel {
 		return previewButton;
 	}
 
-	public void deselect() {
+	public void defaultTool() {
 		getSelectButton().setSelected(true);
-		// SceneManager.getInstance().setOperation(Operation.SELECT);
+		SceneManager.getInstance().setOperation(Operation.SELECT);
 	}
 
 	public JToggleButton getAnnotationToggleButton() {
@@ -732,7 +732,7 @@ public class MainPanel extends JPanel {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (energyViewButton.isSelected())
-						deselect();
+						defaultTool();
 					if (energyViewButton.isSelected()) {
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {

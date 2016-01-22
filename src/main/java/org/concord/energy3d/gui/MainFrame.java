@@ -374,7 +374,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuSelected(final MenuEvent e) {
 
-					MainPanel.getInstance().deselect();
+					MainPanel.getInstance().defaultTool();
 
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
@@ -877,8 +877,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+					MainPanel.getInstance().defaultTool();
 				}
 			});
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
@@ -924,8 +923,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
 					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
 					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+					MainPanel.getInstance().defaultTool();
 				}
 			});
 
@@ -1316,8 +1314,7 @@ public class MainFrame extends JFrame {
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
-					mainPanel.getSelectButton().setSelected(true);
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+					MainPanel.getInstance().defaultTool();
 				}
 			});
 			editMenu.add(getUndoMenuItem());
@@ -1368,7 +1365,7 @@ public class MainFrame extends JFrame {
 			undoMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MainPanel.getInstance().deselect();
+					MainPanel.getInstance().defaultTool();
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().undo();
 					SceneManager.getInstance().refresh();
@@ -1387,7 +1384,7 @@ public class MainFrame extends JFrame {
 			redoMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MainPanel.getInstance().deselect();
+					MainPanel.getInstance().defaultTool();
 					SceneManager.getInstance().hideAllEditPoints();
 					SceneManager.getInstance().getUndoManager().redo();
 					SceneManager.getInstance().refresh();
