@@ -47,6 +47,7 @@ public class Window extends HousePart implements Thermalizable {
 	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6MJ)
 	private int style = MORE_MUNTIN_BARS;
+	private ColorRGBA glassColor = new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f);
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -61,8 +62,7 @@ public class Window extends HousePart implements Thermalizable {
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.setModelBound(new BoundingBox());
 		mesh.getSceneHints().setAllPickingHints(false);
-		final ColorRGBA color = new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f);
-		mesh.setDefaultColor(color);
+		mesh.setDefaultColor(glassColor);
 		final BlendState blend = new BlendState();
 		blend.setBlendEnabled(true);
 		// blend.setTestEnabled(true);
@@ -527,6 +527,14 @@ public class Window extends HousePart implements Thermalizable {
 			}
 		}
 		return c;
+	}
+
+	public void setGlassColor(final ColorRGBA color) {
+		glassColor = color;
+	}
+
+	public ColorRGBA getGlassColor() {
+		return glassColor;
 	}
 
 	@Override

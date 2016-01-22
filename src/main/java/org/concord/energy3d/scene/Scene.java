@@ -230,8 +230,14 @@ public class Scene implements Serializable {
 				instance = (Scene) in.readObject();
 				in.close();
 
-				for (final HousePart part : instance.parts)
+				for (final HousePart part : instance.parts) {
+					if (part instanceof Window) {
+						Window w = (Window) part;
+						if (w.getGlassColor() == null)
+							w.setGlassColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
+					}
 					part.getRoot();
+				}
 
 				instance.upgradeSceneToNewVersion();
 				instance.cleanup();
@@ -365,6 +371,8 @@ public class Scene implements Serializable {
 					w.setSolarHeatGainCoefficient(w.getSolarHeatGainCoefficient() * 0.01);
 				if (Util.isZero(w.getVolumetricHeatCapacity()))
 					w.setVolumetricHeatCapacity(0.5);
+				if (w.getGlassColor() == null)
+					w.setGlassColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
 			} else if (p instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) p;
 				if (Util.isZero(sp.getEfficiency()))
