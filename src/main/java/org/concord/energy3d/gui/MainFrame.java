@@ -1693,8 +1693,7 @@ public class MainFrame extends JFrame {
 			JOptionPane.showMessageDialog(this, "<html>You must select a part.</html>", "Selection missing", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		ReadOnlyColorRGBA color = ColorRGBA.WHITE;
-		color = selectedPart.getColor();
+		ReadOnlyColorRGBA color = selectedPart.getColor();
 		if (color != null)
 			colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
@@ -2069,6 +2068,10 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return lockAllMenuItem;
+	}
+
+	public JColorChooser getColorChooser() {
+		return colorChooser;
 	}
 
 }

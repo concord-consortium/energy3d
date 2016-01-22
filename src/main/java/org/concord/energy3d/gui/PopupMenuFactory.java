@@ -1,5 +1,6 @@
 package org.concord.energy3d.gui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -17,6 +18,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -48,12 +50,15 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
+import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
+import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
@@ -63,6 +68,9 @@ import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
+
+import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 /**
  * Pop-up menus for customizing individual elements.
@@ -425,6 +433,8 @@ public class PopupMenuFactory {
 									if (rb1.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
 										window.setSolarHeatGainCoefficient(val);
+										ReadOnlyColorRGBA color = window.getColor();
+										window.setColor(new ColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), (float) (1.0 - val)));
 									} else if (rb2.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeContainerWindowShgcCommand(window.getContainer()));
 										Scene.getInstance().setWindowShgcOnContainer(window.getContainer(), val);
@@ -445,7 +455,53 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miTint = new JMenuItem("Tint...");
+			miTint.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window))
+						return;
+					final Window window = (Window) selectedPart;
+					final JColorChooser colorChooser = MainFrame.getInstance().getColorChooser();
+					ReadOnlyColorRGBA color = window.getColor();
+					if (color != null)
+						colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+					final ActionListener actionListener = new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							final Color c = colorChooser.getColor();
+							final float[] newColor = c.getComponents(null);
+							final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], (float) (1.0 - window.getSolarHeatGainCoefficient()));
+							JPanel panel = new JPanel();
+							panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+							panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+							final JRadioButton rb1 = new JRadioButton("Only this Window", true);
+							final JRadioButton rb2 = new JRadioButton("All Windows of this Building");
+							panel.add(rb1);
+							panel.add(rb2);
+							ButtonGroup bg = new ButtonGroup();
+							bg.add(rb1);
+							bg.add(rb2);
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+								return;
+							if (rb1.isSelected()) { // apply to only this window
+								SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(window));
+								window.setColor(color);
+							} else {
+								Foundation foundation = window.getTopContainer();
+								SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, Operation.DRAW_WINDOW));
+								Scene.getInstance().setPartColorOfBuilding(foundation, Operation.DRAW_WINDOW, color);
+							}
+							Scene.getInstance().setEdited(true);
+						}
+					};
+					JColorChooser.createDialog(MainFrame.getInstance(), "Select Tint", true, colorChooser, actionListener, null).setVisible(true);
+				}
+			});
+
 			popupMenuForWindow.addSeparator();
+			popupMenuForWindow.add(miTint);
 			popupMenuForWindow.add(createInsulationMenuItem(true));
 			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(muntinMenu);
