@@ -119,7 +119,7 @@ public class SolarRadiation {
 		collidables.clear();
 		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor) {
+			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
 				final Spatial s = part.getRadiationCollisionSpatial();
 				collidables.add(s);
 				collidablesToParts.put(s, part);
@@ -260,8 +260,15 @@ public class SolarRadiation {
 					for (final Spatial spatial : collidables) {
 						if (spatial != collisionMesh) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
-							if (pickResults.getNumber() != 0)
+							if (pickResults.getNumber() != 0) {
+								if (housePart instanceof Foundation) { // at this point, we only show radiation heat map on the first floor
+									final HousePart collidableOwner = collidablesToParts.get(spatial);
+									if (collidableOwner instanceof Window) {
+										radiation += directRadiation * ((Window) collidableOwner).getSolarHeatGainCoefficient();
+									}
+								}
 								break;
+							}
 						}
 					}
 					if (pickResults.getNumber() == 0)

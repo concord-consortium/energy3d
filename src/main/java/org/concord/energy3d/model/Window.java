@@ -566,4 +566,15 @@ public class Window extends HousePart implements Thermalizable {
 	public Spatial getCollisionSpatial() {
 		return collisionMesh;
 	}
+
+	@Override
+	public Mesh getRadiationMesh() {
+		return collisionMesh;
+	}
+
+	@Override
+	public Spatial getRadiationCollisionSpatial() {
+		return getRadiationMesh();
+	}
+
 }
