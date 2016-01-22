@@ -48,6 +48,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
@@ -55,7 +56,7 @@ import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
-import org.concord.energy3d.undo.ChangeWallWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -353,29 +354,35 @@ public class PopupMenuFactory {
 				public void menuSelected(MenuEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						switch (((Window) selectedPart).getStyle()) {
-						case Window.MORE_MUNTIN_BARS:
-							miMoreBars.setSelected(true);
-							break;
-						case Window.MEDIUM_MUNTIN_BARS:
-							miMediumBars.setSelected(true);
-							break;
-						case Window.LESS_MUNTIN_BARS:
-							miLessBars.setSelected(true);
-							break;
-						case Window.NO_MUNTIN_BAR:
-							miNoBar.setSelected(true);
-							break;
+						if (selectedPart.getContainer() instanceof Wall) {
+							switch (((Window) selectedPart).getStyle()) {
+							case Window.MORE_MUNTIN_BARS:
+								miMoreBars.setSelected(true);
+								break;
+							case Window.MEDIUM_MUNTIN_BARS:
+								miMediumBars.setSelected(true);
+								break;
+							case Window.LESS_MUNTIN_BARS:
+								miLessBars.setSelected(true);
+								break;
+							case Window.NO_MUNTIN_BAR:
+								miNoBar.setSelected(true);
+								break;
+							}
+						} else if (selectedPart.getContainer() instanceof Roof) {
+							muntinMenu.setEnabled(false);
 						}
 					}
 				}
 
 				@Override
 				public void menuDeselected(MenuEvent e) {
+					muntinMenu.setEnabled(true);
 				}
 
 				@Override
 				public void menuCanceled(MenuEvent e) {
+					muntinMenu.setEnabled(true);
 				}
 
 			});
@@ -395,7 +402,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Window", true);
-					final JRadioButton rb2 = new JRadioButton("All Windows on this Wall");
+					final JRadioButton rb2 = new JRadioButton("All Windows on this " + (selectedPart.getContainer() instanceof Wall ? "Wall" : "Roof"));
 					final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -419,9 +426,8 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
 										window.setSolarHeatGainCoefficient(val);
 									} else if (rb2.isSelected()) {
-										Wall wall = (Wall) window.getContainer();
-										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWallWindowShgcCommand(wall));
-										Scene.getInstance().setWindowShgcOnWall(wall, val);
+										SceneManager.getInstance().getUndoManager().addEdit(new ChangeContainerWindowShgcCommand(window.getContainer()));
+										Scene.getInstance().setWindowShgcOnContainer(window.getContainer(), val);
 									} else if (rb3.isSelected()) {
 										Foundation foundation = window.getTopContainer();
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingWindowShgcCommand(foundation));
@@ -1047,7 +1053,7 @@ public class PopupMenuFactory {
 				if (selectedPart == null)
 					return;
 				String s = selectedPart.toString();
-				miInfo.setText(s.substring(0, s.indexOf(')') + 1));
+				miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
 				if (runWhenBecomingVisible != null)
 					runWhenBecomingVisible.run();
 			}

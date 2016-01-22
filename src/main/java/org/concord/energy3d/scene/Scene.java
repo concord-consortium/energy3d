@@ -1223,18 +1223,18 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public List<Window> getWindowsOnWall(final Wall wall) {
+	public List<Window> getWindowsOnContainer(final HousePart container) {
 		final List<Window> list = new ArrayList<Window>();
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == wall)
+			if (p instanceof Window && p.getContainer() == container)
 				list.add((Window) p);
 		}
 		return list;
 	}
 
-	public void setWindowShgcOnWall(final Wall wall, final double shgc) {
+	public void setWindowShgcOnContainer(final HousePart container, final double shgc) {
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == wall)
+			if (p instanceof Window && p.getContainer() == container)
 				((Window) p).setSolarHeatGainCoefficient(shgc);
 		}
 	}
