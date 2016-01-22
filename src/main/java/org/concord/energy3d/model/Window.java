@@ -18,6 +18,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -37,6 +38,7 @@ public class Window extends HousePart implements Thermalizable {
 	public static final int MORE_MUNTIN_BARS = 0;
 	public static final int MEDIUM_MUNTIN_BARS = 1;
 	public static final int LESS_MUNTIN_BARS = 2;
+	public static final ReadOnlyColorRGBA DEFAULT_TINT = new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f);
 	private transient Mesh collisionMesh;
 	private transient BMText label1;
 	private transient Line bars;
@@ -47,7 +49,7 @@ public class Window extends HousePart implements Thermalizable {
 	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6MJ)
 	private int style = MORE_MUNTIN_BARS;
-	private ColorRGBA glassColor = new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f);
+	private ReadOnlyColorRGBA glassColor = DEFAULT_TINT;
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -62,6 +64,8 @@ public class Window extends HousePart implements Thermalizable {
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.setModelBound(new BoundingBox());
 		mesh.getSceneHints().setAllPickingHints(false);
+		if (glassColor == null)
+			glassColor = DEFAULT_TINT;
 		mesh.setDefaultColor(glassColor);
 		final BlendState blend = new BlendState();
 		blend.setBlendEnabled(true);
@@ -529,11 +533,15 @@ public class Window extends HousePart implements Thermalizable {
 		return c;
 	}
 
-	public void setGlassColor(final ColorRGBA color) {
+	@Override
+	public void setColor(final ReadOnlyColorRGBA color) {
 		glassColor = color;
+		if (mesh != null)
+			mesh.setDefaultColor(glassColor);
 	}
 
-	public ColorRGBA getGlassColor() {
+	@Override
+	public ReadOnlyColorRGBA getColor() {
 		return glassColor;
 	}
 

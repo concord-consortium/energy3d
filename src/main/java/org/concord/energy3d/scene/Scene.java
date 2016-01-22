@@ -233,8 +233,8 @@ public class Scene implements Serializable {
 				for (final HousePart part : instance.parts) {
 					if (part instanceof Window) {
 						Window w = (Window) part;
-						if (w.getGlassColor() == null)
-							w.setGlassColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
+						if (w.getColor() == null)
+							w.setColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
 					}
 					part.getRoot();
 				}
@@ -371,8 +371,6 @@ public class Scene implements Serializable {
 					w.setSolarHeatGainCoefficient(w.getSolarHeatGainCoefficient() * 0.01);
 				if (Util.isZero(w.getVolumetricHeatCapacity()))
 					w.setVolumetricHeatCapacity(0.5);
-				if (w.getGlassColor() == null)
-					w.setGlassColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
 			} else if (p instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) p;
 				if (Util.isZero(sp.getEfficiency()))
@@ -1144,6 +1142,12 @@ public class Scene implements Serializable {
 		case DRAW_WALL:
 			for (final HousePart p : parts) {
 				if (p instanceof Wall && p.getTopContainer() == foundation)
+					p.setColor(color);
+			}
+			break;
+		case DRAW_WINDOW:
+			for (final HousePart p : parts) {
+				if (p instanceof Window && p.getTopContainer() == foundation)
 					p.setColor(color);
 			}
 			break;
