@@ -388,9 +388,9 @@ public class MainPanel extends JPanel {
 			selectButton.setToolTipText("Select");
 			selectButton.setIcon(new ImageIcon(MainPanel.class.getResource("icons/select.png")));
 			selectButton.setFocusable(false);
-			selectButton.addActionListener(new ActionListener() {
+			selectButton.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
@@ -604,7 +604,7 @@ public class MainPanel extends JPanel {
 
 	public void deselect() {
 		getSelectButton().setSelected(true);
-		SceneManager.getInstance().setOperation(Operation.SELECT);
+		// SceneManager.getInstance().setOperation(Operation.SELECT);
 	}
 
 	public JToggleButton getAnnotationToggleButton() {
@@ -649,6 +649,7 @@ public class MainPanel extends JPanel {
 
 	public void setToolbarEnabledForPreview(final boolean enabled) {
 		EventQueue.invokeLater(new Runnable() { // must be run in the event queue as this method may be called in a custom thread
+			@Override
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
 					if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
@@ -662,6 +663,7 @@ public class MainPanel extends JPanel {
 
 	public void setToolbarEnabledForReplay(final boolean enabled) {
 		EventQueue.invokeLater(new Runnable() { // must be run in the event queue as this method may be called in a custom thread
+			@Override
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
 					if (c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
@@ -729,12 +731,8 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null && !selectedPart.isDrawCompleted()) {
-						Scene.getInstance().remove(selectedPart, true);
-						SceneManager.getInstance().setSelectedPart(null);
-					}
-					selectButton.setSelected(true);
+					if (energyViewButton.isSelected())
+						deselect();
 					if (energyViewButton.isSelected()) {
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {
@@ -1043,7 +1041,7 @@ public class MainPanel extends JPanel {
 		return noteButton;
 	}
 
-	public void setBuildingRotationAngle(double x) {
+	public void setBuildingRotationAngle(final double x) {
 		buildingRotationAngle = x;
 	}
 

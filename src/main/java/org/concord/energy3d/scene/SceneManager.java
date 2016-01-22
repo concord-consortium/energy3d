@@ -986,6 +986,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (this.operation != operation) {
 			this.operation = operation;
 			operationFlag = true;
+			synchronized (this) {
+				if (selectedHousePart != null) {
+					if (selectedHousePart.isDrawCompleted())
+						selectedHousePart.setEditPointsVisible(false);
+					else
+						Scene.getInstance().remove(selectedHousePart, false);
+					selectedHousePart = null;
+				}
+			}
+			if (operation != Operation.SELECT)
+				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 			refresh();
 		}
 	}
@@ -996,13 +1007,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void executeOperation() {
 		operationFlag = false;
-		MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-		if (selectedHousePart != null) {
-			if (selectedHousePart.isDrawCompleted())
-				selectedHousePart.setEditPointsVisible(false);
-			else
-				Scene.getInstance().remove(selectedHousePart, true);
-		}
 
 		for (final HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation)
@@ -1431,6 +1435,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				if (zoomLock)
 					return null;
+				System.out.println("OPERATION: " + operation);
 				if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.ROTATE || operation == Operation.DRAW_ROOF_GABLE) {
 					if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
 						final HousePart previousSelectedHousePart = selectedHousePart;
@@ -1557,7 +1562,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					}
 					if (!operationFlag) {
-						MainPanel.getInstance().deselect();
+						MainPanel.getInstance().getSelectButton().setSelected(false);
 						cameraControl.setLeftMouseButtonEnabled(true);
 					}
 				}

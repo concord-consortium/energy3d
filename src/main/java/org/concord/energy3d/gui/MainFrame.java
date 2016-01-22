@@ -138,7 +138,6 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
-	protected Object lastSelection;
 	private JMenuItem exitMenuItem;
 	private JMenu helpMenu;
 	private JMenuItem aboutMenuItem;
@@ -266,7 +265,7 @@ public class MainFrame extends JFrame {
 		System.out.println("done");
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			@Override
-			public boolean dispatchKeyEvent(KeyEvent e) {
+			public boolean dispatchKeyEvent(final KeyEvent e) {
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:
 					MainPanel.getInstance().getRotateButton().setIcon(new ImageIcon(MainPanel.class.getResource("icons/" + (e.isShiftDown() ? "rotate_ccw.png" : "rotate_cw.png"))));
@@ -375,10 +374,10 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuSelected(final MenuEvent e) {
 
-					MainFrame.this.deselect();
+					MainPanel.getInstance().deselect();
 
 					// prevent multiple replay or postprocessing commands
-					boolean inactive = !PlayControl.active;
+					final boolean inactive = !PlayControl.active;
 					replayFolderMenuItem.setEnabled(inactive);
 					replayLastFolderMenuItem.setEnabled(DesignReplay.getInstance().getLastFolder() != null && inactive);
 					analyzeFolderMenuItem.setEnabled(inactive);
@@ -849,12 +848,6 @@ public class MainFrame extends JFrame {
 		return aboutDialog;
 	}
 
-	public void deselect() {
-		lastSelection = null;
-		mainPanel.getSelectButton().setSelected(true);
-		SceneManager.getInstance().setOperation(Operation.SELECT);
-	}
-
 	private JMenuItem getSaveasMenuItem() {
 		if (saveasMenuItem == null) {
 			saveasMenuItem = new JMenuItem("Save As...");
@@ -1042,7 +1035,7 @@ public class MainFrame extends JFrame {
 			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -1061,7 +1054,7 @@ public class MainFrame extends JFrame {
 			annualEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -1085,13 +1078,13 @@ public class MainFrame extends JFrame {
 			dailyEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
-						EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+						final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
 						if (SceneManager.getInstance().getSolarHeatMap())
 							analysis.updateGraph();
 						analysis.show("Daily Energy");
@@ -1108,7 +1101,7 @@ public class MainFrame extends JFrame {
 			dailyEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -1205,7 +1198,7 @@ public class MainFrame extends JFrame {
 			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -1254,7 +1247,7 @@ public class MainFrame extends JFrame {
 			annualEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -1272,7 +1265,7 @@ public class MainFrame extends JFrame {
 			dailyEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -1317,10 +1310,10 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					cutMenuItem.setEnabled(selectedPart != null);
 					copyMenuItem.setEnabled(selectedPart != null && selectedPart.isCopyable());
-					HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					mainPanel.getSelectButton().setSelected(true);
@@ -1412,7 +1405,7 @@ public class MainFrame extends JFrame {
 			cutMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart != null) {
 						Scene.getInstance().setCopyBuffer(selectedPart);
 						SceneManager.getInstance().deleteCurrentHousePart();
@@ -1430,7 +1423,7 @@ public class MainFrame extends JFrame {
 			copyMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart != null)
 						Scene.getInstance().setCopyBuffer(selectedPart);
 				}
@@ -1708,14 +1701,14 @@ public class MainFrame extends JFrame {
 				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
 				if (selectedPart instanceof Wall) {
-					JPanel panel = new JPanel();
+					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
 					final JRadioButton rb2 = new JRadioButton("All Walls of this Building");
 					panel.add(rb1);
 					panel.add(rb2);
-					ButtonGroup bg = new ButtonGroup();
+					final ButtonGroup bg = new ButtonGroup();
 					bg.add(rb1);
 					bg.add(rb2);
 					if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
@@ -1724,7 +1717,7 @@ public class MainFrame extends JFrame {
 						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
 						selectedPart.setColor(color);
 					} else {
-						Foundation foundation = selectedPart.getTopContainer();
+						final Foundation foundation = selectedPart.getTopContainer();
 						SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, Operation.DRAW_WALL));
 						Scene.getInstance().setPartColorOfBuilding(foundation, Operation.DRAW_WALL, color);
 					}
