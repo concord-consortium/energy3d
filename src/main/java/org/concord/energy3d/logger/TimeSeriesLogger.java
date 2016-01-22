@@ -63,7 +63,7 @@ import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
-import org.concord.energy3d.undo.ChangeWallWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
@@ -235,11 +235,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			} else if (lastEdit instanceof ChangeWindowShgcCommand) {
 				Window w = ((ChangeWindowShgcCommand) lastEdit).getWindow();
 				stateValue = "{\"Building\":" + w.getTopContainer().getId() + ", \"ID\":" + w.getId() + ", \"Value\": " + w.getSolarHeatGainCoefficient() + "}";
-			} else if (lastEdit instanceof ChangeWallWindowShgcCommand) {
-				ChangeWallWindowShgcCommand c = (ChangeWallWindowShgcCommand) lastEdit;
-				Wall wall = c.getWall();
-				List<Window> windows = Scene.getInstance().getWindowsOnWall(wall);
-				stateValue = "{\"Wall\":" + wall.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
+			} else if (lastEdit instanceof ChangeContainerWindowShgcCommand) {
+				ChangeContainerWindowShgcCommand c = (ChangeContainerWindowShgcCommand) lastEdit;
+				HousePart container = c.getContainer();
+				List<Window> windows = Scene.getInstance().getWindowsOnContainer(container);
+				String containerType = container instanceof Wall ? "Wall" : "Roof";
+				stateValue = "{\"" + containerType + "\":" + container.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
 			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
 				Foundation foundation = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
 				List<Window> windows = Scene.getInstance().getWindowsOfBuilding(foundation);

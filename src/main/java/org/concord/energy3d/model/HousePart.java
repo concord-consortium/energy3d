@@ -141,7 +141,6 @@ public abstract class HousePart implements Serializable {
 		HousePart.gridsHighlightedHousePart = gridsHighlightedHousePart;
 	}
 
-	/** set the custom color of this wall */
 	public void setColor(final ReadOnlyColorRGBA color) {
 		this.color = color;
 	}

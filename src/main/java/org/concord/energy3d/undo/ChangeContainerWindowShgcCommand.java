@@ -6,20 +6,21 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeWallWindowShgcCommand extends AbstractUndoableEdit {
+public class ChangeContainerWindowShgcCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] orgShgc, newShgc;
-	private Wall wall;
+	private HousePart container;
 	private List<Window> windows;
 
-	public ChangeWallWindowShgcCommand(Wall wall) {
-		this.wall = wall;
-		windows = Scene.getInstance().getWindowsOnWall(wall);
+	public ChangeContainerWindowShgcCommand(HousePart container) {
+		this.container = container;
+		windows = Scene.getInstance().getWindowsOnContainer(container);
 		int n = windows.size();
 		orgShgc = new double[n];
 		for (int i = 0; i < n; i++) {
@@ -48,13 +49,13 @@ public class ChangeWallWindowShgcCommand extends AbstractUndoableEdit {
 	}
 
 	// for action logging
-	public Wall getWall() {
-		return wall;
+	public HousePart getContainer() {
+		return container;
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "SHGC Change for All Windows on Wall";
+		return "SHGC Change for All Windows on " + (container instanceof Wall ? "Wall" : "Roof");
 	}
 
 }
