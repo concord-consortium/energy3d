@@ -409,6 +409,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	public void setSolarHeatGainCoefficient(final double shgc) {
 		solarHeatGainCoefficient = shgc;
+		setColor(new ColorRGBA(glassColor.getRed(), glassColor.getGreen(), glassColor.getBlue(), (float) (1.0 - shgc)));
 	}
 
 	public double getSolarHeatGainCoefficient() {

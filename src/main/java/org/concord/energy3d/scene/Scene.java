@@ -1133,6 +1133,13 @@ public class Scene implements Serializable {
 		this.roofColor = roofColor;
 	}
 
+	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == container)
+				((Window) p).setColor(c);
+		}
+	}
+
 	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
 	public void setPartColorOfBuilding(final Foundation foundation, final Operation operation, final ReadOnlyColorRGBA color) {
 		switch (operation) {
@@ -1244,7 +1251,7 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setWindowShgcOnContainer(final HousePart container, final double shgc) {
+	public void setWindowShgcInContainer(final HousePart container, final double shgc) {
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getContainer() == container)
 				((Window) p).setSolarHeatGainCoefficient(shgc);
