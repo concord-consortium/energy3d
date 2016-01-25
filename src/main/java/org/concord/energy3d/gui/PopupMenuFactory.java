@@ -57,6 +57,7 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
@@ -433,11 +434,9 @@ public class PopupMenuFactory {
 									if (rb1.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
 										window.setSolarHeatGainCoefficient(val);
-										ReadOnlyColorRGBA color = window.getColor();
-										window.setColor(new ColorRGBA(color.getRed(), color.getGreen(), color.getBlue(), (float) (1.0 - val)));
 									} else if (rb2.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeContainerWindowShgcCommand(window.getContainer()));
-										Scene.getInstance().setWindowShgcOnContainer(window.getContainer(), val);
+										Scene.getInstance().setWindowShgcInContainer(window.getContainer(), val);
 									} else if (rb3.isSelected()) {
 										Foundation foundation = window.getTopContainer();
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingWindowShgcCommand(foundation));
@@ -477,17 +476,23 @@ public class PopupMenuFactory {
 							panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 							panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 							final JRadioButton rb1 = new JRadioButton("Only this Window", true);
-							final JRadioButton rb2 = new JRadioButton("All Windows of this Building");
+							final JRadioButton rb2 = new JRadioButton("All Windows on this " + (window.getContainer() instanceof Wall ? "Wall" : "Roof"));
+							final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
 							panel.add(rb1);
 							panel.add(rb2);
+							panel.add(rb3);
 							ButtonGroup bg = new ButtonGroup();
 							bg.add(rb1);
 							bg.add(rb2);
+							bg.add(rb3);
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 								return;
 							if (rb1.isSelected()) { // apply to only this window
 								SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(window));
 								window.setColor(color);
+							} else if (rb2.isSelected()) {
+								SceneManager.getInstance().getUndoManager().addEdit(new ChangeContainerWindowColorCommand(window.getContainer()));
+								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color);
 							} else {
 								Foundation foundation = window.getTopContainer();
 								SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, Operation.DRAW_WINDOW));

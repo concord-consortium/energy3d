@@ -56,6 +56,7 @@ import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
+import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
@@ -241,6 +242,13 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				List<Window> windows = Scene.getInstance().getWindowsOnContainer(container);
 				String containerType = container instanceof Wall ? "Wall" : "Roof";
 				stateValue = "{\"" + containerType + "\":" + container.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
+			} else if (lastEdit instanceof ChangeContainerWindowColorCommand) {
+				ChangeContainerWindowColorCommand cmd = (ChangeContainerWindowColorCommand) lastEdit;
+				HousePart container = cmd.getContainer();
+				List<Window> windows = Scene.getInstance().getWindowsOnContainer(container);
+				String containerType = container instanceof Wall ? "Wall" : "Roof";
+				ReadOnlyColorRGBA c = windows.get(0).getColor();
+				stateValue = "{\"" + containerType + "\":" + container.getId() + ", \"Color\": \"" + String.format("#%02x%02x%02x", (int) Math.round(c.getRed() * 255), (int) Math.round(c.getGreen() * 255), (int) Math.round(c.getBlue() * 255)) + "\"}";
 			} else if (lastEdit instanceof ChangeBuildingWindowShgcCommand) {
 				Foundation foundation = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
 				List<Window> windows = Scene.getInstance().getWindowsOfBuilding(foundation);
