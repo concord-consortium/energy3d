@@ -179,7 +179,25 @@ public class Window extends HousePart implements Thermalizable {
 		normal = computeNormalAndKeepOnRoof();
 		updateEditShapes();
 
-		fillRectangleBuffer(mesh.getMeshData().getVertexBuffer(), container instanceof Roof ? new Vector3() : normal.multiply(-0.6, null));
+		final boolean drawBars = style != NO_MUNTIN_BAR && !isFrozen() && !Util.isEqual(getAbsPoint(2), getAbsPoint(0)) && !Util.isEqual(getAbsPoint(1), getAbsPoint(0));
+		final ReadOnlyVector3 meshOffset, barsOffset;
+		if (container instanceof Roof) {
+			if (drawBars) {
+				meshOffset = normal.multiply(-0.1, null);
+				barsOffset = new Vector3();
+			} else {
+				meshOffset = new Vector3();
+				barsOffset = null;
+			}
+		} else {
+			meshOffset = normal.multiply(-0.6, null);
+			if (drawBars)
+				barsOffset = normal.multiply(-0.5, null);
+			else
+				barsOffset = null;
+		}
+
+		fillRectangleBuffer(mesh.getMeshData().getVertexBuffer(), meshOffset);
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		for (int i = 0; i < 6; i += 1)
 			BufferUtils.setInBuffer(normal.negate(null), normalBuffer, i);
@@ -191,12 +209,11 @@ public class Window extends HousePart implements Thermalizable {
 		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.updateCollisionTree(collisionMesh);
 
-		if (container instanceof Roof || style == NO_MUNTIN_BAR || isFrozen() || Util.isEqual(getAbsPoint(2), getAbsPoint(0)) || Util.isEqual(getAbsPoint(1), getAbsPoint(0)))
+		if (!drawBars)
 			bars.getSceneHints().setCullHint(CullHint.Always);
 		else {
-			final double divisionLength = 3.0 + style * 3.0;
 			bars.getSceneHints().setCullHint(CullHint.Inherit);
-			final Vector3 halfThickness = getNormal().multiply(-0.5, null);
+			final double divisionLength = 3.0 + style * 3.0;
 			FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
 			final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / divisionLength);
 			final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / divisionLength);
@@ -208,54 +225,45 @@ public class Window extends HousePart implements Thermalizable {
 				barsVertices.limit(barsVertices.capacity());
 			}
 
-			barsVertices.rewind();
-			final Vector3 p = new Vector3();
-			getAbsPoint(0).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			getAbsPoint(1).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			getAbsPoint(1).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			getAbsPoint(3).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			getAbsPoint(3).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			getAbsPoint(2).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			getAbsPoint(2).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			getAbsPoint(0).add(halfThickness, p);
-			barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			int i = 0;
+			BufferUtils.setInBuffer(getAbsPoint(0).addLocal(barsOffset), barsVertices, i++);
+			BufferUtils.setInBuffer(getAbsPoint(1).addLocal(barsOffset), barsVertices, i++);
+			BufferUtils.setInBuffer(getAbsPoint(1).addLocal(barsOffset), barsVertices, i++);
+			BufferUtils.setInBuffer(getAbsPoint(3).addLocal(barsOffset), barsVertices, i++);
+			BufferUtils.setInBuffer(getAbsPoint(3).addLocal(barsOffset), barsVertices, i++);
+			BufferUtils.setInBuffer(getAbsPoint(2).addLocal(barsOffset), barsVertices, i++);
+			BufferUtils.setInBuffer(getAbsPoint(2).addLocal(barsOffset), barsVertices, i++);
+			BufferUtils.setInBuffer(getAbsPoint(0).addLocal(barsOffset), barsVertices, i++);
 
-			final ReadOnlyVector3 o = getAbsPoint(0).add(halfThickness, null);
+			final ReadOnlyVector3 o = getAbsPoint(0).add(barsOffset, null);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
 			final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+			final Vector3 p = new Vector3();
 			for (int col = 1; col < cols; col++) {
 				u.multiply((double) col / cols, p).addLocal(o);
-				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				BufferUtils.setInBuffer(p, barsVertices, i++);
 				p.addLocal(v);
-				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				BufferUtils.setInBuffer(p, barsVertices, i++);
 			}
 			for (int row = 1; row < rows; row++) {
 				v.multiply((double) row / rows, p).addLocal(o);
-				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				BufferUtils.setInBuffer(p, barsVertices, i++);
 				p.addLocal(u);
-				barsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				BufferUtils.setInBuffer(p, barsVertices, i++);
 			}
-			p.set(halfThickness).negateLocal().normalizeLocal();
-			barsVertices.limit(barsVertices.position());
+			barsVertices.limit(i * 3);
 			bars.getMeshData().updateVertexCount();
 			bars.updateModelBound();
 		}
 	}
 
-	private void fillRectangleBuffer(final FloatBuffer vertexBuffer, final Vector3 normalOffset) {
-		BufferUtils.setInBuffer(getAbsPoint(0).addLocal(normalOffset), vertexBuffer, 0);
-		BufferUtils.setInBuffer(getAbsPoint(2).addLocal(normalOffset), vertexBuffer, 1);
-		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(normalOffset), vertexBuffer, 2);
-		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(normalOffset), vertexBuffer, 3);
-		BufferUtils.setInBuffer(getAbsPoint(2).addLocal(normalOffset), vertexBuffer, 4);
-		BufferUtils.setInBuffer(getAbsPoint(3).addLocal(normalOffset), vertexBuffer, 5);
+	private void fillRectangleBuffer(final FloatBuffer vertexBuffer, final ReadOnlyVector3 meshOffset) {
+		BufferUtils.setInBuffer(getAbsPoint(0).addLocal(meshOffset), vertexBuffer, 0);
+		BufferUtils.setInBuffer(getAbsPoint(2).addLocal(meshOffset), vertexBuffer, 1);
+		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(meshOffset), vertexBuffer, 2);
+		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(meshOffset), vertexBuffer, 3);
+		BufferUtils.setInBuffer(getAbsPoint(2).addLocal(meshOffset), vertexBuffer, 4);
+		BufferUtils.setInBuffer(getAbsPoint(3).addLocal(meshOffset), vertexBuffer, 5);
 	}
 
 	@Override
