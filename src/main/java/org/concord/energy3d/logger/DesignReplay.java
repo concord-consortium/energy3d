@@ -62,6 +62,8 @@ public class DesignReplay extends PlayControl {
 			lastFolder = files[0].getParentFile();
 		int i = -1;
 		while (i < n) {
+			if (!active)
+				break;
 			if (replaying) {
 				i++;
 				if (i == n)

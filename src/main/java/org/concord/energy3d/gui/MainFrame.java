@@ -110,6 +110,11 @@ public class MainFrame extends JFrame {
 	private JMenuItem openMenuItem;
 	private JMenuItem replayFolderMenuItem;
 	private JMenuItem replayLastFolderMenuItem;
+	private JMenu replayControlsMenu;
+	private JMenuItem forwardReplayMenuItem;
+	private JMenuItem backwardReplayMenuItem;
+	private JMenuItem endReplayMenuItem;
+	private JMenuItem pauseReplayMenuItem;
 	private JMenuItem analyzeFolderMenuItem;
 	private JMenuItem saveMenuItem;
 	private JMenuItem printMenuItem;
@@ -364,11 +369,19 @@ public class MainFrame extends JFrame {
 			fileMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
+					replayFolderMenuItem.setEnabled(true); // if any of these actions is registered with a keystroke, we must re-enable it
+					replayLastFolderMenuItem.setEnabled(true);
+					replayControlsMenu.setEnabled(true);
+					analyzeFolderMenuItem.setEnabled(true);
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
+					replayFolderMenuItem.setEnabled(true);
+					replayLastFolderMenuItem.setEnabled(true);
+					replayControlsMenu.setEnabled(true);
+					analyzeFolderMenuItem.setEnabled(true);
 				}
 
 				@Override
@@ -380,6 +393,7 @@ public class MainFrame extends JFrame {
 					final boolean inactive = !PlayControl.active;
 					replayFolderMenuItem.setEnabled(inactive);
 					replayLastFolderMenuItem.setEnabled(DesignReplay.getInstance().getLastFolder() != null && inactive);
+					replayControlsMenu.setEnabled(!inactive);
 					analyzeFolderMenuItem.setEnabled(inactive);
 
 					// recent files
@@ -449,6 +463,41 @@ public class MainFrame extends JFrame {
 			if (!Config.isRestrictMode()) {
 				addItemToFileMenu(getReplayFolderMenuItem());
 				addItemToFileMenu(getReplayLastFolderMenuItem());
+
+				replayControlsMenu = new JMenu("Replay Controls");
+				replayControlsMenu.addMenuListener(new MenuListener() {
+					@Override
+					public void menuCanceled(final MenuEvent e) {
+						// if any of these actions is registered with a keystroke, we must re-enable it
+						endReplayMenuItem.setEnabled(true);
+						pauseReplayMenuItem.setEnabled(true);
+						forwardReplayMenuItem.setEnabled(true);
+						backwardReplayMenuItem.setEnabled(true);
+					}
+
+					@Override
+					public void menuDeselected(final MenuEvent e) {
+						endReplayMenuItem.setEnabled(true);
+						pauseReplayMenuItem.setEnabled(true);
+						forwardReplayMenuItem.setEnabled(true);
+						backwardReplayMenuItem.setEnabled(true);
+					}
+
+					@Override
+					public void menuSelected(final MenuEvent e) {
+						endReplayMenuItem.setEnabled(PlayControl.active);
+						pauseReplayMenuItem.setEnabled(PlayControl.active);
+						pauseReplayMenuItem.setText(PlayControl.replaying ? "Pause Replay" : "Resume Replay");
+						forwardReplayMenuItem.setEnabled(!PlayControl.replaying);
+						backwardReplayMenuItem.setEnabled(!PlayControl.replaying);
+					}
+				});
+				addItemToFileMenu(replayControlsMenu);
+				replayControlsMenu.add(getPauseReplayMenuItem());
+				replayControlsMenu.add(getBackwardReplayMenuItem());
+				replayControlsMenu.add(getForwardReplayMenuItem());
+				replayControlsMenu.add(getEndReplayMenuItem());
+
 				addItemToFileMenu(getAnalyzeFolderMenuItem());
 				addItemToFileMenu(new JSeparator());
 			}
@@ -632,6 +681,66 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return replayLastFolderMenuItem;
+	}
+
+	private JMenuItem getEndReplayMenuItem() {
+		if (endReplayMenuItem == null) {
+			endReplayMenuItem = new JMenuItem("End Replay");
+			endReplayMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					DesignReplay.active = false;
+				}
+			});
+		}
+		return endReplayMenuItem;
+	}
+
+	private JMenuItem getPauseReplayMenuItem() {
+		if (pauseReplayMenuItem == null) {
+			pauseReplayMenuItem = new JMenuItem("Pause Replay");
+			pauseReplayMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (PlayControl.active) {
+						PlayControl.replaying = !PlayControl.replaying;
+					}
+				}
+			});
+		}
+		return pauseReplayMenuItem;
+	}
+
+	private JMenuItem getForwardReplayMenuItem() {
+		if (forwardReplayMenuItem == null) {
+			forwardReplayMenuItem = new JMenuItem("Replay Forward");
+			forwardReplayMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (PlayControl.active) {
+						PlayControl.replaying = false;
+						PlayControl.forward = true;
+					}
+				}
+			});
+		}
+		return forwardReplayMenuItem;
+	}
+
+	private JMenuItem getBackwardReplayMenuItem() {
+		if (backwardReplayMenuItem == null) {
+			backwardReplayMenuItem = new JMenuItem("Replay Backward");
+			backwardReplayMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (PlayControl.active) {
+						PlayControl.replaying = false;
+						PlayControl.backward = true;
+					}
+				}
+			});
+		}
+		return backwardReplayMenuItem;
 	}
 
 	public void updateTitleBar() {
@@ -1295,6 +1404,10 @@ public class MainFrame extends JFrame {
 			editMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
+					// enable the cut-copy-paste menu items when the menu disappears, otherwise the keystrokes will be disabled with the menu items
+					cutMenuItem.setEnabled(true);
+					copyMenuItem.setEnabled(true);
+					pasteMenuItem.setEnabled(true);
 				}
 
 				@Override
