@@ -178,7 +178,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private HousePart hoveredHousePart = null;
 	private Operation operation = Operation.SELECT;
 	private CameraControl cameraControl;
-	private ParallelSplitShadowMapPass shadowPass;
+	private final ParallelSplitShadowMapPass shadowPass;
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private CameraNode cameraNode;
 	private MouseState mouseState;
@@ -211,10 +211,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ArrayList<Vector3> houseMovePoints;
 	private boolean solarHeatMap = false;
 	private boolean heatFluxDaily = true;
-	private Spatial axes;
+	private final Spatial axes;
 	private boolean showBuildingLabels = false;
 	private boolean showHeatFlux = false;
-	private Mesh sky;
+	private final Mesh sky;
 	private TextureState daySkyState, nightSkyState;
 	private double buildingRotationAngleRecorded;
 
@@ -331,14 +331,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.addOccluder(Scene.getOriginalHouseRoot());
 		shadowPass.addOccluder(Scene.getNotReceivingShadowRoot());
 
-		taskManager.update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				final Date today = Calendar.getInstance().getTime();
-				new Heliodon(root, light, passManager, logicalLayer, today);
-				return null;
-			}
-		});
+		final Date today = Calendar.getInstance().getTime();
+		new Heliodon(root, light, passManager, logicalLayer, today);
+
+		// taskManager.update(new Callable<Object>() {
+		// @Override
+		// public Object call() throws Exception {
+		// final Date today = Calendar.getInstance().getTime();
+		// new Heliodon(root, light, passManager, logicalLayer, today);
+		// return null;
+		// }
+		// });
 
 		initMouse();
 
@@ -709,7 +712,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
-
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
@@ -1574,18 +1576,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 		EnergyPanel.getInstance().updateGraphs();
-	}
-
-	public void moveMouse(final float x, final float y) {
-		final int pixelX = (int) ((-x + 500f) * getCamera().getWidth() / 1000f);
-		final int pixelY = (int) ((y + 200f) * getCamera().getHeight() / 400f);
-		mouseState = new MouseState(pixelX, pixelY, 0, 0, 0, null, null);
-
-		final Ray3 pickRay = getCamera().getPickRay(new Vector2(pixelX, pixelY), false, null);
-		final ReadOnlyVector3 origin = pickRay.getOrigin();
-		kinectPointer.setTranslation(origin.getX(), origin.getY(), origin.getZ());
-
-		refresh = true;
 	}
 
 	public void grabOrRelease() {

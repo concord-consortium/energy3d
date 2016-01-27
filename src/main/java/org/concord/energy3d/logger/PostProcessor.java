@@ -24,7 +24,7 @@ import org.concord.energy3d.shapes.Heliodon;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class PostProcessor extends PlayControl {
 
@@ -92,8 +92,8 @@ public class PostProcessor extends PlayControl {
 						System.out.println("Play back " + i + " of " + n + ": " + fileName);
 						try {
 							Scene.openNow(files[i].toURI().toURL());
-							Scene.initSceneNow();
-							Scene.initEnergy();
+							// Scene.initSceneNow();
+							// Scene.initEnergy();
 							EnergyPanel.getInstance().computeNow();
 							EnergyPanel.getInstance().update();
 							SceneManager.getInstance().refresh();

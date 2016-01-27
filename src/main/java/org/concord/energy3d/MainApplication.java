@@ -25,12 +25,12 @@ public class MainApplication {
 
 	public static void main(final String[] args) {
 
-		File testFile = new File(System.getProperty("user.dir"), "test.txt");
+		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
 		try {
 			testFile.createNewFile();
 			testFile.delete();
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 			appDirectoryWritable = false;
 		}
 

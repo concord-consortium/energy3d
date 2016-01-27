@@ -8,9 +8,9 @@ import java.util.concurrent.Callable;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
@@ -74,17 +74,17 @@ public class DesignReplay extends PlayControl {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {
-							Scene.initSceneNow();
-							Scene.getInstance().redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
-							Scene.initEnergy();
-							Scene.getInstance().redrawAll(); // need to call this to at least redraw the overhangs
+//							Scene.initSceneNow();
+//							Scene.getInstance().redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
+//							Scene.initEnergy();
+//							Scene.getInstance().redrawAll(); // need to call this to at least redraw the overhangs
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 							EnergyPanel.getInstance().update();
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
 									EnergyPanel.getInstance().clearAllGraphs();
-									HousePart p = SceneManager.getInstance().getSelectedPart();
+									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
 										EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
 										EnergyPanel.getInstance().validate();

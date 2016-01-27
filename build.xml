@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<property name="app.name" value="Energy3D"/>
 	<property name="app.version" value="5.0"/>
@@ -24,7 +25,7 @@
 	</condition>
 	<condition property="bundle_type" value="all">
 		<os family="unix" />
-	</condition>	
+	</condition>
 	
 	<condition property="icon" value="package/windows/${app.name}.ico">
 		<os family="windows"/>

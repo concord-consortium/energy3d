@@ -91,6 +91,7 @@ public class Scene implements Serializable {
 	private static Unit unit = Unit.Meter;
 	private transient boolean edited = false;
 	private final List<HousePart> parts = Collections.synchronizedList(new ArrayList<HousePart>());
+	private final Calendar calendar = Calendar.getInstance();
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
@@ -103,7 +104,6 @@ public class Scene implements Serializable {
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
 	private long idCounter;
-	private Calendar calendar;
 	private String city;
 	private int latitude;
 	private boolean isHeliodonVisible;
@@ -181,29 +181,21 @@ public class Scene implements Serializable {
 
 	public static void open(final URL file) throws Exception {
 		openNow(file);
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				initSceneNow();
-				instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
-				initEnergy();
-				instance.redrawAll(); // need to call this to at least redraw the overhangs
-				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				EnergyPanel.getInstance().update();
-				if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
-					MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
-					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-					SceneManager.getInstance().resetCamera();
-				}
-				EnergyPanel.getInstance().clearAllGraphs();
-				final HousePart p = SceneManager.getInstance().getSelectedPart();
-				if (p instanceof Foundation) {
-					EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
-					EnergyPanel.getInstance().validate();
-				}
-				return null;
+		synchronized (SceneManager.getInstance()) {
+			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+			EnergyPanel.getInstance().update();
+			if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
+				MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
+				SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+				SceneManager.getInstance().resetCamera();
 			}
-		});
+			EnergyPanel.getInstance().clearAllGraphs();
+			final HousePart p = SceneManager.getInstance().getSelectedPart();
+			if (p instanceof Foundation) {
+				EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
+				EnergyPanel.getInstance().validate();
+			}
+		}
 	}
 
 	public static void openNow(final URL file) throws Exception {
@@ -232,7 +224,7 @@ public class Scene implements Serializable {
 
 				for (final HousePart part : instance.parts) {
 					if (part instanceof Window) {
-						Window w = (Window) part;
+						final Window w = (Window) part;
 						if (w.getColor() == null)
 							w.setColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
 					}
@@ -247,8 +239,21 @@ public class Scene implements Serializable {
 			final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 			if (cameraControl != null)
 				cameraControl.reset();
+
+			for (final HousePart p : Scene.getInstance().getParts()) {
+				if (p instanceof Foundation && !p.isFrozen()) {
+					SceneManager.getInstance().setSelectedPart(p);
+					break;
+				}
+			}
+
+			initSceneNow();
+			instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
+			initEnergy();
+			// instance.redrawAll(); // need to call this to at least redraw the overhangs
 		}
 
+		// update GUI
 		if (!Config.isApplet()) {
 			if (instance.textureMode == TextureMode.None)
 				MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
@@ -258,16 +263,7 @@ public class Scene implements Serializable {
 				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
 		}
 		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
-
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation && !p.isFrozen()) {
-				SceneManager.getInstance().setSelectedPart(p);
-				break;
-			}
-		}
-
 		MainFrame.getInstance().updateTitleBar();
-
 	}
 
 	public static void initSceneNow() {
@@ -308,7 +304,7 @@ public class Scene implements Serializable {
 			Util.setSilently(energyPanel.getDateSpinner(), instance.calendar.getTime());
 			Util.setSilently(energyPanel.getTimeSpinner(), instance.calendar.getTime());
 			energyPanel.setLatitude(instance.latitude); // already silent
-			if ("Boston".equals(instance.city) || "".equals(instance.city))
+			if ("Boston".equals(instance.city) || instance.city == null || "".equals(instance.city))
 				instance.city = "Boston, MA";
 			Util.selectSilently(energyPanel.getCityComboBox(), instance.city);
 			Scene.getInstance().setTreeLeaves();
@@ -528,7 +524,7 @@ public class Scene implements Serializable {
 
 				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
-				instance.calendar = Heliodon.getInstance().getCalender();
+				instance.calendar.setTime(Heliodon.getInstance().getCalender().getTime());
 				instance.latitude = EnergyPanel.getInstance().getLatitude();
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
