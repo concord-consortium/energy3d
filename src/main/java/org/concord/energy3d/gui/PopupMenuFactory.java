@@ -363,23 +363,19 @@ public class PopupMenuFactory {
 				public void menuSelected(MenuEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						if (selectedPart.getContainer() instanceof Wall) {
-							switch (((Window) selectedPart).getStyle()) {
-							case Window.MORE_MUNTIN_BARS:
-								miMoreBars.setSelected(true);
-								break;
-							case Window.MEDIUM_MUNTIN_BARS:
-								miMediumBars.setSelected(true);
-								break;
-							case Window.LESS_MUNTIN_BARS:
-								miLessBars.setSelected(true);
-								break;
-							case Window.NO_MUNTIN_BAR:
-								miNoBar.setSelected(true);
-								break;
-							}
-						} else if (selectedPart.getContainer() instanceof Roof) {
-							muntinMenu.setEnabled(false);
+						switch (((Window) selectedPart).getStyle()) {
+						case Window.MORE_MUNTIN_BARS:
+							miMoreBars.setSelected(true);
+							break;
+						case Window.MEDIUM_MUNTIN_BARS:
+							miMediumBars.setSelected(true);
+							break;
+						case Window.LESS_MUNTIN_BARS:
+							miLessBars.setSelected(true);
+							break;
+						case Window.NO_MUNTIN_BAR:
+							miNoBar.setSelected(true);
+							break;
 						}
 					}
 				}

@@ -859,6 +859,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				}
 			}));
+			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
+				@Override
+				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+					PlayControl.active = false;
+				}
+			}));
 		}
 
 	}
