@@ -11,7 +11,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -90,7 +89,7 @@ public class Scene implements Serializable {
 	private static boolean drawAnnotationsInside = false;
 	private static Unit unit = Unit.Meter;
 	private transient boolean edited = false;
-	private final List<HousePart> parts = Collections.synchronizedList(new ArrayList<HousePart>());
+	private final List<HousePart> parts = new ArrayList<HousePart>();
 	private final Calendar calendar = Calendar.getInstance();
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
@@ -274,11 +273,9 @@ public class Scene implements Serializable {
 		root.attachChild(notReceivingShadowRoot);
 
 		if (url != null) {
-			synchronized (instance.parts) {
-				for (final HousePart housePart : instance.getParts()) {
-					final boolean b = housePart instanceof Tree || housePart instanceof Human;
-					(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(housePart.getRoot());
-				}
+			for (final HousePart housePart : instance.getParts()) {
+				final boolean b = housePart instanceof Tree || housePart instanceof Human;
+				(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(housePart.getRoot());
 			}
 			System.out.println("initSceneNow done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
@@ -426,7 +423,7 @@ public class Scene implements Serializable {
 			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
-				synchronized (instance.getParts()) {
+				synchronized (SceneManager.getInstance()) {
 					for (final HousePart housePart : instance.getParts()) {
 						housePart.setId(max + housePart.getId());
 						Scene.getInstance().parts.add(housePart);
@@ -822,7 +819,7 @@ public class Scene implements Serializable {
 
 	public static void setDrawAnnotationsInside(final boolean drawAnnotationsInside) {
 		Scene.drawAnnotationsInside = drawAnnotationsInside;
-		synchronized (instance.getParts()) {
+		synchronized (SceneManager.getInstance()) {
 			for (final HousePart part : instance.getParts())
 				part.drawAnnotations();
 		}
@@ -845,13 +842,13 @@ public class Scene implements Serializable {
 
 	public void redrawAllNow() {
 		System.out.println("redrawAllNow()");
-		if (cleanup) {
-			cleanup();
-			cleanup = false;
-		}
-		connectWalls();
-		Snap.clearAnnotationDrawn();
-		synchronized (parts) { // XIE: This lock is needed as we often run into ConcurrentModificationException here
+		synchronized (SceneManager.getInstance()) {
+			if (cleanup) {
+				cleanup();
+				cleanup = false;
+			}
+			connectWalls();
+			Snap.clearAnnotationDrawn();
 			for (final HousePart part : parts)
 				if (part instanceof Roof)
 					part.draw();
@@ -1314,11 +1311,9 @@ public class Scene implements Serializable {
 	}
 
 	public boolean hasSensor() {
-		synchronized (parts) {
-			for (final HousePart housePart : parts)
-				if (housePart instanceof Sensor)
-					return true;
-		}
+		for (final HousePart housePart : parts)
+			if (housePart instanceof Sensor)
+				return true;
 		return false;
 	}
 

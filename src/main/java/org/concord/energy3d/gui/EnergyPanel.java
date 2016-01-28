@@ -22,7 +22,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +94,7 @@ public class EnergyPanel extends JPanel {
 	private Object disableActionsRequester;
 	private boolean alreadyRenderedHeatmap = false;
 	private boolean computeEnabled = true;
-	private final List<PropertyChangeListener> propertyChangeListeners = Collections.synchronizedList(new ArrayList<PropertyChangeListener>());
+	private final List<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
 	public enum UpdateRadiation {
 		ALWAYS, ONLY_IF_SLECTED_IN_GUI
@@ -723,10 +722,8 @@ public class EnergyPanel extends JPanel {
 
 	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
 		if (!propertyChangeListeners.isEmpty()) {
-			synchronized (propertyChangeListeners) {
-				for (final PropertyChangeListener x : propertyChangeListeners) {
-					x.propertyChange(evt);
-				}
+			for (final PropertyChangeListener x : propertyChangeListeners) {
+				x.propertyChange(evt);
 			}
 		}
 	}
