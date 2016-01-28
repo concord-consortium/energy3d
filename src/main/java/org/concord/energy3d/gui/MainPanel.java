@@ -27,7 +27,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -666,7 +665,7 @@ public class MainPanel extends JPanel {
 			@Override
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
-					if (c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
+					if (c != getNoteButton() && c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
 						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
 							c.setEnabled(enabled);
 					}
@@ -761,11 +760,8 @@ public class MainPanel extends JPanel {
 
 	private JScrollPane getNoteScrollPane() {
 		if (noteScrollPane == null) {
-			noteScrollPane = new JScrollPane();
-			// noteScrollPane.setPreferredSize(new Dimension(100, 100));
-			noteScrollPane.setMinimumSize(getNoteTextArea().getMinimumSize());
-			noteScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-			noteScrollPane.setViewportView(getNoteTextArea());
+			noteScrollPane = new JScrollPane(getNoteTextArea());
+			// //noteScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		}
 		return noteScrollPane;
 	}
@@ -773,8 +769,8 @@ public class MainPanel extends JPanel {
 	public JTextArea getNoteTextArea() {
 		if (noteTextArea == null) {
 			noteTextArea = new JTextArea(new MyPlainDocument()); // want to keep a copy of what was removed
-			noteTextArea.setWrapStyleWord(true);
-			noteTextArea.setLineWrap(true);
+			// noteTextArea.setWrapStyleWord(true);
+			// noteTextArea.setLineWrap(true);
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
 				public void updateEditFlag() {
 					Scene.getInstance().setEdited(true, false);
