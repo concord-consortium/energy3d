@@ -310,7 +310,7 @@ public class Scene implements Serializable {
 			Scene.getInstance().setTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 			SceneManager.getInstance().changeSkyTexture();
-			SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+			// SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 		}
 		final Calendar calendar = Heliodon.getInstance().getCalender();
 
