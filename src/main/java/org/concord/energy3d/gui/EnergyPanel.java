@@ -31,6 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -39,7 +40,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
-import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
@@ -69,7 +69,6 @@ import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
-import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
@@ -102,7 +101,6 @@ public class EnergyPanel extends JPanel {
 
 	private final JPanel dataPanel;
 	private final JComboBox<String> cityComboBox;
-	private final JSpinner insideTemperatureSpinner;
 	private final JTextField outsideTemperatureField;
 	private final JTextField sunshineHoursField;
 	private final JLabel dateLabel;
@@ -115,7 +113,8 @@ public class EnergyPanel extends JPanel {
 	private final JSlider colorMapSlider;
 	private final JProgressBar progressBar;
 	private final ColorBar budgetBar, heightBar, areaBar;
-	private final JPanel budgetPanel, heightPanel, areaPanel;
+	private final JPanel thermostatPanel, budgetPanel, heightPanel, areaPanel;
+	private final JTextField thermostatTemperatureField;
 	private JPanel partPanel;
 	private JPanel buildingPanel;
 	private JPanel partPropertiesPanel;
@@ -183,10 +182,8 @@ public class EnergyPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
 					heliodon.setDate((Date) dateSpinner.getValue());
-					final Calendar c = heliodon.getCalender();
-					Util.setSilently(insideTemperatureSpinner, Scene.getInstance().getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)));
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setDate(c.getTime());
+					Scene.getInstance().setDate(heliodon.getCalender().getTime());
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 				}
@@ -264,9 +261,7 @@ public class EnergyPanel extends JPanel {
 				SceneManager.getInstance().getUndoManager().addEdit(new ChangeTimeCommand());
 				final Heliodon heliodon = Heliodon.getInstance();
 				heliodon.setTime((Date) timeSpinner.getValue());
-				final Calendar c = heliodon.getCalender();
-				Scene.getInstance().setDate(c.getTime());
-				Util.setSilently(insideTemperatureSpinner, Scene.getInstance().getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)));
+				Scene.getInstance().setDate(heliodon.getCalender().getTime());
 				updateWeatherData();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
@@ -317,57 +312,55 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
 
 		final JPanel conditionPanel = new JPanel();
-		conditionPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Conditions", TitledBorder.LEADING, TitledBorder.TOP));
+		conditionPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Weather Conditions", TitledBorder.LEADING, TitledBorder.TOP));
 		dataPanel.add(conditionPanel);
 		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
 		conditionPanel.setLayout(gbl_temperaturePanel);
 
-		final JLabel insideTemperatureLabel = new JLabel("Room \u00B0C: ");
-		final GridBagConstraints gbc_insideTemperatureLabel = new GridBagConstraints();
-		gbc_insideTemperatureLabel.gridx = 1;
-		gbc_insideTemperatureLabel.gridy = 0;
-		conditionPanel.add(insideTemperatureLabel, gbc_insideTemperatureLabel);
+		// insideTemperatureSpinner = new JSpinner();
+		// insideTemperatureSpinner.setToolTipText("Thermostat temperature setting for the selected building");
+		// insideTemperatureSpinner.addChangeListener(new ChangeListener() {
+		// @Override
+		// public void stateChanged(final ChangeEvent e) {
+		// HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		// if (selectedPart instanceof Foundation) {
+		// Foundation f = (Foundation) selectedPart;
+		// SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand(f));
+		// final Calendar c = Heliodon.getInstance().getCalender();
+		// final int i = (int) Double.parseDouble(insideTemperatureSpinner.getValue().toString());
+		// f.getThermostat().setTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY), i);
+		// if (disableActionsRequester == null)
+		// compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		// Scene.getInstance().setEdited(true);
+		// }
+		// }
+		// });
+		// insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
+		// ((DefaultEditor) insideTemperatureSpinner.getEditor()).getTextField().setEditable(false);
+		// final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
+		// gbc_insideTemperatureSpinner.gridx = 2;
+		// gbc_insideTemperatureSpinner.gridy = 0;
+		// conditionPanel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
 
-		insideTemperatureSpinner = new JSpinner();
-		insideTemperatureSpinner.setToolTipText("Thermostat temperature setting for the inside of the house");
-		insideTemperatureSpinner.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand());
-				final Calendar c = Heliodon.getInstance().getCalender();
-				final int i = (int) Double.parseDouble(insideTemperatureSpinner.getValue().toString());
-				Scene.getInstance().getThermostat().setTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY), i);
-				if (disableActionsRequester == null)
-					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-				Scene.getInstance().setEdited(true);
-			}
-		});
-		insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
-		((DefaultEditor) insideTemperatureSpinner.getEditor()).getTextField().setEditable(false);
-		final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
-		gbc_insideTemperatureSpinner.gridx = 2;
-		gbc_insideTemperatureSpinner.gridy = 0;
-		conditionPanel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
-
-		final JLabel outsideTemperatureLabel = new JLabel(" Outside: ");
+		final JLabel outsideTemperatureLabel = new JLabel("Current Temperature: ");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
-		gbc_outsideTemperatureLabel.gridx = 3;
+		gbc_outsideTemperatureLabel.gridx = 1;
 		gbc_outsideTemperatureLabel.gridy = 0;
 		conditionPanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
 
 		conditionPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, conditionPanel.getPreferredSize().height));
 
 		outsideTemperatureField = new JTextField(4);
-		outsideTemperatureField.setToolTipText("Outside temperature at this time and day");
+		outsideTemperatureField.setToolTipText("Current outside temperature at this time and day");
 		outsideTemperatureField.setEnabled(false);
 		final GridBagConstraints gbc_outsideTemperatureField = new GridBagConstraints();
-		gbc_outsideTemperatureField.gridx = 4;
+		gbc_outsideTemperatureField.gridx = 2;
 		gbc_outsideTemperatureField.gridy = 0;
 		conditionPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
 
-		final JLabel sunshineLabel = new JLabel(" Sunshine: ");
+		final JLabel sunshineLabel = new JLabel("  Sunshine: ");
 		final GridBagConstraints gbc_sunshineLabel = new GridBagConstraints();
-		gbc_sunshineLabel.gridx = 5;
+		gbc_sunshineLabel.gridx = 3;
 		gbc_sunshineLabel.gridy = 0;
 		conditionPanel.add(sunshineLabel, gbc_sunshineLabel);
 
@@ -375,7 +368,7 @@ public class EnergyPanel extends JPanel {
 		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
 		sunshineHoursField.setEnabled(false);
 		final GridBagConstraints gbc_sunshineHoursField = new GridBagConstraints();
-		gbc_sunshineHoursField.gridx = 6;
+		gbc_sunshineHoursField.gridx = 4;
 		gbc_sunshineHoursField.gridy = 0;
 		conditionPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
@@ -465,6 +458,17 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		budgetPanel.add(budgetBar, BorderLayout.CENTER);
+
+		// thermostat for the selected building
+
+		thermostatPanel = new JPanel(new BorderLayout(5, 0));
+		thermostatPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Thermostat", TitledBorder.LEADING, TitledBorder.TOP));
+		thermostatPanel.add(new JLabel("Temperature: "), BorderLayout.WEST);
+		thermostatTemperatureField = new JTextField();
+		thermostatTemperatureField.setEditable(false);
+		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
+		thermostatPanel.add(new JButton("Adjust"), BorderLayout.EAST);
+		buildingPanel.add(thermostatPanel);
 
 		progressBar = new JProgressBar();
 		add(progressBar, BorderLayout.SOUTH);
@@ -605,7 +609,7 @@ public class EnergyPanel extends JPanel {
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
-				updatePartEnergy();
+				updateProperties();
 				Scene.getInstance().setTreeLeaves();
 			}
 
@@ -625,10 +629,10 @@ public class EnergyPanel extends JPanel {
 	private void updateWeatherData() {
 		final String city = (String) cityComboBox.getSelectedItem();
 		if (city.equals("")) {
-			outsideTemperatureField.setText("15\u00B0C");
+			outsideTemperatureField.setText("15 \u00B0C");
 			sunshineHoursField.setText("10");
 		} else {
-			outsideTemperatureField.setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + "\u00B0C");
+			outsideTemperatureField.setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + " \u00B0C");
 			final Map<String, int[]> sunshineHours = LocationData.getInstance().getSunshineHours();
 			final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
 			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + "hrs");
@@ -653,10 +657,6 @@ public class EnergyPanel extends JPanel {
 
 	public JSpinner getLatitudeSpinner() {
 		return latitudeSpinner;
-	}
-
-	public JSpinner getInsideTemperatureSpinner() {
-		return insideTemperatureSpinner;
 	}
 
 	public ConstructionCostGraph getConstructionCostGraph() {
@@ -730,7 +730,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public void updatePartEnergy() {
+	public void updateProperties() {
 		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 
@@ -817,9 +817,12 @@ public class EnergyPanel extends JPanel {
 				heightBar.setValue(0);
 				areaBar.setValue(0);
 			}
+			final Calendar c = Heliodon.getInstance().getCalender();
+			thermostatTemperatureField.setText(selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)) + " \u00B0C");
 		} else {
 			heightBar.setValue(0);
 			areaBar.setValue(0);
+			thermostatTemperatureField.setText(null);
 		}
 
 		heightBar.repaint();
@@ -848,7 +851,7 @@ public class EnergyPanel extends JPanel {
 		updateBudgetBar();
 		updateAreaBar();
 		updateHeightBar();
-		updatePartEnergy();
+		updateProperties();
 	}
 
 	/** Apply this when the UI is set programmatically (not by the user) */

@@ -395,17 +395,14 @@ public class Heliodon {
 		if (updateGUI) {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					double t = Scene.getInstance().getThermostat().getTemperature(calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, calendar.get(Calendar.HOUR_OF_DAY));
 					Date d = calendar.getTime();
 					EnergyPanel.getInstance().getOutsideTemperatureField().setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + "\u00B0C");
 					if (undoable) {
 						EnergyPanel.getInstance().getTimeSpinner().setValue(d);
 						EnergyPanel.getInstance().getDateSpinner().setValue(d);
-						EnergyPanel.getInstance().getInsideTemperatureSpinner().setValue(t);
 					} else {
 						Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), d);
 						Util.setSilently(EnergyPanel.getInstance().getDateSpinner(), d);
-						Util.setSilently(EnergyPanel.getInstance().getInsideTemperatureSpinner(), t);
 					}
 				}
 			});

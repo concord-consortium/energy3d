@@ -379,7 +379,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				stateValue = Scene.getInstance().getGround().getThermalDiffusivity();
 			} else if (lastEdit instanceof ChangeInsideTemperatureCommand) {
 				ChangeInsideTemperatureCommand c = (ChangeInsideTemperatureCommand) lastEdit;
-				stateValue = Scene.getInstance().getThermostat().getTemperature(c.getMonthOfYear(), c.getDayOfWeek(), c.getHourOfDay());
+				stateValue = c.getBuilding().getThermostat().getTemperature(c.getMonthOfYear(), c.getDayOfWeek(), c.getHourOfDay());
 			} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
 				stateValue = Scene.getInstance().getSolarHeatMapColorContrast();
 			} else if (lastEdit instanceof ChangeLatitudeCommand) {

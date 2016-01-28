@@ -578,7 +578,7 @@ public class SolarRadiation {
 					// In other words, geothermal energy is good in hot conditions. This is similar to passive solar energy, which is good in the winter but bad in the summer.
 					if (groundHeatLoss > 0) {
 						final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * timeStep);
-						if (outsideTemperature >= Scene.getInstance().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY))) {
+						if (outsideTemperature >= foundation.getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY))) {
 							heatLoss[i] -= groundHeatLoss;
 						}
 					} else {
@@ -656,7 +656,7 @@ public class SolarRadiation {
 				for (int i = 0; i < n; i++) {
 					final double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
 					if (groundHeatLoss > 0) {
-						final double thermostat = Scene.getInstance().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY));
+						final double thermostat = foundation.getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY));
 						if (outsideTemperature >= thermostat) {
 							heatLoss[i] -= groundHeatLoss;
 						}

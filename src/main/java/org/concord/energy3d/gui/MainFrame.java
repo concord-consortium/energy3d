@@ -2017,7 +2017,16 @@ public class MainFrame extends JFrame {
 			thermostatMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new ThermostatDialog().setVisible(true);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null)
+						return;
+					Foundation foundation = null;
+					if (selectedPart instanceof Foundation) {
+						foundation = (Foundation) selectedPart;
+					} else {
+						foundation = selectedPart.getTopContainer();
+					}
+					new ThermostatDialog(foundation).setVisible(true);
 				}
 			});
 		}

@@ -18,7 +18,7 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 
-import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -35,9 +35,11 @@ class ThermostatView extends JPanel {
 	private int selectedHour = -1;
 	private int monthOfYear = -1;
 	private int dayOfWeek = -1;
+	private Foundation foundation;
 
-	public ThermostatView(int monthOfYear, int dayOfWeek) {
+	public ThermostatView(Foundation foundation, int monthOfYear, int dayOfWeek) {
 		super();
+		this.foundation = foundation;
 		this.monthOfYear = monthOfYear;
 		this.dayOfWeek = dayOfWeek;
 		hourlyTemperatures = Collections.synchronizedMap(new LinkedHashMap<Float, Integer>());
@@ -70,7 +72,7 @@ class ThermostatView extends JPanel {
 			Object key2 = hourlyTemperatures.keySet().toArray()[selectedHour];
 			int earlyTemperature = hourlyTemperatures.get(key1);
 			hourlyTemperatures.put((Float) key2, earlyTemperature);
-			Scene.getInstance().getThermostat().setTemperature(monthOfYear, dayOfWeek, selectedHour, earlyTemperature);
+			foundation.getThermostat().setTemperature(monthOfYear, dayOfWeek, selectedHour, earlyTemperature);
 			selectedHour = -1;
 		}
 		repaint();
@@ -179,7 +181,7 @@ class ThermostatView extends JPanel {
 				Object key = hourlyTemperatures.keySet().toArray()[selectedHour];
 				int newTemperature = e.isShiftDown() ? hourlyTemperatures.get(key) - 1 : hourlyTemperatures.get(key) + 1;
 				hourlyTemperatures.put((Float) key, newTemperature);
-				Scene.getInstance().getThermostat().setTemperature(monthOfYear, dayOfWeek, selectedHour, newTemperature);
+				foundation.getThermostat().setTemperature(monthOfYear, dayOfWeek, selectedHour, newTemperature);
 			}
 		}
 		repaint();

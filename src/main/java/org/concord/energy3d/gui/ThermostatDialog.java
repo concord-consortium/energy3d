@@ -21,7 +21,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Thermostat;
 
@@ -40,7 +40,7 @@ class ThermostatDialog extends JDialog {
 
 	private ThermostatView[] sliders;
 
-	public ThermostatDialog() {
+	public ThermostatDialog(Foundation foundation) {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -59,9 +59,9 @@ class ThermostatDialog extends JDialog {
 
 		sliders = new ThermostatView[7];
 		int numberOfSteps = 25;
-		Thermostat t = Scene.getInstance().getThermostat();
+		Thermostat t = foundation.getThermostat();
 		for (int i = 0; i < sliders.length; i++) {
-			sliders[i] = new ThermostatView(month, i);
+			sliders[i] = new ThermostatView(foundation, month, i);
 			sliders[i].setBackground(bgColor);
 			sliders[i].setPreferredSize(new Dimension(720, 30));
 			sliders[i].setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));

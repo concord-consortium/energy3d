@@ -1576,8 +1576,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				}
 				updateHeliodonAndAnnotationSize();
-				EnergyPanel.getInstance().updatePartEnergy();
-				EnergyPanel.getInstance().updateCost();
+				EnergyPanel.getInstance().update();
 				return null;
 			}
 		});

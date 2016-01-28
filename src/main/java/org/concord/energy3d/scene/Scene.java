@@ -117,7 +117,6 @@ public class Scene implements Serializable {
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = true;
 	private Ground ground = new Ground();
-	private Thermostat thermostat = new Thermostat();
 	private DesignSpecs designSpecs = new DesignSpecs();
 	private HousePart copyBuffer, originalCopy;
 
@@ -157,8 +156,7 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
-		EnergyPanel.getInstance().updatePartEnergy();
-		EnergyPanel.getInstance().updateCost();
+		EnergyPanel.getInstance().update();
 		EnergyPanel.getInstance().clearAllGraphs();
 	}
 
@@ -309,7 +307,6 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().changeSkyTexture();
 			// SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 		}
-		final Calendar calendar = Heliodon.getInstance().getCalender();
 
 		if (Util.isZero(instance.solarContrast)) // if the solar map color contrast has not been set, set it to 50
 			instance.solarContrast = 50;
@@ -321,9 +318,6 @@ public class Scene implements Serializable {
 			instance.designSpecs = new DesignSpecs();
 		if (instance.ground == null)
 			instance.ground = new Ground();
-		if (instance.thermostat == null)
-			instance.thermostat = new Thermostat();
-		Util.setSilently(energyPanel.getInsideTemperatureSpinner(), instance.thermostat.getTemperature(calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, calendar.get(Calendar.HOUR_OF_DAY)));
 
 		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
 
@@ -342,6 +336,9 @@ public class Scene implements Serializable {
 					f.setUValue(0.19);
 				if (Util.isZero(f.getVolumetricHeatCapacity()))
 					f.setVolumetricHeatCapacity(0.5);
+				if (f.getThermostat() == null)
+					f.setThermostat(new Thermostat());
+
 			} else if (p instanceof Wall) {
 				final Wall w = (Wall) p;
 				if (Util.isZero(w.getUValue()))
@@ -1388,10 +1385,6 @@ public class Scene implements Serializable {
 
 	public Ground getGround() {
 		return ground;
-	}
-
-	public Thermostat getThermostat() {
-		return thermostat;
 	}
 
 	public DesignSpecs getDesignSpecs() {

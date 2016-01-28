@@ -977,7 +977,7 @@ public class MainPanel extends JPanel {
 						if (count == 1) {
 							SceneManager.getInstance().setSelectedPart(hp);
 							SceneManager.getInstance().refresh();
-							EnergyPanel.getInstance().updatePartEnergy();
+							EnergyPanel.getInstance().updateProperties();
 						} else {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
 							return;
