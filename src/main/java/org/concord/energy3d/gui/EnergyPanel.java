@@ -644,7 +644,7 @@ public class EnergyPanel extends JPanel {
 		compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
-	private void updateWeatherData() {
+	public void updateWeatherData() {
 		final String city = (String) cityComboBox.getSelectedItem();
 		if (city.equals("")) {
 			outsideTemperatureField.setText("15 \u00B0C");
@@ -838,19 +838,26 @@ public class EnergyPanel extends JPanel {
 			final Calendar c = Heliodon.getInstance().getCalender();
 			thermostatTemperatureField.setText(selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)) + " \u00B0C");
 			thermostatPanel.add(adjustThermostatButton, BorderLayout.EAST);
+			String s2 = selectedBuilding.toString();
+			s2 = s2.substring(0, s2.indexOf(')') + 1);
+			int i1 = s2.indexOf('(');
+			int i2 = s2.indexOf(')');
+			((TitledBorder) buildingPanel.getBorder()).setTitle("Building #" + s2.substring(i1 + 1, i2));
 		} else {
 			heightBar.setValue(0);
 			areaBar.setValue(0);
 			thermostatTemperatureField.setText(null);
 			thermostatPanel.remove(adjustThermostatButton);
+			((TitledBorder) buildingPanel.getBorder()).setTitle("Building");
 		}
+		buildingPanel.repaint();
 
 		heightBar.repaint();
 		areaBar.repaint();
 
 	}
 
-	private void updateThermostat() {
+	public void updateThermostat() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart == null)
 			return;

@@ -19,7 +19,7 @@ public class Thermostat implements Serializable {
 	}
 
 	private void init() {
-		temperatures = new int[12][7][24];
+		temperatures = new int[12][7][25]; // the last one of 25 is the default temperature of the whole day
 		for (int i = 0; i < 7; i++) {
 			Arrays.fill(temperatures[0][i], 20);
 			Arrays.fill(temperatures[1][i], 20);
