@@ -1427,6 +1427,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						selectedHousePart.complete(); // to undo edit flag set by SelectUtil above
 						if (!PrintController.getInstance().isPrintPreview())
 							selectedHousePart.setEditPointsVisible(true);
+						EnergyPanel.getInstance().update();
 					}
 					EnergyPanel.getInstance().updateGraphs();
 					final JPanel cp = MainPanel.getInstance().getCanvasPanel();

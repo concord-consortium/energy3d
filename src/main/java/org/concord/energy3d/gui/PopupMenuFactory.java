@@ -679,6 +679,16 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miThermostat = new JMenuItem("Thermostat...");
+			miThermostat.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation)
+						new ThermostatDialog((Foundation) selectedPart).setVisible(true);
+				}
+			});
+
 			popupMenuForFoundation = createPopupMenu(false, true, new Runnable() {
 				@Override
 				public void run() {
@@ -699,6 +709,7 @@ public class PopupMenuFactory {
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createInsulationMenuItem(false));
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
+			popupMenuForFoundation.add(miThermostat);
 
 		}
 
