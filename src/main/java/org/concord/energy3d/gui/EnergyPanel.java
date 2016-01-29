@@ -115,6 +115,7 @@ public class EnergyPanel extends JPanel {
 	private final ColorBar budgetBar, heightBar, areaBar;
 	private final JPanel thermostatPanel, budgetPanel, heightPanel, areaPanel;
 	private final JTextField thermostatTemperatureField;
+	private final JButton adjustThermostatButton;
 	private JPanel partPanel;
 	private JPanel buildingPanel;
 	private JPanel partPropertiesPanel;
@@ -186,6 +187,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().setDate(heliodon.getCalender().getTime());
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
+					updateThermostat();
 				}
 			}
 		});
@@ -263,6 +265,7 @@ public class EnergyPanel extends JPanel {
 				heliodon.setTime((Date) timeSpinner.getValue());
 				Scene.getInstance().setDate(heliodon.getCalender().getTime());
 				updateWeatherData();
+				updateThermostat();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
 				if (MainPanel.getInstance().getShadowButton().isSelected()) {
@@ -467,7 +470,22 @@ public class EnergyPanel extends JPanel {
 		thermostatTemperatureField = new JTextField();
 		thermostatTemperatureField.setEditable(false);
 		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
-		thermostatPanel.add(new JButton("Adjust"), BorderLayout.EAST);
+		adjustThermostatButton = new JButton("Adjust");
+		adjustThermostatButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart == null)
+					return;
+				Foundation foundation = null;
+				if (selectedPart instanceof Foundation) {
+					foundation = (Foundation) selectedPart;
+				} else {
+					foundation = selectedPart.getTopContainer();
+				}
+				new ThermostatDialog(foundation).setVisible(true);
+			}
+		});
 		buildingPanel.add(thermostatPanel);
 
 		progressBar = new JProgressBar();
@@ -819,15 +837,32 @@ public class EnergyPanel extends JPanel {
 			}
 			final Calendar c = Heliodon.getInstance().getCalender();
 			thermostatTemperatureField.setText(selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)) + " \u00B0C");
+			thermostatPanel.add(adjustThermostatButton, BorderLayout.EAST);
 		} else {
 			heightBar.setValue(0);
 			areaBar.setValue(0);
 			thermostatTemperatureField.setText(null);
+			thermostatPanel.remove(adjustThermostatButton);
 		}
 
 		heightBar.repaint();
 		areaBar.repaint();
 
+	}
+
+	private void updateThermostat() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null)
+			return;
+		final Foundation selectedBuilding = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+		if (selectedBuilding != null) {
+			final Calendar c = Heliodon.getInstance().getCalender();
+			thermostatTemperatureField.setText(selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)) + " \u00B0C");
+			thermostatPanel.add(adjustThermostatButton, BorderLayout.EAST);
+		} else {
+			thermostatTemperatureField.setText(null);
+			thermostatPanel.remove(adjustThermostatButton);
+		}
 	}
 
 	public void updateCost() {

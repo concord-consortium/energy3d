@@ -760,8 +760,7 @@ public class MainPanel extends JPanel {
 
 	private JScrollPane getNoteScrollPane() {
 		if (noteScrollPane == null) {
-			noteScrollPane = new JScrollPane(getNoteTextArea());
-			// //noteScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			noteScrollPane = new JScrollPane(getNoteTextArea(), JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		}
 		return noteScrollPane;
 	}
@@ -769,7 +768,7 @@ public class MainPanel extends JPanel {
 	public JTextArea getNoteTextArea() {
 		if (noteTextArea == null) {
 			noteTextArea = new JTextArea(new MyPlainDocument()); // want to keep a copy of what was removed
-			// noteTextArea.setWrapStyleWord(true);
+			// noteTextArea.setWrapStyleWord(true); // don't call this, line break malfunctions
 			// noteTextArea.setLineWrap(true);
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
 				public void updateEditFlag() {

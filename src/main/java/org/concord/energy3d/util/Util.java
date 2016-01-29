@@ -50,10 +50,7 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 public class Util {
 
 	/**
-	 * platform-independent check for Windows' equivalent of right click of
-	 * mouse button. This can be used as an alternative as
-	 * MouseEvent.isPopupTrigger(), which requires checking within both
-	 * mousePressed() and mouseReleased() methods.
+	 * platform-independent check for Windows' equivalent of right click of mouse button. This can be used as an alternative as MouseEvent.isPopupTrigger(), which requires checking within both mousePressed() and mouseReleased() methods.
 	 */
 	public static boolean isRightClick(final MouseEvent e) {
 		if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0)
@@ -186,8 +183,7 @@ public class Util {
 	}
 
 	/*
-	 * A function to check whether point P(x, y) lies inside the triangle formed
-	 * by A(x1, y1), B(x2, y2) and C(x3, y3)
+	 * A function to check whether point P(x, y) lies inside the triangle formed by A(x1, y1), B(x2, y2) and C(x3, y3)
 	 */
 	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3) {
 		final double A = area(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
@@ -260,8 +256,7 @@ public class Util {
 	}
 
 	/*
-	 * This is automatically evaluated as either 2D projection on xy plane or 1D
-	 * projection on z axis
+	 * This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis
 	 */
 	public static Vector3 projectPointOnLine(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final boolean limitToLineSegment) {
 		// return projectPointOnLine(new Vector2(point.getX(), point.getY()),
@@ -279,8 +274,7 @@ public class Util {
 	}
 
 	/*
-	 * This is automatically evaluated as either 2D projection on xy plane or 1D
-	 * projection on z axis
+	 * This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis
 	 */
 	public static double projectPointOnLineScale(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {
 		final boolean isHorizontal = Util.isZero(p2.subtract(p1, null).normalizeLocal().getZ());
@@ -413,8 +407,7 @@ public class Util {
 	}
 
 	/**
-	 * This method sets the selection state of a button visually without
-	 * invoking its ItemListeners and ActionListeners
+	 * This method sets the selection state of a button visually without invoking its ItemListeners and ActionListeners
 	 */
 	public static void selectSilently(final AbstractButton button, final boolean selected) {
 		final ItemListener[] itemListeners = button.getItemListeners();
@@ -431,8 +424,7 @@ public class Util {
 	}
 
 	/**
-	 * This method sets the selection state of a combo box visually without
-	 * invoking its ItemListeners and ActionListeners
+	 * This method sets the selection state of a combo box visually without invoking its ItemListeners and ActionListeners
 	 */
 	public static void selectSilently(final JComboBox<?> comboBox, final int selectedIndex) {
 		final ItemListener[] itemListeners = comboBox.getItemListeners();
@@ -449,8 +441,7 @@ public class Util {
 	}
 
 	/**
-	 * This method sets the selection state of a combo box visually without
-	 * invoking its ItemListeners and ActionListeners
+	 * This method sets the selection state of a combo box visually without invoking its ItemListeners and ActionListeners
 	 */
 	public static void selectSilently(final JComboBox<?> comboBox, final Object item) {
 		final ItemListener[] itemListeners = comboBox.getItemListeners();
@@ -467,8 +458,7 @@ public class Util {
 	}
 
 	/**
-	 * This method sets the value of a spinner visually without invoking its
-	 * ChangeListeners
+	 * This method sets the value of a spinner visually without invoking its ChangeListeners
 	 */
 	public static void setSilently(final JSpinner spinner, final Object value) {
 		final ChangeListener[] changeListeners = spinner.getChangeListeners();
@@ -490,8 +480,7 @@ public class Util {
 	}
 
 	/**
-	 * This method sets the value of a slider visually without invoking its
-	 * ChangeListeners
+	 * This method sets the value of a slider visually without invoking its ChangeListeners
 	 */
 	public static void setSilently(final JSlider slider, final int value) {
 		final ChangeListener[] changeListeners = slider.getChangeListeners();
@@ -503,8 +492,7 @@ public class Util {
 	}
 
 	/**
-	 * This method sets the text of a text component without invoking its
-	 * DocumentListeners
+	 * This method sets the text of a text component without invoking its DocumentListeners
 	 */
 	public static void setSilently(final JTextComponent tc, final String text) {
 		final AbstractDocument doc = (AbstractDocument) tc.getDocument();
@@ -617,8 +605,7 @@ public class Util {
 	}
 
 	/**
-	 * Approximately calculate the center of a mesh using the averange of all
-	 * the triangle vertices
+	 * Approximately calculate the center of a mesh using the averange of all the triangle vertices
 	 */
 	public static Vector3 computeCenter(final Mesh mesh) {
 		double x = 0, y = 0, z = 0;
