@@ -88,6 +88,7 @@ public abstract class HousePart implements Serializable {
 	protected transient Vector3 flattenCenter;
 	protected transient double orgHeight;
 	protected transient double area;
+	protected transient int containerRoofIndex;
 	private transient double[] solarPotential;
 	private transient double[] heatLoss;
 	private transient double solarPotentialNow; // solar potential of current hour
@@ -848,8 +849,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public boolean isValid() {
-		if (!isDrawable())
-			return false;
+		// if (!isDrawable())
+		// return false;
 		for (final ReadOnlyVector3 p : points)
 			if (!Vector3.isValid(p))
 				return false;
@@ -899,7 +900,7 @@ public abstract class HousePart implements Serializable {
 			mesh.setDefaultColor(ColorRGBA.RED);
 		} else {
 			mesh.clearRenderState(StateType.Offset);
-			mesh.setDefaultColor(ColorRGBA.WHITE);
+			mesh.setDefaultColor(getColor());
 		}
 	}
 
@@ -1138,6 +1139,7 @@ public abstract class HousePart implements Serializable {
 			return null;
 		ReadOnlyVector3 normal = Vector3.UNIT_Z;
 		if (container instanceof Roof) {
+			final int[] editPointToRoofIndex = new int[points.size()];
 			for (int i = 0; i < points.size(); i++) {
 				final PickResults pickResults = new PrimitivePickResults();
 				final Ray3 ray = new Ray3(getAbsPoint(i).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
@@ -1152,12 +1154,33 @@ public abstract class HousePart implements Serializable {
 					points.get(i).setZ(p.getZ());
 					final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
 					final int roofPartIndex = userData.getIndex();
-					normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
+					editPointToRoofIndex[i] = roofPartIndex;
 				}
+
+				// find roofPart with most edit points on it
+				containerRoofIndex = editPointToRoofIndex[0];
+				if (points.size() > 1) {
+					containerRoofIndex = 0;
+					final Map<Integer, Integer> counts = new HashMap<Integer, Integer>(points.size());
+					for (final int roofIndex : editPointToRoofIndex)
+						counts.put(roofIndex, counts.get(roofIndex) == null ? 1 : counts.get(roofIndex) + 1);
+
+					int highestCount = 0;
+					for (final int roofIndex : editPointToRoofIndex)
+						if (counts.get(roofIndex) > highestCount) {
+							highestCount = counts.get(roofIndex);
+							containerRoofIndex = roofIndex;
+						}
+				}
+				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
 			}
 		} else
 			normal = container.getNormal();
 		return normal;
+	}
+
+	protected boolean fits(final HousePart child) {
+		return true;
 	}
 
 }

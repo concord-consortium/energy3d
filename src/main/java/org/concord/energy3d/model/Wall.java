@@ -1168,12 +1168,13 @@ public class Wall extends HousePart implements Thermalizable {
 	public boolean windowsFit() {
 		for (final HousePart part : children)
 			if (part instanceof Window)
-				if (!fits((Window) part))
+				if (!fits(part))
 					return false;
 		return true;
 	}
 
-	public boolean fits(final Window window) {
+	@Override
+	public boolean fits(final HousePart window) {
 		final List<Vector3> hole = computeWindowHole(window, Vector3.ZERO);
 		applyXYTransform(hole);
 		final double minDistanceToRoof = 0.3 / Scene.getInstance().getAnnotationScale();
@@ -1320,22 +1321,27 @@ public class Wall extends HousePart implements Thermalizable {
 		return neighbors;
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return false;
 	}
 
+	@Override
 	public void setUValue(final double uValue) {
 		this.uValue = uValue;
 	}
 
+	@Override
 	public double getUValue() {
 		return uValue;
 	}
 
+	@Override
 	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
 		this.volumetricHeatCapacity = volumetricHeatCapacity;
 	}
 
+	@Override
 	public double getVolumetricHeatCapacity() {
 		return volumetricHeatCapacity;
 	}

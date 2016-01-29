@@ -1,8 +1,8 @@
 package org.concord.energy3d.model;
 
+import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -19,6 +19,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
@@ -177,11 +178,16 @@ public class Window extends HousePart implements Thermalizable {
 		mesh.setVisible(container instanceof Roof);
 
 		normal = computeNormalAndKeepOnRoof();
+		final boolean isDrawable = isDrawable();
+		setHighlight(!isDrawable);
 		updateEditShapes();
 
 		final boolean drawBars = style != NO_MUNTIN_BAR && !isFrozen() && !Util.isEqual(getAbsPoint(2), getAbsPoint(0)) && !Util.isEqual(getAbsPoint(1), getAbsPoint(0));
 		final ReadOnlyVector3 meshOffset, barsOffset;
-		if (container instanceof Roof) {
+		if (!isDrawable) {
+			meshOffset = new Vector3();
+			barsOffset = normal.multiply(0.1, null);
+		} else if (container instanceof Roof) {
 			if (drawBars) {
 				meshOffset = normal.multiply(-0.1, null);
 				barsOffset = new Vector3();
@@ -388,23 +394,12 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
-		final List<Vector3> orgPoints = new ArrayList<Vector3>(points.size());
-		for (int i = 0; i < points.size(); i++)
-			orgPoints.add(points.get(i));
-
 		final ReadOnlyVector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
-		for (int i = 0; i < points.size(); i++) {
-			final Vector3 newP = houseMoveStartPoints.get(i).add(d_rel, null);
-			points.set(i, newP);
-		}
-
-		if (container instanceof Wall && !((Wall) container).fits(this))
-			for (int i = 0; i < points.size(); i++)
-				points.set(i, orgPoints.get(i));
+		for (int i = 0; i < points.size(); i++)
+			houseMoveStartPoints.get(i).add(d_rel, points.get(i));
 
 		draw();
 		container.draw();
-
 	}
 
 	public void setStyle(final int style) {
@@ -600,6 +595,45 @@ public class Window extends HousePart implements Thermalizable {
 	@Override
 	public Spatial getRadiationCollisionSpatial() {
 		return getRadiationMesh();
+	}
+
+	@Override
+	public boolean isDrawable() {
+		if (container == null) // FIXME: There is a chance that a solar panel can be left without a container
+			return true;
+		if (!super.isDrawable())
+			return false;
+		if (!container.fits(this))
+			return false;
+
+		final boolean isRoof = container instanceof Roof;
+		final Rectangle2D thisWindow = makeRectangle(this, isRoof);
+		for (final HousePart part : container.getChildren())
+			if (part != this && part instanceof Window && (!isRoof || part.containerRoofIndex == this.containerRoofIndex)) {
+				final Rectangle2D otherWindow = makeRectangle((Window) part, isRoof);
+				if (thisWindow.intersects(otherWindow))
+					return false;
+			}
+		return true;
+	}
+
+	private Rectangle2D makeRectangle(final Window window, final boolean isRoof) {
+		final ReadOnlyTransform transform;
+		if (isRoof)
+			transform = ((Roof) container).getRoofPartsRoot().getChild(window.containerRoofIndex).getWorldTransform();
+		else
+			transform = null;
+		Rectangle2D thisWindow = null;
+		for (int i = 0; i < window.getPoints().size(); i++) {
+			final Vector3 p = isRoof ? window.getAbsPoint(i) : window.points.get(i);
+			if (isRoof)
+				transform.applyInverse(p);
+			final double y = isRoof ? p.getY() : p.getZ();
+			if (thisWindow == null)
+				thisWindow = new Rectangle2D.Double(p.getX(), y, 0, 0);
+			thisWindow.add(p.getX(), y);
+		}
+		return thisWindow;
 	}
 
 }

@@ -1219,4 +1219,26 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		return volumetricHeatCapacity;
 	}
 
+	@Override
+	protected boolean fits(final HousePart window) {
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+			final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+			final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
+
+			boolean allInside = true;
+			boolean allOutside = true;
+			for (int i = 0; i < window.getPoints().size(); i++) {
+				final Vector3 p = window.getAbsPoint(i);
+				roofPart.getWorldTransform().applyInverse(p);
+				if (Util.insidePolygon(p, outlinePoints))
+					allOutside = false;
+				else
+					allInside = false;
+			}
+			if (!allInside && !allOutside)
+				return false;
+		}
+		return true;
+	}
+
 }
