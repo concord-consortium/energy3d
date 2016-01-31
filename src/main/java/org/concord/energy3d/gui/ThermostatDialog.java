@@ -5,11 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormatSymbols;
@@ -44,7 +40,7 @@ class ThermostatDialog extends JDialog {
 	private int numberOfSteps = 25;
 	private Color bgColor = new Color(225, 225, 225);
 
-	public ThermostatDialog(Foundation foundation) {
+	public ThermostatDialog(final Foundation foundation) {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -90,22 +86,22 @@ class ThermostatDialog extends JDialog {
 		hourLabel.setHorizontalAlignment(JLabel.LEFT);
 		hourLabel.setVerticalAlignment(JLabel.CENTER);
 		hourLabel.setMinimumSize(new Dimension(40, 20));
-		HourPanel hourPanel = new HourPanel(temperatureButtons[0]);
+		HourPanel hourPanel = new HourPanel(foundation, temperatureButtons);
 		hourPanel.setPreferredSize(new Dimension(temperatureButtons[0].getPreferredSize().width, 20));
 		hourPanel.setBackground(bgColor);
 		hourPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
 
 		JLabel[] labels = new JLabel[7];
-		labels[0] = new JLabel("Sunday");
-		labels[1] = new JLabel("Monday");
-		labels[2] = new JLabel("Tuesday");
-		labels[3] = new JLabel("Wednesday");
-		labels[4] = new JLabel("Thursday");
-		labels[5] = new JLabel("Friday");
-		labels[6] = new JLabel("Saturday");
+		labels[0] = new JLabel("Sun");
+		labels[1] = new JLabel("Mon");
+		labels[2] = new JLabel("Tue");
+		labels[3] = new JLabel("Wed");
+		labels[4] = new JLabel("Thu");
+		labels[5] = new JLabel("Fri");
+		labels[6] = new JLabel("Sat");
 		for (int i = 0; i < labels.length; i++) {
 			labels[i].setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
-			labels[i].setMinimumSize(new Dimension(60, 30));
+			labels[i].setMinimumSize(new Dimension(40, 30));
 			labels[i].setAlignmentX(CENTER_ALIGNMENT);
 		}
 
@@ -165,6 +161,7 @@ class ThermostatDialog extends JDialog {
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				EnergyPanel.getInstance().updateThermostat();
 				ThermostatDialog.this.dispose();
 			}
 		});
@@ -176,6 +173,7 @@ class ThermostatDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				EnergyPanel.getInstance().updateThermostat();
 				ThermostatDialog.this.dispose();
 			}
 		});
@@ -184,46 +182,6 @@ class ThermostatDialog extends JDialog {
 
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());
-
-	}
-
-	@SuppressWarnings("serial")
-	class HourPanel extends JPanel {
-
-		private ThermostatView thermostatView;
-
-		public HourPanel(ThermostatView thermostatView) {
-			this.thermostatView = thermostatView;
-		}
-
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			update(g);
-		}
-
-		public void update(Graphics g) {
-
-			Graphics2D g2 = (Graphics2D) g;
-			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-			Dimension dim = getSize();
-			int width = dim.width;
-			int height = dim.height;
-			g2.setColor(getBackground());
-			g2.fillRect(0, 0, width, height);
-			g2.setFont(new Font("Arial", Font.PLAIN, 10));
-
-			float delta = (width - 0.8f * thermostatView.getHeight()) / 25.0f;
-			g2.setColor(Color.DARK_GRAY);
-			String hourString;
-			FontMetrics fm = g2.getFontMetrics();
-			for (int i = 0; i < 25; i++) {
-				hourString = i == 24 ? "All" : i + "";
-				g2.drawString(hourString, (int) (delta * (i + 1) - fm.stringWidth(hourString) / 2), height - 5);
-			}
-
-		}
 
 	}
 

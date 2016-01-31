@@ -30,10 +30,10 @@ class ThermostatView extends JPanel {
 	private Color allColor = new Color(108, 108, 108);
 	private Color warmColor = new Color(223, 67, 0);
 	private Color coolColor = new Color(0, 67, 223);
-	private Map<Float, Integer> hourlyTemperatures;
+	Map<Float, Integer> hourlyTemperatures;
 	private int selectedHour = -1;
-	private int monthOfYear = -1;
-	private int dayOfWeek = -1;
+	int monthOfYear = -1;
+	int dayOfWeek = -1;
 	private Foundation foundation;
 	private int previousY;
 	private boolean increaseTemperature = false;
