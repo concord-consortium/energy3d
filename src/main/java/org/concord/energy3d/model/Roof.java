@@ -178,11 +178,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null, false);
-		final List<Window> windows = new ArrayList<Window>();
-		for (final HousePart part : children)
-			if (part instanceof Window && part.isDrawable())
-				windows.add((Window) part);
-		MeshLib.groupByPlanner(mesh, roofPartsRoot, windows);
+		MeshLib.groupByPlanner(mesh, roofPartsRoot);
 		hideGableRoofParts();
 		int roofPartIndex = 0;
 		for (final Spatial child : roofPartsRoot.getChildren()) {
@@ -190,6 +186,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			mesh.setUserData(new UserData(this, roofPartIndex, false));
 			roofPartIndex++;
 		}
+		final List<Window> windows = new ArrayList<Window>();
+		for (final HousePart part : children)
+			if (part instanceof Window && part.isDrawable())
+				windows.add((Window) part);
 		MeshLib.applyHoles(roofPartsRoot, windows);
 		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
 	}

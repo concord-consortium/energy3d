@@ -50,7 +50,7 @@ public class MeshLib {
 		final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
 	}
 
-	public static void groupByPlanner(final Mesh mesh, final Node root, final List<Window> windows) {
+	public static void groupByPlanner(final Mesh mesh, final Node root) {
 		final ArrayList<GroupData> groups = extractGroups(mesh);
 		createMeshes(root, groups);
 	}
