@@ -18,6 +18,8 @@ import java.util.Map;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.AdjustThermostatCommand;
 
 /**
  * @author Charles Xie
@@ -38,6 +40,7 @@ class ThermostatView extends JPanel {
 	private int previousY;
 	private boolean increaseTemperature = false;
 	private boolean decreaseTemperature = false;
+	private boolean mouseHeld;
 
 	public ThermostatView(Foundation foundation, int monthOfYear, int dayOfWeek) {
 		super();
@@ -54,6 +57,11 @@ class ThermostatView extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				processMouseReleased(e);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				processMouseExited(e);
 			}
 		});
 		addMouseMotionListener(new MouseMotionAdapter() {
@@ -161,6 +169,7 @@ class ThermostatView extends JPanel {
 		int height = getHeight();
 		previousY = y;
 		selectedHour = -1;
+		mouseHeld = true;
 		synchronized (hourlyTemperatures) {
 			Object[] keys = hourlyTemperatures.keySet().toArray();
 			for (int i = 0; i < keys.length; i++) {
@@ -185,6 +194,7 @@ class ThermostatView extends JPanel {
 	}
 
 	private void processMouseReleased(MouseEvent e) {
+		mouseHeld = false;
 		if (!increaseTemperature && !decreaseTemperature)
 			return;
 		if (selectedHour >= 0) {
@@ -195,6 +205,7 @@ class ThermostatView extends JPanel {
 				newTemperature++;
 			if (decreaseTemperature)
 				newTemperature--;
+			SceneManager.getInstance().getUndoManager().addEdit(new AdjustThermostatCommand(foundation));
 			if (selectedHour == 24) { // temperature for the whole day
 				int originalTemperatureForAll = hourlyTemperatures.get(keys[24]);
 				for (int i = 0; i < keys.length; i++) {
@@ -210,6 +221,14 @@ class ThermostatView extends JPanel {
 			}
 			selectedHour = -1;
 		}
+		repaint();
+		increaseTemperature = false;
+		decreaseTemperature = false;
+	}
+
+	private void processMouseExited(MouseEvent e) {
+		if (!mouseHeld)
+			selectedHour = -1;
 		repaint();
 	}
 

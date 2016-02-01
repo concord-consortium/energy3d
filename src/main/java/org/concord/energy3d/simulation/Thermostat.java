@@ -36,6 +36,20 @@ public class Thermostat implements Serializable {
 		}
 	}
 
+	public int[][][] getTemperatures() {
+		return temperatures;
+	}
+
+	public void setTemperatures(int[][][] values) {
+		for (int i = 0; i < 12; i++) {
+			for (int j = 0; j < 7; j++) {
+				for (int k = 0; k < 25; k++) {
+					temperatures[i][j][k] = values[i][j][k];
+				}
+			}
+		}
+	}
+
 	/** monthOfYear, dayOfWeek, and hourOfDay all starts from zero. */
 	public void setTemperature(int monthOfYear, int dayOfWeek, int hourOfDay, int temperature) {
 		temperatures[monthOfYear][dayOfWeek][hourOfDay] = temperature;

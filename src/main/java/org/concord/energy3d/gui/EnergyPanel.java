@@ -320,31 +320,6 @@ public class EnergyPanel extends JPanel {
 		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
 		conditionPanel.setLayout(gbl_temperaturePanel);
 
-		// insideTemperatureSpinner = new JSpinner();
-		// insideTemperatureSpinner.setToolTipText("Thermostat temperature setting for the selected building");
-		// insideTemperatureSpinner.addChangeListener(new ChangeListener() {
-		// @Override
-		// public void stateChanged(final ChangeEvent e) {
-		// HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		// if (selectedPart instanceof Foundation) {
-		// Foundation f = (Foundation) selectedPart;
-		// SceneManager.getInstance().getUndoManager().addEdit(new ChangeInsideTemperatureCommand(f));
-		// final Calendar c = Heliodon.getInstance().getCalender();
-		// final int i = (int) Double.parseDouble(insideTemperatureSpinner.getValue().toString());
-		// f.getThermostat().setTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY), i);
-		// if (disableActionsRequester == null)
-		// compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-		// Scene.getInstance().setEdited(true);
-		// }
-		// }
-		// });
-		// insideTemperatureSpinner.setModel(new SpinnerNumberModel(20, -70, 60, 1));
-		// ((DefaultEditor) insideTemperatureSpinner.getEditor()).getTextField().setEditable(false);
-		// final GridBagConstraints gbc_insideTemperatureSpinner = new GridBagConstraints();
-		// gbc_insideTemperatureSpinner.gridx = 2;
-		// gbc_insideTemperatureSpinner.gridy = 0;
-		// conditionPanel.add(insideTemperatureSpinner, gbc_insideTemperatureSpinner);
-
 		final JLabel outsideTemperatureLabel = new JLabel("Current Temperature: ");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
 		gbc_outsideTemperatureLabel.gridx = 1;
@@ -466,7 +441,7 @@ public class EnergyPanel extends JPanel {
 
 		thermostatPanel = new JPanel(new BorderLayout(5, 0));
 		thermostatPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Thermostat", TitledBorder.LEADING, TitledBorder.TOP));
-		thermostatPanel.add(new JLabel("Temperature: "), BorderLayout.WEST);
+		thermostatPanel.add(new JLabel("Current Setting: "), BorderLayout.WEST);
 		thermostatTemperatureField = new JTextField();
 		thermostatTemperatureField.setEditable(false);
 		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);

@@ -15,6 +15,8 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.AdjustThermostatCommand;
 
 /**
  * This allows users to change the temperature of a given hour of all days in the week.
@@ -130,6 +132,7 @@ class HourPanel extends JPanel {
 		if (!increaseTemperature && !decreaseTemperature)
 			return;
 		if (selectedHour >= 0) {
+			SceneManager.getInstance().getUndoManager().addEdit(new AdjustThermostatCommand(foundation));
 			for (int i = 0; i < thermostatButtons.length; i++) {
 				Object[] keys = thermostatButtons[i].hourlyTemperatures.keySet().toArray();
 				Object selectedKey = keys[selectedHour];

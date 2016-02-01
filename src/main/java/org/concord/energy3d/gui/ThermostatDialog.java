@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Thermostat;
 
@@ -162,6 +163,7 @@ class ThermostatDialog extends JDialog {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				EnergyPanel.getInstance().updateThermostat();
+				Scene.getInstance().setEdited(true);
 				ThermostatDialog.this.dispose();
 			}
 		});

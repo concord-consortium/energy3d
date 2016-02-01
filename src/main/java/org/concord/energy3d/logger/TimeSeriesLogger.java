@@ -49,6 +49,7 @@ import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.AddPartCommand;
+import org.concord.energy3d.undo.AdjustThermostatCommand;
 import org.concord.energy3d.undo.AnimateSunCommand;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
@@ -253,6 +254,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				Foundation foundation = ((ChangeBuildingWindowShgcCommand) lastEdit).getFoundation();
 				List<Window> windows = Scene.getInstance().getWindowsOfBuilding(foundation);
 				stateValue = "{\"Building\":" + foundation.getId() + ", \"Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
+			} else if (lastEdit instanceof AdjustThermostatCommand) {
+				Foundation foundation = ((AdjustThermostatCommand) lastEdit).getFoundation();
+				stateValue = "{\"Building\":" + foundation.getId() + "}";
 			} else if (lastEdit instanceof ChangePartUValueCommand) {
 				HousePart p = ((ChangePartUValueCommand) lastEdit).getHousePart();
 				if (p instanceof Thermalizable) {
