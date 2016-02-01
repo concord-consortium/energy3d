@@ -7,11 +7,14 @@ import javax.swing.JComboBox;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -77,6 +80,8 @@ public class HeatLoad {
 			iMinute = minute / timeStep;
 			final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], minute);
 			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Human || part instanceof Tree || part instanceof Floor) // these should not be in the heat load calculations
+					continue;
 				final float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
 				if (part instanceof Roof) { // need to compute piece by piece for a roof because sun affects outside temperature of roof part
 					final Roof roof = (Roof) part;

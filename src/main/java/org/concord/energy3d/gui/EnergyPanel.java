@@ -458,7 +458,7 @@ public class EnergyPanel extends JPanel {
 				} else {
 					foundation = selectedPart.getTopContainer();
 				}
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				SceneManager.getInstance().computeEnergyView(false);
 				new ThermostatDialog(foundation).setVisible(true);
 			}
 		});

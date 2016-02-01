@@ -685,7 +685,7 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+						SceneManager.getInstance().computeEnergyView(false);
 						new ThermostatDialog((Foundation) selectedPart).setVisible(true);
 					}
 				}
