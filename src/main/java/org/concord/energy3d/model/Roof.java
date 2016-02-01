@@ -336,7 +336,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	public ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
 		final double offset = 0.001;
 		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults);
+		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
 		return pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
 	}
 

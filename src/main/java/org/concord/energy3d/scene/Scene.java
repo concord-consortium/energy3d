@@ -853,6 +853,7 @@ public class Scene implements Serializable {
 			for (final HousePart part : parts)
 				if (!(part instanceof Roof))
 					part.draw();
+			// need to draw roof again because roof holes depend on drawn windows
 			for (final HousePart part : parts)
 				if (part instanceof Roof)
 					part.draw();
