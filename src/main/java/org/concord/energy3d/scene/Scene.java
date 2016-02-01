@@ -853,6 +853,9 @@ public class Scene implements Serializable {
 			for (final HousePart part : parts)
 				if (!(part instanceof Roof))
 					part.draw();
+			for (final HousePart part : parts)
+				if (part instanceof Roof)
+					part.draw();
 		}
 		// no need for redrawing print parts because they will be regenerated from original parts anyways
 		redrawAll = false;
