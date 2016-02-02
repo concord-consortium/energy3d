@@ -138,44 +138,58 @@ public class MeshLib {
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
-		root.detachAllChildren();
+		// RenderState[] textureStates = new RenderState[root.getNumberOfChildren()];
+		// int i = 0;
+		// if (MainPanel.getInstance().getEnergyViewButton().isSelected())
+		// for (Spatial roofPart : root.getChildren())
+		// textureStates[i++] = ((Mesh)((Node)roofPart).getChild(6)).getLocalRenderState(StateType.Texture);
+		// root.detachAllChildren();
 		int meshIndex = 0;
 		for (final GroupData group : groups) {
-			final Node node = new Node("Roof Part #" + meshIndex);
-			final Mesh mesh = new Mesh("Roof Mesh #" + meshIndex);
-			final Mesh meshWithHoles = new Mesh("Roof Mesh #" + meshIndex);
-			mesh.setVisible(false);
-			mesh.setModelBound(new BoundingBox());
-			meshWithHoles.setModelBound(new BoundingBox());
-			meshWithHoles.setRenderState(HousePart.offsetState);
+			final Node node;
+			final Mesh mesh;
+			final BMText label;
+			if (meshIndex < root.getNumberOfChildren()) {
+				node = (Node) root.getChild(meshIndex);
+				mesh = (Mesh) node.getChild(0);
+				label = (BMText) node.getChild(3);
+			} else {
+				node = new Node("Roof Part #" + meshIndex);
+				mesh = new Mesh("Roof Mesh #" + meshIndex);
+				final Mesh meshWithHoles = new Mesh("Roof Mesh #" + meshIndex);
+				mesh.setVisible(false);
+				mesh.setModelBound(new BoundingBox());
+				meshWithHoles.setModelBound(new BoundingBox());
+				meshWithHoles.setRenderState(HousePart.offsetState);
 
-			final BMText label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
-			Util.initHousePartLabel(label);
-			label.getSceneHints().setCullHint(CullHint.Always);
+				label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
+				Util.initHousePartLabel(label);
+				label.getSceneHints().setCullHint(CullHint.Always);
 
-			final Mesh wireframeMesh = new Line("Roof (wireframe)");
-			wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
-			wireframeMesh.setModelBound(new BoundingBox());
-			wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
-			// offset to avoid z-fighting
-			wireframeMesh.setTranslation(group.key.multiply(0.001, null));
-			Util.disablePickShadowLight(wireframeMesh);
+				final Mesh wireframeMesh = new Line("Roof (wireframe)");
+				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
+				wireframeMesh.setModelBound(new BoundingBox());
+				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
+				// offset to avoid z-fighting
+				wireframeMesh.setTranslation(group.key.multiply(0.001, null));
+				Util.disablePickShadowLight(wireframeMesh);
 
-			final Line dashLineMesh = new Line("Roof (dash line)");
-			dashLineMesh.setStipplePattern((short) 0xFF00);
-			dashLineMesh.setVisible(false);
-			dashLineMesh.setModelBound(new BoundingBox());
-			Util.disablePickShadowLight(dashLineMesh);
+				final Line dashLineMesh = new Line("Roof (dash line)");
+				dashLineMesh.setStipplePattern((short) 0xFF00);
+				dashLineMesh.setVisible(false);
+				dashLineMesh.setModelBound(new BoundingBox());
+				Util.disablePickShadowLight(dashLineMesh);
 
-			node.attachChild(mesh);
-			node.attachChild(new Node("Roof Size Annot"));
-			node.attachChild(new Node("Roof Angle Annot"));
-			node.attachChild(label);
-			node.attachChild(wireframeMesh);
-			node.attachChild(dashLineMesh);
-			node.attachChild(meshWithHoles);
+				node.attachChild(mesh);
+				node.attachChild(new Node("Roof Size Annot"));
+				node.attachChild(new Node("Roof Angle Annot"));
+				node.attachChild(label);
+				node.attachChild(wireframeMesh);
+				node.attachChild(dashLineMesh);
+				node.attachChild(meshWithHoles);
 
-			root.attachChild(node);
+				root.attachChild(node);
+			}
 
 			final Vector3 normal = new Vector3();
 			for (final ReadOnlyVector3 v : group.normals)
@@ -183,9 +197,7 @@ public class MeshLib {
 			normal.normalizeLocal();
 			node.setUserData(normal);
 
-			FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-			final int n = group.vertices.size();
-			buf = BufferUtils.createVector3Buffer(n);
+			final FloatBuffer buf = BufferUtils.createVector3Buffer(group.vertices.size());
 			mesh.getMeshData().setVertexBuffer(buf);
 			final Vector3 center = new Vector3();
 			for (final ReadOnlyVector3 v : group.vertices) {

@@ -995,18 +995,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (this.operation != operation) {
 			this.operation = operation;
 			operationFlag = true;
-			synchronized (this) {
-				if (selectedHousePart != null) {
-					if (selectedHousePart.isDrawCompleted())
-						selectedHousePart.setEditPointsVisible(false);
-					else
-						Scene.getInstance().remove(selectedHousePart, false);
-					selectedHousePart = null;
-				}
-			}
-			if (operation != Operation.SELECT)
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-			refresh();
 		}
 	}
 
@@ -1016,6 +1004,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void executeOperation() {
 		operationFlag = false;
+
+		if (selectedHousePart != null) {
+			if (selectedHousePart.isDrawCompleted())
+				selectedHousePart.setEditPointsVisible(false);
+			else
+				Scene.getInstance().remove(selectedHousePart, false);
+			selectedHousePart = null;
+		}
 
 		for (final HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation)
