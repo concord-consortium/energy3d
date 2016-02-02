@@ -24,6 +24,7 @@ import org.poly2tri.triangulation.point.TPoint;
 import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -138,12 +139,6 @@ public class MeshLib {
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
-		// RenderState[] textureStates = new RenderState[root.getNumberOfChildren()];
-		// int i = 0;
-		// if (MainPanel.getInstance().getEnergyViewButton().isSelected())
-		// for (Spatial roofPart : root.getChildren())
-		// textureStates[i++] = ((Mesh)((Node)roofPart).getChild(6)).getLocalRenderState(StateType.Texture);
-		// root.detachAllChildren();
 		int meshIndex = 0;
 		for (final GroupData group : groups) {
 			final Node node;
@@ -208,6 +203,7 @@ public class MeshLib {
 			label.setTranslation(center.add(normal.multiply(0.1, null), null));
 
 			mesh.updateModelBound();
+			CollisionTreeManager.getInstance().updateCollisionTree(mesh);
 			meshIndex++;
 		}
 	}
