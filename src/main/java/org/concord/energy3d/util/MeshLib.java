@@ -139,7 +139,7 @@ public class MeshLib {
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
-		if (groups.size() != root.getNumberOfChildren() - 1)
+		if (groups.size() != root.getNumberOfChildren())
 			root.detachAllChildren();
 
 		int meshIndex = 0;
