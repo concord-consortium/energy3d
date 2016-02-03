@@ -24,6 +24,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
 
 public class HeatLoad {
 
@@ -86,37 +87,39 @@ public class HeatLoad {
 				if (part instanceof Roof) { // need to compute piece by piece for a roof because sun affects outside temperature of roof part
 					final Roof roof = (Roof) part;
 					for (final Spatial child : roof.getRoofPartsRoot().getChildren()) {
-						final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-						final double[] solarPotential = SolarRadiation.getInstance().getSolarPotential(mesh);
-						final double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / roof.getVolumetricHeatCapacity() : 0;
-						final double insideTemperature = part.getTopContainer().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, minute / 60);
-						final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
-						if (part.isDrawCompleted()) {
-							final double uValue = getUValue(part);
-							if (Util.isZero(uValue))
-								continue;
-							double heatloss = roof.getAreaWithoutOverhang(mesh) * uValue * deltaT / 1000.0 / 60 * timeStep;
-							// if the lowest outside temperature is high enough, there is no need to turn on the heater hence no heat loss
-							if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY)
-								heatloss = 0;
-							roof.getHeatLoss()[iMinute] += heatloss;
-							final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
-							if (heatLossArray != null)
-								heatLossArray[iMinute] += heatloss;
+						if (child.getSceneHints().getCullHint() != CullHint.Always) {
+							final Mesh mesh = (Mesh) ((Node) child).getChild(0);
+							final double[] solarPotential = SolarRadiation.getInstance().getSolarPotential(mesh);
+							final double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / roof.getVolumetricHeatCapacity() : 0;
+							final double insideTemperature = part.getTopContainer().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, minute / 60);
+							final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
+							if (part.isDrawCompleted()) {
+								final double uValue = getUValue(part);
+								if (Util.isZero(uValue))
+									continue;
+								double heatloss = roof.getAreaWithoutOverhang(mesh) * uValue * deltaT / 1000.0 / 60 * timeStep;
+								// if the lowest outside temperature is high enough, there is no need to turn on the heater hence no heat loss
+								if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY)
+									heatloss = 0;
+								roof.getHeatLoss()[iMinute] += heatloss;
+								final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
+								if (heatLossArray != null)
+									heatLossArray[iMinute] += heatloss;
+							}
 						}
 					}
 				} else if (part instanceof Foundation) {
-					double groundTemperature = Scene.getInstance().getGround().getTemperatureMinuteOfDay(today.get(Calendar.DAY_OF_YEAR), minute, 0.5 * (outsideTemperatureRange[1] - outsideTemperatureRange[0]));
-					Foundation foundation = (Foundation) part;
+					final double groundTemperature = Scene.getInstance().getGround().getTemperatureMinuteOfDay(today.get(Calendar.DAY_OF_YEAR), minute, 0.5 * (outsideTemperatureRange[1] - outsideTemperatureRange[0]));
+					final Foundation foundation = (Foundation) part;
 					final double insideTemperature = foundation.getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, minute / 60);
-					double deltaT = insideTemperature - groundTemperature;
+					final double deltaT = insideTemperature - groundTemperature;
 					if (foundation.isDrawCompleted()) {
 						final double uValue = getUValue(part);
 						if (Util.isZero(uValue))
 							continue;
-						double[] buildingGeometry = foundation.getBuildingGeometry();
-						double area = buildingGeometry != null ? buildingGeometry[1] : foundation.getArea();
-						double heatloss = area * uValue * deltaT / 1000.0 / 60 * timeStep;
+						final double[] buildingGeometry = foundation.getBuildingGeometry();
+						final double area = buildingGeometry != null ? buildingGeometry[1] : foundation.getArea();
+						final double heatloss = area * uValue * deltaT / 1000.0 / 60 * timeStep;
 						// if (iMinute % 4 == 0) System.out.println((int) (iMinute / 4) + "=" + outsideTemperature + ", " + groundTemperature + ", " + deltaT + ", " + heatloss);
 						foundation.getHeatLoss()[iMinute] += heatloss;
 					}

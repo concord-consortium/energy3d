@@ -139,6 +139,9 @@ public class MeshLib {
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
+		if (groups.size() != root.getNumberOfChildren() - 1)
+			root.detachAllChildren();
+
 		int meshIndex = 0;
 		for (final GroupData group : groups) {
 			final Node node;
@@ -186,6 +189,8 @@ public class MeshLib {
 				root.attachChild(node);
 			}
 
+			node.getSceneHints().setCullHint(CullHint.Never);
+
 			final Vector3 normal = new Vector3();
 			for (final ReadOnlyVector3 v : group.normals)
 				normal.addLocal(v);
@@ -206,6 +211,8 @@ public class MeshLib {
 			CollisionTreeManager.getInstance().updateCollisionTree(mesh);
 			meshIndex++;
 		}
+
+		// while (meshIndex < root.getNumberOfChildren())
 	}
 
 	public static void applyHoles(final Node root, final List<Window> windows) {
@@ -221,90 +228,92 @@ public class MeshLib {
 
 		for (int roofIndex = 0; roofIndex < root.getChildren().size(); roofIndex++) {
 			final Spatial roofPart = root.getChildren().get(roofIndex);
-			final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
-			final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
-			final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
+				final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
+				final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
 
-			final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-			final ArrayList<ReadOnlyVector3> points3D = computeOutline(mesh.getMeshData().getVertexBuffer());
-			final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
+				final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+				final ArrayList<ReadOnlyVector3> points3D = computeOutline(mesh.getMeshData().getVertexBuffer());
+				final List<PolygonPoint> points2D = new ArrayList<PolygonPoint>();
 
-			final ReadOnlyVector3 firstPoint = points3D.get(0);
-			final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
-			final TPoint o;
-			final TPoint u;
-			final TPoint v;
-			if (normal.dot(Vector3.UNIT_Z) == 1) {
-				o = new TPoint(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ());
-				u = new TPoint(1 / scale, 0, 0);
-				v = new TPoint(0, 1 / scale, 0);
-			} else {
-				final ReadOnlyVector3 u3 = Vector3.UNIT_Z.cross(normal, null).normalizeLocal();
-				final ReadOnlyVector3 ou3 = u3.divide(scale, null).add(firstPoint, null);
-				final ReadOnlyVector3 ov3 = normal.cross(u3, null).divideLocal(scale).addLocal(firstPoint);
-				o = new TPoint(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ());
-				u = new TPoint(ou3.getX(), ou3.getY(), ou3.getZ());
-				v = new TPoint(ov3.getX(), ov3.getY(), ov3.getZ());
+				final ReadOnlyVector3 firstPoint = points3D.get(0);
+				final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 0.5 : 0.1;
+				final TPoint o;
+				final TPoint u;
+				final TPoint v;
+				if (normal.dot(Vector3.UNIT_Z) == 1) {
+					o = new TPoint(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ());
+					u = new TPoint(1 / scale, 0, 0);
+					v = new TPoint(0, 1 / scale, 0);
+				} else {
+					final ReadOnlyVector3 u3 = Vector3.UNIT_Z.cross(normal, null).normalizeLocal();
+					final ReadOnlyVector3 ou3 = u3.divide(scale, null).add(firstPoint, null);
+					final ReadOnlyVector3 ov3 = normal.cross(u3, null).divideLocal(scale).addLocal(firstPoint);
+					o = new TPoint(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ());
+					u = new TPoint(ou3.getX(), ou3.getY(), ou3.getZ());
+					v = new TPoint(ov3.getX(), ov3.getY(), ov3.getZ());
 
-				toXY.transform(o);
-				toXY.transform(u);
-				toXY.transform(v);
+					toXY.transform(o);
+					toXY.transform(u);
+					toXY.transform(v);
 
-				u.set(u.getX() - o.getX(), u.getY() - o.getY(), 0);
-				v.set(v.getX() - o.getX(), v.getY() - o.getY(), 0);
-			}
+					u.set(u.getX() - o.getX(), u.getY() - o.getY(), 0);
+					v.set(v.getX() - o.getX(), v.getY() - o.getY(), 0);
+				}
 
-			final Vector2 o2 = new Vector2(firstPoint.getX(), firstPoint.getY());
-			final Vector2 ou2 = o2.add(new Vector2(u.getX(), u.getY()), null);
-			final Vector2 ov2 = o2.add(new Vector2(v.getX(), v.getY()), null);
-			double minLineScaleU = Double.MAX_VALUE;
-			double minLineScaleV = Double.MAX_VALUE;
-			for (final ReadOnlyVector3 p : points3D) {
-				final PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
-				toXY.transform(polygonPoint);
-				points2D.add(polygonPoint);
-				final Vector2 p2 = new Vector2(polygonPoint.getX(), polygonPoint.getY());
-				final double lineScaleU = Util.projectPointOnLineScale(p2, o2, ou2);
-				final double lineScaleV = Util.projectPointOnLineScale(p2, o2, ov2);
+				final Vector2 o2 = new Vector2(firstPoint.getX(), firstPoint.getY());
+				final Vector2 ou2 = o2.add(new Vector2(u.getX(), u.getY()), null);
+				final Vector2 ov2 = o2.add(new Vector2(v.getX(), v.getY()), null);
+				double minLineScaleU = Double.MAX_VALUE;
+				double minLineScaleV = Double.MAX_VALUE;
+				for (final ReadOnlyVector3 p : points3D) {
+					final PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+					toXY.transform(polygonPoint);
+					points2D.add(polygonPoint);
+					final Vector2 p2 = new Vector2(polygonPoint.getX(), polygonPoint.getY());
+					final double lineScaleU = Util.projectPointOnLineScale(p2, o2, ou2);
+					final double lineScaleV = Util.projectPointOnLineScale(p2, o2, ov2);
 
-				if (lineScaleU < minLineScaleU)
-					minLineScaleU = lineScaleU;
-				if (lineScaleV < minLineScaleV)
-					minLineScaleV = lineScaleV;
-			}
-			o2.addLocal(new Vector2(u.getX(), u.getY()).multiplyLocal(minLineScaleU));
-			o2.addLocal(new Vector2(v.getX(), v.getY()).multiplyLocal(minLineScaleV));
-			final PolygonWithHoles polygon = new PolygonWithHoles(points2D);
-			o.set(o2.getX(), o2.getY(), 0);
+					if (lineScaleU < minLineScaleU)
+						minLineScaleU = lineScaleU;
+					if (lineScaleV < minLineScaleV)
+						minLineScaleV = lineScaleV;
+				}
+				o2.addLocal(new Vector2(u.getX(), u.getY()).multiplyLocal(minLineScaleU));
+				o2.addLocal(new Vector2(v.getX(), v.getY()).multiplyLocal(minLineScaleV));
+				final PolygonWithHoles polygon = new PolygonWithHoles(points2D);
+				o.set(o2.getX(), o2.getY(), 0);
 
-			roofPart.updateWorldBound(true);
-			for (final Window window : windows) {
-				if (holes.get(window) == null)
-					continue;
-				final List<PolygonPoint> holePolygon = new ArrayList<PolygonPoint>();
-				boolean outside = false;
-				for (final ReadOnlyVector3 holePoint : holes.get(window)) {
-					final PickResults pickResults = new PrimitivePickResults();
-					PickingUtil.findPick(((Node) roofPart).getChild(0), new Ray3(holePoint, Vector3.UNIT_Z), pickResults, false);
-					if (pickResults.getNumber() > 0) {
-						final ReadOnlyVector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
-						final PolygonPoint polygonPoint = new PolygonPoint(intersectionPoint.getX(), intersectionPoint.getY(), intersectionPoint.getZ());
-						toXY.transform(polygonPoint);
-						holePolygon.add(polygonPoint);
-					} else {
-						outside = true;
-						break;
+				roofPart.updateWorldBound(true);
+				for (final Window window : windows) {
+					if (holes.get(window) == null)
+						continue;
+					final List<PolygonPoint> holePolygon = new ArrayList<PolygonPoint>();
+					boolean outside = false;
+					for (final ReadOnlyVector3 holePoint : holes.get(window)) {
+						final PickResults pickResults = new PrimitivePickResults();
+						PickingUtil.findPick(((Node) roofPart).getChild(0), new Ray3(holePoint, Vector3.UNIT_Z), pickResults, false);
+						if (pickResults.getNumber() > 0) {
+							final ReadOnlyVector3 intersectionPoint = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
+							final PolygonPoint polygonPoint = new PolygonPoint(intersectionPoint.getX(), intersectionPoint.getY(), intersectionPoint.getZ());
+							toXY.transform(polygonPoint);
+							holePolygon.add(polygonPoint);
+						} else {
+							outside = true;
+							break;
+						}
+					}
+					if (!outside) {
+						polygon.addHole(new PolygonWithHoles(holePolygon));
+						holes.remove(window);
+						window.setRoofIndex(roofIndex);
 					}
 				}
-				if (!outside) {
-					polygon.addHole(new PolygonWithHoles(holePolygon));
-					holes.remove(window);
-					window.setRoofIndex(roofIndex);
-				}
-			}
 
-			final Mesh meshWithHoles = (Mesh) ((Node) roofPart).getChild(6);
-			fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u, false);
+				final Mesh meshWithHoles = (Mesh) ((Node) roofPart).getChild(6);
+				fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u, false);
+			}
 		}
 	}
 

@@ -1144,9 +1144,11 @@ public abstract class HousePart implements Serializable {
 				final PickResults pickResults = new PrimitivePickResults();
 				final Ray3 ray = new Ray3(getAbsPoint(i).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
 				for (final Spatial roofPart : ((Roof) container).getRoofPartsRoot().getChildren()) {
-					PickingUtil.findPick(((Node) roofPart).getChild(0), ray, pickResults, false);
-					if (pickResults.getNumber() != 0)
-						break;
+					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+						PickingUtil.findPick(((Node) roofPart).getChild(0), ray, pickResults, false);
+						if (pickResults.getNumber() != 0)
+							break;
+					}
 				}
 				if (pickResults.getNumber() != 0) {
 					final PickData pickData = pickResults.getPickData(0);

@@ -49,6 +49,7 @@ import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.TextureKey;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -125,9 +126,11 @@ public class SolarRadiation {
 				collidablesToParts.put(s, part);
 			} else if (part instanceof Roof) {
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					final Spatial s = ((Node) roofPart).getChild(6);
-					collidables.add(s);
-					collidablesToParts.put(s, part);
+					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+						final Spatial s = ((Node) roofPart).getChild(6);
+						collidables.add(s);
+						collidablesToParts.put(s, part);
+					}
 				}
 			}
 		}
@@ -161,9 +164,11 @@ public class SolarRadiation {
 							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						else if (part instanceof Roof)
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-								final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
-								final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
-								computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
+								if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+									final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
+									final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
+									computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
+								}
 							}
 				}
 				computeOnLand(dayLength, directionTowardSun);
@@ -541,8 +546,10 @@ public class SolarRadiation {
 				applyTexture(part.getRadiationMesh());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
-					applyTexture(mesh);
+					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
+						applyTexture(mesh);
+					}
 				}
 			part.drawHeatFlux();
 		}

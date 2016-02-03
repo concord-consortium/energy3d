@@ -217,33 +217,37 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 		if (isFrozen()) {
 			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-				final Node roofPartNode = (Node) roofPart;
-				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-				dashLinesMesh.setVisible(false);
+				if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+					final Node roofPartNode = (Node) roofPart;
+					final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
+					dashLinesMesh.setVisible(false);
+				}
 			}
 		} else
 			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-				final Node roofPartNode = (Node) roofPart;
-				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-				final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
-				if (result.isEmpty()) {
-					dashLinesMesh.setVisible(false);
-				} else {
-					dashLinesMesh.setVisible(true);
-					FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
-					if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
-						vertexBuffer = BufferUtils.createVector3Buffer(result.size());
-						dashLinesMesh.getMeshData().setVertexBuffer(vertexBuffer);
+				if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+					final Node roofPartNode = (Node) roofPart;
+					final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
+					final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
+					final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
+					if (result.isEmpty()) {
+						dashLinesMesh.setVisible(false);
+					} else {
+						dashLinesMesh.setVisible(true);
+						FloatBuffer vertexBuffer = dashLinesMesh.getMeshData().getVertexBuffer();
+						if (vertexBuffer == null || vertexBuffer.capacity() < result.size() * 3) {
+							vertexBuffer = BufferUtils.createVector3Buffer(result.size());
+							dashLinesMesh.getMeshData().setVertexBuffer(vertexBuffer);
+						}
+						vertexBuffer.limit(result.size() * 3);
+						vertexBuffer.rewind();
+
+						for (final ReadOnlyVector3 p : result)
+							vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+
+						dashLinesMesh.getMeshData().updateVertexCount();
+						dashLinesMesh.updateModelBound();
 					}
-					vertexBuffer.limit(result.size() * 3);
-					vertexBuffer.rewind();
-
-					for (final ReadOnlyVector3 p : result)
-						vertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-
-					dashLinesMesh.getMeshData().updateVertexCount();
-					dashLinesMesh.updateModelBound();
 				}
 			}
 		updateDashLinesColor();
@@ -283,9 +287,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	public void updateDashLinesColor() {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			final Node roofPartNode = (Node) roofPart;
-			final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-			dashLinesMesh.setDefaultColor(ColorRGBA.RED);
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Node roofPartNode = (Node) roofPart;
+				final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
+				dashLinesMesh.setDefaultColor(ColorRGBA.RED);
+			}
 		}
 	}
 
@@ -416,17 +422,19 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	public void computeOrientedBoundingBox() {
 		orgCenters.clear();
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-			final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
-			computeOrientedBoundingBox(roofPartMesh);
-			orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
+			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
+				final Mesh roofPartMesh = (Mesh) ((Node) roofPartNode).getChild(0);
+				computeOrientedBoundingBox(roofPartMesh);
+				orgCenters.put((Node) roofPartNode, new Vector3(roofPartMesh.getWorldBound().getCenter()));
+			}
 		}
 	}
 
 	@Override
 	public void flatten(final double flattenTime) {
-		for (final Spatial child : getRoofPartsRoot().getChildren()) {
-			flattenQuadTriangle((Node) child, flattenTime);
-		}
+		for (final Spatial roofPart : getRoofPartsRoot().getChildren())
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always)
+				flattenQuadTriangle((Node) roofPart, flattenTime);
 		root.updateGeometricState(0);
 	}
 
@@ -459,10 +467,12 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	@Override
 	protected void clearAnnotations() {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			for (final Spatial sizeAnnot : ((Node) ((Node) roofPart).getChild(1)).getChildren())
-				sizeAnnot.getSceneHints().setCullHint(CullHint.Always);
-			for (final Spatial sizeAnnot : ((Node) ((Node) roofPart).getChild(2)).getChildren())
-				sizeAnnot.getSceneHints().setCullHint(CullHint.Always);
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				for (final Spatial sizeAnnot : ((Node) ((Node) roofPart).getChild(1)).getChildren())
+					sizeAnnot.getSceneHints().setCullHint(CullHint.Always);
+				for (final Spatial sizeAnnot : ((Node) ((Node) roofPart).getChild(2)).getChildren())
+					sizeAnnot.getSceneHints().setCullHint(CullHint.Always);
+			}
 		}
 	}
 
@@ -471,34 +481,36 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (container == null)
 			return;
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			int annotCounter = 0, angleAnnotCounter = 0;
-			final Node roofPartNode = (Node) roofPart;
-			final FloatBuffer buf = ((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer();
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				int annotCounter = 0, angleAnnotCounter = 0;
+				final Node roofPartNode = (Node) roofPart;
+				final FloatBuffer buf = ((Mesh) roofPartNode.getChild(0)).getMeshData().getVertexBuffer();
 
-			final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(buf);
+				final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(buf);
 
-			final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
-			final int n = convexHull.size();
-			for (int i = 0; i < n; i++) {
-				final ReadOnlyVector3 p1 = convexHull.get(i);
-				final ReadOnlyVector3 p2 = convexHull.get((i + 1) % n);
-				final ReadOnlyVector3 p3 = convexHull.get((i + 2) % n);
+				final ReadOnlyVector3 normal = (ReadOnlyVector3) roofPart.getUserData();
+				final int n = convexHull.size();
+				for (int i = 0; i < n; i++) {
+					final ReadOnlyVector3 p1 = convexHull.get(i);
+					final ReadOnlyVector3 p2 = convexHull.get((i + 1) % n);
+					final ReadOnlyVector3 p3 = convexHull.get((i + 2) % n);
 
-				// Size annotation
-				final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
-				final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1));
-				final boolean drawAnnotationsInside = Scene.isDrawAnnotationsInside();
-				sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, drawAnnotationsInside);
-				sizeAnnot.setLineWidth(original == null ? 1f : 2f);
-				if (drawAnnotationsInside)
-					sizeAnnot.setColor(ColorRGBA.WHITE);
-				else
-					sizeAnnot.setColor(ColorRGBA.BLACK);
+					// Size annotation
+					final ReadOnlyVector3 center = p1.add(p2, null).addLocal(p3).multiplyLocal(1.0 / 3.0);
+					final SizeAnnotation sizeAnnot = fetchSizeAnnot(annotCounter++, (Node) roofPartNode.getChild(1));
+					final boolean drawAnnotationsInside = Scene.isDrawAnnotationsInside();
+					sizeAnnot.setRange(p2, p3, center, normal, false, Align.Center, true, true, drawAnnotationsInside);
+					sizeAnnot.setLineWidth(original == null ? 1f : 2f);
+					if (drawAnnotationsInside)
+						sizeAnnot.setColor(ColorRGBA.WHITE);
+					else
+						sizeAnnot.setColor(ColorRGBA.BLACK);
 
-				// Angle annotations
-				final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
-				angleAnnot.setLineWidth(original == null ? 1f : 2f);
-				angleAnnot.setRange(p2, p1, p3, normal);
+					// Angle annotations
+					final AngleAnnotation angleAnnot = fetchAngleAnnot(angleAnnotCounter++, (Node) roofPartNode.getChild(2));
+					angleAnnot.setLineWidth(original == null ? 1f : 2f);
+					angleAnnot.setRange(p2, p1, p3, normal);
+				}
 			}
 		}
 	}
@@ -507,57 +519,59 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (container == null)
 			return;
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			final Node roofPartNode = (Node) roofPart;
-			final Mesh outlineMesh = (Mesh) roofPartNode.getChild(4);
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Node roofPartNode = (Node) roofPart;
+				final Mesh outlineMesh = (Mesh) roofPartNode.getChild(4);
 
-			final Mesh mesh = (Mesh) roofPartNode.getChild(0);
-			final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
-			int totalVertices = outlinePoints.size();
-			for (final HousePart part : children)
-				if (part instanceof Window)
-					totalVertices += 8;
+				final Mesh mesh = (Mesh) roofPartNode.getChild(0);
+				final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
+				int totalVertices = outlinePoints.size();
+				for (final HousePart part : children)
+					if (part instanceof Window)
+						totalVertices += 8;
 
-			final FloatBuffer buf;
-			if (outlineMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
-				buf = outlineMesh.getMeshData().getVertexBuffer();
-				buf.limit(buf.capacity());
-				buf.rewind();
-			} else {
-				buf = BufferUtils.createVector3Buffer(totalVertices * 2);
-				outlineMesh.getMeshData().setVertexBuffer(buf);
+				final FloatBuffer buf;
+				if (outlineMesh.getMeshData().getVertexBuffer().capacity() >= totalVertices * 2 * 3) {
+					buf = outlineMesh.getMeshData().getVertexBuffer();
+					buf.limit(buf.capacity());
+					buf.rewind();
+				} else {
+					buf = BufferUtils.createVector3Buffer(totalVertices * 2);
+					outlineMesh.getMeshData().setVertexBuffer(buf);
+				}
+
+				// draw roof outline
+				for (int i = 0; i < outlinePoints.size(); i++) {
+					final ReadOnlyVector3 p1 = outlinePoints.get(i);
+					final ReadOnlyVector3 p2 = outlinePoints.get((i + 1) % outlinePoints.size());
+
+					buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+					buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+				}
+
+				// draw skylights outline
+				final int[] windowIndices = new int[] { 0, 2, 3, 1 };
+				for (final HousePart part : children)
+					if (part instanceof Window && part.isDrawable() && ((Window) part).getRoofIndex() == ((UserData) mesh.getUserData()).getIndex())
+						for (int i = 0; i < part.getPoints().size(); i++) {
+							final ReadOnlyVector3 p1 = part.getAbsPoint(windowIndices[i]);
+							final ReadOnlyVector3 p2 = part.getAbsPoint(windowIndices[(i + 1) % part.getPoints().size()]);
+
+							buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+							buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+						}
+
+				buf.limit(buf.position());
+				outlineMesh.getMeshData().updateVertexCount();
+				outlineMesh.updateModelBound();
 			}
-
-			// draw roof outline
-			for (int i = 0; i < outlinePoints.size(); i++) {
-				final ReadOnlyVector3 p1 = outlinePoints.get(i);
-				final ReadOnlyVector3 p2 = outlinePoints.get((i + 1) % outlinePoints.size());
-
-				buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-				buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-			}
-
-			// draw skylights outline
-			final int[] windowIndices = new int[] { 0, 2, 3, 1 };
-			for (final HousePart part : children)
-				if (part instanceof Window && part.isDrawable() && ((Window) part).getRoofIndex() == ((UserData) mesh.getUserData()).getIndex())
-					for (int i = 0; i < part.getPoints().size(); i++) {
-						final ReadOnlyVector3 p1 = part.getAbsPoint(windowIndices[i]);
-						final ReadOnlyVector3 p2 = part.getAbsPoint(windowIndices[(i + 1) % part.getPoints().size()]);
-
-						buf.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-						buf.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-					}
-
-			buf.limit(buf.position());
-			outlineMesh.getMeshData().updateVertexCount();
-			outlineMesh.updateModelBound();
 		}
 	}
 
 	@Override
 	public int drawLabels(int printSequence) {
-		synchronized (roofPartsRoot.getChildren()) {
-			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
+		for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
+			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
 				final String text = "(" + (printSequence++ + 1) + ")";
 				final BMText label = (BMText) ((Node) roofPartNode).getChild(3);
 				label.getSceneHints().setCullHint(CullHint.Inherit);
@@ -570,14 +584,16 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	@Override
 	public void hideLabels() {
 		for (final Spatial roofPartNode : roofPartsRoot.getChildren())
-			((Node) roofPartNode).getChild(3).getSceneHints().setCullHint(CullHint.Always);
+			if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
+				((Node) roofPartNode).getChild(3).getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	@Override
 	public void updateTextureAndColor() {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
-				updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(6), getColor() == null ? Scene.getInstance().getRoofColor() : getColor());
+				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always)
+					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(6), getColor() == null ? Scene.getInstance().getRoofColor() : getColor());
 			}
 		}
 	}
@@ -781,7 +797,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				for (final Spatial roofPart : getRoofPartsRoot().getChildren()) {
 					final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
 					if (base != null && isSameBasePoints(base_i[0], base_i[1], base[0], base[1])) {
-						roofPart.removeFromParent();
+						roofPart.getSceneHints().setCullHint(CullHint.Always);
 						break;
 					}
 				}
@@ -803,29 +819,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				return wall;
 		}
 		return null;
-	}
-
-	public ArrayList<Spatial> findMeshesContainingEditPoints(final ArrayList<Vector3> editpoints) {
-		final ArrayList<Spatial> meshes = new ArrayList<Spatial>();
-		for (final Spatial mesh : roofPartsRoot.getChildren()) {
-			boolean foundAll = true;
-			for (final Vector3 p : editpoints) {
-				final FloatBuffer buf = ((Mesh) mesh).getMeshData().getVertexBuffer();
-				buf.rewind();
-				boolean found = false;
-				while (buf.hasRemaining() && !found) {
-					if (Util.isEqual(p, new Vector3(buf.get(), buf.get(), buf.get())))
-						found = true;
-				}
-				if (!found) {
-					foundAll = false;
-					break;
-				}
-			}
-			if (foundAll)
-				meshes.add(mesh);
-		}
-		return meshes;
 	}
 
 	@Override
@@ -879,8 +872,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		final CullHint cull = visible ? CullHint.Inherit : CullHint.Always;
 		if (roofPartsRoot != null)
 			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-				((Node) roofPart).getChild(1).getSceneHints().setCullHint(cull);
-				((Node) roofPart).getChild(2).getSceneHints().setCullHint(cull);
+				if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+					((Node) roofPart).getChild(1).getSceneHints().setCullHint(cull);
+					((Node) roofPart).getChild(2).getSceneHints().setCullHint(cull);
+				}
 			}
 	}
 
@@ -999,70 +994,71 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			areaByPartWithoutOverhang.clear();
 
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			final Node roofPartNode = (Node) roofPart;
-			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-			areaByPartWithOverhang.put(roofPartMesh, Util.computeArea(roofPartMesh));
-			final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
-			final Vector3 p = new Vector3();
-			if (overhangLength <= OVERHANG_MIN) {
-				final double a = Util.computeArea(roofPartMesh);
-				areaByPartWithoutOverhang.put(roofPartMesh, a);
-				area += a;
-			} else {
-				final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
-				if (result.isEmpty()) {
-					vertexBuffer.rewind();
-					p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-					final double a;
-					if (Util.insidePolygon(p, wallUpperPointsWithoutOverhang))
-						a = Util.computeArea(roofPartMesh);
-					else
-						a = 0;
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Node roofPartNode = (Node) roofPart;
+				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
+				areaByPartWithOverhang.put(roofPartMesh, Util.computeArea(roofPartMesh));
+				final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
+				final Vector3 p = new Vector3();
+				if (overhangLength <= OVERHANG_MIN) {
+					final double a = Util.computeArea(roofPartMesh);
 					areaByPartWithoutOverhang.put(roofPartMesh, a);
 					area += a;
 				} else {
-					// if (roofPartsRoot.getNumberOfChildren() > 1) {
-					double highPointZ = Double.NEGATIVE_INFINITY;
-					vertexBuffer.rewind();
-					while (vertexBuffer.hasRemaining()) {
+					final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
+					if (result.isEmpty()) {
+						vertexBuffer.rewind();
 						p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-						if (p.getZ() > highPointZ)
-							highPointZ = p.getZ();
-					}
-
-					final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
-					vertexBuffer.rewind();
-					while (vertexBuffer.hasRemaining()) {
-						p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-						if (p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE && Util.insidePolygon(p, wallUpperPointsWithoutOverhang))
-							highPoints.add(new Vector3(p));
-					}
-
-					if (highPoints.size() == 1)
-						result.add(highPoints.get(0));
-					else {
-						final ReadOnlyVector3 lastPoint = result.get(result.size() - 1);
-						while (!highPoints.isEmpty()) {
-							double shortestDistance = Double.MAX_VALUE;
-							ReadOnlyVector3 nearestPoint = null;
-							for (final ReadOnlyVector3 hp : highPoints) {
-								final double distance = hp.distance(lastPoint);
-								if (distance < shortestDistance) {
-									shortestDistance = distance;
-									nearestPoint = hp;
-								}
-							}
-							result.add(nearestPoint);
-							highPoints.remove(nearestPoint);
+						final double a;
+						if (Util.insidePolygon(p, wallUpperPointsWithoutOverhang))
+							a = Util.computeArea(roofPartMesh);
+						else
+							a = 0;
+						areaByPartWithoutOverhang.put(roofPartMesh, a);
+						area += a;
+					} else {
+						// if (roofPartsRoot.getNumberOfChildren() > 1) {
+						double highPointZ = Double.NEGATIVE_INFINITY;
+						vertexBuffer.rewind();
+						while (vertexBuffer.hasRemaining()) {
+							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							if (p.getZ() > highPointZ)
+								highPointZ = p.getZ();
 						}
+
+						final List<ReadOnlyVector3> highPoints = new ArrayList<ReadOnlyVector3>();
+						vertexBuffer.rewind();
+						while (vertexBuffer.hasRemaining()) {
+							p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
+							if (p.getZ() >= highPointZ - MathUtils.ZERO_TOLERANCE && Util.insidePolygon(p, wallUpperPointsWithoutOverhang))
+								highPoints.add(new Vector3(p));
+						}
+
+						if (highPoints.size() == 1)
+							result.add(highPoints.get(0));
+						else {
+							final ReadOnlyVector3 lastPoint = result.get(result.size() - 1);
+							while (!highPoints.isEmpty()) {
+								double shortestDistance = Double.MAX_VALUE;
+								ReadOnlyVector3 nearestPoint = null;
+								for (final ReadOnlyVector3 hp : highPoints) {
+									final double distance = hp.distance(lastPoint);
+									if (distance < shortestDistance) {
+										shortestDistance = distance;
+										nearestPoint = hp;
+									}
+								}
+								result.add(nearestPoint);
+								highPoints.remove(nearestPoint);
+							}
+						}
+						result.add(result.get(0));
+						final double annotationScale = Scene.getInstance().getAnnotationScale();
+						final double a = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
+						areaByPartWithoutOverhang.put(roofPartMesh, a);
+						this.area += a;
 					}
-					result.add(result.get(0));
-					final double annotationScale = Scene.getInstance().getAnnotationScale();
-					final double a = Util.area3D_Polygon(result, (ReadOnlyVector3) roofPart.getUserData()) * annotationScale * annotationScale;
-					areaByPartWithoutOverhang.put(roofPartMesh, a);
-					this.area += a;
 				}
-				// }
 			}
 		}
 	}
@@ -1072,11 +1068,13 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			return 0;
 		double a = 0;
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			final Node roofPartNode = (Node) roofPart;
-			final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
-			final Double d = areaByPartWithOverhang.get(roofPartMesh);
-			if (d != null)
-				a += d;
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Node roofPartNode = (Node) roofPart;
+				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
+				final Double d = areaByPartWithOverhang.get(roofPartMesh);
+				if (d != null)
+					a += d;
+			}
 		}
 		return a;
 	}
@@ -1151,11 +1149,13 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					Node node = null;
 					Mesh mesh = null;
 					for (final Spatial child : roofPartsRoot.getChildren()) {
-						node = (Node) child;
-						mesh = (Mesh) node.getChild(0);
-						b = findRoofIntersection(mesh, a);
-						if (b != null)
-							break;
+						if (child.getSceneHints().getCullHint() != CullHint.Always) {
+							node = (Node) child;
+							mesh = (Mesh) node.getChild(0);
+							b = findRoofIntersection(mesh, a);
+							if (b != null)
+								break;
+						}
 					}
 					if (b != null) {
 						final ReadOnlyVector3 normal = (ReadOnlyVector3) node.getUserData();
@@ -1222,21 +1222,23 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	@Override
 	protected boolean fits(final HousePart window) {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
-			final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-			final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+				final ArrayList<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
 
-			boolean allInside = true;
-			boolean allOutside = true;
-			for (int i = 0; i < window.getPoints().size(); i++) {
-				final Vector3 p = window.getAbsPoint(i);
-				roofPart.getWorldTransform().applyInverse(p);
-				if (Util.insidePolygon(p, outlinePoints))
-					allOutside = false;
-				else
-					allInside = false;
+				boolean allInside = true;
+				boolean allOutside = true;
+				for (int i = 0; i < window.getPoints().size(); i++) {
+					final Vector3 p = window.getAbsPoint(i);
+					roofPart.getWorldTransform().applyInverse(p);
+					if (Util.insidePolygon(p, outlinePoints))
+						allOutside = false;
+					else
+						allInside = false;
+				}
+				if (!allInside && !allOutside)
+					return false;
 			}
-			if (!allInside && !allOutside)
-				return false;
 		}
 		return true;
 	}

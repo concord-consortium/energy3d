@@ -606,6 +606,7 @@ public class Window extends HousePart implements Thermalizable {
 		if (!container.fits(this))
 			return false;
 
+		computeNormalAndKeepOnRoof(); // in case roof changes and has different roof part #s
 		final boolean isRoof = container instanceof Roof;
 		final Rectangle2D thisWindow = makeRectangle(this, isRoof);
 		for (final HousePart part : container.getChildren())

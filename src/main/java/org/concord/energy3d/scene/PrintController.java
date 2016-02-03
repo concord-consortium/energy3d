@@ -342,13 +342,15 @@ public class PrintController implements Updater {
 				if (printPart.isPrintable()) {
 					if (printPart instanceof Roof) {
 						for (final Spatial roofPartNode : ((Roof) printPart).getRoofPartsRoot().getChildren()) {
-							final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound().asType(Type.OBB);
-							final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
-							final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
-							if (width > maxWidth)
-								maxWidth = width;
-							if (height > maxHeight)
-								maxHeight = height;
+							if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
+								final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound().asType(Type.OBB);
+								final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
+								final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
+								if (width > maxWidth)
+									maxWidth = width;
+								if (height > maxHeight)
+									maxHeight = height;
+							}
 						}
 					} else {
 						final OrientedBoundingBox boundingBox = (OrientedBoundingBox) printPart.getMesh().getWorldBound().asType(Type.OBB);
@@ -448,9 +450,11 @@ public class PrintController implements Updater {
 				if (printPart instanceof Roof) {
 					final Roof roof = (Roof) printPart;
 					for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
-						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
-						roof.setPrintVertical(roofPart, decideVertical(mesh));
-						computePrintCenterOf(mesh, pages);
+						if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+							final Mesh mesh = (Mesh) ((Node) roofPart).getChild(0);
+							roof.setPrintVertical(roofPart, decideVertical(mesh));
+							computePrintCenterOf(mesh, pages);
+						}
 					}
 				} else {
 					final Mesh mesh = printPart.getMesh();
