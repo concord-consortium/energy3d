@@ -163,6 +163,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem gridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
+	private JMenu textureMenu;
 	private JRadioButtonMenuItem noTextureMenuItem;
 	private JRadioButtonMenuItem simpleTextureMenuItem;
 	private JRadioButtonMenuItem fullTextureMenuItem;
@@ -1030,9 +1031,6 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
-					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
-					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
-					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
 					MainPanel.getInstance().defaultTool();
 				}
 			});
@@ -1047,9 +1045,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getTopViewCheckBoxMenuItem());
 			viewMenu.add(getResetCameraMenuItem());
 			viewMenu.addSeparator();
-			viewMenu.add(getNoTextureMenuItem());
-			viewMenu.add(getSimpleTextureMenuItem());
-			viewMenu.add(getFullTextureMenuItem());
+			viewMenu.add(getTextureMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(getSolarAbsorptionHeatMapMenuItem());
@@ -1064,6 +1060,37 @@ public class MainFrame extends JFrame {
 
 		}
 		return viewMenu;
+	}
+
+	public JMenu getTextureMenu() {
+
+		if (textureMenu == null) {
+			textureMenu = new JMenu("Texture");
+			textureMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
+					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
+					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
+				}
+			});
+
+			textureMenu.add(getNoTextureMenuItem());
+			textureMenu.add(getSimpleTextureMenuItem());
+			textureMenu.add(getFullTextureMenuItem());
+
+		}
+		return textureMenu;
+
 	}
 
 	public JCheckBoxMenuItem getAxesMenuItem() {
