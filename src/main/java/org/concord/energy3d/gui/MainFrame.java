@@ -163,6 +163,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem gridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
+	private JMenu textureMenu;
 	private JRadioButtonMenuItem noTextureMenuItem;
 	private JRadioButtonMenuItem simpleTextureMenuItem;
 	private JRadioButtonMenuItem fullTextureMenuItem;
@@ -391,7 +392,9 @@ public class MainFrame extends JFrame {
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
 					replayFolderMenuItem.setEnabled(inactive);
-					replayLastFolderMenuItem.setEnabled(DesignReplay.getInstance().getLastFolder() != null && inactive);
+					File lastFolder = DesignReplay.getInstance().getLastFolder();
+					replayLastFolderMenuItem.setEnabled(lastFolder != null && inactive);
+					replayLastFolderMenuItem.setText(lastFolder != null ? "Replay Last Folder: " + lastFolder : "Replay Last Folder");
 					replayControlsMenu.setEnabled(!inactive);
 					analyzeFolderMenuItem.setEnabled(inactive);
 
@@ -486,7 +489,7 @@ public class MainFrame extends JFrame {
 					public void menuSelected(final MenuEvent e) {
 						endReplayMenuItem.setEnabled(PlayControl.active);
 						pauseReplayMenuItem.setEnabled(PlayControl.active);
-						pauseReplayMenuItem.setText(PlayControl.replaying ? "Pause Replay" : "Resume Replay");
+						pauseReplayMenuItem.setText((PlayControl.replaying ? "Pause Replay" : "Resume Replay") + " (Space Bar)");
 						forwardReplayMenuItem.setEnabled(!PlayControl.replaying);
 						backwardReplayMenuItem.setEnabled(!PlayControl.replaying);
 					}
@@ -684,7 +687,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getEndReplayMenuItem() {
 		if (endReplayMenuItem == null) {
-			endReplayMenuItem = new JMenuItem("End Replay");
+			endReplayMenuItem = new JMenuItem("End Replay (Escape Key)");
 			endReplayMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -712,7 +715,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getForwardReplayMenuItem() {
 		if (forwardReplayMenuItem == null) {
-			forwardReplayMenuItem = new JMenuItem("Replay Forward");
+			forwardReplayMenuItem = new JMenuItem("Replay Forward (Right Arrow Key)");
 			forwardReplayMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -728,7 +731,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getBackwardReplayMenuItem() {
 		if (backwardReplayMenuItem == null) {
-			backwardReplayMenuItem = new JMenuItem("Replay Backward");
+			backwardReplayMenuItem = new JMenuItem("Replay Backward (Left Arrow Key)");
 			backwardReplayMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1028,9 +1031,6 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
-					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
-					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
-					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
 					MainPanel.getInstance().defaultTool();
 				}
 			});
@@ -1045,9 +1045,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getTopViewCheckBoxMenuItem());
 			viewMenu.add(getResetCameraMenuItem());
 			viewMenu.addSeparator();
-			viewMenu.add(getNoTextureMenuItem());
-			viewMenu.add(getSimpleTextureMenuItem());
-			viewMenu.add(getFullTextureMenuItem());
+			viewMenu.add(getTextureMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(getSolarAbsorptionHeatMapMenuItem());
@@ -1062,6 +1060,37 @@ public class MainFrame extends JFrame {
 
 		}
 		return viewMenu;
+	}
+
+	public JMenu getTextureMenu() {
+
+		if (textureMenu == null) {
+			textureMenu = new JMenu("Texture");
+			textureMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
+					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
+					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
+				}
+			});
+
+			textureMenu.add(getNoTextureMenuItem());
+			textureMenu.add(getSimpleTextureMenuItem());
+			textureMenu.add(getFullTextureMenuItem());
+
+		}
+		return textureMenu;
+
 	}
 
 	public JCheckBoxMenuItem getAxesMenuItem() {
