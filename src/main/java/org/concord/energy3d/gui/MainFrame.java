@@ -391,7 +391,9 @@ public class MainFrame extends JFrame {
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
 					replayFolderMenuItem.setEnabled(inactive);
-					replayLastFolderMenuItem.setEnabled(DesignReplay.getInstance().getLastFolder() != null && inactive);
+					File lastFolder = DesignReplay.getInstance().getLastFolder();
+					replayLastFolderMenuItem.setEnabled(lastFolder != null && inactive);
+					replayLastFolderMenuItem.setText(lastFolder != null ? "Replay Last Folder: " + lastFolder : "Replay Last Folder");
 					replayControlsMenu.setEnabled(!inactive);
 					analyzeFolderMenuItem.setEnabled(inactive);
 
@@ -486,7 +488,7 @@ public class MainFrame extends JFrame {
 					public void menuSelected(final MenuEvent e) {
 						endReplayMenuItem.setEnabled(PlayControl.active);
 						pauseReplayMenuItem.setEnabled(PlayControl.active);
-						pauseReplayMenuItem.setText(PlayControl.replaying ? "Pause Replay" : "Resume Replay");
+						pauseReplayMenuItem.setText((PlayControl.replaying ? "Pause Replay" : "Resume Replay") + " (Space Bar)");
 						forwardReplayMenuItem.setEnabled(!PlayControl.replaying);
 						backwardReplayMenuItem.setEnabled(!PlayControl.replaying);
 					}
@@ -684,7 +686,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getEndReplayMenuItem() {
 		if (endReplayMenuItem == null) {
-			endReplayMenuItem = new JMenuItem("End Replay");
+			endReplayMenuItem = new JMenuItem("End Replay (Escape Key)");
 			endReplayMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -712,7 +714,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getForwardReplayMenuItem() {
 		if (forwardReplayMenuItem == null) {
-			forwardReplayMenuItem = new JMenuItem("Replay Forward");
+			forwardReplayMenuItem = new JMenuItem("Replay Forward (Right Arrow Key)");
 			forwardReplayMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -728,7 +730,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getBackwardReplayMenuItem() {
 		if (backwardReplayMenuItem == null) {
-			backwardReplayMenuItem = new JMenuItem("Replay Backward");
+			backwardReplayMenuItem = new JMenuItem("Replay Backward (Left Arrow Key)");
 			backwardReplayMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
