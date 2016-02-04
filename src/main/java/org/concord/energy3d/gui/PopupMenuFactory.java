@@ -1055,6 +1055,7 @@ public class PopupMenuFactory {
 								}
 								Scene.getInstance().setEdited(true);
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
 								break;
 							}
 						} catch (final NumberFormatException exception) {

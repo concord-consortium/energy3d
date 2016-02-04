@@ -14,8 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyBoundsAdapter;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
@@ -61,7 +59,6 @@ import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.LocationData;
@@ -112,8 +109,8 @@ public class EnergyPanel extends JPanel {
 	private final JPanel heatMapPanel;
 	private final JSlider colorMapSlider;
 	private final JProgressBar progressBar;
-	private final ColorBar budgetBar, heightBar, areaBar;
-	private final JPanel thermostatPanel, budgetPanel, heightPanel, areaPanel;
+	private final ColorBar heightBar, areaBar;
+	private final JPanel thermostatPanel, heightPanel, areaPanel;
 	private final JTextField thermostatTemperatureField;
 	private final JButton adjustThermostatButton;
 	private JPanel partPanel;
@@ -146,18 +143,17 @@ public class EnergyPanel extends JPanel {
 		dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
 		add(new JScrollPane(dataPanel), BorderLayout.CENTER);
 
-		final JPanel timeAndLocationPanel = new JPanel();
-		timeAndLocationPanel.setToolTipText("<html>The outside temperature and the sun path<br>differ from time to time and from location to location.</html>");
-		timeAndLocationPanel.setBorder(new TitledBorder(null, "Time & Location", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(timeAndLocationPanel);
+		final JPanel infoPanel = new JPanel();
+		infoPanel.setBorder(new TitledBorder(null, "Info", TitledBorder.LEADING, TitledBorder.TOP));
+		dataPanel.add(infoPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
-		timeAndLocationPanel.setLayout(gbl_panel_3);
+		infoPanel.setLayout(gbl_panel_3);
 
 		dateLabel = new JLabel("Date: ");
 		final GridBagConstraints gbc_dateLabel = new GridBagConstraints();
 		gbc_dateLabel.gridx = 0;
 		gbc_dateLabel.gridy = 0;
-		timeAndLocationPanel.add(dateLabel, gbc_dateLabel);
+		infoPanel.add(dateLabel, gbc_dateLabel);
 
 		dateSpinner = new JSpinner();
 		dateSpinner.setModel(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
@@ -195,7 +191,7 @@ public class EnergyPanel extends JPanel {
 		gbc_dateSpinner.insets = new Insets(0, 0, 1, 1);
 		gbc_dateSpinner.gridx = 1;
 		gbc_dateSpinner.gridy = 0;
-		timeAndLocationPanel.add(dateSpinner, gbc_dateSpinner);
+		infoPanel.add(dateSpinner, gbc_dateSpinner);
 
 		latitudeChangeListener = new ChangeListener() {
 			@Override
@@ -240,13 +236,13 @@ public class EnergyPanel extends JPanel {
 		gbc_cityComboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_cityComboBox.gridx = 2;
 		gbc_cityComboBox.gridy = 0;
-		timeAndLocationPanel.add(cityComboBox, gbc_cityComboBox);
+		infoPanel.add(cityComboBox, gbc_cityComboBox);
 
 		timeLabel = new JLabel("Time: ");
 		final GridBagConstraints gbc_timeLabel = new GridBagConstraints();
 		gbc_timeLabel.gridx = 0;
 		gbc_timeLabel.gridy = 1;
-		timeAndLocationPanel.add(timeLabel, gbc_timeLabel);
+		infoPanel.add(timeLabel, gbc_timeLabel);
 
 		timeSpinner = new JSpinner(new SpinnerDateModel());
 		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
@@ -285,14 +281,14 @@ public class EnergyPanel extends JPanel {
 		gbc_timeSpinner.fill = GridBagConstraints.HORIZONTAL;
 		gbc_timeSpinner.gridx = 1;
 		gbc_timeSpinner.gridy = 1;
-		timeAndLocationPanel.add(timeSpinner, gbc_timeSpinner);
+		infoPanel.add(timeSpinner, gbc_timeSpinner);
 
 		latitudeLabel = new JLabel("Latitude: ");
 		final GridBagConstraints gbc_altitudeLabel = new GridBagConstraints();
 		gbc_altitudeLabel.insets = new Insets(0, 1, 0, 0);
 		gbc_altitudeLabel.gridx = 2;
 		gbc_altitudeLabel.gridy = 1;
-		timeAndLocationPanel.add(latitudeLabel, gbc_altitudeLabel);
+		infoPanel.add(latitudeLabel, gbc_altitudeLabel);
 
 		latitudeSpinner = new JSpinner();
 		latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
@@ -310,45 +306,45 @@ public class EnergyPanel extends JPanel {
 		gbc_latitudeSpinner.fill = GridBagConstraints.HORIZONTAL;
 		gbc_latitudeSpinner.gridx = 3;
 		gbc_latitudeSpinner.gridy = 1;
-		timeAndLocationPanel.add(latitudeSpinner, gbc_latitudeSpinner);
+		infoPanel.add(latitudeSpinner, gbc_latitudeSpinner);
 
-		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
+		infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
 
-		final JPanel conditionPanel = new JPanel();
-		conditionPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Weather Conditions", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(conditionPanel);
-		final GridBagLayout gbl_temperaturePanel = new GridBagLayout();
-		conditionPanel.setLayout(gbl_temperaturePanel);
-
-		final JLabel outsideTemperatureLabel = new JLabel("Current Temperature: ");
+		final JLabel outsideTemperatureLabel = new JLabel("Temp.: ");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
-		gbc_outsideTemperatureLabel.gridx = 1;
-		gbc_outsideTemperatureLabel.gridy = 0;
-		conditionPanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
+		gbc_outsideTemperatureLabel.insets = new Insets(0, 8, 1, 1);
+		gbc_outsideTemperatureLabel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_outsideTemperatureLabel.gridx = 0;
+		gbc_outsideTemperatureLabel.gridy = 2;
+		infoPanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
 
-		conditionPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, conditionPanel.getPreferredSize().height));
-
-		outsideTemperatureField = new JTextField(4);
+		outsideTemperatureField = new JTextField();
 		outsideTemperatureField.setToolTipText("Current outside temperature at this time and day");
-		outsideTemperatureField.setEnabled(false);
+		outsideTemperatureField.setEditable(false);
+		outsideTemperatureField.setBackground(Color.WHITE);
 		final GridBagConstraints gbc_outsideTemperatureField = new GridBagConstraints();
-		gbc_outsideTemperatureField.gridx = 2;
-		gbc_outsideTemperatureField.gridy = 0;
-		conditionPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
+		gbc_outsideTemperatureField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_outsideTemperatureField.gridx = 1;
+		gbc_outsideTemperatureField.gridy = 2;
+		infoPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
 
-		final JLabel sunshineLabel = new JLabel("  Sunshine: ");
+		final JLabel sunshineLabel = new JLabel("Sunshine: ");
 		final GridBagConstraints gbc_sunshineLabel = new GridBagConstraints();
-		gbc_sunshineLabel.gridx = 3;
-		gbc_sunshineLabel.gridy = 0;
-		conditionPanel.add(sunshineLabel, gbc_sunshineLabel);
+		gbc_sunshineLabel.insets = new Insets(0, 5, 0, 0);
+		gbc_sunshineLabel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sunshineLabel.gridx = 2;
+		gbc_sunshineLabel.gridy = 2;
+		infoPanel.add(sunshineLabel, gbc_sunshineLabel);
 
-		sunshineHoursField = new JTextField(4);
+		sunshineHoursField = new JTextField();
 		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
-		sunshineHoursField.setEnabled(false);
+		sunshineHoursField.setEditable(false);
+		sunshineHoursField.setBackground(Color.WHITE);
 		final GridBagConstraints gbc_sunshineHoursField = new GridBagConstraints();
-		gbc_sunshineHoursField.gridx = 4;
-		gbc_sunshineHoursField.gridy = 0;
-		conditionPanel.add(sunshineHoursField, gbc_sunshineHoursField);
+		gbc_sunshineHoursField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sunshineHoursField.gridx = 3;
+		gbc_sunshineHoursField.gridy = 2;
+		infoPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP));
@@ -419,31 +415,13 @@ public class EnergyPanel extends JPanel {
 		heightBar.setPreferredSize(new Dimension(100, 16));
 		heightPanel.add(heightBar, BorderLayout.CENTER);
 
-		// cost for the selected building
-
-		budgetPanel = new JPanel(new BorderLayout());
-		budgetPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Cost ($)", TitledBorder.LEADING, TitledBorder.TOP));
-		budgetPanel.setToolTipText("<html>The total material cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
-		buildingPanel.add(budgetPanel);
-		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		budgetBar.setToolTipText(budgetPanel.getToolTipText());
-		budgetBar.setPreferredSize(new Dimension(200, 16));
-		budgetBar.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(final MouseEvent e) {
-				if (e.getClickCount() > 1)
-					Cost.getInstance().showGraph();
-			}
-		});
-		budgetPanel.add(budgetBar, BorderLayout.CENTER);
-
 		// thermostat for the selected building
 
 		thermostatPanel = new JPanel(new BorderLayout(5, 0));
-		thermostatPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Thermostat", TitledBorder.LEADING, TitledBorder.TOP));
-		thermostatPanel.add(new JLabel("Current Setting: "), BorderLayout.WEST);
+		thermostatPanel.add(new JLabel("   Thermostat: "), BorderLayout.WEST);
 		thermostatTemperatureField = new JTextField();
 		thermostatTemperatureField.setEditable(false);
+		thermostatTemperatureField.setBackground(Color.WHITE);
 		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
 		adjustThermostatButton = new JButton("Adjust");
 		adjustThermostatButton.addActionListener(new ActionListener() {
@@ -507,6 +485,7 @@ public class EnergyPanel extends JPanel {
 
 		partProperty1TextField = new JTextField();
 		partProperty1TextField.setEditable(false);
+		partProperty1TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty1TextField);
 		partProperty1TextField.setColumns(4);
 
@@ -515,6 +494,7 @@ public class EnergyPanel extends JPanel {
 
 		partProperty2TextField = new JTextField();
 		partProperty2TextField.setEditable(false);
+		partProperty2TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty2TextField);
 		partProperty2TextField.setColumns(4);
 
@@ -523,12 +503,14 @@ public class EnergyPanel extends JPanel {
 
 		partProperty3TextField = new JTextField();
 		partProperty3TextField.setEditable(false);
+		partProperty3TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty3TextField);
 		partProperty3TextField.setColumns(4);
 
 		partProperty4Label = new JLabel();
 		partProperty4TextField = new JTextField();
 		partProperty4TextField.setEditable(false);
+		partProperty4TextField.setBackground(Color.WHITE);
 		partProperty4TextField.setColumns(4);
 
 	}
@@ -629,7 +611,7 @@ public class EnergyPanel extends JPanel {
 			outsideTemperatureField.setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + " \u00B0C");
 			final Map<String, int[]> sunshineHours = LocationData.getInstance().getSunshineHours();
 			final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
-			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + "hrs");
+			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + " hours");
 		}
 	}
 
@@ -848,25 +830,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public void updateCost() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		final Foundation selectedBuilding;
-		if (selectedPart == null)
-			selectedBuilding = null;
-		else if (selectedPart instanceof Foundation)
-			selectedBuilding = (Foundation) selectedPart;
-		else
-			selectedBuilding = selectedPart.getTopContainer();
-		int n = 0;
-		if (selectedBuilding != null)
-			n = Cost.getInstance().getBuildingCost(selectedBuilding);
-		budgetBar.setValue(n);
-		budgetBar.repaint();
-	}
-
 	public void update() {
-		updateCost();
-		updateBudgetBar();
 		updateAreaBar();
 		updateHeightBar();
 		updateProperties();
@@ -891,17 +855,6 @@ public class EnergyPanel extends JPanel {
 
 	public JComboBox<String> getCityComboBox() {
 		return cityComboBox;
-	}
-
-	public void updateBudgetBar() {
-		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
-		String t = "Cost (";
-		t += specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$";
-		t += ")";
-		budgetPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
-		budgetBar.setEnabled(specs.isBudgetEnabled());
-		budgetBar.setMaximum(specs.getMaximumBudget());
-		budgetBar.repaint();
 	}
 
 	public void updateAreaBar() {

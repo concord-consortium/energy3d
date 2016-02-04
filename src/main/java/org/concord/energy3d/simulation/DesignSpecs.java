@@ -32,7 +32,7 @@ public class DesignSpecs implements Serializable {
 		this.budgetEnabled = budgetEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateBudgetBar();
+				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
 			}
 		});
 	}
@@ -45,7 +45,7 @@ public class DesignSpecs implements Serializable {
 		this.maximumBudget = maximumBudget;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateBudgetBar();
+				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
 			}
 		});
 	}

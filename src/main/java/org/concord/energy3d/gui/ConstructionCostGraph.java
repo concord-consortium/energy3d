@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -15,6 +16,8 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -29,6 +32,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.PieChart;
 import org.concord.energy3d.util.Util;
 
@@ -42,10 +46,23 @@ public class ConstructionCostGraph extends JPanel {
 
 	private PieChart pie;
 	private Box buttonPanel;
+	private JPanel budgetPanel;
+	private ColorBar budgetBar;
 	private JPopupMenu popupMenu;
+	private final DecimalFormat noDecimals = new DecimalFormat();
+	private Foundation building;
+	private int wallSum;
+	private int windowSum;
+	private int roofSum;
+	private int doorSum;
+	private int solarPanelSum;
+	private int treeSum;
+	private int foundationSum;
+	private int totalCost;
 
 	public ConstructionCostGraph() {
 		super(new BorderLayout());
+		noDecimals.setMaximumFractionDigits(0);
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
 		buttonPanel.setBackground(Color.WHITE);
 		buttonPanel.add(Box.createVerticalGlue());
@@ -91,33 +108,19 @@ public class ConstructionCostGraph extends JPanel {
 		popupMenu.add(mi);
 	}
 
-	public void removeGraph() {
-		if (pie != null)
-			remove(pie);
-		repaint();
-		add(buttonPanel, BorderLayout.CENTER);
-		EnergyPanel.getInstance().validate();
-	}
-
-	public void addGraph(Foundation building) {
-
-		if (pie != null)
-			remove(pie);
-		remove(buttonPanel);
-
+	private void calculateCost() {
 		int countBuildings = 0;
 		for (HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation)
 				countBuildings++;
 		}
-
-		int wallSum = 0;
-		int windowSum = 0;
-		int roofSum = 0;
-		int doorSum = 0;
-		int solarPanelSum = 0;
-		int treeSum = 0;
-		int foundationSum = Cost.getInstance().getPartCost(building);
+		wallSum = 0;
+		windowSum = 0;
+		roofSum = 0;
+		doorSum = 0;
+		solarPanelSum = 0;
+		treeSum = 0;
+		foundationSum = Cost.getInstance().getPartCost(building);
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == building) {
 				if (p instanceof Wall)
@@ -136,7 +139,36 @@ public class ConstructionCostGraph extends JPanel {
 					treeSum += Cost.getInstance().getPartCost(p);
 			}
 		}
+		totalCost = wallSum + windowSum + roofSum + doorSum + solarPanelSum + treeSum + foundationSum;
+	}
 
+	public void removeGraph() {
+		removeAll();
+		repaint();
+		add(buttonPanel, BorderLayout.CENTER);
+		EnergyPanel.getInstance().validate();
+	}
+
+	public void updateBudget() {
+		if (budgetPanel != null) {
+			calculateCost();
+			final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+			budgetBar.setEnabled(specs.isBudgetEnabled());
+			budgetBar.setMaximum(specs.getMaximumBudget());
+			budgetBar.setValue(totalCost);
+			budgetBar.repaint();
+			String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
+			budgetPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
+			budgetPanel.repaint();
+		}
+	}
+
+	public void addGraph(Foundation building) {
+
+		removeAll();
+
+		this.building = building;
+		calculateCost();
 		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, doorSum, solarPanelSum, treeSum };
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Ground Floor", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.PINK, Color.YELLOW, Color.GREEN };
@@ -158,6 +190,16 @@ public class ConstructionCostGraph extends JPanel {
 		});
 
 		add(pie, BorderLayout.CENTER);
+
+		budgetPanel = new JPanel(new BorderLayout());
+		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		budgetBar.setPreferredSize(new Dimension(100, 16));
+		budgetBar.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
+		budgetBar.setValue(totalCost);
+		updateBudget();
+		budgetPanel.add(budgetBar, BorderLayout.CENTER);
+
+		add(budgetPanel, BorderLayout.NORTH);
 
 		repaint();
 
