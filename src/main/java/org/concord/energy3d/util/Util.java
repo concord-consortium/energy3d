@@ -92,7 +92,7 @@ public class Util {
 	}
 
 	public static void disablePickShadowLight(final Spatial spatial) {
-		spatial.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		spatial.getSceneHints().setAllPickingHints(false);
 		spatial.getSceneHints().setCastsShadows(false);
 		spatial.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 	}
@@ -340,6 +340,7 @@ public class Util {
 		label.setFontScale(0.6);
 		label.setAutoScale(AutoScale.FixedScreenSize);
 		label.setAutoFade(AutoFade.Off);
+		Util.disablePickShadowLight(label);
 	}
 
 	public static double round(final double x) {

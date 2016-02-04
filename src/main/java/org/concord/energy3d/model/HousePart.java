@@ -51,7 +51,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
-import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -182,10 +181,11 @@ public abstract class HousePart implements Serializable {
 		root = new Node(toString());
 		pointsRoot = new Node("Edit Points");
 		sizeAnnotRoot = new Node("Size Annotations");
-		sizeAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		sizeAnnotRoot.getSceneHints().setAllPickingHints(false);
 		angleAnnotRoot = new Node("Angle Annotations");
-		angleAnnotRoot.getSceneHints().setPickingHint(PickingHint.Pickable, false);
+		angleAnnotRoot.getSceneHints().setAllPickingHints(false);
 		labelsRoot = new Node("Labels");
+		labelsRoot.getSceneHints().setAllPickingHints(false);
 
 		setAnnotationsVisible(Scene.getInstance().areAnnotationsVisible());
 

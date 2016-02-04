@@ -162,7 +162,6 @@ public class MeshLib {
 
 				label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
 				Util.initHousePartLabel(label);
-				label.getSceneHints().setCullHint(CullHint.Always);
 
 				final Mesh wireframeMesh = new Line("Roof (wireframe)");
 				wireframeMesh.setDefaultColor(ColorRGBA.BLACK);
@@ -170,17 +169,25 @@ public class MeshLib {
 				wireframeMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10));
 				// offset to avoid z-fighting
 				wireframeMesh.setTranslation(group.key.multiply(0.001, null));
-				Util.disablePickShadowLight(wireframeMesh);
 
 				final Line dashLineMesh = new Line("Roof (dash line)");
 				dashLineMesh.setStipplePattern((short) 0xFF00);
 				dashLineMesh.setVisible(false);
 				dashLineMesh.setModelBound(new BoundingBox());
+
+				final Node sizeAnnotation = new Node("Roof Size Annot");
+				final Node angleAnnotation = new Node("Roof Angle Annot");
+
+				// disable picking for all except mesh
+				Util.disablePickShadowLight(sizeAnnotation);
+				Util.disablePickShadowLight(angleAnnotation);
+				Util.disablePickShadowLight(wireframeMesh);
 				Util.disablePickShadowLight(dashLineMesh);
+				meshWithHoles.getSceneHints().setAllPickingHints(false);
 
 				node.attachChild(mesh);
-				node.attachChild(new Node("Roof Size Annot"));
-				node.attachChild(new Node("Roof Angle Annot"));
+				node.attachChild(sizeAnnotation);
+				node.attachChild(angleAnnotation);
 				node.attachChild(label);
 				node.attachChild(wireframeMesh);
 				node.attachChild(dashLineMesh);
@@ -190,6 +197,7 @@ public class MeshLib {
 			}
 
 			node.getSceneHints().setCullHint(CullHint.Never);
+			CollisionTreeManager.getInstance().removeCollisionTree(mesh);
 
 			final Vector3 normal = new Vector3();
 			for (final ReadOnlyVector3 v : group.normals)
@@ -208,11 +216,8 @@ public class MeshLib {
 			label.setTranslation(center.add(normal.multiply(0.1, null), null));
 
 			mesh.updateModelBound();
-			CollisionTreeManager.getInstance().updateCollisionTree(mesh);
 			meshIndex++;
 		}
-
-		// while (meshIndex < root.getNumberOfChildren())
 	}
 
 	public static void applyHoles(final Node root, final List<Window> windows) {
