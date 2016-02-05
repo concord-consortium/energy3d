@@ -88,7 +88,7 @@ public class HeatLoad {
 					final Roof roof = (Roof) part;
 					for (final Spatial child : roof.getRoofPartsRoot().getChildren()) {
 						if (child.getSceneHints().getCullHint() != CullHint.Always) {
-							final Mesh mesh = (Mesh) ((Node) child).getChild(0);
+							final Mesh mesh = (Mesh) ((Node) child).getChild(6);
 							final double[] solarPotential = SolarRadiation.getInstance().getSolarPotential(mesh);
 							final double solarHeat = solarPotential != null ? solarPotential[iMinute] * absorption / roof.getVolumetricHeatCapacity() : 0;
 							final double insideTemperature = part.getTopContainer().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, minute / 60);

@@ -146,15 +146,17 @@ public class MeshLib {
 		for (final GroupData group : groups) {
 			final Node node;
 			final Mesh mesh;
+			final Mesh meshWithHoles;
 			final BMText label;
 			if (meshIndex < root.getNumberOfChildren()) {
 				node = (Node) root.getChild(meshIndex);
 				mesh = (Mesh) node.getChild(0);
 				label = (BMText) node.getChild(3);
+				meshWithHoles = (Mesh) node.getChild(6);
 			} else {
 				node = new Node("Roof Part #" + meshIndex);
 				mesh = new Mesh("Roof Mesh #" + meshIndex);
-				final Mesh meshWithHoles = new Mesh("Roof Mesh with Holes #" + meshIndex);
+				meshWithHoles = new Mesh("Roof Mesh with Holes #" + meshIndex);
 				mesh.setVisible(false);
 				mesh.setModelBound(new BoundingBox());
 				meshWithHoles.setModelBound(new BoundingBox());
@@ -183,7 +185,7 @@ public class MeshLib {
 				Util.disablePickShadowLight(angleAnnotation);
 				Util.disablePickShadowLight(wireframeMesh);
 				Util.disablePickShadowLight(dashLineMesh);
-				meshWithHoles.getSceneHints().setAllPickingHints(false);
+				// meshWithHoles.getSceneHints().setAllPickingHints(false);
 
 				node.attachChild(mesh);
 				node.attachChild(sizeAnnotation);
@@ -198,6 +200,7 @@ public class MeshLib {
 
 			node.getSceneHints().setCullHint(CullHint.Never);
 			CollisionTreeManager.getInstance().removeCollisionTree(mesh);
+			CollisionTreeManager.getInstance().removeCollisionTree(meshWithHoles);
 
 			final Vector3 normal = new Vector3();
 			for (final ReadOnlyVector3 v : group.normals)
