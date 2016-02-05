@@ -154,7 +154,7 @@ public class MeshLib {
 			} else {
 				node = new Node("Roof Part #" + meshIndex);
 				mesh = new Mesh("Roof Mesh #" + meshIndex);
-				final Mesh meshWithHoles = new Mesh("Roof Mesh #" + meshIndex);
+				final Mesh meshWithHoles = new Mesh("Roof Mesh with Holes #" + meshIndex);
 				mesh.setVisible(false);
 				mesh.setModelBound(new BoundingBox());
 				meshWithHoles.setModelBound(new BoundingBox());

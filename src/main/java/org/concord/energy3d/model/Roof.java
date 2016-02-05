@@ -339,7 +339,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		}
 	}
 
-	public ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
+	private ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
 		final double offset = 0.001;
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
@@ -1104,7 +1104,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		return roofPartsRoot;
 	}
 
-	double calculateHeatVector(final Mesh mesh) {
+	private double calculateHeatVector(final Mesh mesh) {
 		double heat = 0;
 		final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
 		if (heatLossArray != null) {
@@ -1151,7 +1151,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					for (final Spatial child : roofPartsRoot.getChildren()) {
 						if (child.getSceneHints().getCullHint() != CullHint.Always) {
 							node = (Node) child;
-							mesh = (Mesh) node.getChild(0);
+							mesh = (Mesh) node.getChild(6);
 							b = findRoofIntersection(mesh, a);
 							if (b != null)
 								break;
