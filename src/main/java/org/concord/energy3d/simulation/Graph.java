@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -395,7 +396,7 @@ public abstract class Graph extends JPanel {
 			FontMetrics fm = g2.getFontMetrics();
 			if (today == null)
 				today = Heliodon.getInstance().getCalender();
-			String cityAndDate = city + (this instanceof DailyGraph ? " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH) : "");
+			String cityAndDate = city + (this instanceof DailyGraph ? " - " + new SimpleDateFormat("MMM").format(today.getTime()) + " " + today.get(Calendar.DAY_OF_MONTH) : "");
 			g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, popup ? 20 : 10);
 		}
 

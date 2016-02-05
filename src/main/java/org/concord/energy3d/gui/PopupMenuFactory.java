@@ -424,8 +424,8 @@ public class PopupMenuFactory {
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
-								if (val < 0.1 || val > 0.9) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0.1 and 0.9.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 0 || val > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));

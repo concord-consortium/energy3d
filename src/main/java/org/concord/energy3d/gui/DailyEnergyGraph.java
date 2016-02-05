@@ -51,15 +51,20 @@ public class DailyEnergyGraph extends JPanel {
 			}
 		});
 	}
-	
-	public void setCalendar(Calendar today){
+
+	public void setCalendar(Calendar today) {
 		graph.setCalendar(today);
+	}
+
+	public Foundation getBuilding() {
+		return building;
 	}
 
 	public void removeGraph() {
 		remove(graph);
 		repaint();
 		EnergyPanel.getInstance().validate();
+		building = null;
 	}
 
 	public boolean hasGraph() {
@@ -82,13 +87,13 @@ public class DailyEnergyGraph extends JPanel {
 	}
 
 	public void addGraph(Foundation building) {
-		this.building = building;
 		removeGraph();
+		this.building = building;
 		graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			updateGraph();
 		}
-		add(graph, BorderLayout.CENTER);
+		add(graph, BorderLayout.NORTH);
 		repaint();
 		EnergyPanel.getInstance().validate();
 	}

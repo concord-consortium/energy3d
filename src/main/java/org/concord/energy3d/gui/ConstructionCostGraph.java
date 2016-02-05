@@ -62,7 +62,14 @@ public class ConstructionCostGraph extends JPanel {
 
 	public ConstructionCostGraph() {
 		super(new BorderLayout());
+
 		noDecimals.setMaximumFractionDigits(0);
+		budgetPanel = new JPanel(new BorderLayout());
+		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		budgetBar.setPreferredSize(new Dimension(100, 16));
+		budgetBar.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
+		budgetPanel.add(budgetBar, BorderLayout.CENTER);
+
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
 		buttonPanel.setBackground(Color.WHITE);
 		buttonPanel.add(Box.createVerticalGlue());
@@ -147,6 +154,7 @@ public class ConstructionCostGraph extends JPanel {
 		repaint();
 		add(buttonPanel, BorderLayout.CENTER);
 		EnergyPanel.getInstance().validate();
+		building = null;
 	}
 
 	public void updateBudget() {
@@ -163,19 +171,27 @@ public class ConstructionCostGraph extends JPanel {
 		}
 	}
 
+	public Foundation getBuilding() {
+		return building;
+	}
+
 	public void addGraph(Foundation building) {
 
 		removeAll();
 
 		this.building = building;
 		calculateCost();
+		updateBudget();
+
+		add(budgetPanel, BorderLayout.NORTH);
+
 		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, doorSum, solarPanelSum, treeSum };
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Ground Floor", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
-		pie.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
 		pie.setBackground(Color.WHITE);
+		pie.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - budgetPanel.getHeight() - 5));
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		pie.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -190,16 +206,6 @@ public class ConstructionCostGraph extends JPanel {
 		});
 
 		add(pie, BorderLayout.CENTER);
-
-		budgetPanel = new JPanel(new BorderLayout());
-		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		budgetBar.setPreferredSize(new Dimension(100, 16));
-		budgetBar.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
-		budgetBar.setValue(totalCost);
-		updateBudget();
-		budgetPanel.add(budgetBar, BorderLayout.CENTER);
-
-		add(budgetPanel, BorderLayout.NORTH);
 
 		repaint();
 

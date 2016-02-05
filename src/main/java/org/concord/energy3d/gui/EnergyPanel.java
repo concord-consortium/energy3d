@@ -143,17 +143,17 @@ public class EnergyPanel extends JPanel {
 		dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
 		add(new JScrollPane(dataPanel), BorderLayout.CENTER);
 
-		final JPanel infoPanel = new JPanel();
-		infoPanel.setBorder(new TitledBorder(null, "Info", TitledBorder.LEADING, TitledBorder.TOP));
-		dataPanel.add(infoPanel);
+		final JPanel timeAndLocationPanel = new JPanel();
+		timeAndLocationPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 2, 0));
+		dataPanel.add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
-		infoPanel.setLayout(gbl_panel_3);
+		timeAndLocationPanel.setLayout(gbl_panel_3);
 
 		dateLabel = new JLabel("Date: ");
 		final GridBagConstraints gbc_dateLabel = new GridBagConstraints();
 		gbc_dateLabel.gridx = 0;
 		gbc_dateLabel.gridy = 0;
-		infoPanel.add(dateLabel, gbc_dateLabel);
+		timeAndLocationPanel.add(dateLabel, gbc_dateLabel);
 
 		dateSpinner = new JSpinner();
 		dateSpinner.setModel(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
@@ -191,7 +191,7 @@ public class EnergyPanel extends JPanel {
 		gbc_dateSpinner.insets = new Insets(0, 0, 1, 1);
 		gbc_dateSpinner.gridx = 1;
 		gbc_dateSpinner.gridy = 0;
-		infoPanel.add(dateSpinner, gbc_dateSpinner);
+		timeAndLocationPanel.add(dateSpinner, gbc_dateSpinner);
 
 		latitudeChangeListener = new ChangeListener() {
 			@Override
@@ -236,13 +236,13 @@ public class EnergyPanel extends JPanel {
 		gbc_cityComboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_cityComboBox.gridx = 2;
 		gbc_cityComboBox.gridy = 0;
-		infoPanel.add(cityComboBox, gbc_cityComboBox);
+		timeAndLocationPanel.add(cityComboBox, gbc_cityComboBox);
 
 		timeLabel = new JLabel("Time: ");
 		final GridBagConstraints gbc_timeLabel = new GridBagConstraints();
 		gbc_timeLabel.gridx = 0;
 		gbc_timeLabel.gridy = 1;
-		infoPanel.add(timeLabel, gbc_timeLabel);
+		timeAndLocationPanel.add(timeLabel, gbc_timeLabel);
 
 		timeSpinner = new JSpinner(new SpinnerDateModel());
 		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
@@ -281,14 +281,14 @@ public class EnergyPanel extends JPanel {
 		gbc_timeSpinner.fill = GridBagConstraints.HORIZONTAL;
 		gbc_timeSpinner.gridx = 1;
 		gbc_timeSpinner.gridy = 1;
-		infoPanel.add(timeSpinner, gbc_timeSpinner);
+		timeAndLocationPanel.add(timeSpinner, gbc_timeSpinner);
 
 		latitudeLabel = new JLabel("Latitude: ");
 		final GridBagConstraints gbc_altitudeLabel = new GridBagConstraints();
 		gbc_altitudeLabel.insets = new Insets(0, 1, 0, 0);
 		gbc_altitudeLabel.gridx = 2;
 		gbc_altitudeLabel.gridy = 1;
-		infoPanel.add(latitudeLabel, gbc_altitudeLabel);
+		timeAndLocationPanel.add(latitudeLabel, gbc_altitudeLabel);
 
 		latitudeSpinner = new JSpinner();
 		latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
@@ -306,9 +306,9 @@ public class EnergyPanel extends JPanel {
 		gbc_latitudeSpinner.fill = GridBagConstraints.HORIZONTAL;
 		gbc_latitudeSpinner.gridx = 3;
 		gbc_latitudeSpinner.gridy = 1;
-		infoPanel.add(latitudeSpinner, gbc_latitudeSpinner);
+		timeAndLocationPanel.add(latitudeSpinner, gbc_latitudeSpinner);
 
-		infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, infoPanel.getPreferredSize().height));
+		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
 
 		final JLabel outsideTemperatureLabel = new JLabel("Temp.: ");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
@@ -316,7 +316,7 @@ public class EnergyPanel extends JPanel {
 		gbc_outsideTemperatureLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_outsideTemperatureLabel.gridx = 0;
 		gbc_outsideTemperatureLabel.gridy = 2;
-		infoPanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
+		timeAndLocationPanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
 
 		outsideTemperatureField = new JTextField();
 		outsideTemperatureField.setToolTipText("Current outside temperature at this time and day");
@@ -326,7 +326,7 @@ public class EnergyPanel extends JPanel {
 		gbc_outsideTemperatureField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_outsideTemperatureField.gridx = 1;
 		gbc_outsideTemperatureField.gridy = 2;
-		infoPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
+		timeAndLocationPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
 
 		final JLabel sunshineLabel = new JLabel("Sunshine: ");
 		final GridBagConstraints gbc_sunshineLabel = new GridBagConstraints();
@@ -334,7 +334,7 @@ public class EnergyPanel extends JPanel {
 		gbc_sunshineLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_sunshineLabel.gridx = 2;
 		gbc_sunshineLabel.gridy = 2;
-		infoPanel.add(sunshineLabel, gbc_sunshineLabel);
+		timeAndLocationPanel.add(sunshineLabel, gbc_sunshineLabel);
 
 		sunshineHoursField = new JTextField();
 		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
@@ -344,7 +344,7 @@ public class EnergyPanel extends JPanel {
 		gbc_sunshineHoursField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_sunshineHoursField.gridx = 3;
 		gbc_sunshineHoursField.gridy = 2;
-		infoPanel.add(sunshineHoursField, gbc_sunshineHoursField);
+		timeAndLocationPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP));
@@ -922,9 +922,13 @@ public class EnergyPanel extends JPanel {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) {
 			final Foundation foundation = (Foundation) selectedPart;
-			constructionCostGraph.addGraph(foundation);
-			if (SceneManager.getInstance().getSolarHeatMap())
-				dailyEnergyGraph.addGraph(foundation);
+			if (foundation != constructionCostGraph.getBuilding()) {
+				constructionCostGraph.addGraph(foundation);
+			}
+			if (foundation != dailyEnergyGraph.getBuilding()) {
+				if (SceneManager.getInstance().getSolarHeatMap())
+					dailyEnergyGraph.addGraph(foundation);
+			}
 		} else {
 			constructionCostGraph.removeGraph();
 			dailyEnergyGraph.removeGraph();

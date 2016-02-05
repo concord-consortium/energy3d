@@ -160,7 +160,7 @@ public class MeshLib {
 				meshWithHoles.setModelBound(new BoundingBox());
 				meshWithHoles.setRenderState(HousePart.offsetState);
 
-				label = new BMText("Label Text", "Test", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
+				label = new BMText("Label Text", "", FontManager.getInstance().getPartNumberFont(), Align.South, Justify.Center);
 				Util.initHousePartLabel(label);
 
 				final Mesh wireframeMesh = new Line("Roof (wireframe)");
