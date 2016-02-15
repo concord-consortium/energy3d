@@ -299,9 +299,11 @@ public class Scene implements Serializable {
 			Heliodon.getInstance().setTime(instance.calendar.getTime());
 			Util.setSilently(energyPanel.getDateSpinner(), instance.calendar.getTime());
 			Util.setSilently(energyPanel.getTimeSpinner(), instance.calendar.getTime());
-			energyPanel.setLatitude(instance.latitude); // already silent
-			if ("Boston".equals(instance.city) || instance.city == null || "".equals(instance.city))
+			if ("Boston".equals(instance.city) || instance.city == null || "".equals(instance.city)) {
 				instance.city = "Boston, MA";
+				instance.latitude = 42;
+			}
+			energyPanel.setLatitude(instance.latitude); // already silent
 			Util.selectSilently(energyPanel.getCityComboBox(), instance.city);
 			Scene.getInstance().setTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);

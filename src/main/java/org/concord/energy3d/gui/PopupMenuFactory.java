@@ -867,7 +867,13 @@ public class PopupMenuFactory {
 
 				JPanel panel = new JPanel();
 				panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-				JLabel label = new JLabel("<html>Insulation Value of " + partInfo + "<hr><font size=2>Examples:<br>US R13 (cellulose, 3.5\"), US R16 (mineral wool, 5.25\"), US R31 (fiberglass, 10\")</html>");
+				String s;
+				if (useUValue) {
+					s = "<html>U-Value of " + partInfo + "<hr><font size=2>Examples:<br>US 1.30 (single glass), US 0.81 (double glass), US 0.53 (triple glass)</html>";
+				} else {
+					s = "<html>Insulation Value of " + partInfo + "<hr><font size=2>Examples:<br>US R13 (cellulose, 3.5\"), US R16 (mineral wool, 5.25\"), US R31 (fiberglass, 10\")</html>";
+				}
+				JLabel label = new JLabel(s);
 				label.setAlignmentX(Component.LEFT_ALIGNMENT);
 				panel.add(label);
 				panel.add(Box.createVerticalStrut(15));
