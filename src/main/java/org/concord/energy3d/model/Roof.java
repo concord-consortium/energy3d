@@ -798,6 +798,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					final ReadOnlyVector3[] base = findBasePoints((Mesh) ((Node) roofPart).getChild(0), null);
 					if (base != null && isSameBasePoints(base_i[0], base_i[1], base[0], base[1])) {
 						roofPart.getSceneHints().setCullHint(CullHint.Always);
+						roofPart.getSceneHints().setAllPickingHints(false);
 						break;
 					}
 				}

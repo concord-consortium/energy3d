@@ -556,7 +556,7 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	public boolean includeWindow(final HousePart window) {
-		return window.getPoints().size() >= 4 && window.getAbsPoint(2).subtract(window.getAbsPoint(0), null).length() >= 0.1;
+		return window.getPoints().size() >= 4 && window.getAbsPoint(2).distance(window.getAbsPoint(0)) >= 0.1 && window.getAbsPoint(1).distance(window.getAbsPoint(0)) >= 0.1;
 	}
 
 	private void drawBackMesh(final List<List<Vector3>> polygon) {
@@ -1214,10 +1214,6 @@ public class Wall extends HousePart implements Thermalizable {
 		if (areaWithoutWindows < 0)
 			areaWithoutWindows = 0;
 		return areaWithoutWindows;
-	}
-
-	public Mesh getInvisibleMesh() {
-		return invisibleMesh;
 	}
 
 	@Override

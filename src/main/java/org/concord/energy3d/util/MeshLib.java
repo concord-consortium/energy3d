@@ -153,6 +153,7 @@ public class MeshLib {
 				mesh = (Mesh) node.getChild(0);
 				label = (BMText) node.getChild(3);
 				meshWithHoles = (Mesh) node.getChild(6);
+				node.getSceneHints().setAllPickingHints(true);
 			} else {
 				node = new Node("Roof Part #" + meshIndex);
 				mesh = new Mesh("Roof Mesh #" + meshIndex);
