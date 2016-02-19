@@ -245,9 +245,9 @@ public class Scene implements Serializable {
 			}
 
 			initSceneNow();
-			instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
 			initEnergy();
-			// instance.redrawAll(); // need to call this to at least redraw the overhangs
+			instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
+
 		}
 
 		// update GUI
