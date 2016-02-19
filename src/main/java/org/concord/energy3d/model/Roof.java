@@ -1071,7 +1071,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
-				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
+				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(6);
 				final Double d = areaByPartWithOverhang.get(roofPartMesh);
 				if (d != null)
 					a += d;
