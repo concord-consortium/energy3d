@@ -58,16 +58,7 @@ import com.ardor3d.scenegraph.Node;
 public class Scene implements Serializable {
 
 	public static enum Unit {
-		Meter("m"), Centimeter("cm"), Inches("\"");
-		private final String notation;
-
-		private Unit(final String notation) {
-			this.notation = notation;
-		}
-
-		public String getNotation() {
-			return notation;
-		}
+		InternationalSystemOfUnits, USCustomaryUnits
 	};
 
 	public static enum TextureMode {
@@ -87,7 +78,7 @@ public class Scene implements Serializable {
 	private static boolean redrawAll = false;
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
-	private static Unit unit = Unit.Meter;
+	private Unit unit = Unit.InternationalSystemOfUnits;
 	private transient boolean edited = false;
 	private final List<HousePart> parts = new ArrayList<HousePart>();
 	private final Calendar calendar = Calendar.getInstance();
@@ -321,6 +312,9 @@ public class Scene implements Serializable {
 			instance.designSpecs = new DesignSpecs();
 		if (instance.ground == null)
 			instance.ground = new Ground();
+
+		if (instance.unit == null)
+			instance.unit = Unit.InternationalSystemOfUnits;
 
 		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
 
@@ -872,13 +866,13 @@ public class Scene implements Serializable {
 	}
 
 	public void setUnit(final Unit unit) {
-		Scene.unit = unit;
+		this.unit = unit;
 		redrawAll = true;
 	}
 
 	public Unit getUnit() {
 		if (unit == null)
-			unit = Unit.Meter;
+			unit = Unit.InternationalSystemOfUnits;
 		return unit;
 	}
 

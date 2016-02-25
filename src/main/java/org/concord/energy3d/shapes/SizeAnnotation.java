@@ -98,7 +98,15 @@ public class SizeAnnotation extends Annotation {
 
 		label.setTranslation(middle);
 		final DecimalFormat df = new DecimalFormat("#.##");
-		label.setText("" + df.format(to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale()) + Scene.getInstance().getUnit().getNotation());
+		double length = to.subtract(from, null).length() * Scene.getInstance().getAnnotationScale();
+		switch (Scene.getInstance().getUnit()) {
+		case InternationalSystemOfUnits:
+			label.setText(df.format(length) + " m");
+			break;
+		case USCustomaryUnits:
+			label.setText(df.format(length * 3.28084) + " ft");
+			break;
+		}
 		label.setAlign(align);
 		label.updateWorldTransform(true);
 		label.updateWorldBound(true);

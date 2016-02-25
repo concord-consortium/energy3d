@@ -1,8 +1,6 @@
-package org.concord.energy3d.util;
+package org.concord.energy3d.gui;
 
 import java.awt.Toolkit;
-
-import org.concord.energy3d.gui.MainFrame;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -15,15 +13,16 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
-public class Mac {
+class Mac {
+
 	public static void init() {
+
 		final Application application = Application.getApplication();
 		application.setDockIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("icons/icon.png")));
 
 		application.setOpenFileHandler(new OpenFilesHandler() {
 			@Override
 			public void openFiles(final OpenFilesEvent e) {
-				System.out.println("OpenFileHandler()");
 				MainFrame.getInstance().open(e.getFiles().get(0).toString());
 			}
 		});
@@ -31,15 +30,15 @@ public class Mac {
 		application.setAboutHandler(new AboutHandler() {
 			@Override
 			public void handleAbout(final AboutEvent e) {
-				System.out.println("AboutHandler()");
-				MainFrame.getInstance().showAbout();;
+				MainFrame.getInstance().showAbout();
+				;
 			}
 		});
 
 		application.setPreferencesHandler(new PreferencesHandler() {
 			@Override
 			public void handlePreferences(final PreferencesEvent e) {
-				System.out.println("AboutHandler()");
+				MainFrame.getInstance().showPreferences();
 			}
 		});
 
@@ -50,5 +49,7 @@ public class Mac {
 				r.cancelQuit();
 			}
 		});
+
 	}
+
 }

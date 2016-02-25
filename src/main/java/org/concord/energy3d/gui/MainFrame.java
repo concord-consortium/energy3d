@@ -90,7 +90,6 @@ import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
-import org.concord.energy3d.util.Mac;
 import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
 
@@ -174,6 +173,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllLocksMenuItem;
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
+	private JMenuItem preferencesMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final FileChooser fileChooser;
@@ -913,7 +913,7 @@ public class MainFrame extends JFrame {
 		return helpMenu;
 	}
 
-	public void showAbout() {
+	void showAbout() {
 		final JDialog aboutDialog = getAboutDialog();
 		final Dimension frameSize = getSize();
 		final Dimension dialogSize = aboutDialog.getSize();
@@ -1484,6 +1484,10 @@ public class MainFrame extends JFrame {
 				editMenu.addSeparator();
 				editMenu.add(getSpecificationsMenuItem());
 			}
+			if (!Config.isMac()) {
+				editMenu.addSeparator();
+				editMenu.add(getPreferencesMenuItem());
+			}
 		}
 		return editMenu;
 	}
@@ -2034,6 +2038,23 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return specificationsMenuItem;
+	}
+
+	void showPreferences() {
+		new PreferencesDialog().setVisible(true);
+	}
+
+	private JMenuItem getPreferencesMenuItem() {
+		if (preferencesMenuItem == null) {
+			preferencesMenuItem = new JMenuItem("Preferences");
+			preferencesMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					showPreferences();
+				}
+			});
+		}
+		return preferencesMenuItem;
 	}
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
