@@ -169,8 +169,10 @@ public class Sensor extends HousePart {
 
 		ReadOnlyVector3 translation = mesh.getTranslation();
 		label.setText("" + getId());
-		double labelOffset = 1.0;
-		label.setTranslation(translation.getX() + labelOffset * normal.getX(), translation.getY() + labelOffset * normal.getY(), translation.getZ() + labelOffset * normal.getZ());
+		if (normal != null) {
+			double labelOffset = 1.0;
+			label.setTranslation(translation.getX() + labelOffset * normal.getX(), translation.getY() + labelOffset * normal.getY(), translation.getZ() + labelOffset * normal.getZ());
+		}
 
 	}
 

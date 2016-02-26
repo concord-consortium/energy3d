@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -477,7 +478,7 @@ public class EnergyPanel extends JPanel {
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 		partPanel.setLayout(new BoxLayout(partPanel, BoxLayout.Y_AXIS));
 
-		partPropertiesPanel = new JPanel();
+		partPropertiesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		partPanel.add(partPropertiesPanel);
 
 		partProperty1Label = new JLabel("Width:");
@@ -710,16 +711,12 @@ public class EnergyPanel extends JPanel {
 		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 
-		if (selectedPart instanceof Foundation) {
-			partProperty1Label.setText("Width:");
-			partProperty2Label.setText("Length:");
-			partProperty3Label.setText("Insolation:");
-			partPropertiesPanel.remove(partProperty4Label);
-			partPropertiesPanel.remove(partProperty4TextField);
-		} else if (selectedPart instanceof Tree) {
+		if (selectedPart instanceof Tree) {
 			partProperty1Label.setText("Spread:");
 			partProperty2Label.setText("Height:");
 			partProperty3Label.setText("Species:");
+			partPropertiesPanel.add(partProperty3Label);
+			partPropertiesPanel.add(partProperty3TextField);
 			partPropertiesPanel.remove(partProperty4Label);
 			partPropertiesPanel.remove(partProperty4TextField);
 		} else if (selectedPart instanceof Sensor) {
@@ -727,12 +724,15 @@ public class EnergyPanel extends JPanel {
 			partProperty2Label.setText("Y:");
 			partProperty3Label.setText("Z:");
 			partProperty4Label.setText("Data:");
+			partPropertiesPanel.add(partProperty3Label);
+			partPropertiesPanel.add(partProperty3TextField);
 			partPropertiesPanel.add(partProperty4Label);
 			partPropertiesPanel.add(partProperty4TextField);
 		} else {
 			partProperty1Label.setText("Width:");
 			partProperty2Label.setText("Height:");
-			partProperty3Label.setText("Insolation:");
+			partPropertiesPanel.remove(partProperty3Label);
+			partPropertiesPanel.remove(partProperty3TextField);
 			partPropertiesPanel.remove(partProperty4Label);
 			partPropertiesPanel.remove(partProperty4TextField);
 		}
@@ -749,27 +749,37 @@ public class EnergyPanel extends JPanel {
 				final String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.getArea());
 				partProperty4TextField.setText(light + ", " + heatFlux);
 				partProperty4TextField.setToolTipText("Light sensor: " + light + ", heat flux sensor: " + heatFlux);
-			} else
+			} else {
 				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
+			}
 		}
 
 		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Human)) {
+			double meterToFeet = 1;
+			switch (Scene.getInstance().getUnit()) {
+			case InternationalSystemOfUnits:
+				meterToFeet = 1;
+				break;
+			case USCustomaryUnits:
+				meterToFeet = 3.28084;
+				break;
+			}
 			if (selectedPart instanceof SolarPanel) {
-				partProperty1TextField.setText(twoDecimals.format(SolarPanel.WIDTH));
-				partProperty2TextField.setText(twoDecimals.format(SolarPanel.HEIGHT));
+				partProperty1TextField.setText(twoDecimals.format(SolarPanel.WIDTH * meterToFeet));
+				partProperty2TextField.setText(twoDecimals.format(SolarPanel.HEIGHT * meterToFeet));
 			} else if (selectedPart instanceof Sensor) {
 				final ReadOnlyVector3 v = ((Sensor) selectedPart).getAbsPoint(0);
-				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale()));
-				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale()));
-				partProperty3TextField.setText(twoDecimals.format(v.getZ() * Scene.getInstance().getAnnotationScale()));
+				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty3TextField.setText(twoDecimals.format(v.getZ() * Scene.getInstance().getAnnotationScale() * meterToFeet));
 			} else if (selectedPart instanceof Tree) {
 				final Tree tree = (Tree) selectedPart;
-				partProperty1TextField.setText(twoDecimals.format(tree.getWidth() * Scene.getInstance().getAnnotationScale()));
-				partProperty2TextField.setText(twoDecimals.format(tree.getHeight() * Scene.getInstance().getAnnotationScale()));
+				partProperty1TextField.setText(twoDecimals.format(tree.getWidth() * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty2TextField.setText(twoDecimals.format(tree.getHeight() * Scene.getInstance().getAnnotationScale() * meterToFeet));
 				partProperty3TextField.setText(tree.getTreeName());
 			} else {
-				partProperty1TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale()));
-				partProperty2TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale()));
+				partProperty1TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty2TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale() * meterToFeet));
 			}
 		} else {
 			partProperty1TextField.setText("");
@@ -787,8 +797,16 @@ public class EnergyPanel extends JPanel {
 		if (selectedBuilding != null) {
 			final double[] buildingGeometry = selectedBuilding.getBuildingGeometry();
 			if (buildingGeometry != null) {
-				heightBar.setValue((float) buildingGeometry[0]);
-				areaBar.setValue((float) buildingGeometry[1]);
+				switch (Scene.getInstance().getUnit()) {
+				case InternationalSystemOfUnits:
+					heightBar.setValue((float) buildingGeometry[0]);
+					areaBar.setValue((float) buildingGeometry[1]);
+					break;
+				case USCustomaryUnits:
+					heightBar.setValue((float) (buildingGeometry[0] * 3.28084));
+					areaBar.setValue((float) (buildingGeometry[1] * 3.28084 * 3.28084));
+					break;
+				}
 			} else {
 				heightBar.setValue(0);
 				areaBar.setValue(0);
@@ -860,9 +878,18 @@ public class EnergyPanel extends JPanel {
 	public void updateAreaBar() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Area (";
-		if (specs.isAreaEnabled())
-			t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea());
-		t += "\u33A1)";
+		switch (Scene.getInstance().getUnit()) {
+		case InternationalSystemOfUnits:
+			if (specs.isAreaEnabled())
+				t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea());
+			t += "m\u00B2)";
+			break;
+		case USCustomaryUnits:
+			if (specs.isAreaEnabled())
+				t += twoDecimals.format(specs.getMinimumArea() * 3.28084 * 3.28084) + " - " + twoDecimals.format(specs.getMaximumArea() * 3.28084 * 3.28084);
+			t += "ft\u00B2)";
+			break;
+		}
 		areaPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
 		areaBar.setEnabled(specs.isAreaEnabled());
 		areaBar.setMinimum(specs.getMinimumArea());
@@ -873,9 +900,18 @@ public class EnergyPanel extends JPanel {
 	public void updateHeightBar() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Height (";
-		if (specs.isHeightEnabled())
-			t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight());
-		t += "m)";
+		switch (Scene.getInstance().getUnit()) {
+		case InternationalSystemOfUnits:
+			if (specs.isHeightEnabled())
+				t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight());
+			t += "m)";
+			break;
+		case USCustomaryUnits:
+			if (specs.isHeightEnabled())
+				t += twoDecimals.format(specs.getMinimumHeight() * 3.28084) + " - " + twoDecimals.format(specs.getMaximumHeight() * 3.28084);
+			t += "ft)";
+			break;
+		}
 		heightPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
 		heightBar.setEnabled(specs.isHeightEnabled());
 		heightBar.setMinimum(specs.getMinimumHeight());

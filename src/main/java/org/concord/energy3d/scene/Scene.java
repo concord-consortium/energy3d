@@ -1391,5 +1391,5 @@ public class Scene implements Serializable {
 	public DesignSpecs getDesignSpecs() {
 		return designSpecs;
 	}
-
+	
 }

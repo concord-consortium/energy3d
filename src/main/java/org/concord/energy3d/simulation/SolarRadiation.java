@@ -554,20 +554,6 @@ public class SolarRadiation {
 			part.drawHeatFlux();
 		}
 
-		/* subtract window potential from wall potential */
-		for (final HousePart wall : Scene.getInstance().getParts()) {
-			if (wall instanceof Wall) {
-				final double[] wallSolarPotentials = wall.getSolarPotential();
-				for (final HousePart window : wall.getChildren()) {
-					if (window instanceof Window) {
-						final double[] windowSolarPotentials = window.getSolarPotential();
-						for (int i = 0; i < wallSolarPotentials.length; i++)
-							wallSolarPotentials[i] -= windowSolarPotentials[i];
-					}
-				}
-			}
-		}
-
 		final Calendar today = Heliodon.getInstance().getCalender();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
