@@ -182,8 +182,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		hideGableRoofParts();
 		int roofPartIndex = 0;
 		for (final Spatial child : roofPartsRoot.getChildren()) {
-			final Mesh mesh = (Mesh) ((Node) child).getChild(0);
-			mesh.setUserData(new UserData(this, roofPartIndex, false));
+			((Mesh) ((Node) child).getChild(0)).setUserData(new UserData(this, roofPartIndex, false));
+			((Mesh) ((Node) child).getChild(6)).setUserData(new UserData(this, roofPartIndex, false));
 			roofPartIndex++;
 		}
 		final List<Window> windows = new ArrayList<Window>();

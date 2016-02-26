@@ -100,7 +100,7 @@ public class Sensor extends HousePart {
 		if (container instanceof Roof) {
 			final PickResults pickResults = new PrimitivePickResults();
 			final Ray3 ray = new Ray3(getAbsPoint(0).addLocal(0, 0, 1000), Vector3.NEG_UNIT_Z);
-			PickingUtil.findPick(container.getRoot(), ray, pickResults);
+			PickingUtil.findPick(container.getRoot(), ray, pickResults, false);
 			if (pickResults.getNumber() != 0) {
 				final PickData pickData = pickResults.getPickData(0);
 				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
@@ -167,10 +167,10 @@ public class Sensor extends HousePart {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
-		ReadOnlyVector3 translation = mesh.getTranslation();
+		final ReadOnlyVector3 translation = mesh.getTranslation();
 		label.setText("" + getId());
 		if (normal != null) {
-			double labelOffset = 1.0;
+			final double labelOffset = 1.0;
 			label.setTranslation(translation.getX() + labelOffset * normal.getX(), translation.getY() + labelOffset * normal.getY(), translation.getZ() + labelOffset * normal.getZ());
 		}
 
@@ -232,10 +232,11 @@ public class Sensor extends HousePart {
 		// this method is left empty on purpose -- don't draw heat flux
 	}
 
-	public void moveTo(HousePart target) {
+	public void moveTo(final HousePart target) {
 		setContainer(target);
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return false;
 	}
