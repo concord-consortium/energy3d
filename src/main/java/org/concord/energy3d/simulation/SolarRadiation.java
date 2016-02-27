@@ -280,9 +280,9 @@ public class SolarRadiation {
 						radiation += directRadiation;
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
-				if (data.solarPotential != null)
-					data.solarPotential[minute / timeStep] += absorption * radiation * w * h * scaleFactor;
-				housePart.getSolarPotential()[minute / timeStep] += absorption * radiation * w * h * scaleFactor;
+				if (data.solarPotential != null) // solar potential should not apply absorption
+					data.solarPotential[minute / timeStep] += radiation * w * h * scaleFactor;
+				housePart.getSolarPotential()[minute / timeStep] += radiation * w * h * scaleFactor;
 			}
 		}
 

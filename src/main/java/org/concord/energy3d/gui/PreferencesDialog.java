@@ -49,6 +49,8 @@ class PreferencesDialog extends JDialog {
 					Scene.getInstance().setUnit(Scene.Unit.USCustomaryUnits);
 					break;
 				}
+				EnergyPanel.getInstance().updateWeatherData();
+				EnergyPanel.getInstance().update();
 				Scene.getInstance().setEdited(true);
 				PreferencesDialog.this.dispose();
 			}
