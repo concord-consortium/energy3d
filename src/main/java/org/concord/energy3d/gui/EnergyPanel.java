@@ -606,10 +606,24 @@ public class EnergyPanel extends JPanel {
 	public void updateWeatherData() {
 		final String city = (String) cityComboBox.getSelectedItem();
 		if (city.equals("")) {
-			outsideTemperatureField.setText("15 \u00B0C");
+			switch (Scene.getInstance().getUnit()) {
+			case InternationalSystemOfUnits:
+				outsideTemperatureField.setText("15 \u00B0C");
+				break;
+			case USCustomaryUnits:
+				outsideTemperatureField.setText(Math.round(32.0 + 9.0 * 15.0 / 5.0) + " \u00B0F");
+				break;
+			}
 			sunshineHoursField.setText("10");
 		} else {
-			outsideTemperatureField.setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + " \u00B0C");
+			switch (Scene.getInstance().getUnit()) {
+			case InternationalSystemOfUnits:
+				outsideTemperatureField.setText(Math.round(Weather.getInstance().getCurrentOutsideTemperature()) + " \u00B0C");
+				break;
+			case USCustomaryUnits:
+				outsideTemperatureField.setText(Math.round(32.0 + 9.0 * Weather.getInstance().getCurrentOutsideTemperature() / 5.0) + " \u00B0F");
+				break;
+			}
 			final Map<String, int[]> sunshineHours = LocationData.getInstance().getSunshineHours();
 			final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
 			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + " hours");
@@ -618,10 +632,6 @@ public class EnergyPanel extends JPanel {
 
 	public JTabbedPane getGraphTabbedPane() {
 		return graphTabbedPane;
-	}
-
-	public JTextField getOutsideTemperatureField() {
-		return outsideTemperatureField;
 	}
 
 	public JSpinner getDateSpinner() {
@@ -812,7 +822,15 @@ public class EnergyPanel extends JPanel {
 				areaBar.setValue(0);
 			}
 			final Calendar c = Heliodon.getInstance().getCalender();
-			thermostatTemperatureField.setText(selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)) + " \u00B0C");
+			int temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
+			switch (Scene.getInstance().getUnit()) {
+			case InternationalSystemOfUnits:
+				thermostatTemperatureField.setText(temp + " \u00B0C");
+				break;
+			case USCustomaryUnits:
+				thermostatTemperatureField.setText(Math.round(32.0 + 9.0 * temp / 5.0) + " \u00B0F");
+				break;
+			}
 			thermostatPanel.add(adjustThermostatButton, BorderLayout.EAST);
 			String s2 = selectedBuilding.toString();
 			s2 = s2.substring(0, s2.indexOf(')') + 1);
@@ -840,7 +858,15 @@ public class EnergyPanel extends JPanel {
 		final Foundation selectedBuilding = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 		if (selectedBuilding != null) {
 			final Calendar c = Heliodon.getInstance().getCalender();
-			thermostatTemperatureField.setText(selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY)) + " \u00B0C");
+			double temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
+			switch (Scene.getInstance().getUnit()) {
+			case InternationalSystemOfUnits:
+				thermostatTemperatureField.setText(temp + " \u00B0C");
+				break;
+			case USCustomaryUnits:
+				thermostatTemperatureField.setText(Math.round(32.0 + 9.0 * temp / 5.0) + " \u00B0F");
+				break;
+			}
 			thermostatPanel.add(adjustThermostatButton, BorderLayout.EAST);
 		} else {
 			thermostatTemperatureField.setText(null);
