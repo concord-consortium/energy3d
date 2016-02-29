@@ -22,6 +22,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
@@ -348,6 +349,13 @@ public class Foundation extends HousePart implements Thermalizable {
 			insidePoints.add(new Vector2(p0.getX(), p0.getY()));
 			insidePoints.add(new Vector2(p2.getX(), p2.getY()));
 		}
+
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p1 = getAbsPoint(1);
+		final Vector3 p2 = getAbsPoint(2);
+		final ReadOnlyVector2 p0_2d = new Vector2(p0.getX(), p0.getY());
+		final ReadOnlyVector2 p1_2d = new Vector2(p1.getX(), p1.getY());
+		final ReadOnlyVector2 p2_2d = new Vector2(p2.getX(), p2.getY());
 		useOrgPoints = false;
 
 		double uScaleMin = Double.MAX_VALUE;
@@ -355,24 +363,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		double vScaleMin = Double.MAX_VALUE;
 		double vScaleMax = -Double.MAX_VALUE;
 		for (final Vector2 insidePoint : insidePoints) {
-			final double uScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
+			final double uScale = Util.projectPointOnLineScale(insidePoint, p0_2d, p2_2d);
 			if (uScaleMin > uScale)
 				uScaleMin = uScale;
 			if (uScaleMax < uScale)
 				uScaleMax = uScale;
-			final double vScale = Util.projectPointOnLineScale(insidePoint, new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+			final double vScale = Util.projectPointOnLineScale(insidePoint, p0_2d, p1_2d);
 			if (vScaleMin > vScale)
 				vScaleMin = vScale;
 			if (vScaleMax < vScale)
 				vScaleMax = vScale;
 		}
 
-		final double uScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
-		final double vScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
-		final double uScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
-		final double uScaleP2 = Util.projectPointOnLineScale(new Vector2(points.get(2).getX(), points.get(2).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(2).getX(), points.get(2).getY()));
-		final double vScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
-		final double vScaleP1 = Util.projectPointOnLineScale(new Vector2(points.get(1).getX(), points.get(1).getY()), new Vector2(points.get(0).getX(), points.get(0).getY()), new Vector2(points.get(1).getX(), points.get(1).getY()));
+		final double uScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), p0_2d, p2_2d);
+		final double vScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), p0_2d, p1_2d);
+		final double uScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), p0_2d, p2_2d);
+		final double uScaleP2 = Util.projectPointOnLineScale(new Vector2(points.get(2).getX(), points.get(2).getY()), p0_2d, p2_2d);
+		final double vScaleP0 = Util.projectPointOnLineScale(new Vector2(points.get(0).getX(), points.get(0).getY()), p0_2d, p1_2d);
+		final double vScaleP1 = Util.projectPointOnLineScale(new Vector2(points.get(1).getX(), points.get(1).getY()), p0_2d, p1_2d);
 		final boolean isOnRight = uScaleP2 >= uScaleP0 && (index == 2 || index == 3);
 		final boolean isOnTop = vScaleP1 >= vScaleP0 && (index == 1 || index == 3);
 
@@ -392,9 +400,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		else
 			vScale = vScaleP;
 
-		final Vector3 u = points.get(2).subtract(points.get(0), null);
-		final Vector3 v = points.get(1).subtract(points.get(0), null);
-		p.set(points.get(0)).addLocal(u.multiplyLocal(uScale)).addLocal(v.multiplyLocal(vScale));
+		final Vector3 u = p2.subtract(p0, null);
+		final Vector3 v = p1.subtract(p0, null);
+		p.set(p0).addLocal(u.multiplyLocal(uScale)).addLocal(v.multiplyLocal(vScale));
 	}
 
 	private Vector3 ensureDistanceFromOtherFoundations(final Vector3 p, final int index) {
@@ -1038,11 +1046,11 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	@Override
-	public Vector3 getAbsPoint(final int index) {
+	public Vector3 getAbsPoint(final int index, final Vector3 result) {
 		if (useOrgPoints && orgPoints != null)
-			return super.toAbsolute(orgPoints.get(index));
+			return super.toAbsolute(orgPoints.get(index), result);
 		else
-			return super.getAbsPoint(index);
+			return super.getAbsPoint(index, result);
 	}
 
 	public void setLockEdit(final boolean b) {
@@ -1106,27 +1114,32 @@ public class Foundation extends HousePart implements Thermalizable {
 			area = 0.0;
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return false;
 	}
 
+	@Override
 	public void setUValue(final double uValue) {
 		this.uValue = uValue;
 	}
 
+	@Override
 	public double getUValue() {
 		return uValue;
 	}
 
+	@Override
 	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
 		this.volumetricHeatCapacity = volumetricHeatCapacity;
 	}
 
+	@Override
 	public double getVolumetricHeatCapacity() {
 		return volumetricHeatCapacity;
 	}
 
-	public void setThermostat(Thermostat t) {
+	public void setThermostat(final Thermostat t) {
 		thermostat = t;
 	}
 
