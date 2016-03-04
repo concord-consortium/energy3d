@@ -742,7 +742,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
 					final String title = "<html>Energy Conversion Efficiency (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley–Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
+					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));

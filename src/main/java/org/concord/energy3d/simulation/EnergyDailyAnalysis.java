@@ -125,6 +125,8 @@ public class EnergyDailyAnalysis extends Analysis {
 					sum += loss[k];
 				graph.addData("Heat Gain", -sum);
 			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
+				final double solar = selectedPart.getSolarPotentialNow();
+				graph.addData("Solar", solar);
 				final double[] loss = selectedPart.getHeatLoss();
 				int t0 = n * i;
 				double sum = 0;
