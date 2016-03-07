@@ -1,4 +1,3 @@
-#expr Exec("C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe", "sign /n Concord /tr http://tsa.starfieldtech.com " + AddBackslash(SourcePath) + "Energy3D\Energy3D.exe")
 
 ;This file will be executed next to the application bundle image
 ;I.e. current directory will contain folder Energy3D with application files
@@ -34,9 +33,7 @@ UninstallDisplayIcon={app}\Energy3D.ico
 UninstallDisplayName=Energy3D
 WizardImageStretch=No
 WizardSmallImageFile=Energy3D-setup-icon.bmp   
-ArchitecturesInstallIn64BitMode=x64
 ChangesAssociations=yes
-SignTool=mysign
 
 [Registry]
 Root: HKCU; Subkey: "Software\Classes\.ng3"; ValueType: string; ValueName: ""; ValueData: "Energy3DFile"; Flags: uninsdeletevalue

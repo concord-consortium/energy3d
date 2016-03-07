@@ -770,7 +770,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
 										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingSolarPanelEfficiencyCommand(foundation));
-										Scene.getInstance().setSolarPanelEfficiencyOfBuilding(foundation, val);
+										Scene.getInstance().setSolarPanelEfficiencyOfBuilding(foundation, val * 0.01);
 									}
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
