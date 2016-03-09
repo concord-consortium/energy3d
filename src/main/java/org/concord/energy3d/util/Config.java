@@ -4,7 +4,7 @@ import org.concord.energy3d.MainApplet;
 
 public class Config {
 
-	public static final String VERSION = "5.1.3";
+	public static final String VERSION = "5.1.4";
 	public static final RenderMode RENDER_MODE = RenderMode.JOGL;
 	private static MainApplet applet;
 	private static boolean isWebstart;

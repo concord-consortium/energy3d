@@ -1096,6 +1096,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Scene.getInstance().add(drawn, false);
 		addHousePartCommand = new AddPartCommand(drawn);
 		return drawn;
+		
 	}
 
 	public Operation getOperation() {
@@ -1818,8 +1819,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				SceneManager.getInstance().setSelectedPart(hp);
 				foundation = (Foundation) hp;
 			} else {
-				if (ask)
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+				if (ask) {
+					if (count > 1) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+					}
+				}
 			}
 		} else {
 			final HousePart topContainer = selectedPart.getTopContainer();

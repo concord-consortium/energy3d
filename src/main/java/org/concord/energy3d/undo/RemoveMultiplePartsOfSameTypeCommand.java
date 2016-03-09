@@ -47,16 +47,19 @@ public class RemoveMultiplePartsOfSameTypeCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		for (HousePart p : parts)
-			Scene.getInstance().add(p, true);
+		for (HousePart p : parts) {
+			if (p.isDrawable()) // as an extra defense of potential invisible ghost part
+				Scene.getInstance().add(p, true);
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		for (HousePart p : parts)
+		for (HousePart p : parts) {
 			Scene.getInstance().remove(p, true);
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 

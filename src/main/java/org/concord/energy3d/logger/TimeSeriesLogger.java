@@ -636,7 +636,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 						log();
 					} catch (Throwable t) {
 						t.printStackTrace();
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + t + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + t.getMessage() + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
