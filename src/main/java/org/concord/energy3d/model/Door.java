@@ -162,4 +162,11 @@ public class Door extends HousePart implements Thermalizable {
 		return volumetricHeatCapacity;
 	}
 
+	@Override
+	public boolean isValid() {
+		if (!super.isValid())
+			return false;
+		return super.isDrawable();
+	}
+
 }

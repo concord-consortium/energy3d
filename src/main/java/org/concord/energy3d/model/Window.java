@@ -637,4 +637,11 @@ public class Window extends HousePart implements Thermalizable {
 		return thisWindow;
 	}
 
+	@Override
+	public boolean isValid() {
+		if (!super.isValid())
+			return false;
+		return super.isDrawable();
+	}
+
 }
