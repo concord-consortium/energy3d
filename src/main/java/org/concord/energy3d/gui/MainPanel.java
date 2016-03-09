@@ -604,6 +604,7 @@ public class MainPanel extends JPanel {
 	public void defaultTool() {
 		getSelectButton().setSelected(true);
 		SceneManager.getInstance().setOperation(Operation.SELECT);
+		SceneManager.getInstance().refresh();
 	}
 
 	public JToggleButton getAnnotationToggleButton() {

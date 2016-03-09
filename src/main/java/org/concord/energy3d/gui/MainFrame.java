@@ -2,6 +2,7 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.KeyEventDispatcher;
@@ -359,8 +360,30 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getViewMenu());
 			appMenuBar.add(getAnalysisMenu());
 			appMenuBar.add(getHelpMenu());
+
+			addCommonActionListeners(appMenuBar);
 		}
 		return appMenuBar;
+	}
+
+	private void addCommonActionListeners(final JMenuBar menuBar) {
+		for (final Component c : menuBar.getComponents())
+			if (c instanceof JMenu)
+				addCommonActionListeners((JMenu) c);
+	}
+
+	private void addCommonActionListeners(final JMenu menu) {
+		for (final Component c : menu.getMenuComponents()) {
+			if (c instanceof JMenuItem) {
+				final JMenuItem menuItem = (JMenuItem) c;
+				menuItem.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						MainPanel.getInstance().defaultTool();
+					}
+				});
+			}
+		}
 	}
 
 	private JMenu getFileMenu() {
@@ -392,7 +415,7 @@ public class MainFrame extends JFrame {
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
 					replayFolderMenuItem.setEnabled(inactive);
-					File lastFolder = DesignReplay.getInstance().getLastFolder();
+					final File lastFolder = DesignReplay.getInstance().getLastFolder();
 					replayLastFolderMenuItem.setEnabled(lastFolder != null && inactive);
 					replayLastFolderMenuItem.setText(lastFolder != null ? "Replay Last Folder: " + lastFolder : "Replay Last Folder");
 					replayControlsMenu.setEnabled(!inactive);
@@ -1825,7 +1848,7 @@ public class MainFrame extends JFrame {
 			JOptionPane.showMessageDialog(this, "<html>You must select a part.</html>", "Selection missing", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		ReadOnlyColorRGBA color = selectedPart.getColor();
+		final ReadOnlyColorRGBA color = selectedPart.getColor();
 		if (color != null)
 			colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 		final ActionListener actionListener = new ActionListener() {
