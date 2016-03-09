@@ -369,7 +369,7 @@ public class Util {
 
 	public static void reportError(final Throwable e) {
 		if (!suppressReportError)
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public final static void openBrowser(final String url) {
