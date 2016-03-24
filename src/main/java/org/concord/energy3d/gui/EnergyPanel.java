@@ -341,9 +341,7 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
 		heatMapPanel = new JPanel(new BorderLayout());
-		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP);
-		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 4));
-		heatMapPanel.setBorder(b);
+		heatMapPanel.setBorder(createTitledBorder("Heat Map Contrast", true));
 		// dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
@@ -370,17 +368,11 @@ public class EnergyPanel extends JPanel {
 		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
 
 		partPanel = new JPanel();
-		b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP);
-		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 2));
-		b.setTitleColor(Color.GRAY);
-		partPanel.setBorder(b);
+		partPanel.setBorder(createTitledBorder("Part", true));
 		dataPanel.add(partPanel);
 
 		buildingPanel = new JPanel();
-		b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP);
-		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 2));
-		b.setTitleColor(Color.GRAY);
-		buildingPanel.setBorder(b);
+		buildingPanel.setBorder(createTitledBorder("Building", true));
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
@@ -452,7 +444,7 @@ public class EnergyPanel extends JPanel {
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 
 		graphTabbedPane = new JTabbedPane();
-		graphTabbedPane.setFont(new Font(graphTabbedPane.getFont().getName(), Font.PLAIN, graphTabbedPane.getFont().getSize() - 3));
+		graphTabbedPane.setFont(new Font(graphTabbedPane.getFont().getName(), Font.PLAIN, graphTabbedPane.getFont().getSize() - 1));
 		graphTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
@@ -924,9 +916,7 @@ public class EnergyPanel extends JPanel {
 			areaBar.setMaximum(specs.getMaximumArea() * r);
 			break;
 		}
-		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP);
-		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 4));
-		areaPanel.setBorder(b);
+		areaPanel.setBorder(createTitledBorder(t, true));
 		areaBar.setEnabled(specs.isAreaEnabled());
 		areaBar.repaint();
 	}
@@ -951,9 +941,7 @@ public class EnergyPanel extends JPanel {
 			heightBar.setMaximum(specs.getMaximumHeight() * r);
 			break;
 		}
-		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP);
-		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 4));
-		heightPanel.setBorder(b);
+		heightPanel.setBorder(createTitledBorder(t, true));
 		heightBar.setEnabled(specs.isHeightEnabled());
 		heightBar.repaint();
 	}
@@ -1012,21 +1000,26 @@ public class EnergyPanel extends JPanel {
 
 	private JLabel createLabel(String text) {
 		JLabel label = new JLabel(text);
-		label.setForeground(Color.GRAY);
 		label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize() - 2));
 		return label;
 	}
 
 	private JTextField createTextField() {
 		JTextField text = new JTextField();
-		text.setFont(new Font(text.getFont().getName(), Font.PLAIN, text.getFont().getSize() - 2));
+		text.setFont(new Font(text.getFont().getName(), Font.PLAIN, text.getFont().getSize() - 1));
 		return text;
 	}
 
 	private JSpinner createSpinner(SpinnerModel model) {
 		JSpinner spinner = new JSpinner(model);
-		spinner.setFont(new Font(spinner.getFont().getName(), Font.PLAIN, spinner.getFont().getSize() - 2));
+		spinner.setFont(new Font(spinner.getFont().getName(), Font.PLAIN, spinner.getFont().getSize() - 1));
 		return spinner;
+	}
+
+	TitledBorder createTitledBorder(String title, boolean smaller) {
+		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), title, TitledBorder.LEADING, TitledBorder.TOP);
+		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - (smaller ? 2 : 1)));
+		return b;
 	}
 
 }
