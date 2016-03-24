@@ -11,6 +11,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.scene.Scene;
@@ -19,24 +20,25 @@ import org.concord.energy3d.scene.Scene;
  * @author Charles Xie
  * 
  */
-class PreferencesDialog extends JDialog {
+class PropertiesDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
-	public PreferencesDialog() {
+	public PropertiesDialog() {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setTitle("Preferences");
+		setTitle("Properties");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(1, 2, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(2, 2, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final JComboBox<String> unitSystemComboBox = new JComboBox<String>(new String[] { "International System of Units", "United States Customary Units" });
 		if (Scene.getInstance().getUnit() == Scene.Unit.USCustomaryUnits)
 			unitSystemComboBox.setSelectedIndex(1);
+		final JTextField projectNameField = new JTextField(Scene.getInstance().getProjectName());
 
 		ActionListener okListener = new ActionListener() {
 			@Override
@@ -51,10 +53,15 @@ class PreferencesDialog extends JDialog {
 				}
 				EnergyPanel.getInstance().updateWeatherData();
 				EnergyPanel.getInstance().update();
+				Scene.getInstance().setProjectName(projectNameField.getText());
 				Scene.getInstance().setEdited(true);
-				PreferencesDialog.this.dispose();
+				PropertiesDialog.this.dispose();
 			}
 		};
+
+		// set project name
+		panel.add(new JLabel("Project Name: "));
+		panel.add(projectNameField);
 
 		// choose unit system
 		panel.add(new JLabel("Unit System: "));
@@ -74,7 +81,7 @@ class PreferencesDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				PreferencesDialog.this.dispose();
+				PropertiesDialog.this.dispose();
 			}
 		});
 		cancelButton.setActionCommand("Cancel");

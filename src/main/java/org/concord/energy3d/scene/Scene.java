@@ -94,6 +94,7 @@ public class Scene implements Serializable {
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
 	private long idCounter;
+	private String projectName;
 	private String city;
 	private int latitude;
 	private boolean isHeliodonVisible;
@@ -1315,6 +1316,14 @@ public class Scene implements Serializable {
 		return false;
 	}
 
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	public String getProjectName() {
+		return projectName;
+	}
+
 	public void setCity(final String city) {
 		this.city = city;
 	}
@@ -1391,5 +1400,5 @@ public class Scene implements Serializable {
 	public DesignSpecs getDesignSpecs() {
 		return designSpecs;
 	}
-	
+
 }

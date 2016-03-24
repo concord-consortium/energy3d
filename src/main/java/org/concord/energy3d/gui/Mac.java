@@ -38,7 +38,6 @@ class Mac {
 		application.setPreferencesHandler(new PreferencesHandler() {
 			@Override
 			public void handlePreferences(final PreferencesEvent e) {
-				MainFrame.getInstance().showPreferences();
 			}
 		});
 

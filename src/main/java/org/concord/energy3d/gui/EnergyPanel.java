@@ -907,12 +907,12 @@ public class EnergyPanel extends JPanel {
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
 			if (specs.isAreaEnabled())
-				t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea());
+				t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea()) + " ";
 			t += "m\u00B2)";
 			break;
 		case USCustomaryUnits:
 			if (specs.isAreaEnabled())
-				t += twoDecimals.format(specs.getMinimumArea() * 3.28084 * 3.28084) + " - " + twoDecimals.format(specs.getMaximumArea() * 3.28084 * 3.28084);
+				t += noDecimals.format(specs.getMinimumArea() * 3.28084 * 3.28084) + " - " + noDecimals.format(specs.getMaximumArea() * 3.28084 * 3.28084) + " ";
 			t += "ft\u00B2)";
 			break;
 		}
@@ -929,12 +929,12 @@ public class EnergyPanel extends JPanel {
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
 			if (specs.isHeightEnabled())
-				t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight());
+				t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight()) + " ";
 			t += "m)";
 			break;
 		case USCustomaryUnits:
 			if (specs.isHeightEnabled())
-				t += twoDecimals.format(specs.getMinimumHeight() * 3.28084) + " - " + twoDecimals.format(specs.getMaximumHeight() * 3.28084);
+				t += noDecimals.format(specs.getMinimumHeight() * 3.28084) + " - " + noDecimals.format(specs.getMaximumHeight() * 3.28084) + " ";
 			t += "ft)";
 			break;
 		}

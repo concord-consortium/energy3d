@@ -419,6 +419,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		}
 
 		String line = "\"File\": \"" + filename + "\"";
+		if (Scene.getInstance().getProjectName() != null && !Scene.getInstance().getProjectName().trim().equals("")) {
+			line += separator + "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"";
+		}
 		analysisRequester = EnergyPanel.getInstance().getDisableActionsRequester();
 		if (analysisRequester != null) {
 

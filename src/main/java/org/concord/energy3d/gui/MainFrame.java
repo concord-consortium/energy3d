@@ -174,7 +174,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllLocksMenuItem;
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
-	private JMenuItem preferencesMenuItem;
+	private JMenuItem propertiesMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 
 	private final FileChooser fileChooser;
@@ -1507,10 +1507,8 @@ public class MainFrame extends JFrame {
 				editMenu.addSeparator();
 				editMenu.add(getSpecificationsMenuItem());
 			}
-			if (!Config.isMac()) {
-				editMenu.addSeparator();
-				editMenu.add(getPreferencesMenuItem());
-			}
+			editMenu.addSeparator();
+			editMenu.add(getPropertiesMenuItem());
 		}
 		return editMenu;
 	}
@@ -2063,21 +2061,21 @@ public class MainFrame extends JFrame {
 		return specificationsMenuItem;
 	}
 
-	void showPreferences() {
-		new PreferencesDialog().setVisible(true);
+	void showProperties() {
+		new PropertiesDialog().setVisible(true);
 	}
 
-	private JMenuItem getPreferencesMenuItem() {
-		if (preferencesMenuItem == null) {
-			preferencesMenuItem = new JMenuItem("Preferences");
-			preferencesMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getPropertiesMenuItem() {
+		if (propertiesMenuItem == null) {
+			propertiesMenuItem = new JMenuItem("Properties");
+			propertiesMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showPreferences();
+					showProperties();
 				}
 			});
 		}
-		return preferencesMenuItem;
+		return propertiesMenuItem;
 	}
 
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
