@@ -88,11 +88,25 @@ class LoggerUtil {
 		int n = p.getPoints().size();
 		if (n > 0) {
 			s += ", \"Coordinates\": [";
+			boolean exist;
 			for (int i = 0; i < n; i++) {
-				Vector3 v = p.getAbsPoint(i);
-				s += "{\"x\": " + FORMAT.format(v.getX()) + ", \"y\": " + FORMAT.format(v.getY()) + ", \"z\": " + FORMAT.format(v.getZ()) + "}";
-				if (i < n - 1)
-					s += ", ";
+				exist = false;
+				for (int j = 0; j < i; j++) {
+					if (p.getPoints().get(j).equals(p.getPoints().get(i))) {
+						exist = true;
+						break;
+					}
+				}
+				if (!exist) {
+					Vector3 v = p.getAbsPoint(i);
+					s += "{\"x\": " + FORMAT.format(v.getX()) + ", \"y\": " + FORMAT.format(v.getY()) + ", \"z\": " + FORMAT.format(v.getZ()) + "}";
+					if (i < n - 1)
+						s += ", ";
+				}
+			}
+			s = s.trim();
+			if (s.endsWith(",")) {
+				s = s.substring(0, s.length() - 1);
 			}
 			s += "]";
 		}
