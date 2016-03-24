@@ -3,6 +3,7 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -166,7 +167,9 @@ public class ConstructionCostGraph extends JPanel {
 			budgetBar.setValue(totalCost);
 			budgetBar.repaint();
 			String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
-			budgetPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
+			TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP);
+			b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 4));
+			budgetPanel.setBorder(b);
 			budgetPanel.repaint();
 		}
 	}

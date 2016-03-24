@@ -7,6 +7,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -42,6 +43,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
@@ -101,11 +103,8 @@ public class EnergyPanel extends JPanel {
 	private final JComboBox<String> cityComboBox;
 	private final JTextField outsideTemperatureField;
 	private final JTextField sunshineHoursField;
-	private final JLabel dateLabel;
-	private final JLabel timeLabel;
 	private final JSpinner dateSpinner;
 	private final JSpinner timeSpinner;
-	private final JLabel latitudeLabel;
 	private final JSpinner latitudeSpinner;
 	private final JPanel heatMapPanel;
 	private final JSlider colorMapSlider;
@@ -150,14 +149,12 @@ public class EnergyPanel extends JPanel {
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
 		timeAndLocationPanel.setLayout(gbl_panel_3);
 
-		dateLabel = new JLabel("Date: ");
 		final GridBagConstraints gbc_dateLabel = new GridBagConstraints();
 		gbc_dateLabel.gridx = 0;
 		gbc_dateLabel.gridy = 0;
-		timeAndLocationPanel.add(dateLabel, gbc_dateLabel);
+		timeAndLocationPanel.add(createLabel("Date: "), gbc_dateLabel);
 
-		dateSpinner = new JSpinner();
-		dateSpinner.setModel(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
+		dateSpinner = createSpinner(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
 		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 		dateSpinner.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
 			@Override
@@ -203,6 +200,7 @@ public class EnergyPanel extends JPanel {
 
 		Arrays.sort(LocationData.getInstance().getCities());
 		cityComboBox = new JComboBox<String>();
+		cityComboBox.setFont(new Font(cityComboBox.getFont().getName(), Font.PLAIN, cityComboBox.getFont().getSize() - 2));
 		cityComboBox.setModel(new DefaultComboBoxModel<String>(LocationData.getInstance().getCities()));
 		cityComboBox.setSelectedItem("Boston, MA");
 		cityComboBox.setMaximumRowCount(15);
@@ -239,13 +237,12 @@ public class EnergyPanel extends JPanel {
 		gbc_cityComboBox.gridy = 0;
 		timeAndLocationPanel.add(cityComboBox, gbc_cityComboBox);
 
-		timeLabel = new JLabel("Time: ");
 		final GridBagConstraints gbc_timeLabel = new GridBagConstraints();
 		gbc_timeLabel.gridx = 0;
 		gbc_timeLabel.gridy = 1;
-		timeAndLocationPanel.add(timeLabel, gbc_timeLabel);
+		timeAndLocationPanel.add(createLabel("Time: "), gbc_timeLabel);
 
-		timeSpinner = new JSpinner(new SpinnerDateModel());
+		timeSpinner = createSpinner(new SpinnerDateModel());
 		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
 		timeSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
@@ -284,15 +281,13 @@ public class EnergyPanel extends JPanel {
 		gbc_timeSpinner.gridy = 1;
 		timeAndLocationPanel.add(timeSpinner, gbc_timeSpinner);
 
-		latitudeLabel = new JLabel("Latitude: ");
 		final GridBagConstraints gbc_altitudeLabel = new GridBagConstraints();
 		gbc_altitudeLabel.insets = new Insets(0, 1, 0, 0);
 		gbc_altitudeLabel.gridx = 2;
 		gbc_altitudeLabel.gridy = 1;
-		timeAndLocationPanel.add(latitudeLabel, gbc_altitudeLabel);
+		timeAndLocationPanel.add(createLabel("Latitude: "), gbc_altitudeLabel);
 
-		latitudeSpinner = new JSpinner();
-		latitudeSpinner.setModel(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
+		latitudeSpinner = createSpinner(new SpinnerNumberModel(Heliodon.DEFAULT_LATITUDE, -90, 90, 1));
 		latitudeSpinner.addChangeListener(latitudeChangeListener);
 		latitudeSpinner.addChangeListener(new ChangeListener() {
 			@Override
@@ -311,15 +306,14 @@ public class EnergyPanel extends JPanel {
 
 		timeAndLocationPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, timeAndLocationPanel.getPreferredSize().height));
 
-		final JLabel outsideTemperatureLabel = new JLabel("Temp.: ");
 		final GridBagConstraints gbc_outsideTemperatureLabel = new GridBagConstraints();
 		gbc_outsideTemperatureLabel.insets = new Insets(0, 8, 1, 1);
 		gbc_outsideTemperatureLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_outsideTemperatureLabel.gridx = 0;
 		gbc_outsideTemperatureLabel.gridy = 2;
-		timeAndLocationPanel.add(outsideTemperatureLabel, gbc_outsideTemperatureLabel);
+		timeAndLocationPanel.add(createLabel("Temp.: "), gbc_outsideTemperatureLabel);
 
-		outsideTemperatureField = new JTextField();
+		outsideTemperatureField = createTextField();
 		outsideTemperatureField.setToolTipText("Current outside temperature at this time and day");
 		outsideTemperatureField.setEditable(false);
 		outsideTemperatureField.setBackground(Color.WHITE);
@@ -329,15 +323,14 @@ public class EnergyPanel extends JPanel {
 		gbc_outsideTemperatureField.gridy = 2;
 		timeAndLocationPanel.add(outsideTemperatureField, gbc_outsideTemperatureField);
 
-		final JLabel sunshineLabel = new JLabel("Sunshine: ");
 		final GridBagConstraints gbc_sunshineLabel = new GridBagConstraints();
 		gbc_sunshineLabel.insets = new Insets(0, 5, 0, 0);
 		gbc_sunshineLabel.fill = GridBagConstraints.HORIZONTAL;
 		gbc_sunshineLabel.gridx = 2;
 		gbc_sunshineLabel.gridy = 2;
-		timeAndLocationPanel.add(sunshineLabel, gbc_sunshineLabel);
+		timeAndLocationPanel.add(createLabel("Sunshine: "), gbc_sunshineLabel);
 
-		sunshineHoursField = new JTextField();
+		sunshineHoursField = createTextField();
 		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
 		sunshineHoursField.setEditable(false);
 		sunshineHoursField.setBackground(Color.WHITE);
@@ -348,7 +341,9 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
 		heatMapPanel = new JPanel(new BorderLayout());
-		heatMapPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP));
+		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Heat Map Contrast", TitledBorder.LEADING, TitledBorder.TOP);
+		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 4));
+		heatMapPanel.setBorder(b);
 		// dataPanel.add(heatMapPanel);
 
 		colorMapSlider = new MySlider();
@@ -375,11 +370,17 @@ public class EnergyPanel extends JPanel {
 		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
 
 		partPanel = new JPanel();
-		partPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP));
+		b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Part", TitledBorder.LEADING, TitledBorder.TOP);
+		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 2));
+		b.setTitleColor(Color.GRAY);
+		partPanel.setBorder(b);
 		dataPanel.add(partPanel);
 
 		buildingPanel = new JPanel();
-		buildingPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP));
+		b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), "Building", TitledBorder.LEADING, TitledBorder.TOP);
+		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 2));
+		b.setTitleColor(Color.GRAY);
+		buildingPanel.setBorder(b);
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
@@ -419,12 +420,13 @@ public class EnergyPanel extends JPanel {
 		// thermostat for the selected building
 
 		thermostatPanel = new JPanel(new BorderLayout(5, 0));
-		thermostatPanel.add(new JLabel("   Thermostat: "), BorderLayout.WEST);
-		thermostatTemperatureField = new JTextField();
+		thermostatPanel.add(createLabel("   Thermostat: "), BorderLayout.WEST);
+		thermostatTemperatureField = createTextField();
 		thermostatTemperatureField.setEditable(false);
 		thermostatTemperatureField.setBackground(Color.WHITE);
 		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
 		adjustThermostatButton = new JButton("Adjust");
+		adjustThermostatButton.setFont(new Font(adjustThermostatButton.getFont().getName(), Font.PLAIN, adjustThermostatButton.getFont().getSize() - 2));
 		adjustThermostatButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -450,6 +452,7 @@ public class EnergyPanel extends JPanel {
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
 
 		graphTabbedPane = new JTabbedPane();
+		graphTabbedPane.setFont(new Font(graphTabbedPane.getFont().getName(), Font.PLAIN, graphTabbedPane.getFont().getSize() - 3));
 		graphTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
@@ -481,35 +484,35 @@ public class EnergyPanel extends JPanel {
 		partPropertiesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		partPanel.add(partPropertiesPanel);
 
-		partProperty1Label = new JLabel("Width:");
+		partProperty1Label = createLabel("Width:");
 		partPropertiesPanel.add(partProperty1Label);
 
-		partProperty1TextField = new JTextField();
+		partProperty1TextField = createTextField();
 		partProperty1TextField.setEditable(false);
 		partProperty1TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty1TextField);
 		partProperty1TextField.setColumns(4);
 
-		partProperty2Label = new JLabel("Height:");
+		partProperty2Label = createLabel("Height:");
 		partPropertiesPanel.add(partProperty2Label);
 
-		partProperty2TextField = new JTextField();
+		partProperty2TextField = createTextField();
 		partProperty2TextField.setEditable(false);
 		partProperty2TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty2TextField);
 		partProperty2TextField.setColumns(4);
 
-		partProperty3Label = new JLabel("Insolation:");
+		partProperty3Label = createLabel("Insolation:");
 		partPropertiesPanel.add(partProperty3Label);
 
-		partProperty3TextField = new JTextField();
+		partProperty3TextField = createTextField();
 		partProperty3TextField.setEditable(false);
 		partProperty3TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty3TextField);
 		partProperty3TextField.setColumns(4);
 
-		partProperty4Label = new JLabel();
-		partProperty4TextField = new JTextField();
+		partProperty4Label = createLabel("");
+		partProperty4TextField = createTextField();
 		partProperty4TextField.setEditable(false);
 		partProperty4TextField.setBackground(Color.WHITE);
 		partProperty4TextField.setColumns(4);
@@ -903,45 +906,55 @@ public class EnergyPanel extends JPanel {
 
 	public void updateAreaBar() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		final double r = 3.28084 * 3.28084;
 		String t = "Area (";
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
 			if (specs.isAreaEnabled())
 				t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea()) + " ";
 			t += "m\u00B2)";
+			areaBar.setMinimum(specs.getMinimumArea());
+			areaBar.setMaximum(specs.getMaximumArea());
 			break;
 		case USCustomaryUnits:
 			if (specs.isAreaEnabled())
-				t += noDecimals.format(specs.getMinimumArea() * 3.28084 * 3.28084) + " - " + noDecimals.format(specs.getMaximumArea() * 3.28084 * 3.28084) + " ";
+				t += noDecimals.format(specs.getMinimumArea() * r) + " - " + noDecimals.format(specs.getMaximumArea() * r) + " ";
 			t += "ft\u00B2)";
+			areaBar.setMinimum(specs.getMinimumArea() * r);
+			areaBar.setMaximum(specs.getMaximumArea() * r);
 			break;
 		}
-		areaPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
+		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP);
+		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 4));
+		areaPanel.setBorder(b);
 		areaBar.setEnabled(specs.isAreaEnabled());
-		areaBar.setMinimum(specs.getMinimumArea());
-		areaBar.setMaximum(specs.getMaximumArea());
 		areaBar.repaint();
 	}
 
 	public void updateHeightBar() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		final double r = 3.28084;
 		String t = "Height (";
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
 			if (specs.isHeightEnabled())
 				t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight()) + " ";
 			t += "m)";
+			heightBar.setMinimum(specs.getMinimumHeight());
+			heightBar.setMaximum(specs.getMaximumHeight());
 			break;
 		case USCustomaryUnits:
 			if (specs.isHeightEnabled())
-				t += noDecimals.format(specs.getMinimumHeight() * 3.28084) + " - " + noDecimals.format(specs.getMaximumHeight() * 3.28084) + " ";
+				t += noDecimals.format(specs.getMinimumHeight() * r) + " - " + noDecimals.format(specs.getMaximumHeight() * r) + " ";
 			t += "ft)";
+			heightBar.setMinimum(specs.getMinimumHeight() * r);
+			heightBar.setMaximum(specs.getMaximumHeight() * r);
 			break;
 		}
-		heightPanel.setBorder(BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP));
+		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), t, TitledBorder.LEADING, TitledBorder.TOP);
+		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - 4));
+		heightPanel.setBorder(b);
 		heightBar.setEnabled(specs.isHeightEnabled());
-		heightBar.setMinimum(specs.getMinimumHeight());
-		heightBar.setMaximum(specs.getMaximumHeight());
 		heightBar.repaint();
 	}
 
@@ -995,6 +1008,25 @@ public class EnergyPanel extends JPanel {
 			constructionCostGraph.removeGraph();
 			dailyEnergyGraph.removeGraph();
 		}
+	}
+
+	private JLabel createLabel(String text) {
+		JLabel label = new JLabel(text);
+		label.setForeground(Color.GRAY);
+		label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize() - 2));
+		return label;
+	}
+
+	private JTextField createTextField() {
+		JTextField text = new JTextField();
+		text.setFont(new Font(text.getFont().getName(), Font.PLAIN, text.getFont().getSize() - 2));
+		return text;
+	}
+
+	private JSpinner createSpinner(SpinnerModel model) {
+		JSpinner spinner = new JSpinner(model);
+		spinner.setFont(new Font(spinner.getFont().getName(), Font.PLAIN, spinner.getFont().getSize() - 2));
+		return spinner;
 	}
 
 }
