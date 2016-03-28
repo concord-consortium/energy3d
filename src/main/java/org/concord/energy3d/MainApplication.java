@@ -21,6 +21,7 @@ import com.threerings.getdown.launcher.GetdownApp;
 public class MainApplication {
 
 	public static boolean appDirectoryWritable = true;
+	public static boolean isMacOpeningFile;
 	private static ArrayList<Runnable> shutdownHooks;
 
 	public static void main(final String[] args) {
@@ -66,14 +67,6 @@ public class MainApplication {
 		Scene.getInstance();
 		new Thread(sceneManager, "Energy3D Application").start();
 
-		if (Config.isWebStart()) {
-			if (args.length > 1 && !args[args.length - 1].startsWith("-"))
-				mainFrame.open(args[args.length - 1]);
-		} else {
-			if (args.length > 0)
-				mainFrame.open(args[0]);
-		}
-
 		/* initialize data logging */
 		final TimeSeriesLogger logger = new TimeSeriesLogger(1);
 		addShutdownHook(new Runnable() {
@@ -87,6 +80,30 @@ public class MainApplication {
 		logger.start();
 		SnapshotLogger.start(20, logger);
 
+		try {
+			new Thread() {
+				@Override
+				public void run() {
+					try {
+						if (isMacOpeningFile)
+							return;
+						if (Config.isWebStart()) {
+							if (args.length > 1 && !args[args.length - 1].startsWith("-"))
+								mainFrame.open(args[args.length - 1]);
+						} else {
+							if (args.length > 0)
+								mainFrame.open(args[0]);
+						}
+					} catch (final Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}.start();
+
+			System.out.println("Initiatialization phase 2 done.");
+		} catch (final Throwable e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void addShutdownHook(final Runnable r) {

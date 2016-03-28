@@ -2,6 +2,8 @@ package org.concord.energy3d.gui;
 
 import java.awt.Toolkit;
 
+import org.concord.energy3d.MainApplication;
+
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
 import com.apple.eawt.AppEvent.OpenFilesEvent;
@@ -23,6 +25,7 @@ class Mac {
 		application.setOpenFileHandler(new OpenFilesHandler() {
 			@Override
 			public void openFiles(final OpenFilesEvent e) {
+				MainApplication.isMacOpeningFile = true;
 				MainFrame.getInstance().open(e.getFiles().get(0).toString());
 			}
 		});
@@ -31,7 +34,6 @@ class Mac {
 			@Override
 			public void handleAbout(final AboutEvent e) {
 				MainFrame.getInstance().showAbout();
-				;
 			}
 		});
 

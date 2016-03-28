@@ -7,7 +7,7 @@
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="dist" />
 	
-	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\jdk1.8.0_72\">
+	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\jdk1.8.0_77\">
 		<os family="windows" />
 	</condition>
 	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home">
