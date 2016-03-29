@@ -23,6 +23,8 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,7 +53,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -1896,8 +1900,12 @@ public class MainFrame extends JFrame {
 
 	public void showUnexpectedErrorMessage(final Throwable err) {
 		err.printStackTrace();
-		final String message = err.getMessage();
-		JOptionPane.showMessageDialog(this, message != null ? message : "Unexpected error occured!", "Error", JOptionPane.ERROR_MESSAGE);
+		final StringWriter sw = new StringWriter();
+		err.printStackTrace(new PrintWriter(sw));
+		final String exceptionAsString = sw.toString();
+		final JTextArea textArea = new JTextArea(exceptionAsString);
+		final JScrollPane scrollPane = new JScrollPane(textArea);
+		JOptionPane.showMessageDialog(this, scrollPane, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public void open(final String filename) {

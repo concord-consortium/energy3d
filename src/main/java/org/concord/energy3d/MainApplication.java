@@ -90,9 +90,13 @@ public class MainApplication {
 						if (Config.isWebStart()) {
 							if (args.length > 1 && !args[args.length - 1].startsWith("-"))
 								mainFrame.open(args[args.length - 1]);
+							else
+								Scene.newFile();
 						} else {
 							if (args.length > 0)
 								mainFrame.open(args[0]);
+							else
+								Scene.newFile();
 						}
 					} catch (final Exception e) {
 						e.printStackTrace();

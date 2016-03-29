@@ -1,8 +1,12 @@
 package org.concord.energy3d.gui;
 
 import java.awt.Toolkit;
+import java.io.File;
+import java.util.concurrent.Callable;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -26,7 +30,18 @@ class Mac {
 			@Override
 			public void openFiles(final OpenFilesEvent e) {
 				MainApplication.isMacOpeningFile = true;
-				MainFrame.getInstance().open(e.getFiles().get(0).toString());
+//				MainFrame.getInstance().open(e.getFiles().get(0).toString());
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						try {
+							Scene.open(new File(e.getFiles().get(0).toString()).toURI().toURL());
+						} catch (final Throwable err) {
+							MainFrame.getInstance().showUnexpectedErrorMessage(err);
+						}
+						return null;
+					}
+				});
 			}
 		});
 

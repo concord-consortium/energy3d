@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -117,14 +116,9 @@ public class Scene implements Serializable {
 	public static Scene getInstance() {
 		if (instance == null) {
 			try {
-				if (Config.isApplet() && Config.getApplet().getParameter("file") != null) {
-					final URL url = new URL(Config.getApplet().getCodeBase(), Config.getApplet().getParameter("file"));
-					open(new URI(url.getProtocol(), url.getHost(), url.getPath(), null).toURL());
-				} else
-					newFile();
-			} catch (final Throwable e) {
+				open(null);
+			} catch (final Exception e) {
 				e.printStackTrace();
-				newFile();
 			}
 		}
 		return instance;
