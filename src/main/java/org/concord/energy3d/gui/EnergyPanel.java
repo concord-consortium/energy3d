@@ -316,6 +316,7 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureField = createTextField();
 		outsideTemperatureField.setToolTipText("Current outside temperature at this time and day");
 		outsideTemperatureField.setEditable(false);
+		outsideTemperatureField.setEnabled(false);
 		outsideTemperatureField.setBackground(Color.WHITE);
 		final GridBagConstraints gbc_outsideTemperatureField = new GridBagConstraints();
 		gbc_outsideTemperatureField.fill = GridBagConstraints.HORIZONTAL;
@@ -333,6 +334,7 @@ public class EnergyPanel extends JPanel {
 		sunshineHoursField = createTextField();
 		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
 		sunshineHoursField.setEditable(false);
+		sunshineHoursField.setEnabled(false);
 		sunshineHoursField.setBackground(Color.WHITE);
 		final GridBagConstraints gbc_sunshineHoursField = new GridBagConstraints();
 		gbc_sunshineHoursField.fill = GridBagConstraints.HORIZONTAL;
@@ -480,7 +482,7 @@ public class EnergyPanel extends JPanel {
 		partPropertiesPanel.add(partProperty1Label);
 
 		partProperty1TextField = createTextField();
-		partProperty1TextField.setEditable(false);
+		partProperty1TextField.setEnabled(false);
 		partProperty1TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty1TextField);
 		partProperty1TextField.setColumns(4);
@@ -489,7 +491,7 @@ public class EnergyPanel extends JPanel {
 		partPropertiesPanel.add(partProperty2Label);
 
 		partProperty2TextField = createTextField();
-		partProperty2TextField.setEditable(false);
+		partProperty2TextField.setEnabled(false);
 		partProperty2TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty2TextField);
 		partProperty2TextField.setColumns(4);
@@ -498,14 +500,14 @@ public class EnergyPanel extends JPanel {
 		partPropertiesPanel.add(partProperty3Label);
 
 		partProperty3TextField = createTextField();
-		partProperty3TextField.setEditable(false);
+		partProperty3TextField.setEnabled(false);
 		partProperty3TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty3TextField);
 		partProperty3TextField.setColumns(4);
 
 		partProperty4Label = createLabel("");
 		partProperty4TextField = createTextField();
-		partProperty4TextField.setEditable(false);
+		partProperty4TextField.setEnabled(false);
 		partProperty4TextField.setBackground(Color.WHITE);
 		partProperty4TextField.setColumns(4);
 

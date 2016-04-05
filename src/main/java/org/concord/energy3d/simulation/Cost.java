@@ -125,7 +125,8 @@ public class Cost {
 			// for zone 5 by energystar.gov) that has a U-value of 0.23 W/m^2/C.
 			// Let's also assume that the insulation cost is inversely proportional to the U-value.
 			// The baseline cost (that is, the structure without insulation) for floor is set to be $100/m^2.
-			double unitPrice = 100 + 8 / uFactor;
+			// The foundation cost is set to be $200/m^2.
+			double unitPrice = 300 + 8 / uFactor;
 			final double[] buildingGeometry = foundation.getBuildingGeometry();
 			if (buildingGeometry != null)
 				return (int) (buildingGeometry[1] * unitPrice);
@@ -145,7 +146,7 @@ public class Cost {
 		}
 		if (part instanceof SolarPanel) {
 			// According to http://www.solartown.com/learning/solar-panels/solar-module-comparison
-			return 150 + (int) (((SolarPanel) part).getEfficiency() * 1000);
+			return 350 + (int) (((SolarPanel) part).getEfficiency() * 1000);
 		}
 		if (part instanceof Tree) {
 			Tree tree = (Tree) part;
