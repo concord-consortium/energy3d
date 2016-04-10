@@ -865,6 +865,7 @@ public class EnergyPanel extends JPanel {
 				break;
 			}
 			thermostatPanel.add(adjustThermostatButton, BorderLayout.EAST);
+			adjustThermostatButton.setEnabled(!Scene.getInstance().isStudentMode());
 		} else {
 			thermostatTemperatureField.setText(null);
 			thermostatPanel.remove(adjustThermostatButton);

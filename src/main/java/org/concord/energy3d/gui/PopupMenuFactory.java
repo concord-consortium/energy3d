@@ -696,6 +696,15 @@ public class PopupMenuFactory {
 				public void run() {
 					HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
+						if (Scene.getInstance().isStudentMode()) {
+							miLock.setEnabled(false);
+							miDisableEdits.setEnabled(false);
+							miThermostat.setEnabled(false);
+						} else {
+							miLock.setEnabled(true);
+							miDisableEdits.setEnabled(true);
+							miThermostat.setEnabled(true);
+						}
 						Util.selectSilently(miLock, p.isFrozen());
 						Util.selectSilently(miDisableEdits, ((Foundation) p).getLockEdit());
 					}

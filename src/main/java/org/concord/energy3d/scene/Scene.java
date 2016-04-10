@@ -93,6 +93,7 @@ public class Scene implements Serializable {
 	private int version = currentVersion;
 	private boolean isAnnotationsVisible = true;
 	private long idCounter;
+	private boolean studentMode;
 	private String projectName;
 	private String city;
 	private int latitude;
@@ -368,6 +369,12 @@ public class Scene implements Serializable {
 		SolarRadiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
 		SolarRadiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
 		instance.setEdited(false);
+		
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateThermostat();
+			}
+		});
 
 	}
 
@@ -1316,6 +1323,14 @@ public class Scene implements Serializable {
 
 	public String getProjectName() {
 		return projectName;
+	}
+
+	public void setStudentMode(boolean b) {
+		studentMode = b;
+	}
+
+	public boolean isStudentMode() {
+		return studentMode;
 	}
 
 	public void setCity(final String city) {

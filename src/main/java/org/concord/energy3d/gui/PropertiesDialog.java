@@ -31,13 +31,16 @@ class PropertiesDialog extends JDialog {
 		setTitle("Properties");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(2, 2, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(3, 2, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final JComboBox<String> unitSystemComboBox = new JComboBox<String>(new String[] { "International System of Units", "United States Customary Units" });
 		if (Scene.getInstance().getUnit() == Scene.Unit.USCustomaryUnits)
 			unitSystemComboBox.setSelectedIndex(1);
+		final JComboBox<String> studentModeComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
+		if (Scene.getInstance().isStudentMode())
+			studentModeComboBox.setSelectedIndex(1);
 		final JTextField projectNameField = new JTextField(Scene.getInstance().getProjectName());
 
 		ActionListener okListener = new ActionListener() {
@@ -54,6 +57,7 @@ class PropertiesDialog extends JDialog {
 				EnergyPanel.getInstance().updateWeatherData();
 				EnergyPanel.getInstance().update();
 				Scene.getInstance().setProjectName(projectNameField.getText());
+				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setEdited(true);
 				PropertiesDialog.this.dispose();
 			}
@@ -62,6 +66,10 @@ class PropertiesDialog extends JDialog {
 		// set project name
 		panel.add(new JLabel("Project Name: "));
 		panel.add(projectNameField);
+
+		// set project name
+		panel.add(new JLabel("Student Mode: "));
+		panel.add(studentModeComboBox);
 
 		// choose unit system
 		panel.add(new JLabel("Unit System: "));

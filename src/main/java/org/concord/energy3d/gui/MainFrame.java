@@ -394,21 +394,24 @@ public class MainFrame extends JFrame {
 		if (fileMenu == null) {
 			fileMenu = new JMenu();
 			fileMenu.addMenuListener(new MenuListener() {
+
+				private void enableMenuItems(boolean b) {
+					replayFolderMenuItem.setEnabled(b);
+					replayLastFolderMenuItem.setEnabled(b);
+					replayControlsMenu.setEnabled(b);
+					analyzeFolderMenuItem.setEnabled(b);
+					importColladaMenuItem.setEnabled(b);
+				}
+
 				@Override
 				public void menuCanceled(final MenuEvent e) {
-					replayFolderMenuItem.setEnabled(true); // if any of these actions is registered with a keystroke, we must re-enable it
-					replayLastFolderMenuItem.setEnabled(true);
-					replayControlsMenu.setEnabled(true);
-					analyzeFolderMenuItem.setEnabled(true);
+					enableMenuItems(true); // if any of these actions is registered with a keystroke, we must re-enable it
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
-					replayFolderMenuItem.setEnabled(true);
-					replayLastFolderMenuItem.setEnabled(true);
-					replayControlsMenu.setEnabled(true);
-					analyzeFolderMenuItem.setEnabled(true);
+					enableMenuItems(true);
 				}
 
 				@Override
@@ -416,14 +419,19 @@ public class MainFrame extends JFrame {
 
 					MainPanel.getInstance().defaultTool();
 
-					// prevent multiple replay or postprocessing commands
-					final boolean inactive = !PlayControl.active;
-					replayFolderMenuItem.setEnabled(inactive);
-					final File lastFolder = DesignReplay.getInstance().getLastFolder();
-					replayLastFolderMenuItem.setEnabled(lastFolder != null && inactive);
-					replayLastFolderMenuItem.setText(lastFolder != null ? "Replay Last Folder: " + lastFolder : "Replay Last Folder");
-					replayControlsMenu.setEnabled(!inactive);
-					analyzeFolderMenuItem.setEnabled(inactive);
+					if (Scene.getInstance().isStudentMode()) {
+						enableMenuItems(false);
+					} else {
+						enableMenuItems(true);
+						// prevent multiple replay or postprocessing commands
+						final boolean inactive = !PlayControl.active;
+						replayFolderMenuItem.setEnabled(inactive);
+						final File lastFolder = DesignReplay.getInstance().getLastFolder();
+						replayLastFolderMenuItem.setEnabled(lastFolder != null && inactive);
+						replayLastFolderMenuItem.setText(lastFolder != null ? "Replay Last Folder: " + lastFolder : "Replay Last Folder");
+						replayControlsMenu.setEnabled(!inactive);
+						analyzeFolderMenuItem.setEnabled(inactive);
+					}
 
 					// recent files
 					if (!recentFileMenuItems.isEmpty()) {
@@ -489,47 +497,47 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getImportMenuItem());
 			addItemToFileMenu(getImportColladaMenuItem());
 			addItemToFileMenu(new JSeparator());
-			if (!Config.isRestrictMode()) {
-				addItemToFileMenu(getReplayFolderMenuItem());
-				addItemToFileMenu(getReplayLastFolderMenuItem());
 
-				replayControlsMenu = new JMenu("Replay Controls");
-				replayControlsMenu.addMenuListener(new MenuListener() {
-					@Override
-					public void menuCanceled(final MenuEvent e) {
-						// if any of these actions is registered with a keystroke, we must re-enable it
-						endReplayMenuItem.setEnabled(true);
-						pauseReplayMenuItem.setEnabled(true);
-						forwardReplayMenuItem.setEnabled(true);
-						backwardReplayMenuItem.setEnabled(true);
-					}
+			addItemToFileMenu(getReplayFolderMenuItem());
+			addItemToFileMenu(getReplayLastFolderMenuItem());
 
-					@Override
-					public void menuDeselected(final MenuEvent e) {
-						endReplayMenuItem.setEnabled(true);
-						pauseReplayMenuItem.setEnabled(true);
-						forwardReplayMenuItem.setEnabled(true);
-						backwardReplayMenuItem.setEnabled(true);
-					}
+			replayControlsMenu = new JMenu("Replay Controls");
+			replayControlsMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					// if any of these actions is registered with a keystroke, we must re-enable it
+					endReplayMenuItem.setEnabled(true);
+					pauseReplayMenuItem.setEnabled(true);
+					forwardReplayMenuItem.setEnabled(true);
+					backwardReplayMenuItem.setEnabled(true);
+				}
 
-					@Override
-					public void menuSelected(final MenuEvent e) {
-						endReplayMenuItem.setEnabled(PlayControl.active);
-						pauseReplayMenuItem.setEnabled(PlayControl.active);
-						pauseReplayMenuItem.setText((PlayControl.replaying ? "Pause Replay" : "Resume Replay") + " (Space Bar)");
-						forwardReplayMenuItem.setEnabled(!PlayControl.replaying);
-						backwardReplayMenuItem.setEnabled(!PlayControl.replaying);
-					}
-				});
-				addItemToFileMenu(replayControlsMenu);
-				replayControlsMenu.add(getPauseReplayMenuItem());
-				replayControlsMenu.add(getBackwardReplayMenuItem());
-				replayControlsMenu.add(getForwardReplayMenuItem());
-				replayControlsMenu.add(getEndReplayMenuItem());
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					endReplayMenuItem.setEnabled(true);
+					pauseReplayMenuItem.setEnabled(true);
+					forwardReplayMenuItem.setEnabled(true);
+					backwardReplayMenuItem.setEnabled(true);
+				}
 
-				addItemToFileMenu(getAnalyzeFolderMenuItem());
-				addItemToFileMenu(new JSeparator());
-			}
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					endReplayMenuItem.setEnabled(PlayControl.active);
+					pauseReplayMenuItem.setEnabled(PlayControl.active);
+					pauseReplayMenuItem.setText((PlayControl.replaying ? "Pause Replay" : "Resume Replay") + " (Space Bar)");
+					forwardReplayMenuItem.setEnabled(!PlayControl.replaying);
+					backwardReplayMenuItem.setEnabled(!PlayControl.replaying);
+				}
+			});
+			addItemToFileMenu(replayControlsMenu);
+			replayControlsMenu.add(getPauseReplayMenuItem());
+			replayControlsMenu.add(getBackwardReplayMenuItem());
+			replayControlsMenu.add(getForwardReplayMenuItem());
+			replayControlsMenu.add(getEndReplayMenuItem());
+
+			addItemToFileMenu(getAnalyzeFolderMenuItem());
+			addItemToFileMenu(new JSeparator());
+
 			addItemToFileMenu(getScaleToFitRadioButtonMenuItem());
 			addItemToFileMenu(getExactSizeRadioButtonMenuItem());
 			addItemToFileMenu(getPageSetupMenuItem());
@@ -1006,16 +1014,19 @@ public class MainFrame extends JFrame {
 			analysisMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
+					simulationSettingsMenuItem.setEnabled(true);
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
+					simulationSettingsMenuItem.setEnabled(true);
 				}
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
 					MainPanel.getInstance().defaultTool();
+					simulationSettingsMenuItem.setEnabled(!Scene.getInstance().isStudentMode());
 				}
 			});
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
@@ -1029,10 +1040,8 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getAnnualSensorMenuItem());
 			analysisMenu.add(getDailySensorMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
-			if (!Config.isRestrictMode()) {
-				analysisMenu.addSeparator();
-				analysisMenu.add(getSimulationSettingsMenuItem());
-			}
+			analysisMenu.addSeparator();
+			analysisMenu.add(getSimulationSettingsMenuItem());
 		}
 		return analysisMenu;
 	}
@@ -1457,25 +1466,32 @@ public class MainFrame extends JFrame {
 		if (editMenu == null) {
 			editMenu = new JMenu("Edit");
 			editMenu.addMenuListener(new MenuListener() {
+
+				private void enableMenuItems(boolean b) {
+					cutMenuItem.setEnabled(b);
+					copyMenuItem.setEnabled(b);
+					pasteMenuItem.setEnabled(b);
+					lockAllMenuItem.setEnabled(b);
+					removeAllLocksMenuItem.setEnabled(b);
+					specificationsMenuItem.setEnabled(b);
+				}
+
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 					// enable the cut-copy-paste menu items when the menu disappears, otherwise the keystrokes will be disabled with the menu items
-					cutMenuItem.setEnabled(true);
-					copyMenuItem.setEnabled(true);
-					pasteMenuItem.setEnabled(true);
+					enableMenuItems(true);
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
 					// enable the cut-copy-paste menu items when the menu disappears, otherwise the keystrokes will be disabled with the menu items
-					cutMenuItem.setEnabled(true);
-					copyMenuItem.setEnabled(true);
-					pasteMenuItem.setEnabled(true);
+					enableMenuItems(true);
 				}
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					enableMenuItems(true);
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					cutMenuItem.setEnabled(selectedPart != null);
 					copyMenuItem.setEnabled(selectedPart != null && selectedPart.isCopyable());
@@ -1483,6 +1499,11 @@ public class MainFrame extends JFrame {
 					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					MainPanel.getInstance().defaultTool();
+					if (Scene.getInstance().isStudentMode()) {
+						lockAllMenuItem.setEnabled(false);
+						removeAllLocksMenuItem.setEnabled(false);
+						specificationsMenuItem.setEnabled(false);
+					}
 				}
 			});
 			editMenu.add(getUndoMenuItem());
@@ -1496,21 +1517,17 @@ public class MainFrame extends JFrame {
 			editMenu.addSeparator();
 			editMenu.add(getGridsMenuItem());
 			editMenu.add(getSnapMenuItem());
-			if (!Config.isRestrictMode()) {
-				editMenu.add(getAutoRecomputeEnergyMenuItem());
-				editMenu.add(getLockAllMenuItem());
-			}
+			editMenu.add(getAutoRecomputeEnergyMenuItem());
+			editMenu.add(getLockAllMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getRemoveAllWindowsMenuItem());
 			editMenu.add(getRemoveAllSolarPanelsMenuItem());
 			editMenu.add(getRemoveAllTreesMenuItem());
 			editMenu.add(getRemoveAllRoofsMenuItem());
 			editMenu.add(getRemoveAllFloorsMenuItem());
-			if (!Config.isRestrictMode()) {
-				editMenu.add(getRemoveAllLocksMenuItem());
-				editMenu.addSeparator();
-				editMenu.add(getSpecificationsMenuItem());
-			}
+			editMenu.add(getRemoveAllLocksMenuItem());
+			editMenu.addSeparator();
+			editMenu.add(getSpecificationsMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getPropertiesMenuItem());
 		}

@@ -54,8 +54,4 @@ public class Config {
 		return isWindows;
 	}
 
-	public static boolean isRestrictMode() {
-		return false;
-	}
-
 }

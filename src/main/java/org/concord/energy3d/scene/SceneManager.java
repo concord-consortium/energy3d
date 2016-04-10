@@ -814,58 +814,56 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}));
 
 		// XIE: Run/pause model replay
-		if (!Config.isRestrictMode()) {
-			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (PlayControl.active) {
-						PlayControl.replaying = !PlayControl.replaying;
-					}
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (PlayControl.active) {
+					PlayControl.replaying = !PlayControl.replaying;
 				}
-			}));
-			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (PlayControl.active) {
-						PlayControl.replaying = false;
-						PlayControl.backward = true;
-					}
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LEFT), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (PlayControl.active) {
+					PlayControl.replaying = false;
+					PlayControl.backward = true;
 				}
-			}));
-			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.UP), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (PlayControl.active) {
-						PlayControl.replaying = false;
-						PlayControl.backward = true;
-					}
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.UP), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (PlayControl.active) {
+					PlayControl.replaying = false;
+					PlayControl.backward = true;
 				}
-			}));
-			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (PlayControl.active) {
-						PlayControl.replaying = false;
-						PlayControl.forward = true;
-					}
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.RIGHT), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (PlayControl.active) {
+					PlayControl.replaying = false;
+					PlayControl.forward = true;
 				}
-			}));
-			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DOWN), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (PlayControl.active) {
-						PlayControl.replaying = false;
-						PlayControl.forward = true;
-					}
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DOWN), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (PlayControl.active) {
+					PlayControl.replaying = false;
+					PlayControl.forward = true;
 				}
-			}));
-			logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					PlayControl.active = false;
-				}
-			}));
-		}
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				PlayControl.active = false;
+			}
+		}));
 
 	}
 
@@ -1098,7 +1096,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		Scene.getInstance().add(drawn, false);
 		addHousePartCommand = new AddPartCommand(drawn);
 		return drawn;
-		
+
 	}
 
 	public Operation getOperation() {
