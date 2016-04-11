@@ -81,10 +81,10 @@ public class DesignReplay extends PlayControl {
 //							Scene.initEnergy();
 //							Scene.getInstance().redrawAll(); // need to call this to at least redraw the overhangs
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-							EnergyPanel.getInstance().update();
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
+									EnergyPanel.getInstance().update();
 									EnergyPanel.getInstance().clearAllGraphs();
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {

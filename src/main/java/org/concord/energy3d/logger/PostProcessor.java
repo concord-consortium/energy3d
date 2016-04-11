@@ -1,5 +1,6 @@
 package org.concord.energy3d.logger;
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -95,9 +96,14 @@ public class PostProcessor extends PlayControl {
 							// Scene.initSceneNow();
 							// Scene.initEnergy();
 							EnergyPanel.getInstance().computeNow();
-							EnergyPanel.getInstance().update();
 							SceneManager.getInstance().refresh();
 							update.run();
+							EventQueue.invokeLater(new Runnable(){
+								@Override
+								public void run() {
+									EnergyPanel.getInstance().update();
+								}
+							});
 							sleep(SLEEP);
 						} catch (final Exception e) {
 							e.printStackTrace();

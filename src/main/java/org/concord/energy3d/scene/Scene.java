@@ -143,8 +143,13 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
-		EnergyPanel.getInstance().update();
-		EnergyPanel.getInstance().clearAllGraphs();
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().update();
+				EnergyPanel.getInstance().clearAllGraphs();
+			}
+		});
 	}
 
 	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
@@ -167,18 +172,23 @@ public class Scene implements Serializable {
 		openNow(file);
 		synchronized (SceneManager.getInstance()) {
 			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-			EnergyPanel.getInstance().update();
-			if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
-				MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
-				SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-				SceneManager.getInstance().resetCamera();
-			}
-			EnergyPanel.getInstance().clearAllGraphs();
-			final HousePart p = SceneManager.getInstance().getSelectedPart();
-			if (p instanceof Foundation) {
-				EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
-				EnergyPanel.getInstance().validate();
-			}
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					EnergyPanel.getInstance().update();
+					EnergyPanel.getInstance().clearAllGraphs();
+					if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
+						MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
+						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+						SceneManager.getInstance().resetCamera();
+					}
+					final HousePart p = SceneManager.getInstance().getSelectedPart();
+					if (p instanceof Foundation) {
+						EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
+						EnergyPanel.getInstance().validate();
+					}
+				}
+			});
 		}
 	}
 
