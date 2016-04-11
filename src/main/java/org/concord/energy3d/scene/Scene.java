@@ -282,9 +282,13 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().setAxesVisible(!instance.hideAxes);
 		SceneManager.getInstance().setBuildingLabelsVisible(instance.showBuildingLabels);
 		Util.setSilently(MainPanel.getInstance().getNoteTextArea(), instance.note == null ? "" : instance.note); // need to do this to avoid logging
-		MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
-		MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
-		SceneManager.getInstance().getUndoManager().die();
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
+				MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
+				SceneManager.getInstance().getUndoManager().die();
+			}
+		});
 		instance.setEdited(false);
 		instance.setCopyBuffer(null);
 	}
