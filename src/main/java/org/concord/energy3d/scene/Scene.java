@@ -192,8 +192,13 @@ public class Scene implements Serializable {
 		synchronized (SceneManager.getInstance()) {
 			Scene.url = file;
 
-			MainPanel.getInstance().getHeliodonButton().setSelected(false);
-			MainPanel.getInstance().getSunAnimationButton().setSelected(false);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					MainPanel.getInstance().getHeliodonButton().setSelected(false);
+					MainPanel.getInstance().getSunAnimationButton().setSelected(false);
+				}
+			});
 			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 			Wall.resetDefaultWallHeight();
 
@@ -237,17 +242,22 @@ public class Scene implements Serializable {
 
 		}
 
-		// update GUI
-		if (!Config.isApplet()) {
-			if (instance.textureMode == TextureMode.None)
-				MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
-			else if (instance.textureMode == TextureMode.Simple)
-				MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
-			else
-				MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
-		}
-		MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
-		MainFrame.getInstance().updateTitleBar();
+		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
+			@Override
+			public void run() {
+				if (!Config.isApplet()) {
+					if (instance.textureMode == TextureMode.None)
+						MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
+					else if (instance.textureMode == TextureMode.Simple)
+						MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
+					else
+						MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
+				}
+				MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
+				MainFrame.getInstance().updateTitleBar();
+			}
+		});
+
 	}
 
 	public static void initSceneNow() {
@@ -369,7 +379,7 @@ public class Scene implements Serializable {
 		SolarRadiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
 		SolarRadiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
 		instance.setEdited(false);
-		
+
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				EnergyPanel.getInstance().updateThermostat();

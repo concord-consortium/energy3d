@@ -125,6 +125,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
+	private InfoPanel infoPanel;
 	private ConstructionCostGraph constructionCostGraph;
 	private DailyEnergyGraph dailyEnergyGraph;
 	private JTabbedPane graphTabbedPane;
@@ -416,7 +417,7 @@ public class EnergyPanel extends JPanel {
 		thermostatPanel = new JPanel(new BorderLayout(5, 0));
 		thermostatPanel.add(createLabel("   Thermostat: "), BorderLayout.WEST);
 		thermostatTemperatureField = createTextField();
-		thermostatTemperatureField.setEditable(false);
+		thermostatTemperatureField.setEnabled(false);
 		thermostatTemperatureField.setBackground(Color.WHITE);
 		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
 		adjustThermostatButton = new JButton("Adjust");
@@ -466,10 +467,13 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(Box.createVerticalGlue());
 
 		constructionCostGraph = new ConstructionCostGraph();
-		graphTabbedPane.add("Construction Cost", constructionCostGraph);
+		graphTabbedPane.add("Cost", constructionCostGraph);
 
 		dailyEnergyGraph = new DailyEnergyGraph();
-		graphTabbedPane.add("Hourly Energy", dailyEnergyGraph);
+		graphTabbedPane.add("Energy", dailyEnergyGraph);
+
+		infoPanel = new InfoPanel();
+		graphTabbedPane.add("Info", infoPanel);
 
 		target = partPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
@@ -641,6 +645,10 @@ public class EnergyPanel extends JPanel {
 
 	public JSpinner getLatitudeSpinner() {
 		return latitudeSpinner;
+	}
+
+	public InfoPanel getInfoPanel() {
+		return infoPanel;
 	}
 
 	public ConstructionCostGraph getConstructionCostGraph() {
