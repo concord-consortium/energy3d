@@ -547,6 +547,7 @@ public class EnergyPanel extends JPanel {
 						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
+							return;
 						} finally {
 							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}

@@ -379,6 +379,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (shadowPass.isEnabled()) {
 						JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your video card driver does not support shadows! Updating your video card drivers may fix this issue. Shadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
 						shadowPass.setEnabled(false);
+					} else {
+						Util.reportError(e);
+						return;
 					}
 				}
 				synchronized (this) {
@@ -400,49 +403,45 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	@Override
 	public void update(final ReadOnlyTimer timer) {
-		try {
-			final double tpf = timer.getTimePerFrame();
-			passManager.updatePasses(tpf);
-			taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
-			taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
+		final double tpf = timer.getTimePerFrame();
+		passManager.updatePasses(tpf);
+		taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
+		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 
-			if (operationFlag)
-				executeOperation();
+		if (operationFlag)
+			executeOperation();
 
-			if (mouseState != null)
-				mouseMoved();
+		if (mouseState != null)
+			mouseMoved();
 
-			if (Scene.isRedrawAll())
-				Scene.getInstance().redrawAllNow();
+		if (Scene.isRedrawAll())
+			Scene.getInstance().redrawAllNow();
 
-			if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
-				final Matrix3 rotate = new Matrix3();
-				rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
-				final Camera camera = getCamera();
-				camera.setLocation(rotate.applyPre(camera.getLocation(), null));
-				camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
-				getCameraNode().updateFromCamera();
-				Scene.getInstance().updateEditShapes();
-			}
-
-			final Heliodon heliodon = Heliodon.getInstance();
-			if (heliodon != null) {
-				if (sunAnim) {
-					heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true, false);
-					SceneManager.getInstance().changeSkyTexture();
-					SceneManager.getInstance().setShading(heliodon.isNightTime());
-				}
-				heliodon.update();
-			}
-
-			if (cameraControl != null && cameraControl.isAnimating())
-				cameraControl.animate();
-
-			root.updateGeometricState(tpf);
-		} catch (final Throwable e) {
-			e.printStackTrace();
-			Util.reportError(e);
+		if (rotAnim && viewMode == ViewMode.NORMAL && canvas.getCanvasRenderer() != null) {
+			final Matrix3 rotate = new Matrix3();
+			rotate.fromAngleNormalAxis(45 * tpf * MathUtils.DEG_TO_RAD, Vector3.UNIT_Z);
+			final Camera camera = getCamera();
+			camera.setLocation(rotate.applyPre(camera.getLocation(), null));
+			camera.lookAt(0, 0, 1, Vector3.UNIT_Z);
+			getCameraNode().updateFromCamera();
+			Scene.getInstance().updateEditShapes();
 		}
+
+		final Heliodon heliodon = Heliodon.getInstance();
+		if (heliodon != null) {
+			if (sunAnim) {
+				heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true, false);
+				SceneManager.getInstance().changeSkyTexture();
+				SceneManager.getInstance().setShading(heliodon.isNightTime());
+			}
+			heliodon.update();
+		}
+
+		if (cameraControl != null && cameraControl.isAnimating())
+			cameraControl.animate();
+
+		root.updateGeometricState(tpf);
+
 	}
 
 	@Override

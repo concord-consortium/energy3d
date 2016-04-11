@@ -177,11 +177,19 @@ public class Foundation extends HousePart implements Thermalizable {
 		newBoundingHeight = points.get(4).getZ() - height; // problem?
 		applyNewHeight(boundingHeight, newBoundingHeight, true);
 		if (!resizeHouseMode && orgPoints != null) {
-			final double dx = Math.abs(points.get(2).getX() - points.get(0).getX());
-			final double dxOrg = Math.abs(orgPoints.get(2).getX() - orgPoints.get(0).getX());
+			final int i1, i2;
+			if (Util.isEqual(points.get(0).getX(), points.get(2).getX())) {
+				i1 = 2;
+				i2 = 1;
+			} else {
+				i1=1;
+				i2=2;
+			}
+			final double dx = Math.abs(points.get(i2).getX() - points.get(0).getX());
+			final double dxOrg = Math.abs(orgPoints.get(i2).getX() - orgPoints.get(0).getX());
 			final double ratioX = dx / dxOrg;
-			final double dy = Math.abs(points.get(1).getY() - points.get(0).getY());
-			final double dyOrg = Math.abs(orgPoints.get(1).getY() - orgPoints.get(0).getY());
+			final double dy = Math.abs(points.get(i1).getY() - points.get(0).getY());
+			final double dyOrg = Math.abs(orgPoints.get(i1).getY() - orgPoints.get(0).getY());
 			final double ratioY = dy / dyOrg;
 			final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 			for (final HousePart child : children) {
