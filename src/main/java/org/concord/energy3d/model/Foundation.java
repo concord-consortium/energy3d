@@ -191,19 +191,25 @@ public class Foundation extends HousePart implements Thermalizable {
 			final double dy = Math.abs(points.get(1).getValue(yi) - points.get(0).getValue(yi));
 			final double dyOrg = Math.abs(orgPoints.get(1).getValue(yi) - orgPoints.get(0).getValue(yi));
 			final double ratioY = dy / dyOrg;
-			final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
-			for (final HousePart child : children) {
-				reverseFoundationResizeEffect(child, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
-				if (child instanceof Wall) {
-					final HousePart roof = ((Wall) child).getRoof();
-					if (roof != null && !roofs.contains(roof)) {
-						reverseFoundationResizeEffect(roof, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
-						roofs.add(roof);
-					}
-				}
-			}
+			reverseFoundationResizeEffect(getChildren(), dx, dxOrg, ratioX, dy, dyOrg, ratioY);
 			orgPoints = null;
 		}
+	}
+
+	private void reverseFoundationResizeEffect(ArrayList<HousePart> children, final double dx, final double dxOrg, final double ratioX, final double dy, final double dyOrg, final double ratioY) {
+		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
+		for (final HousePart child : children) {
+			reverseFoundationResizeEffect(child, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
+			if (child instanceof Wall) {
+				final HousePart roof = ((Wall) child).getRoof();
+				if (roof != null && !roofs.contains(roof)) {
+					reverseFoundationResizeEffect(roof, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
+					roofs.add(roof);
+				}
+			}
+		}
+		for (final HousePart roof : roofs)
+			reverseFoundationResizeEffect(roof.getChildren(), dx, dxOrg, ratioX, dy, dyOrg, ratioY);
 	}
 
 	private void reverseFoundationResizeEffect(final HousePart child, final double dx, final double dxOrg, final double ratioX, final double dy, final double dyOrg, final double ratioY) {
