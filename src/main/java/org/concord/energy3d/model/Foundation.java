@@ -38,7 +38,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private static final long serialVersionUID = 1L;
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;
-	private transient ArrayList<Vector2> floorVertices;
+	private transient ArrayList<Vector2> buildingWallVertices;
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
 	private transient Mesh surroundMesh;
@@ -845,11 +845,11 @@ public class Foundation extends HousePart implements Thermalizable {
 		Scene.getInstance().redrawAll();
 	}
 
-	private void initFloor() {
-		if (floorVertices == null)
-			floorVertices = new ArrayList<Vector2>();
+	private void initBuildingWallVertices() {
+		if (buildingWallVertices == null)
+			buildingWallVertices = new ArrayList<Vector2>();
 		else
-			floorVertices.clear();
+			buildingWallVertices.clear();
 		if (children.isEmpty())
 			return;
 		final HousePart firstBorn = children.get(0);
@@ -861,31 +861,31 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (next != null)
 						pointIndex = next.getSnapPointIndexOf(currentWall);
 					pointIndex++;
-					addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
-					addVertex(currentWall.getAbsPoint(pointIndex));
+					addBuildingWallVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
+					addBuildingWallVertex(currentWall.getAbsPoint(pointIndex));
 				}
 			});
 	}
 
-	private void addVertex(final ReadOnlyVector3 v3) {
+	private void addBuildingWallVertex(final ReadOnlyVector3 v3) {
 		final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
 		boolean b = false;
-		for (final Vector2 x : floorVertices) {
+		for (final Vector2 x : buildingWallVertices) {
 			if (Util.isEqual(x, v2)) {
 				b = true;
 				break;
 			}
 		}
 		if (!b)
-			floorVertices.add(v2);
+			buildingWallVertices.add(v2);
 	}
 
-	private Path2D.Double path;
+	private Path2D.Double buildingWallPath;
 
-	public boolean insideBuilding(final double x, final double y, final boolean init) {
+	private boolean insideBuilding(final double x, final double y, final boolean init) {
 		if (init) {
-			initFloor();
-			final int n = floorVertices.size();
+			initBuildingWallVertices();
+			final int n = buildingWallVertices.size();
 			int m = 0;
 			for (final HousePart p : children) {
 				if (p instanceof Wall)
@@ -893,21 +893,21 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			if (n <= 0 || m != n) // not closed in the latter case
 				return false;
-			if (path == null)
-				path = new Path2D.Double();
+			if (buildingWallPath == null)
+				buildingWallPath = new Path2D.Double();
 			else
-				path.reset();
-			Vector2 v = floorVertices.get(0);
-			path.moveTo(v.getX(), v.getY());
+				buildingWallPath.reset();
+			Vector2 v = buildingWallVertices.get(0);
+			buildingWallPath.moveTo(v.getX(), v.getY());
 			for (int i = 1; i < n; i++) {
-				v = floorVertices.get(i);
-				path.lineTo(v.getX(), v.getY());
+				v = buildingWallVertices.get(i);
+				buildingWallPath.lineTo(v.getX(), v.getY());
 			}
-			v = floorVertices.get(0);
-			path.lineTo(v.getX(), v.getY());
-			path.closePath();
+			v = buildingWallVertices.get(0);
+			buildingWallPath.lineTo(v.getX(), v.getY());
+			buildingWallPath.closePath();
 		}
-		final int n = floorVertices.size();
+		final int n = buildingWallVertices.size();
 		int m = 0;
 		for (final HousePart p : children) {
 			if (p instanceof Wall)
@@ -915,13 +915,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (n <= 0 || m != n) // not closed in the latter case
 			return false;
-		return path != null ? path.contains(x, y) : false;
+		return buildingWallPath != null ? buildingWallPath.contains(x, y) : false;
 	}
 
 	public double[] getBuildingGeometry() {
 
-		initFloor();
-		final int n = floorVertices.size();
+		initBuildingWallVertices();
+		final int n = buildingWallVertices.size();
 		int m = 0;
 		for (final HousePart p : children) {
 			if (p instanceof Wall)
@@ -936,24 +936,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		double area = 0;
 		Vector2 v1, v2;
 		for (int i = 0; i < n - 1; i++) {
-			v1 = floorVertices.get(i);
-			v2 = floorVertices.get(i + 1);
+			v1 = buildingWallVertices.get(i);
+			v2 = buildingWallVertices.get(i + 1);
 			area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
 		}
-		v1 = floorVertices.get(n - 1);
-		v2 = floorVertices.get(0);
+		v1 = buildingWallVertices.get(n - 1);
+		v2 = buildingWallVertices.get(0);
 		area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
 		area *= 0.5;
 
 		double cx = 0, cy = 0;
 		for (int i = 0; i < n - 1; i++) {
-			v1 = floorVertices.get(i);
-			v2 = floorVertices.get(i + 1);
+			v1 = buildingWallVertices.get(i);
+			v2 = buildingWallVertices.get(i + 1);
 			cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
 			cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
 		}
-		v1 = floorVertices.get(n - 1);
-		v2 = floorVertices.get(0);
+		v1 = buildingWallVertices.get(n - 1);
+		v2 = buildingWallVertices.get(0);
 		cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
 		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
 		cx /= 6 * area;
