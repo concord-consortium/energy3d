@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.awt.geom.Path2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1105,6 +1106,57 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		return roofPartsRoot;
 	}
 
+	private Path2D.Double underlyingWallPath;
+	private List<Vector2> underlyingWallVerticesOnFoundation;
+
+	private void addUnderlyingWallVertex(final ReadOnlyVector3 v3) {
+		final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
+		boolean b = false;
+		for (final Vector2 x : underlyingWallVerticesOnFoundation) {
+			if (Util.isEqual(x, v2)) {
+				b = true;
+				break;
+			}
+		}
+		if (!b)
+			underlyingWallVerticesOnFoundation.add(v2);
+	}
+
+	public boolean insideWalls(final double x, final double y, final boolean init) {
+		if (walls.isEmpty())
+			return false;
+		if (init) {
+			if (underlyingWallVerticesOnFoundation == null)
+				underlyingWallVerticesOnFoundation = new ArrayList<Vector2>();
+			else
+				underlyingWallVerticesOnFoundation.clear();
+			walls.get(0).visitNeighbors(new WallVisitor() {
+				@Override
+				public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+					int pointIndex = 0;
+					if (next != null)
+						pointIndex = next.getSnapPointIndexOf(currentWall);
+					pointIndex++;
+					addUnderlyingWallVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
+					addUnderlyingWallVertex(currentWall.getAbsPoint(pointIndex));
+				}
+			});
+			if (underlyingWallPath == null)
+				underlyingWallPath = new Path2D.Double();
+			else
+				underlyingWallPath.reset();
+			Vector2 v0 = underlyingWallVerticesOnFoundation.get(0);
+			underlyingWallPath.moveTo(v0.getX(), v0.getY());
+			for (int i = 1; i < underlyingWallVerticesOnFoundation.size(); i++) {
+				Vector2 v = underlyingWallVerticesOnFoundation.get(i);
+				underlyingWallPath.lineTo(v.getX(), v.getY());
+			}
+			underlyingWallPath.lineTo(v0.getX(), v0.getY());
+			underlyingWallPath.closePath();
+		}
+		return underlyingWallPath != null ? underlyingWallPath.contains(x, y) : false;
+	}
+
 	private double calculateHeatVector(final Mesh mesh) {
 		double heat = 0;
 		final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
@@ -1145,7 +1197,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
 				a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
 				a.setZ(o.getZ());
-				if (foundation.insideBuilding(a.getX(), a.getY(), init)) {
+				if (insideWalls(a.getX(), a.getY(), init)) {
 					ReadOnlyVector3 b = null;
 					Node node = null;
 					Mesh mesh = null;

@@ -473,7 +473,7 @@ public class EnergyPanel extends JPanel {
 		graphTabbedPane.add("Energy", dailyEnergyGraph);
 
 		infoPanel = new InfoPanel();
-		graphTabbedPane.add("Info", infoPanel);
+		//graphTabbedPane.add("Info", infoPanel);
 
 		target = partPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
