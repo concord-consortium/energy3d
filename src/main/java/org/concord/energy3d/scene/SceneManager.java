@@ -1467,7 +1467,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								selectedHousePart = selectedHousePart.getTopContainer();
 							}
 						}
-						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE || selectedHousePart instanceof Foundation)) {
+						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
 							cameraControl.setLeftMouseButtonEnabled(false);
 							if (selectedHousePart != null) { // there is a chance that selectedHousePart = null
 								houseMoveStartPoint = selectHousePart.getPoint().clone();
