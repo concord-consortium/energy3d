@@ -120,7 +120,7 @@ public class PostProcessor extends PlayControl {
 							buildings0 = new ArrayList<Building>();
 							synchronized (parts) {
 								for (final HousePart x : parts) {
-									final Building b = new Building((int) LoggerUtil.getBuildingId(x));
+									final Building b = new Building(LoggerUtil.getBuildingFoundation(x));
 									if (!buildings0.contains(b))
 										buildings0.add(b);
 								}
@@ -141,7 +141,7 @@ public class PostProcessor extends PlayControl {
 									doorCount++;
 								else if (x instanceof Wall) {
 									wallCount++;
-									final Building b = new Building((int) LoggerUtil.getBuildingId(x));
+									final Building b = new Building(LoggerUtil.getBuildingFoundation(x));
 									if (!buildings.contains(b) && !buildings0.contains(b))
 										buildings.add(b);
 								}
@@ -154,8 +154,6 @@ public class PostProcessor extends PlayControl {
 								if (b != null) {
 									if (x instanceof Window)
 										b.setWindowCount(b.getWindowCount() + 1);
-									else if (x instanceof Wall)
-										b.addWall((Wall) x);
 								}
 							}
 						}

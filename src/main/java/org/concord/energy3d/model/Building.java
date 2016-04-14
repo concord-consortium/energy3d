@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -19,20 +20,144 @@ public class Building {
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("###0.##");
 	private final static DecimalFormat FORMAT4 = new DecimalFormat("###0.####");
 
-	private final int id;
-	private int windowCount;
-	private double height = Double.MAX_VALUE;
+	private Foundation foundation;
 	private final ArrayList<Wall> walls;
-	private final ArrayList<Vector2> floorVertices;
+	private final ArrayList<Vector2> wallVertices;
+	private int windowCount;
+	private double area, cx, cy, height;
+	private boolean wallComplete;
+	private Path2D.Double wallPath;
 
-	public Building(final int id) {
-		this.id = id;
+	public Building(final Foundation foundation) {
+		this.foundation = foundation;
 		walls = new ArrayList<Wall>();
-		floorVertices = new ArrayList<Vector2>();
+		for (HousePart x : foundation.getChildren()) {
+			if (x instanceof Wall)
+				walls.add((Wall) x);
+		}
+		wallVertices = new ArrayList<Vector2>();
+		if (walls.isEmpty())
+			return;
+		walls.get(0).visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+				int pointIndex = 0;
+				if (next != null)
+					pointIndex = next.getSnapPointIndexOf(currentWall);
+				pointIndex++;
+				addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
+				addVertex(currentWall.getAbsPoint(pointIndex));
+			}
+
+			private void addVertex(final ReadOnlyVector3 v3) {
+				final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
+				boolean b = false;
+				for (final Vector2 x : wallVertices) {
+					if (Util.isEqual(x, v2)) {
+						b = true;
+						break;
+					}
+				}
+				if (!b)
+					wallVertices.add(v2);
+			}
+		});
+		wallComplete = walls.size() == wallVertices.size();
+	}
+
+	public boolean isWallComplete() {
+		return wallComplete;
 	}
 
 	public int getID() {
-		return id;
+		return (int) foundation.getId();
+	}
+
+	/** @return false if the building does not conform */
+	public boolean calculate() {
+
+		if (!wallComplete)
+			return false;
+
+		final int n = wallVertices.size();
+		final double scale = Scene.getInstance().getAnnotationScale();
+
+		height = foundation.getBoundingHeight() * scale;
+
+		area = 0;
+		Vector2 v1, v2;
+		for (int i = 0; i < n - 1; i++) {
+			v1 = wallVertices.get(i);
+			v2 = wallVertices.get(i + 1);
+			area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
+		}
+		v1 = wallVertices.get(n - 1);
+		v2 = wallVertices.get(0);
+		area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
+		area *= 0.5;
+
+		cx = 0;
+		cy = 0;
+		for (int i = 0; i < n - 1; i++) {
+			v1 = wallVertices.get(i);
+			v2 = wallVertices.get(i + 1);
+			cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
+			cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
+		}
+		v1 = wallVertices.get(n - 1);
+		v2 = wallVertices.get(0);
+		cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
+		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
+		cx /= 6 * area;
+		cy /= 6 * area;
+		cx *= scale;
+		cy *= scale;
+		area = Math.abs(area) * scale * scale;
+
+		return true;
+
+	}
+
+	/** call calculate() before calling this */
+	public double getArea() {
+		return area;
+	}
+
+	/** call calculate() before calling this */
+	public double getHeight() {
+		return height;
+	}
+
+	/** call calculate() before calling this */
+	public double getCenterX() {
+		return cx;
+	}
+
+	/** call calculate() before calling this */
+	public double getCenterY() {
+		return cy;
+	}
+
+	public boolean contains(final double x, final double y, final boolean init) {
+		if (wallComplete)
+			return false;
+		final int n = wallVertices.size();
+		if (init) {
+			if (wallPath == null)
+				wallPath = new Path2D.Double();
+			else
+				wallPath.reset();
+			Vector2 v = wallVertices.get(0);
+			wallPath.moveTo(v.getX(), v.getY());
+			for (int i = 1; i < n; i++) {
+				v = wallVertices.get(i);
+				wallPath.lineTo(v.getX(), v.getY());
+			}
+			v = wallVertices.get(0);
+			wallPath.lineTo(v.getX(), v.getY());
+			wallPath.closePath();
+		}
+		return wallPath != null ? wallPath.contains(x, y) : false;
 	}
 
 	public HousePart getRoof() {
@@ -49,119 +174,28 @@ public class Building {
 		return windowCount;
 	}
 
-	public void addWall(final Wall w) {
-		if (walls.contains(w))
-			return;
-		walls.add(w);
-		final double h = w.getHeight();
-		if (height > h)
-			height = h;
-	}
-
-	private double getArea() {
-		double area = 0;
-		final int n = floorVertices.size();
-		Vector2 v1, v2;
-		for (int i = 0; i < n - 1; i++) {
-			v1 = floorVertices.get(i);
-			v2 = floorVertices.get(i + 1);
-			area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
-		}
-		v1 = floorVertices.get(n - 1);
-		v2 = floorVertices.get(0);
-		area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
-		return area * 0.5;
-	}
-
-	private double getCentroidX() {
-		double cx = 0;
-		final int n = floorVertices.size();
-		Vector2 v1, v2;
-		for (int i = 0; i < n - 1; i++) {
-			v1 = floorVertices.get(i);
-			v2 = floorVertices.get(i + 1);
-			cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
-		}
-		v1 = floorVertices.get(n - 1);
-		v2 = floorVertices.get(0);
-		cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
-		return cx / 6;
-	}
-
-	private double getCentroidY() {
-		double cy = 0;
-		final int n = floorVertices.size();
-		Vector2 v1, v2;
-		for (int i = 0; i < n - 1; i++) {
-			v1 = floorVertices.get(i);
-			v2 = floorVertices.get(i + 1);
-			cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
-		}
-		v1 = floorVertices.get(n - 1);
-		v2 = floorVertices.get(0);
-		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
-		return cy / 6;
-	}
-
-	private void addVertex(final ReadOnlyVector3 v3) {
-		final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
-		boolean b = false;
-		for (final Vector2 x : floorVertices) {
-			if (Util.isEqual(x, v2)) {
-				b = true;
-				break;
-			}
-		}
-		if (!b)
-			floorVertices.add(v2);
-	}
-
-	private void exploreWallNeighbors() {
-		if (walls.isEmpty())
-			return;
-		walls.get(0).visitNeighbors(new WallVisitor() {
-			@Override
-			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
-				int pointIndex = 0;
-				if (next != null)
-					pointIndex = next.getSnapPointIndexOf(currentWall);
-				pointIndex++;
-				addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
-				addVertex(currentWall.getAbsPoint(pointIndex));
-			}
-		});
-	}
-
 	@Override
 	public boolean equals(final Object o) {
 		if ((!(o instanceof Building)))
 			return false;
 		final Building b = (Building) o;
-		return b.id == id;
+		return b.foundation == foundation;
 	}
 
 	@Override
 	public int hashCode() {
-		return id;
-	}
-
-	public boolean isWallComplete() {
-		exploreWallNeighbors();
-		return walls.size() == floorVertices.size() && !walls.isEmpty();
+		return getID();
 	}
 
 	public String getGeometryJson() {
-		final double scale = Scene.getInstance().getAnnotationScale();
-		String s = "\"Height\": " + FORMAT1.format(height * scale);
-		final double area = getArea();
-		s += ", \"Area\": " + FORMAT1.format(Math.abs(area * scale * scale));
-		final double volume = Math.abs(area) * height;
-		s += ", \"Volume\": " + FORMAT1.format(volume * scale * scale * scale);
-		if (area != 0) {
-			s += ", \"CentroidX\": " + FORMAT1.format(getCentroidX() / area * scale);
-			s += ", \"CentroidY\": " + FORMAT1.format(getCentroidY() / area * scale);
+		if (calculate()) {
+			String s = "\"Height\": " + FORMAT1.format(height);
+			s += ", \"Area\": " + FORMAT1.format(area);
+			s += ", \"CentroidX\": " + FORMAT1.format(cx);
+			s += ", \"CentroidY\": " + FORMAT1.format(cy);
+			return s;
 		}
-		return s;
+		return null;
 	}
 
 	public String getSolarEnergy() {
@@ -175,8 +209,8 @@ public class Building {
 	}
 
 	String toJson() {
-		String s = "\"ID\": " + id;
-		if (isWallComplete()) {
+		String s = "\"ID\": " + getID();
+		if (wallComplete) {
 			s += ", \"WallCount\": " + walls.size();
 			if (windowCount > 0)
 				s += ", \"WindowCount\": " + windowCount;
@@ -190,21 +224,18 @@ public class Building {
 
 	@Override
 	public String toString() {
-		String s = "(ID=" + id;
-		if (isWallComplete()) {
+		String s = "(ID=" + getID();
+		if (calculate()) {
 			s += " #wall=" + walls.size();
 			if (windowCount > 0)
 				s += " #window=" + windowCount;
 			s += " height=" + FORMAT1.format(height);
-			final double area = getArea();
-			s += " area=" + FORMAT1.format(Math.abs(area));
-			final double volume = Math.abs(area) * height;
-			s += " volume=" + FORMAT1.format(volume);
-			s += " centroid=\"" + FORMAT1.format(getCentroidX() / area) + "," + FORMAT1.format(getCentroidY() / area) + "\"";
+			s += " area=" + FORMAT1.format(area);
+			s += " centroid=\"" + FORMAT1.format(cx) + "," + FORMAT1.format(cy) + "\"";
 			final double solar = getSolarValue();
 			if (solar >= 0) {
 				s += " solar_energy=" + solar;
-				s += " solar_energy_density=" + FORMAT4.format(solar / volume);
+				s += " solar_energy_density=" + FORMAT4.format(solar / (area * height));
 			}
 		}
 		return s + ")";

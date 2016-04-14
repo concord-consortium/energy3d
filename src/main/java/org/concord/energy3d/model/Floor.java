@@ -220,9 +220,10 @@ public class Floor extends HousePart {
 
 	@Override
 	protected void computeArea() {
-		final double[] buildingGeometry = getTopContainer().getBuildingGeometry();
-		if (buildingGeometry != null) {
-			area = buildingGeometry[1];
+		Building b = new Building(getTopContainer());
+		if (b.isWallComplete()) {
+			b.calculate();
+			area = b.getArea();
 		} else {
 			area = -1; // return a negative number to indicate problems
 		}

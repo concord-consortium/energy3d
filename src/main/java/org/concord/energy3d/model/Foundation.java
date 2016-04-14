@@ -1,6 +1,5 @@
 package org.concord.energy3d.model;
 
-import java.awt.geom.Path2D;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
-import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
@@ -39,7 +37,6 @@ public class Foundation extends HousePart implements Thermalizable {
 	private static final long serialVersionUID = 1L;
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;
-	private transient ArrayList<Vector2> buildingWallVertices;
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
 	private transient Mesh surroundMesh;
@@ -838,125 +835,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		Scene.getInstance().redrawAll();
 	}
 
-	private void initBuildingWallVertices() {
-		if (buildingWallVertices == null)
-			buildingWallVertices = new ArrayList<Vector2>();
-		else
-			buildingWallVertices.clear();
-		if (children.isEmpty())
-			return;
-		final HousePart firstBorn = children.get(0);
-		if (firstBorn instanceof Wall)
-			((Wall) firstBorn).visitNeighbors(new WallVisitor() {
-				@Override
-				public void visit(final Wall currentWall, final Snap prev, final Snap next) {
-					int pointIndex = 0;
-					if (next != null)
-						pointIndex = next.getSnapPointIndexOf(currentWall);
-					pointIndex++;
-					addBuildingWallVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
-					addBuildingWallVertex(currentWall.getAbsPoint(pointIndex));
-				}
-			});
-	}
-
-	private void addBuildingWallVertex(final ReadOnlyVector3 v3) {
-		final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
-		boolean b = false;
-		for (final Vector2 x : buildingWallVertices) {
-			if (Util.isEqual(x, v2)) {
-				b = true;
-				break;
-			}
-		}
-		if (!b)
-			buildingWallVertices.add(v2);
-	}
-
-	private Path2D.Double buildingWallPath;
-
-	private boolean insideBuilding(final double x, final double y, final boolean init) {
-		if (init) {
-			initBuildingWallVertices();
-			final int n = buildingWallVertices.size();
-			int m = 0;
-			for (final HousePart p : children) {
-				if (p instanceof Wall)
-					m++;
-			}
-			if (n <= 0 || m != n) // not closed in the latter case
-				return false;
-			if (buildingWallPath == null)
-				buildingWallPath = new Path2D.Double();
-			else
-				buildingWallPath.reset();
-			Vector2 v = buildingWallVertices.get(0);
-			buildingWallPath.moveTo(v.getX(), v.getY());
-			for (int i = 1; i < n; i++) {
-				v = buildingWallVertices.get(i);
-				buildingWallPath.lineTo(v.getX(), v.getY());
-			}
-			v = buildingWallVertices.get(0);
-			buildingWallPath.lineTo(v.getX(), v.getY());
-			buildingWallPath.closePath();
-		}
-		final int n = buildingWallVertices.size();
-		int m = 0;
-		for (final HousePart p : children) {
-			if (p instanceof Wall)
-				m++;
-		}
-		if (n <= 0 || m != n) // not closed in the latter case
-			return false;
-		return buildingWallPath != null ? buildingWallPath.contains(x, y) : false;
-	}
-
-	public double[] getBuildingGeometry() {
-
-		initBuildingWallVertices();
-		final int n = buildingWallVertices.size();
-		int m = 0;
-		for (final HousePart p : children) {
-			if (p instanceof Wall)
-				m++;
-		}
-		if (n <= 0 || m != n) // not closed in the latter case
-			return null;
-
-		final double scale = Scene.getInstance().getAnnotationScale();
-		final double height = boundingHeight * scale;
-
-		double area = 0;
-		Vector2 v1, v2;
-		for (int i = 0; i < n - 1; i++) {
-			v1 = buildingWallVertices.get(i);
-			v2 = buildingWallVertices.get(i + 1);
-			area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
-		}
-		v1 = buildingWallVertices.get(n - 1);
-		v2 = buildingWallVertices.get(0);
-		area += v1.getX() * v2.getY() - v2.getX() * v1.getY();
-		area *= 0.5;
-
-		double cx = 0, cy = 0;
-		for (int i = 0; i < n - 1; i++) {
-			v1 = buildingWallVertices.get(i);
-			v2 = buildingWallVertices.get(i + 1);
-			cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
-			cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
-		}
-		v1 = buildingWallVertices.get(n - 1);
-		v2 = buildingWallVertices.get(0);
-		cx += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getX() + v2.getX());
-		cy += (v1.getX() * v2.getY() - v2.getX() * v1.getY()) * (v1.getY() + v2.getY());
-		cx /= 6 * area;
-		cy /= 6 * area;
-		cx *= scale;
-		cy *= scale;
-		area = Math.abs(area) * scale * scale;
-
-		return new double[] { height, area, height * area, cx, cy };
-
+	double getBoundingHeight() {
+		return boundingHeight;
 	}
 
 	public double getPassiveSolarNow() {
@@ -1086,13 +966,14 @@ public class Foundation extends HousePart implements Thermalizable {
 			final Vector3 a = new Vector3();
 			double g, h;
 			boolean init = true;
+			Building building = new Building(this);
 			for (int j = 0; j < cols; j++) {
 				h = j + 0.5;
 				for (int i = 0; i < rows; i++) {
 					g = i + 0.5;
 					a.setX(o.getX() + g * v.getX() / rows + h * u.getX() / cols);
 					a.setY(o.getY() + g * v.getY() / rows + h * u.getY() / cols);
-					if (insideBuilding(a.getX(), a.getY(), init)) {
+					if (building.contains(a.getX(), a.getY(), init)) {
 						a.setZ(o.getZ());
 						drawArrow(a, normal, arrowsVertices, heat);
 					}

@@ -2,7 +2,6 @@ package org.concord.energy3d.logger;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.model.Building;
@@ -10,7 +9,6 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Tree;
-import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.util.Config;
 
 import com.ardor3d.math.Vector3;
@@ -70,6 +68,14 @@ class LoggerUtil {
 		return x == null ? -1 : x.getId();
 	}
 
+	static Foundation getBuildingFoundation(final HousePart p) {
+		if (p == null)
+			return null;
+		if (p instanceof Foundation)
+			return (Foundation) p;
+		return p.getTopContainer();
+	}
+
 	static Object getInfo(final HousePart p) {
 		if (p == null)
 			return null;
@@ -112,12 +118,7 @@ class LoggerUtil {
 		}
 		if (bid != -1 && bid == p.getId()) {
 			if (p instanceof Foundation) {
-				Building b = new Building((int) p.getId());
-				ArrayList<HousePart> children = p.getChildren();
-				for (HousePart x : children) {
-					if (x instanceof Wall)
-						b.addWall((Wall) x);
-				}
+				Building b = new Building((Foundation) p);
 				if (b.isWallComplete()) {
 					s += ", " + b.getGeometryJson();
 				}

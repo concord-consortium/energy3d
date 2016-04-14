@@ -990,12 +990,13 @@ public abstract class HousePart implements Serializable {
 
 	double calculateHeatVector() {
 		double heat = 0;
-		double a;
+		double a = area;
 		if (this instanceof Foundation) {
-			final double[] buildingGeometry = ((Foundation) this).getBuildingGeometry();
-			a = buildingGeometry != null ? buildingGeometry[1] : area;
-		} else {
-			a = area;
+			Building building = new Building((Foundation) this);
+			if (building.isWallComplete()) {
+				building.calculate();
+				a = building.getArea(); // reduce the area of the foundation to the floor area within the building envelope
+			}
 		}
 		if (heatLoss != null) {
 			if (SceneManager.getInstance().isHeatFluxDaily()) {

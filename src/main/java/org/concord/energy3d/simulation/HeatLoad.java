@@ -6,6 +6,7 @@ import java.util.Calendar;
 import javax.swing.JComboBox;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -117,8 +118,14 @@ public class HeatLoad {
 						final double uValue = getUValue(part);
 						if (Util.isZero(uValue))
 							continue;
-						final double[] buildingGeometry = foundation.getBuildingGeometry();
-						final double area = buildingGeometry != null ? buildingGeometry[1] : foundation.getArea();
+						Building building = new Building(foundation);
+						double area;
+						if (building.isWallComplete()) {
+							building.calculate();
+							area = building.getArea();
+						} else {
+							area = foundation.getArea();
+						}
 						final double heatloss = area * uValue * deltaT / 1000.0 / 60 * timeStep;
 						// if (iMinute % 4 == 0) System.out.println((int) (iMinute / 4) + "=" + outsideTemperature + ", " + groundTemperature + ", " + deltaT + ", " + heatloss);
 						foundation.getHeatLoss()[iMinute] += heatloss;

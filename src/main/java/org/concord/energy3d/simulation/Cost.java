@@ -20,6 +20,7 @@ import javax.swing.table.DefaultTableModel;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -117,8 +118,6 @@ public class Cost {
 			return (int) (((Roof) part).getAreaWithOverhang() * unitPrice);
 		}
 		if (part instanceof Foundation) {
-			Foundation foundation = (Foundation) part;
-			double uFactor = foundation.getUValue();
 			// http://www.homewyse.com/costs/cost_of_floor_insulation.html
 			// As of 2015, a 1000 square feet of floor area costs as high as $3000 to insulate in Boston. This translates into $32/m^2.
 			// Now, we don't know what R-value this insulation is. But let's assume it is R25 material (minimum insulation recommended
@@ -126,10 +125,14 @@ public class Cost {
 			// Let's also assume that the insulation cost is inversely proportional to the U-value.
 			// The baseline cost (that is, the structure without insulation) for floor is set to be $100/m^2.
 			// The foundation cost is set to be $200/m^2.
-			double unitPrice = 300 + 8 / uFactor;
-			final double[] buildingGeometry = foundation.getBuildingGeometry();
-			if (buildingGeometry != null)
-				return (int) (buildingGeometry[1] * unitPrice);
+			Foundation foundation = (Foundation) part;
+			Building b = new Building(foundation);
+			if (b.isWallComplete()) {
+				b.calculate();
+				double uFactor = foundation.getUValue();
+				double unitPrice = 300 + 8 / uFactor;
+				return (int) (b.getArea() * unitPrice);
+			}
 			return -1; // the building is incomplete yet, so we can assume the floor insulation isn't there yet
 		}
 		if (part instanceof Floor) {

@@ -171,12 +171,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		synchronized (list) {
 			for (HousePart p : list) {
 				if (p instanceof Foundation) {
-					Building b = new Building((int) p.getId());
-					ArrayList<HousePart> children = p.getChildren();
-					for (HousePart x : children) {
-						if (x instanceof Wall)
-							b.addWall((Wall) x);
-					}
+					Building b = new Building((Foundation) p);
 					if (b.isWallComplete() && !buildings.contains(b)) {
 						buildings.add(b);
 					}

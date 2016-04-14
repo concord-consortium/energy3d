@@ -50,6 +50,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -473,7 +474,7 @@ public class EnergyPanel extends JPanel {
 		graphTabbedPane.add("Energy", dailyEnergyGraph);
 
 		infoPanel = new InfoPanel();
-		//graphTabbedPane.add("Info", infoPanel);
+		// graphTabbedPane.add("Info", infoPanel);
 
 		target = partPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
@@ -811,16 +812,17 @@ public class EnergyPanel extends JPanel {
 			selectedBuilding = selectedPart.getTopContainer();
 
 		if (selectedBuilding != null) {
-			final double[] buildingGeometry = selectedBuilding.getBuildingGeometry();
-			if (buildingGeometry != null) {
+			Building b = new Building(selectedBuilding);
+			if (b.isWallComplete()) {
+				b.calculate();
 				switch (Scene.getInstance().getUnit()) {
 				case InternationalSystemOfUnits:
-					heightBar.setValue((float) buildingGeometry[0]);
-					areaBar.setValue((float) buildingGeometry[1]);
+					heightBar.setValue((float) b.getHeight());
+					areaBar.setValue((float) b.getArea());
 					break;
 				case USCustomaryUnits:
-					heightBar.setValue((float) (buildingGeometry[0] * 3.28084));
-					areaBar.setValue((float) (buildingGeometry[1] * 3.28084 * 3.28084));
+					heightBar.setValue((float) (b.getHeight() * 3.28084));
+					areaBar.setValue((float) (b.getArea() * 3.28084 * 3.28084));
 					break;
 				}
 			} else {

@@ -72,6 +72,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	private double overhangLength = 2.0;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.15; // default is R38 (IECC for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
+	private Path2D.Double underlyingWallPath;
+	private List<Vector2> underlyingWallVerticesOnFoundation;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -1090,9 +1092,9 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		return d;
 	}
 
+	// if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time
 	@Override
 	public boolean isDrawable() {
-		// if wallUpperPoints is null then it has not been drawn yet so we assume wallUpperPoints size is okay otherwise all roofs would be invalid at init time
 		return container != null && (wallUpperPoints == null || wallUpperPoints.size() >= 3);
 	}
 
@@ -1104,22 +1106,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	@Override
 	public Spatial getCollisionSpatial() {
 		return roofPartsRoot;
-	}
-
-	private Path2D.Double underlyingWallPath;
-	private List<Vector2> underlyingWallVerticesOnFoundation;
-
-	private void addUnderlyingWallVertex(final ReadOnlyVector3 v3) {
-		final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
-		boolean b = false;
-		for (final Vector2 x : underlyingWallVerticesOnFoundation) {
-			if (Util.isEqual(x, v2)) {
-				b = true;
-				break;
-			}
-		}
-		if (!b)
-			underlyingWallVerticesOnFoundation.add(v2);
 	}
 
 	public boolean insideWalls(final double x, final double y, final boolean init) {
@@ -1139,6 +1125,19 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					pointIndex++;
 					addUnderlyingWallVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
 					addUnderlyingWallVertex(currentWall.getAbsPoint(pointIndex));
+				}
+
+				private void addUnderlyingWallVertex(final ReadOnlyVector3 v3) {
+					final Vector2 v2 = new Vector2(v3.getX(), v3.getY());
+					boolean b = false;
+					for (final Vector2 x : underlyingWallVerticesOnFoundation) {
+						if (Util.isEqual(x, v2)) {
+							b = true;
+							break;
+						}
+					}
+					if (!b)
+						underlyingWallVerticesOnFoundation.add(v2);
 				}
 			});
 			if (underlyingWallPath == null)
