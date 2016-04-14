@@ -106,7 +106,7 @@ public class SelectUtil {
 			final PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint, pick.getIntersectionRecord().getIntersectionNormal(0));
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			if (userData != null && userData.getHousePart() instanceof Window)
-				polyDist_i -= 0.2;	// give more priority to window (specially skylight)
+				polyDist_i -= 0.2; // give more priority to window (specially skylight)
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
 				for (int j = 0; j < userData.getHousePart().getPoints().size(); j++) {
@@ -154,7 +154,7 @@ public class SelectUtil {
 			if (data != null && data.isEditPoint() && currentEditPointMesh != data.getHousePart().getEditPointShape(data.getIndex())) {
 				currentEditPointMesh = data.getHousePart().getEditPointShape(data.getIndex());
 				currentEditPointOriginalColor.set(currentEditPointMesh.getDefaultColor());
-				currentEditPointMesh.setDefaultColor(ColorRGBA.YELLOW);
+				currentEditPointMesh.setDefaultColor(ColorRGBA.RED);
 			}
 
 			if (data == null) {

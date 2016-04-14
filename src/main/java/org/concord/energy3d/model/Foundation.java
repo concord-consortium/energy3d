@@ -28,6 +28,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
+import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -155,19 +156,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	@Override
 	public void setEditPointsVisible(final boolean visible) {
-		if (!visible && resizeHouseMode)
-			return;
-		else {
-			for (int i = 0; i < points.size(); i++) {
-				if (!visible)
-					pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-				else {
-					if (!resizeHouseMode && i >= 4)
-						pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Always);
-					else
-						pointsRoot.getChild(i).getSceneHints().setCullHint(CullHint.Inherit);
-				}
-			}
+		for (int i = 0; i < points.size(); i++) {
+			final boolean visible_i = visible && (resizeHouseMode || i < 4);
+			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
+			sceneHints.setCullHint(visible_i ? CullHint.Inherit : CullHint.Always);
+			sceneHints.setAllPickingHints(visible_i);
 		}
 	}
 
@@ -182,8 +175,8 @@ public class Foundation extends HousePart implements Thermalizable {
 				xi = 1;
 				yi = 0;
 			} else {
-				xi=0;
-				yi=1;
+				xi = 0;
+				yi = 1;
 			}
 			final double dx = Math.abs(points.get(2).getValue(xi) - points.get(0).getValue(xi));
 			final double dxOrg = Math.abs(orgPoints.get(2).getValue(xi) - orgPoints.get(0).getValue(xi));
@@ -196,7 +189,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	private void reverseFoundationResizeEffect(ArrayList<HousePart> children, final double dx, final double dxOrg, final double ratioX, final double dy, final double dyOrg, final double ratioY) {
+	private void reverseFoundationResizeEffect(final ArrayList<HousePart> children, final double dx, final double dxOrg, final double ratioX, final double dy, final double dyOrg, final double ratioY) {
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 		for (final HousePart child : children) {
 			reverseFoundationResizeEffect(child, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
@@ -1161,7 +1154,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		return thermostat;
 	}
 
-	public double getTotalWindowArea(boolean roofWindowsIncluded) {
+	public double getTotalWindowArea(final boolean roofWindowsIncluded) {
 		double area = 0;
 		for (final HousePart x : Scene.getInstance().getParts()) {
 			if (x.getTopContainer() != this)

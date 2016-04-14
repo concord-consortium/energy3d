@@ -1322,16 +1322,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		mouseState = null;
 
 		final Component canvasComponent = (Component) canvas;
-		if (operation == Operation.SELECT && !zoomLock) {
-			if (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human) {
-				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-			} else {
-				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-			}
-		} else {
+		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredHousePart != null && pick.getIndex() == -1 && (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human))
+			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		else
 			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		}
-
 	}
 
 	public void setMouseControlEnabled(final boolean enabled) {
@@ -1467,16 +1461,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								selectedHousePart = selectedHousePart.getTopContainer();
 							}
 						}
-						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || (operation == Operation.RESIZE && selectedHousePart instanceof Foundation)) {
+						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
 							cameraControl.setLeftMouseButtonEnabled(false);
-							if (selectedHousePart != null) { // there is a chance that selectedHousePart = null
-								houseMoveStartPoint = selectHousePart.getPoint().clone();
-								collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
-								final ArrayList<Vector3> points = selectedHousePart.getPoints();
-								houseMovePoints = new ArrayList<Vector3>(points.size());
-								for (final Vector3 p : points)
-									houseMovePoints.add(p.clone());
-							}
+							houseMoveStartPoint = selectHousePart.getPoint().clone();
+							collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
+							final ArrayList<Vector3> points = selectedHousePart.getPoints();
+							houseMovePoints = new ArrayList<Vector3>(points.size());
+							for (final Vector3 p : points)
+								houseMovePoints.add(p.clone());
 						}
 
 						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
