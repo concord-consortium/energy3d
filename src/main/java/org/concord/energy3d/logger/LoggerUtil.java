@@ -120,7 +120,7 @@ class LoggerUtil {
 			if (p instanceof Foundation) {
 				Building b = new Building((Foundation) p);
 				if (b.isWallComplete()) {
-					s += ", " + b.getGeometryJson();
+					s += ", " + b.geometryToJson();
 				}
 			}
 		}

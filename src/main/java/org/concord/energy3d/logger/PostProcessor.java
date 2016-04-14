@@ -148,15 +148,6 @@ public class PostProcessor extends PlayControl {
 							}
 						}
 						// scan again to compute building properties
-						synchronized (parts) {
-							for (final HousePart x : parts) {
-								final Building b = getBuilding(buildings, (int) LoggerUtil.getBuildingId(x));
-								if (b != null) {
-									if (x instanceof Window)
-										b.setWindowCount(b.getWindowCount() + 1);
-								}
-							}
-						}
 						if (total0 == -1)
 							total0 = parts.size();
 						if (wallCount0 == -1)
@@ -224,14 +215,6 @@ public class PostProcessor extends PlayControl {
 				active = false;
 			}
 		}.start();
-	}
-
-	private static Building getBuilding(final ArrayList<Building> buildings, final int id) {
-		for (final Building x : buildings) {
-			if (x.getID() == id)
-				return x;
-		}
-		return null;
 	}
 
 }

@@ -19,21 +19,28 @@ public class Building {
 
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("###0.##");
 	private final static DecimalFormat FORMAT4 = new DecimalFormat("###0.####");
+	private final static double STORY_HEIGHT = 4;
 
 	private Foundation foundation;
 	private final ArrayList<Wall> walls;
+	private final ArrayList<Window> windows;
 	private final ArrayList<Vector2> wallVertices;
-	private int windowCount;
-	private double area, cx, cy, height;
+	private double area, height, cx, cy, wallArea, windowArea, windowToFloorAreaPercentage;
 	private boolean wallComplete;
 	private Path2D.Double wallPath;
 
 	public Building(final Foundation foundation) {
 		this.foundation = foundation;
 		walls = new ArrayList<Wall>();
+		windows = new ArrayList<Window>();
 		for (HousePart x : foundation.getChildren()) {
-			if (x instanceof Wall)
+			if (x instanceof Wall) {
 				walls.add((Wall) x);
+				for (HousePart y : x.getChildren()) {
+					if (y instanceof Window)
+						windows.add((Window) y);
+				}
+			}
 		}
 		wallVertices = new ArrayList<Vector2>();
 		if (walls.isEmpty())
@@ -69,8 +76,8 @@ public class Building {
 		return wallComplete;
 	}
 
-	public int getID() {
-		return (int) foundation.getId();
+	public Foundation getFoundation() {
+		return foundation;
 	}
 
 	/** @return false if the building does not conform */
@@ -114,6 +121,18 @@ public class Building {
 		cy *= scale;
 		area = Math.abs(area) * scale * scale;
 
+		wallArea = 0;
+		for (Wall w : walls) {
+			wallArea += w.getArea();
+		}
+
+		windowArea = 0;
+		for (Window w : windows) {
+			windowArea += w.getArea();
+		}
+
+		windowToFloorAreaPercentage = 100 * windowArea / (area * height / STORY_HEIGHT);
+
 		return true;
 
 	}
@@ -138,6 +157,21 @@ public class Building {
 		return cy;
 	}
 
+	/** call calculate() before calling this */
+	public double getWallArea() {
+		return wallArea;
+	}
+
+	/** call calculate() before calling this */
+	public double getWindowArea() {
+		return windowArea;
+	}
+
+	/** call calculate() before calling this */
+	public double getWindowToFloorAreaPercentage() {
+		return windowToFloorAreaPercentage;
+	}
+
 	public boolean contains(final double x, final double y, final boolean init) {
 		if (wallComplete)
 			return false;
@@ -160,20 +194,6 @@ public class Building {
 		return wallPath != null ? wallPath.contains(x, y) : false;
 	}
 
-	public HousePart getRoof() {
-		if (walls.isEmpty())
-			return null;
-		return walls.get(0).getRoof();
-	}
-
-	public void setWindowCount(int n) {
-		windowCount = n;
-	}
-
-	public int getWindowCount() {
-		return windowCount;
-	}
-
 	@Override
 	public boolean equals(final Object o) {
 		if ((!(o instanceof Building)))
@@ -184,10 +204,10 @@ public class Building {
 
 	@Override
 	public int hashCode() {
-		return getID();
+		return (int) foundation.getId();
 	}
 
-	public String getGeometryJson() {
+	public String geometryToJson() {
 		if (calculate()) {
 			String s = "\"Height\": " + FORMAT1.format(height);
 			s += ", \"Area\": " + FORMAT1.format(area);
@@ -198,41 +218,16 @@ public class Building {
 		return null;
 	}
 
-	public String getSolarEnergy() {
-		Foundation x = walls.get(0).getTopContainer();
-		return x == null ? null : FORMAT1.format(x.getSolarPotentialToday());
-	}
-
-	public double getSolarValue() {
-		Foundation x = walls.get(0).getTopContainer();
-		return x == null ? -1 : x.getSolarPotentialToday();
-	}
-
-	String toJson() {
-		String s = "\"ID\": " + getID();
-		if (wallComplete) {
-			s += ", \"WallCount\": " + walls.size();
-			if (windowCount > 0)
-				s += ", \"WindowCount\": " + windowCount;
-			s += ", " + getGeometryJson();
-			final String solar = getSolarEnergy();
-			if (solar != null)
-				s += ", \"SolarEnergy\": " + solar;
-		}
-		return s;
-	}
-
 	@Override
 	public String toString() {
-		String s = "(ID=" + getID();
+		String s = "(ID=" + foundation.getId();
 		if (calculate()) {
 			s += " #wall=" + walls.size();
-			if (windowCount > 0)
-				s += " #window=" + windowCount;
+			s += " #window=" + windows.size();
 			s += " height=" + FORMAT1.format(height);
 			s += " area=" + FORMAT1.format(area);
-			s += " centroid=\"" + FORMAT1.format(cx) + "," + FORMAT1.format(cy) + "\"";
-			final double solar = getSolarValue();
+			s += " centroid=\"" + FORMAT1.format(cx) + ", " + FORMAT1.format(cy) + "\"";
+			final double solar = foundation.getSolarPotentialToday();
 			if (solar >= 0) {
 				s += " solar_energy=" + solar;
 				s += " solar_energy_density=" + FORMAT4.format(solar / (area * height));

@@ -181,7 +181,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (!buildings.isEmpty()) {
 			result = "[";
 			for (Building b : buildings)
-				result += "{\"Building\": " + b.getID() + ", \"Daily\": " + b.getSolarEnergy() + "}, ";
+				result += "{\"Building\": " + b.getFoundation().getId() + ", \"Daily\": " + ENERGY_FORMAT.format(b.getFoundation().getSolarPotentialToday()) + "}, ";
 			result = result.trim().substring(0, result.length() - 2);
 			result += "]";
 		}

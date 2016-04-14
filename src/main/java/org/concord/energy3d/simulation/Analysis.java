@@ -93,11 +93,8 @@ public abstract class Analysis {
 		SceneManager.getInstance().getSolarLand().setVisible(true);
 	}
 
-	public static boolean isBuildingComplete(final Foundation foundation) {
-		final Building b = new Building(foundation);
-		if (!b.isWallComplete())
-			return false;
-		return b.getRoof() != null;
+	static boolean isBuildingComplete(final Foundation foundation) {
+		return new Building(foundation).isWallComplete();
 	}
 
 }
