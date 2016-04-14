@@ -16,10 +16,12 @@ public class DesignSpecs implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private boolean budgetEnabled = true;
+	private boolean windowAreaEnabled = false;
 	private boolean heightEnabled = false;
 	private boolean areaEnabled = false;
 
 	private int maximumBudget = 200000;
+	private double minimumWindowAreaPercentage = 15;
 	private double minimumHeight = 8;
 	private double maximumHeight = 10;
 	private double minimumArea = 100;
@@ -52,6 +54,30 @@ public class DesignSpecs implements Serializable {
 
 	public int getMaximumBudget() {
 		return maximumBudget;
+	}
+
+	public void setWindowAreaEnabled(boolean windowAreaEnabled) {
+		this.windowAreaEnabled = windowAreaEnabled;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+			}
+		});
+	}
+
+	public boolean isWindowAreaEnabled() {
+		return windowAreaEnabled;
+	}
+
+	public void setMinimumWindowAreaPercentage(double minimumWindowAreaPercentage) {
+		this.minimumWindowAreaPercentage = minimumWindowAreaPercentage;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+			}
+		});
+	}
+
+	public double getMinimumWindowAreaPercentage() {
+		return minimumWindowAreaPercentage;
 	}
 
 	public void setHeightEnabled(boolean heightEnabled) {
