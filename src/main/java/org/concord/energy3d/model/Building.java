@@ -24,8 +24,10 @@ public class Building {
 	private Foundation foundation;
 	private final ArrayList<Wall> walls;
 	private final ArrayList<Window> windows;
+	private final ArrayList<SolarPanel> solarPanels;
+	private Roof roof;
 	private final ArrayList<Vector2> wallVertices;
-	private double area, height, cx, cy, wallArea, windowArea, windowToFloorAreaPercentage;
+	private double area, height, cx, cy, wallArea, windowArea, windowToFloorRatio;
 	private boolean wallComplete;
 	private Path2D.Double wallPath;
 
@@ -33,6 +35,7 @@ public class Building {
 		this.foundation = foundation;
 		walls = new ArrayList<Wall>();
 		windows = new ArrayList<Window>();
+		solarPanels = new ArrayList<SolarPanel>();
 		for (HousePart x : foundation.getChildren()) {
 			if (x instanceof Wall) {
 				walls.add((Wall) x);
@@ -45,6 +48,14 @@ public class Building {
 		wallVertices = new ArrayList<Vector2>();
 		if (walls.isEmpty())
 			return;
+		roof = walls.get(0).getRoof();
+		if (roof != null) {
+			for (HousePart x : roof.getChildren()) {
+				if (x instanceof SolarPanel) {
+					solarPanels.add((SolarPanel) x);
+				}
+			}
+		}
 		walls.get(0).visitNeighbors(new WallVisitor() {
 			@Override
 			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
@@ -78,6 +89,10 @@ public class Building {
 
 	public Foundation getFoundation() {
 		return foundation;
+	}
+
+	public Roof getRoof() {
+		return roof;
 	}
 
 	/** @return false if the building does not conform */
@@ -131,7 +146,7 @@ public class Building {
 			windowArea += w.getArea();
 		}
 
-		windowToFloorAreaPercentage = 100 * windowArea / (area * height / STORY_HEIGHT);
+		windowToFloorRatio = windowArea / (area * height / STORY_HEIGHT);
 
 		return true;
 
@@ -168,8 +183,8 @@ public class Building {
 	}
 
 	/** call calculate() before calling this */
-	public double getWindowToFloorAreaPercentage() {
-		return windowToFloorAreaPercentage;
+	public double getWindowToFloorRatio() {
+		return windowToFloorRatio;
 	}
 
 	public boolean contains(final double x, final double y, final boolean init) {

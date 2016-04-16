@@ -50,7 +50,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -63,7 +62,6 @@ import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.SolarRadiation;
@@ -110,8 +108,7 @@ public class EnergyPanel extends JPanel {
 	private final JPanel heatMapPanel;
 	private final JSlider colorMapSlider;
 	private final JProgressBar progressBar;
-	private final ColorBar heightBar, areaBar;
-	private final JPanel thermostatPanel, heightPanel, areaPanel;
+	private final JPanel thermostatPanel;
 	private final JTextField thermostatTemperatureField;
 	private final JButton adjustThermostatButton;
 	private JPanel partPanel;
@@ -126,7 +123,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
-	private InfoPanel infoPanel;
+	private SpecsPanel specsPanel;
 	private ConstructionCostGraph constructionCostGraph;
 	private DailyEnergyGraph dailyEnergyGraph;
 	private JTabbedPane graphTabbedPane;
@@ -383,36 +380,6 @@ public class EnergyPanel extends JPanel {
 		final JPanel buildingSizePanel = new JPanel(new GridLayout(1, 2, 0, 0));
 		buildingPanel.add(buildingSizePanel);
 
-		// area for the selected building
-
-		areaPanel = new JPanel(new BorderLayout());
-		areaPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Area (\u33A1)", TitledBorder.LEADING, TitledBorder.TOP));
-		areaPanel.setToolTipText("<html>The area of the selected building<br><b>Must be within the specified range (if any).</b></html>");
-		buildingSizePanel.add(areaPanel);
-		areaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		areaBar.setUnit("");
-		areaBar.setUnitPrefix(false);
-		areaBar.setVerticalLineRepresentation(false);
-		areaBar.setDecimalDigits(1);
-		areaBar.setToolTipText(areaPanel.getToolTipText());
-		areaBar.setPreferredSize(new Dimension(100, 16));
-		areaPanel.add(areaBar, BorderLayout.CENTER);
-
-		// height for the selected building
-
-		heightPanel = new JPanel(new BorderLayout());
-		heightPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Height (m)", TitledBorder.LEADING, TitledBorder.TOP));
-		heightPanel.setToolTipText("<html>The height of the selected building<br><b>Must be within the specified range (if any).</b></html>");
-		buildingSizePanel.add(heightPanel);
-		heightBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		heightBar.setUnit("");
-		heightBar.setUnitPrefix(false);
-		heightBar.setVerticalLineRepresentation(false);
-		heightBar.setDecimalDigits(1);
-		heightBar.setToolTipText(heightPanel.getToolTipText());
-		heightBar.setPreferredSize(new Dimension(100, 16));
-		heightPanel.add(heightBar, BorderLayout.CENTER);
-
 		// thermostat for the selected building
 
 		thermostatPanel = new JPanel(new BorderLayout(5, 0));
@@ -467,14 +434,16 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(graphTabbedPane);
 		dataPanel.add(Box.createVerticalGlue());
 
+		specsPanel = new SpecsPanel();
+		graphTabbedPane.add("Specs", specsPanel);
+
+		// construction cost graph
+
 		constructionCostGraph = new ConstructionCostGraph();
 		graphTabbedPane.add("Cost", constructionCostGraph);
 
 		dailyEnergyGraph = new DailyEnergyGraph();
 		graphTabbedPane.add("Energy", dailyEnergyGraph);
-
-		infoPanel = new InfoPanel();
-		// graphTabbedPane.add("Info", infoPanel);
 
 		target = partPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
@@ -649,8 +618,8 @@ public class EnergyPanel extends JPanel {
 		return latitudeSpinner;
 	}
 
-	public InfoPanel getInfoPanel() {
-		return infoPanel;
+	public SpecsPanel getSpecsPanel() {
+		return specsPanel;
 	}
 
 	public ConstructionCostGraph getConstructionCostGraph() {
@@ -812,23 +781,7 @@ public class EnergyPanel extends JPanel {
 			selectedBuilding = selectedPart.getTopContainer();
 
 		if (selectedBuilding != null) {
-			Building b = new Building(selectedBuilding);
-			if (b.isWallComplete()) {
-				b.calculate();
-				switch (Scene.getInstance().getUnit()) {
-				case InternationalSystemOfUnits:
-					heightBar.setValue((float) b.getHeight());
-					areaBar.setValue((float) b.getArea());
-					break;
-				case USCustomaryUnits:
-					heightBar.setValue((float) (b.getHeight() * 3.28084));
-					areaBar.setValue((float) (b.getArea() * 3.28084 * 3.28084));
-					break;
-				}
-			} else {
-				heightBar.setValue(0);
-				areaBar.setValue(0);
-			}
+			specsPanel.update(selectedBuilding);
 			final Calendar c = Heliodon.getInstance().getCalender();
 			int temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 			switch (Scene.getInstance().getUnit()) {
@@ -846,16 +799,14 @@ public class EnergyPanel extends JPanel {
 			int i2 = s2.indexOf(')');
 			((TitledBorder) buildingPanel.getBorder()).setTitle("Building #" + s2.substring(i1 + 1, i2));
 		} else {
-			heightBar.setValue(0);
-			areaBar.setValue(0);
+			specsPanel.clear();
 			thermostatTemperatureField.setText(null);
 			thermostatPanel.remove(adjustThermostatButton);
 			((TitledBorder) buildingPanel.getBorder()).setTitle("Building");
 		}
 		buildingPanel.repaint();
 
-		heightBar.repaint();
-		areaBar.repaint();
+		specsPanel.repaint();
 
 	}
 
@@ -884,8 +835,9 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void update() {
-		updateAreaBar();
-		updateHeightBar();
+		specsPanel.updateArea();
+		specsPanel.updateHeight();
+		specsPanel.updateWindowToFloorRatio();
 		updateProperties();
 	}
 
@@ -908,56 +860,6 @@ public class EnergyPanel extends JPanel {
 
 	public JComboBox<String> getCityComboBox() {
 		return cityComboBox;
-	}
-
-	public void updateAreaBar() {
-		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
-		final double r = 3.28084 * 3.28084;
-		String t = "Area (";
-		switch (Scene.getInstance().getUnit()) {
-		case InternationalSystemOfUnits:
-			if (specs.isAreaEnabled())
-				t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea()) + " ";
-			t += "m\u00B2)";
-			areaBar.setMinimum(specs.getMinimumArea());
-			areaBar.setMaximum(specs.getMaximumArea());
-			break;
-		case USCustomaryUnits:
-			if (specs.isAreaEnabled())
-				t += noDecimals.format(specs.getMinimumArea() * r) + " - " + noDecimals.format(specs.getMaximumArea() * r) + " ";
-			t += "ft\u00B2)";
-			areaBar.setMinimum(specs.getMinimumArea() * r);
-			areaBar.setMaximum(specs.getMaximumArea() * r);
-			break;
-		}
-		areaPanel.setBorder(createTitledBorder(t, true));
-		areaBar.setEnabled(specs.isAreaEnabled());
-		areaBar.repaint();
-	}
-
-	public void updateHeightBar() {
-		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
-		final double r = 3.28084;
-		String t = "Height (";
-		switch (Scene.getInstance().getUnit()) {
-		case InternationalSystemOfUnits:
-			if (specs.isHeightEnabled())
-				t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight()) + " ";
-			t += "m)";
-			heightBar.setMinimum(specs.getMinimumHeight());
-			heightBar.setMaximum(specs.getMaximumHeight());
-			break;
-		case USCustomaryUnits:
-			if (specs.isHeightEnabled())
-				t += noDecimals.format(specs.getMinimumHeight() * r) + " - " + noDecimals.format(specs.getMaximumHeight() * r) + " ";
-			t += "ft)";
-			heightBar.setMinimum(specs.getMinimumHeight() * r);
-			heightBar.setMaximum(specs.getMaximumHeight() * r);
-			break;
-		}
-		heightPanel.setBorder(createTitledBorder(t, true));
-		heightBar.setEnabled(specs.isHeightEnabled());
-		heightBar.repaint();
 	}
 
 	public void showHeatMapContrastSlider(final boolean b) {
@@ -1030,7 +932,7 @@ public class EnergyPanel extends JPanel {
 		return spinner;
 	}
 
-	TitledBorder createTitledBorder(String title, boolean smaller) {
+	static TitledBorder createTitledBorder(String title, boolean smaller) {
 		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), title, TitledBorder.LEADING, TitledBorder.TOP);
 		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - (smaller ? 2 : 1)));
 		return b;

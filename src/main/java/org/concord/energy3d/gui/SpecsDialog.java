@@ -51,18 +51,23 @@ class SpecsDialog extends JDialog {
 	private final JTextField maximumHeightTextField;
 	private final JLabel maximumHeightLabel;
 
-	private final JCheckBox minimumWindowAreaCheckBox;
-	private final JTextField minimumWindowAreaTextField;
-	private final JLabel minimumWindowAreaLabel;
+	private final JCheckBox minimumWindowToFloorRatioCheckBox;
+	private final JTextField minimumWindowToFloorRatioTextField;
+	private final JLabel minimumWindowToFloorRatioLabel;
+	private final JCheckBox maximumWindowToFloorRatioCheckBox;
+	private final JTextField maximumWindowToFloorRatioTextField;
+	private final JLabel maximumWindowToFloorRatioLabel;
 
 	private void enableBudgetItems(boolean b) {
 		budgetTextField.setEnabled(b);
 		budgetLabel.setEnabled(b);
 	}
 
-	private void enableWindowAreaItems(boolean b) {
-		minimumWindowAreaTextField.setEnabled(b);
-		minimumWindowAreaLabel.setEnabled(b);
+	private void enableWindowToFloorRatioItems(boolean b) {
+		minimumWindowToFloorRatioTextField.setEnabled(b);
+		maximumWindowToFloorRatioTextField.setEnabled(b);
+		minimumWindowToFloorRatioLabel.setEnabled(b);
+		maximumWindowToFloorRatioLabel.setEnabled(b);
 	}
 
 	private void enableAreaItems(boolean b) {
@@ -86,7 +91,7 @@ class SpecsDialog extends JDialog {
 		setTitle("Specifications");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(6, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(7, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -109,22 +114,40 @@ class SpecsDialog extends JDialog {
 		});
 		enableBudgetItems(specs.isBudgetEnabled());
 
-		// set the minimum window area percentage
-		minimumWindowAreaCheckBox = new JCheckBox("Minimum Window Area: ", specs.isWindowAreaEnabled());
-		minimumWindowAreaCheckBox.setToolTipText("Select to apply a window area requirement");
-		minimumWindowAreaTextField = new JTextField(FORMAT2.format(specs.getMinimumWindowAreaPercentage()), 6);
-		minimumWindowAreaLabel = new JLabel("% of floor area");
-		panel.add(minimumWindowAreaCheckBox);
-		panel.add(minimumWindowAreaTextField);
-		panel.add(minimumWindowAreaLabel);
+		// set the minimum and maximum window to floor area ratio
+		minimumWindowToFloorRatioCheckBox = new JCheckBox("Minimum Window/Floor Area Ratio: ", specs.isWindowToFloorRatioEnabled());
+		minimumWindowToFloorRatioCheckBox.setToolTipText("Select to apply a window-to-floor area requirement");
+		minimumWindowToFloorRatioTextField = new JTextField(FORMAT1.format(specs.getMinimumWindowToFloorRatio()), 6);
+		minimumWindowToFloorRatioLabel = new JLabel("Dimensionless");
+		panel.add(minimumWindowToFloorRatioCheckBox);
+		panel.add(minimumWindowToFloorRatioTextField);
+		panel.add(minimumWindowToFloorRatioLabel);
 
-		minimumWindowAreaCheckBox.addItemListener(new ItemListener() {
+		maximumWindowToFloorRatioCheckBox = new JCheckBox("Maximum Window/Floor Area Ratio: ", specs.isWindowToFloorRatioEnabled());
+		maximumWindowToFloorRatioCheckBox.setToolTipText("Select to apply a window-to-floor area requirement");
+		maximumWindowToFloorRatioTextField = new JTextField(FORMAT1.format(specs.getMaximumWindowToFloorRatio()), 6);
+		maximumWindowToFloorRatioLabel = new JLabel("Dimensionless");
+		panel.add(maximumWindowToFloorRatioCheckBox);
+		panel.add(maximumWindowToFloorRatioTextField);
+		panel.add(maximumWindowToFloorRatioLabel);
+
+		minimumWindowToFloorRatioCheckBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				enableWindowAreaItems(minimumWindowAreaCheckBox.isSelected());
+				boolean b = minimumWindowToFloorRatioCheckBox.isSelected();
+				Util.selectSilently(maximumWindowToFloorRatioCheckBox, b);
+				enableWindowToFloorRatioItems(b);
 			}
 		});
-		enableWindowAreaItems(specs.isWindowAreaEnabled());
+		maximumWindowToFloorRatioCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = maximumWindowToFloorRatioCheckBox.isSelected();
+				Util.selectSilently(minimumWindowToFloorRatioCheckBox, b);
+				enableWindowToFloorRatioItems(b);
+			}
+		});
+		enableWindowToFloorRatioItems(specs.isWindowToFloorRatioEnabled());
 
 		// set the minimum and maximum areas
 		minimumAreaCheckBox = new JCheckBox("Minimum Area: ", specs.isAreaEnabled());
@@ -205,14 +228,15 @@ class SpecsDialog extends JDialog {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				int maximumBudget;
-				double minimumArea, maximumArea, minimumHeight, maximumHeight, minimumWindowAreaPercentage;
+				double minimumArea, maximumArea, minimumHeight, maximumHeight, minimumWindowToFloorRatio, maximumWindowToFloorRatio;
 				try {
 					maximumBudget = (int) Double.parseDouble(budgetTextField.getText());
 					minimumArea = Double.parseDouble(minimumAreaTextField.getText());
 					maximumArea = Double.parseDouble(maximumAreaTextField.getText());
 					minimumHeight = Double.parseDouble(minimumHeightTextField.getText());
 					maximumHeight = Double.parseDouble(maximumHeightTextField.getText());
-					minimumWindowAreaPercentage = Double.parseDouble(minimumWindowAreaTextField.getText());
+					minimumWindowToFloorRatio = Double.parseDouble(minimumWindowToFloorRatioTextField.getText());
+					maximumWindowToFloorRatio = Double.parseDouble(maximumWindowToFloorRatioTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -223,12 +247,16 @@ class SpecsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Your budget is too low to construct a building.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (minimumWindowAreaPercentage <= 0) {
-					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum window area must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (minimumWindowToFloorRatio <= 0 || maximumWindowToFloorRatio <= 0) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum or maximium window-to-floor ratio must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (minimumWindowAreaPercentage >= 50) {
-					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum window area must be less than 50%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (minimumWindowToFloorRatio >= 1 || maximumWindowToFloorRatio >= 1) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum or maximum window-to-floor ratio must be less than 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (minimumWindowToFloorRatio >= maximumWindowToFloorRatio) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum cannot be greater than maximum window-to-floor ratio.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (minimumArea < 0 || maximumArea < 0) {
@@ -252,11 +280,12 @@ class SpecsDialog extends JDialog {
 				specs.setMinimumArea(minimumArea);
 				specs.setMaximumHeight(maximumHeight);
 				specs.setMinimumHeight(minimumHeight);
-				specs.setMinimumWindowAreaPercentage(minimumWindowAreaPercentage);
+				specs.setMinimumWindowToFloorRatio(minimumWindowToFloorRatio);
+				specs.setMaximumWindowToFloorRatio(maximumWindowToFloorRatio);
 				specs.setBudgetEnabled(budgetCheckBox.isSelected());
 				specs.setAreaEnabled(minimumAreaCheckBox.isSelected());
 				specs.setHeightEnabled(minimumHeightCheckBox.isSelected());
-				specs.setWindowAreaEnabled(minimumWindowAreaCheckBox.isSelected());
+				specs.setWindowToFloorRatioEnabled(minimumWindowToFloorRatioCheckBox.isSelected());
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				SpecsDialog.this.dispose();

@@ -164,7 +164,7 @@ public class ConstructionCostGraph extends JPanel {
 			budgetBar.setValue(totalCost);
 			budgetBar.repaint();
 			String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
-			budgetPanel.setBorder(EnergyPanel.getInstance().createTitledBorder(t, true));
+			budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 			budgetPanel.repaint();
 		}
 	}

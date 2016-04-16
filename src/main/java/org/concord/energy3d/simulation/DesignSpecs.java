@@ -16,12 +16,13 @@ public class DesignSpecs implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private boolean budgetEnabled = true;
-	private boolean windowAreaEnabled = false;
+	private boolean windowToFloorRatioEnabled = false;
 	private boolean heightEnabled = false;
 	private boolean areaEnabled = false;
 
 	private int maximumBudget = 200000;
-	private double minimumWindowAreaPercentage = 15;
+	private double minimumWindowToFloorRatio = 0.15;
+	private double maximumWindowToFloorRatio = 0.25;
 	private double minimumHeight = 8;
 	private double maximumHeight = 10;
 	private double minimumArea = 100;
@@ -56,35 +57,50 @@ public class DesignSpecs implements Serializable {
 		return maximumBudget;
 	}
 
-	public void setWindowAreaEnabled(boolean windowAreaEnabled) {
-		this.windowAreaEnabled = windowAreaEnabled;
+	public void setWindowToFloorRatioEnabled(boolean windowToFloorRatioEnabled) {
+		this.windowToFloorRatioEnabled = windowToFloorRatioEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				EnergyPanel.getInstance().getSpecsPanel().updateWindowToFloorRatio();
 			}
 		});
 	}
 
-	public boolean isWindowAreaEnabled() {
-		return windowAreaEnabled;
+	public boolean isWindowToFloorRatioEnabled() {
+		return windowToFloorRatioEnabled;
 	}
 
-	public void setMinimumWindowAreaPercentage(double minimumWindowAreaPercentage) {
-		this.minimumWindowAreaPercentage = minimumWindowAreaPercentage;
+	public void setMinimumWindowToFloorRatio(double minimumWindowToFloorRatio) {
+		this.minimumWindowToFloorRatio = minimumWindowToFloorRatio;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
+				EnergyPanel.getInstance().getSpecsPanel().updateWindowToFloorRatio();
 			}
 		});
 	}
 
-	public double getMinimumWindowAreaPercentage() {
-		return minimumWindowAreaPercentage;
+	public double getMinimumWindowToFloorRatio() {
+		return minimumWindowToFloorRatio;
+	}
+
+	public void setMaximumWindowToFloorRatio(double maximumWindowToFloorRatio) {
+		this.maximumWindowToFloorRatio = maximumWindowToFloorRatio;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getSpecsPanel().updateWindowToFloorRatio();
+			}
+		});
+	}
+
+	public double getMaximumWindowToFloorRatio() {
+		return maximumWindowToFloorRatio;
 	}
 
 	public void setHeightEnabled(boolean heightEnabled) {
 		this.heightEnabled = heightEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateHeightBar();
+				EnergyPanel.getInstance().getSpecsPanel().updateHeight();
 			}
 		});
 	}
@@ -97,7 +113,7 @@ public class DesignSpecs implements Serializable {
 		this.maximumHeight = maximumHeight;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateHeightBar();
+				EnergyPanel.getInstance().getSpecsPanel().updateHeight();
 			}
 		});
 	}
@@ -110,7 +126,7 @@ public class DesignSpecs implements Serializable {
 		this.minimumHeight = minimumHeight;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateHeightBar();
+				EnergyPanel.getInstance().getSpecsPanel().updateHeight();
 			}
 		});
 	}
@@ -123,7 +139,7 @@ public class DesignSpecs implements Serializable {
 		this.areaEnabled = areaEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateAreaBar();
+				EnergyPanel.getInstance().getSpecsPanel().updateArea();
 			}
 		});
 	}
@@ -136,7 +152,7 @@ public class DesignSpecs implements Serializable {
 		this.maximumArea = maximumArea;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateAreaBar();
+				EnergyPanel.getInstance().getSpecsPanel().updateArea();
 			}
 		});
 	}
@@ -149,7 +165,7 @@ public class DesignSpecs implements Serializable {
 		this.minimumArea = minimumArea;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().updateAreaBar();
+				EnergyPanel.getInstance().getSpecsPanel().updateArea();
 			}
 		});
 	}
