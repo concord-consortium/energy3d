@@ -16,11 +16,13 @@ public class DesignSpecs implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private boolean budgetEnabled = true;
+	private boolean solarPanelEnabled = false;
 	private boolean windowToFloorRatioEnabled = false;
 	private boolean heightEnabled = false;
 	private boolean areaEnabled = false;
 
 	private int maximumBudget = 200000;
+	private int maximumNumberOfSolarPanels = 50;
 	private double minimumWindowToFloorRatio = 0.15;
 	private double maximumWindowToFloorRatio = 0.25;
 	private double minimumHeight = 8;
@@ -55,6 +57,32 @@ public class DesignSpecs implements Serializable {
 
 	public int getMaximumBudget() {
 		return maximumBudget;
+	}
+
+	public void setMaximumNumberOfSolarPanelsEnabled(boolean solarPanelEnabled) {
+		this.solarPanelEnabled = solarPanelEnabled;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getSpecsPanel().updateSolarPanel();
+			}
+		});
+	}
+
+	public boolean isSolarPanelEnabled() {
+		return solarPanelEnabled;
+	}
+
+	public void setMaximumNumberOfSolarPanels(int maximumNumberOfSolarPanels) {
+		this.maximumNumberOfSolarPanels = maximumNumberOfSolarPanels;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getSpecsPanel().updateSolarPanel();
+			}
+		});
+	}
+
+	public int getMaximumNumberOfSolarPanels() {
+		return maximumNumberOfSolarPanels;
 	}
 
 	public void setWindowToFloorRatioEnabled(boolean windowToFloorRatioEnabled) {

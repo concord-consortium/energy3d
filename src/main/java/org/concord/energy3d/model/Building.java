@@ -42,6 +42,8 @@ public class Building {
 				for (HousePart y : x.getChildren()) {
 					if (y instanceof Window)
 						windows.add((Window) y);
+					else if (y instanceof SolarPanel)
+						solarPanels.add((SolarPanel) y);
 				}
 			}
 		}
@@ -185,6 +187,10 @@ public class Building {
 	/** call calculate() before calling this */
 	public double getWindowToFloorRatio() {
 		return windowToFloorRatio;
+	}
+
+	public int getSolarPanelCount() {
+		return solarPanels.size();
 	}
 
 	public boolean contains(final double x, final double y, final boolean init) {

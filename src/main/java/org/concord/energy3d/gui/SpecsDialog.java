@@ -58,9 +58,18 @@ class SpecsDialog extends JDialog {
 	private final JTextField maximumWindowToFloorRatioTextField;
 	private final JLabel maximumWindowToFloorRatioLabel;
 
+	private final JCheckBox maximumSolarPanelCheckBox;
+	private final JTextField maximumSolarPanelTextField;
+	private final JLabel maximumSolarPanelLabel;
+
 	private void enableBudgetItems(boolean b) {
 		budgetTextField.setEnabled(b);
 		budgetLabel.setEnabled(b);
+	}
+
+	private void enableSolarPanelItems(boolean b) {
+		maximumSolarPanelTextField.setEnabled(b);
+		maximumSolarPanelLabel.setEnabled(b);
 	}
 
 	private void enableWindowToFloorRatioItems(boolean b) {
@@ -91,7 +100,7 @@ class SpecsDialog extends JDialog {
 		setTitle("Specifications");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(7, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(8, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -113,6 +122,23 @@ class SpecsDialog extends JDialog {
 			}
 		});
 		enableBudgetItems(specs.isBudgetEnabled());
+
+		// set the maximum number of solar panels allowed
+		maximumSolarPanelCheckBox = new JCheckBox("Maximum Number of Solar Panels: ", specs.isSolarPanelEnabled());
+		maximumSolarPanelCheckBox.setToolTipText("Select to apply a limit of solar panels");
+		maximumSolarPanelTextField = new JTextField("" + specs.getMaximumNumberOfSolarPanels(), 6);
+		maximumSolarPanelLabel = new JLabel("");
+		panel.add(maximumSolarPanelCheckBox);
+		panel.add(maximumSolarPanelTextField);
+		panel.add(maximumSolarPanelLabel);
+
+		maximumSolarPanelCheckBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				enableSolarPanelItems(maximumSolarPanelCheckBox.isSelected());
+			}
+		});
+		enableSolarPanelItems(specs.isSolarPanelEnabled());
 
 		// set the minimum and maximum window to floor area ratio
 		minimumWindowToFloorRatioCheckBox = new JCheckBox("Minimum Window/Floor Area Ratio: ", specs.isWindowToFloorRatioEnabled());
@@ -228,9 +254,12 @@ class SpecsDialog extends JDialog {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				int maximumBudget;
-				double minimumArea, maximumArea, minimumHeight, maximumHeight, minimumWindowToFloorRatio, maximumWindowToFloorRatio;
+				int maximumNumberOfSolarPanels;
+				double minimumArea, maximumArea, minimumHeight, maximumHeight;
+				double minimumWindowToFloorRatio, maximumWindowToFloorRatio;
 				try {
 					maximumBudget = (int) Double.parseDouble(budgetTextField.getText());
+					maximumNumberOfSolarPanels = (int) Double.parseDouble(maximumSolarPanelTextField.getText());
 					minimumArea = Double.parseDouble(minimumAreaTextField.getText());
 					maximumArea = Double.parseDouble(maximumAreaTextField.getText());
 					minimumHeight = Double.parseDouble(minimumHeightTextField.getText());
@@ -245,6 +274,10 @@ class SpecsDialog extends JDialog {
 				// range check
 				if (maximumBudget <= 1000) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Your budget is too low to construct a building.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (maximumNumberOfSolarPanels < 0) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Maximum number of solar panels cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (minimumWindowToFloorRatio <= 0 || maximumWindowToFloorRatio <= 0) {
@@ -276,6 +309,7 @@ class SpecsDialog extends JDialog {
 					return;
 				}
 				specs.setMaximumBudget(maximumBudget);
+				specs.setMaximumNumberOfSolarPanels(maximumNumberOfSolarPanels);
 				specs.setMaximumArea(maximumArea);
 				specs.setMinimumArea(minimumArea);
 				specs.setMaximumHeight(maximumHeight);
@@ -283,6 +317,7 @@ class SpecsDialog extends JDialog {
 				specs.setMinimumWindowToFloorRatio(minimumWindowToFloorRatio);
 				specs.setMaximumWindowToFloorRatio(maximumWindowToFloorRatio);
 				specs.setBudgetEnabled(budgetCheckBox.isSelected());
+				specs.setMaximumNumberOfSolarPanelsEnabled(maximumSolarPanelCheckBox.isSelected());
 				specs.setAreaEnabled(minimumAreaCheckBox.isSelected());
 				specs.setHeightEnabled(minimumHeightCheckBox.isSelected());
 				specs.setWindowToFloorRatioEnabled(minimumWindowToFloorRatioCheckBox.isSelected());

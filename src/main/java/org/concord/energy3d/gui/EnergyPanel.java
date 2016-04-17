@@ -434,14 +434,15 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(graphTabbedPane);
 		dataPanel.add(Box.createVerticalGlue());
 
+		// design specs panel
 		specsPanel = new SpecsPanel();
 		graphTabbedPane.add("Specs", specsPanel);
 
 		// construction cost graph
-
 		constructionCostGraph = new ConstructionCostGraph();
 		graphTabbedPane.add("Cost", constructionCostGraph);
 
+		// hourly energy graph
 		dailyEnergyGraph = new DailyEnergyGraph();
 		graphTabbedPane.add("Energy", dailyEnergyGraph);
 
@@ -838,6 +839,7 @@ public class EnergyPanel extends JPanel {
 		specsPanel.updateArea();
 		specsPanel.updateHeight();
 		specsPanel.updateWindowToFloorRatio();
+		specsPanel.updateSolarPanel();
 		updateProperties();
 	}
 

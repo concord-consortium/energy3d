@@ -25,8 +25,8 @@ public class SpecsPanel extends JPanel {
 
 	private final DecimalFormat twoDecimals = new DecimalFormat();
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private JPanel heightPanel, areaPanel, windowToFloorPanel;
-	private ColorBar heightBar, areaBar, windowToFloorBar;
+	private JPanel heightPanel, areaPanel, windowToFloorPanel, solarPanelPanel;
+	private ColorBar heightBar, areaBar, windowToFloorBar, solarPanelBar;
 
 	public SpecsPanel() {
 
@@ -80,9 +80,24 @@ public class SpecsPanel extends JPanel {
 		windowToFloorBar.setUnitPrefix(false);
 		windowToFloorBar.setVerticalLineRepresentation(false);
 		windowToFloorBar.setDecimalDigits(3);
-		windowToFloorBar.setToolTipText(heightPanel.getToolTipText());
+		windowToFloorBar.setToolTipText(windowToFloorPanel.getToolTipText());
 		windowToFloorBar.setPreferredSize(new Dimension(100, 16));
 		windowToFloorPanel.add(windowToFloorBar, BorderLayout.CENTER);
+
+		// solar panel count for the selected building
+
+		solarPanelPanel = new JPanel(new BorderLayout());
+		solarPanelPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Number of solar panels", TitledBorder.LEADING, TitledBorder.TOP));
+		solarPanelPanel.setToolTipText("<html>The number of solar panels of the selected building<br><b>Must be within the specified range (if any).</b></html>");
+		container.add(solarPanelPanel);
+		solarPanelBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		solarPanelBar.setUnit("");
+		solarPanelBar.setUnitPrefix(false);
+		solarPanelBar.setVerticalLineRepresentation(false);
+		solarPanelBar.setDecimalDigits(0);
+		solarPanelBar.setToolTipText(solarPanelPanel.getToolTipText());
+		solarPanelBar.setPreferredSize(new Dimension(100, 16));
+		solarPanelPanel.add(solarPanelBar, BorderLayout.CENTER);
 
 	}
 
@@ -101,6 +116,7 @@ public class SpecsPanel extends JPanel {
 				break;
 			}
 			windowToFloorBar.setValue((float) b.getWindowToFloorRatio());
+			solarPanelBar.setValue(b.getSolarPanelCount());
 		} else {
 			clear();
 		}
@@ -110,6 +126,7 @@ public class SpecsPanel extends JPanel {
 		heightBar.setValue(0);
 		areaBar.setValue(0);
 		windowToFloorBar.setValue(0);
+		solarPanelBar.setValue(0);
 	}
 
 	public void updateArea() {
@@ -172,6 +189,17 @@ public class SpecsPanel extends JPanel {
 		windowToFloorPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 		windowToFloorBar.setEnabled(specs.isWindowToFloorRatioEnabled());
 		windowToFloorBar.repaint();
+	}
+
+	public void updateSolarPanel() {
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		String t = "Number of solar panels";
+		if (specs.isSolarPanelEnabled())
+			t += " (<" +specs.getMaximumNumberOfSolarPanels() + ")";
+		solarPanelBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
+		solarPanelPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		solarPanelBar.setEnabled(specs.isSolarPanelEnabled());
+		solarPanelBar.repaint();
 	}
 
 }
