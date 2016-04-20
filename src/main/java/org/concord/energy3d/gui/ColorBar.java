@@ -99,20 +99,20 @@ class ColorBar extends JPanel {
 				if (!Double.isNaN(minimum))
 					g2.fillRect((int) Math.round(minimum * width / max), 1, 2, height - 2);
 			} else {
-				g2.setColor(new Color(0xCD5C5C));
-				int x1 = 0;
 				if (!Double.isNaN(minimum)) {
+					g2.setColor(new Color(0xCD5C5C));
+					int x1 = 0;
 					x1 = (int) Math.round(minimum * width / max);
 					g2.fillRect(0, height - 4, x1, 4);
+					int x2 = (int) Math.round(maximum * width / max);
+					g2.fillRect(x2, height - 4, width - x2, 4);
+					g2.setColor(new Color(0x32CD32));
+					g2.fillRect(x1, height - 4, x2 - x1, 4);
 				}
-				int x2 = (int) Math.round(maximum * width / max);
-				g2.fillRect(x2, height - 4, width - x2, 4);
-				g2.setColor(new Color(0x32CD32));
-				g2.fillRect(x1, height - 4, x2 - x1, 4);
 			}
 		}
 
-		if (value / maximum > 0.0001) {
+		if (value / maximum > 0.000001) {
 			g2.setFont(new Font(null, Font.PLAIN, 10));
 			g2.setColor(Color.BLACK);
 			String s = unitPrefix ? unit + decimalFormat.format(value) : decimalFormat.format(value) + unit;

@@ -10,7 +10,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -341,33 +340,6 @@ public class EnergyPanel extends JPanel {
 		gbc_sunshineHoursField.gridy = 2;
 		timeAndLocationPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
-		heatMapPanel = new JPanel(new BorderLayout());
-		heatMapPanel.setBorder(createTitledBorder("Heat Map Contrast", true));
-		// dataPanel.add(heatMapPanel);
-
-		colorMapSlider = new MySlider();
-		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar heat map.</html>");
-		colorMapSlider.setMinimum(15);
-		colorMapSlider.setMaximum(95);
-		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
-		colorMapSlider.setSnapToTicks(true);
-		colorMapSlider.setMinorTickSpacing(1);
-		colorMapSlider.setMajorTickSpacing(5);
-		colorMapSlider.setFocusable(false);
-		colorMapSlider.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				if (!colorMapSlider.getValueIsAdjusting()) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarHeatMapColorContrastCommand());
-					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
-					compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setEdited(true, false);
-				}
-			}
-		});
-		heatMapPanel.add(colorMapSlider, BorderLayout.CENTER);
-		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
-
 		partPanel = new JPanel();
 		partPanel.setBorder(createTitledBorder("Part", true));
 		dataPanel.add(partPanel);
@@ -377,13 +349,10 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
-		final JPanel buildingSizePanel = new JPanel(new GridLayout(1, 2, 0, 0));
-		buildingPanel.add(buildingSizePanel);
-
 		// thermostat for the selected building
 
 		thermostatPanel = new JPanel(new BorderLayout(5, 0));
-		thermostatPanel.add(createLabel("   Thermostat: "), BorderLayout.WEST);
+		thermostatPanel.add(createLabel(" Thermostat: "), BorderLayout.WEST);
 		thermostatTemperatureField = createTextField();
 		thermostatTemperatureField.setEnabled(false);
 		thermostatTemperatureField.setBackground(Color.WHITE);
@@ -407,9 +376,6 @@ public class EnergyPanel extends JPanel {
 			}
 		});
 		buildingPanel.add(thermostatPanel);
-
-		progressBar = new JProgressBar();
-		add(progressBar, BorderLayout.SOUTH);
 
 		JPanel target = buildingPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
@@ -436,7 +402,7 @@ public class EnergyPanel extends JPanel {
 
 		// design specs panel
 		specsPanel = new SpecsPanel();
-		graphTabbedPane.add("Specs", specsPanel);
+		graphTabbedPane.add("Geometry", specsPanel);
 
 		// construction cost graph
 		constructionCostGraph = new ConstructionCostGraph();
@@ -485,6 +451,35 @@ public class EnergyPanel extends JPanel {
 		partProperty4TextField.setEnabled(false);
 		partProperty4TextField.setBackground(Color.WHITE);
 		partProperty4TextField.setColumns(4);
+
+		heatMapPanel = new JPanel(new BorderLayout());
+		heatMapPanel.setBorder(createTitledBorder("Heat Map Contrast", true));
+
+		colorMapSlider = new MySlider();
+		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar heat map.</html>");
+		colorMapSlider.setMinimum(15);
+		colorMapSlider.setMaximum(95);
+		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
+		colorMapSlider.setSnapToTicks(true);
+		colorMapSlider.setMinorTickSpacing(1);
+		colorMapSlider.setMajorTickSpacing(5);
+		colorMapSlider.setFocusable(false);
+		colorMapSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (!colorMapSlider.getValueIsAdjusting()) {
+					SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarHeatMapColorContrastCommand());
+					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
+					compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true, false);
+				}
+			}
+		});
+		heatMapPanel.add(colorMapSlider, BorderLayout.CENTER);
+		heatMapPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, heatMapPanel.getPreferredSize().height));
+
+		progressBar = new JProgressBar();
+		add(progressBar, BorderLayout.SOUTH);
 
 	}
 

@@ -55,6 +55,8 @@ public class Building {
 			for (HousePart x : roof.getChildren()) {
 				if (x instanceof SolarPanel) {
 					solarPanels.add((SolarPanel) x);
+				} else if (x instanceof Window) {
+					windows.add((Window) x);
 				}
 			}
 		}
@@ -191,6 +193,10 @@ public class Building {
 
 	public int getSolarPanelCount() {
 		return solarPanels.size();
+	}
+
+	public int getWindowCount() {
+		return windows.size();
 	}
 
 	public boolean contains(final double x, final double y, final boolean init) {

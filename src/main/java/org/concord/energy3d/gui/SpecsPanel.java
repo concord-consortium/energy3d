@@ -25,8 +25,10 @@ public class SpecsPanel extends JPanel {
 
 	private final DecimalFormat twoDecimals = new DecimalFormat();
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private JPanel heightPanel, areaPanel, windowToFloorPanel, solarPanelPanel;
-	private ColorBar heightBar, areaBar, windowToFloorBar, solarPanelBar;
+	private JPanel heightPanel, areaPanel, windowToFloorPanel;
+	private ColorBar heightBar, areaBar, windowToFloorBar;
+	private JPanel solarPanelPanel, windowPanel;
+	private ColorBar solarPanelBar, windowBar;
 
 	public SpecsPanel() {
 
@@ -68,6 +70,21 @@ public class SpecsPanel extends JPanel {
 		heightBar.setToolTipText(heightPanel.getToolTipText());
 		heightBar.setPreferredSize(new Dimension(100, 16));
 		heightPanel.add(heightBar, BorderLayout.CENTER);
+
+		// window count for the selected building
+
+		windowPanel = new JPanel(new BorderLayout());
+		windowPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Number of windows", TitledBorder.LEADING, TitledBorder.TOP));
+		windowPanel.setToolTipText("<html>The number of windows of the selected building<br><b>Must be within the specified range (if any).</b></html>");
+		container.add(windowPanel);
+		windowBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		windowBar.setUnit("");
+		windowBar.setUnitPrefix(false);
+		windowBar.setVerticalLineRepresentation(false);
+		windowBar.setDecimalDigits(0);
+		windowBar.setToolTipText(windowPanel.getToolTipText());
+		windowBar.setPreferredSize(new Dimension(100, 16));
+		windowPanel.add(windowBar, BorderLayout.CENTER);
 
 		// window-to-floor area ratio for the selected building
 
@@ -117,6 +134,7 @@ public class SpecsPanel extends JPanel {
 			}
 			windowToFloorBar.setValue((float) b.getWindowToFloorRatio());
 			solarPanelBar.setValue(b.getSolarPanelCount());
+			windowBar.setValue(b.getWindowCount());
 		} else {
 			clear();
 		}
@@ -127,6 +145,7 @@ public class SpecsPanel extends JPanel {
 		areaBar.setValue(0);
 		windowToFloorBar.setValue(0);
 		solarPanelBar.setValue(0);
+		windowBar.setValue(0);
 	}
 
 	public void updateArea() {
