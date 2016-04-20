@@ -7,8 +7,6 @@ import java.text.DecimalFormat;
 
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.border.TitledBorder;
 
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
@@ -19,7 +17,7 @@ import org.concord.energy3d.simulation.DesignSpecs;
  * @author Charles Xie
  *
  */
-public class SpecsPanel extends JPanel {
+public class BasicsPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,10 +25,10 @@ public class SpecsPanel extends JPanel {
 	private final DecimalFormat noDecimals = new DecimalFormat();
 	private JPanel heightPanel, areaPanel, windowToFloorPanel;
 	private ColorBar heightBar, areaBar, windowToFloorBar;
-	private JPanel solarPanelPanel, windowPanel;
-	private ColorBar solarPanelBar, windowBar;
+	private JPanel solarPanelCountPanel, windowCountPanel, wallCountPanel;
+	private ColorBar solarPanelCountBar, windowCountBar, wallCountBar;
 
-	public SpecsPanel() {
+	public BasicsPanel() {
 
 		super(new BorderLayout());
 
@@ -44,7 +42,7 @@ public class SpecsPanel extends JPanel {
 		// area for the selected building
 
 		areaPanel = new JPanel(new BorderLayout());
-		areaPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Area (\u33A1)", TitledBorder.LEADING, TitledBorder.TOP));
+		areaPanel.setBorder(EnergyPanel.createTitledBorder("Area (\u33A1)", true));
 		areaPanel.setToolTipText("<html>The area of the selected building<br><b>Must be within the specified range (if any).</b></html>");
 		container.add(areaPanel);
 		areaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
@@ -59,7 +57,7 @@ public class SpecsPanel extends JPanel {
 		// height for the selected building
 
 		heightPanel = new JPanel(new BorderLayout());
-		heightPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Height (m)", TitledBorder.LEADING, TitledBorder.TOP));
+		heightPanel.setBorder(EnergyPanel.createTitledBorder("Height (m)", true));
 		heightPanel.setToolTipText("<html>The height of the selected building<br><b>Must be within the specified range (if any).</b></html>");
 		container.add(heightPanel);
 		heightBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
@@ -71,25 +69,10 @@ public class SpecsPanel extends JPanel {
 		heightBar.setPreferredSize(new Dimension(100, 16));
 		heightPanel.add(heightBar, BorderLayout.CENTER);
 
-		// window count for the selected building
-
-		windowPanel = new JPanel(new BorderLayout());
-		windowPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Number of windows", TitledBorder.LEADING, TitledBorder.TOP));
-		windowPanel.setToolTipText("<html>The number of windows of the selected building<br><b>Must be within the specified range (if any).</b></html>");
-		container.add(windowPanel);
-		windowBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		windowBar.setUnit("");
-		windowBar.setUnitPrefix(false);
-		windowBar.setVerticalLineRepresentation(false);
-		windowBar.setDecimalDigits(0);
-		windowBar.setToolTipText(windowPanel.getToolTipText());
-		windowBar.setPreferredSize(new Dimension(100, 16));
-		windowPanel.add(windowBar, BorderLayout.CENTER);
-
 		// window-to-floor area ratio for the selected building
 
 		windowToFloorPanel = new JPanel(new BorderLayout());
-		windowToFloorPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Window/floor area ratio", TitledBorder.LEADING, TitledBorder.TOP));
+		windowToFloorPanel.setBorder(EnergyPanel.createTitledBorder("Window/floor area ratio", true));
 		windowToFloorPanel.setToolTipText("<html>The window to floor area ratio of the selected building<br><b>Must be within the specified range (if any).</b></html>");
 		container.add(windowToFloorPanel);
 		windowToFloorBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
@@ -101,20 +84,50 @@ public class SpecsPanel extends JPanel {
 		windowToFloorBar.setPreferredSize(new Dimension(100, 16));
 		windowToFloorPanel.add(windowToFloorBar, BorderLayout.CENTER);
 
+		// window count for the selected building
+
+		windowCountPanel = new JPanel(new BorderLayout());
+		windowCountPanel.setBorder(EnergyPanel.createTitledBorder("Number of windows", true));
+		windowCountPanel.setToolTipText("<html>The number of windows of the selected building<br><b>Must be within the specified range (if any).</b></html>");
+		container.add(windowCountPanel);
+		windowCountBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		windowCountBar.setUnit("");
+		windowCountBar.setUnitPrefix(false);
+		windowCountBar.setVerticalLineRepresentation(false);
+		windowCountBar.setDecimalDigits(0);
+		windowCountBar.setToolTipText(windowCountPanel.getToolTipText());
+		windowCountBar.setPreferredSize(new Dimension(100, 16));
+		windowCountPanel.add(windowCountBar, BorderLayout.CENTER);
+
+		// wall count for the selected building
+
+		wallCountPanel = new JPanel(new BorderLayout());
+		wallCountPanel.setBorder(EnergyPanel.createTitledBorder("Number of walls", true));
+		wallCountPanel.setToolTipText("<html>The number of walls of the selected building<br><b>Must be within the specified range (if any).</b></html>");
+		container.add(wallCountPanel);
+		wallCountBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		wallCountBar.setUnit("");
+		wallCountBar.setUnitPrefix(false);
+		wallCountBar.setVerticalLineRepresentation(false);
+		wallCountBar.setDecimalDigits(0);
+		wallCountBar.setToolTipText(wallCountPanel.getToolTipText());
+		wallCountBar.setPreferredSize(new Dimension(100, 16));
+		wallCountPanel.add(wallCountBar, BorderLayout.CENTER);
+
 		// solar panel count for the selected building
 
-		solarPanelPanel = new JPanel(new BorderLayout());
-		solarPanelPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Number of solar panels", TitledBorder.LEADING, TitledBorder.TOP));
-		solarPanelPanel.setToolTipText("<html>The number of solar panels of the selected building<br><b>Must be within the specified range (if any).</b></html>");
-		container.add(solarPanelPanel);
-		solarPanelBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		solarPanelBar.setUnit("");
-		solarPanelBar.setUnitPrefix(false);
-		solarPanelBar.setVerticalLineRepresentation(false);
-		solarPanelBar.setDecimalDigits(0);
-		solarPanelBar.setToolTipText(solarPanelPanel.getToolTipText());
-		solarPanelBar.setPreferredSize(new Dimension(100, 16));
-		solarPanelPanel.add(solarPanelBar, BorderLayout.CENTER);
+		solarPanelCountPanel = new JPanel(new BorderLayout());
+		solarPanelCountPanel.setBorder(EnergyPanel.createTitledBorder("Number of solar panels", true));
+		solarPanelCountPanel.setToolTipText("<html>The number of solar panels of the selected building<br><b>Must be within the specified range (if any).</b></html>");
+		container.add(solarPanelCountPanel);
+		solarPanelCountBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		solarPanelCountBar.setUnit("");
+		solarPanelCountBar.setUnitPrefix(false);
+		solarPanelCountBar.setVerticalLineRepresentation(false);
+		solarPanelCountBar.setDecimalDigits(0);
+		solarPanelCountBar.setToolTipText(solarPanelCountPanel.getToolTipText());
+		solarPanelCountBar.setPreferredSize(new Dimension(100, 16));
+		solarPanelCountPanel.add(solarPanelCountBar, BorderLayout.CENTER);
 
 	}
 
@@ -133,8 +146,9 @@ public class SpecsPanel extends JPanel {
 				break;
 			}
 			windowToFloorBar.setValue((float) b.getWindowToFloorRatio());
-			solarPanelBar.setValue(b.getSolarPanelCount());
-			windowBar.setValue(b.getWindowCount());
+			solarPanelCountBar.setValue(b.getSolarPanelCount());
+			windowCountBar.setValue(b.getWindowCount());
+			wallCountBar.setValue(b.getWallCount());
 		} else {
 			clear();
 		}
@@ -144,8 +158,9 @@ public class SpecsPanel extends JPanel {
 		heightBar.setValue(0);
 		areaBar.setValue(0);
 		windowToFloorBar.setValue(0);
-		solarPanelBar.setValue(0);
-		windowBar.setValue(0);
+		solarPanelCountBar.setValue(0);
+		windowCountBar.setValue(0);
+		wallCountBar.setValue(0);
 	}
 
 	public void updateArea() {
@@ -214,11 +229,34 @@ public class SpecsPanel extends JPanel {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of solar panels";
 		if (specs.isSolarPanelEnabled())
-			t += " (<" +specs.getMaximumNumberOfSolarPanels() + ")";
-		solarPanelBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
-		solarPanelPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-		solarPanelBar.setEnabled(specs.isSolarPanelEnabled());
-		solarPanelBar.repaint();
+			t += " (<" + specs.getMaximumNumberOfSolarPanels() + ")";
+		solarPanelCountBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
+		solarPanelCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		solarPanelCountBar.setEnabled(specs.isSolarPanelEnabled());
+		solarPanelCountBar.repaint();
+	}
+
+	public void updateWindow() {
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		String t = "Number of windows";
+		if (specs.isWindowEnabled())
+			t += " (<" + specs.getMaximumNumberOfWindows() + ")";
+		windowCountBar.setMaximum(specs.getMaximumNumberOfWindows());
+		windowCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		windowCountBar.setEnabled(specs.isWindowEnabled());
+		windowCountBar.repaint();
+	}
+
+	public void updateWall() {
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		String t = "Number of walls";
+		if (specs.isWallEnabled())
+			t += " (" + specs.getMinimumNumberOfWalls() + " - " + specs.getMaximumNumberOfWalls() + ")";
+		wallCountBar.setMinimum(specs.getMinimumNumberOfWalls());
+		wallCountBar.setMaximum(specs.getMaximumNumberOfWalls());
+		wallCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		wallCountBar.setEnabled(specs.isWallEnabled());
+		wallCountBar.repaint();
 	}
 
 }

@@ -13,8 +13,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.HierarchyBoundsAdapter;
-import java.awt.event.HierarchyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
@@ -122,7 +120,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
-	private SpecsPanel specsPanel;
+	private BasicsPanel basicsPanel;
 	private ConstructionCostGraph constructionCostGraph;
 	private DailyEnergyGraph dailyEnergyGraph;
 	private JTabbedPane graphTabbedPane;
@@ -154,14 +152,6 @@ public class EnergyPanel extends JPanel {
 
 		dateSpinner = createSpinner(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
 		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
-		dateSpinner.addHierarchyBoundsListener(new HierarchyBoundsAdapter() {
-			@Override
-			public void ancestorResized(final HierarchyEvent e) {
-				dateSpinner.setMinimumSize(dateSpinner.getPreferredSize());
-				dateSpinner.setPreferredSize(dateSpinner.getPreferredSize());
-				dateSpinner.removeHierarchyBoundsListener(this);
-			}
-		});
 		dateSpinner.addChangeListener(new ChangeListener() {
 			boolean firstCall = true;
 
@@ -180,6 +170,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 					updateThermostat();
+					EnergyPanel.this.validate();
 				}
 			}
 		});
@@ -351,9 +342,10 @@ public class EnergyPanel extends JPanel {
 
 		// thermostat for the selected building
 
-		thermostatPanel = new JPanel(new BorderLayout(5, 0));
+		thermostatPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
 		thermostatPanel.add(createLabel(" Thermostat: "), BorderLayout.WEST);
 		thermostatTemperatureField = createTextField();
+		thermostatTemperatureField.setPreferredSize(new Dimension(72, sunshineHoursField.getPreferredSize().height));
 		thermostatTemperatureField.setEnabled(false);
 		thermostatTemperatureField.setBackground(Color.WHITE);
 		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
@@ -400,9 +392,9 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(graphTabbedPane);
 		dataPanel.add(Box.createVerticalGlue());
 
-		// design specs panel
-		specsPanel = new SpecsPanel();
-		graphTabbedPane.add("Geometry", specsPanel);
+		// basics panel
+		basicsPanel = new BasicsPanel();
+		graphTabbedPane.add("Basics", basicsPanel);
 
 		// construction cost graph
 		constructionCostGraph = new ConstructionCostGraph();
@@ -614,8 +606,8 @@ public class EnergyPanel extends JPanel {
 		return latitudeSpinner;
 	}
 
-	public SpecsPanel getSpecsPanel() {
-		return specsPanel;
+	public BasicsPanel getBasicsPanel() {
+		return basicsPanel;
 	}
 
 	public ConstructionCostGraph getConstructionCostGraph() {
@@ -777,7 +769,7 @@ public class EnergyPanel extends JPanel {
 			selectedBuilding = selectedPart.getTopContainer();
 
 		if (selectedBuilding != null) {
-			specsPanel.update(selectedBuilding);
+			basicsPanel.update(selectedBuilding);
 			final Calendar c = Heliodon.getInstance().getCalender();
 			int temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 			switch (Scene.getInstance().getUnit()) {
@@ -795,14 +787,14 @@ public class EnergyPanel extends JPanel {
 			int i2 = s2.indexOf(')');
 			((TitledBorder) buildingPanel.getBorder()).setTitle("Building #" + s2.substring(i1 + 1, i2));
 		} else {
-			specsPanel.clear();
+			basicsPanel.clear();
 			thermostatTemperatureField.setText(null);
 			thermostatPanel.remove(adjustThermostatButton);
 			((TitledBorder) buildingPanel.getBorder()).setTitle("Building");
 		}
 		buildingPanel.repaint();
 
-		specsPanel.repaint();
+		basicsPanel.repaint();
 
 	}
 
@@ -831,10 +823,12 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void update() {
-		specsPanel.updateArea();
-		specsPanel.updateHeight();
-		specsPanel.updateWindowToFloorRatio();
-		specsPanel.updateSolarPanel();
+		basicsPanel.updateArea();
+		basicsPanel.updateHeight();
+		basicsPanel.updateWindowToFloorRatio();
+		basicsPanel.updateSolarPanel();
+		basicsPanel.updateWindow();
+		basicsPanel.updateWall();
 		updateProperties();
 	}
 

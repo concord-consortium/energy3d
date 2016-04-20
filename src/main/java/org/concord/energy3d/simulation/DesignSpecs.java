@@ -15,7 +15,9 @@ public class DesignSpecs implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private boolean budgetEnabled = true;
+	private boolean budgetEnabled = false;
+	private boolean windowEnabled = false;
+	private boolean wallEnabled = false;
 	private boolean solarPanelEnabled = false;
 	private boolean windowToFloorRatioEnabled = false;
 	private boolean heightEnabled = false;
@@ -23,6 +25,9 @@ public class DesignSpecs implements Serializable {
 
 	private int maximumBudget = 200000;
 	private int maximumNumberOfSolarPanels = 50;
+	private int maximumNumberOfWindows = 20;
+	private int minimumNumberOfWalls = 4;
+	private int maximumNumberOfWalls = 10;
 	private double minimumWindowToFloorRatio = 0.15;
 	private double maximumWindowToFloorRatio = 0.25;
 	private double minimumHeight = 8;
@@ -32,6 +37,8 @@ public class DesignSpecs implements Serializable {
 
 	public DesignSpecs() {
 	}
+
+	// budget
 
 	public void setBudgetEnabled(boolean budgetEnabled) {
 		this.budgetEnabled = budgetEnabled;
@@ -59,11 +66,41 @@ public class DesignSpecs implements Serializable {
 		return maximumBudget;
 	}
 
+	// number of windows
+
+	public void setMaximumNumberOfWindowsEnabled(boolean windowEnabled) {
+		this.windowEnabled = windowEnabled;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getBasicsPanel().updateWindow();
+			}
+		});
+	}
+
+	public boolean isWindowEnabled() {
+		return windowEnabled;
+	}
+
+	public void setMaximumNumberOfWindows(int maximumNumberOfWindows) {
+		this.maximumNumberOfWindows = maximumNumberOfWindows;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getBasicsPanel().updateWindow();
+			}
+		});
+	}
+
+	public int getMaximumNumberOfWindows() {
+		return maximumNumberOfWindows;
+	}
+
+	// number of solar panels
+
 	public void setMaximumNumberOfSolarPanelsEnabled(boolean solarPanelEnabled) {
 		this.solarPanelEnabled = solarPanelEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateSolarPanel();
+				EnergyPanel.getInstance().getBasicsPanel().updateSolarPanel();
 			}
 		});
 	}
@@ -76,7 +113,7 @@ public class DesignSpecs implements Serializable {
 		this.maximumNumberOfSolarPanels = maximumNumberOfSolarPanels;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateSolarPanel();
+				EnergyPanel.getInstance().getBasicsPanel().updateSolarPanel();
 			}
 		});
 	}
@@ -85,11 +122,13 @@ public class DesignSpecs implements Serializable {
 		return maximumNumberOfSolarPanels;
 	}
 
+	// window-to-floor ratio
+
 	public void setWindowToFloorRatioEnabled(boolean windowToFloorRatioEnabled) {
 		this.windowToFloorRatioEnabled = windowToFloorRatioEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateWindowToFloorRatio();
+				EnergyPanel.getInstance().getBasicsPanel().updateWindowToFloorRatio();
 			}
 		});
 	}
@@ -102,7 +141,7 @@ public class DesignSpecs implements Serializable {
 		this.minimumWindowToFloorRatio = minimumWindowToFloorRatio;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateWindowToFloorRatio();
+				EnergyPanel.getInstance().getBasicsPanel().updateWindowToFloorRatio();
 			}
 		});
 	}
@@ -115,7 +154,7 @@ public class DesignSpecs implements Serializable {
 		this.maximumWindowToFloorRatio = maximumWindowToFloorRatio;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateWindowToFloorRatio();
+				EnergyPanel.getInstance().getBasicsPanel().updateWindowToFloorRatio();
 			}
 		});
 	}
@@ -124,11 +163,13 @@ public class DesignSpecs implements Serializable {
 		return maximumWindowToFloorRatio;
 	}
 
+	// height
+
 	public void setHeightEnabled(boolean heightEnabled) {
 		this.heightEnabled = heightEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateHeight();
+				EnergyPanel.getInstance().getBasicsPanel().updateHeight();
 			}
 		});
 	}
@@ -141,7 +182,7 @@ public class DesignSpecs implements Serializable {
 		this.maximumHeight = maximumHeight;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateHeight();
+				EnergyPanel.getInstance().getBasicsPanel().updateHeight();
 			}
 		});
 	}
@@ -154,7 +195,7 @@ public class DesignSpecs implements Serializable {
 		this.minimumHeight = minimumHeight;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateHeight();
+				EnergyPanel.getInstance().getBasicsPanel().updateHeight();
 			}
 		});
 	}
@@ -163,11 +204,13 @@ public class DesignSpecs implements Serializable {
 		return minimumHeight;
 	}
 
+	// area
+
 	public void setAreaEnabled(boolean areaEnabled) {
 		this.areaEnabled = areaEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateArea();
+				EnergyPanel.getInstance().getBasicsPanel().updateArea();
 			}
 		});
 	}
@@ -180,7 +223,7 @@ public class DesignSpecs implements Serializable {
 		this.maximumArea = maximumArea;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateArea();
+				EnergyPanel.getInstance().getBasicsPanel().updateArea();
 			}
 		});
 	}
@@ -193,13 +236,54 @@ public class DesignSpecs implements Serializable {
 		this.minimumArea = minimumArea;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				EnergyPanel.getInstance().getSpecsPanel().updateArea();
+				EnergyPanel.getInstance().getBasicsPanel().updateArea();
 			}
 		});
 	}
 
 	public double getMinimumArea() {
 		return minimumArea;
+	}
+
+	// wall
+
+	public void setWallEnabled(boolean wallEnabled) {
+		this.wallEnabled = wallEnabled;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getBasicsPanel().updateWall();
+			}
+		});
+	}
+
+	public boolean isWallEnabled() {
+		return wallEnabled;
+	}
+
+	public void setMaximumNumberOfWalls(int maximumNumberOfWalls) {
+		this.maximumNumberOfWalls = maximumNumberOfWalls;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getBasicsPanel().updateWall();
+			}
+		});
+	}
+
+	public int getMaximumNumberOfWalls() {
+		return maximumNumberOfWalls;
+	}
+
+	public void setMinimumNumberOfWalls(int minimumNumberOfWalls) {
+		this.minimumNumberOfWalls = minimumNumberOfWalls;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getBasicsPanel().updateWall();
+			}
+		});
+	}
+
+	public int getMinimumNumberOfWalls() {
+		return minimumNumberOfWalls;
 	}
 
 }

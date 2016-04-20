@@ -195,6 +195,10 @@ public class Building {
 		return solarPanels.size();
 	}
 
+	public int getWallCount() {
+		return walls.size();
+	}
+
 	public int getWindowCount() {
 		return windows.size();
 	}
