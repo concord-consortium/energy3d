@@ -1138,7 +1138,7 @@ public abstract class HousePart implements Serializable {
 	protected ReadOnlyVector3 computeNormalAndKeepOnRoof() {
 		if (container == null)
 			return null;
-		ReadOnlyVector3 normal = Vector3.UNIT_Z;
+		ReadOnlyVector3 n = Vector3.UNIT_Z;
 		if (container instanceof Roof) {
 			final int[] editPointToRoofIndex = new int[points.size()];
 			for (int i = 0; i < points.size(); i++) {
@@ -1175,11 +1175,11 @@ public abstract class HousePart implements Serializable {
 							containerRoofIndex = roofIndex;
 						}
 				}
-				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
+				n = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
 			}
 		} else
-			normal = container.getNormal();
-		return normal;
+			n = container.getNormal();
+		return n;
 	}
 
 	protected boolean fits(final HousePart child) {

@@ -23,8 +23,6 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,9 +51,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -469,7 +465,7 @@ public class MainFrame extends JFrame {
 														updateTitleBar();
 														fileChooser.rememberFile(rf.getPath());
 													} catch (final Throwable err) {
-														showUnexpectedErrorMessage(err);
+														Util.reportError(err);
 													}
 												}
 											}.start();
@@ -582,7 +578,7 @@ public class MainFrame extends JFrame {
 									SceneManager.getInstance().getCameraControl().reset();
 									updateTitleBar();
 								} catch (final Throwable err) {
-									showUnexpectedErrorMessage(err);
+									Util.reportError(err);
 								}
 							}
 						}.start();
@@ -639,7 +635,7 @@ public class MainFrame extends JFrame {
 						Scene.open(file.toURI().toURL());
 						fileChooser.rememberFile(file.getPath());
 					} catch (final Throwable err) {
-						showUnexpectedErrorMessage(err);
+						Util.reportError(err);
 					}
 				}
 			}.start();
@@ -1467,31 +1463,32 @@ public class MainFrame extends JFrame {
 			editMenu = new JMenu("Edit");
 			editMenu.addMenuListener(new MenuListener() {
 
-				private void enableMenuItems(boolean b) {
-					cutMenuItem.setEnabled(b);
-					copyMenuItem.setEnabled(b);
-					pasteMenuItem.setEnabled(b);
-					lockAllMenuItem.setEnabled(b);
-					removeAllLocksMenuItem.setEnabled(b);
-					specificationsMenuItem.setEnabled(b);
+				private void enableMenuItems() {
+					cutMenuItem.setEnabled(true);
+					copyMenuItem.setEnabled(true);
+					pasteMenuItem.setEnabled(true);
+					lockAllMenuItem.setEnabled(true);
+					removeAllLocksMenuItem.setEnabled(true);
+					specificationsMenuItem.setEnabled(true);
+					autoRecomputeEnergyMenuItem.setEnabled(true);
 				}
 
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 					// enable the cut-copy-paste menu items when the menu disappears, otherwise the keystrokes will be disabled with the menu items
-					enableMenuItems(true);
+					enableMenuItems();
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
 					// enable the cut-copy-paste menu items when the menu disappears, otherwise the keystrokes will be disabled with the menu items
-					enableMenuItems(true);
+					enableMenuItems();
 				}
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					enableMenuItems(true);
+					enableMenuItems();
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					cutMenuItem.setEnabled(selectedPart != null);
 					copyMenuItem.setEnabled(selectedPart != null && selectedPart.isCopyable());
@@ -1503,6 +1500,7 @@ public class MainFrame extends JFrame {
 						lockAllMenuItem.setEnabled(false);
 						removeAllLocksMenuItem.setEnabled(false);
 						specificationsMenuItem.setEnabled(false);
+						autoRecomputeEnergyMenuItem.setEnabled(false);
 					}
 				}
 			});
@@ -1915,16 +1913,6 @@ public class MainFrame extends JFrame {
 		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
 	}
 
-	public void showUnexpectedErrorMessage(final Throwable err) {
-		err.printStackTrace();
-		final StringWriter sw = new StringWriter();
-		err.printStackTrace(new PrintWriter(sw));
-		final String exceptionAsString = sw.toString();
-		final JTextArea textArea = new JTextArea(exceptionAsString);
-		final JScrollPane scrollPane = new JScrollPane(textArea);
-		JOptionPane.showMessageDialog(this, scrollPane, "Error", JOptionPane.ERROR_MESSAGE);
-	}
-
 	public void open(final String filename) {
 		try {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -1936,7 +1924,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 		} catch (final Throwable e) {
-			showUnexpectedErrorMessage(e);
+			Util.reportError(e);
 		}
 	}
 

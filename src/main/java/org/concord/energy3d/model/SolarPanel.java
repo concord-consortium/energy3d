@@ -96,7 +96,7 @@ public class SolarPanel extends HousePart {
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0.05), WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.1);
+		surround.setData(new Vector3(0, 0, 0.5), WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -230,7 +230,7 @@ public class SolarPanel extends HousePart {
 	public HousePart copy(final boolean check) {
 		final SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {
-			c.computeNormalAndKeepOnRoof();
+			normal = c.computeNormalAndKeepOnRoof();
 			if (container instanceof Roof) {
 				if (normal == null) {
 					// don't remove this error message just in case this happens again

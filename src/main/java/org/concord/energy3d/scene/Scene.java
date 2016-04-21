@@ -253,6 +253,7 @@ public class Scene implements Serializable {
 		}
 
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
+
 			@Override
 			public void run() {
 				if (!Config.isApplet()) {
@@ -266,6 +267,7 @@ public class Scene implements Serializable {
 				MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 			}
+
 		});
 
 	}
@@ -579,10 +581,15 @@ public class Scene implements Serializable {
 	}
 
 	public void add(final HousePart housePart, final boolean redraw) {
-		final HousePart container = housePart.getContainer();
-		if (container != null)
-			container.getChildren().add(housePart);
-		add(housePart);
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			public Object call() {
+				final HousePart container = housePart.getContainer();
+				if (container != null)
+					container.getChildren().add(housePart);
+				add(housePart);
+				return null;
+			}
+		});
 		if (redraw)
 			redrawAll();
 	}
@@ -603,10 +610,15 @@ public class Scene implements Serializable {
 		if (housePart == null)
 			return;
 		housePart.setGridsVisible(false);
-		final HousePart container = housePart.getContainer();
-		if (container != null)
-			container.getChildren().remove(housePart);
-		removeChildren(housePart);
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			public Object call() {
+				final HousePart container = housePart.getContainer();
+				if (container != null)
+					container.getChildren().remove(housePart);
+				removeChildren(housePart);
+				return null;
+			}
+		});
 		if (redraw)
 			redrawAll();
 	}
@@ -650,11 +662,11 @@ public class Scene implements Serializable {
 	}
 
 	public void paste() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
 		if (copyBuffer == null)
 			return;
 		if (copyBuffer instanceof Foundation) // copying a foundation copies the entire building above it, which requires a different treatment elsewhere
 			return;
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final HousePart c = copyBuffer.copy(true);
 		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
 			return;

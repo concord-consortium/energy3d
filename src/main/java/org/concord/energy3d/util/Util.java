@@ -9,6 +9,8 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -19,8 +21,10 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentListener;
@@ -364,13 +368,19 @@ public class Util {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
 	}
 
-	// This is called by DesignReplay to suppress the error dialog when we
-	// replay a design process
+	// This is called by DesignReplay to suppress the error dialog when we replay a design process
 	public static boolean suppressReportError = false;
 
 	public static void reportError(final Throwable e) {
-		if (!suppressReportError)
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured! Please notify us of this problem:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		if (suppressReportError)
+			return;
+		e.printStackTrace();
+		final StringWriter sw = new StringWriter();
+		e.printStackTrace(new PrintWriter(sw));
+		final String exceptionAsString = sw.toString();
+		final JTextArea textArea = new JTextArea(exceptionAsString);
+		final JScrollPane scrollPane = new JScrollPane(textArea);
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), scrollPane, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
 	public final static void openBrowser(final String url) {
