@@ -91,7 +91,7 @@ class ColorBar extends JPanel {
 			} else {
 				g2.setColor(getForeground());
 			}
-			double max = maximum + (Double.isNaN(minimum) ? 0 : minimum);
+			double max = maximum + (Double.isNaN(minimum) ? 0 : (minimum == 0 ? 0.1 * maximum : minimum));
 			g2.fillRect(1, 1, (int) Math.round(value * width / max), height);
 			if (verticalLineRepresentation) {
 				g2.setColor(Color.RED);

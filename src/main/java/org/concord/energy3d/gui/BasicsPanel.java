@@ -228,34 +228,41 @@ public class BasicsPanel extends JPanel {
 	public void updateSolarPanel() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of solar panels";
-		if (specs.isSolarPanelEnabled())
-			t += " (<" + specs.getMaximumNumberOfSolarPanels() + ")";
+		if (specs.isNumberOfSolarPanelsEnabled())
+			t += " (" + specs.getMinimumNumberOfSolarPanels() + " - " + specs.getMaximumNumberOfSolarPanels() + ")";
+		solarPanelCountBar.setMinimum(specs.getMinimumNumberOfSolarPanels());
 		solarPanelCountBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
 		solarPanelCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-		solarPanelCountBar.setEnabled(specs.isSolarPanelEnabled());
+		solarPanelCountBar.setEnabled(specs.isNumberOfSolarPanelsEnabled());
 		solarPanelCountBar.repaint();
 	}
 
 	public void updateWindow() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of windows";
-		if (specs.isWindowEnabled())
-			t += " (<" + specs.getMaximumNumberOfWindows() + ")";
+		if (specs.isNumberOfWindowsEnabled()) {
+			if (specs.getMinimumNumberOfWindows() == 0) {
+				t += " (<" + specs.getMaximumNumberOfWindows() + ")";
+			} else {
+				t += " (" + specs.getMinimumNumberOfWindows() + " - " + specs.getMaximumNumberOfWindows() + ")";
+			}
+		}
+		windowCountBar.setMinimum(specs.getMinimumNumberOfWindows());
 		windowCountBar.setMaximum(specs.getMaximumNumberOfWindows());
 		windowCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-		windowCountBar.setEnabled(specs.isWindowEnabled());
+		windowCountBar.setEnabled(specs.isNumberOfWindowsEnabled());
 		windowCountBar.repaint();
 	}
 
 	public void updateWall() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of walls";
-		if (specs.isWallEnabled())
+		if (specs.isNumberOfWallsEnabled())
 			t += " (" + specs.getMinimumNumberOfWalls() + " - " + specs.getMaximumNumberOfWalls() + ")";
 		wallCountBar.setMinimum(specs.getMinimumNumberOfWalls());
 		wallCountBar.setMaximum(specs.getMaximumNumberOfWalls());
 		wallCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-		wallCountBar.setEnabled(specs.isWallEnabled());
+		wallCountBar.setEnabled(specs.isNumberOfWallsEnabled());
 		wallCountBar.repaint();
 	}
 

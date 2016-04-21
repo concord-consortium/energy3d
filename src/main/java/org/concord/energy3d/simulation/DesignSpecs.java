@@ -15,23 +15,30 @@ public class DesignSpecs implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private boolean budgetEnabled = false;
-	private boolean windowEnabled = false;
-	private boolean wallEnabled = false;
-	private boolean solarPanelEnabled = false;
-	private boolean windowToFloorRatioEnabled = false;
-	private boolean heightEnabled = false;
-	private boolean areaEnabled = false;
-
+	private boolean budgetEnabled;
 	private int maximumBudget = 200000;
+
+	private boolean numberOfSolarPanelsEnabled;
+	private int minimumNumberOfSolarPanels = 0;
 	private int maximumNumberOfSolarPanels = 50;
+
+	private boolean numberOfWindowsEnabled;
+	private int minimumNumberOfWindows = 4;
 	private int maximumNumberOfWindows = 20;
+
+	private boolean numberOfWallsEnabled;
 	private int minimumNumberOfWalls = 4;
 	private int maximumNumberOfWalls = 10;
+
+	private boolean windowToFloorRatioEnabled;
 	private double minimumWindowToFloorRatio = 0.15;
 	private double maximumWindowToFloorRatio = 0.25;
+
+	private boolean heightEnabled;
 	private double minimumHeight = 8;
 	private double maximumHeight = 10;
+
+	private boolean areaEnabled;
 	private double minimumArea = 100;
 	private double maximumArea = 150;
 
@@ -68,8 +75,8 @@ public class DesignSpecs implements Serializable {
 
 	// number of windows
 
-	public void setMaximumNumberOfWindowsEnabled(boolean windowEnabled) {
-		this.windowEnabled = windowEnabled;
+	public void setNumberOfWindowsEnabled(boolean windowEnabled) {
+		this.numberOfWindowsEnabled = windowEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				EnergyPanel.getInstance().getBasicsPanel().updateWindow();
@@ -77,8 +84,21 @@ public class DesignSpecs implements Serializable {
 		});
 	}
 
-	public boolean isWindowEnabled() {
-		return windowEnabled;
+	public boolean isNumberOfWindowsEnabled() {
+		return numberOfWindowsEnabled;
+	}
+
+	public void setMinimumNumberOfWindows(int minimumNumberOfWindows) {
+		this.minimumNumberOfWindows = minimumNumberOfWindows;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getBasicsPanel().updateWindow();
+			}
+		});
+	}
+
+	public int getMinimumNumberOfWindows() {
+		return minimumNumberOfWindows;
 	}
 
 	public void setMaximumNumberOfWindows(int maximumNumberOfWindows) {
@@ -96,8 +116,8 @@ public class DesignSpecs implements Serializable {
 
 	// number of solar panels
 
-	public void setMaximumNumberOfSolarPanelsEnabled(boolean solarPanelEnabled) {
-		this.solarPanelEnabled = solarPanelEnabled;
+	public void setNumberOfSolarPanelsEnabled(boolean solarPanelEnabled) {
+		this.numberOfSolarPanelsEnabled = solarPanelEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				EnergyPanel.getInstance().getBasicsPanel().updateSolarPanel();
@@ -105,8 +125,21 @@ public class DesignSpecs implements Serializable {
 		});
 	}
 
-	public boolean isSolarPanelEnabled() {
-		return solarPanelEnabled;
+	public boolean isNumberOfSolarPanelsEnabled() {
+		return numberOfSolarPanelsEnabled;
+	}
+
+	public void setMinimumNumberOfSolarPanels(int minimumNumberOfSolarPanels) {
+		this.minimumNumberOfSolarPanels = minimumNumberOfSolarPanels;
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().getBasicsPanel().updateSolarPanel();
+			}
+		});
+	}
+
+	public int getMinimumNumberOfSolarPanels() {
+		return minimumNumberOfSolarPanels;
 	}
 
 	public void setMaximumNumberOfSolarPanels(int maximumNumberOfSolarPanels) {
@@ -247,8 +280,8 @@ public class DesignSpecs implements Serializable {
 
 	// wall
 
-	public void setWallEnabled(boolean wallEnabled) {
-		this.wallEnabled = wallEnabled;
+	public void setNumberOfWallsEnabled(boolean wallEnabled) {
+		this.numberOfWallsEnabled = wallEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				EnergyPanel.getInstance().getBasicsPanel().updateWall();
@@ -256,8 +289,8 @@ public class DesignSpecs implements Serializable {
 		});
 	}
 
-	public boolean isWallEnabled() {
-		return wallEnabled;
+	public boolean isNumberOfWallsEnabled() {
+		return numberOfWallsEnabled;
 	}
 
 	public void setMaximumNumberOfWalls(int maximumNumberOfWalls) {
