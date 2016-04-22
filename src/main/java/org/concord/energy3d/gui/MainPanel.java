@@ -32,6 +32,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Tree;
@@ -128,7 +129,7 @@ public class MainPanel extends JPanel {
 
 	private MainPanel() {
 		super();
-		System.out.println("Version: " + Config.VERSION);
+		System.out.println("Version: " + MainApplication.VERSION);
 		System.out.print("Initiating GUI Panel...");
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);

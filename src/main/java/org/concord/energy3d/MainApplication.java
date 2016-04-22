@@ -20,6 +20,8 @@ import com.threerings.getdown.launcher.GetdownApp;
 
 public class MainApplication {
 
+	public static final String VERSION = "5.2.2";
+
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
 	private static ArrayList<Runnable> shutdownHooks;

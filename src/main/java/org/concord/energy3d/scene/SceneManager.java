@@ -10,6 +10,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -705,6 +706,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
 						mouseRightClicked(e.getX(), cp.getHeight() - e.getY());
 					}
+				}
+			});
+
+			((Component) canvas).addMouseMotionListener(new MouseMotionAdapter() {
+				@Override
+				public void mouseDragged(final MouseEvent e) {
+					EnergyPanel.getInstance().update();
 				}
 			});
 

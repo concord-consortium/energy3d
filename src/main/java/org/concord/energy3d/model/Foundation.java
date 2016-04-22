@@ -836,7 +836,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	double getBoundingHeight() {
-		return boundingHeight;
+		// return boundingHeight; // do not just return the boundingHeight because it may represent a previous value
+		return scanChildrenHeight(this) - height;
 	}
 
 	public double getPassiveSolarNow() {

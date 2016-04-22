@@ -53,6 +53,7 @@ public abstract class Graph extends JPanel {
 
 	DecimalFormat oneDecimals = new DecimalFormat();
 	DecimalFormat twoDecimals = new DecimalFormat();
+	DecimalFormat fiveDecimals = new DecimalFormat();
 	int top = 50, right = 50, bottom = 80, left = 90;
 	BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	BasicStroke thin = new BasicStroke(1);
@@ -100,6 +101,7 @@ public abstract class Graph extends JPanel {
 		hideData("Windows", true);
 		oneDecimals.setMaximumFractionDigits(1);
 		twoDecimals.setMaximumFractionDigits(2);
+		fiveDecimals.setMaximumFractionDigits(5);
 
 		popupMenu = new JPopupMenu();
 		popupMenu.setInvoker(this);

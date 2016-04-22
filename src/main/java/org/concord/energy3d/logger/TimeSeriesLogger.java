@@ -433,8 +433,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					AnnualSensorData asd = (AnnualSensorData) analysisRequesterCopy;
 					line += "{\"Months\": " + asd.getNumberOfDataPoints() + "}";
 				} else if (analysisRequesterCopy instanceof DailySensorData) {
-					DailySensorData asd = (DailySensorData) analysisRequesterCopy;
-					line += "{\"Hours\": " + asd.getNumberOfDataPoints() + "}";
+					line += analysisRequesterCopy.toString();
 				} else {
 					if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
 						line += "{";
@@ -443,58 +442,40 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 							EnergyDailyAnalysis eda = (EnergyDailyAnalysis) analysisRequesterCopy;
 							if (analyzedPart instanceof Foundation) {
 								line += "\"Building\": " + analyzedPart.getId();
-								String name = "Net";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
-								name = "AC";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
-								name = "Heater";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
-								name = "Windows";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
-								name = "Solar Panels";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+								for (String name : names) {
+									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								}
 							} else {
 								line += "\"Part\": \"" + part + "\"";
-								String name = "Solar";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
-								name = "Heat Gain";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								String[] names = { "Solar", "Heat Gain" };
+								for (String name : names) {
+									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
+								}
 							}
 						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
 							DailyEnergyGraph deg = (DailyEnergyGraph) analysisRequesterCopy;
 							Foundation foundation = deg.getBuilding();
 							line += "\"Building\": " + foundation.getId();
-							String name = "Net";
-							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
-							name = "AC";
-							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
-							name = "Heater";
-							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
-							name = "Windows";
-							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
-							name = "Solar Panels";
-							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
+							String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+							for (String name : names) {
+								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
+							}
 						} else if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
 							EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
 							line += "\"Months\": " + eaa.getNumberOfDataPoints();
 							if (analyzedPart instanceof Foundation) {
 								line += ", \"Building\": " + analyzedPart.getId();
-								String name = "Net";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
-								name = "AC";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
-								name = "Heater";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
-								name = "Windows";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
-								name = "Solar Panels";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+								for (String name : names) {
+									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								}
 							} else {
 								line += ", \"Part\": \"" + part + "\"";
-								String name = "Solar";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
-								name = "Heat Gain";
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								String[] names = { "Solar", "Heat Gain" };
+								for (String name : names) {
+									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
+								}
 							}
 						} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
 							line += "\"Building\": " + LoggerUtil.getBuildingId(analyzedPart);

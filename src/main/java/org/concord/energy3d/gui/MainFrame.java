@@ -290,7 +290,7 @@ public class MainFrame extends JFrame {
 	private void initialize() {
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setTitle("Energy3D V" + Config.VERSION);
+		setTitle("Energy3D V" + MainApplication.VERSION);
 
 		setJMenuBar(getAppMenuBar());
 		setContentPane(getMainPanel());
@@ -779,9 +779,9 @@ public class MainFrame extends JFrame {
 	public void updateTitleBar() {
 		final String star = Scene.getInstance().isEdited() ? "*" : "";
 		if (Scene.getURL() == null)
-			setTitle("Energy3D V" + Config.VERSION + star);
+			setTitle("Energy3D V" + MainApplication.VERSION + star);
 		else
-			setTitle("Energy3D V" + Config.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
+			setTitle("Energy3D V" + MainApplication.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
 	}
 
 	private JMenuItem getSaveMenuItem() {
@@ -973,7 +973,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable future</i></h3><br>Version: " + Config.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Intelligent Learning Technology Laboratory, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, and 1512868.</html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable future</i></h3><br>Version: " + MainApplication.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Intelligent Learning Technology Laboratory, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, and 1512868.</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
 				@Override
