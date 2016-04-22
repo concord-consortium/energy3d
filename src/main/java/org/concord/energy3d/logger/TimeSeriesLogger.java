@@ -17,6 +17,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.gui.DailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.MyPlainDocument;
@@ -412,10 +413,11 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 		}
 
-		String line = "\"File\": \"" + filename + "\"";
+		String line = "";
 		if (Scene.getInstance().getProjectName() != null && !Scene.getInstance().getProjectName().trim().equals("")) {
-			line += separator + "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"";
+			line += "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"" + separator;
 		}
+		line += "\"File\": \"" + filename + "\"";
 
 		analysisRequester = SceneManager.getInstance().getAnalysisRequester();
 		if (analysisRequester != null) {
@@ -458,6 +460,20 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 								name = "Heat Gain";
 								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
 							}
+						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
+							DailyEnergyGraph deg = (DailyEnergyGraph) analysisRequesterCopy;
+							Foundation foundation = deg.getBuilding();
+							line += "\"Building\": " + foundation.getId();
+							String name = "Net";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
+							name = "AC";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
+							name = "Heater";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
+							name = "Windows";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
+							name = "Solar Panels";
+							line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
 						} else if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
 							EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
 							line += "\"Months\": " + eaa.getNumberOfDataPoints();

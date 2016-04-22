@@ -278,7 +278,7 @@ public abstract class Graph extends JPanel {
 		return data.get(name);
 	}
 
-	double getSum(String name) {
+	public double getSum(String name) {
 		List<Double> x = getData(name);
 		if (x == null || x.isEmpty())
 			return 0;

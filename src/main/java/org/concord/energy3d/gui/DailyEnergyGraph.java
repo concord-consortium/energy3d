@@ -60,11 +60,14 @@ public class DailyEnergyGraph extends JPanel {
 		return building;
 	}
 
+	public double getResult(final String name) {
+		return graph.getSum(name);
+	}
+
 	public void removeGraph() {
 		remove(graph);
 		repaint();
 		EnergyPanel.getInstance().validate();
-		building = null;
 	}
 
 	public boolean hasGraph() {

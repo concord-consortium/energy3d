@@ -546,7 +546,7 @@ public class Scene implements Serializable {
 				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
 				instance.calendar.setTime(Heliodon.getInstance().getCalender().getTime());
-				instance.latitude = EnergyPanel.getInstance().getLatitude();
+				instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();

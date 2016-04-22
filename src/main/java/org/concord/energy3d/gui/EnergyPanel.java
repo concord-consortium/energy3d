@@ -201,16 +201,8 @@ public class EnergyPanel extends JPanel {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
 				} else {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
-					final Integer newLatitude = LocationData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).intValue();
-					if (newLatitude.equals(latitudeSpinner.getValue()))
-						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					else {
-						setLatitude(newLatitude);
-						Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
-						compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					}
-					if (LocationData.getInstance().getSunshineHours().get(city) == null)
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No sunshine data is found for " + city + ".\nSolar radiation will be overestimated.", "Warning", JOptionPane.WARNING_MESSAGE);
+					setLatitude((int) LocationData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).floatValue());
+					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				}
 				Scene.getInstance().setCity(city);
 				Scene.getInstance().setTreeLeaves();
@@ -492,6 +484,7 @@ public class EnergyPanel extends JPanel {
 						try {
 							final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
 							if (doCompute) {
+								SceneManager.getInstance().setAnalysisRequester(dailyEnergyGraph);
 								alreadyRenderedHeatmap = true;
 								computeNow();
 								if (!cancel) {
@@ -513,12 +506,13 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								progress(0);
 								if (SceneManager.getInstance().getSolarHeatMap()) {
-									EnergyPanel.getInstance().getGraphTabbedPane().setSelectedComponent(EnergyPanel.getInstance().getDailyEnergyGraph());
+									graphTabbedPane.setSelectedComponent(dailyEnergyGraph);
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
 										dailyEnergyGraph.addGraph((Foundation) p);
 									}
 								}
+								SceneManager.getInstance().setAnalysisRequester(null);
 							}
 						});
 					} while (computeRequest);
@@ -640,10 +634,7 @@ public class EnergyPanel extends JPanel {
 
 	public void setLatitude(final int latitude) {
 		Util.setSilently(latitudeSpinner, latitude);
-	}
-
-	public int getLatitude() {
-		return (Integer) latitudeSpinner.getValue();
+		Heliodon.getInstance().setLatitude(Math.toRadians(latitude));
 	}
 
 	public JSlider getColorMapSlider() {

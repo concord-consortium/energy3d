@@ -207,6 +207,8 @@ public class Building {
 		if (wallComplete)
 			return false;
 		final int n = wallVertices.size();
+		if (n == 0)
+			return false;
 		if (init) {
 			if (wallPath == null)
 				wallPath = new Path2D.Double();

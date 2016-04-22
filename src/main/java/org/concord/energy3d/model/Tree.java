@@ -3,7 +3,6 @@ package org.concord.energy3d.model;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
@@ -281,7 +280,7 @@ public class Tree extends HousePart {
 			return false;
 		Calendar c = Heliodon.getInstance().getCalender();
 		int year = c.get(Calendar.YEAR);
-		if (EnergyPanel.getInstance().getLatitude() > 0) {
+		if (Heliodon.getInstance().getLatitude() > 0) {
 			leaf_grow_northern_hemisphere.set(Calendar.YEAR, year); // make sure that the year is the same
 			leaf_shed_northern_hemisphere.set(Calendar.YEAR, year);
 			return !(c.before(leaf_shed_northern_hemisphere) && c.after(leaf_grow_northern_hemisphere));
