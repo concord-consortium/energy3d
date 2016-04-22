@@ -240,23 +240,14 @@ public class Util {
 		else if (limitToLineSegment && t > 1.0)
 			return p2.clone();
 		else
-			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t
-																		// * (w
-																		// - v);
+			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
 	}
 
 	public static double projectPointOnLineScale(final ReadOnlyVector2 point, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2) {
 		final double l2 = p1.distanceSquared(p2);
 		if (l2 == 0.0)
 			return 0.0;
-		final double t = point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p
-																					// -
-																					// v,
-																					// w
-																					// -
-																					// v)
-																					// /
-																					// l2;
+		final double t = point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p - v, w - v) / l2;
 		return t;
 	}
 
@@ -273,9 +264,7 @@ public class Util {
 		else if (limitToLineSegment && t > 1.0)
 			return p2.clone();
 		else
-			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t
-																		// * (w
-																		// - v);
+			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
 	}
 
 	/*
@@ -570,12 +559,9 @@ public class Util {
 			return 0; // a degenerate polygon
 
 		// select largest abs coordinate to ignore for projection
-		ax = (normal.getX() > 0 ? normal.getX() : -normal.getX()); // abs
-																	// x-coord
-		ay = (normal.getY() > 0 ? normal.getY() : -normal.getY()); // abs
-																	// y-coord
-		az = (normal.getZ() > 0 ? normal.getZ() : -normal.getZ()); // abs
-																	// z-coord
+		ax = (normal.getX() > 0 ? normal.getX() : -normal.getX()); // abs x-coord
+		ay = (normal.getY() > 0 ? normal.getY() : -normal.getY()); // abs y-coord
+		az = (normal.getZ() > 0 ? normal.getZ() : -normal.getZ()); // abs z-coord
 
 		coord = 3; // ignore z-coord
 		if (ax > ay) {

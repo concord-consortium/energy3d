@@ -34,6 +34,7 @@ import javax.swing.event.MenuListener;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
@@ -308,7 +309,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	public void showDialog() {
 
-		EnergyPanel.getInstance().requestDisableActions(this);
+		SceneManager.getInstance().setAnalysisRequester(this);
 
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Daily Environmental Temperature", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -388,7 +389,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		dialog.setLocationRelativeTo(MainFrame.getInstance());
 		dialog.setVisible(true);
 
-		EnergyPanel.getInstance().requestDisableActions(null);
+		SceneManager.getInstance().setAnalysisRequester(null);
 
 	}
 

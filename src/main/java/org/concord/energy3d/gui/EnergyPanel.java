@@ -86,7 +86,6 @@ public class EnergyPanel extends JPanel {
 	private Thread thread;
 	private boolean computeRequest;
 	private boolean cancel;
-	private Object disableActionsRequester;
 	private boolean alreadyRenderedHeatmap = false;
 	private boolean computeEnabled = true;
 	private final List<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
@@ -161,7 +160,7 @@ public class EnergyPanel extends JPanel {
 					firstCall = false;
 					return;
 				}
-				if (disableActionsRequester == null) {
+				if (SceneManager.getInstance().getAnalysisRequester() == null) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
 					heliodon.setDate((Date) dateSpinner.getValue());
@@ -830,15 +829,6 @@ public class EnergyPanel extends JPanel {
 		basicsPanel.updateWindow();
 		basicsPanel.updateWall();
 		updateProperties();
-	}
-
-	/** Apply this when the UI is set programmatically (not by the user) */
-	public void requestDisableActions(final Object requester) {
-		disableActionsRequester = requester;
-	}
-
-	public Object getDisableActionsRequester() {
-		return disableActionsRequester;
 	}
 
 	public boolean isCancelled() {

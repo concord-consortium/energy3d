@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.io.Serializable;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.util.Util;
 
 /**
  * This class defines the design specifications.
@@ -45,6 +46,43 @@ public class DesignSpecs implements Serializable {
 	public DesignSpecs() {
 	}
 
+	// fix the serialization problem (that sets all unset values to zero)
+
+	public void setDefaultValues() {
+
+		if (maximumBudget == 0)
+			maximumBudget = 200000;
+
+		if (maximumNumberOfSolarPanels == 0)
+			maximumNumberOfSolarPanels = 50;
+
+		if (minimumNumberOfWindows == 0)
+			minimumNumberOfWindows = 4;
+		if (maximumNumberOfWindows == 0)
+			maximumNumberOfWindows = 20;
+
+		if (minimumNumberOfWalls == 0)
+			minimumNumberOfWalls = 4;
+		if (maximumNumberOfWalls == 0)
+			maximumNumberOfWalls = 10;
+
+		if (Util.isZero(minimumWindowToFloorRatio))
+			minimumWindowToFloorRatio = 0.15;
+		if (Util.isZero(maximumWindowToFloorRatio))
+			maximumWindowToFloorRatio = 0.25;
+
+		if (Util.isZero(minimumHeight))
+			minimumHeight = 8;
+		if (Util.isZero(maximumHeight))
+			maximumHeight = 10;
+
+		if (Util.isZero(minimumArea))
+			minimumArea = 100;
+		if (Util.isZero(maximumArea))
+			maximumArea = 150;
+
+	}
+
 	// budget
 
 	public void setBudgetEnabled(boolean budgetEnabled) {
@@ -75,8 +113,8 @@ public class DesignSpecs implements Serializable {
 
 	// number of windows
 
-	public void setNumberOfWindowsEnabled(boolean windowEnabled) {
-		this.numberOfWindowsEnabled = windowEnabled;
+	public void setNumberOfWindowsEnabled(boolean numberOfWindowsEnabled) {
+		this.numberOfWindowsEnabled = numberOfWindowsEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				EnergyPanel.getInstance().getBasicsPanel().updateWindow();
@@ -116,8 +154,8 @@ public class DesignSpecs implements Serializable {
 
 	// number of solar panels
 
-	public void setNumberOfSolarPanelsEnabled(boolean solarPanelEnabled) {
-		this.numberOfSolarPanelsEnabled = solarPanelEnabled;
+	public void setNumberOfSolarPanelsEnabled(boolean numberOfSolarPanelsEnabled) {
+		this.numberOfSolarPanelsEnabled = numberOfSolarPanelsEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				EnergyPanel.getInstance().getBasicsPanel().updateSolarPanel();
@@ -280,8 +318,8 @@ public class DesignSpecs implements Serializable {
 
 	// wall
 
-	public void setNumberOfWallsEnabled(boolean wallEnabled) {
-		this.numberOfWallsEnabled = wallEnabled;
+	public void setNumberOfWallsEnabled(boolean numberOfWallsEnabled) {
+		this.numberOfWallsEnabled = numberOfWallsEnabled;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				EnergyPanel.getInstance().getBasicsPanel().updateWall();

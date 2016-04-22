@@ -78,14 +78,14 @@ public abstract class Analysis {
 	public abstract void updateGraph();
 
 	void onCompletion() {
-		EnergyPanel.getInstance().requestDisableActions(null);
+		SceneManager.getInstance().setAnalysisRequester(null);
 		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);
 	}
 
 	private void onStart() {
 		SceneManager.getInstance().setHeatFluxDaily(true);
-		EnergyPanel.getInstance().requestDisableActions(this);
+		SceneManager.getInstance().setAnalysisRequester(this);
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
 		SceneManager.getInstance().setHeatFluxVectorsVisible(true);

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -19,7 +18,6 @@ import javax.swing.text.Document;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.MyPlainDocument;
 import org.concord.energy3d.model.Building;
@@ -84,6 +82,7 @@ import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.undo.UndoManager;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -417,7 +416,8 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		if (Scene.getInstance().getProjectName() != null && !Scene.getInstance().getProjectName().trim().equals("")) {
 			line += separator + "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"";
 		}
-		analysisRequester = EnergyPanel.getInstance().getDisableActionsRequester();
+
+		analysisRequester = SceneManager.getInstance().getAnalysisRequester();
 		if (analysisRequester != null) {
 
 			analyzedPart = SceneManager.getInstance().getSelectedPart();
@@ -617,8 +617,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		try {
 			writer = new PrintWriter(file);
 		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), e.getMessage(), "Logger Error", JOptionPane.WARNING_MESSAGE);
+			Util.reportError(e);
 		}
 		writer.write("{\n\"Activities\": [\n");
 		final Thread t = new Thread("Time Series Logger") {
@@ -633,8 +632,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					try {
 						log();
 					} catch (Throwable t) {
-						t.printStackTrace();
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging: " + t.getMessage() + "\nPlease restart Energy3D.", "Logging Error", JOptionPane.ERROR_MESSAGE);
+						Util.reportError(t);
 					}
 				}
 			}

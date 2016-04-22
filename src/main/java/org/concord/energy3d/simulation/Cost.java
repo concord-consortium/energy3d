@@ -18,7 +18,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
@@ -266,9 +265,9 @@ public class Cost {
 	}
 
 	public void showGraph() {
-		EnergyPanel.getInstance().requestDisableActions(this);
+		SceneManager.getInstance().setAnalysisRequester(this);
 		show();
-		EnergyPanel.getInstance().requestDisableActions(null);
+		SceneManager.getInstance().setAnalysisRequester(null);
 	}
 
 	private void show() {

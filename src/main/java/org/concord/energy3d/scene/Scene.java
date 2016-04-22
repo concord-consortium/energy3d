@@ -332,6 +332,8 @@ public class Scene implements Serializable {
 
 		if (instance.designSpecs == null)
 			instance.designSpecs = new DesignSpecs();
+		else
+			instance.designSpecs.setDefaultValues();
 		if (instance.ground == null)
 			instance.ground = new Ground();
 
