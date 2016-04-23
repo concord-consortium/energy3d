@@ -426,4 +426,24 @@ public class EnergyAnnualAnalysis extends Analysis {
 
 	}
 
+	@Override
+	public String toString() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		String s = "\"Months\": " + getNumberOfDataPoints();
+		if (selectedPart instanceof Foundation) {
+			s += ", \"Building\": " + selectedPart.getId();
+			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+			for (String name : names) {
+				s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+			}
+		} else {
+			s += ", \"Part\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			String[] names = { "Solar", "Heat Gain" };
+			for (String name : names) {
+				s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+			}
+		}
+		return s;
+	}
+
 }

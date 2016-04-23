@@ -15,6 +15,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.BuildingEnergyDailyGraph;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.Graph;
 import org.concord.energy3d.simulation.SolarRadiation;
 
 /**
@@ -99,6 +100,16 @@ public class DailyEnergyGraph extends JPanel {
 		add(graph, BorderLayout.NORTH);
 		repaint();
 		EnergyPanel.getInstance().validate();
+	}
+
+	@Override
+	public String toString() {
+		String s = "\"Building\": " + building.getId();
+		String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+		for (String name : names) {
+			s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+		}
+		return s;
 	}
 
 }

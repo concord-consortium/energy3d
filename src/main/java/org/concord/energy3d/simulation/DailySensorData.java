@@ -66,14 +66,14 @@ public class DailySensorData extends EnergyDailyAnalysis {
 				s += "{\"ID\": " + id;
 				s += ", \"Light\": [";
 				for (Double x : lightData) {
-					s += graph.fiveDecimals.format(x) + ",";
+					s += Graph.FIVE_DECIMALS.format(x) + ",";
 				}
 				s = s.substring(0, s.length() - 1);
 				s += "]\n";
 				List<Double> heatData = graph.getData("Heat Flux: #" + id);
 				s += ", \"HeatFlux\": [";
 				for (Double x : heatData) {
-					s += graph.fiveDecimals.format(x) + ",";
+					s += Graph.FIVE_DECIMALS.format(x) + ",";
 				}
 				s = s.substring(0, s.length() - 1);
 				s += "]";

@@ -48,12 +48,14 @@ public abstract class Graph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	static final byte DEFAULT = 0;
-	static final byte SENSOR = 1;
+	final static byte DEFAULT = 0;
+	final static byte SENSOR = 1;
 
-	DecimalFormat oneDecimals = new DecimalFormat();
-	DecimalFormat twoDecimals = new DecimalFormat();
-	DecimalFormat fiveDecimals = new DecimalFormat();
+	final static DecimalFormat ONE_DECIMAL = new DecimalFormat();
+	final static DecimalFormat TWO_DECIMALS = new DecimalFormat();
+	final static DecimalFormat FIVE_DECIMALS = new DecimalFormat();
+	public final static DecimalFormat ENERGY_FORMAT = new DecimalFormat("######.##");
+
 	int top = 50, right = 50, bottom = 80, left = 90;
 	BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	BasicStroke thin = new BasicStroke(1);
@@ -99,9 +101,9 @@ public abstract class Graph extends JPanel {
 		hideData = new HashMap<String, Boolean>();
 		hideRuns = new HashMap<Integer, Boolean>();
 		hideData("Windows", true);
-		oneDecimals.setMaximumFractionDigits(1);
-		twoDecimals.setMaximumFractionDigits(2);
-		fiveDecimals.setMaximumFractionDigits(5);
+		ONE_DECIMAL.setMaximumFractionDigits(1);
+		TWO_DECIMALS.setMaximumFractionDigits(2);
+		FIVE_DECIMALS.setMaximumFractionDigits(5);
 
 		popupMenu = new JPopupMenu();
 		popupMenu.setInvoker(this);
@@ -536,7 +538,7 @@ public abstract class Graph extends JPanel {
 		String s = "Windows";
 		if (!isDataHidden(s)) {
 			drawDiamond(g2, x0 + 4, y0 + 3, popup ? 5 : 2, colors.get(s));
-			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("* " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -545,7 +547,7 @@ public abstract class Graph extends JPanel {
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawSquare(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u2212 " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -554,7 +556,7 @@ public abstract class Graph extends JPanel {
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawTriangleUp(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -563,7 +565,7 @@ public abstract class Graph extends JPanel {
 		y0 += 12;
 		if (!isDataHidden(s)) {
 			drawTriangleDown(g2, x0, y0, popup ? 8 : 4, colors.get(s));
-			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u002b " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -573,7 +575,7 @@ public abstract class Graph extends JPanel {
 		if (!isDataHidden(s)) {
 			drawCircle(g2, x0, y0, popup ? 8 : 4, colors.get(s));
 			g2.setFont(new Font("Arial", Font.BOLD, popup ? 11 : 8));
-			String t = isAngularGraph ? s : s + " (" + oneDecimals.format(getSum(s)) + ")";
+			String t = isAngularGraph ? s : s + " (" + ONE_DECIMAL.format(getSum(s)) + ")";
 			g2.drawString("\u003d " + t, x0 + 14, y0 + 8);
 			legendText += "<li>" + t;
 		}
@@ -704,13 +706,13 @@ public abstract class Graph extends JPanel {
 			boolean isAngularGraph = this instanceof AngularGraph;
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
-				g2.drawString(isAngularGraph ? s : s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 			s = "Heat Gain";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
-				g2.drawString(isAngularGraph ? s : s + " (" + twoDecimals.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 		}
 

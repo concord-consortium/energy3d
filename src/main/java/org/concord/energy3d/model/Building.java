@@ -269,4 +269,21 @@ public class Building {
 		return s + ")";
 	}
 
+	public static long getBuildingId(final HousePart p) {
+		if (p == null)
+			return -1;
+		if (p instanceof Foundation)
+			return p.getId();
+		final HousePart x = p.getTopContainer();
+		return x == null ? -1 : x.getId();
+	}
+
+	public static Foundation getBuildingFoundation(final HousePart p) {
+		if (p == null)
+			return null;
+		if (p instanceof Foundation)
+			return (Foundation) p;
+		return p.getTopContainer();
+	}
+
 }

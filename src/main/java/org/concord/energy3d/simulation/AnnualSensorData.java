@@ -49,4 +49,35 @@ public class AnnualSensorData extends EnergyAnnualAnalysis {
 
 	}
 
+	@Override
+	public String toString() {
+		String s = "{\"Months\": " + getNumberOfDataPoints() + ", \"Data\": [";
+		final List<HousePart> parts = Scene.getInstance().getParts();
+		for (final HousePart p : parts) {
+			if (p instanceof Sensor) {
+				final Sensor sensor = (Sensor) p;
+				final long id = sensor.getId();
+				List<Double> lightData = graph.getData("Light: #" + id);
+				s += "{\"ID\": " + id;
+				s += ", \"Light\": [";
+				for (Double x : lightData) {
+					s += Graph.FIVE_DECIMALS.format(x) + ",";
+				}
+				s = s.substring(0, s.length() - 1);
+				s += "]\n";
+				List<Double> heatData = graph.getData("Heat Flux: #" + id);
+				s += ", \"HeatFlux\": [";
+				for (Double x : heatData) {
+					s += Graph.FIVE_DECIMALS.format(x) + ",";
+				}
+				s = s.substring(0, s.length() - 1);
+				s += "]";
+				s += "},";
+			}
+		}
+		s = s.substring(0, s.length() - 1);
+		s += "]}";
+		return s;
+	}
+
 }

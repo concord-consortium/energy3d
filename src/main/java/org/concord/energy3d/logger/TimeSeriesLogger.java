@@ -429,61 +429,20 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 			if (analysisRequesterCopy != null) { // this analysis is completed, now record some results
 				line += separator + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": ";
-				if (analysisRequesterCopy instanceof AnnualSensorData) {
-					AnnualSensorData asd = (AnnualSensorData) analysisRequesterCopy;
-					line += "{\"Months\": " + asd.getNumberOfDataPoints() + "}";
-				} else if (analysisRequesterCopy instanceof DailySensorData) {
+				if (analysisRequesterCopy instanceof AnnualSensorData || analysisRequesterCopy instanceof DailySensorData) {
 					line += analysisRequesterCopy.toString();
 				} else {
 					if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
 						line += "{";
-						String part = analyzedPart.toString().substring(0, analyzedPart.toString().indexOf(')') + 1);
-						if (analysisRequesterCopy instanceof EnergyDailyAnalysis) {
-							EnergyDailyAnalysis eda = (EnergyDailyAnalysis) analysisRequesterCopy;
-							if (analyzedPart instanceof Foundation) {
-								line += "\"Building\": " + analyzedPart.getId();
-								String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-								for (String name : names) {
-									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
-								}
-							} else {
-								line += "\"Part\": \"" + part + "\"";
-								String[] names = { "Solar", "Heat Gain" };
-								for (String name : names) {
-									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eda.getResult(name));
-								}
-							}
-						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
-							DailyEnergyGraph deg = (DailyEnergyGraph) analysisRequesterCopy;
-							Foundation foundation = deg.getBuilding();
-							line += "\"Building\": " + foundation.getId();
-							String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-							for (String name : names) {
-								line += ", \"" + name + "\": " + ENERGY_FORMAT.format(deg.getResult(name));
-							}
+						if (analysisRequesterCopy instanceof EnergyDailyAnalysis || analysisRequesterCopy instanceof DailyEnergyGraph) {
+							line += analysisRequesterCopy.toString();
 						} else if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
-							EnergyAnnualAnalysis eaa = (EnergyAnnualAnalysis) analysisRequesterCopy;
-							line += "\"Months\": " + eaa.getNumberOfDataPoints();
-							if (analyzedPart instanceof Foundation) {
-								line += ", \"Building\": " + analyzedPart.getId();
-								String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-								for (String name : names) {
-									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
-								}
-							} else {
-								line += ", \"Part\": \"" + part + "\"";
-								String[] names = { "Solar", "Heat Gain" };
-								for (String name : names) {
-									line += ", \"" + name + "\": " + ENERGY_FORMAT.format(eaa.getResult(name));
-								}
-							}
+							line+=analysisRequesterCopy.toString();
 						} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
-							line += "\"Building\": " + LoggerUtil.getBuildingId(analyzedPart);
-							EnergyAngularAnalysis eaa = (EnergyAngularAnalysis) analysisRequesterCopy;
-							line += ", \"Angles\": " + eaa.getNumberOfDataPoints();
+							line += analysisRequesterCopy.toString();
 						} else if (analysisRequesterCopy instanceof Cost) {
 							Cost cost = (Cost) analysisRequesterCopy;
-							line += "\"Building\": " + LoggerUtil.getBuildingId(analyzedPart);
+							line += "\"Building\": " + Building.getBuildingId(analyzedPart);
 							line += ", \"Amount\": " + cost.getBuildingCost(analyzedPart instanceof Foundation ? (Foundation) analyzedPart : analyzedPart.getTopContainer());
 						}
 						analyzedPart = null;
@@ -496,7 +455,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 							for (HousePart p : Scene.getInstance().getParts()) {
 								if (p instanceof Foundation) {
 									count++;
-									line += "{\"Building\": " + LoggerUtil.getBuildingId(p) + ", \"Amount\": " + cost.getBuildingCost((Foundation) p) + "}, ";
+									line += "{\"Building\": " + Building.getBuildingId(p) + ", \"Amount\": " + cost.getBuildingCost((Foundation) p) + "}, ";
 								}
 							}
 							if (count > 0)

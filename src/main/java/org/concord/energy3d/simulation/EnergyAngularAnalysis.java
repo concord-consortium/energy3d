@@ -26,6 +26,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -360,6 +361,13 @@ public class EnergyAngularAnalysis extends Analysis {
 			dialog.setLocationRelativeTo(MainFrame.getInstance());
 		dialog.setVisible(true);
 
+	}
+
+	@Override
+	public String toString() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		String s = "\"Building\": " + Building.getBuildingId(selectedPart) + ", \"Angles\": " + getNumberOfDataPoints();
+		return s;
 	}
 
 }

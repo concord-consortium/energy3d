@@ -59,27 +59,10 @@ class LoggerUtil {
 		return folder;
 	}
 
-	static long getBuildingId(final HousePart p) {
-		if (p == null)
-			return -1;
-		if (p instanceof Foundation)
-			return p.getId();
-		final HousePart x = p.getTopContainer();
-		return x == null ? -1 : x.getId();
-	}
-
-	static Foundation getBuildingFoundation(final HousePart p) {
-		if (p == null)
-			return null;
-		if (p instanceof Foundation)
-			return (Foundation) p;
-		return p.getTopContainer();
-	}
-
 	static Object getInfo(final HousePart p) {
 		if (p == null)
 			return null;
-		long bid = getBuildingId(p);
+		long bid = Building.getBuildingId(p);
 		String s;
 		if (p instanceof Human) {
 			s = "{\"Name\": \"" + ((Human) p).getHumanName() + "\", ";
