@@ -20,6 +20,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
@@ -50,6 +51,7 @@ public class ConstructionCostGraph extends JPanel {
 	private final DecimalFormat noDecimals = new DecimalFormat();
 	private Foundation building;
 	private int wallSum;
+	private int floorSum;
 	private int windowSum;
 	private int roofSum;
 	private int doorSum;
@@ -120,6 +122,7 @@ public class ConstructionCostGraph extends JPanel {
 				countBuildings++;
 		}
 		wallSum = 0;
+		floorSum = 0;
 		windowSum = 0;
 		roofSum = 0;
 		doorSum = 0;
@@ -130,6 +133,8 @@ public class ConstructionCostGraph extends JPanel {
 			if (p.getTopContainer() == building) {
 				if (p instanceof Wall)
 					wallSum += Cost.getInstance().getPartCost(p);
+				else if (p instanceof Floor)
+					floorSum += Cost.getInstance().getPartCost(p);
 				else if (p instanceof Window)
 					windowSum += Cost.getInstance().getPartCost(p);
 				else if (p instanceof Roof)
@@ -144,7 +149,7 @@ public class ConstructionCostGraph extends JPanel {
 					treeSum += Cost.getInstance().getPartCost(p);
 			}
 		}
-		totalCost = wallSum + windowSum + roofSum + doorSum + solarPanelSum + treeSum + foundationSum;
+		totalCost = wallSum + windowSum + roofSum + doorSum + solarPanelSum + treeSum + foundationSum + floorSum;
 	}
 
 	public void removeGraph() {
@@ -183,9 +188,9 @@ public class ConstructionCostGraph extends JPanel {
 
 		add(budgetPanel, BorderLayout.NORTH);
 
-		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Ground Floor", "Doors", "Solar Panels", "Trees" };
-		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.PINK, Color.YELLOW, Color.GREEN };
+		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
+		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
+		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
 		pie.setBackground(Color.WHITE);

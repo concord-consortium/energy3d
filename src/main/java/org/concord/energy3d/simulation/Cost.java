@@ -296,6 +296,7 @@ public class Cost {
 			SceneManager.getInstance().setSelectedPart(selectedBuilding);
 		}
 		int wallSum = 0;
+		int floorSum = 0;
 		int windowSum = 0;
 		int roofSum = 0;
 		int foundationSum = 0;
@@ -310,6 +311,8 @@ public class Cost {
 				if (p.getTopContainer() == selectedBuilding) {
 					if (p instanceof Wall)
 						wallSum += getPartCost(p);
+					else if (p instanceof Floor)
+						floorSum += getPartCost(p);
 					else if (p instanceof Window)
 						windowSum += getPartCost(p);
 					else if (p instanceof Roof)
@@ -329,6 +332,8 @@ public class Cost {
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Wall)
 					wallSum += getPartCost(p);
+				else if (p instanceof Floor)
+					floorSum += getPartCost(p);
 				else if (p instanceof Window)
 					windowSum += getPartCost(p);
 				else if (p instanceof Roof)
@@ -344,9 +349,9 @@ public class Cost {
 			}
 		}
 
-		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Ground Floor", "Doors", "Solar Panels", "Trees" };
-		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.PINK, Color.YELLOW, Color.GREEN };
+		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
+		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
+		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		// show them in a popup window
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
