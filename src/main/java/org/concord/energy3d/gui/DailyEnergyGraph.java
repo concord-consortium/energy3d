@@ -102,13 +102,18 @@ public class DailyEnergyGraph extends JPanel {
 		EnergyPanel.getInstance().validate();
 	}
 
-	@Override
-	public String toString() {
-		String s = "\"Building\": " + building.getId();
-		String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-		for (String name : names) {
-			s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+	public String toJson() {
+		String s = "{";
+		if (building != null) {
+			s += "\"Building\": " + building.getId();
+			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+			for (String name : names) {
+				s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+			}
+		} else {
+			// TODO
 		}
+		s += "}";
 		return s;
 	}
 

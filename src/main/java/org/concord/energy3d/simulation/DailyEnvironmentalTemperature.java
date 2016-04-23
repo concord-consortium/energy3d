@@ -393,4 +393,9 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	}
 
+	public String toJson() {
+		String s = "{}";
+		return s;
+	}
+
 }

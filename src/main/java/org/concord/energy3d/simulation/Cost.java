@@ -384,4 +384,29 @@ public class Cost {
 
 	}
 
+	public String toJson() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		String s = "";
+		if (selectedPart != null) {
+			s += "{";
+			s = "\"Building\": " + Building.getBuildingId(selectedPart);
+			s += ", \"Amount\": " + getBuildingCost(selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer());
+			s += "}";
+		} else {
+			s += "[";
+			int count = 0;
+			for (HousePart p : Scene.getInstance().getParts()) {
+				if (p instanceof Foundation) {
+					count++;
+					s += "{\"Building\": " + Building.getBuildingId(p) + ", \"Amount\": " + getBuildingCost((Foundation) p) + "}, ";
+				}
+			}
+			if (count > 0)
+				s = s.substring(0, s.length() - 2);
+			s += "]";
+
+		}
+		return s;
+	}
+
 }

@@ -429,40 +429,33 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 			if (analysisRequesterCopy != null) { // this analysis is completed, now record some results
 				line += separator + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": ";
-				if (analysisRequesterCopy instanceof AnnualSensorData || analysisRequesterCopy instanceof DailySensorData) {
-					line += analysisRequesterCopy.toString();
+				if (analysisRequesterCopy instanceof AnnualSensorData) {
+					line += ((AnnualSensorData) analysisRequesterCopy).toJson();
+				} else if (analysisRequesterCopy instanceof DailySensorData) {
+					line += ((DailySensorData) analysisRequesterCopy).toJson();
+				} else if (analysisRequesterCopy instanceof DailyEnvironmentalTemperature) {
+					line += ((DailyEnvironmentalTemperature) analysisRequesterCopy).toJson();
+				} else if (analysisRequesterCopy instanceof AnnualEnvironmentalTemperature) {
+					line += ((AnnualEnvironmentalTemperature) analysisRequesterCopy).toJson();
 				} else {
 					if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
-						line += "{";
-						if (analysisRequesterCopy instanceof EnergyDailyAnalysis || analysisRequesterCopy instanceof DailyEnergyGraph) {
-							line += analysisRequesterCopy.toString();
+						if (analysisRequesterCopy instanceof EnergyDailyAnalysis) {
+							line += ((EnergyDailyAnalysis) analysisRequesterCopy).toJson();
+						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
+							line += ((DailyEnergyGraph) analysisRequesterCopy).toJson();
 						} else if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
-							line+=analysisRequesterCopy.toString();
+							line += ((EnergyAnnualAnalysis) analysisRequesterCopy).toJson();
 						} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
-							line += analysisRequesterCopy.toString();
+							line += ((EnergyAngularAnalysis) analysisRequesterCopy).toJson();
 						} else if (analysisRequesterCopy instanceof Cost) {
-							Cost cost = (Cost) analysisRequesterCopy;
-							line += "\"Building\": " + Building.getBuildingId(analyzedPart);
-							line += ", \"Amount\": " + cost.getBuildingCost(analyzedPart instanceof Foundation ? (Foundation) analyzedPart : analyzedPart.getTopContainer());
+							line += ((Cost) analysisRequesterCopy).toJson();
 						}
 						analyzedPart = null;
-						line += "}";
 					} else {
 						if (analysisRequesterCopy instanceof Cost) {
-							line += "[";
-							Cost cost = (Cost) analysisRequesterCopy;
-							int count = 0;
-							for (HousePart p : Scene.getInstance().getParts()) {
-								if (p instanceof Foundation) {
-									count++;
-									line += "{\"Building\": " + Building.getBuildingId(p) + ", \"Amount\": " + cost.getBuildingCost((Foundation) p) + "}, ";
-								}
-							}
-							if (count > 0)
-								line = line.substring(0, line.length() - 2);
-							line += "]";
-						} else if (analysisRequesterCopy instanceof AnnualEnvironmentalTemperature || analysisRequesterCopy instanceof DailyEnvironmentalTemperature) {
-							line += "{}";
+							line += ((Cost) analysisRequesterCopy).toJson();
+						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
+							line += ((DailyEnergyGraph) analysisRequesterCopy).toJson();
 						}
 					}
 				}

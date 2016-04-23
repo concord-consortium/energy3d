@@ -493,4 +493,9 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 
 	}
 
+	public String toJson() {
+		String s = "{}";
+		return s;
+	}
+
 }

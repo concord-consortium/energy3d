@@ -50,7 +50,7 @@ public class AnnualSensorData extends EnergyAnnualAnalysis {
 	}
 
 	@Override
-	public String toString() {
+	public String toJson() {
 		String s = "{\"Months\": " + getNumberOfDataPoints() + ", \"Data\": [";
 		final List<HousePart> parts = Scene.getInstance().getParts();
 		for (final HousePart p : parts) {

@@ -97,4 +97,6 @@ public abstract class Analysis {
 		return new Building(foundation).isWallComplete();
 	}
 
+	public abstract String toJson();
+
 }

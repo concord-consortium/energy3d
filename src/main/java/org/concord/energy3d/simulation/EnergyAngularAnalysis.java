@@ -364,9 +364,10 @@ public class EnergyAngularAnalysis extends Analysis {
 	}
 
 	@Override
-	public String toString() {
+	public String toJson() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		String s = "\"Building\": " + Building.getBuildingId(selectedPart) + ", \"Angles\": " + getNumberOfDataPoints();
+		String s = "{\"Building\": " + Building.getBuildingId(selectedPart) + ", \"Angles\": " + getNumberOfDataPoints();
+		s += "}";
 		return s;
 	}
 

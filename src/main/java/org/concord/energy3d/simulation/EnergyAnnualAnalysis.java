@@ -427,9 +427,9 @@ public class EnergyAnnualAnalysis extends Analysis {
 	}
 
 	@Override
-	public String toString() {
+	public String toJson() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		String s = "\"Months\": " + getNumberOfDataPoints();
+		String s = "{\"Months\": " + getNumberOfDataPoints();
 		if (selectedPart instanceof Foundation) {
 			s += ", \"Building\": " + selectedPart.getId();
 			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
@@ -443,6 +443,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 				s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
 			}
 		}
+		s += "}";
 		return s;
 	}
 

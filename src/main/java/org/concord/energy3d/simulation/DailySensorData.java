@@ -55,7 +55,7 @@ public class DailySensorData extends EnergyDailyAnalysis {
 	}
 
 	@Override
-	public String toString() {
+	public String toJson() {
 		String s = "{\"Hours\": " + getNumberOfDataPoints() + ", \"Data\": [";
 		final List<HousePart> parts = Scene.getInstance().getParts();
 		for (final HousePart p : parts) {
