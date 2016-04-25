@@ -212,8 +212,8 @@ public class Window extends HousePart implements Thermalizable {
 
 		mesh.updateModelBound();
 		collisionMesh.updateModelBound();
-		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
-		CollisionTreeManager.INSTANCE.updateCollisionTree(collisionMesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(collisionMesh);
 
 		if (!drawBars)
 			bars.getSceneHints().setCullHint(CullHint.Always);

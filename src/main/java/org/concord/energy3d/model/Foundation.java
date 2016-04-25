@@ -560,7 +560,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 
 		surroundMesh.updateModelBound();
-		CollisionTreeManager.INSTANCE.updateCollisionTree(surroundMesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(surroundMesh);
 	}
 
 	public void drawTopMesh() {
@@ -599,7 +599,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		textureBuffer.put(1).put(1);
 
 		mesh.updateModelBound();
-		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 	}
 
 	private void drawOutline(final Mesh mesh, final float height) {
@@ -967,7 +967,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			final Vector3 a = new Vector3();
 			double g, h;
 			boolean init = true;
-			Building building = new Building(this);
+			final Building building = new Building(this);
 			for (int j = 0; j < cols; j++) {
 				h = j + 0.5;
 				for (int i = 0; i < rows; i++) {

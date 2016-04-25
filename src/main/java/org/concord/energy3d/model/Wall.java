@@ -370,8 +370,8 @@ public class Wall extends HousePart implements Thermalizable {
 		drawOutline(wallAndWindowsPoints);
 		drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
 		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
-		CollisionTreeManager.INSTANCE.updateCollisionTree(mesh);
-		CollisionTreeManager.INSTANCE.updateCollisionTree(invisibleMesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
 
 		if (!isFrozen()) {
 			drawBackMesh(computeWallAndWindowPolygon(true));
@@ -709,7 +709,7 @@ public class Wall extends HousePart implements Thermalizable {
 		normalBuffer.limit(normalBuffer.position());
 		surroundMesh.getMeshData().updateVertexCount();
 		surroundMesh.updateModelBound();
-		CollisionTreeManager.INSTANCE.updateCollisionTree(surroundMesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(surroundMesh);
 	}
 
 	protected void addSurroundQuad(final int i1, final int i2, final ReadOnlyVector3 n, final ReadOnlyVector3 thickness, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
