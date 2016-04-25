@@ -140,8 +140,10 @@ public class EnergyPanel extends JPanel {
 		dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
 		add(new JScrollPane(dataPanel), BorderLayout.CENTER);
 
+		// date, time, and location
+
 		final JPanel timeAndLocationPanel = new JPanel();
-		timeAndLocationPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 2, 0));
+		timeAndLocationPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 10, 0));
 		dataPanel.add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
 		timeAndLocationPanel.setLayout(gbl_panel_3);
@@ -324,87 +326,13 @@ public class EnergyPanel extends JPanel {
 		gbc_sunshineHoursField.gridy = 2;
 		timeAndLocationPanel.add(sunshineHoursField, gbc_sunshineHoursField);
 
+		// part panel
+
 		partPanel = new JPanel();
 		partPanel.setBorder(createTitledBorder("Part", true));
-		dataPanel.add(partPanel);
-
-		buildingPanel = new JPanel();
-		buildingPanel.setBorder(createTitledBorder("Building", true));
-		dataPanel.add(buildingPanel);
-		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
-
-		// thermostat for the selected building
-
-		thermostatPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-		thermostatPanel.add(createLabel(" Thermostat: "), BorderLayout.WEST);
-		thermostatTemperatureField = createTextField();
-		thermostatTemperatureField.setPreferredSize(new Dimension(72, sunshineHoursField.getPreferredSize().height));
-		thermostatTemperatureField.setEnabled(false);
-		thermostatTemperatureField.setBackground(Color.WHITE);
-		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
-		adjustThermostatButton = new JButton("Adjust");
-		adjustThermostatButton.setFont(new Font(adjustThermostatButton.getFont().getName(), Font.PLAIN, adjustThermostatButton.getFont().getSize() - 2));
-		adjustThermostatButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart == null)
-					return;
-				Foundation foundation = null;
-				if (selectedPart instanceof Foundation) {
-					foundation = (Foundation) selectedPart;
-				} else {
-					foundation = selectedPart.getTopContainer();
-				}
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeThermostatCommand());
-				new ThermostatDialog(foundation).setVisible(true);
-			}
-		});
-		buildingPanel.add(thermostatPanel);
-
-		JPanel target = buildingPanel;
-		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
-
-		graphTabbedPane = new JTabbedPane();
-		graphTabbedPane.setFont(new Font(graphTabbedPane.getFont().getName(), Font.PLAIN, graphTabbedPane.getFont().getSize() - 1));
-		dataPanel.add(graphTabbedPane);
-		dataPanel.add(Box.createVerticalGlue());
-
-		// basics panel
-		basicsPanel = new BasicsPanel();
-		graphTabbedPane.add("Basics", basicsPanel);
-
-		// construction cost graph
-		constructionCostGraph = new ConstructionCostGraph();
-		graphTabbedPane.add("Cost", constructionCostGraph);
-
-		// hourly energy graph
-		dailyEnergyGraph = new DailyEnergyGraph();
-		graphTabbedPane.add("Energy", dailyEnergyGraph);
-
-		graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
-		graphTabbedPane.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeGraphTabCommand());
-				if (graphTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Foundation) {
-							EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
-						} else {
-							EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
-						}
-					}
-				}
-				graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
-			}
-		});
-
-		target = partPanel;
-		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));
+		partPanel.setMaximumSize(new Dimension(partPanel.getMaximumSize().width, partPanel.getPreferredSize().height));
 		partPanel.setLayout(new BoxLayout(partPanel, BoxLayout.Y_AXIS));
+		dataPanel.add(partPanel);
 
 		partPropertiesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		partPanel.add(partPropertiesPanel);
@@ -441,6 +369,79 @@ public class EnergyPanel extends JPanel {
 		partProperty4TextField.setEnabled(false);
 		partProperty4TextField.setBackground(Color.WHITE);
 		partProperty4TextField.setColumns(4);
+
+		// building panel
+
+		buildingPanel = new JPanel();
+		buildingPanel.setBorder(createTitledBorder("Building", true));
+		dataPanel.add(buildingPanel);
+		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
+
+		thermostatPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); // thermostat for the selected building
+		thermostatPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		thermostatPanel.add(createLabel(" Thermostat: "), BorderLayout.WEST);
+		thermostatTemperatureField = createTextField();
+		thermostatTemperatureField.setPreferredSize(new Dimension(72, sunshineHoursField.getPreferredSize().height));
+		thermostatTemperatureField.setEnabled(false);
+		thermostatTemperatureField.setBackground(Color.WHITE);
+		thermostatPanel.add(thermostatTemperatureField, BorderLayout.CENTER);
+		adjustThermostatButton = new JButton("Adjust");
+		adjustThermostatButton.setFont(new Font(adjustThermostatButton.getFont().getName(), Font.PLAIN, adjustThermostatButton.getFont().getSize() - 2));
+		adjustThermostatButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart == null)
+					return;
+				Foundation foundation = null;
+				if (selectedPart instanceof Foundation) {
+					foundation = (Foundation) selectedPart;
+				} else {
+					foundation = selectedPart.getTopContainer();
+				}
+				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeThermostatCommand());
+				new ThermostatDialog(foundation).setVisible(true);
+			}
+		});
+		buildingPanel.add(thermostatPanel);
+
+		graphTabbedPane = new JTabbedPane();
+		graphTabbedPane.setFont(new Font(graphTabbedPane.getFont().getName(), Font.PLAIN, graphTabbedPane.getFont().getSize() - 1));
+		buildingPanel.add(graphTabbedPane);
+
+		basicsPanel = new BasicsPanel(); // basics panel
+		graphTabbedPane.add("Basics", basicsPanel);
+
+		constructionCostGraph = new ConstructionCostGraph(); // construction cost graph
+		graphTabbedPane.add("Cost", constructionCostGraph);
+
+		dailyEnergyGraph = new DailyEnergyGraph(); // hourly energy graph
+		graphTabbedPane.add("Energy", dailyEnergyGraph);
+
+		graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
+		graphTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeGraphTabCommand());
+				if (graphTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
+						} else {
+							EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
+						}
+					}
+				}
+				graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
+			}
+		});
+		buildingPanel.setMaximumSize(new Dimension(buildingPanel.getMaximumSize().width, buildingPanel.getPreferredSize().height));
+
+		dataPanel.add(Box.createVerticalGlue());
+
+		// heat map slider and progress bar
 
 		heatMapPanel = new JPanel(new BorderLayout());
 		heatMapPanel.setBorder(createTitledBorder("Heat Map Contrast", true));
@@ -513,7 +514,7 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								progress(0);
 								if (SceneManager.getInstance().getSolarHeatMap()) {
-									graphTabbedPane.setSelectedComponent(dailyEnergyGraph);
+									Util.setSilently(graphTabbedPane, dailyEnergyGraph);
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
 										dailyEnergyGraph.addGraph((Foundation) p);
@@ -699,6 +700,13 @@ public class EnergyPanel extends JPanel {
 			partPropertiesPanel.add(partProperty3TextField);
 			partPropertiesPanel.add(partProperty4Label);
 			partPropertiesPanel.add(partProperty4TextField);
+		} else if (selectedPart instanceof Human) {
+			partProperty1Label.setText("X:");
+			partProperty2Label.setText("Y:");
+			partPropertiesPanel.remove(partProperty3Label);
+			partPropertiesPanel.remove(partProperty3TextField);
+			partPropertiesPanel.remove(partProperty4Label);
+			partPropertiesPanel.remove(partProperty4TextField);
 		} else {
 			partProperty1Label.setText("Width:");
 			partProperty2Label.setText("Height:");
@@ -725,7 +733,7 @@ public class EnergyPanel extends JPanel {
 			}
 		}
 
-		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof Human)) {
+		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor)) {
 			double meterToFeet = 1;
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:
@@ -748,6 +756,11 @@ public class EnergyPanel extends JPanel {
 				partProperty1TextField.setText(twoDecimals.format(tree.getWidth() * Scene.getInstance().getAnnotationScale() * meterToFeet));
 				partProperty2TextField.setText(twoDecimals.format(tree.getHeight() * Scene.getInstance().getAnnotationScale() * meterToFeet));
 				partProperty3TextField.setText(tree.getTreeName());
+			} else if (selectedPart instanceof Human) {
+				final Human human = (Human) selectedPart;
+				final ReadOnlyVector3 v = human.getAbsPoint(0);
+				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale() * meterToFeet));
 			} else {
 				partProperty1TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale() * meterToFeet));
 				partProperty2TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale() * meterToFeet));
