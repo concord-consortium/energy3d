@@ -1067,7 +1067,9 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		}
 	}
 
-	public double getAreaWithOverhang() {
+	// return the area WITH overhang
+	@Override
+	public double getArea() {
 		if (areaByPartWithOverhang == null)
 			return 0;
 		double a = 0;

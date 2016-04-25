@@ -1036,42 +1036,4 @@ public class Foundation extends HousePart implements Thermalizable {
 		return thermostat;
 	}
 
-	public double getTotalWindowArea(final boolean roofWindowsIncluded) {
-		double area = 0;
-		for (final HousePart x : Scene.getInstance().getParts()) {
-			if (x.getTopContainer() != this)
-				continue;
-			if (x instanceof Window) {
-				if (x.getContainer() instanceof Roof && !roofWindowsIncluded)
-					continue;
-				area += x.getArea();
-			}
-		}
-		return area;
-	}
-
-	public double getTotalWallArea() {
-		double area = 0;
-		for (final HousePart x : Scene.getInstance().getParts()) {
-			if (x.getTopContainer() != this)
-				continue;
-			if (x instanceof Wall) {
-				area += x.getArea();
-			}
-		}
-		return area;
-	}
-
-	public double getTotalRoofArea() {
-		double area = 0;
-		for (final HousePart x : Scene.getInstance().getParts()) {
-			if (x.getTopContainer() != this)
-				continue;
-			if (x instanceof Roof) {
-				area += x.getArea();
-			}
-		}
-		return area;
-	}
-
 }

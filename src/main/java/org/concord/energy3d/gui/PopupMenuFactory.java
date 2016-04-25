@@ -65,6 +65,7 @@ import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeThermostatCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.util.Config;
@@ -686,6 +687,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						SceneManager.getInstance().getUndoManager().addEdit(new ChangeThermostatCommand());
 						new ThermostatDialog((Foundation) selectedPart).setVisible(true);
 					}
 				}
