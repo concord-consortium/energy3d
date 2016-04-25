@@ -9,10 +9,14 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Config;
 
 public class UndoManager extends javax.swing.undo.UndoManager {
+	
 	private static final long serialVersionUID = 1L;
+
 	private boolean undoFlag = false;
 	private boolean redoFlag = false;
 	private boolean saveFlag = false;
+	private boolean changeGraphTabFlag = false;
+	private boolean changeThermostatFlag = false;
 
 	@Override
 	public synchronized boolean addEdit(final UndoableEdit anEdit) {
@@ -20,6 +24,8 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		saveFlag = anEdit instanceof SaveCommand;
 		Scene.getInstance().setEdited(!saveFlag);
 		refreshUndoRedoGui();
+		changeGraphTabFlag = anEdit instanceof ChangeGraphTabCommand;
+		changeThermostatFlag = anEdit instanceof ChangeThermostatCommand;
 		return result;
 	}
 
@@ -58,6 +64,8 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		undoFlag = false;
 		redoFlag = false;
 		saveFlag = false;
+		changeGraphTabFlag = false;
+		changeThermostatFlag = false;
 	}
 
 	private void refreshUndoRedoGui() {
@@ -87,6 +95,22 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 
 	public boolean getSaveFlag() {
 		return saveFlag;
+	}
+
+	public void setChangeGraphTabFlag(boolean changeGraphTabFlag) {
+		this.changeGraphTabFlag = changeGraphTabFlag;
+	}
+
+	public boolean getChangeGraphTabFlag() {
+		return changeGraphTabFlag;
+	}
+
+	public void setChangeThermostatFlag(boolean changeThermostatFlag) {
+		this.changeThermostatFlag = changeThermostatFlag;
+	}
+
+	public boolean getChangeThermostatFlag() {
+		return changeThermostatFlag;
 	}
 
 	@Override

@@ -392,13 +392,11 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			} else if (lastEdit instanceof ChangeTimeCommand) {
 				Calendar calendar = Heliodon.getInstance().getCalender();
 				stateValue = "\"" + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" + calendar.get(Calendar.MINUTE) + "\"";
-			} else if (lastEdit instanceof ChangeGraphTabCommand) {
-				stateValue = "\"" + ((ChangeGraphTabCommand) lastEdit).getCurrentTitle() + "\"";
 			}
 		} else {
 			action = null;
 		}
-		String type2Action = null;
+		String type2Action = null; // type-2 actions are actually not undoable, but they are registered with the undo manager to be logged
 		if (action == null) {
 			if (undoManager.getUndoFlag()) {
 				action = "Undo";
@@ -413,6 +411,16 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				action = "Save";
 				undoManager.setSaveFlag(false);
 				type2Action = Scene.getURL().toString() + "*";
+			}
+			if (undoManager.getChangeGraphTabFlag()) {
+				action = lastEdit.getPresentationName();
+				undoManager.setChangeGraphTabFlag(false);
+				if (lastEdit instanceof ChangeGraphTabCommand)
+					type2Action = ((ChangeGraphTabCommand) lastEdit).getCurrentTitle();
+			}
+			if (undoManager.getChangeThermostatFlag()) {
+				action = lastEdit.getPresentationName();
+				undoManager.setChangeThermostatFlag(false);
 			}
 		}
 

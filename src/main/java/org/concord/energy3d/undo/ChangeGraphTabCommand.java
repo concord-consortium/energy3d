@@ -40,4 +40,9 @@ public class ChangeGraphTabCommand extends AbstractUndoableEdit {
 		return "Change Graph Tab";
 	}
 
+	@Override
+	public boolean isSignificant() {
+		return false;
+	}
+
 }
