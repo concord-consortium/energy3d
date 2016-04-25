@@ -114,7 +114,7 @@ public class Cost {
 			// Let's also assume that the insulation cost is inversely proportional to the U-value.
 			// The baseline (that is, the structure without insulation) cost for a roof is set to be $100/m^2.
 			double unitPrice = 100 + 9 / uFactor;
-			return (int) (((Roof) part).getAreaWithOverhang() * unitPrice);
+			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Foundation) {
 			// http://www.homewyse.com/costs/cost_of_floor_insulation.html

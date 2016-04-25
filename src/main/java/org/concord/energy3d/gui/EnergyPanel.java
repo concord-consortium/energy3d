@@ -82,8 +82,9 @@ public class EnergyPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final EnergyPanel instance = new EnergyPanel();
+	private final DecimalFormat noDecimal = new DecimalFormat();
+	private final DecimalFormat oneDecimal = new DecimalFormat();
 	private final DecimalFormat twoDecimals = new DecimalFormat();
-	private final DecimalFormat noDecimals = new DecimalFormat();
 	private static boolean autoRecomputeEnergy = false;
 	private Thread thread;
 	private boolean computeRequest;
@@ -115,11 +116,9 @@ public class EnergyPanel extends JPanel {
 	private JLabel partProperty1Label;
 	private JLabel partProperty2Label;
 	private JLabel partProperty3Label;
-	private JLabel partProperty4Label;
 	private JTextField partProperty1TextField;
 	private JTextField partProperty2TextField;
 	private JTextField partProperty3TextField;
-	private JTextField partProperty4TextField;
 	private ChangeListener latitudeChangeListener;
 	private BasicsPanel basicsPanel;
 	private ConstructionCostGraph constructionCostGraph;
@@ -132,8 +131,9 @@ public class EnergyPanel extends JPanel {
 
 	private EnergyPanel() {
 
+		noDecimal.setMaximumFractionDigits(0);
+		oneDecimal.setMaximumFractionDigits(1);
 		twoDecimals.setMaximumFractionDigits(2);
-		noDecimals.setMaximumFractionDigits(0);
 
 		setLayout(new BorderLayout());
 		dataPanel = new JPanel();
@@ -355,7 +355,7 @@ public class EnergyPanel extends JPanel {
 		partPropertiesPanel.add(partProperty2TextField);
 		partProperty2TextField.setColumns(4);
 
-		partProperty3Label = createLabel("Insolation:");
+		partProperty3Label = createLabel("Unknown");
 		partPropertiesPanel.add(partProperty3Label);
 
 		partProperty3TextField = createTextField();
@@ -363,12 +363,6 @@ public class EnergyPanel extends JPanel {
 		partProperty3TextField.setBackground(Color.WHITE);
 		partPropertiesPanel.add(partProperty3TextField);
 		partProperty3TextField.setColumns(4);
-
-		partProperty4Label = createLabel("");
-		partProperty4TextField = createTextField();
-		partProperty4TextField.setEnabled(false);
-		partProperty4TextField.setBackground(Color.WHITE);
-		partProperty4TextField.setColumns(4);
 
 		// building panel
 
@@ -547,8 +541,13 @@ public class EnergyPanel extends JPanel {
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
-				updateProperties();
 				Scene.getInstance().setTreeLeaves();
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						updateProperties();
+					}
+				});
 			}
 
 			progressBar.setValue(100);
@@ -680,60 +679,57 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateProperties() {
+
 		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 
 		if (selectedPart instanceof Tree) {
 			partProperty1Label.setText("Spread:");
 			partProperty2Label.setText("Height:");
-			partProperty3Label.setText("Species:");
-			partPropertiesPanel.add(partProperty3Label);
-			partPropertiesPanel.add(partProperty3TextField);
-			partPropertiesPanel.remove(partProperty4Label);
-			partPropertiesPanel.remove(partProperty4TextField);
+			partProperty3Label.setText("Position:");
 		} else if (selectedPart instanceof Sensor) {
-			partProperty1Label.setText("X:");
-			partProperty2Label.setText("Y:");
-			partProperty3Label.setText("Z:");
-			partProperty4Label.setText("Data:");
-			partPropertiesPanel.add(partProperty3Label);
-			partPropertiesPanel.add(partProperty3TextField);
-			partPropertiesPanel.add(partProperty4Label);
-			partPropertiesPanel.add(partProperty4TextField);
+			partProperty1Label.setText("Position:");
+			partProperty2Label.setText("Light:");
+			partProperty3Label.setText("Heat:");
 		} else if (selectedPart instanceof Human) {
 			partProperty1Label.setText("X:");
 			partProperty2Label.setText("Y:");
-			partPropertiesPanel.remove(partProperty3Label);
-			partPropertiesPanel.remove(partProperty3TextField);
-			partPropertiesPanel.remove(partProperty4Label);
-			partPropertiesPanel.remove(partProperty4TextField);
+			partProperty3Label.setText("Z:");
+		} else if (selectedPart instanceof Roof) {
+			partProperty1Label.setText("Area:");
+			partProperty2Label.setText("Position:");
+			partProperty3Label.setText("Solar:");
 		} else {
-			partProperty1Label.setText("Width:");
-			partProperty2Label.setText("Height:");
-			partPropertiesPanel.remove(partProperty3Label);
-			partPropertiesPanel.remove(partProperty3TextField);
-			partPropertiesPanel.remove(partProperty4Label);
-			partPropertiesPanel.remove(partProperty4TextField);
+			partProperty1Label.setText("Size:");
+			partProperty2Label.setText("Position:");
+			partProperty3Label.setText("Solar:");
 		}
+		partProperty1TextField.setText("");
+		partProperty2TextField.setText("");
+		partProperty3TextField.setText("");
 		partPropertiesPanel.revalidate();
 
-		((TitledBorder) partPanel.getBorder()).setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
+		TitledBorder partPanelBorder = (TitledBorder) partPanel.getBorder();
+		if (selectedPart instanceof Tree) {
+			Tree tree = (Tree) selectedPart;
+			partPanelBorder.setTitle("Part - " + tree.getTreeName() + "(" + tree.getId() + ")");
+		} else {
+			partPanelBorder.setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
+		}
 		partPanel.repaint();
 
 		if (!energyViewShown || selectedPart == null || selectedPart instanceof Door || selectedPart instanceof Foundation)
 			partProperty3TextField.setText("");
 		else {
 			if (selectedPart instanceof Sensor) {
-				final String light = twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.getArea());
-				final String heatFlux = twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.getArea());
-				partProperty4TextField.setText(light + ", " + heatFlux);
-				partProperty4TextField.setToolTipText("Light sensor: " + light + ", heat flux sensor: " + heatFlux);
+				partProperty2TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.getArea()));
+				partProperty3TextField.setText(twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.getArea()));
 			} else {
 				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
 			}
 		}
 
-		if (selectedPart != null && !(selectedPart instanceof Roof || selectedPart instanceof Floor)) {
+		if (selectedPart != null && !(selectedPart instanceof Floor)) {
 			double meterToFeet = 1;
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:
@@ -743,40 +739,39 @@ public class EnergyPanel extends JPanel {
 				meterToFeet = 3.28084;
 				break;
 			}
+			double scale = Scene.getInstance().getAnnotationScale() * meterToFeet;
+			final ReadOnlyVector3 v = selectedPart.getAbsPoint(0);
 			if (selectedPart instanceof SolarPanel) {
-				partProperty1TextField.setText(twoDecimals.format(SolarPanel.WIDTH * meterToFeet));
-				partProperty2TextField.setText(twoDecimals.format(SolarPanel.HEIGHT * meterToFeet));
+				partProperty1TextField.setText(oneDecimal.format(SolarPanel.WIDTH * meterToFeet) + "\u00d7" + oneDecimal.format(SolarPanel.HEIGHT * meterToFeet));
+				partProperty2TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			} else if (selectedPart instanceof Sensor) {
-				final ReadOnlyVector3 v = ((Sensor) selectedPart).getAbsPoint(0);
-				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale() * meterToFeet));
-				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale() * meterToFeet));
-				partProperty3TextField.setText(twoDecimals.format(v.getZ() * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty1TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			} else if (selectedPart instanceof Tree) {
 				final Tree tree = (Tree) selectedPart;
-				partProperty1TextField.setText(twoDecimals.format(tree.getWidth() * Scene.getInstance().getAnnotationScale() * meterToFeet));
-				partProperty2TextField.setText(twoDecimals.format(tree.getHeight() * Scene.getInstance().getAnnotationScale() * meterToFeet));
-				partProperty3TextField.setText(tree.getTreeName());
+				partProperty1TextField.setText(noDecimal.format(tree.getWidth() * scale));
+				partProperty2TextField.setText(noDecimal.format(tree.getHeight() * scale));
+				partProperty3TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ")");
 			} else if (selectedPart instanceof Human) {
-				final Human human = (Human) selectedPart;
-				final ReadOnlyVector3 v = human.getAbsPoint(0);
-				partProperty1TextField.setText(twoDecimals.format(v.getX() * Scene.getInstance().getAnnotationScale() * meterToFeet));
-				partProperty2TextField.setText(twoDecimals.format(v.getY() * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty1TextField.setText(noDecimal.format(v.getX() * scale));
+				partProperty2TextField.setText(noDecimal.format(v.getY() * scale));
+				partProperty3TextField.setText(noDecimal.format(v.getZ() * scale));
+			} else if (selectedPart instanceof Roof) {
+				partProperty1TextField.setText(noDecimal.format(((Roof) selectedPart).getArea()));
+				partProperty2TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			} else {
-				partProperty1TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale() * meterToFeet));
-				partProperty2TextField.setText(twoDecimals.format(selectedPart.getAbsPoint(0).distance(selectedPart.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale() * meterToFeet));
+				partProperty1TextField.setText(noDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (noDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
+				partProperty2TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			}
-		} else {
-			partProperty1TextField.setText("");
-			partProperty2TextField.setText("");
 		}
 
 		final Foundation selectedBuilding;
-		if (selectedPart == null)
+		if (selectedPart == null) {
 			selectedBuilding = null;
-		else if (selectedPart instanceof Foundation)
+		} else if (selectedPart instanceof Foundation) {
 			selectedBuilding = (Foundation) selectedPart;
-		else
+		} else {
 			selectedBuilding = selectedPart.getTopContainer();
+		}
 
 		if (selectedBuilding != null) {
 			basicsPanel.update(selectedBuilding);
@@ -802,9 +797,13 @@ public class EnergyPanel extends JPanel {
 			thermostatPanel.remove(adjustThermostatButton);
 			((TitledBorder) buildingPanel.getBorder()).setTitle("Building");
 		}
-		buildingPanel.repaint();
 
+		buildingPanel.repaint();
 		basicsPanel.repaint();
+
+		partProperty1TextField.setToolTipText(partProperty1TextField.getText());
+		partProperty2TextField.setToolTipText(partProperty2TextField.getText());
+		partProperty3TextField.setToolTipText(partProperty3TextField.getText());
 
 	}
 
@@ -893,13 +892,9 @@ public class EnergyPanel extends JPanel {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Foundation) {
 			final Foundation foundation = (Foundation) selectedPart;
-			if (foundation != constructionCostGraph.getBuilding()) {
-				constructionCostGraph.addGraph(foundation);
-			}
-			if (foundation != dailyEnergyGraph.getBuilding()) {
-				if (SceneManager.getInstance().getSolarHeatMap())
-					dailyEnergyGraph.addGraph(foundation);
-			}
+			constructionCostGraph.addGraph(foundation);
+			if (SceneManager.getInstance().getSolarHeatMap())
+				dailyEnergyGraph.addGraph(foundation);
 		} else {
 			constructionCostGraph.removeGraph();
 			dailyEnergyGraph.removeGraph();
