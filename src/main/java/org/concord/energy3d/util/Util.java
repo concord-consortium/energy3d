@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.event.ChangeListener;
@@ -508,6 +509,23 @@ public class Util {
 				slider.setValue(value);
 				for (final ChangeListener x : changeListeners)
 					slider.addChangeListener(x);
+			}
+		});
+	}
+
+	/**
+	 * This method selects a tab from a tabbed pane without invoking its ChangeListeners
+	 */
+	public static void setSilently(final JTabbedPane tabbedPane, final Component value) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				final ChangeListener[] changeListeners = tabbedPane.getChangeListeners();
+				for (final ChangeListener x : changeListeners)
+					tabbedPane.removeChangeListener(x);
+				tabbedPane.setSelectedComponent(value);
+				for (final ChangeListener x : changeListeners)
+					tabbedPane.addChangeListener(x);
+				tabbedPane.repaint();
 			}
 		});
 	}

@@ -65,6 +65,7 @@ import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
+import org.concord.energy3d.undo.ChangeGraphTabCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
@@ -365,21 +366,6 @@ public class EnergyPanel extends JPanel {
 
 		graphTabbedPane = new JTabbedPane();
 		graphTabbedPane.setFont(new Font(graphTabbedPane.getFont().getName(), Font.PLAIN, graphTabbedPane.getFont().getSize() - 1));
-		graphTabbedPane.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(final ChangeEvent e) {
-				if (graphTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Foundation) {
-							EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
-						} else {
-							EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
-						}
-					}
-				}
-			}
-		});
 		dataPanel.add(graphTabbedPane);
 		dataPanel.add(Box.createVerticalGlue());
 
@@ -394,6 +380,25 @@ public class EnergyPanel extends JPanel {
 		// hourly energy graph
 		dailyEnergyGraph = new DailyEnergyGraph();
 		graphTabbedPane.add("Energy", dailyEnergyGraph);
+
+		graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
+		graphTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				SceneManager.getInstance().getUndoManager().addEdit(new ChangeGraphTabCommand());
+				if (graphTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
+						} else {
+							EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
+						}
+					}
+				}
+				graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
+			}
+		});
 
 		target = partPanel;
 		target.setMaximumSize(new Dimension(target.getMaximumSize().width, target.getPreferredSize().height));

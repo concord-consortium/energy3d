@@ -161,9 +161,10 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		int hVal, hPos;
 		for (int i = i1; i <= i2; i++) {
 			hVal = i * digits;
-			hPos = (int) (getHeight() - top - (hVal - ymin) * dy);
-			if (hPos > top / 2 && hPos < getHeight() - bottom / 2)
+			hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+			if (hPos > top / 2 && hPos < getHeight() - bottom / 2) {
 				drawHorizontalLine(g2, hPos, Integer.toString(hVal));
+			}
 		}
 
 		for (int i = 0; i < depth.length; i++) {
@@ -320,10 +321,9 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
-		final JCheckBoxMenuItem cbmiAirTemperature = new JCheckBoxMenuItem("Air Temperature");
 		final JCheckBoxMenuItem[] cbmiGroundTemperature = new JCheckBoxMenuItem[depth.length];
 		for (int i = 0; i < depth.length; i++) {
-			cbmiGroundTemperature[i] = new JCheckBoxMenuItem("Ground Temperature (" + depth[i] + "m)");
+			cbmiGroundTemperature[i] = new JCheckBoxMenuItem(i == 0 ? "Air Temperature" : "Ground Temperature (" + depth[i] + "m)");
 			Util.selectSilently(cbmiGroundTemperature[i], !hideData.get(groundTemperature[i]));
 		}
 
@@ -344,8 +344,6 @@ public class DailyEnvironmentalTemperature extends JPanel {
 			public void menuCanceled(MenuEvent e) {
 			}
 		});
-
-		menuView.add(cbmiAirTemperature);
 
 		for (int i = 0; i < depth.length; i++) {
 			final int i2 = i;
