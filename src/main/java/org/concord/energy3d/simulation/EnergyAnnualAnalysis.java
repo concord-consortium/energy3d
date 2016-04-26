@@ -54,6 +54,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.ShowCurveCommand;
+import org.concord.energy3d.undo.ShowRunCommand;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
@@ -328,6 +329,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, true));
 							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
@@ -338,6 +340,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, false));
 							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
@@ -353,6 +356,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
+								SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, r.getID()));
 								graph.hideRun(r.getID(), !cbmi.isSelected());
 								graph.repaint();
 							}

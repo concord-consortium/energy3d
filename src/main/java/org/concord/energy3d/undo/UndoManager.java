@@ -17,7 +17,8 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	private boolean saveFlag = false;
 
 	// TODO: there must be a better way to handle these insignificant commands
-	private boolean hideCurveFlag = false;
+	private boolean showCurveFlag = false;
+	private boolean showRunFlag = false;
 	private boolean changeGraphTabFlag = false;
 	private boolean changeThermostatFlag = false;
 
@@ -27,7 +28,8 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		saveFlag = anEdit instanceof SaveCommand;
 		Scene.getInstance().setEdited(!saveFlag);
 		refreshUndoRedoGui();
-		hideCurveFlag = anEdit instanceof ShowCurveCommand;
+		showCurveFlag = anEdit instanceof ShowCurveCommand;
+		showRunFlag = anEdit instanceof ShowRunCommand;
 		changeGraphTabFlag = anEdit instanceof ChangeGraphTabCommand;
 		changeThermostatFlag = anEdit instanceof ChangeThermostatCommand;
 		return result;
@@ -68,7 +70,8 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		undoFlag = false;
 		redoFlag = false;
 		saveFlag = false;
-		hideCurveFlag = false;
+		showCurveFlag = false;
+		showRunFlag = false;
 		changeGraphTabFlag = false;
 		changeThermostatFlag = false;
 	}
@@ -124,12 +127,20 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		return changeThermostatFlag;
 	}
 
-	public void setHideCurveFlag(boolean hideCurveFlag) {
-		this.hideCurveFlag = hideCurveFlag;
+	public void setShowCurveFlag(boolean showCurveFlag) {
+		this.showCurveFlag = showCurveFlag;
 	}
 
-	public boolean getHideCurveFlag() {
-		return hideCurveFlag;
+	public boolean getShowCurveFlag() {
+		return showCurveFlag;
+	}
+
+	public void setShowRunFlag(boolean showRunFlag) {
+		this.showRunFlag = showRunFlag;
+	}
+
+	public boolean getShowRunFlag() {
+		return showRunFlag;
 	}
 
 }

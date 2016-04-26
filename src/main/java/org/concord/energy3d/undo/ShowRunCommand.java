@@ -10,22 +10,22 @@ import org.concord.energy3d.simulation.Graph;
  * WARNING: As this is currently treated as insignificant, this is not fully implemented.
  */
 
-public class ShowCurveCommand extends AbstractUndoableEdit {
+public class ShowRunCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private Graph graph;
-	private String curveName;
+	private int runID;
 	private boolean oldValue, newValue;
 
-	public ShowCurveCommand(Graph graph, String curveName) {
+	public ShowRunCommand(Graph graph, int runID) {
 		this.graph = graph;
-		this.curveName = curveName;
-		oldValue = !graph.isDataHidden(curveName);
+		this.runID = runID;
+		oldValue = !graph.isRunHidden(runID);
 	}
 
-	public ShowCurveCommand(Graph graph, boolean showAll) {
+	public ShowRunCommand(Graph graph, boolean showAll) {
 		this.graph = graph;
-		this.curveName = "All";
+		this.runID = -1;
 		oldValue = !showAll;
 	}
 
@@ -33,8 +33,8 @@ public class ShowCurveCommand extends AbstractUndoableEdit {
 		return graph;
 	}
 
-	public String getCurveName() {
-		return curveName;
+	public int getRunID() {
+		return runID;
 	}
 
 	public boolean isShown() {
@@ -44,19 +44,19 @@ public class ShowCurveCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = !graph.isDataHidden(curveName);
-		graph.hideData(curveName, !oldValue);
+		newValue = !graph.isRunHidden(runID);
+		graph.hideRun(runID, !oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		graph.hideData(curveName, !newValue);
+		graph.hideRun(runID, !newValue);
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Show Curve";
+		return "Show Run";
 	}
 
 	@Override

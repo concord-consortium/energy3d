@@ -81,6 +81,7 @@ import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
+import org.concord.energy3d.undo.ShowRunCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.undo.TopViewCommand;
@@ -423,12 +424,20 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				action = lastEdit.getPresentationName();
 				undoManager.setChangeThermostatFlag(false);
 			}
-			if (undoManager.getHideCurveFlag()) {
+			if (undoManager.getShowCurveFlag()) {
 				action = lastEdit.getPresentationName();
-				undoManager.setHideCurveFlag(false);
+				undoManager.setShowCurveFlag(false);
 				if (lastEdit instanceof ShowCurveCommand) {
 					ShowCurveCommand c = (ShowCurveCommand) lastEdit;
 					type2Action = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"Name\": \"" + c.getCurveName() + "\", \"Shown\": " + c.isShown() + "}";
+				}
+			}
+			if (undoManager.getShowRunFlag()) {
+				action = lastEdit.getPresentationName();
+				undoManager.setShowRunFlag(false);
+				if (lastEdit instanceof ShowRunCommand) {
+					ShowRunCommand c = (ShowRunCommand) lastEdit;
+					type2Action = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"ID\": \"" + c.getRunID() + "\", \"Shown\": " + c.isShown() + "}";
 				}
 			}
 		}

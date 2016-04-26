@@ -39,6 +39,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.undo.ShowCurveCommand;
+import org.concord.energy3d.undo.ShowRunCommand;
 
 /**
  * @author Charles Xie
@@ -285,6 +286,7 @@ public class EnergyDailyAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, true));
 							for (Results r : DailyGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
@@ -295,6 +297,7 @@ public class EnergyDailyAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, false));
 							for (Results r : DailyGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
@@ -310,6 +313,7 @@ public class EnergyDailyAnalysis extends Analysis {
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
+								SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, r.getID()));
 								graph.hideRun(r.getID(), !cbmi.isSelected());
 								graph.repaint();
 							}
