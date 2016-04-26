@@ -9,12 +9,15 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Config;
 
 public class UndoManager extends javax.swing.undo.UndoManager {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private boolean undoFlag = false;
 	private boolean redoFlag = false;
 	private boolean saveFlag = false;
+
+	// TODO: there must be a better way to handle these insignificant commands
+	private boolean hideCurveFlag = false;
 	private boolean changeGraphTabFlag = false;
 	private boolean changeThermostatFlag = false;
 
@@ -24,6 +27,7 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		saveFlag = anEdit instanceof SaveCommand;
 		Scene.getInstance().setEdited(!saveFlag);
 		refreshUndoRedoGui();
+		hideCurveFlag = anEdit instanceof ShowCurveCommand;
 		changeGraphTabFlag = anEdit instanceof ChangeGraphTabCommand;
 		changeThermostatFlag = anEdit instanceof ChangeThermostatCommand;
 		return result;
@@ -64,8 +68,15 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		undoFlag = false;
 		redoFlag = false;
 		saveFlag = false;
+		hideCurveFlag = false;
 		changeGraphTabFlag = false;
 		changeThermostatFlag = false;
+	}
+
+	// override to make it public
+	@Override
+	public UndoableEdit lastEdit() {
+		return super.lastEdit();
 	}
 
 	private void refreshUndoRedoGui() {
@@ -113,9 +124,12 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 		return changeThermostatFlag;
 	}
 
-	@Override
-	public UndoableEdit lastEdit() {
-		return super.lastEdit();
+	public void setHideCurveFlag(boolean hideCurveFlag) {
+		this.hideCurveFlag = hideCurveFlag;
+	}
+
+	public boolean getHideCurveFlag() {
+		return hideCurveFlag;
 	}
 
 }

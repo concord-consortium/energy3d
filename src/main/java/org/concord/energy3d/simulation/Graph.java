@@ -37,7 +37,9 @@ import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.undo.ShowCurveCommand;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -126,6 +128,7 @@ public abstract class Graph extends JPanel {
 					cbmi.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(final ItemEvent e) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(Graph.this, name));
 							hideData(name, !cbmi.isSelected());
 							Graph.this.repaint();
 						}
@@ -260,20 +263,20 @@ public abstract class Graph extends JPanel {
 		list.add(d);
 	}
 
-	void hideData(String name, boolean hidden) {
+	public void hideData(String name, boolean hidden) {
 		hideData.put(name, hidden);
 	}
 
-	boolean isDataHidden(String name) {
+	public boolean isDataHidden(String name) {
 		Boolean b = hideData.get(name);
 		return b != null ? b : false;
 	}
 
-	void hideRun(int id, boolean hidden) {
+	public void hideRun(int id, boolean hidden) {
 		hideRuns.put(id, hidden);
 	}
 
-	boolean isRunHidden(int id) {
+	public boolean isRunHidden(int id) {
 		Boolean b = hideRuns.get(id);
 		return b != null ? b : false;
 	}

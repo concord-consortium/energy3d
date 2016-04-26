@@ -37,6 +37,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.ShowCurveCommand;
 
 /**
  * This calculates and visualizes the angular dependence of all energy items for any selected part or building.
@@ -212,6 +213,7 @@ public class EnergyAngularAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(graph, true));
 							for (final String name : dataNames)
 								graph.hideData(name, false);
 							graph.repaint();
@@ -222,6 +224,7 @@ public class EnergyAngularAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
+							SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(graph, false));
 							for (final String name : dataNames)
 								graph.hideData(name, true);
 							graph.repaint();
@@ -234,6 +237,7 @@ public class EnergyAngularAnalysis extends Analysis {
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
+								SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(graph, name));
 								graph.hideData(name, !cbmi.isSelected());
 								graph.repaint();
 							}

@@ -73,6 +73,7 @@ import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditPartCommand;
+import org.concord.energy3d.undo.ShowCurveCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
@@ -401,26 +402,34 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (undoManager.getUndoFlag()) {
 				action = "Undo";
 				undoManager.setUndoFlag(false);
-				type2Action = undoManager.getPresentationName();
+				type2Action = "\"" + undoManager.getPresentationName() + "\"";
 			} else if (undoManager.getRedoFlag()) {
 				action = "Redo";
 				undoManager.setRedoFlag(false);
-				type2Action = undoManager.getPresentationName();
+				type2Action = "\"" + undoManager.getPresentationName() + "\"";
 			}
 			if (undoManager.getSaveFlag()) {
 				action = "Save";
 				undoManager.setSaveFlag(false);
-				type2Action = Scene.getURL().toString() + "*";
+				type2Action = "\"" + Scene.getURL().toString() + "*\""; // append * at the end so that the ng3 suffix is not interpreted as a delimiter
 			}
 			if (undoManager.getChangeGraphTabFlag()) {
 				action = lastEdit.getPresentationName();
 				undoManager.setChangeGraphTabFlag(false);
 				if (lastEdit instanceof ChangeGraphTabCommand)
-					type2Action = ((ChangeGraphTabCommand) lastEdit).getCurrentTitle();
+					type2Action = "\"" + ((ChangeGraphTabCommand) lastEdit).getCurrentTitle() + "\"";
 			}
 			if (undoManager.getChangeThermostatFlag()) {
 				action = lastEdit.getPresentationName();
 				undoManager.setChangeThermostatFlag(false);
+			}
+			if (undoManager.getHideCurveFlag()) {
+				action = lastEdit.getPresentationName();
+				undoManager.setHideCurveFlag(false);
+				if (lastEdit instanceof ShowCurveCommand) {
+					ShowCurveCommand c = (ShowCurveCommand) lastEdit;
+					type2Action = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"Name\": \"" + c.getCurveName() + "\", \"Shown\": " + c.isShown() + "}";
+				}
 			}
 		}
 
@@ -476,7 +485,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			if (action != null) {
 				line += separator + "\"" + action + "\": ";
 				if (type2Action != null) {
-					line += "\"" + type2Action + "\"";
+					line += type2Action;
 				} else {
 					if (actedPart != null) {
 						line += LoggerUtil.getInfo(actedPart);
