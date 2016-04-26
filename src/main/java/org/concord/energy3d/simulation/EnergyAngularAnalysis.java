@@ -11,6 +11,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -26,7 +27,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -366,7 +366,26 @@ public class EnergyAngularAnalysis extends Analysis {
 	@Override
 	public String toJson() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		String s = "{\"Building\": " + Building.getBuildingId(selectedPart) + ", \"Angles\": " + getNumberOfDataPoints();
+		String s = "{\"Angles\": " + getNumberOfDataPoints() + ", \"Increment\": 45";
+		String[] names;
+		if (selectedPart instanceof Foundation) {
+			s += ", \"Building\": " + selectedPart.getId();
+			names = new String[] { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+		} else {
+			s += ", \"Part\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			names = new String[] { "Solar", "Heat Gain" };
+		}
+		for (String name : names) {
+			s += ", \"" + name + "\": {";
+			List<Double> data = graph.getData(name);
+			s += "\"Data\": [";
+			for (Double x : data) {
+				s += Graph.ENERGY_FORMAT.format(x) + ",";
+			}
+			s = s.substring(0, s.length() - 1);
+			s += "]\n";
+			s += "}";
+		}
 		s += "}";
 		return s;
 	}

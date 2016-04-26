@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
@@ -108,7 +109,16 @@ public class DailyEnergyGraph extends JPanel {
 			s += "\"Building\": " + building.getId();
 			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
 			for (String name : names) {
-				s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+				s += ", \"" + name + "\": {";
+				List<Double> data = graph.getData(name);
+				s += "\"Hourly\": [";
+				for (Double x : data) {
+					s += Graph.FIVE_DECIMALS.format(x) + ",";
+				}
+				s = s.substring(0, s.length() - 1);
+				s += "]\n";
+				s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+				s += "}";
 			}
 		} else {
 			// TODO

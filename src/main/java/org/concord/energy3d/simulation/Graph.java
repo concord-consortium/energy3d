@@ -53,7 +53,7 @@ public abstract class Graph extends JPanel {
 
 	final static DecimalFormat ONE_DECIMAL = new DecimalFormat();
 	final static DecimalFormat TWO_DECIMALS = new DecimalFormat();
-	final static DecimalFormat FIVE_DECIMALS = new DecimalFormat();
+	public final static DecimalFormat FIVE_DECIMALS = new DecimalFormat();
 	public final static DecimalFormat ENERGY_FORMAT = new DecimalFormat("######.##");
 
 	int top = 50, right = 50, bottom = 80, left = 90;
@@ -278,7 +278,7 @@ public abstract class Graph extends JPanel {
 		return b != null ? b : false;
 	}
 
-	List<Double> getData(String name) {
+	public List<Double> getData(String name) {
 		return data.get(name);
 	}
 

@@ -11,6 +11,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -387,18 +388,25 @@ public class EnergyDailyAnalysis extends Analysis {
 	public String toJson() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = "{";
+		String[] names;
 		if (selectedPart instanceof Foundation) {
 			s += "\"Building\": " + selectedPart.getId();
-			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-			for (String name : names) {
-				s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
-			}
+			names = new String[] { "Net", "AC", "Heater", "Windows", "Solar Panels" };
 		} else {
 			s += "\"Part\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
-			String[] names = { "Solar", "Heat Gain" };
-			for (String name : names) {
-				s += ", \"" + name + "\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+			names = new String[] { "Solar", "Heat Gain" };
+		}
+		for (String name : names) {
+			s += ", \"" + name + "\": {";
+			List<Double> data = graph.getData(name);
+			s += "\"Hourly\": [";
+			for (Double x : data) {
+				s += Graph.FIVE_DECIMALS.format(x) + ",";
 			}
+			s = s.substring(0, s.length() - 1);
+			s += "]\n";
+			s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+			s += "}";
 		}
 		s += "}";
 		return s;
