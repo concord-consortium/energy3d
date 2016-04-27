@@ -11,16 +11,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.gui.DailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
-import org.concord.energy3d.gui.MyPlainDocument;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -100,7 +95,7 @@ import com.ardor3d.renderer.Camera;
  */
 public class TimeSeriesLogger implements PropertyChangeListener {
 
-	private final static String separator = ",   ";
+	private final static String SEPARATOR = ",   ";
 	private int logInterval = 2; // in seconds
 	private File file;
 	private UndoableEdit lastEdit;
@@ -109,9 +104,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private Object stateValue;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
-	private String noteString = "";
-	private boolean noteEditedFlag = false;
-	private boolean sceneEditedFlag = false;
 	private volatile boolean solarCalculationFinished = false;
 	private ArrayList<Building> buildings = new ArrayList<Building>();
 	private Object analysisRequester;
@@ -125,46 +117,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		this.logInterval = logInterval;
 		undoManager = SceneManager.getInstance().getUndoManager();
 		lastEdit = undoManager.lastEdit();
-		final Document noteAreaDoc = MainPanel.getInstance().getNoteTextArea().getDocument();
-		noteAreaDoc.addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(final DocumentEvent e) {
-				noteEditedFlag = true;
-				if (noteAreaDoc instanceof MyPlainDocument) {
-					String s = ((MyPlainDocument) noteAreaDoc).getRemovedString();
-					if (s != null) {
-						s = s.replace("\n", "-linebreak-");
-						s = s.replace("\t", "-tab-");
-						s = s.replace("\\", "\\\\");
-						s = s.replace("\"", "\\\"");
-						noteString += "D(" + e.getOffset() + "," + s + ")";
-					}
-				}
-			}
-
-			@Override
-			public void insertUpdate(final DocumentEvent e) {
-				noteEditedFlag = true;
-				String s = null;
-				try {
-					s = noteAreaDoc.getText(e.getOffset(), e.getLength());
-				} catch (BadLocationException e1) {
-					e1.printStackTrace();
-				}
-				if (s != null) {
-					s = s.replace("\n", "-linebreak-");
-					s = s.replace("\t", "-tab-");
-					s = s.replace("\\", "\\\\");
-					s = s.replace("\"", "\\\"");
-					noteString += "I(" + e.getOffset() + "," + s + ")";
-				}
-			}
-
-			@Override
-			public void changedUpdate(final DocumentEvent e) {
-				noteEditedFlag = true;
-			}
-		});
 	}
 
 	private String getBuildingSolarEnergies() {
@@ -191,7 +143,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		return result;
 	}
 
-	private void log() {
+	public void log() {
 
 		actedPart = null;
 		stateValue = null;
@@ -444,7 +396,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 		String line = "";
 		if (Scene.getInstance().getProjectName() != null && !Scene.getInstance().getProjectName().trim().equals("")) {
-			line += "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"" + separator;
+			line += "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"" + SEPARATOR;
 		}
 		line += "\"File\": \"" + filename + "\"";
 
@@ -457,7 +409,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 		} else {
 
 			if (analysisRequesterCopy != null) { // this analysis is completed, now record some results
-				line += separator + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": ";
+				line += SEPARATOR + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": ";
 				if (analysisRequesterCopy instanceof AnnualSensorData) {
 					line += ((AnnualSensorData) analysisRequesterCopy).toJson();
 				} else if (analysisRequesterCopy instanceof DailySensorData) {
@@ -492,7 +444,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 			}
 
 			if (action != null) {
-				line += separator + "\"" + action + "\": ";
+				line += SEPARATOR + "\"" + action + "\": ";
 				if (type2Action != null) {
 					line += type2Action;
 				} else {
@@ -511,7 +463,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				if (solarCalculationFinished) {
 					String result = getBuildingSolarEnergies();
 					if (result.length() > 0) {
-						line += separator + "\"SolarEnergy\": " + result;
+						line += SEPARATOR + "\"SolarEnergy\": " + result;
 					}
 					solarCalculationFinished = false;
 				}
@@ -530,18 +482,15 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
 					if (!cameraPosition.equals(oldCameraPosition)) {
 						if (!SceneManager.getInstance().getSpinView()) // don't log camera if the view is being spun
-							line += separator + "\"Camera\": {" + cameraPosition + "}";
+							line += SEPARATOR + "\"Camera\": {" + cameraPosition + "}";
 						oldCameraPosition = cameraPosition;
 					}
 				}
 			}
 
-			if (noteEditedFlag) {
-				if (noteString.length() > 0) {
-					line += separator + "\"Note\": \"" + noteString + "\"";
-					noteString = "";
-				}
-				noteEditedFlag = false;
+			if (MainPanel.getInstance().getNoteString().length() > 0) {
+				line += SEPARATOR + "\"Note\": \"" + MainPanel.getInstance().getNoteString() + "\"";
+				MainPanel.getInstance().setNoteString("");
 			}
 
 		}
@@ -553,7 +502,7 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				} else {
 					writer.write(",\n");
 				}
-				writer.write("{\"Timestamp\": \"" + timestamp + "\"" + separator + line + "}");
+				writer.write("{\"Timestamp\": \"" + timestamp + "\"" + SEPARATOR + line + "}");
 				writer.flush();
 				oldLine = line;
 			}
@@ -569,24 +518,9 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
-		if (evt.getSource() == Scene.getInstance()) {
-			if (evt.getPropertyName().equals("Edit")) {
-				final Object newValue = evt.getNewValue();
-				if (newValue.equals(Boolean.TRUE))
-					sceneEditedFlag = true;
-			}
-		} else if (evt.getSource() == EnergyPanel.getInstance()) {
+		if (evt.getSource() == EnergyPanel.getInstance()) {
 			solarCalculationFinished = true;
 		}
-	}
-
-	public boolean isEdited() {
-		return sceneEditedFlag || noteEditedFlag;
-	}
-
-	public void resetEditFlags() {
-		sceneEditedFlag = false;
-		noteEditedFlag = false;
 	}
 
 	public void start() {

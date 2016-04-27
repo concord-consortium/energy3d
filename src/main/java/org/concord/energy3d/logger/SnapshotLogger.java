@@ -5,10 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.swing.JOptionPane;
-
-import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -16,14 +14,37 @@ import org.concord.energy3d.scene.Scene;
  */
 public class SnapshotLogger {
 
+	// must maintain an independent set of "edited" flags for logging snapshots
+	private volatile boolean sceneEdited = false;
+	private volatile boolean noteEdited = false;
+
+	private static SnapshotLogger instance = new SnapshotLogger();
+
 	private SnapshotLogger() {
 	}
-	
+
+	public static SnapshotLogger getInstance() {
+		return instance;
+	}
+
+	public void setNoteEdited(boolean b) {
+		noteEdited = b;
+	}
+
+	public void setSceneEdited(boolean b) {
+		sceneEdited = b;
+	}
+
+	private void reset() {
+		sceneEdited = false;
+		noteEdited = false;
+	}
+
 	public static File getLogFolder() {
 		return LoggerUtil.getLogFolder();
 	}
 
-	public static void start(final int period, final TimeSeriesLogger logger) {
+	public void start(final int period) {
 		final Thread t = new Thread("Snapshots Logger") {
 			public void run() {
 				while (true) {
@@ -33,15 +54,15 @@ public class SnapshotLogger {
 						e.printStackTrace();
 					}
 					if (Scene.getURL() != null) { // log only when student starts with a template
-						if (logger.isEdited()) {
+						if (noteEdited || sceneEdited) {
 							try {
 								saveSnapshot(LoggerUtil.getLogFolder());
 							} catch (final Exception e) {
 								e.printStackTrace();
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error occured in logging! Please notify the teacher of this problem:\n" + e.getMessage(), "Logging Error", JOptionPane.ERROR_MESSAGE);
+								Util.reportError(e);
 								break;
 							}
-							logger.resetEditFlags();
+							reset();
 						}
 					}
 				}

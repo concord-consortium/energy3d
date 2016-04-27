@@ -77,10 +77,9 @@ public class MainApplication {
 				logger.closeLog();
 			}
 		});
-		Scene.getInstance().addPropertyChangeListener(logger);
 		EnergyPanel.getInstance().addPropertyChangeListener(logger);
 		logger.start();
-		SnapshotLogger.start(20, logger);
+		SnapshotLogger.getInstance().start(20);
 
 		try {
 			new Thread() {

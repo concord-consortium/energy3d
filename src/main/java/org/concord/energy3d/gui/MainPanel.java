@@ -31,8 +31,10 @@ import javax.swing.ToolTipManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Tree;
@@ -94,6 +96,7 @@ public class MainPanel extends JPanel {
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
 	private final double buildingRotationAngleAbsolute = Math.PI / 18;
 	private double buildingRotationAngle = -buildingRotationAngleAbsolute;
+	private String noteString = "";
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
 		@Override
@@ -772,7 +775,8 @@ public class MainPanel extends JPanel {
 			// noteTextArea.setWrapStyleWord(true); // don't call this, line break malfunctions
 			// noteTextArea.setLineWrap(true);
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
-				public void updateEditFlag() {
+
+				private void updateEditFlag() {
 					Scene.getInstance().setEdited(true, false);
 					if (!Config.isApplet())
 						MainFrame.getInstance().updateTitleBar();
@@ -781,15 +785,41 @@ public class MainPanel extends JPanel {
 				@Override
 				public void removeUpdate(final DocumentEvent e) {
 					updateEditFlag();
+					SnapshotLogger.getInstance().setNoteEdited(true);
+					if (noteTextArea.getDocument() instanceof MyPlainDocument) {
+						String s = ((MyPlainDocument) noteTextArea.getDocument()).getRemovedString();
+						if (s != null) {
+							s = s.replace("\n", "-linebreak-");
+							s = s.replace("\t", "-tab-");
+							s = s.replace("\\", "\\\\");
+							s = s.replace("\"", "\\\"");
+							noteString += "D(" + e.getOffset() + "," + s + ")";
+						}
+					}
 				}
 
 				@Override
 				public void insertUpdate(final DocumentEvent e) {
 					updateEditFlag();
+					SnapshotLogger.getInstance().setNoteEdited(true);
+					String s = null;
+					try {
+						s = noteTextArea.getDocument().getText(e.getOffset(), e.getLength());
+					} catch (BadLocationException e1) {
+						e1.printStackTrace();
+					}
+					if (s != null) {
+						s = s.replace("\n", "-linebreak-");
+						s = s.replace("\t", "-tab-");
+						s = s.replace("\\", "\\\\");
+						s = s.replace("\"", "\\\"");
+						noteString += "I(" + e.getOffset() + "," + s + ")";
+					}
 				}
 
 				@Override
 				public void changedUpdate(final DocumentEvent e) {
+					SnapshotLogger.getInstance().setNoteEdited(true);
 				}
 			});
 		}
@@ -1043,6 +1073,15 @@ public class MainPanel extends JPanel {
 
 	public double getBuildingRotationAngleAbsolute() {
 		return buildingRotationAngleAbsolute;
+	}
+
+	/** the string that gets inserted or removed in the note area */
+	public String getNoteString() {
+		return noteString;
+	}
+
+	public void setNoteString(String s) {
+		noteString = s;
 	}
 
 }

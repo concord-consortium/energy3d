@@ -1,8 +1,6 @@
 package org.concord.energy3d.scene;
 
 import java.awt.EventQueue;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,6 +16,7 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Door;
@@ -112,8 +111,6 @@ public class Scene implements Serializable {
 	private DesignSpecs designSpecs = new DesignSpecs();
 	private HousePart copyBuffer, originalCopy;
 
-	private static final ArrayList<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
-
 	public static Scene getInstance() {
 		if (instance == null) {
 			try {
@@ -150,22 +147,6 @@ public class Scene implements Serializable {
 				EnergyPanel.getInstance().clearAllGraphs();
 			}
 		});
-	}
-
-	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
-		propertyChangeListeners.add(pcl);
-	}
-
-	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
-		propertyChangeListeners.remove(pcl);
-	}
-
-	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
-		if (!propertyChangeListeners.isEmpty()) {
-			for (final PropertyChangeListener x : propertyChangeListeners) {
-				x.propertyChange(evt);
-			}
-		}
 	}
 
 	public static void open(final URL file) throws Exception {
@@ -1331,12 +1312,10 @@ public class Scene implements Serializable {
 
 	public void setEdited(final boolean edited, final boolean recomputeEnergy) {
 		if (edited)
-			notifyPropertyChangeListeners(new PropertyChangeEvent(this, "Edit", this.edited, edited));
+			SnapshotLogger.getInstance().setSceneEdited(true);
 		this.edited = edited;
 		if (!Config.isApplet())
 			MainFrame.getInstance().updateTitleBar();
-		// if (edited && recomputeEnergy)
-		// EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 	}
 
 	public void updateEditShapes() {
