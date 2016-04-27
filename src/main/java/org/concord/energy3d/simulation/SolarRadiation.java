@@ -632,7 +632,6 @@ public class SolarRadiation {
 	}
 
 	public void computeEnergyAtHour(final int hour) {
-
 		final Calendar today = Heliodon.getInstance().getCalender();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
@@ -641,6 +640,8 @@ public class SolarRadiation {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
+				if (foundation.getHeatLoss() == null)
+					continue;
 				final int n = (int) Math.round(60.0 / timeStep);
 				final double[] heatLoss = new double[n];
 				final double[] passiveSolar = new double[n];
