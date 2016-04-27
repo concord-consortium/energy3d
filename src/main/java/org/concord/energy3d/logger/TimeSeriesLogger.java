@@ -1,20 +1,15 @@
 package org.concord.energy3d.logger;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.gui.DailyEnergyGraph;
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
@@ -93,7 +88,7 @@ import com.ardor3d.renderer.Camera;
  * @author Charles Xie
  * 
  */
-public class TimeSeriesLogger implements PropertyChangeListener {
+public class TimeSeriesLogger {
 
 	private final static String SEPARATOR = ",   ";
 	private int logInterval = 2; // in seconds
@@ -104,43 +99,16 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 	private Object stateValue;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
-	private volatile boolean solarCalculationFinished = false;
-	private ArrayList<Building> buildings = new ArrayList<Building>();
 	private Object analysisRequester;
 	private Object analysisRequesterCopy;
 	private HousePart analyzedPart;
 	private PrintWriter writer;
 	private boolean firstLine = true;
-	private final static DecimalFormat ENERGY_FORMAT = new DecimalFormat("######.##");
 
 	public TimeSeriesLogger(final int logInterval) {
 		this.logInterval = logInterval;
 		undoManager = SceneManager.getInstance().getUndoManager();
 		lastEdit = undoManager.lastEdit();
-	}
-
-	private String getBuildingSolarEnergies() {
-		String result = "";
-		buildings.clear();
-		List<HousePart> list = Scene.getInstance().getParts();
-		synchronized (list) {
-			for (HousePart p : list) {
-				if (p instanceof Foundation) {
-					Building b = new Building((Foundation) p);
-					if (b.isWallComplete() && !buildings.contains(b)) {
-						buildings.add(b);
-					}
-				}
-			}
-		}
-		if (!buildings.isEmpty()) {
-			result = "[";
-			for (Building b : buildings)
-				result += "{\"Building\": " + b.getFoundation().getId() + ", \"Daily\": " + ENERGY_FORMAT.format(b.getFoundation().getSolarPotentialToday()) + "}, ";
-			result = result.trim().substring(0, result.length() - 2);
-			result += "]";
-		}
-		return result;
 	}
 
 	public void log() {
@@ -424,6 +392,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 							line += ((EnergyDailyAnalysis) analysisRequesterCopy).toJson();
 						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
 							line += ((DailyEnergyGraph) analysisRequesterCopy).toJson();
+							if (SceneManager.getInstance().areBuildingLabelsVisible()) {
+								String result = Building.getBuildingSolarPotentials();
+								if (result != null) {
+									line += SEPARATOR + "\"Solar Potential\": " + result;
+								}
+							}
 						} else if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
 							line += ((EnergyAnnualAnalysis) analysisRequesterCopy).toJson();
 						} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
@@ -437,6 +411,12 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 							line += ((Cost) analysisRequesterCopy).toJson();
 						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
 							line += ((DailyEnergyGraph) analysisRequesterCopy).toJson();
+							if (SceneManager.getInstance().areBuildingLabelsVisible()) {
+								String result = Building.getBuildingSolarPotentials();
+								if (result != null) {
+									line += SEPARATOR + "\"Solar Potential\": " + result;
+								}
+							}
 						}
 					}
 				}
@@ -455,17 +435,6 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 					} else {
 						line += "null";
 					}
-				}
-			}
-
-			// record the daily solar radiation results
-			if (SceneManager.getInstance().getSolarHeatMap() && SceneManager.getInstance().areBuildingLabelsVisible()) {
-				if (solarCalculationFinished) {
-					String result = getBuildingSolarEnergies();
-					if (result.length() > 0) {
-						line += SEPARATOR + "\"SolarEnergy\": " + result;
-					}
-					solarCalculationFinished = false;
 				}
 			}
 
@@ -507,19 +476,13 @@ public class TimeSeriesLogger implements PropertyChangeListener {
 				oldLine = line;
 			}
 		}
+
 	}
 
 	public void closeLog() {
 		if (writer != null) {
 			writer.write("]\n}");
 			writer.close();
-		}
-	}
-
-	@Override
-	public void propertyChange(final PropertyChangeEvent evt) {
-		if (evt.getSource() == EnergyPanel.getInstance()) {
-			solarCalculationFinished = true;
 		}
 	}
 

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
@@ -77,7 +76,6 @@ public class MainApplication {
 				logger.closeLog();
 			}
 		});
-		EnergyPanel.getInstance().addPropertyChangeListener(logger);
 		logger.start();
 		SnapshotLogger.getInstance().start(20);
 

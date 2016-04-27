@@ -13,14 +13,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
@@ -91,7 +87,6 @@ public class EnergyPanel extends JPanel {
 	private boolean cancel;
 	private boolean alreadyRenderedHeatmap = false;
 	private boolean computeEnabled = true;
-	private final List<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
 
 	public enum UpdateRadiation {
 		ALWAYS, ONLY_IF_SLECTED_IN_GUI
@@ -540,7 +535,6 @@ public class EnergyPanel extends JPanel {
 				final Calendar c = (Calendar) Heliodon.getInstance().getCalender().clone();
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
-				notifyPropertyChangeListeners(new PropertyChangeEvent(EnergyPanel.this, "Energy calculation completed", 0, 1));
 				Scene.getInstance().setTreeLeaves();
 				EventQueue.invokeLater(new Runnable() {
 					@Override
@@ -660,24 +654,6 @@ public class EnergyPanel extends JPanel {
 		this.computeEnabled = computeEnabled;
 	}
 
-	@Override
-	public void addPropertyChangeListener(final PropertyChangeListener pcl) {
-		propertyChangeListeners.add(pcl);
-	}
-
-	@Override
-	public void removePropertyChangeListener(final PropertyChangeListener pcl) {
-		propertyChangeListeners.remove(pcl);
-	}
-
-	private void notifyPropertyChangeListeners(final PropertyChangeEvent evt) {
-		if (!propertyChangeListeners.isEmpty()) {
-			for (final PropertyChangeListener x : propertyChangeListeners) {
-				x.propertyChange(evt);
-			}
-		}
-	}
-
 	public void updateProperties() {
 
 		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
@@ -759,7 +735,9 @@ public class EnergyPanel extends JPanel {
 				partProperty1TextField.setText(noDecimal.format(((Roof) selectedPart).getArea()));
 				partProperty2TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			} else {
-				partProperty1TextField.setText(noDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (noDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
+				if (selectedPart.getPoints().size() > 2) {
+					partProperty1TextField.setText(noDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (noDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
+				}
 				partProperty2TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			}
 		}

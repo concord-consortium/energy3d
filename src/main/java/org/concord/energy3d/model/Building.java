@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.awt.geom.Path2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
@@ -19,6 +20,7 @@ public class Building {
 
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("###0.##");
 	private final static DecimalFormat FORMAT4 = new DecimalFormat("###0.####");
+	private final static DecimalFormat ENERGY_FORMAT = new DecimalFormat("######.##");
 	private final static double STORY_HEIGHT = 4;
 
 	private Foundation foundation;
@@ -284,6 +286,27 @@ public class Building {
 		if (p instanceof Foundation)
 			return (Foundation) p;
 		return p.getTopContainer();
+	}
+
+	public static String getBuildingSolarPotentials() {
+		List<Building> buildings = new ArrayList<Building>();
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation) {
+				Building b = new Building((Foundation) p);
+				if (b.isWallComplete() && !buildings.contains(b)) {
+					buildings.add(b);
+				}
+			}
+		}
+		String result = null;
+		if (!buildings.isEmpty()) {
+			result = "[";
+			for (Building b : buildings)
+				result += "{\"Building\": " + b.getFoundation().getId() + ", \"Daily\": " + ENERGY_FORMAT.format(b.getFoundation().getSolarPotentialToday()) + "}, ";
+			result = result.trim().substring(0, result.length() - 2);
+			result += "]";
+		}
+		return result;
 	}
 
 }
