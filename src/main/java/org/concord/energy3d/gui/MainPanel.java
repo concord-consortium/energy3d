@@ -795,7 +795,7 @@ public class MainPanel extends JPanel {
 							s = s.replace("\\", "\\\\");
 							s = s.replace("\"", "\\\"");
 							noteString += "D(" + e.getOffset() + "," + s + ")";
-							TimeSeriesLogger.getInstance().log();
+							TimeSeriesLogger.getInstance().logNote();
 						}
 					}
 				}
@@ -816,7 +816,7 @@ public class MainPanel extends JPanel {
 						s = s.replace("\\", "\\\\");
 						s = s.replace("\"", "\\\"");
 						noteString += "I(" + e.getOffset() + "," + s + ")";
-						TimeSeriesLogger.getInstance().log();
+						TimeSeriesLogger.getInstance().logNote();
 					}
 				}
 

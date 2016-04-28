@@ -385,7 +385,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		dialog.setLocationRelativeTo(MainFrame.getInstance());
 		dialog.setVisible(true);
 
-		TimeSeriesLogger.getInstance().log(this);
+		TimeSeriesLogger.getInstance().logAnalysis(this);
 
 	}
 

@@ -79,7 +79,7 @@ public abstract class Analysis {
 	public abstract void updateGraph();
 
 	void onCompletion() {
-		TimeSeriesLogger.getInstance().log(this);
+		TimeSeriesLogger.getInstance().logAnalysis(this);
 		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);
 		EnergyPanel.getInstance().disableDateSpinner(false);

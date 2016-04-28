@@ -508,7 +508,7 @@ public class EnergyPanel extends JPanel {
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
 										dailyEnergyGraph.addGraph((Foundation) p);
-										TimeSeriesLogger.getInstance().log(dailyEnergyGraph);
+										TimeSeriesLogger.getInstance().logAnalysis(dailyEnergyGraph);
 									}
 								}
 							}

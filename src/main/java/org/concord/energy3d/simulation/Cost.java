@@ -267,7 +267,7 @@ public class Cost {
 
 	public void showGraph() {
 		show();
-		TimeSeriesLogger.getInstance().log(this);
+		TimeSeriesLogger.getInstance().logAnalysis(this);
 	}
 
 	private void show() {
