@@ -91,7 +91,7 @@ import com.ardor3d.renderer.Camera;
 public class TimeSeriesLogger {
 
 	private final static String SEPARATOR = ",   ";
-	private int logInterval = 2; // in seconds
+	private int logInterval = 1; // in seconds
 	private File file;
 	private UndoableEdit lastEdit;
 	private final UndoManager undoManager;
@@ -105,10 +105,15 @@ public class TimeSeriesLogger {
 	private PrintWriter writer;
 	private boolean firstLine = true;
 
-	public TimeSeriesLogger(final int logInterval) {
-		this.logInterval = logInterval;
+	private static final TimeSeriesLogger instance = new TimeSeriesLogger();
+
+	private TimeSeriesLogger() {
 		undoManager = SceneManager.getInstance().getUndoManager();
 		lastEdit = undoManager.lastEdit();
+	}
+
+	public static TimeSeriesLogger getInstance() {
+		return instance;
 	}
 
 	public void log() {
@@ -486,6 +491,14 @@ public class TimeSeriesLogger {
 		}
 	}
 
+	private void log2() {
+		try {
+			log();
+		} catch (Throwable t) {
+			Util.reportError(t);
+		}
+	}
+
 	public void start() {
 		final String timestamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(Calendar.getInstance().getTime());
 		file = new File(LoggerUtil.getLogFolder(), timestamp + ".json");
@@ -504,11 +517,7 @@ public class TimeSeriesLogger {
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
-					try {
-						log();
-					} catch (Throwable t) {
-						Util.reportError(t);
-					}
+					log2();
 				}
 			}
 		};

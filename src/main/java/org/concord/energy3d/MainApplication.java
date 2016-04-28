@@ -69,14 +69,13 @@ public class MainApplication {
 		new Thread(sceneManager, "Energy3D Application").start();
 
 		/* initialize data logging */
-		final TimeSeriesLogger logger = new TimeSeriesLogger(1);
 		addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
-				logger.closeLog();
+				TimeSeriesLogger.getInstance().closeLog();
 			}
 		});
-		logger.start();
+		TimeSeriesLogger.getInstance().start();
 		SnapshotLogger.getInstance().start(20);
 
 		try {
