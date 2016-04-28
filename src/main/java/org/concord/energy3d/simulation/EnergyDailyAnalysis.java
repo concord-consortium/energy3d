@@ -405,8 +405,11 @@ public class EnergyDailyAnalysis extends Analysis {
 			names = new String[] { "Solar", "Heat Gain" };
 		}
 		for (String name : names) {
-			s += ", \"" + name + "\": {";
 			List<Double> data = graph.getData(name);
+			if (data == null)
+				continue;
+			System.out.println("*****************"+name);
+			s += ", \"" + name + "\": {";
 			s += "\"Hourly\": [";
 			for (Double x : data) {
 				s += Graph.FIVE_DECIMALS.format(x) + ",";

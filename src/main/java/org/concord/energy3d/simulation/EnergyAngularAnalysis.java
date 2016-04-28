@@ -384,8 +384,10 @@ public class EnergyAngularAnalysis extends Analysis {
 			names = new String[] { "Solar", "Heat Gain" };
 		}
 		for (String name : names) {
-			s += ", \"" + name + "\": {";
 			List<Double> data = graph.getData(name);
+			if (data == null)
+				continue;
+			s += ", \"" + name + "\": {";
 			s += "\"Data\": [";
 			for (Double x : data) {
 				s += Graph.ENERGY_FORMAT.format(x) + ",";

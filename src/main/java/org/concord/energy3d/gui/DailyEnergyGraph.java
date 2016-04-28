@@ -109,8 +109,10 @@ public class DailyEnergyGraph extends JPanel {
 			s += "\"Building\": " + building.getId();
 			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
 			for (String name : names) {
-				s += ", \"" + name + "\": {";
 				List<Double> data = graph.getData(name);
+				if (data == null)
+					continue;
+				s += ", \"" + name + "\": {";
 				s += "\"Hourly\": [";
 				for (Double x : data) {
 					s += Graph.FIVE_DECIMALS.format(x) + ",";
