@@ -19,6 +19,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -265,9 +266,8 @@ public class Cost {
 	}
 
 	public void showGraph() {
-		SceneManager.getInstance().setAnalysisRequester(this);
 		show();
-		SceneManager.getInstance().setAnalysisRequester(null);
+		TimeSeriesLogger.getInstance().log(this);
 	}
 
 	private void show() {
@@ -389,7 +389,7 @@ public class Cost {
 		String s = "";
 		if (selectedPart != null) {
 			s += "{";
-			s = "\"Building\": " + Building.getBuildingId(selectedPart);
+			s += "\"Building\": " + Building.getBuildingId(selectedPart);
 			s += ", \"Amount\": " + getBuildingCost(selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer());
 			s += "}";
 		} else {

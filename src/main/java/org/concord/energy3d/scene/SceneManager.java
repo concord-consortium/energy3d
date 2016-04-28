@@ -1840,16 +1840,4 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return foundation;
 	}
 
-	private Object analysisRequester;
-
-	// An analysis task must be known to the logger so that we know what analysis tasks has been conducted.
-	// Also when there is a requester, certain UI actions (currently only date spinner) may be set programmatically instead of by the user. Those UI actions need to be disabled temporarily.
-	public void setAnalysisRequester(final Object analysisRequester) {
-		this.analysisRequester = analysisRequester;
-	}
-
-	public Object getAnalysisRequester() {
-		return analysisRequester;
-	}
-
 }

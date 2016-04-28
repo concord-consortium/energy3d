@@ -10,6 +10,7 @@ import javax.swing.JButton;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.SceneManager;
@@ -78,14 +79,15 @@ public abstract class Analysis {
 	public abstract void updateGraph();
 
 	void onCompletion() {
-		SceneManager.getInstance().setAnalysisRequester(null);
+		TimeSeriesLogger.getInstance().log(this);
 		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);
+		EnergyPanel.getInstance().disableDateSpinner(false);
 	}
 
 	private void onStart() {
+		EnergyPanel.getInstance().disableDateSpinner(true);
 		SceneManager.getInstance().setHeatFluxDaily(true);
-		SceneManager.getInstance().setAnalysisRequester(this);
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
 		SceneManager.getInstance().setHeatFluxVectorsVisible(true);

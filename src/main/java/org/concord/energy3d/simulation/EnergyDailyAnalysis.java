@@ -408,7 +408,6 @@ public class EnergyDailyAnalysis extends Analysis {
 			List<Double> data = graph.getData(name);
 			if (data == null)
 				continue;
-			System.out.println("*****************"+name);
 			s += ", \"" + name + "\": {";
 			s += "\"Hourly\": [";
 			for (Double x : data) {

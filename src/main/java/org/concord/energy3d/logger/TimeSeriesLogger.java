@@ -60,6 +60,7 @@ import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
+import org.concord.energy3d.undo.ChangeThermostatCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditPartCommand;
@@ -91,32 +92,30 @@ import com.ardor3d.renderer.Camera;
 public class TimeSeriesLogger {
 
 	private final static String SEPARATOR = ",   ";
-	private int logInterval = 1; // in seconds
 	private File file;
-	private UndoableEdit lastEdit;
-	private final UndoManager undoManager;
 	private HousePart actedPart;
 	private Object stateValue;
 	private String oldLine = null;
 	private String oldCameraPosition = null;
 	private Object analysisRequester;
-	private Object analysisRequesterCopy;
 	private HousePart analyzedPart;
 	private PrintWriter writer;
 	private boolean firstLine = true;
+	private UndoManager undoManager;
 
 	private static final TimeSeriesLogger instance = new TimeSeriesLogger();
 
 	private TimeSeriesLogger() {
 		undoManager = SceneManager.getInstance().getUndoManager();
-		lastEdit = undoManager.lastEdit();
 	}
 
 	public static TimeSeriesLogger getInstance() {
 		return instance;
 	}
 
-	public void log() {
+	private void record() {
+
+		UndoableEdit lastEdit = undoManager.lastEdit();
 
 		actedPart = null;
 		stateValue = null;
@@ -126,14 +125,13 @@ public class TimeSeriesLogger {
 		if (url == null) // no logging if not working on a saved file
 			return;
 		final String filename = url == null ? null : new File(url.getFile()).getName();
-		String action = undoManager.getUndoPresentationName();
+		String action = undoManager.getPresentationName();
 		if (action.startsWith("Undo")) {
 			action = action.substring(4).trim();
 			if (action.equals(""))
 				action = null;
 		}
-		if (!(undoManager.lastEdit() instanceof SaveCommand) && undoManager.lastEdit() != lastEdit) {
-			lastEdit = undoManager.lastEdit();
+		if (!(lastEdit instanceof SaveCommand)) {
 			if (lastEdit instanceof AddPartCommand) {
 				actedPart = ((AddPartCommand) lastEdit).getHousePart();
 			} else if (lastEdit instanceof EditPartCommand) {
@@ -319,10 +317,22 @@ public class TimeSeriesLogger {
 			} else if (lastEdit instanceof ChangeTimeCommand) {
 				Calendar calendar = Heliodon.getInstance().getCalender();
 				stateValue = "\"" + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" + calendar.get(Calendar.MINUTE) + "\"";
+			} else if (lastEdit instanceof ChangeGraphTabCommand) {
+				stateValue = "\"" + ((ChangeGraphTabCommand) lastEdit).getCurrentTitle() + "\"";
+			} else if (lastEdit instanceof ChangeThermostatCommand) {
+				stateValue = "\"Button\"";
+			} else if (lastEdit instanceof ShowCurveCommand) {
+				ShowCurveCommand c = (ShowCurveCommand) lastEdit;
+				stateValue = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"Name\": \"" + c.getCurveName() + "\", \"Shown\": " + c.isShown() + "}";
+			} else if (lastEdit instanceof ShowRunCommand) {
+				ShowRunCommand c = (ShowRunCommand) lastEdit;
+				stateValue = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"ID\": \"" + c.getRunID() + "\", \"Shown\": " + c.isShown() + "}";
 			}
+
 		} else {
 			action = null;
 		}
+		System.out.println("****" + lastEdit + " = " + action);
 		String type2Action = null; // type-2 actions are actually not undoable, but they are registered with the undo manager to be logged
 		if (action == null) {
 			if (undoManager.getUndoFlag()) {
@@ -339,32 +349,6 @@ public class TimeSeriesLogger {
 				undoManager.setSaveFlag(false);
 				type2Action = "\"" + Scene.getURL().toString() + "*\""; // append * at the end so that the ng3 suffix is not interpreted as a delimiter
 			}
-			if (undoManager.getChangeGraphTabFlag()) {
-				action = lastEdit.getPresentationName();
-				undoManager.setChangeGraphTabFlag(false);
-				if (lastEdit instanceof ChangeGraphTabCommand)
-					type2Action = "\"" + ((ChangeGraphTabCommand) lastEdit).getCurrentTitle() + "\"";
-			}
-			if (undoManager.getChangeThermostatFlag()) {
-				action = lastEdit.getPresentationName();
-				undoManager.setChangeThermostatFlag(false);
-			}
-			if (undoManager.getShowCurveFlag()) {
-				action = lastEdit.getPresentationName();
-				undoManager.setShowCurveFlag(false);
-				if (lastEdit instanceof ShowCurveCommand) {
-					ShowCurveCommand c = (ShowCurveCommand) lastEdit;
-					type2Action = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"Name\": \"" + c.getCurveName() + "\", \"Shown\": " + c.isShown() + "}";
-				}
-			}
-			if (undoManager.getShowRunFlag()) {
-				action = lastEdit.getPresentationName();
-				undoManager.setShowRunFlag(false);
-				if (lastEdit instanceof ShowRunCommand) {
-					ShowRunCommand c = (ShowRunCommand) lastEdit;
-					type2Action = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"ID\": \"" + c.getRunID() + "\", \"Shown\": " + c.isShown() + "}";
-				}
-			}
 		}
 
 		String line = "";
@@ -373,100 +357,91 @@ public class TimeSeriesLogger {
 		}
 		line += "\"File\": \"" + filename + "\"";
 
-		analysisRequester = SceneManager.getInstance().getAnalysisRequester();
-		if (analysisRequester != null) {
-
-			analyzedPart = SceneManager.getInstance().getSelectedPart();
-			analysisRequesterCopy = analysisRequester;
-
-		} else {
-
-			if (analysisRequesterCopy != null) { // this analysis is completed, now record some results
-				line += SEPARATOR + "\"" + analysisRequesterCopy.getClass().getSimpleName() + "\": ";
-				if (analysisRequesterCopy instanceof AnnualSensorData) {
-					line += ((AnnualSensorData) analysisRequesterCopy).toJson();
-				} else if (analysisRequesterCopy instanceof DailySensorData) {
-					line += ((DailySensorData) analysisRequesterCopy).toJson();
-				} else if (analysisRequesterCopy instanceof DailyEnvironmentalTemperature) {
-					line += ((DailyEnvironmentalTemperature) analysisRequesterCopy).toJson();
-				} else if (analysisRequesterCopy instanceof AnnualEnvironmentalTemperature) {
-					line += ((AnnualEnvironmentalTemperature) analysisRequesterCopy).toJson();
-				} else {
-					if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
-						if (analysisRequesterCopy instanceof EnergyDailyAnalysis) {
-							line += ((EnergyDailyAnalysis) analysisRequesterCopy).toJson();
-						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
-							line += ((DailyEnergyGraph) analysisRequesterCopy).toJson();
-							if (SceneManager.getInstance().areBuildingLabelsVisible()) {
-								String result = Building.getBuildingSolarPotentials();
-								if (result != null) {
-									line += SEPARATOR + "\"Solar Potential\": " + result;
-								}
+		analyzedPart = SceneManager.getInstance().getSelectedPart();
+		if (analysisRequester != null) { // this analysis is completed, now record some results
+			line += SEPARATOR + "\"" + analysisRequester.getClass().getSimpleName() + "\": ";
+			if (analysisRequester instanceof AnnualSensorData) {
+				line += ((AnnualSensorData) analysisRequester).toJson();
+			} else if (analysisRequester instanceof DailySensorData) {
+				line += ((DailySensorData) analysisRequester).toJson();
+			} else if (analysisRequester instanceof DailyEnvironmentalTemperature) {
+				line += ((DailyEnvironmentalTemperature) analysisRequester).toJson();
+			} else if (analysisRequester instanceof AnnualEnvironmentalTemperature) {
+				line += ((AnnualEnvironmentalTemperature) analysisRequester).toJson();
+			} else {
+				if (analyzedPart != null && !(analyzedPart instanceof Tree) && !(analyzedPart instanceof Human)) { // if something analyzable is selected
+					if (analysisRequester instanceof EnergyDailyAnalysis) {
+						line += ((EnergyDailyAnalysis) analysisRequester).toJson();
+					} else if (analysisRequester instanceof DailyEnergyGraph) {
+						line += ((DailyEnergyGraph) analysisRequester).toJson();
+						if (SceneManager.getInstance().areBuildingLabelsVisible()) {
+							String result = Building.getBuildingSolarPotentials();
+							if (result != null) {
+								line += SEPARATOR + "\"Solar Potential\": " + result;
 							}
-						} else if (analysisRequesterCopy instanceof EnergyAnnualAnalysis) {
-							line += ((EnergyAnnualAnalysis) analysisRequesterCopy).toJson();
-						} else if (analysisRequesterCopy instanceof EnergyAngularAnalysis) {
-							line += ((EnergyAngularAnalysis) analysisRequesterCopy).toJson();
-						} else if (analysisRequesterCopy instanceof Cost) {
-							line += ((Cost) analysisRequesterCopy).toJson();
 						}
-						analyzedPart = null;
-					} else {
-						if (analysisRequesterCopy instanceof Cost) {
-							line += ((Cost) analysisRequesterCopy).toJson();
-						} else if (analysisRequesterCopy instanceof DailyEnergyGraph) {
-							line += ((DailyEnergyGraph) analysisRequesterCopy).toJson();
-							if (SceneManager.getInstance().areBuildingLabelsVisible()) {
-								String result = Building.getBuildingSolarPotentials();
-								if (result != null) {
-									line += SEPARATOR + "\"Solar Potential\": " + result;
-								}
+					} else if (analysisRequester instanceof EnergyAnnualAnalysis) {
+						line += ((EnergyAnnualAnalysis) analysisRequester).toJson();
+					} else if (analysisRequester instanceof EnergyAngularAnalysis) {
+						line += ((EnergyAngularAnalysis) analysisRequester).toJson();
+					} else if (analysisRequester instanceof Cost) {
+						line += ((Cost) analysisRequester).toJson();
+					}
+					analyzedPart = null;
+				} else {
+					if (analysisRequester instanceof Cost) {
+						line += ((Cost) analysisRequester).toJson();
+					} else if (analysisRequester instanceof DailyEnergyGraph) {
+						line += ((DailyEnergyGraph) analysisRequester).toJson();
+						if (SceneManager.getInstance().areBuildingLabelsVisible()) {
+							String result = Building.getBuildingSolarPotentials();
+							if (result != null) {
+								line += SEPARATOR + "\"Solar Potential\": " + result;
 							}
 						}
 					}
 				}
-				analysisRequesterCopy = null;
 			}
+			analysisRequester = null;
+		}
 
-			if (action != null) {
-				line += SEPARATOR + "\"" + action + "\": ";
-				if (type2Action != null) {
-					line += type2Action;
+		if (action != null && !action.equals("")) {
+			line += SEPARATOR + "\"" + action + "\": ";
+			if (type2Action != null) {
+				line += type2Action;
+			} else {
+				if (actedPart != null) {
+					line += LoggerUtil.getInfo(actedPart);
+				} else if (stateValue != null) {
+					line += stateValue;
 				} else {
-					if (actedPart != null) {
-						line += LoggerUtil.getInfo(actedPart);
-					} else if (stateValue != null) {
-						line += stateValue;
-					} else {
-						line += "null";
-					}
+					line += "null";
 				}
 			}
+		}
 
-			if (!SceneManager.getInstance().getSpinView()) {
-				final Camera camera = SceneManager.getInstance().getCamera();
-				if (camera != null) {
-					final ReadOnlyVector3 location = camera.getLocation();
-					final ReadOnlyVector3 direction = camera.getDirection();
-					String cameraPosition = "\"Position\": {\"x\": " + LoggerUtil.FORMAT.format(location.getX());
-					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(location.getY());
-					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(location.getZ());
-					cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
-					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
-					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
-					if (!cameraPosition.equals(oldCameraPosition)) {
-						if (!SceneManager.getInstance().getSpinView()) // don't log camera if the view is being spun
-							line += SEPARATOR + "\"Camera\": {" + cameraPosition + "}";
-						oldCameraPosition = cameraPosition;
-					}
+		if (!SceneManager.getInstance().getSpinView()) {
+			final Camera camera = SceneManager.getInstance().getCamera();
+			if (camera != null) {
+				final ReadOnlyVector3 location = camera.getLocation();
+				final ReadOnlyVector3 direction = camera.getDirection();
+				String cameraPosition = "\"Position\": {\"x\": " + LoggerUtil.FORMAT.format(location.getX());
+				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(location.getY());
+				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(location.getZ());
+				cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
+				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
+				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
+				if (!cameraPosition.equals(oldCameraPosition)) {
+					if (!SceneManager.getInstance().getSpinView()) // don't log camera if the view is being spun
+						line += SEPARATOR + "\"Camera\": {" + cameraPosition + "}";
+					oldCameraPosition = cameraPosition;
 				}
 			}
+		}
 
-			if (MainPanel.getInstance().getNoteString().length() > 0) {
-				line += SEPARATOR + "\"Note\": \"" + MainPanel.getInstance().getNoteString() + "\"";
-				MainPanel.getInstance().setNoteString("");
-			}
-
+		if (MainPanel.getInstance().getNoteString().length() > 0) {
+			line += SEPARATOR + "\"Note\": \"" + MainPanel.getInstance().getNoteString() + "\"";
+			MainPanel.getInstance().setNoteString("");
 		}
 
 		if (!line.trim().endsWith(".ng3\"")) {
@@ -484,16 +459,25 @@ public class TimeSeriesLogger {
 
 	}
 
-	public void closeLog() {
+	public void close() {
 		if (writer != null) {
 			writer.write("]\n}");
 			writer.close();
 		}
 	}
 
-	private void log2() {
+	public void log() {
 		try {
-			log();
+			record();
+		} catch (Throwable t) {
+			Util.reportError(t);
+		}
+	}
+
+	public void log(Object analysisRequester) {
+		this.analysisRequester = analysisRequester;
+		try {
+			record();
 		} catch (Throwable t) {
 			Util.reportError(t);
 		}
@@ -508,21 +492,6 @@ public class TimeSeriesLogger {
 			Util.reportError(e);
 		}
 		writer.write("{\n\"Activities\": [\n");
-		final Thread t = new Thread("Time Series Logger") {
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						sleep(1000 * logInterval);
-					} catch (final InterruptedException e) {
-						e.printStackTrace();
-					}
-					log2();
-				}
-			}
-		};
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();
 	}
 
 }

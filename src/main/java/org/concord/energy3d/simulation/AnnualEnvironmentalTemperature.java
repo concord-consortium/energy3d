@@ -33,8 +33,8 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
@@ -384,8 +384,6 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 
 	public void showDialog() {
 
-		SceneManager.getInstance().setAnalysisRequester(this);
-
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Annual Environmental Temperature", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
@@ -489,7 +487,7 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 		dialog.setLocationRelativeTo(MainFrame.getInstance());
 		dialog.setVisible(true);
 
-		SceneManager.getInstance().setAnalysisRequester(null);
+		TimeSeriesLogger.getInstance().log(this);
 
 	}
 

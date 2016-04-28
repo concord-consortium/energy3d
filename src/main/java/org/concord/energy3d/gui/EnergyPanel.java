@@ -43,6 +43,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -119,6 +120,7 @@ public class EnergyPanel extends JPanel {
 	private ConstructionCostGraph constructionCostGraph;
 	private DailyEnergyGraph dailyEnergyGraph;
 	private JTabbedPane graphTabbedPane;
+	private boolean disableDateSpinner;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -159,7 +161,7 @@ public class EnergyPanel extends JPanel {
 					firstCall = false;
 					return;
 				}
-				if (SceneManager.getInstance().getAnalysisRequester() == null) {
+				if (!disableDateSpinner) {
 					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
 					final Heliodon heliodon = Heliodon.getInstance();
 					heliodon.setDate((Date) dateSpinner.getValue());
@@ -481,7 +483,6 @@ public class EnergyPanel extends JPanel {
 						try {
 							final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
 							if (doCompute) {
-								SceneManager.getInstance().setAnalysisRequester(dailyEnergyGraph);
 								alreadyRenderedHeatmap = true;
 								computeNow();
 								if (!cancel) {
@@ -507,9 +508,9 @@ public class EnergyPanel extends JPanel {
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
 										dailyEnergyGraph.addGraph((Foundation) p);
+										TimeSeriesLogger.getInstance().log(dailyEnergyGraph);
 									}
 								}
-								SceneManager.getInstance().setAnalysisRequester(null);
 							}
 						});
 					} while (computeRequest);
@@ -901,6 +902,10 @@ public class EnergyPanel extends JPanel {
 		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), title, TitledBorder.LEADING, TitledBorder.TOP);
 		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - (smaller ? 2 : 1)));
 		return b;
+	}
+
+	public void disableDateSpinner(boolean b) {
+		disableDateSpinner = b;
 	}
 
 }

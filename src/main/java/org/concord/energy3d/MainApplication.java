@@ -72,7 +72,7 @@ public class MainApplication {
 		addShutdownHook(new Runnable() {
 			@Override
 			public void run() {
-				TimeSeriesLogger.getInstance().closeLog();
+				TimeSeriesLogger.getInstance().close();
 			}
 		});
 		TimeSeriesLogger.getInstance().start();

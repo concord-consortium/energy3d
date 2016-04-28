@@ -35,6 +35,7 @@ import javax.swing.text.BadLocationException;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.SnapshotLogger;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Tree;
@@ -794,6 +795,7 @@ public class MainPanel extends JPanel {
 							s = s.replace("\\", "\\\\");
 							s = s.replace("\"", "\\\"");
 							noteString += "D(" + e.getOffset() + "," + s + ")";
+							TimeSeriesLogger.getInstance().log();
 						}
 					}
 				}
@@ -814,6 +816,7 @@ public class MainPanel extends JPanel {
 						s = s.replace("\\", "\\\\");
 						s = s.replace("\"", "\\\"");
 						noteString += "I(" + e.getOffset() + "," + s + ")";
+						TimeSeriesLogger.getInstance().log();
 					}
 				}
 
