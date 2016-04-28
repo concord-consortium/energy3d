@@ -196,8 +196,8 @@ public class Heliodon {
 		scene.attachChild(root);
 
 		setDate(timeAndDate);
-		EnergyPanel.getInstance().getDateSpinner().setValue(timeAndDate);
 		setTime(timeAndDate);
+		Util.setSilently(EnergyPanel.getInstance().getDateSpinner(), timeAndDate);
 
 		if (isNightTime()) {
 			final Calendar calendar = Calendar.getInstance();
@@ -426,7 +426,7 @@ public class Heliodon {
 			// calendar must not be updated if this method is called from setDate() because this method can only computer 6 months of the year from declination angle
 			final double days = MathUtils.asin(this.declinationAngle / TILT_ANGLE) / MathUtils.TWO_PI * 365.25 - 284.0;
 			calendar.set(calendar.get(Calendar.YEAR), 0, (int) Math.round(days)); //
-			EnergyPanel.getInstance().getDateSpinner().setValue(calendar.getTime());
+			Util.setSilently(EnergyPanel.getInstance().getDateSpinner(), calendar.getTime());
 		}
 
 		if (redrawHeliodon)

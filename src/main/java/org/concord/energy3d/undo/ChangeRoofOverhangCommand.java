@@ -10,32 +10,36 @@ import org.concord.energy3d.scene.Scene;
 public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgOverhangLength, newOverhangLength;
-	private Roof selectedRoof;
+	private double oldValue, newValue;
+	private Roof roof;
 
-	public ChangeRoofOverhangCommand(Roof selectedRoof) {
-		this.selectedRoof = selectedRoof;
-		orgOverhangLength = selectedRoof.getOverhangLength();
+	public ChangeRoofOverhangCommand(Roof roof) {
+		this.roof = roof;
+		oldValue = roof.getOverhangLength();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newOverhangLength = selectedRoof.getOverhangLength();
-		selectedRoof.setOverhangLength(orgOverhangLength);
+		newValue = roof.getOverhangLength();
+		roof.setOverhangLength(oldValue);
 		Scene.getInstance().redrawAll(); // can't just use Roof.draw() as we also need to draw the wall parts
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		selectedRoof.setOverhangLength(newOverhangLength);
+		roof.setOverhangLength(newValue);
 		Scene.getInstance().redrawAll(); // can't just use Roof.draw() as we also need to draw the wall parts
 	}
 
 	// for action logging
 	public Roof getRoof() {
-		return selectedRoof;
+		return roof;
+	}
+
+	public double getOldValue() {
+		return oldValue;
 	}
 
 	@Override

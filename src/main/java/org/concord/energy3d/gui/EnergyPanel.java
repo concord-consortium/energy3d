@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 
@@ -153,7 +154,8 @@ public class EnergyPanel extends JPanel {
 		dateSpinner = createSpinner(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
 		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
 		dateSpinner.addChangeListener(new ChangeListener() {
-			boolean firstCall = true;
+			private boolean firstCall = true;
+			private Date lastDate;
 
 			@Override
 			public void stateChanged(final ChangeEvent e) {
@@ -162,15 +164,25 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				if (!disableDateSpinner) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeDateCommand());
-					final Heliodon heliodon = Heliodon.getInstance();
-					heliodon.setDate((Date) dateSpinner.getValue());
+					ChangeDateCommand c = new ChangeDateCommand();
+					Date d = (Date) dateSpinner.getValue();
+					if (lastDate != null) { // fix a Java bug that causes the spinner to fire when going from Dec into Jan
+						Calendar c0 = new GregorianCalendar();
+						c0.setTime(lastDate);
+						Calendar c1 = new GregorianCalendar();
+						c1.setTime(d);
+						if (c0.get(Calendar.MONTH) == c1.get(Calendar.MONTH) && c0.get(Calendar.DAY_OF_MONTH) == c1.get(Calendar.DAY_OF_MONTH))
+							return;
+					}
+					Scene.getInstance().setDate(d);
+					Heliodon.getInstance().setDate(d);
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setDate(heliodon.getCalender().getTime());
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().setEdited(true);
 					updateThermostat();
 					EnergyPanel.this.validate();
+					lastDate = d;
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			}
 		});

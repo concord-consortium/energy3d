@@ -31,10 +31,7 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	public synchronized void undo() throws CannotUndoException {
 		super.undo();
 		SaveCommand.setGloabalSignificant(true);
-		if (editToBeUndone() instanceof SaveCommand)
-			Scene.getInstance().setEdited(false);
-		else
-			Scene.getInstance().setEdited(true);
+		Scene.getInstance().setEdited(!(editToBeUndone() instanceof SaveCommand));
 		SaveCommand.setGloabalSignificant(false);
 		refreshUndoRedoGui();
 		TimeSeriesLogger.getInstance().logUndo();
@@ -44,10 +41,7 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	public synchronized void redo() throws CannotRedoException {
 		super.redo();
 		SaveCommand.setGloabalSignificant(true);
-		if (editToBeUndone() instanceof SaveCommand)
-			Scene.getInstance().setEdited(false);
-		else
-			Scene.getInstance().setEdited(true);
+		Scene.getInstance().setEdited(!(editToBeUndone() instanceof SaveCommand));
 		SaveCommand.setGloabalSignificant(false);
 		refreshUndoRedoGui();
 		TimeSeriesLogger.getInstance().logRedo();

@@ -582,11 +582,12 @@ public class PopupMenuFactory {
 								if (val < 0 || val > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 10.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									SceneManager.getInstance().getUndoManager().addEdit(new ChangeRoofOverhangCommand(roof));
+									ChangeRoofOverhangCommand c = new ChangeRoofOverhangCommand(roof);
 									roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
 									Scene.getInstance().redrawAll();
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
 							} catch (final NumberFormatException exception) {

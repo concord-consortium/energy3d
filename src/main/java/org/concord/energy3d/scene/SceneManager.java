@@ -11,6 +11,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -708,12 +710,26 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						mouseRightClicked(e.getX(), cp.getHeight() - e.getY());
 					}
 				}
+
+				@Override
+				public void mouseReleased(final MouseEvent e) {
+					if (Util.isRightClick(e)) {
+						TimeSeriesLogger.getInstance().logCamera("Pan");
+					}
+				}
 			});
 
 			((Component) canvas).addMouseMotionListener(new MouseMotionAdapter() {
 				@Override
 				public void mouseDragged(final MouseEvent e) {
 					EnergyPanel.getInstance().update();
+				}
+			});
+
+			((Component) canvas).addMouseWheelListener(new MouseWheelListener() {
+				@Override
+				public void mouseWheelMoved(MouseWheelEvent e) {
+					TimeSeriesLogger.getInstance().logCamera("Zoom");
 				}
 			});
 
@@ -1517,7 +1533,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (selectedHousePart != null)
 					selectedHousePart.setGridsVisible(false);
 				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-					// if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || (operation == Operation.RESIZE && houseMoveStartPoint != null))) {
 					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
 						if (selectedHousePart.isDrawable()) {
 							selectedHousePart.complete();
@@ -1526,10 +1541,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						} else {
 							editHousePartCommand.undo();
 							selectedHousePart.setHighlight(false);
-							// selectedHousePart.reset();
-							// selectedHousePart.draw();
-							// undoManager.addEdit(new RemoveHousePartCommand(selectedHousePart));
-							// Scene.getInstance().remove(selectedHousePart, true);
 							selectedHousePart = null;
 						}
 						if (editHousePartCommand != null) {
@@ -1542,7 +1553,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						cameraControl.setLeftMouseButtonEnabled(true);
 					houseMoveStartPoint = null;
 					houseMovePoints = null;
-					TimeSeriesLogger.getInstance().logCamera();
+					TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
 				} else {
 					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());

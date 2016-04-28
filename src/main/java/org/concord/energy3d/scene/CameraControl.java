@@ -31,18 +31,21 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 
 public abstract class CameraControl {
-	public enum ButtonAction {MOVE, ROTATE, ZOOM, NONE};
-    protected final Vector3 _upAxis = new Vector3();
-    protected final Matrix3 _workerMatrix = new Matrix3();
-    protected final Vector3 _workerVector = new Vector3();
-    protected InputTrigger _mouseTrigger;
-    protected InputTrigger _keyTrigger;
-    protected ButtonAction leftButtonAction = ButtonAction.ROTATE;
-    protected ButtonAction rightButtonAction = ButtonAction.MOVE;
-    protected double _mouseRotateSpeed = .005;
-    protected double _moveSpeed = 50;
-    protected double _keyRotateSpeed = 2.25;
-    protected boolean enabled = true;
+	public enum ButtonAction {
+		MOVE, ROTATE, ZOOM, NONE
+	};
+
+	protected final Vector3 _upAxis = new Vector3();
+	protected final Matrix3 _workerMatrix = new Matrix3();
+	protected final Vector3 _workerVector = new Vector3();
+	protected InputTrigger _mouseTrigger;
+	protected InputTrigger _keyTrigger;
+	protected ButtonAction leftButtonAction = ButtonAction.ROTATE;
+	protected ButtonAction rightButtonAction = ButtonAction.MOVE;
+	protected double _mouseRotateSpeed = .005;
+	protected double _moveSpeed = 50;
+	protected double _keyRotateSpeed = 2.25;
+	protected boolean enabled = true;
 	private ReadOnlyVector3 orgCameraDirection;
 	private ReadOnlyVector3 newCameraDirection;
 	private ReadOnlyVector3 orgCameraLocation;
@@ -52,99 +55,98 @@ public abstract class CameraControl {
 	private boolean leftMouseButtonEnabled = true;
 	private boolean rightMouseButtonEnabled = true;
 
-    public CameraControl(final ReadOnlyVector3 upAxis) {
-        _upAxis.set(upAxis);
-    }
+	public CameraControl(final ReadOnlyVector3 upAxis) {
+		_upAxis.set(upAxis);
+	}
 
-    public ReadOnlyVector3 getUpAxis() {
-        return _upAxis;
-    }
+	public ReadOnlyVector3 getUpAxis() {
+		return _upAxis;
+	}
 
-    public void setUpAxis(final ReadOnlyVector3 upAxis) {
-        _upAxis.set(upAxis);
-    }
+	public void setUpAxis(final ReadOnlyVector3 upAxis) {
+		_upAxis.set(upAxis);
+	}
 
-    public double getMouseRotateSpeed() {
-        return _mouseRotateSpeed;
-    }
+	public double getMouseRotateSpeed() {
+		return _mouseRotateSpeed;
+	}
 
-    public void setMouseRotateSpeed(final double speed) {
-        _mouseRotateSpeed = speed;
-    }
+	public void setMouseRotateSpeed(final double speed) {
+		_mouseRotateSpeed = speed;
+	}
 
-    public double getMoveSpeed() {
-        return _moveSpeed;
-    }
+	public double getMoveSpeed() {
+		return _moveSpeed;
+	}
 
-    public void setMoveSpeed(final double speed) {
-        _moveSpeed = speed;
-    }
+	public void setMoveSpeed(final double speed) {
+		_moveSpeed = speed;
+	}
 
-    public double getKeyRotateSpeed() {
-        return _keyRotateSpeed;
-    }
+	public double getKeyRotateSpeed() {
+		return _keyRotateSpeed;
+	}
 
-    public void setKeyRotateSpeed(final double speed) {
-        _keyRotateSpeed = speed;
-    }
+	public void setKeyRotateSpeed(final double speed) {
+		_keyRotateSpeed = speed;
+	}
 
-    protected abstract void move(final Camera camera, final double dx, final double dy);
+	protected abstract void move(final Camera camera, final double dx, final double dy);
 
-    protected abstract void rotate(final Camera camera, final double dx, final double dy);
+	protected abstract void rotate(final Camera camera, final double dx, final double dy);
 
-    /**
-     * @param layer
-     *            the logical layer to register with
-     * @param upAxis
-     *            the up axis of the camera
-     * @param dragOnly
-     *            if true, mouse input will only rotate the camera if one of the mouse buttons (left, center or right)
-     *            is down.
-     * @return a new FirstPersonControl object
-     */
-    public void setupTriggers(final LogicalLayer layer, final ReadOnlyVector3 upAxis, final boolean dragOnly) {
-        setupMouseTriggers(layer, dragOnly);
-    }
+	/**
+	 * @param layer
+	 *            the logical layer to register with
+	 * @param upAxis
+	 *            the up axis of the camera
+	 * @param dragOnly
+	 *            if true, mouse input will only rotate the camera if one of the mouse buttons (left, center or right) is down.
+	 * @return a new FirstPersonControl object
+	 */
+	public void setupTriggers(final LogicalLayer layer, final ReadOnlyVector3 upAxis, final boolean dragOnly) {
+		setupMouseTriggers(layer, dragOnly);
+	}
 
-    public void removeTriggers(final LogicalLayer layer) {
-        if (_mouseTrigger != null) {
-            layer.deregisterTrigger(_mouseTrigger);
-        }
-        if (_keyTrigger != null) {
-            layer.deregisterTrigger(_keyTrigger);
-        }
-    }
+	public void removeTriggers(final LogicalLayer layer) {
+		if (_mouseTrigger != null) {
+			layer.deregisterTrigger(_mouseTrigger);
+		}
+		if (_keyTrigger != null) {
+			layer.deregisterTrigger(_keyTrigger);
+		}
+	}
 
-    public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
-        // Mouse look
-        final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates
-                .or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
-        final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), Predicates.and(someMouseDown, Predicates.not(new KeyHeldCondition(Key.LCONTROL))));
-        final TriggerAction dragAction = new TriggerAction() {
+	public void setupMouseTriggers(final LogicalLayer layer, final boolean dragOnly) {
+		// Mouse look
+		final Predicate<TwoInputStates> someMouseDown = Predicates.or(TriggerConditions.leftButtonDown(), Predicates.or(TriggerConditions.rightButtonDown(), TriggerConditions.middleButtonDown()));
+		final Predicate<TwoInputStates> dragged = Predicates.and(TriggerConditions.mouseMoved(), Predicates.and(someMouseDown, Predicates.not(new KeyHeldCondition(Key.LCONTROL))));
+		final TriggerAction dragAction = new TriggerAction() {
 
-            // Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
-            private boolean firstPing = true;
+			// Test boolean to allow us to ignore first mouse event. First event can wildly vary based on platform.
+			private boolean firstPing = true;
 
-            @Override
+			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-            	if (!enabled || !mouseEnabled) return;
-                final MouseState mouse = inputStates.getCurrent().getMouseState();
-                if (mouse.getDx() != 0 || mouse.getDy() != 0) {
-                    if (!firstPing) {
-                    	final boolean left =  leftMouseButtonEnabled && mouse.getButtonState(MouseButton.LEFT) == ButtonState.DOWN;
-                    	final boolean right = rightMouseButtonEnabled && mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
-                    	final boolean middle = mouse.getButtonState(MouseButton.MIDDLE) == ButtonState.DOWN;
+				if (!enabled || !mouseEnabled)
+					return;
+				final MouseState mouse = inputStates.getCurrent().getMouseState();
+				if (mouse.getDx() != 0 || mouse.getDy() != 0) {
+					if (!firstPing) {
+						final boolean left = leftMouseButtonEnabled && mouse.getButtonState(MouseButton.LEFT) == ButtonState.DOWN;
+						final boolean right = rightMouseButtonEnabled && mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
+						final boolean middle = mouse.getButtonState(MouseButton.MIDDLE) == ButtonState.DOWN;
 						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE) {
 							final double fac = Camera.getCurrentCamera().getLocation().length() * 150;
-                    		final double dx = -mouse.getDx() * fac / Camera.getCurrentCamera().getWidth();
+							final double dx = -mouse.getDx() * fac / Camera.getCurrentCamera().getWidth();
 							final double dy = -mouse.getDy() * fac / Camera.getCurrentCamera().getHeight() / 4.0;
 							move(source.getCanvasRenderer().getCamera(), dx, dy);
-                    		SceneManager.getInstance().getCameraNode().updateFromCamera();
-                    		Scene.getInstance().updateEditShapes();
+							SceneManager.getInstance().getCameraNode().updateFromCamera();
+							Scene.getInstance().updateEditShapes();
 						} else if (left && leftButtonAction == ButtonAction.ROTATE || right && rightButtonAction == ButtonAction.ROTATE) {
-                    		rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
-                    		SceneManager.getInstance().getCameraNode().updateFromCamera();
-                    		Scene.getInstance().updateEditShapes();
+							rotate(source.getCanvasRenderer().getCamera(), -mouse.getDx(), -mouse.getDy());
+							SceneManager.getInstance().getCameraNode().updateFromCamera();
+							Scene.getInstance().updateEditShapes();
 						} else if (middle || left && leftButtonAction == ButtonAction.ZOOM || right && rightButtonAction == ButtonAction.ZOOM) {
 							int dy = inputStates.getCurrent().getMouseState().getDy();
 							if (dy < -4)
@@ -153,16 +155,15 @@ public abstract class CameraControl {
 								dy = 4;
 							zoom(source, tpf, -dy / 1.0);
 						}
-                    } else {
-                        firstPing = false;
-                    }
-                }
-            }
-        };
+					} else {
+						firstPing = false;
+					}
+				}
+			}
+		};
 
-
-        _mouseTrigger = new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction);
-        layer.registerTrigger(_mouseTrigger);
+		_mouseTrigger = new InputTrigger(dragOnly ? dragged : TriggerConditions.mouseMoved(), dragAction);
+		layer.registerTrigger(_mouseTrigger);
 
 		layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
 			@Override
@@ -170,23 +171,23 @@ public abstract class CameraControl {
 				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
 			}
 		}));
-    }
+	}
 
-    public InputTrigger getKeyTrigger() {
-        return _keyTrigger;
-    }
+	public InputTrigger getKeyTrigger() {
+		return _keyTrigger;
+	}
 
-    public InputTrigger getMouseTrigger() {
-        return _mouseTrigger;
-    }
+	public InputTrigger getMouseTrigger() {
+		return _mouseTrigger;
+	}
 
-    public boolean isEnabled() {
-    	return enabled;
-    }
+	public boolean isEnabled() {
+		return enabled;
+	}
 
-    public void setEnabled(final boolean enabled) {
-    	this.enabled = enabled;
-    }
+	public void setEnabled(final boolean enabled) {
+		this.enabled = enabled;
+	}
 
 	public void setMouseButtonActions(final ButtonAction leftButtonAction, final ButtonAction rightButtonAction) {
 		this.leftButtonAction = leftButtonAction;
@@ -194,7 +195,7 @@ public abstract class CameraControl {
 	}
 
 	public void setMouseEnabled(final boolean enabled) {
-		mouseEnabled  = enabled;
+		mouseEnabled = enabled;
 	}
 
 	public boolean isMouseEnabled() {
@@ -251,7 +252,7 @@ public abstract class CameraControl {
 			newCameraLocation = PrintController.getInstance().getZoomAllCameraLocation();
 		else
 			newCameraLocation = clickedPoint.subtract(newCameraDirection.multiply(zoomDistance, null), null);
-		animationTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
+		animationTime = SceneManager.getInstance().getTimer().getTimeInSeconds();
 	}
 
 	public boolean isAnimating() {
@@ -259,7 +260,7 @@ public abstract class CameraControl {
 	}
 
 	public void animate() {
-		final double currentTime  = SceneManager.getInstance().getTimer().getTimeInSeconds();
+		final double currentTime = SceneManager.getInstance().getTimer().getTimeInSeconds();
 		final double t = currentTime - animationTime;
 		final double animationDuration = 1.0;
 		final ReadOnlyVector3 currentDirection = orgCameraDirection.multiply(animationDuration - t, null).addLocal(newCameraDirection.multiply(t, null)).normalizeLocal();

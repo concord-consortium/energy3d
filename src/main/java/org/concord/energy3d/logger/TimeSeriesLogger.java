@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.undo.UndoableEdit;
@@ -89,12 +90,16 @@ import com.ardor3d.renderer.Camera;
  */
 public class TimeSeriesLogger {
 
+	private final static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private final static String SEPARATOR = ",   ";
 	private File file;
 	private Object analysisRequester;
 	private String action;
+	private String cameraMode;
 	private PrintWriter writer;
 	private boolean firstRecord = true;
+	private String lastAction;
+	private String lastTimestamp;
 
 	private static final TimeSeriesLogger instance = new TimeSeriesLogger();
 
@@ -114,7 +119,7 @@ public class TimeSeriesLogger {
 		// write the header
 
 		final String filename = url == null ? null : new File(url.getFile()).getName();
-		final String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Calendar.getInstance().getTime());
+		final String timestamp = TIME_FORMAT.format(Calendar.getInstance().getTime());
 		String line = "";
 		if (Scene.getInstance().getProjectName() != null && !Scene.getInstance().getProjectName().trim().equals("")) {
 			line += "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"" + SEPARATOR;
@@ -125,12 +130,23 @@ public class TimeSeriesLogger {
 
 		if (action != null) {
 
+			if (timestamp.equals(lastTimestamp) && action.equals(lastAction)) // can't log more frequently than one second for the same type of action
+				return;
+
 			HousePart actedPart = null;
-			Object stateValue = null;
+			String stateValue = null;
 
 			// special treatments
-			if (action.equals("Undo") || action.equals("Redo")) {
-				stateValue = "\"" + SceneManager.getInstance().getUndoManager().getPresentationName() + "\"";
+			if (action.equals("Undo")) {
+				String s = SceneManager.getInstance().getUndoManager().getRedoPresentationName();
+				if (s.length() >= 4)
+					s = s.substring(4, s.length()).trim();
+				stateValue = "\"" + s + "\"";
+			} else if (action.equals("Redo")) {
+				String s = SceneManager.getInstance().getUndoManager().getUndoPresentationName();
+				if (s.length() >= 4)
+					s = s.substring(4, s.length()).trim();
+				stateValue = "\"" + s + "\"";
 			} else if (action.equals("Save")) {
 				stateValue = "\"" + Scene.getURL().toString() + "*\""; // append * at the end so that the ng3 suffix is not interpreted as a delimiter
 			} else if (action.equals("Note")) {
@@ -150,7 +166,7 @@ public class TimeSeriesLogger {
 					cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
 					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
 					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
-					stateValue = "{" + cameraPosition + "}";
+					stateValue = "{" + cameraPosition + ", \"Mode\": \"" + cameraMode + "\"}";
 				}
 			} else {
 
@@ -174,8 +190,11 @@ public class TimeSeriesLogger {
 					SolarPanel sp = ((ChangeSolarPanelEfficiencyCommand) lastEdit).getSolarPanel();
 					stateValue = "{\"Building\":" + sp.getTopContainer().getId() + ", \"ID\":" + sp.getId() + ", \"Value\": " + sp.getEfficiency() + "}";
 				} else if (lastEdit instanceof ChangeRoofOverhangCommand) {
-					Roof r = ((ChangeRoofOverhangCommand) lastEdit).getRoof();
-					stateValue = "{\"Building\":" + r.getTopContainer().getId() + ", \"ID\":" + r.getId() + ", \"Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
+					ChangeRoofOverhangCommand c = (ChangeRoofOverhangCommand) lastEdit;
+					Roof r = c.getRoof();
+					stateValue = "{\"Building\":" + r.getTopContainer().getId() + ", \"ID\":" + r.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
+					stateValue += ", \"New Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
 				} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
 					Foundation foundation = ((ChangeBuildingSolarPanelEfficiencyCommand) lastEdit).getFoundation();
 					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
@@ -301,9 +320,9 @@ public class TimeSeriesLogger {
 					s += "}";
 					stateValue = s;
 				} else if (lastEdit instanceof AnimateSunCommand) {
-					stateValue = SceneManager.getInstance().isSunAnimation();
+					stateValue = "" + SceneManager.getInstance().isSunAnimation();
 				} else if (lastEdit instanceof SpinViewCommand) {
-					stateValue = SceneManager.getInstance().getSpinView();
+					stateValue = "" + SceneManager.getInstance().getSpinView();
 				} else if (lastEdit instanceof ChangeTextureCommand) {
 					TextureMode textureMode = Scene.getInstance().getTextureMode();
 					if (textureMode == TextureMode.Full) {
@@ -314,31 +333,35 @@ public class TimeSeriesLogger {
 						stateValue = "\"None\"";
 					}
 				} else if (lastEdit instanceof ShowAxesCommand) {
-					stateValue = SceneManager.getInstance().areAxesVisible();
+					stateValue = "" + SceneManager.getInstance().areAxesVisible();
 				} else if (lastEdit instanceof TopViewCommand) {
-					stateValue = SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW;
+					stateValue = "" + (SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW);
 				} else if (lastEdit instanceof ShowShadowCommand) {
-					stateValue = SceneManager.getInstance().isShadowEnabled();
+					stateValue = "" + SceneManager.getInstance().isShadowEnabled();
 				} else if (lastEdit instanceof ShowAnnotationCommand) {
-					stateValue = Scene.getInstance().areAnnotationsVisible();
+					stateValue = "" + Scene.getInstance().areAnnotationsVisible();
 				} else if (lastEdit instanceof ShowHeliodonCommand) {
-					stateValue = SceneManager.getInstance().isHeliodonVisible();
+					stateValue = "" + SceneManager.getInstance().isHeliodonVisible();
 				} else if (lastEdit instanceof ChangeBackgroundAlbedoCommand) {
-					stateValue = Scene.getInstance().getGround().getAlbedo();
+					stateValue = "" + Scene.getInstance().getGround().getAlbedo();
 				} else if (lastEdit instanceof ChangeGroundThermalDiffusivityCommand) {
-					stateValue = Scene.getInstance().getGround().getThermalDiffusivity();
+					stateValue = "" + Scene.getInstance().getGround().getThermalDiffusivity();
 				} else if (lastEdit instanceof ChangeInsideTemperatureCommand) {
 					ChangeInsideTemperatureCommand c = (ChangeInsideTemperatureCommand) lastEdit;
-					stateValue = c.getBuilding().getThermostat().getTemperature(c.getMonthOfYear(), c.getDayOfWeek(), c.getHourOfDay());
+					stateValue = "" + c.getBuilding().getThermostat().getTemperature(c.getMonthOfYear(), c.getDayOfWeek(), c.getHourOfDay());
 				} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
-					stateValue = Scene.getInstance().getSolarHeatMapColorContrast();
+					stateValue = "" + Scene.getInstance().getSolarHeatMapColorContrast();
 				} else if (lastEdit instanceof ChangeLatitudeCommand) {
-					stateValue = Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
+					stateValue = "" + Math.round(180 * Heliodon.getInstance().getLatitude() / Math.PI);
 				} else if (lastEdit instanceof ChangeCityCommand) {
 					stateValue = "\"" + Scene.getInstance().getCity() + "\"";
 				} else if (lastEdit instanceof ChangeDateCommand) {
-					Calendar calendar = Heliodon.getInstance().getCalender();
-					stateValue = "\"" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "\"";
+					ChangeDateCommand c = (ChangeDateCommand) lastEdit;
+					Calendar calendar = new GregorianCalendar();
+					calendar.setTime(c.getOldDate());
+					stateValue = "{\"Old Date\": \"" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "\"";
+					calendar.setTime(Scene.getInstance().getDate());
+					stateValue += ", \"New Date\": \"" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.DAY_OF_MONTH) + "\"}";
 				} else if (lastEdit instanceof ChangeTimeCommand) {
 					Calendar calendar = Heliodon.getInstance().getCalender();
 					stateValue = "\"" + (calendar.get(Calendar.HOUR_OF_DAY)) + ":" + calendar.get(Calendar.MINUTE) + "\"";
@@ -363,6 +386,8 @@ public class TimeSeriesLogger {
 			} else {
 				line += "null";
 			}
+
+			lastAction = action;
 
 		}
 
@@ -422,6 +447,8 @@ public class TimeSeriesLogger {
 		writer.write("{\"Timestamp\": \"" + timestamp + "\"" + SEPARATOR + line + "}");
 		writer.flush();
 
+		lastTimestamp = timestamp;
+
 	}
 
 	public void close() {
@@ -477,8 +504,9 @@ public class TimeSeriesLogger {
 		action = null;
 	}
 
-	public void logCamera() {
+	public void logCamera(String mode) {
 		action = "Camera";
+		cameraMode = mode;
 		record();
 		action = null;
 	}
