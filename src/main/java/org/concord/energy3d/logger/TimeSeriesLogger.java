@@ -91,7 +91,6 @@ public class TimeSeriesLogger {
 
 	private final static String SEPARATOR = ",   ";
 	private File file;
-	private String oldCameraPosition;
 	private Object analysisRequester;
 	private String action;
 	private PrintWriter writer;
@@ -139,6 +138,19 @@ public class TimeSeriesLogger {
 				if (s.length() > 0) {
 					stateValue = "\"" + s + "\"";
 					MainPanel.getInstance().setNoteString("");
+				}
+			} else if (action.equals("Camera")) {
+				final Camera camera = SceneManager.getInstance().getCamera();
+				if (camera != null) {
+					final ReadOnlyVector3 location = camera.getLocation();
+					final ReadOnlyVector3 direction = camera.getDirection();
+					String cameraPosition = "\"Position\": {\"x\": " + LoggerUtil.FORMAT.format(location.getX());
+					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(location.getY());
+					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(location.getZ());
+					cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
+					cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
+					cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
+					stateValue = "{" + cameraPosition + "}";
 				}
 			} else {
 
@@ -402,25 +414,6 @@ public class TimeSeriesLogger {
 			}
 		}
 
-		if (!SceneManager.getInstance().getSpinView()) {
-			final Camera camera = SceneManager.getInstance().getCamera();
-			if (camera != null) {
-				final ReadOnlyVector3 location = camera.getLocation();
-				final ReadOnlyVector3 direction = camera.getDirection();
-				String cameraPosition = "\"Position\": {\"x\": " + LoggerUtil.FORMAT.format(location.getX());
-				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(location.getY());
-				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(location.getZ());
-				cameraPosition += "}, \"Direction\": {\"x\": " + LoggerUtil.FORMAT.format(direction.getX());
-				cameraPosition += ", \"y\": " + LoggerUtil.FORMAT.format(direction.getY());
-				cameraPosition += ", \"z\": " + LoggerUtil.FORMAT.format(direction.getZ()) + "}";
-				if (!cameraPosition.equals(oldCameraPosition)) {
-					if (!SceneManager.getInstance().getSpinView()) // don't log camera if the view is being spun
-						line += SEPARATOR + "\"Camera\": {" + cameraPosition + "}";
-					oldCameraPosition = cameraPosition;
-				}
-			}
-		}
-
 		if (firstRecord) {
 			firstRecord = false;
 		} else {
@@ -480,6 +473,12 @@ public class TimeSeriesLogger {
 
 	public void logNote() {
 		action = "Note";
+		record();
+		action = null;
+	}
+
+	public void logCamera() {
+		action = "Camera";
 		record();
 		action = null;
 	}

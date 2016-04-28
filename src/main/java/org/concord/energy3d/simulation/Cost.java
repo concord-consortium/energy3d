@@ -386,14 +386,14 @@ public class Cost {
 
 	public String toJson() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		String s = "";
+		String s;
 		if (selectedPart != null) {
-			s += "{";
+			s = "{";
 			s += "\"Building\": " + Building.getBuildingId(selectedPart);
 			s += ", \"Amount\": " + getBuildingCost(selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer());
 			s += "}";
 		} else {
-			s += "[";
+			s = "[";
 			int count = 0;
 			for (HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {

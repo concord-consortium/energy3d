@@ -32,6 +32,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.PopupMenuFactory;
 import org.concord.energy3d.logger.PlayControl;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -1541,6 +1542,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						cameraControl.setLeftMouseButtonEnabled(true);
 					houseMoveStartPoint = null;
 					houseMovePoints = null;
+					TimeSeriesLogger.getInstance().logCamera();
 				} else {
 					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
