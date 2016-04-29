@@ -26,7 +26,6 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualSensorData;
@@ -77,7 +76,6 @@ import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
@@ -256,33 +254,19 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + foundation.getId() + ", \"ID\": " + p.getId();
 					stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
 					stateValue += ", \"Old Color\": \"" + Util.toString(c.getOldColor()) + "\", \"New Color\": \"" + Util.toString(p.getColor()) + "\"}";
-				} else if (lastEdit instanceof ChangeBuildingColorCommand) {
-					ChangeBuildingColorCommand c = (ChangeBuildingColorCommand) lastEdit;
-					String s = "{\"Building\":" + c.getFoundation().getId();
-					Operation o = c.getOperation();
-					if (o == Operation.DRAW_FOUNDATION) {
-						s += ", \"Type\": \"Foundation\"";
-					} else if (o == Operation.DRAW_WALL) {
-						s += ", \"Type\": \"Wall\"";
-					} else if (o == Operation.DRAW_DOOR) {
-						s += ", \"Type\": \"Door\"";
-					} else if (o == Operation.DRAW_FLOOR) {
-						s += ", \"Type\": \"Floor\"";
-					} else if (o == Operation.DRAW_ROOF_PYRAMID) {
-						s += ", \"Type\": \"Roof\"";
-					}
-					ReadOnlyColorRGBA color = Scene.getInstance().getPartColorOfBuilding(c.getFoundation(), o);
-					if (color != null)
-						s += ", \"Color\": \"" + String.format("#%02x%02x%02x", (int) Math.round(color.getRed() * 255), (int) Math.round(color.getGreen() * 255), (int) Math.round(color.getBlue() * 255)) + "\"";
-					s += "}";
-					stateValue = s;
 				} else if (lastEdit instanceof ChangeContainerWindowColorCommand) {
 					ChangeContainerWindowColorCommand cmd = (ChangeContainerWindowColorCommand) lastEdit;
 					HousePart container = cmd.getContainer();
 					List<Window> windows = Scene.getInstance().getWindowsOnContainer(container);
 					String containerType = container instanceof Wall ? "Wall" : "Roof";
-					ReadOnlyColorRGBA c = windows.get(0).getColor();
-					stateValue = "{\"" + containerType + "\":" + container.getId() + ", \"Color\": \"" + String.format("#%02x%02x%02x", (int) Math.round(c.getRed() * 255), (int) Math.round(c.getGreen() * 255), (int) Math.round(c.getBlue() * 255)) + "\"}";
+					stateValue = "{\"" + containerType + "\":" + container.getId() + ", \"New Color\": \"" + Util.toString(windows.get(0).getColor()) + "\"}";
+				} else if (lastEdit instanceof ChangeBuildingColorCommand) {
+					ChangeBuildingColorCommand c = (ChangeBuildingColorCommand) lastEdit;
+					HousePart p = c.getPart();
+					String s = "{\"Building\":" + c.getFoundation().getId();
+					s += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
+					s += ", \"New Color\": \"" + Util.toString(p.getColor()) + "\"}";
+					stateValue = s;
 				}
 
 				// u-values

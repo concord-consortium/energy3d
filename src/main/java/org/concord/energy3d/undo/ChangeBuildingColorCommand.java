@@ -5,47 +5,49 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager.Operation;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyColorRGBA orgColor, newColor;
+	private ReadOnlyColorRGBA oldColor, newColor;
+	private HousePart part;
 	private Foundation foundation;
-	private Operation operation;
 
-	public ChangeBuildingColorCommand(Foundation foundation, Operation operation) {
-		this.foundation = foundation;
-		this.operation = operation;
-		orgColor = Scene.getInstance().getPartColorOfBuilding(foundation, operation);
+	public ChangeBuildingColorCommand(HousePart part) {
+		this.part = part;
+		if (part instanceof Foundation) {
+			foundation = (Foundation) part;
+		} else {
+			foundation = part.getTopContainer();
+		}
+		oldColor = part.getColor();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newColor = Scene.getInstance().getPartColorOfBuilding(foundation, operation);
-		Scene.getInstance().setPartColorOfBuilding(foundation, operation, orgColor);
+		newColor = part.getColor();
+		Scene.getInstance().setPartColorOfBuilding(part, oldColor);
 		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setPartColorOfBuilding(foundation, operation, newColor);
+		Scene.getInstance().setPartColorOfBuilding(part, newColor);
 		Scene.getInstance().redrawAll();
 	}
 
-	// for action logging
-	public Foundation getFoundation() {
-		return foundation;
+	public HousePart getPart() {
+		return part;
 	}
 
-	// for action logging
-	public Operation getOperation() {
-		return operation;
+	public Foundation getFoundation() {
+		return foundation;
 	}
 
 	@Override

@@ -170,16 +170,16 @@ public class Heliodon {
 		root.attachChild(baseTicks);
 
 		// Compass Labels N S E W
-		final BMText northLabel = createText("N");
+		final BMText northLabel = createText("90\u00B0");
 		northLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, 0));
 		northLabel.setTranslation(0, 6, 0);
-		final BMText southLabel = createText("S");
+		final BMText southLabel = createText("270\u00B0");
 		southLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, Math.PI));
 		southLabel.setTranslation(0, -6, 0);
-		final BMText eastLabel = createText("E");
+		final BMText eastLabel = createText("0\u00B0");
 		eastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, -MathUtils.HALF_PI));
 		eastLabel.setTranslation(6, 0, 0);
-		final BMText westLabel = createText("W");
+		final BMText westLabel = createText("180\u00B0");
 		westLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, MathUtils.HALF_PI));
 		westLabel.setTranslation(-6, 0, 0);
 
@@ -220,9 +220,9 @@ public class Heliodon {
 	private BMText createText(final String text) {
 		final BMText label = new BMText(text, text, FontManager.getInstance().getAnnotationFont(), Align.Center);
 		label.setAutoRotate(false);
-		label.setAutoScale(AutoScale.Off);
+		label.setAutoScale(AutoScale.FixedScreenSize);
 		label.setAutoFade(AutoFade.Off);
-		label.setFontScale(5.0);
+		label.setFontScale(1.0);
 		root.attachChild(label);
 		return label;
 	}

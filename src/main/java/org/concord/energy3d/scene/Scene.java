@@ -32,7 +32,6 @@ import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.DesignSpecs;
@@ -1153,79 +1152,15 @@ public class Scene implements Serializable {
 	}
 
 	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public void setPartColorOfBuilding(final Foundation foundation, final Operation operation, final ReadOnlyColorRGBA color) {
-		switch (operation) {
-		case DRAW_FOUNDATION:
-			foundation.setColor(color);
-			break;
-		case DRAW_WALL:
+	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
+		if (part instanceof Foundation) {
+			part.setColor(color);
+		} else {
 			for (final HousePart p : parts) {
-				if (p instanceof Wall && p.getTopContainer() == foundation)
+				if (p.getTopContainer() == part.getTopContainer() && p.getClass().equals(part.getClass()))
 					p.setColor(color);
 			}
-			break;
-		case DRAW_WINDOW:
-			for (final HousePart p : parts) {
-				if (p instanceof Window && p.getTopContainer() == foundation)
-					p.setColor(color);
-			}
-			break;
-		case DRAW_DOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Door && p.getTopContainer() == foundation)
-					p.setColor(color);
-			}
-			break;
-		case DRAW_FLOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Floor && p.getTopContainer() == foundation)
-					p.setColor(color);
-			}
-			break;
-		case DRAW_ROOF_PYRAMID:
-			for (final HousePart p : parts) {
-				if (p instanceof Roof && p.getTopContainer() == foundation)
-					p.setColor(color);
-			}
-			break;
-		default:
-			break;
 		}
-	}
-
-	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
-	public ReadOnlyColorRGBA getPartColorOfBuilding(final Foundation foundation, final Operation operation) {
-		switch (operation) {
-		case DRAW_FOUNDATION:
-			return foundation.getColor();
-		case DRAW_WALL:
-			for (final HousePart p : parts) {
-				if (p instanceof Wall && p.getTopContainer() == foundation)
-					return p.getColor();
-			}
-			break;
-		case DRAW_DOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Door && p.getTopContainer() == foundation)
-					return p.getColor();
-			}
-			break;
-		case DRAW_FLOOR:
-			for (final HousePart p : parts) {
-				if (p instanceof Floor && p.getTopContainer() == foundation)
-					return p.getColor();
-			}
-			break;
-		case DRAW_ROOF_PYRAMID:
-			for (final HousePart p : parts) {
-				if (p instanceof Roof && p.getTopContainer() == foundation)
-					return p.getColor();
-			}
-			break;
-		default:
-			break;
-		}
-		return null;
 	}
 
 	public List<HousePart> getHousePartsOfSameTypeInBuilding(final HousePart x) {

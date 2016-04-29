@@ -50,7 +50,6 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
@@ -494,12 +493,13 @@ public class PopupMenuFactory {
 								window.setColor(color);
 								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else if (rb2.isSelected()) {
-								SceneManager.getInstance().getUndoManager().addEdit(new ChangeContainerWindowColorCommand(window.getContainer()));
+								ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
 								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color);
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else {
-								Foundation foundation = window.getTopContainer();
-								SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, Operation.DRAW_WINDOW));
-								Scene.getInstance().setPartColorOfBuilding(foundation, Operation.DRAW_WINDOW, color);
+								ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(window);
+								Scene.getInstance().setPartColorOfBuilding(window, color);
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							}
 							Scene.getInstance().setEdited(true);
 						}

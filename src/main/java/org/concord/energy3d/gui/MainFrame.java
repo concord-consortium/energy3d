@@ -73,7 +73,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
-import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualSensorData;
@@ -1902,9 +1901,9 @@ public class MainFrame extends JFrame {
 						selectedPart.setColor(color);
 						SceneManager.getInstance().getUndoManager().addEdit(cmd);
 					} else {
-						final Foundation foundation = selectedPart.getTopContainer();
-						SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, Operation.DRAW_WALL));
-						Scene.getInstance().setPartColorOfBuilding(foundation, Operation.DRAW_WALL, color);
+						ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
+						Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+						SceneManager.getInstance().getUndoManager().addEdit(cmd);
 					}
 				} else {
 					ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);

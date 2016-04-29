@@ -51,7 +51,6 @@ public class ChangeContainerWindowColorCommand extends AbstractUndoableEdit {
 		}
 	}
 
-	// for action logging
 	public HousePart getContainer() {
 		return container;
 	}
