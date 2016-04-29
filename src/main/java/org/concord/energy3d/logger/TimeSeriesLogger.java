@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -13,7 +14,6 @@ import javax.swing.undo.UndoableEdit;
 import org.concord.energy3d.gui.DailyEnergyGraph;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Building;
-import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -89,6 +89,7 @@ public class TimeSeriesLogger {
 
 	private final static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private final static String SEPARATOR = ",   ";
+	private final static int MINIMUM_INTERVAL = 200; // in milliseconds
 	private File file;
 	private Object analysisRequester;
 	private String action;
@@ -96,7 +97,7 @@ public class TimeSeriesLogger {
 	private PrintWriter writer;
 	private boolean firstRecord = true;
 	private String lastAction;
-	private String lastTimestamp;
+	private Date lastTime;
 	private String lastCameraPosition;
 
 	private static final TimeSeriesLogger instance = new TimeSeriesLogger();
@@ -114,22 +115,23 @@ public class TimeSeriesLogger {
 		if (url == null) // no logging if not working on a saved file
 			return;
 
-		// write the header
+		/* write the header */
 
 		final String filename = url == null ? null : new File(url.getFile()).getName();
-		final String timestamp = TIME_FORMAT.format(Calendar.getInstance().getTime());
+		final Date time = Calendar.getInstance().getTime();
+		final String timestamp = TIME_FORMAT.format(time);
 		String line = "";
 		if (Scene.getInstance().getProjectName() != null && !Scene.getInstance().getProjectName().trim().equals("")) {
 			line += "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"" + SEPARATOR;
 		}
 		line += "\"File\": \"" + filename + "\"";
 
-		// actions registered with the Undo Manager
+		/* actions registered with the Undo Manager */
 
 		if (action != null) {
 
-			if (timestamp.equals(lastTimestamp) && action.equals(lastAction)) // can't log more frequently than one second for the same type of action
-				return;
+			if ((lastTime != null && Math.abs(time.getTime() - lastTime.getTime()) < MINIMUM_INTERVAL) && action.equals(lastAction))
+				return; // don't log too frequently for the same type of action
 
 			HousePart actedPart = null;
 			String stateValue = null;
@@ -244,6 +246,9 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof AdjustThermostatCommand) {
 					Foundation foundation = ((AdjustThermostatCommand) lastEdit).getFoundation();
 					stateValue = "{\"Building\":" + foundation.getId() + "}";
+				} else if (lastEdit instanceof ChangeThermostatCommand) {
+					Foundation foundation = ((ChangeThermostatCommand) lastEdit).getFoundation();
+					stateValue = "{\"Building\":" + foundation.getId() + "}";
 				}
 
 				// colors
@@ -269,63 +274,35 @@ public class TimeSeriesLogger {
 					stateValue = s;
 				}
 
-				// u-values
+				// u-values and thermal masses
 				else if (lastEdit instanceof ChangePartUValueCommand) {
-					HousePart p = ((ChangePartUValueCommand) lastEdit).getHousePart();
+					ChangePartUValueCommand c = (ChangePartUValueCommand) lastEdit;
+					HousePart p = c.getPart();
 					if (p instanceof Thermalizable) {
 						Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
-						String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
-						if (p instanceof Wall) {
-							s += ", \"Type\": \"Wall\"";
-						} else if (p instanceof Door) {
-							s += ", \"Type\": \"Door\"";
-						} else if (p instanceof Window) {
-							s += ", \"Type\": \"Window\"";
-						} else if (p instanceof Roof) {
-							s += ", \"Type\": \"Roof\"";
-						} else if (p instanceof Foundation) {
-							s += ", \"Type\": \"Floor\"";
-						}
-						s += ", \"Value\": " + ((Thermalizable) p).getUValue() + "}";
-						stateValue = s;
-					}
-				} else if (lastEdit instanceof ChangeVolumetricHeatCapacityCommand) {
-					HousePart p = ((ChangeVolumetricHeatCapacityCommand) lastEdit).getHousePart();
-					if (p instanceof Thermalizable) {
-						Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
-						String s = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
-						if (p instanceof Wall) {
-							s += ", \"Type\": \"Wall\"";
-						} else if (p instanceof Door) {
-							s += ", \"Type\": \"Door\"";
-						} else if (p instanceof Window) {
-							s += ", \"Type\": \"Window\"";
-						} else if (p instanceof Roof) {
-							s += ", \"Type\": \"Roof\"";
-						} else if (p instanceof Foundation) {
-							s += ", \"Type\": \"Floor\"";
-						}
-						s += ", \"Value\": " + ((Thermalizable) p).getVolumetricHeatCapacity() + "}";
-						stateValue = s;
+						stateValue = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+						stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
+						stateValue += ", \"Old Value\": " + c.getOldValue();
+						stateValue += ", \"New Value\": " + ((Thermalizable) p).getUValue() + "}";
 					}
 				} else if (lastEdit instanceof ChangeBuildingUValueCommand) {
-					HousePart p = ((ChangeBuildingUValueCommand) lastEdit).getHousePart();
+					ChangeBuildingUValueCommand c = (ChangeBuildingUValueCommand) lastEdit;
+					HousePart p = c.getPart();
 					if (p instanceof Thermalizable) {
 						Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
-						String s = "{\"Building\":" + foundation.getId();
-						if (p instanceof Wall) {
-							s += ", \"Type\": \"Wall\"";
-						} else if (p instanceof Door) {
-							s += ", \"Type\": \"Door\"";
-						} else if (p instanceof Foundation) {
-							s += ", \"Type\": \"Floor\"";
-						} else if (p instanceof Window) {
-							s += ", \"Type\": \"Window\"";
-						} else if (p instanceof Roof) {
-							s += ", \"Type\": \"Roof\"";
-						}
-						s += ", \"Value\": " + ((Thermalizable) p).getUValue() + "}";
-						stateValue = s;
+						stateValue = "{\"Building\":" + foundation.getId();
+						stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
+						stateValue += ", \"New Value\": " + ((Thermalizable) p).getUValue() + "}";
+					}
+				} else if (lastEdit instanceof ChangeVolumetricHeatCapacityCommand) {
+					ChangeVolumetricHeatCapacityCommand c = (ChangeVolumetricHeatCapacityCommand) lastEdit;
+					HousePart p = c.getPart();
+					if (p instanceof Thermalizable) {
+						Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+						stateValue = "{\"Building\":" + foundation.getId() + ", \"ID\":" + p.getId();
+						stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
+						stateValue += ", \"Old Value\": " + c.getOldValue();
+						stateValue += ", \"New Value\": " + ((Thermalizable) p).getVolumetricHeatCapacity() + "}";
 					}
 				}
 
@@ -363,8 +340,6 @@ public class TimeSeriesLogger {
 				// TODO
 				else if (lastEdit instanceof ChangeGraphTabCommand) {
 					stateValue = "\"" + ((ChangeGraphTabCommand) lastEdit).getCurrentTitle() + "\"";
-				} else if (lastEdit instanceof ChangeThermostatCommand) {
-					stateValue = "\"Button\"";
 				} else if (lastEdit instanceof ShowCurveCommand) {
 					ShowCurveCommand c = (ShowCurveCommand) lastEdit;
 					stateValue = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"Name\": \"" + c.getCurveName() + "\", \"Shown\": " + c.isShown() + "}";
@@ -374,7 +349,7 @@ public class TimeSeriesLogger {
 				}
 
 				/* deprecated */
-				else if (lastEdit instanceof ChangeInsideTemperatureCommand) { // replaced by thermostat
+				else if (lastEdit instanceof ChangeInsideTemperatureCommand) { // replaced by programmable thermostat
 					ChangeInsideTemperatureCommand c = (ChangeInsideTemperatureCommand) lastEdit;
 					stateValue = "" + c.getBuilding().getThermostat().getTemperature(c.getMonthOfYear(), c.getDayOfWeek(), c.getHourOfDay());
 				}
@@ -452,7 +427,7 @@ public class TimeSeriesLogger {
 		writer.write("{\"Timestamp\": \"" + timestamp + "\"" + SEPARATOR + line + "}");
 		writer.flush();
 
-		lastTimestamp = timestamp;
+		lastTime = time;
 
 	}
 

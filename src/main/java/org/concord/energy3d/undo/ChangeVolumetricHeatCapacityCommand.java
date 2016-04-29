@@ -10,34 +10,37 @@ import org.concord.energy3d.model.Thermalizable;
 public class ChangeVolumetricHeatCapacityCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgVolumetricHeatCapacity, newVolumetricHeatCapacity;
-	private HousePart selectedPart;
+	private double oldValue, newValue;
+	private HousePart part;
 
-	public ChangeVolumetricHeatCapacityCommand(HousePart selectedPart) {
-		this.selectedPart = selectedPart;
-		if (selectedPart instanceof Thermalizable)
-			orgVolumetricHeatCapacity = ((Thermalizable) selectedPart).getVolumetricHeatCapacity();
+	public ChangeVolumetricHeatCapacityCommand(HousePart part) {
+		this.part = part;
+		if (part instanceof Thermalizable)
+			oldValue = ((Thermalizable) part).getVolumetricHeatCapacity();
+	}
+
+	public double getOldValue() {
+		return oldValue;
+	}
+
+	public HousePart getPart() {
+		return part;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		if (selectedPart instanceof Thermalizable) {
-			newVolumetricHeatCapacity = ((Thermalizable) selectedPart).getVolumetricHeatCapacity();
-			((Thermalizable) selectedPart).setVolumetricHeatCapacity(orgVolumetricHeatCapacity);
+		if (part instanceof Thermalizable) {
+			newValue = ((Thermalizable) part).getVolumetricHeatCapacity();
+			((Thermalizable) part).setVolumetricHeatCapacity(oldValue);
 		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		if (selectedPart instanceof Thermalizable)
-			((Thermalizable) selectedPart).setVolumetricHeatCapacity(newVolumetricHeatCapacity);
-	}
-
-	// for action logging
-	public HousePart getHousePart() {
-		return selectedPart;
+		if (part instanceof Thermalizable)
+			((Thermalizable) part).setVolumetricHeatCapacity(newValue);
 	}
 
 	@Override

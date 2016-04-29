@@ -693,9 +693,10 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
+						Foundation foundation = (Foundation) selectedPart;
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-						ChangeThermostatCommand c = new ChangeThermostatCommand();
-						new ThermostatDialog((Foundation) selectedPart).setVisible(true);
+						ChangeThermostatCommand c = new ChangeThermostatCommand(foundation);
+						new ThermostatDialog(foundation).setVisible(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
@@ -1074,11 +1075,13 @@ public class PopupMenuFactory {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "U-value must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else {
 								if (rb1.isSelected()) {
-									SceneManager.getInstance().getUndoManager().addEdit(new ChangePartUValueCommand(selectedPart));
+									ChangePartUValueCommand c = new ChangePartUValueCommand(selectedPart);
 									t.setUValue(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else {
-									SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingUValueCommand(selectedPart));
+									ChangeBuildingUValueCommand c = new ChangeBuildingUValueCommand(selectedPart);
 									Scene.getInstance().setUValuesOfSameTypeInBuilding(selectedPart, val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								Scene.getInstance().setEdited(true);
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -1120,10 +1123,11 @@ public class PopupMenuFactory {
 							if (val <= 0) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Volumeric heat capacity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else {
-								SceneManager.getInstance().getUndoManager().addEdit(new ChangeVolumetricHeatCapacityCommand(selectedPart));
+								ChangeVolumetricHeatCapacityCommand c = new ChangeVolumetricHeatCapacityCommand(selectedPart);
 								t.setVolumetricHeatCapacity(val);
 								Scene.getInstance().setEdited(true);
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
 								break;
 							}
 						} catch (final NumberFormatException exception) {

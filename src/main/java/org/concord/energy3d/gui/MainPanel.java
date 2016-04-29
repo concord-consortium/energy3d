@@ -95,7 +95,7 @@ public class MainPanel extends JPanel {
 	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
-	private final double buildingRotationAngleAbsolute = Math.PI / 18;
+	private final double buildingRotationAngleAbsolute = Math.PI / 36;
 	private double buildingRotationAngle = -buildingRotationAngleAbsolute;
 	private String noteString = "";
 
@@ -1027,7 +1027,12 @@ public class MainPanel extends JPanel {
 								SceneManager.getTaskManager().update(new Callable<Object>() {
 									@Override
 									public Object call() throws Exception {
-										SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true, true);
+										final HousePart hp = SceneManager.getInstance().getSelectedPart();
+										if (hp instanceof Foundation) {
+											RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, buildingRotationAngle);
+											SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true, true);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										return null;
 									}
 								});
@@ -1037,9 +1042,6 @@ public class MainPanel extends JPanel {
 								} catch (final InterruptedException e) {
 								}
 							}
-							final HousePart hp = SceneManager.getInstance().getSelectedPart();
-							if (hp instanceof Foundation)
-								SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) hp, SceneManager.getInstance().getBuildingRotationAngleRecorded()));
 						}
 					}.start();
 				}

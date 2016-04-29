@@ -46,7 +46,6 @@ public class AdjustThermostatCommand extends AbstractUndoableEdit {
 		foundation.getThermostat().setTemperatures(newTemperatures);
 	}
 
-	// for action logging
 	public Foundation getFoundation() {
 		return foundation;
 	}

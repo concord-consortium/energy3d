@@ -10,34 +10,37 @@ import org.concord.energy3d.model.Thermalizable;
 public class ChangePartUValueCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgUValue, newUValue;
-	private HousePart selectedPart;
+	private double oldValue, newValue;
+	private HousePart part;
 
-	public ChangePartUValueCommand(HousePart selectedPart) {
-		this.selectedPart = selectedPart;
-		if (selectedPart instanceof Thermalizable)
-			orgUValue = ((Thermalizable) selectedPart).getUValue();
+	public ChangePartUValueCommand(HousePart part) {
+		this.part = part;
+		if (part instanceof Thermalizable)
+			oldValue = ((Thermalizable) part).getUValue();
+	}
+
+	public double getOldValue() {
+		return oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		if (selectedPart instanceof Thermalizable) {
-			newUValue = ((Thermalizable) selectedPart).getUValue();
-			((Thermalizable) selectedPart).setUValue(orgUValue);
+		if (part instanceof Thermalizable) {
+			newValue = ((Thermalizable) part).getUValue();
+			((Thermalizable) part).setUValue(oldValue);
 		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		if (selectedPart instanceof Thermalizable)
-			((Thermalizable) selectedPart).setUValue(newUValue);
+		if (part instanceof Thermalizable)
+			((Thermalizable) part).setUValue(newValue);
 	}
 
-	// for action logging
-	public HousePart getHousePart() {
-		return selectedPart;
+	public HousePart getPart() {
+		return part;
 	}
 
 	@Override

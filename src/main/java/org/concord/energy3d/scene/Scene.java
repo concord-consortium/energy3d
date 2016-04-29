@@ -1151,7 +1151,6 @@ public class Scene implements Serializable {
 		}
 	}
 
-	/** use operation to specify the type of parts (Use DRAW_ROOF_PYRAMIND for roofs) */
 	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
 		if (part instanceof Foundation) {
 			part.setColor(color);

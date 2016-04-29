@@ -13,19 +13,19 @@ import org.concord.energy3d.scene.Scene;
 public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double[] orgUValues, newUValues;
-	private HousePart selectedPart;
+	private double[] oldValues, newValues;
+	private HousePart part;
 	private List<HousePart> parts;
 
-	public ChangeBuildingUValueCommand(HousePart selectedPart) {
-		this.selectedPart = selectedPart;
-		if (!(selectedPart instanceof Thermalizable))
-			throw new IllegalArgumentException(selectedPart + "is not thermalizable!");
-		parts = Scene.getInstance().getHousePartsOfSameTypeInBuilding(selectedPart);
+	public ChangeBuildingUValueCommand(HousePart part) {
+		this.part = part;
+		if (!(part instanceof Thermalizable))
+			throw new IllegalArgumentException(part + "is not thermalizable!");
+		parts = Scene.getInstance().getHousePartsOfSameTypeInBuilding(part);
 		int n = parts.size();
-		orgUValues = new double[n];
+		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			orgUValues[i] = ((Thermalizable) parts.get(i)).getUValue();
+			oldValues[i] = ((Thermalizable) parts.get(i)).getUValue();
 		}
 	}
 
@@ -33,10 +33,10 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		int n = parts.size();
-		newUValues = new double[n];
+		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newUValues[i] = ((Thermalizable) parts.get(i)).getUValue();
-			((Thermalizable) parts.get(i)).setUValue(orgUValues[i]);
+			newValues[i] = ((Thermalizable) parts.get(i)).getUValue();
+			((Thermalizable) parts.get(i)).setUValue(oldValues[i]);
 		}
 	}
 
@@ -45,13 +45,12 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = parts.size();
 		for (int i = 0; i < n; i++) {
-			((Thermalizable) parts.get(i)).setUValue(newUValues[i]);
+			((Thermalizable) parts.get(i)).setUValue(newValues[i]);
 		}
 	}
 
-	// for action logging
-	public HousePart getHousePart() {
-		return selectedPart;
+	public HousePart getPart() {
+		return part;
 	}
 
 	@Override

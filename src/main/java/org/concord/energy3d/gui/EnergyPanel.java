@@ -416,7 +416,7 @@ public class EnergyPanel extends JPanel {
 					foundation = selectedPart.getTopContainer();
 				}
 				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-				ChangeThermostatCommand c = new ChangeThermostatCommand();
+				ChangeThermostatCommand c = new ChangeThermostatCommand(foundation);
 				new ThermostatDialog(foundation).setVisible(true);
 				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}
