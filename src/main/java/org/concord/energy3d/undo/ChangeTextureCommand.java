@@ -10,23 +10,23 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 public class ChangeTextureCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private TextureMode orgTextureMode, newTextureMode;
+	private TextureMode orgValue, newValue;
 
 	public ChangeTextureCommand() {
-		orgTextureMode = Scene.getInstance().getTextureMode();
+		orgValue = Scene.getInstance().getTextureMode();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newTextureMode = Scene.getInstance().getTextureMode();
-		Scene.getInstance().setTextureMode(orgTextureMode);
+		newValue = Scene.getInstance().getTextureMode();
+		Scene.getInstance().setTextureMode(orgValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setTextureMode(newTextureMode);
+		Scene.getInstance().setTextureMode(newValue);
 	}
 
 	@Override

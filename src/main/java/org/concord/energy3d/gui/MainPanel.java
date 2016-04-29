@@ -505,7 +505,7 @@ public class MainPanel extends JPanel {
 			shadowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ShowShadowCommand());
+					ShowShadowCommand c = new ShowShadowCommand();
 					if (SceneManager.getInstance().isSunAnimation() || Heliodon.getInstance().isNightTime())
 						SceneManager.getInstance().setShading(shadowButton.isSelected());
 					else
@@ -514,6 +514,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
 					// Scene.getInstance().setEdited(true, false); // shadow not saved -- make sense because it doesn't work on some machines
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -549,11 +550,12 @@ public class MainPanel extends JPanel {
 			heliodonButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ShowHeliodonCommand());
+					ShowHeliodonCommand c = new ShowHeliodonCommand();
 					SceneManager.getInstance().setHeliodonVisible(heliodonButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
 					Scene.getInstance().setEdited(true, false);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -571,11 +573,12 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new AnimateSunCommand());
+					AnimateSunCommand c = new AnimateSunCommand();
 					SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
 					if (shadowButton.isSelected())
 						SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -623,10 +626,11 @@ public class MainPanel extends JPanel {
 			annotationToggleButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ShowAnnotationCommand());
+					ShowAnnotationCommand c = new ShowAnnotationCommand();
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					Scene.getInstance().setEdited(true, false);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}

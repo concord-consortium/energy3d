@@ -11,25 +11,29 @@ import org.concord.energy3d.util.Util;
 public class ChangeLatitudeCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgLatitude, newLatitude;
+	private double oldValue, newValue;
 
 	public ChangeLatitudeCommand() {
-		orgLatitude = Heliodon.getInstance().getLatitude();
+		oldValue = Heliodon.getInstance().getLatitude();
+	}
+
+	public double getOldValue() {
+		return oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newLatitude = Heliodon.getInstance().getLatitude();
-		Heliodon.getInstance().setLatitude(orgLatitude);
-		Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), (int) Math.round(180 * orgLatitude / Math.PI));
+		newValue = Heliodon.getInstance().getLatitude();
+		Heliodon.getInstance().setLatitude(oldValue);
+		Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), (int) Math.round(180 * oldValue / Math.PI));
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Heliodon.getInstance().setLatitude(newLatitude);
-		Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), (int) Math.round(180 * newLatitude / Math.PI));
+		Heliodon.getInstance().setLatitude(newValue);
+		Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), (int) Math.round(180 * newValue / Math.PI));
 	}
 
 	@Override

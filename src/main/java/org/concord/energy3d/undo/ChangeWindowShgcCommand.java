@@ -9,30 +9,33 @@ import org.concord.energy3d.model.Window;
 public class ChangeWindowShgcCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgShgc, newShgc;
-	private Window selectedWindow;
+	private double oldValue, newValue;
+	private Window window;
 
 	public ChangeWindowShgcCommand(Window selectedWindow) {
-		this.selectedWindow = selectedWindow;
-		orgShgc = selectedWindow.getSolarHeatGainCoefficient();
+		this.window = selectedWindow;
+		oldValue = selectedWindow.getSolarHeatGainCoefficient();
+	}
+
+	public double getOldValue() {
+		return oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newShgc = selectedWindow.getSolarHeatGainCoefficient();
-		selectedWindow.setSolarHeatGainCoefficient(orgShgc);
+		newValue = window.getSolarHeatGainCoefficient();
+		window.setSolarHeatGainCoefficient(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		selectedWindow.setSolarHeatGainCoefficient(newShgc);
+		window.setSolarHeatGainCoefficient(newValue);
 	}
 
-	// for action logging
 	public Window getWindow() {
-		return selectedWindow;
+		return window;
 	}
 
 	@Override

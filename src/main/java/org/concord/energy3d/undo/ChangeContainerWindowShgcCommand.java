@@ -14,7 +14,7 @@ import org.concord.energy3d.scene.Scene;
 public class ChangeContainerWindowShgcCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double[] orgShgc, newShgc;
+	private double[] oldValues, newValues;
 	private HousePart container;
 	private List<Window> windows;
 
@@ -22,9 +22,9 @@ public class ChangeContainerWindowShgcCommand extends AbstractUndoableEdit {
 		this.container = container;
 		windows = Scene.getInstance().getWindowsOnContainer(container);
 		int n = windows.size();
-		orgShgc = new double[n];
+		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			orgShgc[i] = windows.get(i).getSolarHeatGainCoefficient();
+			oldValues[i] = windows.get(i).getSolarHeatGainCoefficient();
 		}
 	}
 
@@ -32,10 +32,10 @@ public class ChangeContainerWindowShgcCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		int n = windows.size();
-		newShgc = new double[n];
+		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newShgc[i] = windows.get(i).getSolarHeatGainCoefficient();
-			windows.get(i).setSolarHeatGainCoefficient(orgShgc[i]);
+			newValues[i] = windows.get(i).getSolarHeatGainCoefficient();
+			windows.get(i).setSolarHeatGainCoefficient(oldValues[i]);
 		}
 	}
 
@@ -44,11 +44,10 @@ public class ChangeContainerWindowShgcCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = windows.size();
 		for (int i = 0; i < n; i++) {
-			windows.get(i).setSolarHeatGainCoefficient(newShgc[i]);
+			windows.get(i).setSolarHeatGainCoefficient(newValues[i]);
 		}
 	}
 
-	// for action logging
 	public HousePart getContainer() {
 		return container;
 	}

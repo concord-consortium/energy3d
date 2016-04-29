@@ -12,18 +12,22 @@ import org.concord.energy3d.util.Util;
 public class ChangeCityCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private String orgCity, newCity;
+	private String oldValue, newValue;
 
 	public ChangeCityCommand() {
-		orgCity = Scene.getInstance().getCity();
+		oldValue = Scene.getInstance().getCity();
+	}
+
+	public String getOldValue() {
+		return oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newCity = Scene.getInstance().getCity();
-		Scene.getInstance().setCity(orgCity);
-		Util.selectSilently(EnergyPanel.getInstance().getCityComboBox(), orgCity);
+		newValue = Scene.getInstance().getCity();
+		Scene.getInstance().setCity(oldValue);
+		Util.selectSilently(EnergyPanel.getInstance().getCityComboBox(), oldValue);
 		Float latitude = LocationData.getInstance().getLatitutes().get(EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		if (latitude != null)
 			Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), latitude.intValue());
@@ -32,8 +36,8 @@ public class ChangeCityCommand extends AbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setCity(newCity);
-		Util.selectSilently(EnergyPanel.getInstance().getCityComboBox(), newCity);
+		Scene.getInstance().setCity(newValue);
+		Util.selectSilently(EnergyPanel.getInstance().getCityComboBox(), newValue);
 		Float latitude = LocationData.getInstance().getLatitutes().get(EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		if (latitude != null)
 			Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), latitude.intValue());

@@ -13,18 +13,22 @@ import org.concord.energy3d.util.Util;
 public class ChangeTimeCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private Date orgTime, newTime;
+	private Date oldTime, newTime;
 
 	public ChangeTimeCommand() {
-		orgTime = Scene.getInstance().getDate();
+		oldTime = Scene.getInstance().getDate();
+	}
+
+	public Date getOldTime() {
+		return oldTime;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
 		newTime = Scene.getInstance().getDate();
-		Scene.getInstance().setDate(orgTime);
-		Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), orgTime);
+		Scene.getInstance().setDate(oldTime);
+		Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), oldTime);
 	}
 
 	@Override

@@ -12,32 +12,35 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 public class ChangePartColorCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyColorRGBA orgColor, newColor;
-	private HousePart selectedPart;
+	private ReadOnlyColorRGBA oldColor, newColor;
+	private HousePart part;
 
-	public ChangePartColorCommand(HousePart selectedPart) {
-		this.selectedPart = selectedPart;
-		orgColor = selectedPart.getColor();
+	public ChangePartColorCommand(HousePart part) {
+		this.part = part;
+		oldColor = part.getColor();
+	}
+
+	public ReadOnlyColorRGBA getOldColor() {
+		return oldColor;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newColor = selectedPart.getColor();
-		selectedPart.setColor(orgColor);
+		newColor = part.getColor();
+		part.setColor(oldColor);
 		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		selectedPart.setColor(newColor);
+		part.setColor(newColor);
 		Scene.getInstance().redrawAll();
 	}
 
-	// for action logging
 	public HousePart getHousePart() {
-		return selectedPart;
+		return part;
 	}
 
 	@Override

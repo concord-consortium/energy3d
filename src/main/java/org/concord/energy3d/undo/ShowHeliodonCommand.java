@@ -15,12 +15,12 @@ public class ShowHeliodonCommand extends AbstractUndoableEdit {
 
 	public ShowHeliodonCommand() {
 		oldValue = SceneManager.getInstance().isHeliodonVisible();
+		newValue = !oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = SceneManager.getInstance().isHeliodonVisible();
 		SceneManager.getInstance().setHeliodonVisible(oldValue);
 		Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), oldValue);
 	}
@@ -30,6 +30,10 @@ public class ShowHeliodonCommand extends AbstractUndoableEdit {
 		super.redo();
 		SceneManager.getInstance().setHeliodonVisible(newValue);
 		Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), newValue);
+	}
+
+	public boolean getNewValue() {
+		return newValue;
 	}
 
 	@Override

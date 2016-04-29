@@ -43,6 +43,7 @@ import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
@@ -76,6 +77,10 @@ public class Util {
 
 	public static double toUsRValue(final double siUValue) {
 		return 5.67826 / siUValue;
+	}
+
+	public static String toString(ReadOnlyColorRGBA c) {
+		return String.format("#%02x%02x%02x", (int) Math.round(c.getRed() * 255), (int) Math.round(c.getGreen() * 255), (int) Math.round(c.getBlue() * 255));
 	}
 
 	public static double findBoundLength(final BoundingVolume bounds) {

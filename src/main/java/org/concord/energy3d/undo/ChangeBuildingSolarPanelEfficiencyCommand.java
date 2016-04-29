@@ -13,7 +13,7 @@ import org.concord.energy3d.scene.Scene;
 public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double[] orgEfficiency, newEfficiency;
+	private double[] oldValues, newValues;
 	private Foundation foundation;
 	private List<SolarPanel> panels;
 
@@ -21,9 +21,9 @@ public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableE
 		this.foundation = foundation;
 		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
 		int n = panels.size();
-		orgEfficiency = new double[n];
+		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			orgEfficiency[i] = panels.get(i).getEfficiency();
+			oldValues[i] = panels.get(i).getEfficiency();
 		}
 	}
 
@@ -31,10 +31,10 @@ public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableE
 	public void undo() throws CannotUndoException {
 		super.undo();
 		int n = panels.size();
-		newEfficiency = new double[n];
+		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newEfficiency[i] = panels.get(i).getEfficiency();
-			panels.get(i).setEfficiency(orgEfficiency[i]);
+			newValues[i] = panels.get(i).getEfficiency();
+			panels.get(i).setEfficiency(oldValues[i]);
 		}
 	}
 
@@ -43,11 +43,10 @@ public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableE
 		super.redo();
 		int n = panels.size();
 		for (int i = 0; i < n; i++) {
-			panels.get(i).setEfficiency(newEfficiency[i]);
+			panels.get(i).setEfficiency(newValues[i]);
 		}
 	}
 
-	// for action logging
 	public Foundation getFoundation() {
 		return foundation;
 	}

@@ -9,23 +9,27 @@ import org.concord.energy3d.scene.Scene;
 public class ChangeBackgroundAlbedoCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgAlbedo, newAlbedo;
+	private double oldValue, newValue;
 
 	public ChangeBackgroundAlbedoCommand() {
-		orgAlbedo = Scene.getInstance().getGround().getAlbedo();
+		oldValue = Scene.getInstance().getGround().getAlbedo();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newAlbedo = Scene.getInstance().getGround().getAlbedo();
-		Scene.getInstance().getGround().setAlbedo(orgAlbedo);
+		newValue = Scene.getInstance().getGround().getAlbedo();
+		Scene.getInstance().getGround().setAlbedo(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().getGround().setAlbedo(newAlbedo);
+		Scene.getInstance().getGround().setAlbedo(newValue);
+	}
+
+	public double getOldValue() {
+		return oldValue;
 	}
 
 	@Override

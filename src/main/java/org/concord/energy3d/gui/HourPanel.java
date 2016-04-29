@@ -132,7 +132,7 @@ class HourPanel extends JPanel {
 		if (!increaseTemperature && !decreaseTemperature)
 			return;
 		if (selectedHour >= 0) {
-			SceneManager.getInstance().getUndoManager().addEdit(new AdjustThermostatCommand(foundation));
+			AdjustThermostatCommand c = new AdjustThermostatCommand(foundation);
 			for (int i = 0; i < thermostatButtons.length; i++) {
 				Object[] keys = thermostatButtons[i].hourlyTemperatures.keySet().toArray();
 				Object selectedKey = keys[selectedHour];
@@ -161,6 +161,7 @@ class HourPanel extends JPanel {
 				}
 			}
 			selectedHour = -1;
+			SceneManager.getInstance().getUndoManager().addEdit(c);
 		}
 		repaint();
 	}

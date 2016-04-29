@@ -15,12 +15,12 @@ public class AnimateSunCommand extends AbstractUndoableEdit {
 
 	public AnimateSunCommand() {
 		oldValue = SceneManager.getInstance().isSunAnimation();
+		newValue = !oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = SceneManager.getInstance().isSunAnimation();
 		SceneManager.getInstance().setSunAnimation(oldValue);
 		Util.selectSilently(MainPanel.getInstance().getSunAnimationButton(), oldValue);
 	}
@@ -30,6 +30,10 @@ public class AnimateSunCommand extends AbstractUndoableEdit {
 		super.redo();
 		SceneManager.getInstance().setSunAnimation(newValue);
 		Util.selectSilently(MainPanel.getInstance().getSunAnimationButton(), newValue);
+	}
+
+	public boolean getNewValue() {
+		return newValue;
 	}
 
 	@Override

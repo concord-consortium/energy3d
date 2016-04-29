@@ -11,25 +11,29 @@ import org.concord.energy3d.util.Util;
 public class ChangeSolarHeatMapColorContrastCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private int orgContrast, newContrast;
+	private int oldValue, newValue;
 
 	public ChangeSolarHeatMapColorContrastCommand() {
-		orgContrast = Scene.getInstance().getSolarHeatMapColorContrast();
+		oldValue = Scene.getInstance().getSolarHeatMapColorContrast();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newContrast = Scene.getInstance().getSolarHeatMapColorContrast();
-		Scene.getInstance().setSolarHeatMapColorContrast(orgContrast);
-		Util.setSilently(EnergyPanel.getInstance().getColorMapSlider(), orgContrast);
+		newValue = Scene.getInstance().getSolarHeatMapColorContrast();
+		Scene.getInstance().setSolarHeatMapColorContrast(oldValue);
+		Util.setSilently(EnergyPanel.getInstance().getColorMapSlider(), oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().setSolarHeatMapColorContrast(newContrast);
-		Util.setSilently(EnergyPanel.getInstance().getColorMapSlider(), newContrast);
+		Scene.getInstance().setSolarHeatMapColorContrast(newValue);
+		Util.setSilently(EnergyPanel.getInstance().getColorMapSlider(), newValue);
+	}
+
+	public int getOldValue() {
+		return oldValue;
 	}
 
 	@Override

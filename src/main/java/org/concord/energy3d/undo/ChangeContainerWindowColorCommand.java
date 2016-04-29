@@ -17,7 +17,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 public class ChangeContainerWindowColorCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyColorRGBA[] orgColor, newColor;
+	private ReadOnlyColorRGBA[] oldColors, newColors;
 	private HousePart container;
 	private List<Window> windows;
 
@@ -25,9 +25,9 @@ public class ChangeContainerWindowColorCommand extends AbstractUndoableEdit {
 		this.container = container;
 		windows = Scene.getInstance().getWindowsOnContainer(container);
 		int n = windows.size();
-		orgColor = new ColorRGBA[n];
+		oldColors = new ColorRGBA[n];
 		for (int i = 0; i < n; i++) {
-			orgColor[i] = windows.get(i).getColor();
+			oldColors[i] = windows.get(i).getColor();
 		}
 	}
 
@@ -35,10 +35,10 @@ public class ChangeContainerWindowColorCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		int n = windows.size();
-		newColor = new ColorRGBA[n];
+		newColors = new ColorRGBA[n];
 		for (int i = 0; i < n; i++) {
-			newColor[i] = windows.get(i).getColor();
-			windows.get(i).setColor(orgColor[i]);
+			newColors[i] = windows.get(i).getColor();
+			windows.get(i).setColor(oldColors[i]);
 		}
 	}
 
@@ -47,7 +47,7 @@ public class ChangeContainerWindowColorCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = windows.size();
 		for (int i = 0; i < n; i++) {
-			windows.get(i).setColor(newColor[i]);
+			windows.get(i).setColor(newColors[i]);
 		}
 	}
 

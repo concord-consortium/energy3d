@@ -15,12 +15,12 @@ public class ShowAnnotationCommand extends AbstractUndoableEdit {
 
 	public ShowAnnotationCommand() {
 		oldValue = Scene.getInstance().areAnnotationsVisible();
+		newValue = !oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = Scene.getInstance().areAnnotationsVisible();
 		Scene.getInstance().setAnnotationsVisible(oldValue);
 		Util.selectSilently(MainPanel.getInstance().getAnnotationToggleButton(), oldValue);
 	}
@@ -30,6 +30,10 @@ public class ShowAnnotationCommand extends AbstractUndoableEdit {
 		super.redo();
 		Scene.getInstance().setAnnotationsVisible(newValue);
 		Util.selectSilently(MainPanel.getInstance().getAnnotationToggleButton(), newValue);
+	}
+
+	public boolean getNewValue() {
+		return newValue;
 	}
 
 	@Override

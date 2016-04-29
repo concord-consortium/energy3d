@@ -16,12 +16,12 @@ public class ShowShadowCommand extends AbstractUndoableEdit {
 
 	public ShowShadowCommand() {
 		oldValue = SceneManager.getInstance().isShadowEnabled();
+		newValue = !oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = SceneManager.getInstance().isShadowEnabled();
 		SceneManager.getInstance().setShadow(oldValue);
 		Util.selectSilently(MainFrame.getInstance().getShadowMenuItem(), oldValue);
 		Util.selectSilently(MainPanel.getInstance().getShadowButton(), oldValue);
@@ -33,6 +33,10 @@ public class ShowShadowCommand extends AbstractUndoableEdit {
 		SceneManager.getInstance().setShadow(newValue);
 		Util.selectSilently(MainFrame.getInstance().getShadowMenuItem(), newValue);
 		Util.selectSilently(MainPanel.getInstance().getShadowButton(), newValue);
+	}
+	
+	public boolean getNewValue() {
+		return newValue;
 	}
 
 	@Override

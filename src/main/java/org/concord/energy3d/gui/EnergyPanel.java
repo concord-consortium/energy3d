@@ -166,7 +166,7 @@ public class EnergyPanel extends JPanel {
 				if (!disableDateSpinner) {
 					ChangeDateCommand c = new ChangeDateCommand();
 					Date d = (Date) dateSpinner.getValue();
-					if (lastDate != null) { // fix a Java bug that causes the spinner to fire when going from Dec into Jan
+					if (lastDate != null) { // fix a bug that causes the spinner to fire when going from Dec into Jan
 						Calendar c0 = new GregorianCalendar();
 						c0.setTime(lastDate);
 						Calendar c1 = new GregorianCalendar();
@@ -212,12 +212,14 @@ public class EnergyPanel extends JPanel {
 				if (city.equals("")) {
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
+					Scene.getInstance().setCity(city);
 				} else {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeCityCommand());
+					ChangeCityCommand c = new ChangeCityCommand();
 					setLatitude((int) LocationData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).floatValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setCity(city);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
-				Scene.getInstance().setCity(city);
 				Scene.getInstance().setTreeLeaves();
 				Scene.getInstance().setEdited(true);
 			}
@@ -239,18 +241,26 @@ public class EnergyPanel extends JPanel {
 		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
 		timeSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
+			private Date lastDate;
 
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				// ignore the first event
-				if (firstCall) {
+				if (firstCall) { // ignore the first event
 					firstCall = false;
 					return;
 				}
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeTimeCommand());
-				final Heliodon heliodon = Heliodon.getInstance();
-				heliodon.setTime((Date) timeSpinner.getValue());
-				Scene.getInstance().setDate(heliodon.getCalender().getTime());
+				ChangeTimeCommand c = new ChangeTimeCommand();
+				Date d = (Date) timeSpinner.getValue();
+				if (lastDate != null) { // fix a bug that causes the spinner to fire when crossing day boundary
+					Calendar c0 = new GregorianCalendar();
+					c0.setTime(lastDate);
+					Calendar c1 = new GregorianCalendar();
+					c1.setTime(d);
+					if (c0.get(Calendar.HOUR_OF_DAY) == c1.get(Calendar.HOUR_OF_DAY) && c0.get(Calendar.MINUTE) == c1.get(Calendar.MINUTE))
+						return;
+				}
+				Heliodon.getInstance().setTime(d);
+				Scene.getInstance().setDate(d);
 				updateWeatherData();
 				updateThermostat();
 				Scene.getInstance().setEdited(true);
@@ -265,6 +275,8 @@ public class EnergyPanel extends JPanel {
 					for (final HousePart part : Scene.getInstance().getParts())
 						part.drawHeatFlux();
 				}
+				lastDate = d;
+				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}
 		});
 		final GridBagConstraints gbc_timeSpinner = new GridBagConstraints();
@@ -285,10 +297,11 @@ public class EnergyPanel extends JPanel {
 		latitudeSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeLatitudeCommand());
+				ChangeLatitudeCommand c = new ChangeLatitudeCommand();
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
+				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}
 		});
 		final GridBagConstraints gbc_latitudeSpinner = new GridBagConstraints();
@@ -403,8 +416,9 @@ public class EnergyPanel extends JPanel {
 					foundation = selectedPart.getTopContainer();
 				}
 				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeThermostatCommand());
+				ChangeThermostatCommand c = new ChangeThermostatCommand();
 				new ThermostatDialog(foundation).setVisible(true);
+				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}
 		});
 		buildingPanel.add(thermostatPanel);
@@ -462,10 +476,11 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting()) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarHeatMapColorContrastCommand());
+					ChangeSolarHeatMapColorContrastCommand c = new ChangeSolarHeatMapColorContrastCommand();
 					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
 					compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true, false);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			}
 		});

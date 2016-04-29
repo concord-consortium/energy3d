@@ -169,10 +169,11 @@ public class PopupMenuFactory {
 								if (val < 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Albedo value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									SceneManager.getInstance().getUndoManager().addEdit(new ChangeBackgroundAlbedoCommand());
+									ChangeBackgroundAlbedoCommand c = new ChangeBackgroundAlbedoCommand();
 									Scene.getInstance().getGround().setAlbedo(val);
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -198,9 +199,10 @@ public class PopupMenuFactory {
 								if (val <= 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ground thermal diffusivity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									SceneManager.getInstance().getUndoManager().addEdit(new ChangeGroundThermalDiffusivityCommand());
+									ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
 									Scene.getInstance().getGround().setThermalDiffusivity(val);
 									Scene.getInstance().setEdited(true);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -429,15 +431,18 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										SceneManager.getInstance().getUndoManager().addEdit(new ChangeWindowShgcCommand(window));
+										ChangeWindowShgcCommand c = new ChangeWindowShgcCommand(window);
 										window.setSolarHeatGainCoefficient(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
-										SceneManager.getInstance().getUndoManager().addEdit(new ChangeContainerWindowShgcCommand(window.getContainer()));
+										ChangeContainerWindowShgcCommand c = new ChangeContainerWindowShgcCommand(window.getContainer());
 										Scene.getInstance().setWindowShgcInContainer(window.getContainer(), val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										Foundation foundation = window.getTopContainer();
-										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingWindowShgcCommand(foundation));
+										ChangeBuildingWindowShgcCommand c = new ChangeBuildingWindowShgcCommand(foundation);
 										Scene.getInstance().setWindowShgcOfBuilding(foundation, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -485,8 +490,9 @@ public class PopupMenuFactory {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 								return;
 							if (rb1.isSelected()) { // apply to only this window
-								SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(window));
+								ChangePartColorCommand cmd = new ChangePartColorCommand(window);
 								window.setColor(color);
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else if (rb2.isSelected()) {
 								SceneManager.getInstance().getUndoManager().addEdit(new ChangeContainerWindowColorCommand(window.getContainer()));
 								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color);
@@ -688,8 +694,9 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-						SceneManager.getInstance().getUndoManager().addEdit(new ChangeThermostatCommand());
+						ChangeThermostatCommand c = new ChangeThermostatCommand();
 						new ThermostatDialog((Foundation) selectedPart).setVisible(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -777,12 +784,14 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Conversion efficiency must be between 10% and 86%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										SceneManager.getInstance().getUndoManager().addEdit(new ChangeSolarPanelEfficiencyCommand(solarPanel));
+										ChangeSolarPanelEfficiencyCommand c = new ChangeSolarPanelEfficiencyCommand(solarPanel);
 										solarPanel.setEfficiency(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
-										SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingSolarPanelEfficiencyCommand(foundation));
+										ChangeBuildingSolarPanelEfficiencyCommand c = new ChangeBuildingSolarPanelEfficiencyCommand(foundation);
 										Scene.getInstance().setSolarPanelEfficiencyOfBuilding(foundation, val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);

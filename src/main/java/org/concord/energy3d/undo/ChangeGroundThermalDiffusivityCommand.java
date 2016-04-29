@@ -9,23 +9,27 @@ import org.concord.energy3d.scene.Scene;
 public class ChangeGroundThermalDiffusivityCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgThermalDiffusivity, newThermalDiffusivity;
+	private double oldValue, newValue;
 
 	public ChangeGroundThermalDiffusivityCommand() {
-		orgThermalDiffusivity = Scene.getInstance().getGround().getThermalDiffusivity();
+		oldValue = Scene.getInstance().getGround().getThermalDiffusivity();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newThermalDiffusivity = Scene.getInstance().getGround().getThermalDiffusivity();
-		Scene.getInstance().getGround().setThermalDiffusivity(orgThermalDiffusivity);
+		newValue = Scene.getInstance().getGround().getThermalDiffusivity();
+		Scene.getInstance().getGround().setThermalDiffusivity(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().getGround().setThermalDiffusivity(newThermalDiffusivity);
+		Scene.getInstance().getGround().setThermalDiffusivity(newValue);
+	}
+
+	public double getOldValue() {
+		return oldValue;
 	}
 
 	@Override

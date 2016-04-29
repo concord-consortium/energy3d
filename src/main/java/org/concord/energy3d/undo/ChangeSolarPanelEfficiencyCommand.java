@@ -9,30 +9,33 @@ import org.concord.energy3d.model.SolarPanel;
 public class ChangeSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double orgEfficiency, newEfficiency;
-	private SolarPanel selectedSolarPanel;
+	private double oldValue, newValue;
+	private SolarPanel solarPanel;
 
-	public ChangeSolarPanelEfficiencyCommand(SolarPanel selectedSolarPanel) {
-		this.selectedSolarPanel = selectedSolarPanel;
-		orgEfficiency = selectedSolarPanel.getEfficiency();
+	public ChangeSolarPanelEfficiencyCommand(SolarPanel solarPanel) {
+		this.solarPanel = solarPanel;
+		oldValue = solarPanel.getEfficiency();
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newEfficiency = selectedSolarPanel.getEfficiency();
-		selectedSolarPanel.setEfficiency(orgEfficiency);
+		newValue = solarPanel.getEfficiency();
+		solarPanel.setEfficiency(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		selectedSolarPanel.setEfficiency(newEfficiency);
+		solarPanel.setEfficiency(newValue);
 	}
 
-	// for action logging
 	public SolarPanel getSolarPanel() {
-		return selectedSolarPanel;
+		return solarPanel;
+	}
+
+	public double getOldValue() {
+		return oldValue;
 	}
 
 	@Override

@@ -205,7 +205,7 @@ class ThermostatView extends JPanel {
 				newTemperature++;
 			if (decreaseTemperature)
 				newTemperature--;
-			SceneManager.getInstance().getUndoManager().addEdit(new AdjustThermostatCommand(foundation));
+			AdjustThermostatCommand c = new AdjustThermostatCommand(foundation);
 			if (selectedHour == 24) { // temperature for the whole day
 				int originalTemperatureForAll = hourlyTemperatures.get(keys[24]);
 				for (int i = 0; i < keys.length; i++) {
@@ -220,6 +220,7 @@ class ThermostatView extends JPanel {
 				foundation.getThermostat().setTemperature(monthOfYear, dayOfWeek, selectedHour, newTemperature);
 			}
 			selectedHour = -1;
+			SceneManager.getInstance().getUndoManager().addEdit(c);
 		}
 		repaint();
 		increaseTemperature = false;

@@ -1197,17 +1197,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.getSceneHints().setCullHint(printPreview ? CullHint.Always : CullHint.Inherit);
 	}
 
-	public void setShadow(final boolean shadow) {
-		taskManager.update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				shadowPass.setEnabled(shadow);
-				root.updateWorldRenderStates(true);
-				return null;
-			}
-		});
-	}
-
 	public CameraNode getCameraNode() {
 		return cameraNode;
 	}
@@ -1369,6 +1358,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public boolean isShadingEnabled() {
 		return lightState.isEnabled();
+	}
+
+	public void setShadow(final boolean shadow) {
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				shadowPass.setEnabled(shadow);
+				root.updateWorldRenderStates(true);
+				return null;
+			}
+		});
 	}
 
 	public boolean isShadowEnabled() {

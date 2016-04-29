@@ -1131,9 +1131,10 @@ public class MainFrame extends JFrame {
 			axesMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ShowAxesCommand());
+					ShowAxesCommand c = new ShowAxesCommand();
 					SceneManager.getInstance().setAxesVisible(axesMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -1160,9 +1161,10 @@ public class MainFrame extends JFrame {
 			shadowMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ShowShadowCommand());
+					ShowShadowCommand c = new ShowShadowCommand();
 					SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
 					Util.selectSilently(MainPanel.getInstance().getShadowButton(), shadowMenuItem.isSelected());
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -1782,7 +1784,7 @@ public class MainFrame extends JFrame {
 			topViewCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new TopViewCommand());
+					TopViewCommand c = new TopViewCommand();
 					final boolean isTopView = topViewCheckBoxMenuItem.isSelected();
 					if (isTopView) {
 						Scene.saveCameraLocation();
@@ -1792,6 +1794,7 @@ public class MainFrame extends JFrame {
 						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
 					}
 					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -1804,11 +1807,12 @@ public class MainFrame extends JFrame {
 			noTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeTextureCommand());
+					ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.None);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 			textureButtonGroup.add(noTextureMenuItem);
@@ -1822,11 +1826,12 @@ public class MainFrame extends JFrame {
 			simpleTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeTextureCommand());
+					ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 			textureButtonGroup.add(simpleTextureMenuItem);
@@ -1840,11 +1845,12 @@ public class MainFrame extends JFrame {
 			fullTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangeTextureCommand());
+					ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.Full);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 			fullTextureMenuItem.setSelected(true);
@@ -1892,16 +1898,18 @@ public class MainFrame extends JFrame {
 					if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) { // apply to only this part
-						SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
+						ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 						selectedPart.setColor(color);
+						SceneManager.getInstance().getUndoManager().addEdit(cmd);
 					} else {
 						final Foundation foundation = selectedPart.getTopContainer();
 						SceneManager.getInstance().getUndoManager().addEdit(new ChangeBuildingColorCommand(foundation, Operation.DRAW_WALL));
 						Scene.getInstance().setPartColorOfBuilding(foundation, Operation.DRAW_WALL, color);
 					}
 				} else {
-					SceneManager.getInstance().getUndoManager().addEdit(new ChangePartColorCommand(selectedPart));
+					ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 					selectedPart.setColor(color);
+					SceneManager.getInstance().getUndoManager().addEdit(cmd);
 				}
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
