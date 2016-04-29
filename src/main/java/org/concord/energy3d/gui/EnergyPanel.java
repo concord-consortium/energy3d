@@ -63,7 +63,6 @@ import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
-import org.concord.energy3d.undo.ChangeGraphTabCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeThermostatCommand;
@@ -436,11 +435,9 @@ public class EnergyPanel extends JPanel {
 		dailyEnergyGraph = new DailyEnergyGraph(); // hourly energy graph
 		graphTabbedPane.add("Energy", dailyEnergyGraph);
 
-		graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
 		graphTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				SceneManager.getInstance().getUndoManager().addEdit(new ChangeGraphTabCommand());
 				if (graphTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
 					if (SceneManager.getInstance().getSolarHeatMap()) {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -451,7 +448,7 @@ public class EnergyPanel extends JPanel {
 						}
 					}
 				}
-				graphTabbedPane.putClientProperty("Selection", graphTabbedPane.getSelectedComponent());
+				TimeSeriesLogger.getInstance().logGraphTab(graphTabbedPane.getTitleAt(graphTabbedPane.getSelectedIndex()));
 			}
 		});
 		buildingPanel.setMaximumSize(new Dimension(buildingPanel.getMaximumSize().width, buildingPanel.getPreferredSize().height));

@@ -47,9 +47,7 @@ import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
-import org.concord.energy3d.undo.ChangeGraphTabCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
-import org.concord.energy3d.undo.ChangeInsideTemperatureCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
@@ -63,14 +61,12 @@ import org.concord.energy3d.undo.ChangeThermostatCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditPartCommand;
-import org.concord.energy3d.undo.ShowCurveCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
-import org.concord.energy3d.undo.ShowRunCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.undo.TopViewCommand;
@@ -99,6 +95,9 @@ public class TimeSeriesLogger {
 	private String lastAction;
 	private Date lastTime;
 	private String lastCameraPosition;
+	private String graphTabName;
+	private String graphName, curveName, runID;
+	private boolean curveShown, runShown;
 
 	private static final TimeSeriesLogger instance = new TimeSeriesLogger();
 
@@ -157,6 +156,12 @@ public class TimeSeriesLogger {
 				}
 			} else if (action.equals("Camera")) {
 				stateValue = "{" + cameraPosition + ", \"Mode\": \"" + cameraMode + "\"}";
+			} else if (action.equals("Graph Tab")) {
+				stateValue = "\"" + graphTabName + "\"";
+			} else if (action.equals("Show Curve")) {
+				stateValue = "{\"Graph\": \"" + graphName + "\", \"Name\": \"" + curveName + "\", \"Shown\": " + curveShown + "}";
+			} else if (action.equals("Show Run")) {
+				stateValue = "{\"Graph\": \"" + graphName + "\", \"ID\": \"" + runID + "\", \"Shown\": " + runShown + "}";
 			} else {
 
 				// everything else
@@ -337,23 +342,6 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (windows.isEmpty() ? -1 : windows.get(0).getSolarHeatGainCoefficient()) + "}";
 				}
 
-				// TODO
-				else if (lastEdit instanceof ChangeGraphTabCommand) {
-					stateValue = "\"" + ((ChangeGraphTabCommand) lastEdit).getCurrentTitle() + "\"";
-				} else if (lastEdit instanceof ShowCurveCommand) {
-					ShowCurveCommand c = (ShowCurveCommand) lastEdit;
-					stateValue = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"Name\": \"" + c.getCurveName() + "\", \"Shown\": " + c.isShown() + "}";
-				} else if (lastEdit instanceof ShowRunCommand) {
-					ShowRunCommand c = (ShowRunCommand) lastEdit;
-					stateValue = "{\"Graph\": \"" + c.getGraph().getClass().getSimpleName() + "\", \"ID\": \"" + c.getRunID() + "\", \"Shown\": " + c.isShown() + "}";
-				}
-
-				/* deprecated */
-				else if (lastEdit instanceof ChangeInsideTemperatureCommand) { // replaced by programmable thermostat
-					ChangeInsideTemperatureCommand c = (ChangeInsideTemperatureCommand) lastEdit;
-					stateValue = "" + c.getBuilding().getThermostat().getTemperature(c.getMonthOfYear(), c.getDayOfWeek(), c.getHourOfDay());
-				}
-
 			}
 
 			line += SEPARATOR + "\"" + action + "\": ";
@@ -419,9 +407,13 @@ public class TimeSeriesLogger {
 			}
 		}
 
-		if (firstRecord) {
+		if (firstRecord)
+
+		{
 			firstRecord = false;
-		} else {
+		} else
+
+		{
 			writer.write(",\n");
 		}
 		writer.write("{\"Timestamp\": \"" + timestamp + "\"" + SEPARATOR + line + "}");
@@ -507,6 +499,31 @@ public class TimeSeriesLogger {
 			return false;
 		lastCameraPosition = cameraPosition;
 		return true;
+	}
+
+	public void logGraphTab(String graphTabName) {
+		action = "Graph Tab";
+		this.graphTabName = graphTabName;
+		record();
+		action = null;
+	}
+
+	public void logShowCurve(String graphName, String curveName, boolean curveShown) {
+		action = "Show Curve";
+		this.graphName = graphName;
+		this.curveName = curveName;
+		this.curveShown = curveShown;
+		record();
+		action = null;
+	}
+
+	public void logShowRun(String graphName, String runID, boolean runShown) {
+		action = "Show Run";
+		this.graphName = graphName;
+		this.runID = runID;
+		this.runShown = runShown;
+		record();
+		action = null;
 	}
 
 	public void start() {

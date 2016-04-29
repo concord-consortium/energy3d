@@ -246,8 +246,8 @@ public class Building {
 		if (calculate()) {
 			String s = "\"Height\": " + FORMAT1.format(height);
 			s += ", \"Area\": " + FORMAT1.format(area);
-			s += ", \"CentroidX\": " + FORMAT1.format(cx);
-			s += ", \"CentroidY\": " + FORMAT1.format(cy);
+			s += ", \"CenterX\": " + FORMAT1.format(cx);
+			s += ", \"CenterY\": " + FORMAT1.format(cy);
 			return s;
 		}
 		return null;
@@ -261,7 +261,7 @@ public class Building {
 			s += " #window=" + windows.size();
 			s += " height=" + FORMAT1.format(height);
 			s += " area=" + FORMAT1.format(area);
-			s += " centroid=\"" + FORMAT1.format(cx) + ", " + FORMAT1.format(cy) + "\"";
+			s += " center=\"" + FORMAT1.format(cx) + ", " + FORMAT1.format(cy) + "\"";
 			final double solar = foundation.getSolarPotentialToday();
 			if (solar >= 0) {
 				s += " solar_energy=" + solar;

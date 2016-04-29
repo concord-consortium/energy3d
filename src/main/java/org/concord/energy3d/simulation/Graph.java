@@ -37,9 +37,8 @@ import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.undo.ShowCurveCommand;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -128,9 +127,9 @@ public abstract class Graph extends JPanel {
 					cbmi.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(final ItemEvent e) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(Graph.this, name));
 							hideData(name, !cbmi.isSelected());
 							Graph.this.repaint();
+							TimeSeriesLogger.getInstance().logShowCurve(Graph.this.getClass().getSimpleName(), name, cbmi.isSelected());
 						}
 					});
 					popupMenu.add(cbmi);

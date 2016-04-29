@@ -43,6 +43,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -53,8 +54,6 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.undo.ShowCurveCommand;
-import org.concord.energy3d.undo.ShowRunCommand;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
@@ -275,10 +274,10 @@ public class EnergyAnnualAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(graph, true));
 							for (String name : dataNames)
 								graph.hideData(name, false);
 							graph.repaint();
+							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", true);
 						}
 					});
 					showTypeMenu.add(mi);
@@ -286,10 +285,10 @@ public class EnergyAnnualAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(graph, false));
 							for (String name : dataNames)
 								graph.hideData(name, true);
 							graph.repaint();
+							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", false);
 						}
 					});
 					showTypeMenu.add(mi);
@@ -299,9 +298,9 @@ public class EnergyAnnualAnalysis extends Analysis {
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
-								SceneManager.getInstance().getUndoManager().addEdit(new ShowCurveCommand(graph, name));
 								graph.hideData(name, !cbmi.isSelected());
 								graph.repaint();
+								TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), name, cbmi.isSelected());
 							}
 						});
 						showTypeMenu.add(cbmi);
@@ -329,10 +328,10 @@ public class EnergyAnnualAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, true));
 							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
+							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", true);
 						}
 					});
 					showRunsMenu.add(mi);
@@ -340,10 +339,10 @@ public class EnergyAnnualAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, false));
 							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
+							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", false);
 						}
 					});
 					showRunsMenu.add(mi);
@@ -356,9 +355,9 @@ public class EnergyAnnualAnalysis extends Analysis {
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
-								SceneManager.getInstance().getUndoManager().addEdit(new ShowRunCommand(graph, r.getID()));
 								graph.hideRun(r.getID(), !cbmi.isSelected());
 								graph.repaint();
+								TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "" + r.getID(), cbmi.isSelected());
 							}
 						});
 						showRunsMenu.add(cbmi);
