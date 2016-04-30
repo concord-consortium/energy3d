@@ -11,24 +11,13 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
-@SuppressWarnings("serial")
 public class RemoveMultiplePartsOfSameTypeCommand extends AbstractUndoableEdit {
 
+	private static final long serialVersionUID = 1L;
 	private final List<HousePart> parts;
-	private final boolean isSignificant;
 
 	public RemoveMultiplePartsOfSameTypeCommand(final List<HousePart> parts) {
-		this(parts, true);
-	}
-
-	public RemoveMultiplePartsOfSameTypeCommand(final List<HousePart> parts, final boolean isSignificant) {
 		this.parts = parts;
-		this.isSignificant = isSignificant;
-	}
-
-	@Override
-	public boolean isSignificant() {
-		return isSignificant;
 	}
 
 	// for action logging: Return the foundation if all the parts are on the same one; return null otherwise to indicate that all the parts are removed

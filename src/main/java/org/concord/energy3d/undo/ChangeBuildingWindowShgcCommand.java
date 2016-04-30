@@ -27,6 +27,10 @@ public class ChangeBuildingWindowShgcCommand extends AbstractUndoableEdit {
 		}
 	}
 
+	public Foundation getFoundation() {
+		return foundation;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -45,10 +49,6 @@ public class ChangeBuildingWindowShgcCommand extends AbstractUndoableEdit {
 		for (int i = 0; i < n; i++) {
 			windows.get(i).setSolarHeatGainCoefficient(newValues[i]);
 		}
-	}
-
-	public Foundation getFoundation() {
-		return foundation;
 	}
 
 	@Override

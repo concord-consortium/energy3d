@@ -15,6 +15,10 @@ public class ChangeGroundThermalDiffusivityCommand extends AbstractUndoableEdit 
 		oldValue = Scene.getInstance().getGround().getThermalDiffusivity();
 	}
 
+	public double getOldValue() {
+		return oldValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -26,10 +30,6 @@ public class ChangeGroundThermalDiffusivityCommand extends AbstractUndoableEdit 
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().getGround().setThermalDiffusivity(newValue);
-	}
-
-	public double getOldValue() {
-		return oldValue;
 	}
 
 	@Override

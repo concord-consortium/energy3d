@@ -31,6 +31,10 @@ public class ChangeContainerWindowColorCommand extends AbstractUndoableEdit {
 		}
 	}
 
+	public HousePart getContainer() {
+		return container;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -51,10 +55,6 @@ public class ChangeContainerWindowColorCommand extends AbstractUndoableEdit {
 		}
 	}
 
-	public HousePart getContainer() {
-		return container;
-	}
-	
 	@Override
 	public String getPresentationName() {
 		return "Color Change for All Windows on " + (container instanceof Wall ? "Wall" : "Roof");

@@ -65,7 +65,6 @@ import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
-import org.concord.energy3d.undo.ChangeThermostatCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.util.Util;
 
@@ -415,9 +414,8 @@ public class EnergyPanel extends JPanel {
 					foundation = selectedPart.getTopContainer();
 				}
 				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-				ChangeThermostatCommand c = new ChangeThermostatCommand(foundation);
 				new ThermostatDialog(foundation).setVisible(true);
-				SceneManager.getInstance().getUndoManager().addEdit(c);
+				TimeSeriesLogger.getInstance().logAdjustThermostatButton();
 			}
 		});
 		buildingPanel.add(thermostatPanel);

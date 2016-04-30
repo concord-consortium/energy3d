@@ -9,9 +9,9 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 
-@SuppressWarnings("serial")
 public class RotateBuildingCommand extends AbstractUndoableEdit {
 
+	private static final long serialVersionUID = 1L;
 	private final Foundation foundation;
 	private final double rotationAngle;
 
@@ -20,7 +20,6 @@ public class RotateBuildingCommand extends AbstractUndoableEdit {
 		this.rotationAngle = rotationAngle;
 	}
 
-	// for action logging
 	public HousePart getFoundation() {
 		return foundation;
 	}

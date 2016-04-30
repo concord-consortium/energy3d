@@ -18,6 +18,10 @@ public class ShowAxesCommand extends AbstractUndoableEdit {
 		newValue = !oldValue;
 	}
 
+	public boolean getNewValue() {
+		return newValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -30,10 +34,6 @@ public class ShowAxesCommand extends AbstractUndoableEdit {
 		super.redo();
 		SceneManager.getInstance().setAxesVisible(newValue);
 		Util.selectSilently(MainFrame.getInstance().getAxesMenuItem(), newValue);
-	}
-
-	public boolean getNewValue() {
-		return newValue;
 	}
 
 	@Override

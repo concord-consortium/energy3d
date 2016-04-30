@@ -17,6 +17,14 @@ public class ChangeSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
 		oldValue = solarPanel.getEfficiency();
 	}
 
+	public SolarPanel getSolarPanel() {
+		return solarPanel;
+	}
+
+	public double getOldValue() {
+		return oldValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -28,14 +36,6 @@ public class ChangeSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		solarPanel.setEfficiency(newValue);
-	}
-
-	public SolarPanel getSolarPanel() {
-		return solarPanel;
-	}
-
-	public double getOldValue() {
-		return oldValue;
 	}
 
 	@Override

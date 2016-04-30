@@ -18,6 +18,10 @@ public class SpinViewCommand extends AbstractUndoableEdit {
 		newValue = !oldValue;
 	}
 
+	public boolean getNewValue() {
+		return newValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -30,10 +34,6 @@ public class SpinViewCommand extends AbstractUndoableEdit {
 		super.redo();
 		SceneManager.getInstance().setSpinView(newValue);
 		Util.selectSilently(MainPanel.getInstance().getSpinViewButton(), newValue);
-	}
-
-	public boolean getNewValue() {
-		return newValue;
 	}
 
 	@Override

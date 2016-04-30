@@ -20,6 +20,10 @@ public class ChangePartColorCommand extends AbstractUndoableEdit {
 		oldColor = part.getColor();
 	}
 
+	public HousePart getPart() {
+		return part;
+	}
+
 	public ReadOnlyColorRGBA getOldColor() {
 		return oldColor;
 	}
@@ -37,10 +41,6 @@ public class ChangePartColorCommand extends AbstractUndoableEdit {
 		super.redo();
 		part.setColor(newColor);
 		Scene.getInstance().redrawAll();
-	}
-
-	public HousePart getHousePart() {
-		return part;
 	}
 
 	@Override

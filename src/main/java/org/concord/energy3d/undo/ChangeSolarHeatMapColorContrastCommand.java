@@ -17,6 +17,10 @@ public class ChangeSolarHeatMapColorContrastCommand extends AbstractUndoableEdit
 		oldValue = Scene.getInstance().getSolarHeatMapColorContrast();
 	}
 
+	public int getOldValue() {
+		return oldValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -30,10 +34,6 @@ public class ChangeSolarHeatMapColorContrastCommand extends AbstractUndoableEdit
 		super.redo();
 		Scene.getInstance().setSolarHeatMapColorContrast(newValue);
 		Util.setSilently(EnergyPanel.getInstance().getColorMapSlider(), newValue);
-	}
-
-	public int getOldValue() {
-		return oldValue;
 	}
 
 	@Override

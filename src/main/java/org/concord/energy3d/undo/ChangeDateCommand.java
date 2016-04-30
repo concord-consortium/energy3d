@@ -19,6 +19,10 @@ public class ChangeDateCommand extends AbstractUndoableEdit {
 		oldDate = Scene.getInstance().getDate();
 	}
 
+	public Date getOldDate() {
+		return oldDate;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -32,10 +36,6 @@ public class ChangeDateCommand extends AbstractUndoableEdit {
 		super.redo();
 		Scene.getInstance().setDate(newDate);
 		Util.setSilently(EnergyPanel.getInstance().getDateSpinner(), newDate);
-	}
-
-	public Date getOldDate() {
-		return oldDate;
 	}
 
 	@Override

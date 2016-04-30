@@ -27,6 +27,10 @@ public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableE
 		}
 	}
 
+	public Foundation getFoundation() {
+		return foundation;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -45,10 +49,6 @@ public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableE
 		for (int i = 0; i < n; i++) {
 			panels.get(i).setEfficiency(newValues[i]);
 		}
-	}
-
-	public Foundation getFoundation() {
-		return foundation;
 	}
 
 	@Override

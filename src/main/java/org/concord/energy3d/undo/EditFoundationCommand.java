@@ -9,8 +9,9 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
-@SuppressWarnings("serial")
 public class EditFoundationCommand extends EditPartCommand {
+
+	private static final long serialVersionUID = 1L;
 	private final Foundation foundation;
 	private final boolean isResizeMode;
 	private final boolean isMoveMode;
@@ -22,9 +23,8 @@ public class EditFoundationCommand extends EditPartCommand {
 		isMoveMode = moveMode;
 	}
 
-	// for action logging
 	@Override
-	public HousePart getHousePart() {
+	public HousePart getPart() {
 		return foundation;
 	}
 

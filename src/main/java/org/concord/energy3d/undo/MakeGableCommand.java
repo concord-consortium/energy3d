@@ -11,9 +11,9 @@ import org.concord.energy3d.model.Wall;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
 
-@SuppressWarnings("serial")
 public class MakeGableCommand extends EditPartCommand {
 
+	private static final long serialVersionUID = 1L;
 	private final Roof roof;
 	private final Wall wall;
 	private final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints;

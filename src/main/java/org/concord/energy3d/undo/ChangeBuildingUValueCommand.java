@@ -29,6 +29,10 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 		}
 	}
 
+	public HousePart getPart() {
+		return part;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -47,10 +51,6 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 		for (int i = 0; i < n; i++) {
 			((Thermalizable) parts.get(i)).setUValue(newValues[i]);
 		}
-	}
-
-	public HousePart getPart() {
-		return part;
 	}
 
 	@Override

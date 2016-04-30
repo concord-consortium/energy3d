@@ -28,6 +28,10 @@ public class ChangeContainerWindowShgcCommand extends AbstractUndoableEdit {
 		}
 	}
 
+	public HousePart getContainer() {
+		return container;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -46,10 +50,6 @@ public class ChangeContainerWindowShgcCommand extends AbstractUndoableEdit {
 		for (int i = 0; i < n; i++) {
 			windows.get(i).setSolarHeatGainCoefficient(newValues[i]);
 		}
-	}
-
-	public HousePart getContainer() {
-		return container;
 	}
 
 	@Override

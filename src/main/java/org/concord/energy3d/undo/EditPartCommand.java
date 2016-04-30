@@ -12,9 +12,9 @@ import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.Vector3;
 
-@SuppressWarnings("serial")
 public class EditPartCommand extends AbstractUndoableEdit {
 
+	private static final long serialVersionUID = 1L;
 	private final HousePart housePart;
 	protected final ArrayList<Vector3> orgPoints;
 	private final double orgHeight;
@@ -31,8 +31,7 @@ public class EditPartCommand extends AbstractUndoableEdit {
 		editPoint = housePart.getEditPoint();
 	}
 
-	// for action logging
-	public HousePart getHousePart() {
+	public HousePart getPart() {
 		return housePart;
 	}
 

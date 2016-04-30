@@ -17,20 +17,14 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-@SuppressWarnings("serial")
 public class RemovePartCommand extends AbstractUndoableEdit {
 
+	private static final long serialVersionUID = 1L;
 	private final HousePart housePart;
-	private final boolean isSignificant;
 	private List<Map<Integer, List<Wall>>> gableInfo; // there may be multiple roofs on a foundation, which is why we need to have a list of maps
 
 	public RemovePartCommand(final HousePart housePart) {
-		this(housePart, true);
-	}
-
-	public RemovePartCommand(final HousePart housePart, final boolean isSignificant) {
 		this.housePart = housePart;
-		this.isSignificant = isSignificant;
 	}
 
 	public void setGableInfo(List<Map<Integer, List<Wall>>> x) {
@@ -44,14 +38,8 @@ public class RemovePartCommand extends AbstractUndoableEdit {
 		}
 	}
 
-	// for action logging
-	public HousePart getHousePart() {
+	public HousePart getPart() {
 		return housePart;
-	}
-
-	@Override
-	public boolean isSignificant() {
-		return isSignificant;
 	}
 
 	@Override

@@ -15,6 +15,10 @@ public class ChangeBackgroundAlbedoCommand extends AbstractUndoableEdit {
 		oldValue = Scene.getInstance().getGround().getAlbedo();
 	}
 
+	public double getOldValue() {
+		return oldValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -26,10 +30,6 @@ public class ChangeBackgroundAlbedoCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().getGround().setAlbedo(newValue);
-	}
-
-	public double getOldValue() {
-		return oldValue;
 	}
 
 	@Override

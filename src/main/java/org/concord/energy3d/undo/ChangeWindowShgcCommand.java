@@ -17,6 +17,10 @@ public class ChangeWindowShgcCommand extends AbstractUndoableEdit {
 		oldValue = selectedWindow.getSolarHeatGainCoefficient();
 	}
 
+	public Window getWindow() {
+		return window;
+	}
+
 	public double getOldValue() {
 		return oldValue;
 	}
@@ -32,10 +36,6 @@ public class ChangeWindowShgcCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		window.setSolarHeatGainCoefficient(newValue);
-	}
-
-	public Window getWindow() {
-		return window;
 	}
 
 	@Override

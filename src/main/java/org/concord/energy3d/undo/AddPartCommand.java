@@ -8,17 +8,16 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
-@SuppressWarnings("serial")
 public class AddPartCommand extends AbstractUndoableEdit {
 
+	private static final long serialVersionUID = 1L;
 	private final HousePart housePart;
 
 	public AddPartCommand(final HousePart housePart) {
 		this.housePart = housePart;
 	}
 
-	// for action logging
-	public HousePart getHousePart() {
+	public HousePart getPart() {
 		return housePart;
 	}
 

@@ -10,13 +10,13 @@ import org.concord.energy3d.scene.SceneManager;
 public class LockAllCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private boolean[] oldValue;
+	private boolean[] oldValues;
 
 	public LockAllCommand() {
 		int n = Scene.getInstance().getParts().size();
-		oldValue = new boolean[n];
+		oldValues = new boolean[n];
 		for (int i = 0; i < n; i++) {
-			oldValue[i] = Scene.getInstance().getParts().get(i).isFrozen();
+			oldValues[i] = Scene.getInstance().getParts().get(i).isFrozen();
 		}
 	}
 
@@ -26,8 +26,8 @@ public class LockAllCommand extends AbstractUndoableEdit {
 		int n = Scene.getInstance().getParts().size();
 		boolean b = false;
 		for (int i = 0; i < n; i++) {
-			Scene.getInstance().getParts().get(i).setFreeze(oldValue[i]);
-			if (oldValue[i])
+			Scene.getInstance().getParts().get(i).setFreeze(oldValues[i]);
+			if (oldValues[i])
 				b = true;
 		}
 		if (b)

@@ -19,12 +19,16 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 
 	public ChangeBuildingColorCommand(HousePart part) {
 		this.part = part;
-		if (part instanceof Foundation) {
-			foundation = (Foundation) part;
-		} else {
-			foundation = part.getTopContainer();
-		}
+		foundation = part instanceof Foundation ? (Foundation) part : part.getTopContainer();
 		oldColor = part.getColor();
+	}
+
+	public HousePart getPart() {
+		return part;
+	}
+
+	public Foundation getFoundation() {
+		return foundation;
 	}
 
 	@Override
@@ -40,14 +44,6 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 		super.redo();
 		Scene.getInstance().setPartColorOfBuilding(part, newColor);
 		Scene.getInstance().redrawAll();
-	}
-
-	public HousePart getPart() {
-		return part;
-	}
-
-	public Foundation getFoundation() {
-		return foundation;
 	}
 
 	@Override

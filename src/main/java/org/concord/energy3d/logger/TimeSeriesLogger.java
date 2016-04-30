@@ -57,7 +57,6 @@ import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
-import org.concord.energy3d.undo.ChangeThermostatCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditPartCommand;
@@ -158,6 +157,11 @@ public class TimeSeriesLogger {
 				stateValue = "{" + cameraPosition + ", \"Mode\": \"" + cameraMode + "\"}";
 			} else if (action.equals("Graph Tab")) {
 				stateValue = "\"" + graphTabName + "\"";
+			} else if (action.equals("Adjust Thermostat")) {
+				HousePart p = SceneManager.getInstance().getSelectedPart();
+				if (p instanceof Foundation) {
+					stateValue = "{\"Building\": " + p.getId() + "}";
+				}
 			} else if (action.equals("Show Curve")) {
 				stateValue = "{\"Graph\": \"" + graphName + "\", \"Name\": \"" + curveName + "\", \"Shown\": " + curveShown + "}";
 			} else if (action.equals("Show Run")) {
@@ -169,18 +173,18 @@ public class TimeSeriesLogger {
 
 				/* add, edit, or remove parts */
 				if (lastEdit instanceof AddPartCommand) {
-					actedPart = ((AddPartCommand) lastEdit).getHousePart();
+					actedPart = ((AddPartCommand) lastEdit).getPart();
 				} else if (lastEdit instanceof EditPartCommand) {
-					actedPart = ((EditPartCommand) lastEdit).getHousePart();
+					actedPart = ((EditPartCommand) lastEdit).getPart();
 				} else if (lastEdit instanceof RemovePartCommand) {
-					actedPart = ((RemovePartCommand) lastEdit).getHousePart();
+					actedPart = ((RemovePartCommand) lastEdit).getPart();
 				} else if (lastEdit instanceof RemoveMultiplePartsOfSameTypeCommand) {
 					Foundation foundation = ((RemoveMultiplePartsOfSameTypeCommand) lastEdit).getFoundation();
 					if (foundation != null)
-						stateValue = "{\"Building\":" + foundation.getId() + "}";
+						stateValue = "{\"Building\": " + foundation.getId() + "}";
 				} else if (lastEdit instanceof RotateBuildingCommand) {
 					RotateBuildingCommand c = (RotateBuildingCommand) lastEdit;
-					stateValue = "{\"Building\":" + c.getFoundation().getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
+					stateValue = "{\"Building\": " + c.getFoundation().getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
 				}
 
 				/* boolean switches below */
@@ -231,14 +235,25 @@ public class TimeSeriesLogger {
 					Calendar cal1 = Heliodon.getInstance().getCalender();
 					stateValue += ", \"New Time\": \"" + (cal1.get(Calendar.HOUR_OF_DAY)) + ":" + cal1.get(Calendar.MINUTE) + "\"}";
 				} else if (lastEdit instanceof ChangeTextureCommand) {
-					TextureMode textureMode = Scene.getInstance().getTextureMode();
+					stateValue = "{\"Old Value\": ";
+					TextureMode textureMode = ((ChangeTextureCommand) lastEdit).getOldValue();
 					if (textureMode == TextureMode.Full) {
-						stateValue = "\"Full\"";
+						stateValue += "\"Full\"";
 					} else if (textureMode == TextureMode.Simple) {
-						stateValue = "\"Simple\"";
+						stateValue += "\"Simple\"";
 					} else if (textureMode == TextureMode.None) {
-						stateValue = "\"None\"";
+						stateValue += "\"None\"";
 					}
+					stateValue += ", \"New Value\": ";
+					textureMode = Scene.getInstance().getTextureMode();
+					if (textureMode == TextureMode.Full) {
+						stateValue += "\"Full\"";
+					} else if (textureMode == TextureMode.Simple) {
+						stateValue += "\"Simple\"";
+					} else if (textureMode == TextureMode.None) {
+						stateValue += "\"None\"";
+					}
+					stateValue += "}";
 				}
 
 				// building properties
@@ -251,15 +266,12 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof AdjustThermostatCommand) {
 					Foundation foundation = ((AdjustThermostatCommand) lastEdit).getFoundation();
 					stateValue = "{\"Building\":" + foundation.getId() + "}";
-				} else if (lastEdit instanceof ChangeThermostatCommand) {
-					Foundation foundation = ((ChangeThermostatCommand) lastEdit).getFoundation();
-					stateValue = "{\"Building\":" + foundation.getId() + "}";
 				}
 
 				// colors
 				else if (lastEdit instanceof ChangePartColorCommand) {
 					ChangePartColorCommand c = (ChangePartColorCommand) lastEdit;
-					HousePart p = c.getHousePart();
+					HousePart p = c.getPart();
 					Foundation foundation = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
 					stateValue = "{\"Building\": " + foundation.getId() + ", \"ID\": " + p.getId();
 					stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
@@ -522,6 +534,12 @@ public class TimeSeriesLogger {
 		this.graphName = graphName;
 		this.runID = runID;
 		this.runShown = runShown;
+		record();
+		action = null;
+	}
+
+	public void logAdjustThermostatButton() {
+		action = "Adjust Thermostat";
 		record();
 		action = null;
 	}

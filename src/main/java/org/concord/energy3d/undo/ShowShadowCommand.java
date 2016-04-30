@@ -19,6 +19,10 @@ public class ShowShadowCommand extends AbstractUndoableEdit {
 		newValue = !oldValue;
 	}
 
+	public boolean getNewValue() {
+		return newValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -35,10 +39,6 @@ public class ShowShadowCommand extends AbstractUndoableEdit {
 		Util.selectSilently(MainPanel.getInstance().getShadowButton(), newValue);
 	}
 	
-	public boolean getNewValue() {
-		return newValue;
-	}
-
 	@Override
 	public String getPresentationName() {
 		return "Show Shadow";

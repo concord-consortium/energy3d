@@ -19,6 +19,10 @@ public class ChangePartUValueCommand extends AbstractUndoableEdit {
 			oldValue = ((Thermalizable) part).getUValue();
 	}
 
+	public HousePart getPart() {
+		return part;
+	}
+
 	public double getOldValue() {
 		return oldValue;
 	}
@@ -37,10 +41,6 @@ public class ChangePartUValueCommand extends AbstractUndoableEdit {
 		super.redo();
 		if (part instanceof Thermalizable)
 			((Thermalizable) part).setUValue(newValue);
-	}
-
-	public HousePart getPart() {
-		return part;
 	}
 
 	@Override

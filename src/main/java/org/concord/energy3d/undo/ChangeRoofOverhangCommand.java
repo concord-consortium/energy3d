@@ -18,6 +18,14 @@ public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
 		oldValue = roof.getOverhangLength();
 	}
 
+	public Roof getRoof() {
+		return roof;
+	}
+
+	public double getOldValue() {
+		return oldValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -31,15 +39,6 @@ public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
 		super.redo();
 		roof.setOverhangLength(newValue);
 		Scene.getInstance().redrawAll(); // can't just use Roof.draw() as we also need to draw the wall parts
-	}
-
-	// for action logging
-	public Roof getRoof() {
-		return roof;
-	}
-
-	public double getOldValue() {
-		return oldValue;
 	}
 
 	@Override
