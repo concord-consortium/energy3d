@@ -106,6 +106,7 @@ public class EnergyPanel extends JPanel {
 	private final JTextField thermostatTemperatureField;
 	private final JButton adjustThermostatButton;
 	private JPanel partPanel;
+	private JPanel timeAndLocationPanel;
 	private JPanel buildingPanel;
 	private JPanel partPropertiesPanel;
 	private JLabel partProperty1Label;
@@ -138,8 +139,8 @@ public class EnergyPanel extends JPanel {
 
 		// date, time, and location
 
-		final JPanel timeAndLocationPanel = new JPanel();
-		timeAndLocationPanel.setBorder(BorderFactory.createEmptyBorder(4, 0, 10, 0));
+		timeAndLocationPanel = new JPanel();
+		timeAndLocationPanel.setBorder(createTitledBorder("Project", true));
 		dataPanel.add(timeAndLocationPanel);
 		final GridBagLayout gbl_panel_3 = new GridBagLayout();
 		timeAndLocationPanel.setLayout(gbl_panel_3);
@@ -759,7 +760,7 @@ public class EnergyPanel extends JPanel {
 				partProperty2TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			} else {
 				if (selectedPart.getPoints().size() > 2) {
-					partProperty1TextField.setText(noDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (noDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
+					partProperty1TextField.setText(oneDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
 				}
 				partProperty2TextField.setText("(" + noDecimal.format(v.getX() * scale) + ", " + noDecimal.format(v.getY() * scale) + ", " + noDecimal.format(v.getZ() * scale) + ")");
 			}
@@ -833,6 +834,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void update() {
+		String s = Scene.getInstance().getProjectName();
+		timeAndLocationPanel.setBorder(createTitledBorder("Project: " + (s != null ? s : ""), true));
 		basicsPanel.updateArea();
 		basicsPanel.updateHeight();
 		basicsPanel.updateWindowToFloorRatio();
