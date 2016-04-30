@@ -38,8 +38,8 @@ import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Thermostat;
-import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.LockAllCommand;
+import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
@@ -654,7 +654,7 @@ public class Scene implements Serializable {
 			return;
 		add(c, true);
 		copyBuffer = c;
-		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
@@ -672,7 +672,7 @@ public class Scene implements Serializable {
 			c.getPoints().set(0, position);
 			add(c, true);
 			copyBuffer = c;
-			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+			SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		} else if (c instanceof Foundation) { // pasting a foundation also clones the building above it
 			final Vector3 shift = position.subtractLocal(c.getAbsCenter()).multiplyLocal(1, 1, 0);
 			final int n = c.getPoints().size();
@@ -682,7 +682,7 @@ public class Scene implements Serializable {
 			add(c, true);
 			copyBuffer = c;
 			setIdOfChildren(c);
-			SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+			SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		}
 	}
 
@@ -737,7 +737,7 @@ public class Scene implements Serializable {
 		}
 		add(c, true);
 		copyBuffer = c;
-		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
 	public void pasteToPickedLocationOnRoof() {
@@ -768,7 +768,7 @@ public class Scene implements Serializable {
 		}
 		add(c, true);
 		copyBuffer = c;
-		SceneManager.getInstance().getUndoManager().addEdit(new AddPartCommand(c));
+		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
 	public List<HousePart> getParts() {

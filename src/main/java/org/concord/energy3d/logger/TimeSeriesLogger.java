@@ -60,6 +60,7 @@ import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditPartCommand;
+import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
@@ -83,7 +84,6 @@ import com.ardor3d.renderer.Camera;
 public class TimeSeriesLogger {
 
 	private final static SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private final static String SEPARATOR = ",   ";
 	private final static int MINIMUM_INTERVAL = 200; // in milliseconds
 	private File file;
 	private Object analysisRequester;
@@ -94,6 +94,8 @@ public class TimeSeriesLogger {
 	private String lastAction;
 	private Date lastTime;
 	private String lastCameraPosition;
+
+	// Ugly logging
 	private String graphTabName;
 	private String graphName, curveName, runID;
 	private boolean curveShown, runShown;
@@ -120,7 +122,7 @@ public class TimeSeriesLogger {
 		final String timestamp = TIME_FORMAT.format(time);
 		String line = "";
 		if (Scene.getInstance().getProjectName() != null && !Scene.getInstance().getProjectName().trim().equals("")) {
-			line += "\"Project\": \"" + Scene.getInstance().getProjectName() + "\"" + SEPARATOR;
+			line += "\"Project\": \"" + Scene.getInstance().getProjectName() + "\", ";
 		}
 		line += "\"File\": \"" + filename + "\"";
 
@@ -171,9 +173,15 @@ public class TimeSeriesLogger {
 				// everything else
 				UndoableEdit lastEdit = SceneManager.getInstance().getUndoManager().lastEdit();
 
-				/* add, edit, or remove parts */
+				// add, edit, or remove parts
 				if (lastEdit instanceof AddPartCommand) {
 					actedPart = ((AddPartCommand) lastEdit).getPart();
+				} else if (lastEdit instanceof PastePartCommand) {
+					actedPart = ((PastePartCommand) lastEdit).getPart();
+					if (actedPart instanceof Foundation) {
+						stateValue = "{\"Building\": " + actedPart.getId() + "}";
+						actedPart = null; // FIXME: work around a bug related to pasting a building, fix later
+					}
 				} else if (lastEdit instanceof EditPartCommand) {
 					actedPart = ((EditPartCommand) lastEdit).getPart();
 				} else if (lastEdit instanceof RemovePartCommand) {
@@ -187,7 +195,7 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + c.getFoundation().getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
 				}
 
-				/* boolean switches below */
+				// boolean switches
 				else if (lastEdit instanceof AnimateSunCommand) {
 					stateValue = "" + ((AnimateSunCommand) lastEdit).getNewValue();
 				} else if (lastEdit instanceof ShowShadowCommand) {
@@ -204,7 +212,7 @@ public class TimeSeriesLogger {
 					stateValue = "" + (SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW);
 				}
 
-				/* value changes below */
+				// value changes
 				else if (lastEdit instanceof ChangeBackgroundAlbedoCommand) {
 					ChangeBackgroundAlbedoCommand c = (ChangeBackgroundAlbedoCommand) lastEdit;
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getGround().getAlbedo() + "}";
@@ -356,7 +364,7 @@ public class TimeSeriesLogger {
 
 			}
 
-			line += SEPARATOR + "\"" + action + "\": ";
+			line += ", \"" + action + "\": ";
 			if (actedPart != null) {
 				line += LoggerUtil.getInfo(actedPart);
 			} else if (stateValue != null) {
@@ -375,7 +383,7 @@ public class TimeSeriesLogger {
 
 		{ // this analysis is completed, now record some results
 			HousePart analyzedPart = SceneManager.getInstance().getSelectedPart();
-			line += SEPARATOR + "\"" + analysisRequester.getClass().getSimpleName() + "\": ";
+			line += ", \"" + analysisRequester.getClass().getSimpleName() + "\": ";
 			if (analysisRequester instanceof AnnualSensorData) {
 				line += ((AnnualSensorData) analysisRequester).toJson();
 			} else if (analysisRequester instanceof DailySensorData) {
@@ -393,7 +401,7 @@ public class TimeSeriesLogger {
 						if (SceneManager.getInstance().areBuildingLabelsVisible()) {
 							String result = Building.getBuildingSolarPotentials();
 							if (result != null) {
-								line += SEPARATOR + "\"Solar Potential\": " + result;
+								line += ", \"Solar Potential\": " + result;
 							}
 						}
 					} else if (analysisRequester instanceof EnergyAnnualAnalysis) {
@@ -411,7 +419,7 @@ public class TimeSeriesLogger {
 						if (SceneManager.getInstance().areBuildingLabelsVisible()) {
 							String result = Building.getBuildingSolarPotentials();
 							if (result != null) {
-								line += SEPARATOR + "\"Solar Potential\": " + result;
+								line += ", \"Solar Potential\": " + result;
 							}
 						}
 					}
@@ -428,7 +436,7 @@ public class TimeSeriesLogger {
 		{
 			writer.write(",\n");
 		}
-		writer.write("{\"Timestamp\": \"" + timestamp + "\"" + SEPARATOR + line + "}");
+		writer.write("{\"Timestamp\": \"" + timestamp + "\", " + line + "}");
 		writer.flush();
 
 		lastTime = time;

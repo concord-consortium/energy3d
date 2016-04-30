@@ -221,6 +221,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Mesh sky;
 	private TextureState daySkyState, nightSkyState;
 	private double buildingRotationAngleRecorded;
+	private boolean cameraChanged;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -714,7 +715,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				@Override
 				public void mouseReleased(final MouseEvent e) {
 					if (Util.isRightClick(e)) {
-						TimeSeriesLogger.getInstance().logCamera("Pan");
+						if (cameraChanged) {
+							TimeSeriesLogger.getInstance().logCamera("Pan");
+							cameraChanged = false;
+						}
 					}
 				}
 			});
@@ -723,6 +727,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				@Override
 				public void mouseDragged(final MouseEvent e) {
 					EnergyPanel.getInstance().update();
+					cameraChanged = true;
 				}
 			});
 
@@ -1553,7 +1558,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						cameraControl.setLeftMouseButtonEnabled(true);
 					houseMoveStartPoint = null;
 					houseMovePoints = null;
-					TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
+					if (cameraChanged) {
+						TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
+						cameraChanged = false;
+					}
 				} else {
 					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
 						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
