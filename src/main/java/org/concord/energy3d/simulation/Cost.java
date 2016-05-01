@@ -97,14 +97,14 @@ public class Cost {
 			// This translates into $16/m^2. We don't know what R-value this insulation will be. But let's assume it is R13 material that has a U-value of 0.44 W/m^2/C.
 			// Let's also assume that the insulation cost is inversely proportional to the U-value.
 			// The baseline cost for a wall is set to be $300/m^2, close to homewyse's estimates of masonry walls, interior framing, etc.
-			double unitPrice = 300 + 7 / uFactor;
+			double unitPrice = 300 + 8 / uFactor;
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Window) {
 			double uFactor = ((Window) part).getUValue();
 			// According to http://www.homewyse.com/costs/cost_of_double_pane_windows.html
 			// A storm window of about 1 m^2 costs about $500. A double-pane window of about 1 m^2 costs about $700.
-			double unitPrice = 500 + 600 / uFactor;
+			double unitPrice = 500 + 800 / uFactor;
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Roof) {
@@ -114,7 +114,7 @@ public class Cost {
 			// This translates into $34/m^2. We don't know the R-value of this insulation. But let's assume it is R22 material that has a U-value of 0.26 W/m^2/C.
 			// Let's also assume that the insulation cost is inversely proportional to the U-value.
 			// The baseline (that is, the structure without insulation) cost for a roof is set to be $100/m^2.
-			double unitPrice = 100 + 9 / uFactor;
+			double unitPrice = 100 + 10 / uFactor;
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof Foundation) {
@@ -149,7 +149,7 @@ public class Cost {
 		}
 		if (part instanceof SolarPanel) {
 			// According to http://www.solartown.com/learning/solar-panels/solar-module-comparison
-			return 350 + (int) (((SolarPanel) part).getEfficiency() * 1000);
+			return 350 + (int) (((SolarPanel) part).getEfficiency() * 2000);
 		}
 		if (part instanceof Tree) {
 			Tree tree = (Tree) part;

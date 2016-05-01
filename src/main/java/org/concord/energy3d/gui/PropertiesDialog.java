@@ -54,11 +54,11 @@ class PropertiesDialog extends JDialog {
 					Scene.getInstance().setUnit(Scene.Unit.USCustomaryUnits);
 					break;
 				}
-				EnergyPanel.getInstance().updateWeatherData();
-				EnergyPanel.getInstance().update();
 				Scene.getInstance().setProjectName(projectNameField.getText());
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setEdited(true);
+				EnergyPanel.getInstance().updateWeatherData();
+				EnergyPanel.getInstance().update();
 				PropertiesDialog.this.dispose();
 			}
 		};

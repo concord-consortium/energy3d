@@ -3,16 +3,22 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.BuildingEnergyDailyGraph;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
@@ -29,9 +35,30 @@ public class DailyEnergyGraph extends JPanel {
 
 	private BuildingEnergyDailyGraph graph;
 	private Foundation building;
+	private Box buttonPanel;
 
 	public DailyEnergyGraph() {
 		super(new BorderLayout());
+
+		buttonPanel = new Box(BoxLayout.Y_AXIS);
+		buttonPanel.setBackground(Color.WHITE);
+		buttonPanel.add(Box.createVerticalGlue());
+		JButton button = new JButton("Show");
+		button.setAlignmentX(CENTER_ALIGNMENT);
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SceneManager.getInstance().autoSelectBuilding(true);
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Foundation) {
+					addGraph((Foundation) selectedPart);
+					EnergyPanel.getInstance().validate();
+				}
+			}
+		});
+		buttonPanel.add(button);
+		buttonPanel.add(Box.createVerticalGlue());
+
 		graph = new BuildingEnergyDailyGraph();
 		graph.setPopup(false);
 		graph.setBackground(Color.WHITE);
@@ -66,8 +93,15 @@ public class DailyEnergyGraph extends JPanel {
 		return graph.getSum(name);
 	}
 
+	public void clearData() {
+		graph.clearData();
+		graph.repaint();
+	}
+
 	public void removeGraph() {
-		remove(graph);
+		removeAll();
+		repaint();
+		add(buttonPanel, BorderLayout.CENTER);
 		repaint();
 		EnergyPanel.getInstance().validate();
 	}
@@ -92,7 +126,9 @@ public class DailyEnergyGraph extends JPanel {
 	}
 
 	public void addGraph(Foundation building) {
-		removeGraph();
+
+		removeAll();
+
 		this.building = building;
 		graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
 		if (SceneManager.getInstance().getSolarHeatMap()) {

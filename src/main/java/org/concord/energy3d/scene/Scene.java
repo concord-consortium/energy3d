@@ -165,6 +165,8 @@ public class Scene implements Serializable {
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
 						EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
+						EnergyPanel.getInstance().getDailyEnergyGraph().clearData();
+						EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) p);
 						EnergyPanel.getInstance().validate();
 					}
 				}

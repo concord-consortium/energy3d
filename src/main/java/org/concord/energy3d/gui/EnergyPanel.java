@@ -897,8 +897,7 @@ public class EnergyPanel extends JPanel {
 		if (selectedPart instanceof Foundation) {
 			final Foundation foundation = (Foundation) selectedPart;
 			constructionCostGraph.addGraph(foundation);
-			if (SceneManager.getInstance().getSolarHeatMap())
-				dailyEnergyGraph.addGraph(foundation);
+			dailyEnergyGraph.addGraph(foundation);
 		} else {
 			constructionCostGraph.removeGraph();
 			dailyEnergyGraph.removeGraph();
