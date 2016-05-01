@@ -169,19 +169,34 @@ public class Heliodon {
 		baseTicks.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		root.attachChild(baseTicks);
 
-		// Compass Labels N S E W
+		// Degree Labels
+		final double radius = 6;
 		final BMText northLabel = createText("90\u00B0");
 		northLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, 0));
-		northLabel.setTranslation(0, 6, 0);
+		northLabel.setTranslation(0, radius, 0);
 		final BMText southLabel = createText("270\u00B0");
 		southLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, Math.PI));
-		southLabel.setTranslation(0, -6, 0);
+		southLabel.setTranslation(0, -radius, 0);
 		final BMText eastLabel = createText("0\u00B0");
 		eastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, -MathUtils.HALF_PI));
-		eastLabel.setTranslation(6, 0, 0);
+		eastLabel.setTranslation(radius, 0, 0);
 		final BMText westLabel = createText("180\u00B0");
 		westLabel.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0, MathUtils.HALF_PI));
-		westLabel.setTranslation(-6, 0, 0);
+		westLabel.setTranslation(-radius, 0, 0);
+
+		// TODO: Not exactly working at they do not lie on the ground
+		final BMText northEastLabel = createText("45\u00B0");
+		northEastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.QUARTER_PI, 0, -MathUtils.QUARTER_PI));
+		northEastLabel.setTranslation(radius * Math.cos(MathUtils.QUARTER_PI), radius * Math.sin(MathUtils.QUARTER_PI), 0);
+		final BMText southEastLabel = createText("315\u00B0");
+		southEastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.QUARTER_PI, 0, Math.PI + MathUtils.QUARTER_PI));
+		southEastLabel.setTranslation(radius * Math.cos(MathUtils.QUARTER_PI), radius * Math.sin(-MathUtils.QUARTER_PI), 0);
+		final BMText northWestLabel = createText("135\u00B0");
+		northWestLabel.setRotation(new Matrix3().fromAngles(-MathUtils.QUARTER_PI, 0, MathUtils.QUARTER_PI));
+		northWestLabel.setTranslation(radius * Math.cos(MathUtils.QUARTER_PI + MathUtils.HALF_PI), radius * Math.sin(MathUtils.QUARTER_PI + MathUtils.HALF_PI), 0);
+		final BMText southWestLabel = createText("225\u00B0");
+		southWestLabel.setRotation(new Matrix3().fromAngles(-MathUtils.QUARTER_PI, 0, Math.PI - MathUtils.QUARTER_PI));
+		southWestLabel.setTranslation(radius * Math.cos(MathUtils.QUARTER_PI + MathUtils.PI), radius * Math.sin(MathUtils.QUARTER_PI + MathUtils.PI), 0);
 
 		// Clip
 		final ClipState cs = new ClipState();
@@ -222,7 +237,7 @@ public class Heliodon {
 		label.setAutoRotate(false);
 		label.setAutoScale(AutoScale.FixedScreenSize);
 		label.setAutoFade(AutoFade.Off);
-		label.setFontScale(1.0);
+		label.setFontScale(0.75);
 		root.attachChild(label);
 		return label;
 	}

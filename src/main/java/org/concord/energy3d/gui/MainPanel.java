@@ -95,7 +95,7 @@ public class MainPanel extends JPanel {
 	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
-	private final double buildingRotationAngleAbsolute = Math.PI / 36;
+	private final double buildingRotationAngleAbsolute = Math.PI / 180;
 	private double buildingRotationAngle = -buildingRotationAngleAbsolute;
 	private String noteString = "";
 
@@ -745,6 +745,7 @@ public class MainPanel extends JPanel {
 						defaultTool();
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {
+						EnergyPanel.getInstance().getDailyEnergyGraph().clearData();
 						EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
 					}
 					SceneManager.getInstance().computeEnergyView(energyViewButton.isSelected());
