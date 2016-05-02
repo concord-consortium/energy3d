@@ -66,6 +66,7 @@ import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
+import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
@@ -202,6 +203,8 @@ public class TimeSeriesLogger {
 					stateValue = "" + ((AnimateSunCommand) lastEdit).getNewValue();
 				} else if (lastEdit instanceof ShowShadowCommand) {
 					stateValue = "" + ((ShowShadowCommand) lastEdit).getNewValue();
+				} else if (lastEdit instanceof ShowHeatFluxCommand) {
+					stateValue = "" + ((ShowHeatFluxCommand) lastEdit).getNewValue();
 				} else if (lastEdit instanceof SpinViewCommand) {
 					stateValue = "" + ((SpinViewCommand) lastEdit).getNewValue();
 				} else if (lastEdit instanceof ShowAxesCommand) {

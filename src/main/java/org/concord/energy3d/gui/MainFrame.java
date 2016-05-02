@@ -86,6 +86,7 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
+import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.util.Config;
@@ -1347,13 +1348,16 @@ public class MainFrame extends JFrame {
 		return solarAbsorptionHeatMapMenuItem;
 	}
 
-	private JCheckBoxMenuItem getHeatFluxMenuItem() {
+	public JCheckBoxMenuItem getHeatFluxMenuItem() {
 		if (showHeatFluxVectorsMenuItem == null) {
 			showHeatFluxVectorsMenuItem = new JCheckBoxMenuItem("Heat Flux Vectors");
 			showHeatFluxVectorsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					ShowHeatFluxCommand c = new ShowHeatFluxCommand();
 					Scene.getInstance().setAlwaysComputeHeatFluxVectors(showHeatFluxVectorsMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}

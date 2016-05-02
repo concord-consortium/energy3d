@@ -206,7 +206,7 @@ public class Building {
 	}
 
 	public boolean contains(final double x, final double y, final boolean init) {
-		if (wallComplete)
+		if (!wallComplete)
 			return false;
 		final int n = wallVertices.size();
 		if (n == 0)

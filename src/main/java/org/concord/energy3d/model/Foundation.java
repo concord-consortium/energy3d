@@ -958,7 +958,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
 		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-		final double heat = calculateHeatVector();
+		final double heat = calculateHeatVector();		
 		if (heat != 0) {
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
