@@ -190,6 +190,7 @@ public class EnergyAngularAnalysis extends Analysis {
 					return;
 				graph.clearRecords();
 				graph.repaint();
+				TimeSeriesLogger.getInstance().logClearGraphData(graph.getClass().getSimpleName());
 			}
 		});
 		menu.add(miClear);

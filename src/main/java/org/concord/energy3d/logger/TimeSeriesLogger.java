@@ -168,6 +168,8 @@ public class TimeSeriesLogger {
 				stateValue = "{\"Graph\": \"" + graphName + "\", \"Name\": \"" + curveName + "\", \"Shown\": " + curveShown + "}";
 			} else if (action.equals("Show Run")) {
 				stateValue = "{\"Graph\": \"" + graphName + "\", \"ID\": \"" + runID + "\", \"Shown\": " + runShown + "}";
+			} else if (action.equals("Clear Graph Data")) {
+				stateValue = "\"" + graphName + "\"";
 			} else {
 
 				// everything else
@@ -524,6 +526,13 @@ public class TimeSeriesLogger {
 	public void logGraphTab(String graphTabName) {
 		action = "Graph Tab";
 		this.graphTabName = graphTabName;
+		record();
+		action = null;
+	}
+
+	public void logClearGraphData(String graphName) {
+		action = "Clear Graph Data";
+		this.graphName = graphName;
 		record();
 		action = null;
 	}
