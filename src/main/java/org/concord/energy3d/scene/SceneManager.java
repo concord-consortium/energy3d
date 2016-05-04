@@ -1022,17 +1022,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (this.operation != operation) {
 			this.operation = operation;
 			operationFlag = true;
-
 			// need to be here to ensure immediate removal of unfinished house part before computeEnergy thread is started
-			synchronized (this) {
-				if (selectedHousePart != null) {
-					if (selectedHousePart.isDrawCompleted())
-						selectedHousePart.setEditPointsVisible(false);
-					else
-						Scene.getInstance().remove(selectedHousePart, false);
-					selectedHousePart = null;
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					if (selectedHousePart != null) {
+						if (selectedHousePart.isDrawCompleted())
+							selectedHousePart.setEditPointsVisible(false);
+						else
+							Scene.getInstance().remove(selectedHousePart, false);
+						selectedHousePart = null;
+					}
+					return null;
 				}
-			}
+			});
 		}
 	}
 
