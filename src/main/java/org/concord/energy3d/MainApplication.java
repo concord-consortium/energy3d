@@ -1,5 +1,7 @@
 package org.concord.energy3d;
 
+import java.awt.EventQueue;
+import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +9,9 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import org.concord.energy3d.etc.oneinstance.OneInstance;
+import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
+import org.concord.energy3d.gui.Mac;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
@@ -26,6 +31,8 @@ public class MainApplication {
 	private static ArrayList<Runnable> shutdownHooks;
 
 	public static void main(final String[] args) {
+		System.out.println("Initiating...");
+		checkSingleInstance(MainApplication.class, args);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
@@ -180,6 +187,61 @@ public class MainApplication {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void checkSingleInstance(final Class<?> mainClass, final String[] args) {
+		System.out.println("Checking single instance...");
+		final OneInstance oneInstance = OneInstance.getInstance();
+
+		// Install listener which processes the start of secondary instances
+		oneInstance.addListener(new OneInstanceListener() {
+			@Override
+			public boolean newInstanceCreated(final File workingDir, final String[] args) {
+				System.out.println("SingleInstance.open()");
+				newActivation(args);
+				return false;
+			}
+		});
+
+		if (!oneInstance.register(mainClass, args)) {
+			System.out.println("Already running...exit");
+			System.exit(0);
+		}
+	}
+
+	public static void newActivation(final String[] args) {
+		System.out.println("newActivation()");
+
+		for (final String s : args)
+			System.out.println(s);
+
+		if (args.length > 0)
+			try {
+				MainFrame.getInstance().open(args[0]);
+				MainFrame.getInstance().updateTitleBar();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+
+		showAndBringToFront();
+	}
+
+	public static void showAndBringToFront() {
+		System.out.println("showAndBringToFront");
+		if (!MainFrame.getInstance().isVisible())
+			MainFrame.getInstance().setVisible(true);
+		if (MainFrame.getInstance().getState() == Frame.ICONIFIED)
+			MainFrame.getInstance().setState(Frame.NORMAL);
+
+		else if (Config.isMac())
+			Mac.bringToFront();
+		else
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					MainFrame.getInstance().toFront();
+				}
+			});
 	}
 
 }

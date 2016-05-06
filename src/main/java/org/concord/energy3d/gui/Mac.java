@@ -20,7 +20,7 @@ import com.apple.eawt.PreferencesHandler;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
-class Mac {
+public class Mac {
 
 	public static void init() {
 
@@ -31,7 +31,7 @@ class Mac {
 			@Override
 			public void openFiles(final OpenFilesEvent e) {
 				MainApplication.isMacOpeningFile = true;
-//				MainFrame.getInstance().open(e.getFiles().get(0).toString());
+				// MainFrame.getInstance().open(e.getFiles().get(0).toString());
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {
@@ -67,6 +67,10 @@ class Mac {
 			}
 		});
 
+	}
+
+	public static void bringToFront() {
+		Application.getApplication().requestForeground(true);
 	}
 
 }
