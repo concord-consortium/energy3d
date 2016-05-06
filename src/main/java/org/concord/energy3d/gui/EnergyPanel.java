@@ -546,12 +546,16 @@ public class EnergyPanel extends JPanel {
 
 	public void computeNow() {
 		try {
-			System.out.println("PropertiesPanel.computeNow()");
-			progressBar.setValue(0);
-			progressBar.setStringPainted(false);
+			System.out.println("EnergyPanel.computeNow()");
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					progressBar.setValue(0);
+					progressBar.setStringPainted(false);
+				}
+			});
 
 			synchronized (SceneManager.getInstance()) {
-				updateWeatherData();
 				final int timeStep = SolarRadiation.getInstance().getTimeStep();
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
@@ -560,15 +564,16 @@ public class EnergyPanel extends JPanel {
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 				Scene.getInstance().setTreeLeaves();
-				EventQueue.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						updateProperties();
-					}
-				});
 			}
 
-			progressBar.setValue(100);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					updateWeatherData();
+					updateProperties();
+					progressBar.setValue(100);
+				}
+			});
 
 		} catch (final CancellationException e) {
 			System.out.println("Energy calculation cancelled.");
