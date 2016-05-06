@@ -893,15 +893,20 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateGraphs() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof Foundation) {
-			final Foundation foundation = (Foundation) selectedPart;
-			constructionCostGraph.addGraph(foundation);
-			dailyEnergyGraph.addGraph(foundation);
-		} else {
-			constructionCostGraph.removeGraph();
-			dailyEnergyGraph.removeGraph();
-		}
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Foundation) {
+					final Foundation foundation = (Foundation) selectedPart;
+					constructionCostGraph.addGraph(foundation);
+					dailyEnergyGraph.addGraph(foundation);
+				} else {
+					constructionCostGraph.removeGraph();
+					dailyEnergyGraph.removeGraph();
+				}
+			}
+		});
 	}
 
 	private JLabel createLabel(String text) {

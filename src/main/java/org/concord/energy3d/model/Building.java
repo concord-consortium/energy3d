@@ -69,8 +69,10 @@ public class Building {
 				if (next != null)
 					pointIndex = next.getSnapPointIndexOf(currentWall);
 				pointIndex++;
-				addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
-				addVertex(currentWall.getAbsPoint(pointIndex));
+				if (currentWall.isDrawCompleted()) {
+					addVertex(currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1));
+					addVertex(currentWall.getAbsPoint(pointIndex));
+				}
 			}
 
 			private void addVertex(final ReadOnlyVector3 v3) {

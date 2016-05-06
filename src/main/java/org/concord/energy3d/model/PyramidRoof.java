@@ -23,12 +23,15 @@ public class PyramidRoof extends Roof {
 
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
-			recalculateEditPoints = true;;
+			recalculateEditPoints = true;
+			;
 		} else {
 			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
 			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
-			height = Math.max(0, p.getZ() - base.getZ());
+			if (p != null) {
+				snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
+				height = Math.max(0, p.getZ() - base.getZ());
+			}
 		}
 		postEdit(editState);
 	}

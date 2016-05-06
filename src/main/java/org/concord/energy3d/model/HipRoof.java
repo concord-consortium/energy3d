@@ -27,14 +27,18 @@ public class HipRoof extends Roof {
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
 			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
-			height = Math.max(0, p.getZ() - base.getZ());
+			if (p != null) {
+				snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
+				height = Math.max(0, p.getZ() - base.getZ());
+			}
 		} else if (editPointIndex == 1 || editPointIndex == 2) {
 			final Vector3 hipDirection = container.getAbsPoint(2).subtractLocal(container.getAbsPoint(0)).normalizeLocal();
 			final Vector3 p = Util.closestPoint(getAbsPoint(0), hipDirection, x, y);
-//			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
-			if (insideWallsPolygon(p))
-				points.get(editPointIndex).set(toRelative(p));
+			if (p != null) {
+				// snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
+				if (insideWallsPolygon(p))
+					points.get(editPointIndex).set(toRelative(p));
+			}
 		}
 		postEdit(editState);
 	}
@@ -55,25 +59,25 @@ public class HipRoof extends Roof {
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
 			points.get(0).set(toRelative(center));
-//			if (editPointIndex == -1) {
-				recalculateEditPoints = false;
-				points.add(toRelative(getCenter()));
-				final Vector3 hipDirection = container.getAbsPoint(2).subtractLocal(container.getAbsPoint(0)).normalizeLocal();
-				Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(-50, null), null));
-				Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(50, null), null));
-				if (point1 == null)
-					point1 = center.clone();
-				if (point2 == null)
-					point2 = center.clone();
+			// if (editPointIndex == -1) {
+			recalculateEditPoints = false;
+			points.add(toRelative(getCenter()));
+			final Vector3 hipDirection = container.getAbsPoint(2).subtractLocal(container.getAbsPoint(0)).normalizeLocal();
+			Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(-50, null), null));
+			Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(50, null), null));
+			if (point1 == null)
+				point1 = center.clone();
+			if (point2 == null)
+				point2 = center.clone();
 
-				point1.addLocal(hipDirection.multiply(point1.distance(center) * 0.5, null));
-				point2.addLocal(hipDirection.multiply(-point2.distance(center) * 0.5, null));
-				points.get(1).set(toRelative(point1));
-				points.get(2).set(toRelative(point2));
-				
-				computeHeight(wallUpperPoints);
-				applyHeight();
-//			}
+			point1.addLocal(hipDirection.multiply(point1.distance(center) * 0.5, null));
+			point2.addLocal(hipDirection.multiply(-point2.distance(center) * 0.5, null));
+			points.get(1).set(toRelative(point1));
+			points.get(2).set(toRelative(point2));
+
+			computeHeight(wallUpperPoints);
+			applyHeight();
+			// }
 		} else {
 			applyHeight();
 		}
