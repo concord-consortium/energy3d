@@ -220,7 +220,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean showHeatFlux = false;
 	private final Mesh sky;
 	private TextureState daySkyState, nightSkyState;
-	private double buildingRotationAngleRecorded;
 	private boolean cameraChanged;
 
 	public static SceneManager getInstance() {
@@ -1734,35 +1733,25 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return showBuildingLabels;
 	}
 
-	public void resetBuildingRotationAngleRecorded() {
-		buildingRotationAngleRecorded = 0;
-	}
-
-	public double getBuildingRotationAngleRecorded() {
-		return buildingRotationAngleRecorded;
-	}
-
 	public void undoOrRedoBuildingRotation(final Foundation foundation, final double rotationAngle, final boolean undo) {
 		setSelectedPart(foundation);
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				rotateBuilding(undo ? -rotationAngle : rotationAngle, false, true);
+				rotateBuilding(undo ? -rotationAngle : rotationAngle, true);
 				return null;
 			}
 		});
 	}
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
-	public void rotateBuilding(final double angle, final boolean keepRecord, final boolean redraw) {
+	public void rotateBuilding(final double angle, final boolean redraw) {
 		System.out.println("rotateBuilding()");
 		if (selectedHousePart != null) {
 			if (selectedHousePart instanceof Foundation)
 				((Foundation) selectedHousePart).rotate(angle);
 			else
 				selectedHousePart.getTopContainer().rotate(angle);
-			if (keepRecord)
-				buildingRotationAngleRecorded += angle;
 			if (redraw)
 				Scene.getInstance().redrawAll();
 		}

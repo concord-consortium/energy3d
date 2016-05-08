@@ -69,6 +69,7 @@ import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
@@ -704,6 +705,10 @@ public class EnergyPanel extends JPanel {
 			partProperty1Label.setText("Area:");
 			partProperty2Label.setText("Position:");
 			partProperty3Label.setText("Solar:");
+		} else if (selectedPart instanceof Foundation) {
+			partProperty1Label.setText("Size:");
+			partProperty2Label.setText("Position:");
+			partProperty3Label.setText("Angle:");
 		} else {
 			partProperty1Label.setText("Size:");
 			partProperty2Label.setText("Position:");
@@ -723,14 +728,24 @@ public class EnergyPanel extends JPanel {
 		}
 		partPanel.repaint();
 
-		if (!energyViewShown || selectedPart == null || selectedPart instanceof Door || selectedPart instanceof Foundation)
-			partProperty3TextField.setText("");
-		else {
-			if (selectedPart instanceof Sensor) {
-				partProperty2TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.getArea()));
-				partProperty3TextField.setText(twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.getArea()));
+		if (selectedPart instanceof Foundation) {
+			Vector3 v0 = ((Foundation) selectedPart).getAbsPoint(0);
+			Vector3 v2 = ((Foundation) selectedPart).getAbsPoint(2);
+			double distance = v0.distance(v2);
+			double a = Math.toDegrees(Math.acos((v2.getX() - v0.getX()) / distance));
+			if (v2.getY() < v0.getY())
+				a = 360 - a;
+			partProperty3TextField.setText(noDecimal.format(a) + "\u00B0");
+		} else {
+			if (!energyViewShown || selectedPart == null || selectedPart instanceof Door) {
+				partProperty3TextField.setText("");
 			} else {
-				partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
+				if (selectedPart instanceof Sensor) {
+					partProperty2TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.getArea()));
+					partProperty3TextField.setText(twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.getArea()));
+				} else {
+					partProperty3TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday()));
+				}
 			}
 		}
 

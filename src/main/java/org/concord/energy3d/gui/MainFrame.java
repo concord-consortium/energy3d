@@ -277,14 +277,17 @@ public class MainFrame extends JFrame {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
 			@Override
 			public boolean dispatchKeyEvent(final KeyEvent e) {
+				double a = MainPanel.getInstance().getBuildingRotationAngleAbsolute();
+				if (e.isControlDown())
+					a *= 5;
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:
 					MainPanel.getInstance().getRotateButton().setIcon(new ImageIcon(MainPanel.class.getResource("icons/" + (e.isShiftDown() ? "rotate_ccw.png" : "rotate_cw.png"))));
-					MainPanel.getInstance().setBuildingRotationAngle(e.isShiftDown() ? MainPanel.getInstance().getBuildingRotationAngleAbsolute() : -MainPanel.getInstance().getBuildingRotationAngleAbsolute());
+					MainPanel.getInstance().setBuildingRotationAngle(e.isShiftDown() ? a : -a);
 					break;
 				case KeyEvent.KEY_RELEASED:
 					MainPanel.getInstance().getRotateButton().setIcon(new ImageIcon(MainPanel.class.getResource("icons/rotate_cw.png")));
-					MainPanel.getInstance().setBuildingRotationAngle(-MainPanel.getInstance().getBuildingRotationAngleAbsolute());
+					MainPanel.getInstance().setBuildingRotationAngle(-a);
 					break;
 				}
 				return false;

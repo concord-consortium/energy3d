@@ -930,7 +930,6 @@ public class Foundation extends HousePart implements Thermalizable {
 			op.add(center, p);
 			points.get(i).set(toRelative(p));
 		}
-		// Scene.getInstance().redrawAll();
 	}
 
 	@Override

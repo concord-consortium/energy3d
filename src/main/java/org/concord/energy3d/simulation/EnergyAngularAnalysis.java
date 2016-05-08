@@ -65,7 +65,7 @@ public class EnergyAngularAnalysis extends Analysis {
 				SceneManager.getInstance().setRefreshOnlyMode(true);
 				for (int i = 0; i < nRotation; i++) {
 					if (!analysisStopped) {
-						SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false, false);
+						SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false);
 						Scene.getInstance().redrawAllNow();
 						final Throwable t = compute();
 						if (t != null) {

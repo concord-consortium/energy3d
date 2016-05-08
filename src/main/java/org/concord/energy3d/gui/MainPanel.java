@@ -992,7 +992,7 @@ public class MainPanel extends JPanel {
 			rotateButton = new JButton();
 			rotateButton.addMouseListener(refreshUponMouseExit);
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-			rotateButton.setToolTipText("<html>Rotate building in the clockwise direction; <br>Hold down the SHIFT key and press this button for counter-clockwise rotation.</html>");
+			rotateButton.setToolTipText("<html>Rotate building in the clockwise direction; <br>Hold down the SHIFT key and press this button for counter-clockwise rotation.<br>Hold down the CTRL key while pressing the button to accelerate the rotation.</html>");
 			rotateButton.setFocusable(false);
 			rotateButton.addMouseListener(new MouseAdapter() {
 				private boolean mousePressed = false;
@@ -1001,7 +1001,6 @@ public class MainPanel extends JPanel {
 				public void mousePressed(final MouseEvent e) {
 					energyViewButton.setSelected(false);
 					mousePressed = true;
-					SceneManager.getInstance().resetBuildingRotationAngleRecorded();
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null || selectedPart instanceof Tree) {
 						int count = 0;
@@ -1031,15 +1030,21 @@ public class MainPanel extends JPanel {
 										final HousePart hp = SceneManager.getInstance().getSelectedPart();
 										if (hp instanceof Foundation) {
 											RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, buildingRotationAngle);
-											SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true, true);
+											SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
+											EventQueue.invokeLater(new Runnable() {
+												@Override
+												public void run() {
+													EnergyPanel.getInstance().updateProperties();
+												}
+											});
 										}
 										return null;
 									}
 								});
 								final int partCount = Scene.getInstance().getParts().size();
 								try {
-									Thread.sleep(100 + partCount * 5); // give it enough time for the above call to complete (the more parts it has, the more time it needs)
+									Thread.sleep(200 + partCount * 5); // give it enough time for the above call to complete (the more parts it has, the more time it needs)
 								} catch (final InterruptedException e) {
 								}
 							}
