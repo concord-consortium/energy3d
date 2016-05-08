@@ -16,9 +16,9 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
-import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -232,6 +232,7 @@ public class Scene implements Serializable {
 			initSceneNow();
 			initEnergy();
 			instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
+			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 
 		}
 
@@ -278,6 +279,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().setBuildingLabelsVisible(instance.showBuildingLabels);
 		Util.setSilently(MainPanel.getInstance().getNoteTextArea(), instance.note == null ? "" : instance.note); // need to do this to avoid logging
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
 				MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
@@ -384,6 +386,7 @@ public class Scene implements Serializable {
 		instance.setEdited(false);
 
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				EnergyPanel.getInstance().updateThermostat();
 			}
@@ -569,6 +572,7 @@ public class Scene implements Serializable {
 
 	public void add(final HousePart housePart, final boolean redraw) {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
 			public Object call() {
 				final HousePart container = housePart.getContainer();
 				if (container != null)
@@ -598,6 +602,7 @@ public class Scene implements Serializable {
 			return;
 		housePart.setGridsVisible(false);
 		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
 			public Object call() {
 				final HousePart container = housePart.getContainer();
 				if (container != null)
@@ -1282,7 +1287,7 @@ public class Scene implements Serializable {
 		return false;
 	}
 
-	public void setProjectName(String projectName) {
+	public void setProjectName(final String projectName) {
 		this.projectName = projectName;
 	}
 
@@ -1290,7 +1295,7 @@ public class Scene implements Serializable {
 		return projectName;
 	}
 
-	public void setStudentMode(boolean b) {
+	public void setStudentMode(final boolean b) {
 		studentMode = b;
 	}
 

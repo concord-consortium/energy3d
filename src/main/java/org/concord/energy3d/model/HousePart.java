@@ -281,7 +281,8 @@ public abstract class HousePart implements Serializable {
 	public void complete() {
 		drawCompleted = true;
 		orgHeight = height;
-		computeArea();
+		if (isDrawable())
+			computeArea();
 	}
 
 	public boolean isDrawCompleted() {
@@ -992,7 +993,7 @@ public abstract class HousePart implements Serializable {
 		double heat = 0;
 		double a = area;
 		if (this instanceof Foundation) {
-			Building building = new Building((Foundation) this);
+			final Building building = new Building((Foundation) this);
 			if (building.isWallComplete()) {
 				building.calculate();
 				a = building.getArea(); // reduce the area of the foundation to the floor area within the building envelope
