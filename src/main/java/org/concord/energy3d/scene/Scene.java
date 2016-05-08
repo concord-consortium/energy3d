@@ -1030,6 +1030,15 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeNonDrawables() {
+		final ArrayList<HousePart> a = new ArrayList<HousePart>();
+		for (final HousePart p : parts)
+			if (!p.isDrawable())
+				a.add(p);
+		for (final HousePart p : a)
+			remove(p, false);
+	}
+
 	public void lockAll(final boolean freeze) {
 		if (parts.isEmpty())
 			return;

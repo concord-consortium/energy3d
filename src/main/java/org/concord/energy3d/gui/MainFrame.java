@@ -193,6 +193,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllSolarPanelsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
 	private JMenuItem removeAllTreesMenuItem;
+	private JMenuItem removeAllNonDrawablesMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -1586,6 +1587,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getRemoveAllTreesMenuItem());
 			editMenu.add(getRemoveAllRoofsMenuItem());
 			editMenu.add(getRemoveAllFloorsMenuItem());
+			editMenu.add(getRemoveAllNonDrawablesMenuItem());
 			editMenu.add(getRemoveAllLocksMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getSpecificationsMenuItem());
@@ -2281,6 +2283,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllTreesMenuItem;
+	}
+
+	private JMenuItem getRemoveAllNonDrawablesMenuItem() {
+		if (removeAllNonDrawablesMenuItem == null) {
+			removeAllNonDrawablesMenuItem = new JMenuItem("Remove All Non-Drawables");
+			removeAllNonDrawablesMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().removeNonDrawables();
+				}
+			});
+		}
+		return removeAllNonDrawablesMenuItem;
 	}
 
 	private JMenuItem getRemoveAllLocksMenuItem() {
