@@ -82,6 +82,8 @@ import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.SolarAnnualAnalysis;
+import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
@@ -131,6 +133,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem dailyEnergyAnalysisMenuItem;
 	private JMenuItem dailyEnergyAnalysisForSelectionMenuItem;
+	private JMenuItem annualSolarAnalysisMenuItem;
+	private JMenuItem dailySolarAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
@@ -1030,6 +1034,9 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getDailyEnergyAnalysisMenuItem());
 			analysisMenu.add(getDailyEnergyAnalysisForSelectionMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getAnnualSolarAnalysisMenuItem());
+			analysisMenu.add(getDailySolarAnalysisMenuItem());
+			analysisMenu.addSeparator();
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
@@ -1199,8 +1206,8 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualEnergyAnalysisMenuItem() {
 		if (annualEnergyAnalysisMenuItem == null) {
-			annualEnergyAnalysisMenuItem = new JMenuItem("Run Annual Energy Analysis for Building...");
-			annualEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
+			annualEnergyAnalysisMenuItem = new JMenuItem("Annual Energy Analysis for Selected Building...");
+			annualEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F3"));
 			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1219,7 +1226,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualEnergyAnalysisForSelectionMenuItem() {
 		if (annualEnergyAnalysisForSelectionMenuItem == null) {
-			annualEnergyAnalysisForSelectionMenuItem = new JMenuItem("Run Annual Energy Analysis for Selected Part...");
+			annualEnergyAnalysisForSelectionMenuItem = new JMenuItem("Annual Energy Analysis for Selected Part...");
 			annualEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1242,8 +1249,7 @@ public class MainFrame extends JFrame {
 
 	public JMenuItem getDailyEnergyAnalysisMenuItem() {
 		if (dailyEnergyAnalysisMenuItem == null) {
-			dailyEnergyAnalysisMenuItem = new JMenuItem("Run Daily Energy Analysis for Building...");
-			dailyEnergyAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
+			dailyEnergyAnalysisMenuItem = new JMenuItem("Daily Energy Analysis for Selected Building...");
 			dailyEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1266,7 +1272,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getDailyEnergyAnalysisForSelectionMenuItem() {
 		if (dailyEnergyAnalysisForSelectionMenuItem == null) {
-			dailyEnergyAnalysisForSelectionMenuItem = new JMenuItem("Run Daily Energy Analysis for Selected Part...");
+			dailyEnergyAnalysisForSelectionMenuItem = new JMenuItem("Daily Energy Analysis for Selected Part...");
 			dailyEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1285,6 +1291,58 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return dailyEnergyAnalysisForSelectionMenuItem;
+	}
+
+	private JMenuItem getAnnualSolarAnalysisMenuItem() {
+		if (annualSolarAnalysisMenuItem == null) {
+			annualSolarAnalysisMenuItem = new JMenuItem("Annual Output Analysis of Solar Panels...");
+			annualSolarAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
+			annualSolarAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					int n = Scene.getInstance().getNumberOfSolarPanels();
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					new SolarAnnualAnalysis().show(selectedPart instanceof SolarPanel ? "Annual Output of Selected Solar Panels" : "Annual Output of All Solar Panels");
+				}
+			});
+		}
+		return annualSolarAnalysisMenuItem;
+	}
+
+	private JMenuItem getDailySolarAnalysisMenuItem() {
+		if (dailySolarAnalysisMenuItem == null) {
+			dailySolarAnalysisMenuItem = new JMenuItem("Daily Output Analysis of Solar Panels...");
+			dailySolarAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					int n = Scene.getInstance().getNumberOfSolarPanels();
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final SolarDailyAnalysis analysis = new SolarDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap())
+						analysis.updateGraph();
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					analysis.show(selectedPart instanceof SolarPanel ? "Daily Output of Selected Solar Panels" : "Daily Output of All Solar Panels");
+				}
+			});
+		}
+		return dailySolarAnalysisMenuItem;
 	}
 
 	private JMenuItem getAnnualSensorMenuItem() {
@@ -1402,7 +1460,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getConstructionCostAnalysisMenuItem() {
 		if (constructionCostAnalysisMenuItem == null) {
 			constructionCostAnalysisMenuItem = new JMenuItem("Show Construction Costs...");
-			constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F6"));
+			constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
 			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2105,7 +2163,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem getNoteCheckBoxMenuItem() {
 		if (noteCheckBoxMenuItem == null) {
 			noteCheckBoxMenuItem = new JCheckBoxMenuItem("Show Note");
-			noteCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke("F3"));
+			noteCheckBoxMenuItem.setAccelerator(KeyStroke.getKeyStroke("F11"));
 			noteCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

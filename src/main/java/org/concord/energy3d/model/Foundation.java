@@ -835,7 +835,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		Scene.getInstance().redrawAll();
 	}
 
-	double getBoundingHeight() {
+	public double getBoundingHeight() {
 		// return boundingHeight; // do not just return the boundingHeight because it may represent a previous value
 		return scanChildrenHeight(this) - height;
 	}
@@ -958,7 +958,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
 		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
-		final double heat = calculateHeatVector();		
+		final double heat = calculateHeatVector();
 		if (heat != 0) {
 			final ReadOnlyVector3 o = getAbsPoint(0);
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
@@ -1034,6 +1034,15 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public Thermostat getThermostat() {
 		return thermostat;
+	}
+
+	public int countParts(final Class<?> clazz) {
+		int count = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == this && clazz.isInstance(p))
+				count++;
+		}
+		return count;
 	}
 
 }

@@ -27,7 +27,6 @@ import java.awt.event.WindowEvent;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -44,34 +43,26 @@ import javax.swing.event.MenuListener;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
-import org.concord.energy3d.model.Door;
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Tree;
-import org.concord.energy3d.model.Wall;
-import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
 /**
- * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
- * 
  * For fast feedback, only 12 days are calculated.
  * 
  * @author Charles Xie
  * 
  */
-public class EnergyAnnualAnalysis extends Analysis {
+public class SolarAnnualAnalysis extends Analysis {
 
 	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
-	public EnergyAnnualAnalysis() {
+	public SolarAnnualAnalysis() {
 		super();
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		graph = selectedPart instanceof Foundation ? new BuildingEnergyAnnualGraph() : new PartEnergyAnnualGraph();
+		graph = new PartEnergyAnnualGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.WHITE);
 	}
@@ -82,12 +73,10 @@ public class EnergyAnnualAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
-				Calendar today;
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalender();
 						c.set(Calendar.MONTH, m);
-						today = (Calendar) c.clone();
 						final Throwable t = compute();
 						if (t != null) {
 							stopAnalysis();
@@ -98,25 +87,10 @@ public class EnergyAnnualAnalysis extends Analysis {
 							});
 							break;
 						}
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Foundation) { // synchronize with daily graph
-							if (EnergyPanel.getInstance().getDailyEnergyGraph().hasGraph()) {
-								EnergyPanel.getInstance().getDailyEnergyGraph().setCalendar(today);
-								EnergyPanel.getInstance().getDailyEnergyGraph().updateGraph();
-							}
-						}
-						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
 								EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
-								if (selectedPart instanceof Foundation) {
-									EnergyPanel.getInstance().getGraphTabbedPane().setSelectedComponent(EnergyPanel.getInstance().getDailyEnergyGraph());
-									if (!EnergyPanel.getInstance().getDailyEnergyGraph().hasGraph()) {
-										EnergyPanel.getInstance().getDailyEnergyGraph().setCalendar(today2);
-										EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
-									}
-								}
 							}
 						});
 					}
@@ -125,21 +99,19 @@ public class EnergyAnnualAnalysis extends Analysis {
 					@Override
 					public void run() {
 						onCompletion();
-						if (graph instanceof BuildingEnergyAnnualGraph) {
-							if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
-								return; // annual calculation aborted
-							int net = (int) Math.round(getResult("Net"));
-							String previousRuns = "";
-							Map<String, Double> recordedResults = getRecordedResults("Net");
-							int n = recordedResults.size();
-							if (n > 0) {
-								Object[] keys = recordedResults.keySet().toArray();
-								for (int i = n - 1; i >= 0; i--) {
-									previousRuns += keys[i] + " : " + Math.round(recordedResults.get(keys[i]) * 365.0 / 12.0) + " kWh<br>";
-								}
+						if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
+							return; // annual calculation aborted
+						String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
+						String previousRuns = "";
+						Map<String, Double> recordedResults = getRecordedResults("Solar");
+						int n = recordedResults.size();
+						if (n > 0) {
+							Object[] keys = recordedResults.keySet().toArray();
+							for (int i = n - 1; i >= 0; i--) {
+								previousRuns += keys[i] + " : " + Graph.TWO_DECIMALS.format(recordedResults.get(keys[i]) * 365.0 / 12.0) + " kWh<br>";
 							}
-							JOptionPane.showMessageDialog(parent, "<html>The calculated annual net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Annual Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
+						JOptionPane.showMessageDialog(parent, "<html>The calculated annual output is <b>" + current + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Annual Solar Panel Output", JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
 			}
@@ -149,41 +121,18 @@ public class EnergyAnnualAnalysis extends Analysis {
 	@Override
 	public void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof Foundation) {
-			if (graph instanceof BuildingEnergyAnnualGraph) {
-				final Foundation selectedBuilding = (Foundation) selectedPart;
-				final double window = selectedBuilding.getPassiveSolarToday();
-				final double solarPanel = selectedBuilding.getPhotovoltaicToday();
-				final double heater = selectedBuilding.getHeatingToday();
-				final double ac = selectedBuilding.getCoolingToday();
-				final double net = selectedBuilding.getTotalEnergyToday();
-				graph.addData("Windows", window);
-				graph.addData("Solar Panels", solarPanel);
-				graph.addData("Heater", heater);
-				graph.addData("AC", ac);
-				graph.addData("Net", net);
-			} else {
-				graph.addData("Solar", selectedPart.getSolarPotentialToday());
+		if (selectedPart instanceof SolarPanel) {
+			final SolarPanel sp = (SolarPanel) selectedPart;
+			graph.addData("Solar", sp.getSolarPotentialToday() * sp.getEfficiency());
+		} else {
+			double output = 0;
+			for (HousePart p : Scene.getInstance().getParts()) {
+				if (p instanceof SolarPanel) {
+					final SolarPanel sp = (SolarPanel) p;
+					output += sp.getSolarPotentialToday() * sp.getEfficiency();
+				}
 			}
-		} else if (selectedPart instanceof Window) {
-			Window window = (Window) selectedPart;
-			final double solar = selectedPart.getSolarPotentialToday() * window.getSolarHeatGainCoefficient();
-			graph.addData("Solar", solar);
-			final double[] loss = selectedPart.getHeatLoss();
-			double sum = 0;
-			for (final double x : loss)
-				sum += x;
-			graph.addData("Heat Gain", -sum);
-		} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
-			final double[] loss = selectedPart.getHeatLoss();
-			double sum = 0;
-			for (final double x : loss)
-				sum += x;
-			graph.addData("Heat Gain", -sum);
-		} else if (selectedPart instanceof SolarPanel) {
-			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiency();
-			graph.addData("Solar", solar);
+			graph.addData("Solar", output);
 		}
 		graph.repaint();
 	}
@@ -193,30 +142,11 @@ public class EnergyAnnualAnalysis extends Analysis {
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		if (selectedPart != null) {
+		if (selectedPart instanceof SolarPanel) {
 			cost = Cost.getInstance().getPartCost(selectedPart);
-			if (graph.type == Graph.SENSOR) {
-				SceneManager.getInstance().setSelectedPart(null);
-			} else {
-				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-				if (selectedPart instanceof Foundation) {
-					cost = Cost.getInstance().getTotalCost();
-					s = s.replaceAll("Foundation", "Building");
-					if (selectedPart.getChildren().isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
-						return;
-					}
-					if (!isBuildingComplete((Foundation) selectedPart)) {
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
-							return;
-					}
-				} else if (selectedPart instanceof Tree) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
-					return;
-				}
-			}
+			s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 		}
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Construction cost: $" + cost + ")", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		graph.parent = dialog;
 
@@ -264,61 +194,6 @@ public class EnergyAnnualAnalysis extends Analysis {
 			}
 		});
 		menu.add(miView);
-
-		final JMenu showTypeMenu = new JMenu("Types");
-		showTypeMenu.addMenuListener(new MenuListener() {
-			@Override
-			public void menuSelected(MenuEvent e) {
-				showTypeMenu.removeAll();
-				final Set<String> dataNames = graph.getDataNames();
-				if (!dataNames.isEmpty()) {
-					JMenuItem mi = new JMenuItem("Show All");
-					mi.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
-								graph.hideData(name, false);
-							graph.repaint();
-							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", true);
-						}
-					});
-					showTypeMenu.add(mi);
-					mi = new JMenuItem("Hide All");
-					mi.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
-								graph.hideData(name, true);
-							graph.repaint();
-							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", false);
-						}
-					});
-					showTypeMenu.add(mi);
-					showTypeMenu.addSeparator();
-					for (final String name : dataNames) {
-						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(name, !graph.isDataHidden(name));
-						cbmi.addItemListener(new ItemListener() {
-							@Override
-							public void itemStateChanged(final ItemEvent e) {
-								graph.hideData(name, !cbmi.isSelected());
-								graph.repaint();
-								TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), name, cbmi.isSelected());
-							}
-						});
-						showTypeMenu.add(cbmi);
-					}
-				}
-			}
-
-			@Override
-			public void menuDeselected(MenuEvent e) {
-			}
-
-			@Override
-			public void menuCanceled(MenuEvent e) {
-			}
-		});
-		menuBar.add(showTypeMenu);
 
 		final JMenu showRunsMenu = new JMenu("Runs");
 		showRunsMenu.addMenuListener(new MenuListener() {
@@ -438,30 +313,18 @@ public class EnergyAnnualAnalysis extends Analysis {
 
 	@Override
 	public String toJson() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = "{\"Months\": " + getNumberOfDataPoints();
-		String[] names;
-		if (selectedPart instanceof Foundation) {
-			s += ", \"Building\": " + selectedPart.getId();
-			names = new String[] { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-		} else {
-			s += ", \"Part\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
-			names = new String[] { "Solar", "Heat Gain" };
+		String name = "Solar";
+		List<Double> data = graph.getData(name);
+		s += ", \"" + name + "\": {";
+		s += "\"Monthly\": [";
+		for (Double x : data) {
+			s += Graph.ENERGY_FORMAT.format(x) + ",";
 		}
-		for (String name : names) {
-			List<Double> data = graph.getData(name);
-			if (data == null)
-				continue;
-			s += ", \"" + name + "\": {";
-			s += "\"Monthly\": [";
-			for (Double x : data) {
-				s += Graph.ENERGY_FORMAT.format(x) + ",";
-			}
-			s = s.substring(0, s.length() - 1);
-			s += "]\n";
-			s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
-			s += "}";
-		}
+		s = s.substring(0, s.length() - 1);
+		s += "]\n";
+		s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+		s += "}";
 		s += "}";
 		return s;
 	}

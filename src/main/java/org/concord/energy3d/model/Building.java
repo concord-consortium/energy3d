@@ -106,13 +106,13 @@ public class Building {
 	/** @return false if the building does not conform */
 	public boolean calculate() {
 
+		final double scale = Scene.getInstance().getAnnotationScale();
+		height = foundation.getBoundingHeight() * scale;
+
 		if (!wallComplete)
 			return false;
 
 		final int n = wallVertices.size();
-		final double scale = Scene.getInstance().getAnnotationScale();
-
-		height = foundation.getBoundingHeight() * scale;
 
 		area = 0;
 		Vector2 v1, v2;

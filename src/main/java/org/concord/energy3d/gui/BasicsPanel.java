@@ -10,6 +10,9 @@ import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.DesignSpecs;
 
@@ -64,7 +67,7 @@ public class BasicsPanel extends JPanel {
 		heightBar.setUnit("");
 		heightBar.setUnitPrefix(false);
 		heightBar.setVerticalLineRepresentation(false);
-		heightBar.setDecimalDigits(1);
+		heightBar.setDecimalDigits(2);
 		heightBar.setToolTipText(heightPanel.getToolTipText());
 		heightBar.setPreferredSize(new Dimension(100, 16));
 		heightPanel.add(heightBar, BorderLayout.CENTER);
@@ -137,20 +140,29 @@ public class BasicsPanel extends JPanel {
 			b.calculate();
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:
-				heightBar.setValue((float) b.getHeight());
 				areaBar.setValue((float) b.getArea());
 				break;
 			case USCustomaryUnits:
-				heightBar.setValue((float) (b.getHeight() * 3.28084));
 				areaBar.setValue((float) (b.getArea() * 3.28084 * 3.28084));
 				break;
 			}
 			windowToFloorBar.setValue((float) b.getWindowToFloorRatio());
-			solarPanelCountBar.setValue(b.getSolarPanelCount());
-			windowCountBar.setValue(b.getWindowCount());
-			wallCountBar.setValue(b.getWallCount());
 		} else {
-			clear();
+			areaBar.setValue(0);
+			windowToFloorBar.setValue(0);
+		}
+		// relax the requirement of a building
+		solarPanelCountBar.setValue(foundation.countParts(SolarPanel.class));
+		windowCountBar.setValue(foundation.countParts(Window.class));
+		wallCountBar.setValue(foundation.countParts(Wall.class));
+		final double height = Scene.getInstance().getAnnotationScale() * foundation.getBoundingHeight();
+		switch (Scene.getInstance().getUnit()) {
+		case InternationalSystemOfUnits:
+			heightBar.setValue((float) height);
+			break;
+		case USCustomaryUnits:
+			heightBar.setValue((float) (height * 3.28084));
+			break;
 		}
 	}
 

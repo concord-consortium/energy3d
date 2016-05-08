@@ -38,6 +38,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.Util;
 
 /**
  * This calculates and visualizes the angular dependence of all energy items for any selected part or building.
@@ -72,7 +73,7 @@ public class EnergyAngularAnalysis extends Analysis {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									JOptionPane.showMessageDialog(parent, "Angular analysis failed. Please restart the program.\n" + t.getMessage(), "Analysis Error", JOptionPane.ERROR_MESSAGE);
+									Util.reportError(t);
 								}
 							});
 							break;

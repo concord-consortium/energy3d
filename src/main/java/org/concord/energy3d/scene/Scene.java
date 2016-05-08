@@ -1339,10 +1339,10 @@ public class Scene implements Serializable {
 		return solarContrast;
 	}
 
-	public int countParts(final Foundation foundation, final Class<?> clazz) {
+	public int getNumberOfSolarPanels() {
 		int count = 0;
 		for (final HousePart p : parts) {
-			if (p.getTopContainer() == foundation && clazz.isInstance(p))
+			if (p instanceof SolarPanel)
 				count++;
 		}
 		return count;
