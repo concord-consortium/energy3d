@@ -12,7 +12,7 @@ import java.util.List;
 public abstract class AnnualGraph extends Graph {
 
 	private static final long serialVersionUID = 1L;
-	static final String[] THREE_LETTER_MONTH = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	public static final String[] THREE_LETTER_MONTH = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 	static List<Results> records;
 

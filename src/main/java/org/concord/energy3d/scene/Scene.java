@@ -38,6 +38,7 @@ import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Thermostat;
+import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
@@ -341,6 +342,8 @@ public class Scene implements Serializable {
 					f.setVolumetricHeatCapacity(0.5);
 				if (f.getThermostat() == null)
 					f.setThermostat(new Thermostat());
+				if (f.getUtilityBill() == null)
+					f.setUtilityBill(new UtilityBill());
 
 			} else if (p instanceof Wall) {
 				final Wall w = (Wall) p;

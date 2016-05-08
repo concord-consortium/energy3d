@@ -10,6 +10,7 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.Thermostat;
+import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -63,6 +64,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.568; // default is R10 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private Thermostat thermostat = new Thermostat();
+	private UtilityBill utilityBill = new UtilityBill();
 
 	static {
 		format.setGroupingUsed(true);
@@ -1033,6 +1035,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public Thermostat getThermostat() {
 		return thermostat;
+	}
+
+	public void setUtilityBill(UtilityBill b) {
+		utilityBill = b;
+	}
+
+	public UtilityBill getUtilityBill() {
+		return utilityBill;
 	}
 
 	public int countParts(final Class<?> clazz) {

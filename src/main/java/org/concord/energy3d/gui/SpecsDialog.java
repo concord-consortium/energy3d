@@ -18,7 +18,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
@@ -99,7 +98,7 @@ class SpecsDialog extends JDialog {
 
 		getContentPane().setLayout(new BorderLayout());
 		JPanel container = new JPanel(new GridLayout(1, 2, 10, 10));
-		container.setBorder(new EmptyBorder(15, 15, 15, 15));
+		container.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		getContentPane().add(container, BorderLayout.CENTER);
 
 		JPanel panel = new JPanel();

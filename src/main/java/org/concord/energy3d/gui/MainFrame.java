@@ -128,6 +128,7 @@ public class MainFrame extends JFrame {
 	private JMenu viewMenu;
 	private JMenu analysisMenu;
 	private JMenuItem rescaleMenuItem;
+	private JMenuItem utilityBillMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem annualEnergyAnalysisMenuItem;
 	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
@@ -1048,6 +1049,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getDailySensorMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getUtilityBillMenuItem());
 			analysisMenu.add(getSimulationSettingsMenuItem());
 		}
 		return analysisMenu;
@@ -1206,6 +1208,23 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return simulationSettingsMenuItem;
+	}
+
+	private JMenuItem getUtilityBillMenuItem() {
+		if (utilityBillMenuItem == null) {
+			utilityBillMenuItem = new JMenuItem("Input Utility Bill...");
+			utilityBillMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().autoSelectBuilding(true);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						new UtilityBillDialog((Foundation) selectedPart).setVisible(true);
+					}
+				}
+			});
+		}
+		return utilityBillMenuItem;
 	}
 
 	private JMenuItem getAnnualEnergyAnalysisMenuItem() {

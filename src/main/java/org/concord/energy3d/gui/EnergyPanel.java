@@ -735,6 +735,8 @@ public class EnergyPanel extends JPanel {
 			double a = Math.toDegrees(Math.acos((v2.getX() - v0.getX()) / distance));
 			if (v2.getY() < v0.getY())
 				a = 360 - a;
+			if (Util.isZero(a - 360)) // reset 360 to 0
+				a = 0;
 			partProperty3TextField.setText(noDecimal.format(a) + "\u00B0");
 		} else {
 			if (!energyViewShown || selectedPart == null || selectedPart instanceof Door) {
