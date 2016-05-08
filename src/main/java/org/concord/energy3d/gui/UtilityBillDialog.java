@@ -29,15 +29,14 @@ class UtilityBillDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
 
-	private final JLabel[] labels = new JLabel[12];
-	private final JTextField[] fields = new JTextField[12];
-
 	public UtilityBillDialog(final Foundation foundation) {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setTitle("Input Electricty Usage from Utility Bill (kWh)");
 
+		final JLabel[] labels = new JLabel[12];
+		final JTextField[] fields = new JTextField[12];
 		for (int i = 0; i < 12; i++) {
 			labels[i] = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i]);
 			labels[i].setFont(new Font("Courier New", Font.PLAIN, 12));

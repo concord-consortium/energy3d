@@ -36,6 +36,8 @@ import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.SolarAnnualAnalysis;
+import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.AdjustThermostatCommand;
 import org.concord.energy3d.undo.AnimateSunCommand;
@@ -413,6 +415,10 @@ public class TimeSeriesLogger {
 						line += ((EnergyAnnualAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof EnergyAngularAnalysis) {
 						line += ((EnergyAngularAnalysis) analysisRequester).toJson();
+					} else if (analysisRequester instanceof SolarDailyAnalysis) {
+						line += ((SolarDailyAnalysis) analysisRequester).toJson();
+					} else if (analysisRequester instanceof SolarAnnualAnalysis) {
+						line += ((SolarAnnualAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof Cost) {
 						line += ((Cost) analysisRequester).toJson();
 					}

@@ -281,6 +281,12 @@ public class SolarDailyAnalysis extends Analysis {
 	@Override
 	public String toJson() {
 		String s = "{";
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart instanceof SolarPanel) {
+			s += "\"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+		} else {
+			s += "\"Panel\": \"All\"";
+		}
 		String name = "Solar";
 		List<Double> data = graph.getData(name);
 		s += ", \"" + name + "\": {";

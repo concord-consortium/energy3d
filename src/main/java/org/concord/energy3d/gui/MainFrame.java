@@ -1334,7 +1334,11 @@ public class MainFrame extends JFrame {
 						return;
 					}
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					new SolarAnnualAnalysis().show(selectedPart instanceof SolarPanel ? "Annual Output of Selected Solar Panels" : "Annual Output of All Solar Panels");
+					SolarAnnualAnalysis a = new SolarAnnualAnalysis();
+					if (selectedPart instanceof Foundation) {
+						a.setUtilityBill(((Foundation) selectedPart).getUtilityBill());
+					}
+					a.show(selectedPart instanceof SolarPanel ? "Annual Output of Selected Solar Panels" : "Annual Output of All Solar Panels");
 				}
 			});
 		}

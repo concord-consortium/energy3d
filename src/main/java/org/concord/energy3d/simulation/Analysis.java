@@ -85,7 +85,7 @@ public abstract class Analysis {
 		EnergyPanel.getInstance().disableDateSpinner(false);
 	}
 
-	private void onStart() {
+	void onStart() {
 		EnergyPanel.getInstance().disableDateSpinner(true);
 		SceneManager.getInstance().setHeatFluxDaily(true);
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);

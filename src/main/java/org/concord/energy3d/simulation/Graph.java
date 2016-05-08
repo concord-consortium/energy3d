@@ -94,6 +94,7 @@ public abstract class Graph extends JPanel {
 		colors.put("Heater", Color.RED);
 		colors.put("AC", Color.BLUE);
 		colors.put("Net", Color.MAGENTA);
+		colors.put("Utility", Color.LIGHT_GRAY);
 	}
 
 	Graph() {
@@ -623,7 +624,7 @@ public abstract class Graph extends JPanel {
 						xLabel = dataX;
 					}
 				}
-				g2.setStroke(thin);
+				g2.setStroke("Utility".equals(key) ? dashed : thin);
 				g2.draw(path);
 
 				if (!(this instanceof DailyGraph)) {
@@ -658,6 +659,8 @@ public abstract class Graph extends JPanel {
 							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
 						else if ("Heat Gain".equals(key))
 							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						else if ("Utility".equals(key))
+							drawCircle(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					}
 				}
 
@@ -714,6 +717,12 @@ public abstract class Graph extends JPanel {
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
+				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+			}
+			s = "Utility";
+			if (data.containsKey(s) && !isDataHidden(s)) {
+				y0 += 14;
+				drawCircle(g2, x0, y0, 8, colors.get(s));
 				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
 			}
 		}

@@ -42,6 +42,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.SolarPanel;
@@ -59,6 +60,7 @@ import org.concord.energy3d.util.Util;
 public class SolarAnnualAnalysis extends Analysis {
 
 	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
+	private UtilityBill utilityBill;
 
 	public SolarAnnualAnalysis() {
 		super();
@@ -135,6 +137,27 @@ public class SolarAnnualAnalysis extends Analysis {
 			graph.addData("Solar", output);
 		}
 		graph.repaint();
+	}
+
+	public void setUtilityBill(UtilityBill utilityBill) {
+		this.utilityBill = utilityBill;
+		double[] bill = utilityBill.getMonthlyEnergy();
+		for (int i = 0; i < bill.length; i++)
+			graph.addData("Utility", bill[i] / (365.0 / 12.0));
+		graph.repaint();
+	}
+
+	void onStart() {
+		EnergyPanel.getInstance().disableDateSpinner(true);
+		SceneManager.getInstance().setHeatFluxDaily(true);
+		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
+		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
+		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
+		graph.clearData();
+		double[] bill = utilityBill.getMonthlyEnergy();
+		for (int i = 0; i < bill.length; i++)
+			graph.addData("Utility", bill[i] / (365.0 / 12.0));
+		SceneManager.getInstance().getSolarLand().setVisible(true);
 	}
 
 	public void show(String title) {
@@ -314,6 +337,12 @@ public class SolarAnnualAnalysis extends Analysis {
 	@Override
 	public String toJson() {
 		String s = "{\"Months\": " + getNumberOfDataPoints();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart instanceof SolarPanel) {
+			s += ", \"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+		} else {
+			s += ", \"Panel\": \"All\"";
+		}
 		String name = "Solar";
 		List<Double> data = graph.getData(name);
 		s += ", \"" + name + "\": {";
