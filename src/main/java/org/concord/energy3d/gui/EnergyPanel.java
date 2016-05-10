@@ -708,7 +708,7 @@ public class EnergyPanel extends JPanel {
 		} else if (selectedPart instanceof Foundation) {
 			partProperty1Label.setText("Size:");
 			partProperty2Label.setText("Position:");
-			partProperty3Label.setText("Angle:");
+			partProperty3Label.setText("Azimuth:");
 		} else {
 			partProperty1Label.setText("Size:");
 			partProperty2Label.setText("Position:");
@@ -732,8 +732,8 @@ public class EnergyPanel extends JPanel {
 			Vector3 v0 = ((Foundation) selectedPart).getAbsPoint(0);
 			Vector3 v2 = ((Foundation) selectedPart).getAbsPoint(2);
 			double distance = v0.distance(v2);
-			double a = Math.toDegrees(Math.acos((v2.getX() - v0.getX()) / distance));
-			if (v2.getY() < v0.getY())
+			double a = 90 + Math.toDegrees(Math.asin((v0.getY() - v2.getY()) / distance));
+			if (v0.getX() > v2.getX())
 				a = 360 - a;
 			if (Util.isZero(a - 360)) // reset 360 to 0
 				a = 0;

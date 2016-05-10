@@ -611,21 +611,33 @@ public abstract class Graph extends JPanel {
 				double dataX, dataY;
 				double xLabel = 0;
 				double yLabel = Double.MAX_VALUE;
-				for (int i = 0; i < list.size(); i++) {
-					dataX = left + dx * i;
-					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-					if (i == 0) {
-						path.moveTo(dataX, dataY);
-					} else {
-						path.lineTo(dataX, dataY);
+				if ("Utility".equals(key)) {
+					g2.setStroke(thin);
+					g2.setColor(colors.get(key));
+					double hi;
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						hi = (list.get(i) - ymin) * dy;
+						dataY = getHeight() - top - hi;
+						g2.fillRect((int) Math.round(dataX - dx / 2 + 5), (int) Math.round(dataY), (int) Math.round(dx - 10), (int) Math.round(hi));
 					}
-					if (dataY < yLabel) {
-						yLabel = dataY;
-						xLabel = dataX;
+				} else {
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+						if (i == 0) {
+							path.moveTo(dataX, dataY);
+						} else {
+							path.lineTo(dataX, dataY);
+						}
+						if (dataY < yLabel) {
+							yLabel = dataY;
+							xLabel = dataX;
+						}
 					}
+					g2.setStroke(thin);
+					g2.draw(path);
 				}
-				g2.setStroke("Utility".equals(key) ? dashed : thin);
-				g2.draw(path);
 
 				if (!(this instanceof DailyGraph)) {
 					xLabel = left - 30;
@@ -659,8 +671,6 @@ public abstract class Graph extends JPanel {
 							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
 						else if ("Heat Gain".equals(key))
 							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
-						else if ("Utility".equals(key))
-							drawCircle(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
 					}
 				}
 

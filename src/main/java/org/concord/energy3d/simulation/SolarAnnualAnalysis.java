@@ -42,7 +42,6 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.SolarPanel;
@@ -147,17 +146,14 @@ public class SolarAnnualAnalysis extends Analysis {
 		graph.repaint();
 	}
 
+	@Override
 	void onStart() {
-		EnergyPanel.getInstance().disableDateSpinner(true);
-		SceneManager.getInstance().setHeatFluxDaily(true);
-		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
-		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
-		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
-		graph.clearData();
-		double[] bill = utilityBill.getMonthlyEnergy();
-		for (int i = 0; i < bill.length; i++)
-			graph.addData("Utility", bill[i] / (365.0 / 12.0));
-		SceneManager.getInstance().getSolarLand().setVisible(true);
+		super.onStart();
+		if (utilityBill != null) {
+			double[] bill = utilityBill.getMonthlyEnergy();
+			for (int i = 0; i < bill.length; i++)
+				graph.addData("Utility", bill[i] / (365.0 / 12.0));
+		}
 	}
 
 	public void show(String title) {

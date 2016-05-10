@@ -91,8 +91,8 @@ public abstract class Analysis {
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
 		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
-		graph.clearData();
 		SceneManager.getInstance().getSolarLand().setVisible(true);
+		graph.clearData();
 	}
 
 	static boolean isBuildingComplete(final Foundation foundation) {
