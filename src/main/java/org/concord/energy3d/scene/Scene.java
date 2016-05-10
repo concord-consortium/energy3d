@@ -463,7 +463,7 @@ public class Scene implements Serializable {
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 		for (final HousePart part : parts) {
-			if (!part.isValid() || ((part instanceof Roof || part instanceof Window || part instanceof Door) && part.getContainer() == null))
+			if (!part.isValid() || ((part instanceof Roof || part instanceof Window || part instanceof Door || part instanceof SolarPanel || part instanceof Floor) && part.getContainer() == null))
 				toBeRemoved.add(part);
 			else {
 				removeDeadChildren(part, toBeRemoved);
@@ -526,8 +526,7 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				if (notifyUndoManager)
-					instance.cleanup();
+				// if (notifyUndoManager) instance.cleanup();
 				// save camera to file
 				saveCameraLocation();
 
@@ -571,16 +570,10 @@ public class Scene implements Serializable {
 	}
 
 	public void add(final HousePart housePart, final boolean redraw) {
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() {
-				final HousePart container = housePart.getContainer();
-				if (container != null)
-					container.getChildren().add(housePart);
-				add(housePart);
-				return null;
-			}
-		});
+		final HousePart container = housePart.getContainer();
+		if (container != null)
+			container.getChildren().add(housePart);
+		add(housePart);
 		if (redraw)
 			redrawAll();
 	}

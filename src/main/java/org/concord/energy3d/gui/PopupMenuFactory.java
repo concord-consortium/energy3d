@@ -10,6 +10,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
+import java.util.concurrent.Callable;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -149,7 +150,13 @@ public class PopupMenuFactory {
 			miPaste.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Scene.getInstance().pasteToPickedLocationOnLand();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().pasteToPickedLocationOnLand();
+							return null;
+						}
+					});
 				}
 			});
 
@@ -529,7 +536,13 @@ public class PopupMenuFactory {
 			miPaste.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Scene.getInstance().pasteToPickedLocationOnWall();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().pasteToPickedLocationOnWall();
+							return null;
+						}
+					});
 				}
 			});
 
@@ -562,7 +575,13 @@ public class PopupMenuFactory {
 			miPaste.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					Scene.getInstance().pasteToPickedLocationOnRoof();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().pasteToPickedLocationOnRoof();
+							return null;
+						}
+					});
 				}
 			});
 

@@ -1638,11 +1638,17 @@ public class MainFrame extends JFrame {
 			undoMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MainPanel.getInstance().defaultTool();
-					SceneManager.getInstance().hideAllEditPoints();
-					SceneManager.getInstance().getUndoManager().undo();
-					SceneManager.getInstance().refresh();
-					EnergyPanel.getInstance().update();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							MainPanel.getInstance().defaultTool();
+							SceneManager.getInstance().hideAllEditPoints();
+							SceneManager.getInstance().getUndoManager().undo();
+							SceneManager.getInstance().refresh();
+							EnergyPanel.getInstance().update();
+							return null;
+						}
+					});
 				}
 			});
 		}
@@ -1657,11 +1663,17 @@ public class MainFrame extends JFrame {
 			redoMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MainPanel.getInstance().defaultTool();
-					SceneManager.getInstance().hideAllEditPoints();
-					SceneManager.getInstance().getUndoManager().redo();
-					SceneManager.getInstance().refresh();
-					EnergyPanel.getInstance().update();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							MainPanel.getInstance().defaultTool();
+							SceneManager.getInstance().hideAllEditPoints();
+							SceneManager.getInstance().getUndoManager().redo();
+							SceneManager.getInstance().refresh();
+							EnergyPanel.getInstance().update();
+							return null;
+						}
+					});
 				}
 			});
 		}
@@ -1709,11 +1721,18 @@ public class MainFrame extends JFrame {
 			pasteMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().paste();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().paste();
+							return null;
+						}
+					});
 				}
 			});
 		}
 		return pasteMenuItem;
+
 	}
 
 	private void saveFile() {

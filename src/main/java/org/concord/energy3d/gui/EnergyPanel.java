@@ -856,15 +856,20 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void update() {
-		String s = Scene.getInstance().getProjectName();
-		timeAndLocationPanel.setBorder(createTitledBorder("Project: " + (s != null ? s : ""), true));
-		basicsPanel.updateArea();
-		basicsPanel.updateHeight();
-		basicsPanel.updateWindowToFloorRatio();
-		basicsPanel.updateSolarPanel();
-		basicsPanel.updateWindow();
-		basicsPanel.updateWall();
-		updateProperties();
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				String s = Scene.getInstance().getProjectName();
+				timeAndLocationPanel.setBorder(createTitledBorder("Project: " + (s != null ? s : ""), true));
+				basicsPanel.updateArea();
+				basicsPanel.updateHeight();
+				basicsPanel.updateWindowToFloorRatio();
+				basicsPanel.updateSolarPanel();
+				basicsPanel.updateWindow();
+				basicsPanel.updateWall();
+				updateProperties();
+			}
+		});
 	}
 
 	public boolean isCancelled() {

@@ -610,7 +610,12 @@ public class MainPanel extends JPanel {
 	}
 
 	public void defaultTool() {
-		getSelectButton().setSelected(true);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				getSelectButton().setSelected(true);
+			}
+		});
 		SceneManager.getInstance().setOperation(Operation.SELECT);
 		SceneManager.getInstance().refresh();
 	}
