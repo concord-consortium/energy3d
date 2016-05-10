@@ -1038,13 +1038,33 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
-	public void removeNonDrawables() {
+	/** This can be used by the user to fix problems that are caused by bugs based on our observations */
+	public void fixProblems() {
+
+		// remove all undrawables
 		final ArrayList<HousePart> a = new ArrayList<HousePart>();
-		for (final HousePart p : parts)
+		for (final HousePart p : parts) {
 			if (!p.isDrawable())
 				a.add(p);
+		}
+		for (final HousePart p : a) {
+			remove(p, false);
+		}
+		a.clear();
+
+		// remove all orphan parts without a top container
+		for (final HousePart p : parts) {
+			if (p instanceof Foundation || p instanceof Tree || p instanceof Human)
+				continue;
+			if (p.getTopContainer() == null)
+				a.add(p);
+		}
 		for (final HousePart p : a)
 			remove(p, false);
+		a.clear();
+
+		redrawAll(true);
+
 	}
 
 	public void lockAll(final boolean freeze) {

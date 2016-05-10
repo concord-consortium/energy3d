@@ -38,8 +38,8 @@ public class Building {
 		walls = new ArrayList<Wall>();
 		windows = new ArrayList<Window>();
 		solarPanels = new ArrayList<SolarPanel>();
-		for (HousePart x : foundation.getChildren()) {
-			if (x instanceof Wall) {
+		for (HousePart x : Scene.getInstance().getParts()) {
+			if (x instanceof Wall && x.getTopContainer() == foundation) {
 				walls.add((Wall) x);
 				for (HousePart y : x.getChildren()) {
 					if (y instanceof Window)
