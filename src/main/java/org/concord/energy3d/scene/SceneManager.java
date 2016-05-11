@@ -1482,7 +1482,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						System.out.println("Clicked on: " + pick);
 						if (pick != null && pick.isEditPoint()) {
 							cameraControl.setLeftMouseButtonEnabled(false);
-							// EnergyPanel.getInstance().cancel();
 						}
 
 						if (operation == Operation.RESIZE && selectedHousePart != null) {

@@ -460,26 +460,44 @@ public class Scene implements Serializable {
 		}
 	}
 
+	/** This can be used by the user to fix problems that are caused by bugs based on our observations. This is different than cleanup() as the latter cannot be used to remove undrawables. */
+	public void fixProblems() {
+
+		// remove all undrawables
+		final ArrayList<HousePart> a = new ArrayList<HousePart>();
+		for (final HousePart p : parts) {
+			if (!p.isDrawable())
+				a.add(p);
+		}
+		for (final HousePart p : a) {
+			remove(p, false);
+		}
+		a.clear();
+
+		cleanup();
+		redrawAll(true);
+
+	}
+
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
-		for (final HousePart part : parts) {
-			if (!part.isValid() || ((part instanceof Roof || part instanceof Window || part instanceof Door || part instanceof SolarPanel || part instanceof Floor) && part.getContainer() == null))
-				toBeRemoved.add(part);
+		for (final HousePart p : parts) {
+			if (!p.isValid() || ((p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Floor) && p.getContainer() == null))
+				toBeRemoved.add(p); // remove all orphan parts without a top container
 			else {
-				removeDeadChildren(part, toBeRemoved);
-				if (!part.isDrawCompleted())
-					part.complete();
+				removeDeadChildren(p, toBeRemoved); // remove all the children that are not in parts
+				if (!p.isDrawCompleted())
+					p.complete();
 			}
 		}
-
-		for (final HousePart part : toBeRemoved)
-			remove(part, false);
+		for (final HousePart p : toBeRemoved)
+			remove(p, false);
 	}
 
 	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
-		for (final HousePart part : parent.getChildren())
-			if (!parts.contains(part))
-				toBeRemoved.add(part);
+		for (final HousePart p : parent.getChildren())
+			if (!parts.contains(p))
+				toBeRemoved.add(p);
 	}
 
 	private void upgradeSceneToNewVersion() {
@@ -526,7 +544,8 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				// if (notifyUndoManager) instance.cleanup();
+				if (notifyUndoManager)
+					instance.cleanup();
 				// save camera to file
 				saveCameraLocation();
 
@@ -1029,35 +1048,6 @@ public class Scene implements Serializable {
 		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(windows));
 		edited = true;
-	}
-
-	/** This can be used by the user to fix problems that are caused by bugs based on our observations */
-	public void fixProblems() {
-
-		// remove all undrawables
-		final ArrayList<HousePart> a = new ArrayList<HousePart>();
-		for (final HousePart p : parts) {
-			if (!p.isDrawable())
-				a.add(p);
-		}
-		for (final HousePart p : a) {
-			remove(p, false);
-		}
-		a.clear();
-
-		// remove all orphan parts without a top container
-		for (final HousePart p : parts) {
-			if (p instanceof Foundation || p instanceof Tree || p instanceof Human)
-				continue;
-			if (p.getTopContainer() == null)
-				a.add(p);
-		}
-		for (final HousePart p : a)
-			remove(p, false);
-		a.clear();
-
-		redrawAll(true);
-
 	}
 
 	public void lockAll(final boolean freeze) {
