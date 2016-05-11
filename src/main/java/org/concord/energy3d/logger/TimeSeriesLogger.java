@@ -415,10 +415,6 @@ public class TimeSeriesLogger {
 						line += ((EnergyAnnualAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof EnergyAngularAnalysis) {
 						line += ((EnergyAngularAnalysis) analysisRequester).toJson();
-					} else if (analysisRequester instanceof SolarDailyAnalysis) {
-						line += ((SolarDailyAnalysis) analysisRequester).toJson();
-					} else if (analysisRequester instanceof SolarAnnualAnalysis) {
-						line += ((SolarAnnualAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof Cost) {
 						line += ((Cost) analysisRequester).toJson();
 					}
@@ -434,6 +430,11 @@ public class TimeSeriesLogger {
 							}
 						}
 					}
+				}
+				if (analysisRequester instanceof SolarDailyAnalysis) {
+					line += ((SolarDailyAnalysis) analysisRequester).toJson();
+				} else if (analysisRequester instanceof SolarAnnualAnalysis) {
+					line += ((SolarAnnualAnalysis) analysisRequester).toJson();
 				}
 			}
 		}

@@ -66,7 +66,7 @@ public abstract class Analysis {
 		try {
 			EnergyPanel.getInstance().computeNow();
 		} catch (final Throwable e) {
-			e.printStackTrace();
+			Util.reportError(e);
 			return e;
 		} finally {
 			graph.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
