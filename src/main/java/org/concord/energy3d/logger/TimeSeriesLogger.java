@@ -386,9 +386,7 @@ public class TimeSeriesLogger {
 
 		// analysis requesters
 
-		if (analysisRequester != null)
-
-		{ // this analysis is completed, now record some results
+		if (analysisRequester != null) {
 			HousePart analyzedPart = SceneManager.getInstance().getSelectedPart();
 			line += ", \"" + analysisRequester.getClass().getSimpleName() + "\": ";
 			if (analysisRequester instanceof AnnualSensorData) {
@@ -439,13 +437,9 @@ public class TimeSeriesLogger {
 			}
 		}
 
-		if (firstRecord)
-
-		{
+		if (firstRecord) {
 			firstRecord = false;
-		} else
-
-		{
+		} else {
 			writer.write(",\n");
 		}
 		writer.write("{\"Timestamp\": \"" + timestamp + "\", " + line + "}");

@@ -53,6 +53,8 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
+import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
@@ -520,6 +522,32 @@ public class PopupMenuFactory {
 			popupMenuForWindow.add(createInsulationMenuItem(true));
 			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(muntinMenu);
+
+			popupMenuForWindow.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window))
+						return;
+					new EnergyDailyAnalysis().show("Daily Energy for Window");
+				}
+			});
+			popupMenuForWindow.add(mi);
+
+			mi = new JMenuItem("Annual Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window))
+						return;
+					new EnergyAnnualAnalysis().show("Annual Energy for Window");
+				}
+			});
+			popupMenuForWindow.add(mi);
 
 		}
 
