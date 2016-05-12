@@ -929,6 +929,45 @@ public class PopupMenuFactory {
 			});
 			popupMenuForFoundation.add(mi);
 
+			mi = new JMenuItem("Daily Solar Panel Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation))
+						return;
+					Foundation foundation = (Foundation) selectedPart;
+					if (foundation.countParts(SolarPanel.class) <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final SolarDailyAnalysis a = new SolarDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap())
+						a.updateGraph();
+					a.show();
+				}
+			});
+			popupMenuForFoundation.add(mi);
+
+			mi = new JMenuItem("Annual Solar Panel Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation))
+						return;
+					Foundation foundation = (Foundation) selectedPart;
+					if (foundation.countParts(SolarPanel.class) <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					SolarAnnualAnalysis a = new SolarAnnualAnalysis();
+					a.setUtilityBill(foundation.getUtilityBill());
+					a.show();
+				}
+			});
+			popupMenuForFoundation.add(mi);
+
 		}
 
 		return popupMenuForFoundation;
@@ -1006,26 +1045,26 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miEff);
 			popupMenuForSolarPanel.addSeparator();
 
-			JMenuItem mi = new JMenuItem("Daily Output Analysis...");
+			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
-					new SolarDailyAnalysis().show("Daily Output of Selected Solar Panel");
+					new SolarDailyAnalysis().show();
 				}
 			});
 			popupMenuForSolarPanel.add(mi);
 
-			mi = new JMenuItem("Annual Output Analysis...");
+			mi = new JMenuItem("Annual Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
-					new SolarAnnualAnalysis().show("Annual Output of Selected Solar Panel");
+					new SolarAnnualAnalysis().show();
 				}
 			});
 			popupMenuForSolarPanel.add(mi);

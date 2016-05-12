@@ -1318,27 +1318,40 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualSolarAnalysisMenuItem() {
 		if (annualSolarAnalysisMenuItem == null) {
-			annualSolarAnalysisMenuItem = new JMenuItem("Annual Output Analysis of Solar Panels...");
+			annualSolarAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Solar Panels...");
 			annualSolarAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
 			annualSolarAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					int n = Scene.getInstance().getNumberOfSolarPanels();
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
 					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					SolarAnnualAnalysis a = new SolarAnnualAnalysis();
-					if (selectedPart instanceof Foundation) {
-						a.setUtilityBill(((Foundation) selectedPart).getUtilityBill());
+					int n = Scene.getInstance().getNumberOfSolarPanels();
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
 					}
-					a.show(selectedPart instanceof SolarPanel ? "Annual Output of Selected Solar Panel" : "Annual Output of All Solar Panels");
+					SolarAnnualAnalysis a = new SolarAnnualAnalysis();
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(SolarPanel.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							a.setUtilityBill(foundation.getUtilityBill());
+						}
+					}
+					a.show();
 				}
 			});
 		}
@@ -1347,25 +1360,40 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getDailySolarAnalysisMenuItem() {
 		if (dailySolarAnalysisMenuItem == null) {
-			dailySolarAnalysisMenuItem = new JMenuItem("Daily Output Analysis of Solar Panels...");
+			dailySolarAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Solar Panels...");
 			dailySolarAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					int n = Scene.getInstance().getNumberOfSolarPanels();
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
 					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					final SolarDailyAnalysis analysis = new SolarDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap())
-						analysis.updateGraph();
+					int n = Scene.getInstance().getNumberOfSolarPanels();
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					analysis.show(selectedPart instanceof SolarPanel ? "Daily Output of Selected Solar Panel" : "Daily Output of All Solar Panels");
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(SolarPanel.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					final SolarDailyAnalysis a = new SolarDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap())
+						a.updateGraph();
+					a.show();
 				}
 			});
 		}

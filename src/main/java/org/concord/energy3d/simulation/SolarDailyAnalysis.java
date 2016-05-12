@@ -28,6 +28,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
@@ -87,9 +88,29 @@ public class SolarDailyAnalysis extends Analysis {
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof SolarPanel) {
-				final SolarPanel sp = (SolarPanel) selectedPart;
-				graph.addData("Solar", sp.getSolarPotentialNow() * sp.getEfficiency());
+			if (selectedPart != null) {
+				if (selectedPart instanceof SolarPanel) {
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					graph.addData("Solar", sp.getSolarPotentialNow() * sp.getEfficiency());
+				} else if (selectedPart instanceof Foundation) {
+					double output = 0;
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof SolarPanel && p.getTopContainer() == selectedPart) {
+							final SolarPanel sp = (SolarPanel) p;
+							output += sp.getSolarPotentialNow() * sp.getEfficiency();
+						}
+					}
+					graph.addData("Solar", output);
+				} else if (selectedPart.getTopContainer() instanceof Foundation) {
+					double output = 0;
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof SolarPanel && p.getTopContainer() == selectedPart.getTopContainer()) {
+							final SolarPanel sp = (SolarPanel) p;
+							output += sp.getSolarPotentialNow() * sp.getEfficiency();
+						}
+					}
+					graph.addData("Solar", output);
+				}
 			} else {
 				double output = 0;
 				for (HousePart p : Scene.getInstance().getParts()) {
@@ -104,14 +125,20 @@ public class SolarDailyAnalysis extends Analysis {
 		graph.repaint();
 	}
 
-	public void show(String title) {
+	public void show() {
 
 		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		if (selectedPart instanceof SolarPanel) {
-			cost = Cost.getInstance().getPartCost(selectedPart);
-			s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+		String title = "Daily Yield of All Solar Panels";
+		if (selectedPart != null) {
+			if (selectedPart instanceof SolarPanel) {
+				cost = Cost.getInstance().getPartCost(selectedPart);
+				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+				title = "Daily Yield";
+			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
+				title = "Daily Yield of Selected Building";
+			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -282,8 +309,14 @@ public class SolarDailyAnalysis extends Analysis {
 	public String toJson() {
 		String s = "{";
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof SolarPanel) {
-			s += "\"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+		if (selectedPart != null) {
+			if (selectedPart instanceof SolarPanel) {
+				s += "\"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			} else if (selectedPart instanceof Foundation) {
+				s += "\"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			} else if (selectedPart.getTopContainer() instanceof Foundation) {
+				s += "\"Panel\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
+			}
 		} else {
 			s += "\"Panel\": \"All\"";
 		}
