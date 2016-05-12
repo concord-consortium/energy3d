@@ -481,23 +481,40 @@ public class Scene implements Serializable {
 
 	private void cleanup() {
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
-		for (final HousePart p : parts) {
+
+		// remove all invalid parts or orphan parts without a top container
+		for (final HousePart p : parts)
 			if (!p.isValid() || ((p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Floor) && p.getContainer() == null))
-				toBeRemoved.add(p); // remove all orphan parts without a top container
-			else {
-				removeDeadChildren(p, toBeRemoved); // remove all the children that are not in parts
-				if (!p.isDrawCompleted())
-					p.complete();
-			}
-		}
+				toBeRemoved.add(p);
 		for (final HousePart p : toBeRemoved)
 			remove(p, false);
-	}
 
-	private void removeDeadChildren(final HousePart parent, final ArrayList<HousePart> toBeRemoved) {
-		for (final HousePart p : parent.getChildren())
-			if (!parts.contains(p))
-				toBeRemoved.add(p);
+		// remove children with multiple parents
+		toBeRemoved.clear();
+		for (final HousePart p : parts)
+			for (final HousePart child : p.getChildren())
+				if (child.getContainer() != p && !toBeRemoved.contains(child))
+					toBeRemoved.add(child);
+		for (final HousePart p : toBeRemoved)
+			remove(p, false);
+		// remove from remaining parents
+		for (final HousePart p : parts)
+			for (final HousePart r : toBeRemoved)
+				p.getChildren().remove(r);
+
+		// remove all the children that are not in parts
+		toBeRemoved.clear();
+		for (final HousePart p : parts)
+			for (final HousePart child : p.getChildren())
+				if (!parts.contains(child) && !toBeRemoved.contains(child))
+					toBeRemoved.add(child);
+		for (final HousePart p : toBeRemoved)
+			remove(p, false);
+
+		// complete all non-completed parts
+		for (final HousePart p : parts)
+			if (!p.isDrawCompleted())
+				p.complete();
 	}
 
 	private void upgradeSceneToNewVersion() {
@@ -613,16 +630,10 @@ public class Scene implements Serializable {
 		if (housePart == null)
 			return;
 		housePart.setGridsVisible(false);
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() {
-				final HousePart container = housePart.getContainer();
-				if (container != null)
-					container.getChildren().remove(housePart);
-				removeChildren(housePart);
-				return null;
-			}
-		});
+		final HousePart container = housePart.getContainer();
+		if (container != null)
+			container.getChildren().remove(housePart);
+		removeChildren(housePart);
 		if (redraw)
 			redrawAll();
 	}
