@@ -40,6 +40,7 @@ import javax.swing.event.PopupMenuListener;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -55,6 +56,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.SolarAnnualAnalysis;
+import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
@@ -97,6 +100,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForWall;
 	private static JPopupMenu popupMenuForRoof;
 	private static JPopupMenu popupMenuForDoor;
+	private static JPopupMenu popupMenuForFloor;
 	private static JPopupMenu popupMenuForTree;
 	private static JPopupMenu popupMenuForHuman;
 	private static JPopupMenu popupMenuForFoundation;
@@ -127,6 +131,8 @@ public class PopupMenuFactory {
 			return getPopupMenuForRoof();
 		if (selectedPart instanceof Door)
 			return getPopupMenuForDoor();
+		if (selectedPart instanceof Floor)
+			return getPopupMenuForFloor();
 		if (selectedPart instanceof Foundation)
 			return getPopupMenuForFoundation();
 		if (selectedPart instanceof SolarPanel)
@@ -295,6 +301,46 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenuForSky;
+
+	}
+
+	private static JPopupMenu getPopupMenuForFloor() {
+
+		if (popupMenuForFloor == null) {
+
+			final JMenuItem miInfo = new JMenuItem("Floor");
+			miInfo.setEnabled(false);
+
+			popupMenuForFloor = new JPopupMenu();
+			popupMenuForFloor.setInvoker(MainPanel.getInstance().getCanvasPanel());
+			popupMenuForFloor.addPopupMenuListener(new PopupMenuListener() {
+
+				@Override
+				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null)
+						return;
+					String s = selectedPart.toString();
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(PopupMenuEvent e) {
+				}
+
+			});
+
+			popupMenuForFloor.add(miInfo);
+			popupMenuForFloor.addSeparator();
+			popupMenuForFloor.add(colorAction);
+
+		}
+
+		return popupMenuForFloor;
 
 	}
 
@@ -522,7 +568,6 @@ public class PopupMenuFactory {
 			popupMenuForWindow.add(createInsulationMenuItem(true));
 			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(muntinMenu);
-
 			popupMenuForWindow.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
@@ -587,6 +632,31 @@ public class PopupMenuFactory {
 			popupMenuForWall.add(colorAction);
 			popupMenuForWall.add(createInsulationMenuItem(false));
 			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
+			popupMenuForWall.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Wall))
+						return;
+					new EnergyDailyAnalysis().show("Daily Energy for Wall");
+				}
+			});
+			popupMenuForWall.add(mi);
+
+			mi = new JMenuItem("Annual Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Wall))
+						return;
+					new EnergyAnnualAnalysis().show("Annual Energy for Wall");
+				}
+			});
+			popupMenuForWall.add(mi);
 
 		}
 
@@ -666,6 +736,32 @@ public class PopupMenuFactory {
 			popupMenuForRoof.add(colorAction);
 			popupMenuForRoof.add(createInsulationMenuItem(false));
 			popupMenuForRoof.add(createVolumetricHeatCapacityMenuItem());
+			popupMenuForRoof.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Roof))
+						return;
+					new EnergyDailyAnalysis().show("Daily Energy for Roof");
+				}
+			});
+			popupMenuForRoof.add(mi);
+
+			mi = new JMenuItem("Annual Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Roof))
+						return;
+					new EnergyAnnualAnalysis().show("Annual Energy for Roof");
+				}
+			});
+			popupMenuForRoof.add(mi);
+
 		}
 
 		return popupMenuForRoof;
@@ -680,6 +776,32 @@ public class PopupMenuFactory {
 			popupMenuForDoor.add(colorAction);
 			popupMenuForDoor.add(createInsulationMenuItem(true));
 			popupMenuForDoor.add(createVolumetricHeatCapacityMenuItem());
+			popupMenuForDoor.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Door))
+						return;
+					new EnergyDailyAnalysis().show("Daily Energy for Door");
+				}
+			});
+			popupMenuForDoor.add(mi);
+
+			mi = new JMenuItem("Annual Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Door))
+						return;
+					new EnergyAnnualAnalysis().show("Annual Energy for Door");
+				}
+			});
+			popupMenuForDoor.add(mi);
+
 		}
 
 		return popupMenuForDoor;
@@ -778,6 +900,34 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(createInsulationMenuItem(false));
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForFoundation.add(miThermostat);
+			popupMenuForFoundation.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation))
+						return;
+					final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap())
+						analysis.updateGraph();
+					analysis.show("Daily Energy");
+				}
+			});
+			popupMenuForFoundation.add(mi);
+
+			mi = new JMenuItem("Annual Energy Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation))
+						return;
+					new EnergyAnnualAnalysis().show("Annual Energy");
+				}
+			});
+			popupMenuForFoundation.add(mi);
 
 		}
 
@@ -854,6 +1004,31 @@ public class PopupMenuFactory {
 
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miEff);
+			popupMenuForSolarPanel.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Output Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					new SolarDailyAnalysis().show("Daily Output of Selected Solar Panel");
+				}
+			});
+			popupMenuForSolarPanel.add(mi);
+
+			mi = new JMenuItem("Annual Output Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					new SolarAnnualAnalysis().show("Annual Output of Selected Solar Panel");
+				}
+			});
+			popupMenuForSolarPanel.add(mi);
 
 		}
 

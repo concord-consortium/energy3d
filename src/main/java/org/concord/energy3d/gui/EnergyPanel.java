@@ -691,13 +691,6 @@ public class EnergyPanel extends JPanel {
 		// update part properties
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		TitledBorder partPanelBorder = (TitledBorder) partPanel.getBorder();
-		if (selectedPart instanceof Tree) {
-			Tree tree = (Tree) selectedPart;
-			partPanelBorder.setTitle("Part - " + tree.getTreeName() + "(" + tree.getId() + ")");
-		} else {
-			partPanelBorder.setTitle("Part" + (selectedPart == null ? "" : (" - " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1))));
-		}
 
 		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
 		double meterToFeet = 1;
@@ -711,17 +704,21 @@ public class EnergyPanel extends JPanel {
 		}
 		final double scale = Scene.getInstance().getAnnotationScale() * meterToFeet;
 
+		TitledBorder partPanelBorder = (TitledBorder) partPanel.getBorder();
 		if (selectedPart != null) {
 			final ReadOnlyVector3 v = selectedPart.getAbsPoint(0);
 			if (selectedPart instanceof Tree) {
+				final Tree tree = (Tree) selectedPart;
+				partPanelBorder.setTitle("Tree (" + tree.getId() + "): " + tree.getTreeName());
 				partProperty1Label.setText("Spread:");
 				partProperty2Label.setText("Height:");
 				partProperty3Label.setText("Position:");
-				final Tree tree = (Tree) selectedPart;
 				partProperty1TextField.setText(oneDecimal.format(tree.getWidth() * scale));
 				partProperty2TextField.setText(oneDecimal.format(tree.getHeight() * scale));
 				partProperty3TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ")");
 			} else if (selectedPart instanceof Human) {
+				final Human human = (Human) selectedPart;
+				partPanelBorder.setTitle("Human (" + human.getId() + "): " + human.getHumanName());
 				partProperty1Label.setText("X:");
 				partProperty2Label.setText("Y:");
 				partProperty3Label.setText("Z:");
@@ -729,25 +726,29 @@ public class EnergyPanel extends JPanel {
 				partProperty2TextField.setText(noDecimal.format(v.getY() * scale));
 				partProperty3TextField.setText(noDecimal.format(v.getZ() * scale));
 			} else if (selectedPart instanceof SolarPanel) {
+				SolarPanel sp = (SolarPanel) selectedPart;
+				partPanelBorder.setTitle("Solar Panel (" + sp.getId() + ") : \u03B7 = " + noDecimal.format(sp.getEfficiency() * 100) + "%");
 				partProperty1Label.setText("Size:");
 				partProperty2Label.setText("Position:");
 				partProperty3Label.setText("Solar:");
-				SolarPanel sp = (SolarPanel) selectedPart;
 				partProperty1TextField.setText(oneDecimal.format(SolarPanel.WIDTH * meterToFeet) + "\u00d7" + oneDecimal.format(SolarPanel.HEIGHT * meterToFeet));
 				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
 				partProperty3TextField.setText(energyViewShown ? twoDecimals.format(sp.getSolarPotentialToday() * sp.getEfficiency()) : "");
 			} else if (selectedPart instanceof Sensor) {
+				Sensor sensor = (Sensor) selectedPart;
+				partPanelBorder.setTitle("Sensor (" + sensor.getId() + ")");
 				partProperty1Label.setText("Position:");
 				partProperty2Label.setText("Light:");
 				partProperty3Label.setText("Heat:");
 				partProperty1TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
-				partProperty2TextField.setText(twoDecimals.format(selectedPart.getSolarPotentialToday() / selectedPart.getArea()));
-				partProperty3TextField.setText(twoDecimals.format(selectedPart.getTotalHeatLoss() / selectedPart.getArea()));
+				partProperty2TextField.setText(twoDecimals.format(sensor.getSolarPotentialToday() / sensor.getArea()));
+				partProperty3TextField.setText(twoDecimals.format(sensor.getTotalHeatLoss() / sensor.getArea()));
 			} else if (selectedPart instanceof Foundation) {
+				Foundation foundation = (Foundation) selectedPart;
+				partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 				partProperty1Label.setText("Size:");
 				partProperty2Label.setText("Position:");
 				partProperty3Label.setText("Azimuth:");
-				Foundation foundation = (Foundation) selectedPart;
 				partProperty1TextField.setText(oneDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
 				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
 				Vector3 v0 = foundation.getAbsPoint(0);
@@ -760,48 +761,56 @@ public class EnergyPanel extends JPanel {
 					a = 0;
 				partProperty3TextField.setText(noDecimal.format(a) + "\u00B0");
 			} else if (selectedPart instanceof Roof) {
+				Roof roof = (Roof) selectedPart;
+				partPanelBorder.setTitle("Roof (" + roof.getId() + ")");
 				partProperty1Label.setText("Area:");
 				partProperty2Label.setText("Position:");
 				partProperty3Label.setText("Rise:");
-				Roof roof = (Roof) selectedPart;
 				partProperty1TextField.setText(noDecimal.format(roof.getArea()));
 				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
 				partProperty3TextField.setText("" + oneDecimal.format(roof.getHeight() * scale));
 			} else if (selectedPart instanceof Window) {
+				Window window = (Window) selectedPart;
+				partPanelBorder.setTitle("Window (" + window.getId() + "): SHGC = " + twoDecimals.format(window.getSolarHeatGainCoefficient()));
 				partProperty1Label.setText("Size:");
 				partProperty2Label.setText("Position:");
 				partProperty3Label.setText("Solar:");
-				Window window = (Window) selectedPart;
 				partProperty1TextField.setText(oneDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
 				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
 				partProperty3TextField.setText(energyViewShown ? twoDecimals.format(window.getSolarPotentialToday() * window.getSolarHeatGainCoefficient()) : "");
 			} else if (selectedPart instanceof Wall) {
+				Wall wall = (Wall) selectedPart;
+				partPanelBorder.setTitle("Wall (" + wall.getId() + "): R-value = " + noDecimal.format(Util.toUsRValue(wall.getUValue())));
 				partProperty1Label.setText("Size:");
 				partProperty2Label.setText("Position:");
 				partProperty3Label.setText("Solar:");
-				Wall wall = (Wall) selectedPart;
 				partProperty1TextField.setText(oneDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
 				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
 				partProperty3TextField.setText(energyViewShown ? twoDecimals.format(wall.getSolarPotentialToday()) : "");
 			} else if (selectedPart instanceof Door) {
+				Door door = (Door) selectedPart;
+				partPanelBorder.setTitle("Door (" + door.getId() + ")");
 				partProperty1Label.setText("Size:");
 				partProperty2Label.setText("Position:");
 				partProperty3Label.setText("Solar:");
 				partProperty1TextField.setText(oneDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
 				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
-				partProperty3TextField.setText(energyViewShown ? twoDecimals.format(selectedPart.getSolarPotentialToday()) : "");
+				partProperty3TextField.setText(energyViewShown ? twoDecimals.format(door.getSolarPotentialToday()) : "");
 			} else if (selectedPart instanceof Floor) {
-				partProperty1Label.setText("Size:");
+				Floor floor = (Floor) selectedPart;
+				partPanelBorder.setTitle("Floor (" + floor.getId() + ")");
+				partProperty1Label.setText("Area:");
 				partProperty2Label.setText("Position:");
-				partProperty3Label.setText("");
-				partProperty1TextField.setText(oneDecimal.format(v.distance(selectedPart.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(selectedPart.getAbsPoint(1)) * scale)));
-				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
-				partProperty3TextField.setText("");
+				partProperty3Label.setText("Height:");
+				partProperty1TextField.setText(oneDecimal.format(selectedPart.getArea()));
+				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ")");
+				partProperty3TextField.setText(oneDecimal.format(v.getZ() * scale));
 			}
 		} else {
-			partProperty1Label.setText("Size:");
-			partProperty2Label.setText("Position:");
-			partProperty3Label.setText("Solar:");
+			partPanelBorder.setTitle("Part");
+			partProperty1Label.setText("X:");
+			partProperty2Label.setText("Y:");
+			partProperty3Label.setText("Z:");
 			partProperty1TextField.setText("");
 			partProperty2TextField.setText("");
 			partProperty3TextField.setText("");

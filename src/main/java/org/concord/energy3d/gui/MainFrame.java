@@ -1338,7 +1338,7 @@ public class MainFrame extends JFrame {
 					if (selectedPart instanceof Foundation) {
 						a.setUtilityBill(((Foundation) selectedPart).getUtilityBill());
 					}
-					a.show(selectedPart instanceof SolarPanel ? "Annual Output of Selected Solar Panels" : "Annual Output of All Solar Panels");
+					a.show(selectedPart instanceof SolarPanel ? "Annual Output of Selected Solar Panel" : "Annual Output of All Solar Panels");
 				}
 			});
 		}
@@ -1365,7 +1365,7 @@ public class MainFrame extends JFrame {
 					if (SceneManager.getInstance().getSolarHeatMap())
 						analysis.updateGraph();
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					analysis.show(selectedPart instanceof SolarPanel ? "Daily Output of Selected Solar Panels" : "Daily Output of All Solar Panels");
+					analysis.show(selectedPart instanceof SolarPanel ? "Daily Output of Selected Solar Panel" : "Daily Output of All Solar Panels");
 				}
 			});
 		}
