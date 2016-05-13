@@ -342,7 +342,7 @@ public class SolarRadiation {
 				data.dailySolarIntensity[row][col] += radiation;
 				double area = 1;
 				if (housePart instanceof SolarPanel)
-					area = SolarPanel.WIDTH * SolarPanel.HEIGHT;
+					area = ((SolarPanel) housePart).getPanelWidth() * ((SolarPanel) housePart).getPanelHeight();
 				else if (housePart instanceof Sensor)
 					area = Sensor.WIDTH * Sensor.HEIGHT;
 				housePart.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;

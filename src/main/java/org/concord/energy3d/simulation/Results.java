@@ -22,7 +22,12 @@ class Results {
 
 	Results(Map<String, List<Double>> data) {
 		id = n;
-		copy = new HashMap<String, List<Double>>(data);
+		copy = new HashMap<String, List<Double>>();
+		for (String s : data.keySet()) {
+			if ("Utility".equals(s))
+				continue;
+			copy.put(s, data.get(s));
+		}
 		n++;
 		if (Scene.getURL() != null) {
 			filename = Scene.getURL().getFile();

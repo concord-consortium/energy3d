@@ -728,7 +728,7 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof SolarPanel) {
 				SolarPanel sp = (SolarPanel) selectedPart;
 				partProperty1Label.setText("Size:");
-				partProperty1TextField.setText(oneDecimal.format(SolarPanel.WIDTH * meterToFeet) + "\u00d7" + oneDecimal.format(SolarPanel.HEIGHT * meterToFeet));
+				partProperty1TextField.setText(oneDecimal.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + oneDecimal.format(sp.getPanelHeight() * meterToFeet));
 				partProperty2Label.setText("Position:");
 				partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ")");
 				String id = "Solar Panel (" + sp.getId() + ")";

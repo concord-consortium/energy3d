@@ -22,13 +22,13 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart {
 
-	public static final double WIDTH = 1.0;
-	public static final double HEIGHT = 1.65;
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private double efficiency = 0.1; // a number in (0, 1)
+	private double panelWidth = 1.0; // 39"
+	private double panelHeight = 1.65; // 65"
 
 	public SolarPanel() {
 		super(1, 1, 0.0);
@@ -42,6 +42,22 @@ public class SolarPanel extends HousePart {
 	/** a number between 0 and 1 */
 	public double getEfficiency() {
 		return efficiency;
+	}
+
+	public void setPanelWidth(double panelWidth) {
+		this.panelWidth = panelWidth;
+	}
+
+	public double getPanelWidth() {
+		return panelWidth;
+	}
+
+	public void setPanelHeight(double panelHeight) {
+		this.panelHeight = panelHeight;
+	}
+
+	public double getPanelHeight() {
+		return panelHeight;
 	}
 
 	@Override
@@ -96,7 +112,7 @@ public class SolarPanel extends HousePart {
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0.5), WIDTH / 2.0 / annotationScale, HEIGHT / 2.0 / annotationScale, 0.15);
+		surround.setData(new Vector3(0, 0, 0.5), panelWidth / 2.0 / annotationScale, panelHeight / 2.0 / annotationScale, 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -186,12 +202,12 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return WIDTH / Scene.getInstance().getAnnotationScale() / 5.0;
+		return panelWidth / Scene.getInstance().getAnnotationScale() / 5.0;
 	}
 
 	@Override
 	protected void computeArea() {
-		area = WIDTH * HEIGHT;
+		area = panelWidth * panelHeight;
 	}
 
 	@Override
@@ -215,7 +231,7 @@ public class SolarPanel extends HousePart {
 
 	/** tolerance is a fraction relative to the width of a solar panel */
 	private boolean overlap(double tolerance) {
-		tolerance *= WIDTH / Scene.getInstance().getAnnotationScale();
+		tolerance *= panelWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarPanel && p != this && p.getContainer() == container) {
@@ -242,7 +258,7 @@ public class SolarPanel extends HousePart {
 				if (Util.isZero(d.length()))
 					d.set(1, 0, 0);
 				final Vector3 d0 = d.clone();
-				d.multiplyLocal(WIDTH / Scene.getInstance().getAnnotationScale());
+				d.multiplyLocal(panelWidth / Scene.getInstance().getAnnotationScale());
 				d.addLocal(getContainerRelative().getPoints().get(0));
 				final Vector3 v = toRelative(d);
 				final Vector3 originalCenter = Scene.getInstance().getOriginalCopy().getAbsCenter();
@@ -260,7 +276,7 @@ public class SolarPanel extends HousePart {
 				}
 			} else if (container instanceof Wall) {
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-				final double shift = WIDTH / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
+				final double shift = panelWidth / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
 				final double newX = points.get(0).getX() + s * shift;
 				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;

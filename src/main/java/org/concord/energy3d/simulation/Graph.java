@@ -307,7 +307,11 @@ public abstract class Graph extends JPanel {
 	}
 
 	boolean hasData() {
-		return !data.isEmpty();
+		if (data.isEmpty())
+			return false;
+		if (data.size() == 1 && data.get("Utility") != null)
+			return false;
+		return true;
 	}
 
 	public void clearData() {

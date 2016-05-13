@@ -375,6 +375,10 @@ public class Scene implements Serializable {
 					sp.setEfficiency(0.1);
 				else if (sp.getEfficiency() > 1) // backward compatibility, efficiency used to range from 0 to 100
 					sp.setEfficiency(sp.getEfficiency() * 0.01);
+				if (Util.isZero(sp.getPanelWidth()))
+					sp.setPanelWidth(1);
+				if (Util.isZero(sp.getPanelHeight()))
+					sp.setPanelHeight(1.65);
 			}
 
 		}
