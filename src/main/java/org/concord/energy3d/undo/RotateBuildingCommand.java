@@ -1,12 +1,13 @@
 package org.concord.energy3d.undo;
 
+import java.util.concurrent.Callable;
+
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 
 public class RotateBuildingCommand extends AbstractUndoableEdit {
@@ -20,7 +21,7 @@ public class RotateBuildingCommand extends AbstractUndoableEdit {
 		this.rotationAngle = rotationAngle;
 	}
 
-	public HousePart getFoundation() {
+	public Foundation getFoundation() {
 		return foundation;
 	}
 
@@ -31,15 +32,30 @@ public class RotateBuildingCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, true);
+		rotate(-rotationAngle);
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		SceneManager.getInstance().undoOrRedoBuildingRotation(foundation, rotationAngle, false);
+		rotate(rotationAngle);
 		EnergyPanel.getInstance().clearRadiationHeatMap();
+	}
+
+	private void rotate(final double a) {
+		SceneManager.getInstance().setSelectedPart(foundation);
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				if (foundation != null) {
+					SceneManager.getInstance().rotateBuilding(a, true);
+				} else {
+					SceneManager.getInstance().rotateAllBuildings(a);
+				}
+				return null;
+			}
+		});
 	}
 
 	@Override

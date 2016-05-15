@@ -19,7 +19,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -38,6 +37,7 @@ import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -997,17 +997,17 @@ public class MainPanel extends JPanel {
 			rotateButton = new JButton();
 			rotateButton.addMouseListener(refreshUponMouseExit);
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-			rotateButton.setToolTipText("<html>Rotate building in the clockwise direction; <br>Hold down the SHIFT key and press this button for counter-clockwise rotation.<br>Hold down the CTRL key while pressing the button to accelerate the rotation.</html>");
+			rotateButton.setToolTipText("<html>Rotate in the clockwise direction.<br>Hold down the SHIFT key and press this button for counter-clockwise rotation.<br>Hold down the CTRL key while pressing this button to rotate faster.<br>If a building is selected, rotate around its center. Otherwise rotate all buildings around the origin.</html>");
 			rotateButton.setFocusable(false);
 			rotateButton.addMouseListener(new MouseAdapter() {
-				private boolean mousePressed = false;
+				private volatile boolean mousePressed = false;
 
 				@Override
 				public void mousePressed(final MouseEvent e) {
 					energyViewButton.setSelected(false);
 					mousePressed = true;
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null || selectedPart instanceof Tree) {
+					if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
 						int count = 0;
 						HousePart hp = null;
 						for (final HousePart x : Scene.getInstance().getParts()) {
@@ -1016,13 +1016,10 @@ public class MainPanel extends JPanel {
 								hp = x;
 							}
 						}
-						if (count == 1) {
+						if (count == 1) { // if there is only one building, automatically select it to ensure that we always rotate around its center
 							SceneManager.getInstance().setSelectedPart(hp);
 							SceneManager.getInstance().refresh();
 							EnergyPanel.getInstance().updateProperties();
-						} else {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-							return;
 						}
 					}
 					new Thread() {
@@ -1033,16 +1030,22 @@ public class MainPanel extends JPanel {
 									@Override
 									public Object call() throws Exception {
 										final HousePart hp = SceneManager.getInstance().getSelectedPart();
-										if (hp instanceof Foundation) {
-											RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, buildingRotationAngle);
-											SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
+										if (hp == null) {
+											RotateBuildingCommand c = new RotateBuildingCommand(null, buildingRotationAngle);
+											SceneManager.getInstance().rotateAllBuildings(buildingRotationAngle);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
-											EventQueue.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													EnergyPanel.getInstance().updateProperties();
-												}
-											});
+										} else {
+											if (hp instanceof Foundation) {
+												RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, buildingRotationAngle);
+												SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+												EventQueue.invokeLater(new Runnable() {
+													@Override
+													public void run() {
+														EnergyPanel.getInstance().updateProperties();
+													}
+												});
+											}
 										}
 										return null;
 									}
@@ -1060,9 +1063,6 @@ public class MainPanel extends JPanel {
 				@Override
 				public void mouseReleased(final MouseEvent e) {
 					mousePressed = false;
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No building is selected for rotation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 				}
 			});
 		}

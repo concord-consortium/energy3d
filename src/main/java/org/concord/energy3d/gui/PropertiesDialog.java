@@ -31,7 +31,7 @@ class PropertiesDialog extends JDialog {
 		setTitle("Properties");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(3, 2, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(4, 2, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -42,6 +42,9 @@ class PropertiesDialog extends JDialog {
 		if (Scene.getInstance().isStudentMode())
 			studentModeComboBox.setSelectedIndex(1);
 		final JTextField projectNameField = new JTextField(Scene.getInstance().getProjectName());
+		final JComboBox<String> allowFoundationOverlapComboBox = new JComboBox<String>(new String[] { "Disallowed", "Allowed" });
+		if (Scene.getInstance().getAllowFoundationOverlap())
+			allowFoundationOverlapComboBox.setSelectedIndex(1);
 
 		ActionListener okListener = new ActionListener() {
 			@Override
@@ -56,6 +59,7 @@ class PropertiesDialog extends JDialog {
 				}
 				Scene.getInstance().setProjectName(projectNameField.getText());
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
+				Scene.getInstance().setAllowFoundationOverlap(allowFoundationOverlapComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().updateWeatherData();
 				EnergyPanel.getInstance().update();
@@ -74,6 +78,10 @@ class PropertiesDialog extends JDialog {
 		// choose unit system
 		panel.add(new JLabel("Unit System: "));
 		panel.add(unitSystemComboBox);
+
+		// allow building overlap
+		panel.add(new JLabel("Foundation Overlap: "));
+		panel.add(allowFoundationOverlapComboBox);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

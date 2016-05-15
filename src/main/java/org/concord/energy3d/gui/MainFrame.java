@@ -424,19 +424,15 @@ public class MainFrame extends JFrame {
 
 					MainPanel.getInstance().defaultTool();
 
-					if (Scene.getInstance().isStudentMode()) {
-						enableMenuItems(false);
-					} else {
-						enableMenuItems(true);
-						// prevent multiple replay or postprocessing commands
-						final boolean inactive = !PlayControl.active;
-						replayFolderMenuItem.setEnabled(inactive);
-						final File lastFolder = DesignReplay.getInstance().getLastFolder();
-						replayLastFolderMenuItem.setEnabled(lastFolder != null && inactive);
-						replayLastFolderMenuItem.setText(lastFolder != null ? "Replay Last Folder: " + lastFolder : "Replay Last Folder");
-						replayControlsMenu.setEnabled(!inactive);
-						analyzeFolderMenuItem.setEnabled(inactive);
-					}
+					enableMenuItems(true);
+					// prevent multiple replay or postprocessing commands
+					final boolean inactive = !PlayControl.active;
+					replayFolderMenuItem.setEnabled(inactive);
+					final File lastFolder = DesignReplay.getInstance().getLastFolder();
+					replayLastFolderMenuItem.setEnabled(lastFolder != null && inactive);
+					replayLastFolderMenuItem.setText(lastFolder != null ? "Replay Last Folder: " + lastFolder : "Replay Last Folder");
+					replayControlsMenu.setEnabled(!inactive);
+					analyzeFolderMenuItem.setEnabled(inactive);
 
 					// recent files
 					if (!recentFileMenuItems.isEmpty()) {

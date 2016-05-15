@@ -197,7 +197,12 @@ public class TimeSeriesLogger {
 						stateValue = "{\"Building\": " + foundation.getId() + "}";
 				} else if (lastEdit instanceof RotateBuildingCommand) {
 					RotateBuildingCommand c = (RotateBuildingCommand) lastEdit;
-					stateValue = "{\"Building\": " + c.getFoundation().getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
+					Foundation f = c.getFoundation();
+					if (f != null) {
+						stateValue = "{\"Building\": " + f.getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
+					} else {
+						stateValue = "{\"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
+					}
 				}
 
 				// boolean switches

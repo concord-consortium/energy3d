@@ -107,6 +107,7 @@ public class Scene implements Serializable {
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = true;
+	private boolean allowFoundationOverlap = false;
 	private Ground ground = new Ground();
 	private DesignSpecs designSpecs = new DesignSpecs();
 	private HousePart copyBuffer, originalCopy;
@@ -1364,6 +1365,14 @@ public class Scene implements Serializable {
 
 	public void setOnlyAbsorptionInSolarMap(final boolean onlyAbsorptionInSolarMap) {
 		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
+	}
+
+	public void setAllowFoundationOverlap(boolean allowFoundationOverlap) {
+		this.allowFoundationOverlap = allowFoundationOverlap;
+	}
+
+	public boolean getAllowFoundationOverlap() {
+		return allowFoundationOverlap;
 	}
 
 	public void setSolarHeatMapColorContrast(final int solarContrast) {

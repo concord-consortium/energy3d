@@ -1732,28 +1732,30 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return showBuildingLabels;
 	}
 
-	public void undoOrRedoBuildingRotation(final Foundation foundation, final double rotationAngle, final boolean undo) {
-		setSelectedPart(foundation);
-		taskManager.update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				rotateBuilding(undo ? -rotationAngle : rotationAngle, true);
-				return null;
-			}
-		});
-	}
-
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
 	public void rotateBuilding(final double angle, final boolean redraw) {
 		System.out.println("rotateBuilding()");
 		if (selectedHousePart != null) {
-			if (selectedHousePart instanceof Foundation)
-				((Foundation) selectedHousePart).rotate(angle);
-			else
-				selectedHousePart.getTopContainer().rotate(angle);
+			if (selectedHousePart instanceof Foundation) {
+				((Foundation) selectedHousePart).rotate(angle, null);
+			} else {
+				selectedHousePart.getTopContainer().rotate(angle, null);
+			}
 			if (redraw)
 				Scene.getInstance().redrawAll();
 		}
+	}
+
+	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
+	public void rotateAllBuildings(final double angle) {
+		System.out.println("rotateBuildings()");
+		Vector3 origin = new Vector3();
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation) {
+				((Foundation) p).rotate(angle, origin);
+			}
+		}
+		Scene.getInstance().redrawAll();
 	}
 
 	public boolean isRefreshOnlyMode() {
