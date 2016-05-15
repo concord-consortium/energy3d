@@ -2214,17 +2214,13 @@ public class MainFrame extends JFrame {
 		return specificationsMenuItem;
 	}
 
-	void showProperties() {
-		new PropertiesDialog().setVisible(true);
-	}
-
 	private JMenuItem getPropertiesMenuItem() {
 		if (propertiesMenuItem == null) {
 			propertiesMenuItem = new JMenuItem("Properties");
 			propertiesMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					showProperties();
+					new PropertiesDialog().setVisible(true);
 				}
 			});
 		}

@@ -413,6 +413,35 @@ public class PopupMenuFactory {
 			});
 			muntinButtonGroup.add(miNoBar);
 			muntinMenu.add(miNoBar);
+			muntinMenu.addSeparator();
+
+			final JCheckBoxMenuItem cbmiHorizontalBars = new JCheckBoxMenuItem("Horizontal Bars");
+			cbmiHorizontalBars.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setHorizontalBars(cbmiHorizontalBars.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			muntinMenu.add(cbmiHorizontalBars);
+
+			final JCheckBoxMenuItem cbmiVerticalBars = new JCheckBoxMenuItem("Vertical Bars");
+			cbmiVerticalBars.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setVerticalBars(cbmiVerticalBars.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			muntinMenu.add(cbmiVerticalBars);
 
 			muntinMenu.addMenuListener(new MenuListener() {
 
@@ -420,20 +449,23 @@ public class PopupMenuFactory {
 				public void menuSelected(MenuEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						switch (((Window) selectedPart).getStyle()) {
+						Window window = (Window) selectedPart;
+						switch (window.getStyle()) {
 						case Window.MORE_MUNTIN_BARS:
-							miMoreBars.setSelected(true);
+							Util.selectSilently(miMoreBars, true);
 							break;
 						case Window.MEDIUM_MUNTIN_BARS:
-							miMediumBars.setSelected(true);
+							Util.selectSilently(miMediumBars, true);
 							break;
 						case Window.LESS_MUNTIN_BARS:
-							miLessBars.setSelected(true);
+							Util.selectSilently(miLessBars, true);
 							break;
 						case Window.NO_MUNTIN_BAR:
-							miNoBar.setSelected(true);
+							Util.selectSilently(miNoBar, true);
 							break;
 						}
+						Util.selectSilently(cbmiHorizontalBars, window.getHorizontalBars());
+						Util.selectSilently(cbmiVerticalBars, window.getVerticalBars());
 					}
 				}
 

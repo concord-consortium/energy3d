@@ -50,6 +50,8 @@ public class Window extends HousePart implements Thermalizable {
 	private double uValue = 2.0; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts);
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6MJ)
 	private int style = MORE_MUNTIN_BARS;
+	private boolean noHorizontalBars; // has to use negative as serialization defaults to false
+	private boolean noVerticalBars;
 	private ReadOnlyColorRGBA glassColor = DEFAULT_TINT;
 
 	public Window() {
@@ -245,17 +247,21 @@ public class Window extends HousePart implements Thermalizable {
 			final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
 			final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
 			final Vector3 p = new Vector3();
-			for (int col = 1; col < cols; col++) {
-				u.multiply((double) col / cols, p).addLocal(o);
-				BufferUtils.setInBuffer(p, barsVertices, i++);
-				p.addLocal(v);
-				BufferUtils.setInBuffer(p, barsVertices, i++);
+			if (!noVerticalBars) {
+				for (int col = 1; col < cols; col++) {
+					u.multiply((double) col / cols, p).addLocal(o);
+					BufferUtils.setInBuffer(p, barsVertices, i++);
+					p.addLocal(v);
+					BufferUtils.setInBuffer(p, barsVertices, i++);
+				}
 			}
-			for (int row = 1; row < rows; row++) {
-				v.multiply((double) row / rows, p).addLocal(o);
-				BufferUtils.setInBuffer(p, barsVertices, i++);
-				p.addLocal(u);
-				BufferUtils.setInBuffer(p, barsVertices, i++);
+			if (!noHorizontalBars) {
+				for (int row = 1; row < rows; row++) {
+					v.multiply((double) row / rows, p).addLocal(o);
+					BufferUtils.setInBuffer(p, barsVertices, i++);
+					p.addLocal(u);
+					BufferUtils.setInBuffer(p, barsVertices, i++);
+				}
 			}
 			barsVertices.limit(i * 3);
 			bars.getMeshData().updateVertexCount();
@@ -642,6 +648,22 @@ public class Window extends HousePart implements Thermalizable {
 		if (!super.isValid())
 			return false;
 		return super.isDrawable();
+	}
+
+	public void setHorizontalBars(boolean horizontalBars) {
+		noHorizontalBars = !horizontalBars;
+	}
+
+	public boolean getHorizontalBars() {
+		return !noHorizontalBars;
+	}
+
+	public void setVerticalBars(boolean verticalBars) {
+		noVerticalBars = !verticalBars;
+	}
+
+	public boolean getVerticalBars() {
+		return !noVerticalBars;
 	}
 
 }
