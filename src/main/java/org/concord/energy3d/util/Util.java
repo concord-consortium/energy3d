@@ -3,6 +3,7 @@ package org.concord.energy3d.util;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -24,9 +25,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
@@ -79,8 +80,8 @@ public class Util {
 		return 5.67826 / siUValue;
 	}
 
-	public static String toString(ReadOnlyColorRGBA c) {
-		return String.format("#%02x%02x%02x", (int) Math.round(c.getRed() * 255), (int) Math.round(c.getGreen() * 255), (int) Math.round(c.getBlue() * 255));
+	public static String toString(final ReadOnlyColorRGBA c) {
+		return String.format("#%02x%02x%02x", Math.round(c.getRed() * 255), Math.round(c.getGreen() * 255), Math.round(c.getBlue() * 255));
 	}
 
 	public static double findBoundLength(final BoundingVolume bounds) {
@@ -375,6 +376,7 @@ public class Util {
 		final String exceptionAsString = sw.toString();
 		final JTextArea textArea = new JTextArea(exceptionAsString);
 		final JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setPreferredSize(new Dimension(300, 400));
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), scrollPane, "Error", JOptionPane.ERROR_MESSAGE);
 	}
 
@@ -418,6 +420,7 @@ public class Util {
 	 */
 	public static void selectSilently(final AbstractButton button, final boolean selected) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				final ItemListener[] itemListeners = button.getItemListeners();
 				final ActionListener[] actionListeners = button.getActionListeners();
@@ -439,6 +442,7 @@ public class Util {
 	 */
 	public static void selectSilently(final JComboBox<?> comboBox, final int selectedIndex) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				final ItemListener[] itemListeners = comboBox.getItemListeners();
 				final ActionListener[] actionListeners = comboBox.getActionListeners();
@@ -460,6 +464,7 @@ public class Util {
 	 */
 	public static void selectSilently(final JComboBox<?> comboBox, final Object item) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				final ItemListener[] itemListeners = comboBox.getItemListeners();
 				final ActionListener[] actionListeners = comboBox.getActionListeners();
@@ -481,6 +486,7 @@ public class Util {
 	 */
 	public static void setSilently(final JSpinner spinner, final Object value) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				final ChangeListener[] changeListeners = spinner.getChangeListeners();
 				for (final ChangeListener x : changeListeners)
@@ -507,6 +513,7 @@ public class Util {
 	 */
 	public static void setSilently(final JSlider slider, final int value) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				final ChangeListener[] changeListeners = slider.getChangeListeners();
 				for (final ChangeListener x : changeListeners)
@@ -523,6 +530,7 @@ public class Util {
 	 */
 	public static void setSilently(final JTabbedPane tabbedPane, final Component value) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				final ChangeListener[] changeListeners = tabbedPane.getChangeListeners();
 				for (final ChangeListener x : changeListeners)
@@ -540,6 +548,7 @@ public class Util {
 	 */
 	public static void setSilently(final JTextComponent tc, final String text) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				final AbstractDocument doc = (AbstractDocument) tc.getDocument();
 				final DocumentListener[] documentListeners = doc.getDocumentListeners();

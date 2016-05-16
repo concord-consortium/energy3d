@@ -419,10 +419,10 @@ public class Foundation extends HousePart implements Thermalizable {
 					final Vector3 p1 = part.getAbsPoint(1);
 					final Vector3 p2 = part.getAbsPoint(2);
 					final double minDistance = 0;
-					final double minX = Math.min(p0.getX(), p2.getX()) - minDistance;
-					final double maxX = Math.max(p0.getX(), p2.getX()) + minDistance;
-					final double minY = Math.min(p0.getY(), p1.getY()) - minDistance;
-					final double maxY = Math.max(p0.getY(), p1.getY()) + minDistance;
+					final double minX = Math.min(p0.getX(), Math.min(p1.getX(), p2.getX())) - minDistance;
+					final double maxX = Math.max(p0.getX(), Math.max(p1.getX(), p2.getX())) + minDistance;
+					final double minY = Math.min(p0.getY(), Math.min(p1.getY(), p2.getY())) - minDistance;
+					final double maxY = Math.max(p0.getY(), Math.max(p1.getY(), p2.getY())) + minDistance;
 					if (isFirstPointInserted()) {
 						final double oppositeX = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
 						final double oppositeY = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
@@ -1041,7 +1041,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		return thermostat;
 	}
 
-	public void setUtilityBill(UtilityBill b) {
+	public void setUtilityBill(final UtilityBill b) {
 		utilityBill = b;
 	}
 
