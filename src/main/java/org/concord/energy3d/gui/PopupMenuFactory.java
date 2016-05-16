@@ -352,6 +352,35 @@ public class PopupMenuFactory {
 
 			final JMenu muntinMenu = new JMenu("Muntins");
 
+			final JCheckBoxMenuItem cbmiHorizontalBars = new JCheckBoxMenuItem("Horizontal Bars");
+			cbmiHorizontalBars.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setHorizontalBars(cbmiHorizontalBars.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			muntinMenu.add(cbmiHorizontalBars);
+
+			final JCheckBoxMenuItem cbmiVerticalBars = new JCheckBoxMenuItem("Vertical Bars");
+			cbmiVerticalBars.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setVerticalBars(cbmiVerticalBars.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			muntinMenu.add(cbmiVerticalBars);
+			muntinMenu.addSeparator();
+
 			ButtonGroup muntinButtonGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem miMoreBars = new JRadioButtonMenuItem("More Bars");
@@ -399,50 +428,6 @@ public class PopupMenuFactory {
 			muntinButtonGroup.add(miLessBars);
 			muntinMenu.add(miLessBars);
 
-			final JRadioButtonMenuItem miNoBar = new JRadioButtonMenuItem("No Bar");
-			miNoBar.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setStyle(Window.NO_MUNTIN_BAR);
-						Scene.getInstance().redrawAll();
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
-			muntinButtonGroup.add(miNoBar);
-			muntinMenu.add(miNoBar);
-			muntinMenu.addSeparator();
-
-			final JCheckBoxMenuItem cbmiHorizontalBars = new JCheckBoxMenuItem("Horizontal Bars");
-			cbmiHorizontalBars.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setHorizontalBars(cbmiHorizontalBars.isSelected());
-						Scene.getInstance().redrawAll();
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
-			muntinMenu.add(cbmiHorizontalBars);
-
-			final JCheckBoxMenuItem cbmiVerticalBars = new JCheckBoxMenuItem("Vertical Bars");
-			cbmiVerticalBars.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setVerticalBars(cbmiVerticalBars.isSelected());
-						Scene.getInstance().redrawAll();
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
-			muntinMenu.add(cbmiVerticalBars);
-
 			muntinMenu.addMenuListener(new MenuListener() {
 
 				@Override
@@ -460,12 +445,10 @@ public class PopupMenuFactory {
 						case Window.LESS_MUNTIN_BARS:
 							Util.selectSilently(miLessBars, true);
 							break;
-						case Window.NO_MUNTIN_BAR:
-							Util.selectSilently(miNoBar, true);
-							break;
 						}
-						Util.selectSilently(cbmiHorizontalBars, window.getHorizontalBars());
-						Util.selectSilently(cbmiVerticalBars, window.getVerticalBars());
+						// NO_MUNTIN_BAR backward compatibility
+						Util.selectSilently(cbmiHorizontalBars, window.getStyle() != Window.NO_MUNTIN_BAR && window.getHorizontalBars());
+						Util.selectSilently(cbmiVerticalBars, window.getStyle() != Window.NO_MUNTIN_BAR && window.getVerticalBars());
 					}
 				}
 
@@ -665,6 +648,71 @@ public class PopupMenuFactory {
 			popupMenuForWall.add(createInsulationMenuItem(false));
 			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForWall.addSeparator();
+
+			final JMenu typeMenu = new JMenu("Type");
+			popupMenuForWall.add(typeMenu);
+			popupMenuForWall.addSeparator();
+			final ButtonGroup typeGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiSolidWall = new JRadioButtonMenuItem("Solid Wall");
+			rbmiSolidWall.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						((Wall) selectedPart).setType(Wall.SOLID_WALL);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			typeMenu.add(rbmiSolidWall);
+			typeGroup.add(rbmiSolidWall);
+
+			final JRadioButtonMenuItem rbmiPorchColumn = new JRadioButtonMenuItem("Porch Columns");
+			rbmiPorchColumn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						((Wall) selectedPart).setType(Wall.PORCH_COLUMN);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			typeMenu.add(rbmiPorchColumn);
+			typeGroup.add(rbmiPorchColumn);
+
+			typeMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						Wall wall = (Wall) selectedPart;
+						switch (wall.getType()) {
+						case Wall.SOLID_WALL:
+							Util.selectSilently(rbmiSolidWall, true);
+							break;
+						case Wall.PORCH_COLUMN:
+							Util.selectSilently(rbmiPorchColumn, true);
+							break;
+						}
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+					typeMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+					typeMenu.setEnabled(true);
+				}
+
+			});
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
 			mi.addActionListener(new ActionListener() {

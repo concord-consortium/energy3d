@@ -35,7 +35,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Window extends HousePart implements Thermalizable {
 	private static final long serialVersionUID = 1L;
-	public static final int NO_MUNTIN_BAR = -1;
+	public static final int NO_MUNTIN_BAR = -1; // TODO: remove this in 2017 as it is no longer needed
 	public static final int MORE_MUNTIN_BARS = 0;
 	public static final int MEDIUM_MUNTIN_BARS = 1;
 	public static final int LESS_MUNTIN_BARS = 2;
