@@ -1547,7 +1547,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						} else {
 							editHousePartCommand.undo();
 							selectedHousePart.setHighlight(false);
-							selectedHousePart = null;
+							// selectedHousePart = null;
 						}
 						if (editHousePartCommand != null) {
 							if (editHousePartCommand.isReallyEdited())
