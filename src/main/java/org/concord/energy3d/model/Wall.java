@@ -51,6 +51,9 @@ public class Wall extends HousePart implements Thermalizable {
 	private static double userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
+	public static final int SOLID_WALL = 0;
+	public static final int PORCH_COLUMN = 1;
+
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
 	private transient Mesh invisibleMesh;
@@ -68,6 +71,7 @@ public class Wall extends HousePart implements Thermalizable {
 	private boolean isShortWall;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.28; // default is R20 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
+	private int type = SOLID_WALL;
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -1340,6 +1344,14 @@ public class Wall extends HousePart implements Thermalizable {
 	@Override
 	public double getVolumetricHeatCapacity() {
 		return volumetricHeatCapacity;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getType() {
+		return type;
 	}
 
 	@Override
