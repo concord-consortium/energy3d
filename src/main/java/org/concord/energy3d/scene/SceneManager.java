@@ -732,7 +732,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 			((Component) canvas).addMouseWheelListener(new MouseWheelListener() {
 				@Override
-				public void mouseWheelMoved(MouseWheelEvent e) {
+				public void mouseWheelMoved(final MouseWheelEvent e) {
 					TimeSeriesLogger.getInstance().logCamera("Zoom");
 				}
 			});
@@ -1749,8 +1749,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
 	public void rotateAllBuildings(final double angle) {
 		System.out.println("rotateBuildings()");
-		Vector3 origin = new Vector3();
-		for (HousePart p : Scene.getInstance().getParts()) {
+		final Vector3 origin = new Vector3();
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
 				((Foundation) p).rotate(angle, origin);
 			}
