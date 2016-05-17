@@ -76,10 +76,6 @@ public class DesignReplay extends PlayControl {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {
-//							Scene.initSceneNow();
-//							Scene.getInstance().redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
-//							Scene.initEnergy();
-//							Scene.getInstance().redrawAll(); // need to call this to at least redraw the overhangs
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 							EventQueue.invokeLater(new Runnable() {
 								@Override
