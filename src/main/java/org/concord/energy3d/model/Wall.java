@@ -75,7 +75,10 @@ public class Wall extends HousePart implements Thermalizable {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.28; // default is R20 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private int type = SOLID_WALL;
-	private transient Line columns, railings;
+	private transient Mesh columns;
+	private transient Mesh railings;
+	private double columnRadius = 1;
+	private double railingRadius = 0.1;
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -101,6 +104,11 @@ public class Wall extends HousePart implements Thermalizable {
 		neighbors = new Snap[2];
 		if (thicknessNormal != null)
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
+
+		if (Util.isZero(columnRadius))
+			columnRadius = 1;
+		if (Util.isZero(railingRadius))
+			railingRadius = 0.1;
 
 		mesh = new Mesh("Wall");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
@@ -160,18 +168,20 @@ public class Wall extends HousePart implements Thermalizable {
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
 
-		columns = new Line("Columns");
-		columns.setLineWidth(10);
+		columns = new Mesh("Columns");
+		columns.getMeshData().setIndexMode(IndexMode.Quads);
+		columns.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(500));
+		columns.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(500));
+		columns.setRenderState(offsetState);
 		columns.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(columns);
-		columns.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(columns);
 
-		railings = new Line("Railings");
-		railings.setLineWidth(2);
+		railings = new Mesh("Railings");
+		railings.getMeshData().setIndexMode(IndexMode.Quads);
+		railings.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
+		railings.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
+		railings.setRenderState(offsetState);
 		railings.setModelBound(new BoundingBox());
-		Util.disablePickShadowLight(railings);
-		railings.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(railings);
 
 	}
@@ -427,70 +437,83 @@ public class Wall extends HousePart implements Thermalizable {
 		root.updateWorldBound(true);
 	}
 
+	private void addPointToQuad(ReadOnlyVector3 v1, ReadOnlyVector3 v2, Vector3 dir, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
+		ReadOnlyVector3 p1 = new Vector3(v1).addLocal(dir);
+		ReadOnlyVector3 p3 = new Vector3(v2).addLocal(dir);
+		dir.negateLocal();
+		ReadOnlyVector3 p2 = new Vector3(v1).addLocal(dir);
+		ReadOnlyVector3 p4 = new Vector3(v2).addLocal(dir);
+		vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
+		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+		for (int i = 0; i < 4; i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+	}
+
 	private void drawColumns(final double distance) {
 		columns.setDefaultColor(getColor());
-		FloatBuffer barsVertices = columns.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / distance);
-		if (barsVertices.capacity() < (5 + cols) * 6) {
-			barsVertices = BufferUtils.createVector3Buffer((5 + cols) * 2);
-			columns.getMeshData().setVertexBuffer(barsVertices);
-		} else {
-			barsVertices.rewind();
-			barsVertices.limit(barsVertices.capacity());
-		}
-		final ReadOnlyVector3 barsOffset = normal.multiply(-0.5, null);
-		int i = 0;
-		BufferUtils.setInBuffer(getAbsPoint(0).addLocal(barsOffset), barsVertices, i++);
-		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(barsOffset), barsVertices, i++);
-		BufferUtils.setInBuffer(getAbsPoint(3).addLocal(barsOffset), barsVertices, i++);
-		BufferUtils.setInBuffer(getAbsPoint(2).addLocal(barsOffset), barsVertices, i++);
-		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(barsOffset), barsVertices, i++);
-		BufferUtils.setInBuffer(getAbsPoint(3).addLocal(barsOffset), barsVertices, i++);
-		final ReadOnlyVector3 o = getAbsPoint(0).add(barsOffset, null);
-		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
-		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+		final FloatBuffer vertexBuffer = columns.getMeshData().getVertexBuffer();
+		final FloatBuffer normalBuffer = columns.getMeshData().getNormalBuffer();
+		vertexBuffer.rewind();
+		normalBuffer.rewind();
+		vertexBuffer.limit(vertexBuffer.capacity());
+		normalBuffer.limit(normalBuffer.capacity());
+
+		final ReadOnlyVector3 o = getAbsPoint(0);
+		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+		final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
+		final int cols = (int) Math.max(2, u.length() / distance);
+
+		Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(columnRadius);
+		addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+		dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
+		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
+		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+
 		final Vector3 p = new Vector3();
 		for (int col = 1; col < cols; col++) {
 			u.multiply((double) col / cols, p).addLocal(o);
-			BufferUtils.setInBuffer(p, barsVertices, i++);
-			p.addLocal(v);
-			BufferUtils.setInBuffer(p, barsVertices, i++);
+			addPointToQuad(p, p.add(v, null), dir, vertexBuffer, normalBuffer);
 		}
-		barsVertices.limit(i * 3);
+
+		vertexBuffer.limit(vertexBuffer.position());
+		normalBuffer.limit(normalBuffer.position());
 		columns.getMeshData().updateVertexCount();
 		columns.updateModelBound();
 	}
 
 	private void drawRailings(final double distance) {
 		railings.setDefaultColor(getColor());
-		FloatBuffer barsVertices = railings.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / distance);
-		if (barsVertices.capacity() < (5 + cols) * 6) {
-			barsVertices = BufferUtils.createVector3Buffer((5 + cols) * 2);
-			railings.getMeshData().setVertexBuffer(barsVertices);
-		} else {
-			barsVertices.rewind();
-			barsVertices.limit(barsVertices.capacity());
-		}
-		final ReadOnlyVector3 barsOffset = normal.multiply(-0.5, null);
-		int i = 0;
-		final ReadOnlyVector3 o = getAbsPoint(0).add(barsOffset, null);
-		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
-		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null).multiplyLocal(0.33);
-		final Vector3 p = new Vector3(v);
-		p.addLocal(o);
-		BufferUtils.setInBuffer(p, barsVertices, i++);
-		p.addLocal(u);
-		BufferUtils.setInBuffer(p, barsVertices, i++);
+		final FloatBuffer vertexBuffer = railings.getMeshData().getVertexBuffer();
+		final FloatBuffer normalBuffer = railings.getMeshData().getNormalBuffer();
+		vertexBuffer.rewind();
+		normalBuffer.rewind();
+		vertexBuffer.limit(vertexBuffer.capacity());
+		normalBuffer.limit(normalBuffer.capacity());
+
+		final double heightRatio = 0.33;
+		final ReadOnlyVector3 o = getAbsPoint(0);
+		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+		final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null).multiplyLocal(heightRatio);
+		final int cols = (int) Math.max(2, u.length() / distance);
+
+		Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railingRadius * 3);
+		addPointToQuad(getAbsPoint(1).multiplyLocal(1, 1, heightRatio), getAbsPoint(3).multiplyLocal(1, 1, heightRatio), dir, vertexBuffer, normalBuffer);
+		dir = new Vector3(u).normalizeLocal().multiplyLocal(railingRadius);
+		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
+		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+
+		final Vector3 p = new Vector3();
 		for (int col = 1; col < cols; col++) {
-			u.multiply((double) col / cols, p).addLocal(o);
-			BufferUtils.setInBuffer(p, barsVertices, i++);
-			p.addLocal(v);
-			BufferUtils.setInBuffer(p, barsVertices, i++);
+			u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), 0);
+			addPointToQuad(p, p.add(v, null), dir, vertexBuffer, normalBuffer);
 		}
-		barsVertices.limit(i * 3);
-		columns.getMeshData().updateVertexCount();
-		columns.updateModelBound();
+
+		vertexBuffer.limit(vertexBuffer.position());
+		normalBuffer.limit(normalBuffer.position());
+		railings.getMeshData().updateVertexCount();
+		railings.updateModelBound();
 	}
 
 	private void drawPolygon(final List<List<Vector3>> wallAndWindowsPoints, final Mesh mesh, final boolean drawHoles, final boolean normal, final boolean texture) {
