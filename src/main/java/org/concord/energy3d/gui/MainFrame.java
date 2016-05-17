@@ -465,9 +465,9 @@ public class MainFrame extends JFrame {
 										} else
 											ok = true;
 										if (ok)
-											new Thread() {
+											SceneManager.getTaskManager().update(new Callable<Object>() {
 												@Override
-												public void run() {
+												public Object call() {
 													try {
 														Scene.open(rf.toURI().toURL());
 														updateTitleBar();
@@ -475,8 +475,9 @@ public class MainFrame extends JFrame {
 													} catch (final Throwable err) {
 														Util.reportError(err);
 													}
+													return null;
 												}
-											}.start();
+											});
 									}
 								});
 								fileMenu.insert(x, fileMenuItemCount + i);
@@ -636,17 +637,18 @@ public class MainFrame extends JFrame {
 				file = new File(fileChooser.getSelectedFile().toString() + ".ng3");
 			else
 				file = fileChooser.getSelectedFile();
-			new Thread() {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
-				public void run() {
+				public Object call() {
 					try {
 						Scene.open(file.toURI().toURL());
 						fileChooser.rememberFile(file.getPath());
 					} catch (final Throwable err) {
 						Util.reportError(err);
 					}
+					return null;
 				}
-			}.start();
+			});
 			topViewCheckBoxMenuItem.setSelected(false);
 		}
 	}
@@ -2264,11 +2266,17 @@ public class MainFrame extends JFrame {
 			removeAllRoofsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().removeAllRoofs();
-					EventQueue.invokeLater(new Runnable() {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
-						public void run() {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						public Object call() {
+							Scene.getInstance().removeAllRoofs();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
 						}
 					});
 				}
@@ -2283,11 +2291,17 @@ public class MainFrame extends JFrame {
 			removeAllFloorsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().removeAllFloors();
-					EventQueue.invokeLater(new Runnable() {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
-						public void run() {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						public Object call() {
+							Scene.getInstance().removeAllFloors();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
 						}
 					});
 				}
@@ -2302,11 +2316,17 @@ public class MainFrame extends JFrame {
 			removeAllSolarPanelsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().removeAllSolarPanels();
-					EventQueue.invokeLater(new Runnable() {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
-						public void run() {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						public Object call() {
+							Scene.getInstance().removeAllSolarPanels();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
 						}
 					});
 				}
@@ -2321,11 +2341,17 @@ public class MainFrame extends JFrame {
 			removeAllWindowsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().removeAllWindows();
-					EventQueue.invokeLater(new Runnable() {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
-						public void run() {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						public Object call() {
+							Scene.getInstance().removeAllWindows();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
 						}
 					});
 				}
@@ -2340,11 +2366,17 @@ public class MainFrame extends JFrame {
 			removeAllTreesMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().removeAllTrees();
-					EventQueue.invokeLater(new Runnable() {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
-						public void run() {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						public Object call() {
+							Scene.getInstance().removeAllTrees();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
 						}
 					});
 				}
@@ -2359,7 +2391,13 @@ public class MainFrame extends JFrame {
 			fixProblemsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().fixProblems();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().fixProblems();
+							return null;
+						}
+					});
 				}
 			});
 		}
@@ -2372,7 +2410,13 @@ public class MainFrame extends JFrame {
 			removeAllLocksMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().lockAll(false);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().lockAll(false);
+							return null;
+						}
+					});
 				}
 			});
 		}
@@ -2385,7 +2429,13 @@ public class MainFrame extends JFrame {
 			lockAllMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().lockAll(true);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().lockAll(true);
+							return null;
+						}
+					});
 				}
 			});
 		}
