@@ -39,7 +39,6 @@ public class Window extends HousePart implements Thermalizable {
 	public static final int MORE_MUNTIN_BARS = 0;
 	public static final int MEDIUM_MUNTIN_BARS = 1;
 	public static final int LESS_MUNTIN_BARS = 2;
-	public static final ReadOnlyColorRGBA DEFAULT_TINT = new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f);
 	private transient Mesh collisionMesh;
 	private transient BMText label1;
 	private transient Line bars;
@@ -52,7 +51,7 @@ public class Window extends HousePart implements Thermalizable {
 	private int style = MORE_MUNTIN_BARS;
 	private boolean noHorizontalBars; // has to use negative as serialization defaults to false
 	private boolean noVerticalBars;
-	private ReadOnlyColorRGBA glassColor = DEFAULT_TINT;
+	private ReadOnlyColorRGBA glassColor;
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -68,7 +67,7 @@ public class Window extends HousePart implements Thermalizable {
 		mesh.setModelBound(new BoundingBox());
 		mesh.getSceneHints().setAllPickingHints(false);
 		if (glassColor == null)
-			glassColor = DEFAULT_TINT;
+			glassColor = new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f);
 		mesh.setDefaultColor(glassColor);
 		final BlendState blend = new BlendState();
 		blend.setBlendEnabled(true);

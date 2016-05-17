@@ -52,7 +52,9 @@ public class Wall extends HousePart implements Thermalizable {
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
 	public static final int SOLID_WALL = 0;
-	public static final int PORCH_COLUMN = 1;
+	public static final int COLUMNS = 1;
+	public static final int PORCH = 2;
+	public static final int NEOCLASSICAL = 3;
 
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
@@ -72,6 +74,7 @@ public class Wall extends HousePart implements Thermalizable {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.28; // default is R20 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private int type = SOLID_WALL;
+	private transient Line columns, railings;
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -155,6 +158,21 @@ public class Wall extends HousePart implements Thermalizable {
 		backMesh.setUserData(userData);
 		surroundMesh.setUserData(userData);
 		invisibleMesh.setUserData(userData);
+
+		columns = new Line("Columns");
+		columns.setLineWidth(10);
+		columns.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(columns);
+		columns.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		root.attachChild(columns);
+
+		railings = new Line("Railings");
+		railings.setLineWidth(2);
+		railings.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(railings);
+		railings.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		root.attachChild(railings);
+
 	}
 
 	@Override
@@ -342,7 +360,7 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	protected void drawMesh() {
-		mesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
+		mesh.getSceneHints().setCullHint(isDrawable() && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always);
 		backMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
 		surroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
 		windowsSurroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
@@ -356,36 +374,119 @@ public class Wall extends HousePart implements Thermalizable {
 		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
 		extendToRoof(wallAndWindowsPoints.get(0));
 
-		if (Scene.getInstance().isDrawThickness() && isShortWall) {
-			final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
-
-			if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted()) {
-				if (isPerpendicularToNeighbor(0))
-					reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 0);
+		switch (type) {
+		case SOLID_WALL:
+			columns.getSceneHints().setCullHint(CullHint.Always);
+			railings.getSceneHints().setCullHint(CullHint.Always);
+			if (Scene.getInstance().isDrawThickness() && isShortWall) {
+				final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
+				if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted()) {
+					if (isPerpendicularToNeighbor(0))
+						reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 0);
+				}
+				if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted()) {
+					dir.normalizeLocal().negateLocal();
+					if (isPerpendicularToNeighbor(1))
+						reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 1);
+				}
 			}
-
-			if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted()) {
-				dir.normalizeLocal().negateLocal();
-				if (isPerpendicularToNeighbor(1))
-					reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 1);
+			drawOutline(wallAndWindowsPoints);
+			drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
+			drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
+			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+			CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
+			if (!isFrozen()) {
+				drawBackMesh(computeWallAndWindowPolygon(true));
+				drawSurroundMesh(thicknessNormal);
+				drawWindowsSurroundMesh(thicknessNormal);
 			}
+			break;
+		case COLUMNS:
+			columns.getSceneHints().setCullHint(CullHint.Inherit);
+			railings.getSceneHints().setCullHint(CullHint.Always);
+			drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
+			drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
+			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+			CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
+			drawColumns(10);
+			break;
+		case PORCH:
+			columns.getSceneHints().setCullHint(CullHint.Inherit);
+			railings.getSceneHints().setCullHint(CullHint.Inherit);
+			drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
+			drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
+			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+			CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
+			drawColumns(10);
+			drawRailings(2);
+			break;
 		}
-
-		drawOutline(wallAndWindowsPoints);
-		drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
-		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
-		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
-		CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
-
-		if (!isFrozen()) {
-			drawBackMesh(computeWallAndWindowPolygon(true));
-			drawSurroundMesh(thicknessNormal);
-			drawWindowsSurroundMesh(thicknessNormal);
-		}
-
-		drawHeatFlux();
 
 		root.updateWorldBound(true);
+	}
+
+	private void drawColumns(final double distance) {
+		columns.setDefaultColor(getColor());
+		FloatBuffer barsVertices = columns.getMeshData().getVertexBuffer();
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / distance);
+		if (barsVertices.capacity() < (5 + cols) * 6) {
+			barsVertices = BufferUtils.createVector3Buffer((5 + cols) * 2);
+			columns.getMeshData().setVertexBuffer(barsVertices);
+		} else {
+			barsVertices.rewind();
+			barsVertices.limit(barsVertices.capacity());
+		}
+		final ReadOnlyVector3 barsOffset = normal.multiply(-0.5, null);
+		int i = 0;
+		BufferUtils.setInBuffer(getAbsPoint(0).addLocal(barsOffset), barsVertices, i++);
+		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(barsOffset), barsVertices, i++);
+		BufferUtils.setInBuffer(getAbsPoint(3).addLocal(barsOffset), barsVertices, i++);
+		BufferUtils.setInBuffer(getAbsPoint(2).addLocal(barsOffset), barsVertices, i++);
+		final ReadOnlyVector3 o = getAbsPoint(0).add(barsOffset, null);
+		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
+		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);
+		final Vector3 p = new Vector3();
+		for (int col = 1; col < cols; col++) {
+			u.multiply((double) col / cols, p).addLocal(o);
+			BufferUtils.setInBuffer(p, barsVertices, i++);
+			p.addLocal(v);
+			BufferUtils.setInBuffer(p, barsVertices, i++);
+		}
+		barsVertices.limit(i * 3);
+		columns.getMeshData().updateVertexCount();
+		columns.updateModelBound();
+	}
+
+	private void drawRailings(final double distance) {
+		railings.setDefaultColor(getColor());
+		FloatBuffer barsVertices = railings.getMeshData().getVertexBuffer();
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / distance);
+		if (barsVertices.capacity() < (5 + cols) * 6) {
+			barsVertices = BufferUtils.createVector3Buffer((5 + cols) * 2);
+			railings.getMeshData().setVertexBuffer(barsVertices);
+		} else {
+			barsVertices.rewind();
+			barsVertices.limit(barsVertices.capacity());
+		}
+		final ReadOnlyVector3 barsOffset = normal.multiply(-0.5, null);
+		int i = 0;
+		final ReadOnlyVector3 o = getAbsPoint(0).add(barsOffset, null);
+		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
+		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null).multiplyLocal(0.33);
+		final Vector3 p = new Vector3(v);
+		p.addLocal(o);
+		BufferUtils.setInBuffer(p, barsVertices, i++);
+		p.addLocal(u);
+		BufferUtils.setInBuffer(p, barsVertices, i++);
+		for (int col = 1; col < cols; col++) {
+			u.multiply((double) col / cols, p).addLocal(o);
+			BufferUtils.setInBuffer(p, barsVertices, i++);
+			p.addLocal(v);
+			BufferUtils.setInBuffer(p, barsVertices, i++);
+		}
+		barsVertices.limit(i * 3);
+		columns.getMeshData().updateVertexCount();
+		columns.updateModelBound();
 	}
 
 	private void drawPolygon(final List<List<Vector3>> wallAndWindowsPoints, final Mesh mesh, final boolean drawHoles, final boolean normal, final boolean texture) {
@@ -1239,6 +1340,8 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	public void drawHeatFlux() {
+		if (type != SOLID_WALL)
+			return;
 		double zmax = -Double.MAX_VALUE;
 		final List<Vector3> wallPolygonPoints = getWallPolygonPoints();
 		for (final Vector3 a : wallPolygonPoints) {
