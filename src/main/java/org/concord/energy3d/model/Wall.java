@@ -52,9 +52,10 @@ public class Wall extends HousePart implements Thermalizable {
 	private static int currentVisitStamp = 1;
 	private static boolean extendToRoofEnabled = true;
 	public static final int SOLID_WALL = 0;
-	public static final int COLUMNS = 1;
-	public static final int PORCH = 2;
-	public static final int NEOCLASSICAL = 3;
+	public static final int EMPTY = 1;
+	public static final int COLUMNS_ONLY = 2;
+	public static final int RAILINGS_ONLY = 3;
+	public static final int COLUMNS_RAILINGS = 4;
 
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
@@ -361,10 +362,11 @@ public class Wall extends HousePart implements Thermalizable {
 	@Override
 	protected void drawMesh() {
 		mesh.getSceneHints().setCullHint(isDrawable() && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always);
-		backMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
-		surroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
-		windowsSurroundMesh.getSceneHints().setCullHint(isDrawable() && !isFrozen() ? CullHint.Inherit : CullHint.Always);
 		outlineMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
+		boolean b = isDrawable() && !isFrozen() && type == SOLID_WALL;
+		backMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
+		surroundMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
+		windowsSurroundMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
 
 		if (!isDrawable())
 			return;
@@ -375,7 +377,27 @@ public class Wall extends HousePart implements Thermalizable {
 		extendToRoof(wallAndWindowsPoints.get(0));
 
 		switch (type) {
-		case SOLID_WALL:
+		case EMPTY:
+			columns.getSceneHints().setCullHint(CullHint.Always);
+			railings.getSceneHints().setCullHint(CullHint.Always);
+			break;
+		case COLUMNS_ONLY:
+			columns.getSceneHints().setCullHint(CullHint.Inherit);
+			railings.getSceneHints().setCullHint(CullHint.Always);
+			drawColumns(10);
+			break;
+		case RAILINGS_ONLY:
+			columns.getSceneHints().setCullHint(CullHint.Always);
+			railings.getSceneHints().setCullHint(CullHint.Inherit);
+			drawRailings(1);
+			break;
+		case COLUMNS_RAILINGS:
+			columns.getSceneHints().setCullHint(CullHint.Inherit);
+			railings.getSceneHints().setCullHint(CullHint.Inherit);
+			drawColumns(10);
+			drawRailings(1);
+			break;
+		default:
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			railings.getSceneHints().setCullHint(CullHint.Always);
 			if (Scene.getInstance().isDrawThickness() && isShortWall) {
@@ -391,36 +413,16 @@ public class Wall extends HousePart implements Thermalizable {
 				}
 			}
 			drawOutline(wallAndWindowsPoints);
-			drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
-			drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
 			if (!isFrozen()) {
 				drawBackMesh(computeWallAndWindowPolygon(true));
 				drawSurroundMesh(thicknessNormal);
 				drawWindowsSurroundMesh(thicknessNormal);
 			}
-			break;
-		case COLUMNS:
-			columns.getSceneHints().setCullHint(CullHint.Inherit);
-			railings.getSceneHints().setCullHint(CullHint.Always);
-			drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
-			drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
-			drawColumns(10);
-			break;
-		case PORCH:
-			columns.getSceneHints().setCullHint(CullHint.Inherit);
-			railings.getSceneHints().setCullHint(CullHint.Inherit);
-			drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
-			drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
-			CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
-			drawColumns(10);
-			drawRailings(2);
-			break;
 		}
+		drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
+		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
 
 		root.updateWorldBound(true);
 	}
@@ -442,6 +444,8 @@ public class Wall extends HousePart implements Thermalizable {
 		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(barsOffset), barsVertices, i++);
 		BufferUtils.setInBuffer(getAbsPoint(3).addLocal(barsOffset), barsVertices, i++);
 		BufferUtils.setInBuffer(getAbsPoint(2).addLocal(barsOffset), barsVertices, i++);
+		BufferUtils.setInBuffer(getAbsPoint(1).addLocal(barsOffset), barsVertices, i++);
+		BufferUtils.setInBuffer(getAbsPoint(3).addLocal(barsOffset), barsVertices, i++);
 		final ReadOnlyVector3 o = getAbsPoint(0).add(barsOffset, null);
 		final ReadOnlyVector3 u = getAbsPoint(2).subtract(getAbsPoint(0), null);
 		final ReadOnlyVector3 v = getAbsPoint(1).subtract(getAbsPoint(0), null);

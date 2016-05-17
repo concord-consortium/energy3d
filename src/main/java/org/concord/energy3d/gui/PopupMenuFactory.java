@@ -669,13 +669,28 @@ public class PopupMenuFactory {
 			typeMenu.add(rbmiSolidWall);
 			typeGroup.add(rbmiSolidWall);
 
+			final JRadioButtonMenuItem rbmiEmpty = new JRadioButtonMenuItem("Empty");
+			rbmiEmpty.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						((Wall) selectedPart).setType(Wall.EMPTY);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			typeMenu.add(rbmiEmpty);
+			typeGroup.add(rbmiEmpty);
+
 			final JRadioButtonMenuItem rbmiColumns = new JRadioButtonMenuItem("Columns");
 			rbmiColumns.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.COLUMNS);
+						((Wall) selectedPart).setType(Wall.COLUMNS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
 					}
@@ -684,20 +699,35 @@ public class PopupMenuFactory {
 			typeMenu.add(rbmiColumns);
 			typeGroup.add(rbmiColumns);
 
-			final JRadioButtonMenuItem rbmiPorch = new JRadioButtonMenuItem("Porch");
-			rbmiPorch.addActionListener(new ActionListener() {
+			final JRadioButtonMenuItem rbmiRailings = new JRadioButtonMenuItem("Railings");
+			rbmiRailings.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.PORCH);
+						((Wall) selectedPart).setType(Wall.RAILINGS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
 					}
 				}
 			});
-			typeMenu.add(rbmiPorch);
-			typeGroup.add(rbmiPorch);
+			typeMenu.add(rbmiRailings);
+			typeGroup.add(rbmiRailings);
+
+			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns and Railings");
+			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						((Wall) selectedPart).setType(Wall.COLUMNS_RAILINGS);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			typeMenu.add(rbmiColumnsAndRailings);
+			typeGroup.add(rbmiColumnsAndRailings);
 
 			typeMenu.addMenuListener(new MenuListener() {
 
@@ -710,8 +740,17 @@ public class PopupMenuFactory {
 						case Wall.SOLID_WALL:
 							Util.selectSilently(rbmiSolidWall, true);
 							break;
-						case Wall.COLUMNS:
+						case Wall.EMPTY:
+							Util.selectSilently(rbmiEmpty, true);
+							break;
+						case Wall.COLUMNS_ONLY:
 							Util.selectSilently(rbmiColumns, true);
+							break;
+						case Wall.RAILINGS_ONLY:
+							Util.selectSilently(rbmiRailings, true);
+							break;
+						case Wall.COLUMNS_RAILINGS:
+							Util.selectSilently(rbmiColumnsAndRailings, true);
 							break;
 						}
 					}
