@@ -684,6 +684,21 @@ public class PopupMenuFactory {
 			typeMenu.add(rbmiEmpty);
 			typeGroup.add(rbmiEmpty);
 
+			final JRadioButtonMenuItem rbmiEdges = new JRadioButtonMenuItem("Vertical Edges");
+			rbmiEdges.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						((Wall) selectedPart).setType(Wall.VERTICAL_EDGES_ONLY);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			typeMenu.add(rbmiEdges);
+			typeGroup.add(rbmiEdges);
+
 			final JRadioButtonMenuItem rbmiColumns = new JRadioButtonMenuItem("Columns");
 			rbmiColumns.addActionListener(new ActionListener() {
 				@Override
@@ -742,6 +757,9 @@ public class PopupMenuFactory {
 							break;
 						case Wall.EMPTY:
 							Util.selectSilently(rbmiEmpty, true);
+							break;
+						case Wall.VERTICAL_EDGES_ONLY:
+							Util.selectSilently(rbmiEdges, true);
 							break;
 						case Wall.COLUMNS_ONLY:
 							Util.selectSilently(rbmiColumns, true);

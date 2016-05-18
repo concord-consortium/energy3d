@@ -972,6 +972,24 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllHumans() {
+		final ArrayList<HousePart> humans = new ArrayList<HousePart>();
+		for (final HousePart part : parts)
+			if (part instanceof Human)
+				humans.add(part);
+		if (humans.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no human to remove.", "No Human", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + humans.size() + " humans?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		for (final HousePart part : humans)
+			remove(part, false);
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(humans));
+		edited = true;
+	}
+
 	public void removeAllRoofs() {
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 		for (final HousePart part : parts)

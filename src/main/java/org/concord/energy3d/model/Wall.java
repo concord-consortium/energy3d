@@ -56,6 +56,7 @@ public class Wall extends HousePart implements Thermalizable {
 	public static final int COLUMNS_ONLY = 2;
 	public static final int RAILINGS_ONLY = 3;
 	public static final int COLUMNS_RAILINGS = 4;
+	public static final int VERTICAL_EDGES_ONLY = 5;
 
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
@@ -391,6 +392,11 @@ public class Wall extends HousePart implements Thermalizable {
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			railings.getSceneHints().setCullHint(CullHint.Always);
 			break;
+		case VERTICAL_EDGES_ONLY:
+			columns.getSceneHints().setCullHint(CullHint.Inherit);
+			railings.getSceneHints().setCullHint(CullHint.Always);
+			drawVerticalEdges();
+			break;
 		case COLUMNS_ONLY:
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			railings.getSceneHints().setCullHint(CullHint.Always);
@@ -451,6 +457,28 @@ public class Wall extends HousePart implements Thermalizable {
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 	}
 
+	private void drawVerticalEdges() {
+		columns.setDefaultColor(getColor());
+		final FloatBuffer vertexBuffer = columns.getMeshData().getVertexBuffer();
+		final FloatBuffer normalBuffer = columns.getMeshData().getNormalBuffer();
+		vertexBuffer.rewind();
+		normalBuffer.rewind();
+		vertexBuffer.limit(vertexBuffer.capacity());
+		normalBuffer.limit(normalBuffer.capacity());
+
+		final ReadOnlyVector3 o = getAbsPoint(0);
+		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
+
+		Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
+		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
+		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+
+		vertexBuffer.limit(vertexBuffer.position());
+		normalBuffer.limit(normalBuffer.position());
+		columns.getMeshData().updateVertexCount();
+		columns.updateModelBound();
+	}
+
 	private void drawColumns(final double distance) {
 		columns.setDefaultColor(getColor());
 		final FloatBuffer vertexBuffer = columns.getMeshData().getVertexBuffer();
@@ -465,9 +493,9 @@ public class Wall extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
 		final int cols = (int) Math.max(2, u.length() / distance);
 
-		Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(columnRadius);
-		addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
-		dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
+		// Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(columnRadius);
+		// addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+		Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
 		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
 		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 
