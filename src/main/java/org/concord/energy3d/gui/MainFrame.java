@@ -147,6 +147,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
+	private JCheckBoxMenuItem roofLineMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	private JMenuItem exitMenuItem;
 	private JMenu helpMenu;
@@ -1079,6 +1080,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
+					Util.selectSilently(roofLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					MainPanel.getInstance().defaultTool();
 				}
 			});
@@ -1100,6 +1102,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
+			viewMenu.add(getRoofLineMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
@@ -1158,7 +1161,7 @@ public class MainFrame extends JFrame {
 		return axesMenuItem;
 	}
 
-	public JCheckBoxMenuItem getBuildingLabelsMenuItem() {
+	private JCheckBoxMenuItem getBuildingLabelsMenuItem() {
 		if (buildingLabelsMenuItem == null) {
 			buildingLabelsMenuItem = new JCheckBoxMenuItem("Building Labels", false);
 			buildingLabelsMenuItem.addItemListener(new ItemListener() {
@@ -1170,6 +1173,21 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return buildingLabelsMenuItem;
+	}
+
+	private JCheckBoxMenuItem getRoofLineMenuItem() {
+		if (roofLineMenuItem == null) {
+			roofLineMenuItem = new JCheckBoxMenuItem("Roof Lines", false);
+			roofLineMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					Scene.getInstance().setDashedLinesOnRoofShown(roofLineMenuItem.isSelected());
+					Scene.getInstance().redrawAll();
+					Scene.getInstance().setEdited(true);
+				}
+			});
+		}
+		return roofLineMenuItem;
 	}
 
 	public JCheckBoxMenuItem getShadowMenuItem() {

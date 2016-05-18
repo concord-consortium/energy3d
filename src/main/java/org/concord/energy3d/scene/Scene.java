@@ -37,8 +37,6 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
-import org.concord.energy3d.simulation.Thermostat;
-import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
@@ -111,6 +109,7 @@ public class Scene implements Serializable {
 	private Ground ground = new Ground();
 	private DesignSpecs designSpecs = new DesignSpecs();
 	private HousePart copyBuffer, originalCopy;
+	private boolean dashedlineOnRoofs = true;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -325,64 +324,6 @@ public class Scene implements Serializable {
 
 		if (instance.unit == null)
 			instance.unit = Unit.InternationalSystemOfUnits;
-
-		// set default properties of parts (object serialization initializes every number field to zero, forcing us to do this ugly thing)
-
-		for (final HousePart p : instance.parts) {
-			if (p instanceof Roof) {
-				final Roof r = (Roof) p;
-				if (Util.isZero(r.getUValue()))
-					r.setUValue(0.15);
-				if (Util.isZero(r.getOverhangLength()))
-					r.setOverhangLength(2);
-				if (Util.isZero(r.getVolumetricHeatCapacity()))
-					r.setVolumetricHeatCapacity(0.5);
-			} else if (p instanceof Foundation) {
-				final Foundation f = (Foundation) p;
-				if (Util.isZero(f.getUValue()))
-					f.setUValue(0.19);
-				if (Util.isZero(f.getVolumetricHeatCapacity()))
-					f.setVolumetricHeatCapacity(0.5);
-				if (f.getThermostat() == null)
-					f.setThermostat(new Thermostat());
-				if (f.getUtilityBill() == null)
-					f.setUtilityBill(new UtilityBill());
-
-			} else if (p instanceof Wall) {
-				final Wall w = (Wall) p;
-				if (Util.isZero(w.getUValue()))
-					w.setUValue(0.28);
-				if (Util.isZero(w.getVolumetricHeatCapacity()))
-					w.setVolumetricHeatCapacity(0.5);
-			} else if (p instanceof Door) {
-				final Door d = (Door) p;
-				if (Util.isZero(d.getUValue()))
-					d.setUValue(2);
-				if (Util.isZero(d.getVolumetricHeatCapacity()))
-					d.setVolumetricHeatCapacity(0.5);
-			} else if (p instanceof Window) {
-				final Window w = (Window) p;
-				if (Util.isZero(w.getUValue()))
-					w.setUValue(2);
-				if (Util.isZero(w.getSolarHeatGainCoefficient()))
-					w.setSolarHeatGainCoefficient(0.5);
-				else if (w.getSolarHeatGainCoefficient() > 1) // backward compatibility, SHGC used to range from 0 to 100
-					w.setSolarHeatGainCoefficient(w.getSolarHeatGainCoefficient() * 0.01);
-				if (Util.isZero(w.getVolumetricHeatCapacity()))
-					w.setVolumetricHeatCapacity(0.5);
-			} else if (p instanceof SolarPanel) {
-				final SolarPanel sp = (SolarPanel) p;
-				if (Util.isZero(sp.getEfficiency()))
-					sp.setEfficiency(0.1);
-				else if (sp.getEfficiency() > 1) // backward compatibility, efficiency used to range from 0 to 100
-					sp.setEfficiency(sp.getEfficiency() * 0.01);
-				if (Util.isZero(sp.getPanelWidth()))
-					sp.setPanelWidth(1);
-				if (Util.isZero(sp.getPanelHeight()))
-					sp.setPanelHeight(1.65);
-			}
-
-		}
 
 		if (Util.isZero(instance.heatVectorLength))
 			instance.heatVectorLength = 5000;
@@ -1423,6 +1364,14 @@ public class Scene implements Serializable {
 
 	public DesignSpecs getDesignSpecs() {
 		return designSpecs;
+	}
+
+	public void setDashedLinesOnRoofShown(boolean dashedLineOnRoofs) {
+		this.dashedlineOnRoofs = dashedLineOnRoofs;
+	}
+
+	public boolean areDashedLinesOnRoofShown() {
+		return dashedlineOnRoofs;
 	}
 
 }

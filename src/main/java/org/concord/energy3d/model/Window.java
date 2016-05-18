@@ -61,6 +61,16 @@ public class Window extends HousePart implements Thermalizable {
 	protected void init() {
 		label1 = Annotation.makeNewLabel();
 		super.init();
+
+		if (Util.isZero(uValue))
+			uValue = 2;
+		if (Util.isZero(solarHeatGainCoefficient))
+			solarHeatGainCoefficient = 0.5;
+		else if (solarHeatGainCoefficient > 1) // backward compatibility, SHGC used to range from 0 to 100
+			solarHeatGainCoefficient *= 0.01;
+		if (Util.isZero(volumetricHeatCapacity))
+			volumetricHeatCapacity = 0.5;
+
 		mesh = new Mesh("Window");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
