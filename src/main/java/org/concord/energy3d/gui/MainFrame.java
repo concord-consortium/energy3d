@@ -277,6 +277,9 @@ public class MainFrame extends JFrame {
 		setMinimumSize(new Dimension(800, 600));
 		System.out.println("done");
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+			final ImageIcon icon_cw = new ImageIcon(MainPanel.class.getResource("icons/rotate_cw.png"));
+			final ImageIcon icon_ccw = new ImageIcon(MainPanel.class.getResource("icons/rotate_ccw.png"));
+
 			@Override
 			public boolean dispatchKeyEvent(final KeyEvent e) {
 				double a = MainPanel.getInstance().getBuildingRotationAngleAbsolute();
@@ -284,11 +287,11 @@ public class MainFrame extends JFrame {
 					a *= 5;
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:
-					MainPanel.getInstance().getRotateButton().setIcon(new ImageIcon(MainPanel.class.getResource("icons/" + (e.isShiftDown() ? "rotate_ccw.png" : "rotate_cw.png"))));
+					MainPanel.getInstance().getRotateButton().setIcon(e.isShiftDown() ? icon_ccw : icon_cw);
 					MainPanel.getInstance().setBuildingRotationAngle(e.isShiftDown() ? a : -a);
 					break;
 				case KeyEvent.KEY_RELEASED:
-					MainPanel.getInstance().getRotateButton().setIcon(new ImageIcon(MainPanel.class.getResource("icons/rotate_cw.png")));
+					MainPanel.getInstance().getRotateButton().setIcon(icon_cw);
 					MainPanel.getInstance().setBuildingRotationAngle(-a);
 					break;
 				}
@@ -401,7 +404,7 @@ public class MainFrame extends JFrame {
 			fileMenu = new JMenu();
 			fileMenu.addMenuListener(new MenuListener() {
 
-				private void enableMenuItems(boolean b) {
+				private void enableMenuItems(final boolean b) {
 					replayFolderMenuItem.setEnabled(b);
 					replayLastFolderMenuItem.setEnabled(b);
 					replayControlsMenu.setEnabled(b);
@@ -1143,7 +1146,7 @@ public class MainFrame extends JFrame {
 			axesMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					ShowAxesCommand c = new ShowAxesCommand();
+					final ShowAxesCommand c = new ShowAxesCommand();
 					SceneManager.getInstance().setAxesVisible(axesMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1173,7 +1176,7 @@ public class MainFrame extends JFrame {
 			shadowMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					ShowShadowCommand c = new ShowShadowCommand();
+					final ShowShadowCommand c = new ShowShadowCommand();
 					SceneManager.getInstance().setShadow(shadowMenuItem.isSelected());
 					Util.selectSilently(MainPanel.getInstance().getShadowButton(), shadowMenuItem.isSelected());
 					SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1216,7 +1219,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().autoSelectBuilding(true);
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						new UtilityBillDialog((Foundation) selectedPart).setVisible(true);
 					}
@@ -1332,8 +1335,8 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					SolarAnnualAnalysis a = new SolarAnnualAnalysis();
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final SolarAnnualAnalysis a = new SolarAnnualAnalysis();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart != null) {
 						Foundation foundation;
 						if (selectedPart instanceof Foundation) {
@@ -1373,7 +1376,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart != null) {
 						Foundation foundation;
 						if (selectedPart instanceof Foundation) {
@@ -1466,7 +1469,7 @@ public class MainFrame extends JFrame {
 			showHeatFluxVectorsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ShowHeatFluxCommand c = new ShowHeatFluxCommand();
+					final ShowHeatFluxCommand c = new ShowHeatFluxCommand();
 					Scene.getInstance().setAlwaysComputeHeatFluxVectors(showHeatFluxVectorsMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1920,7 +1923,7 @@ public class MainFrame extends JFrame {
 			topViewCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					TopViewCommand c = new TopViewCommand();
+					final TopViewCommand c = new TopViewCommand();
 					final boolean isTopView = topViewCheckBoxMenuItem.isSelected();
 					if (isTopView) {
 						Scene.saveCameraLocation();
@@ -1943,7 +1946,7 @@ public class MainFrame extends JFrame {
 			noTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ChangeTextureCommand c = new ChangeTextureCommand();
+					final ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.None);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
@@ -1962,7 +1965,7 @@ public class MainFrame extends JFrame {
 			simpleTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ChangeTextureCommand c = new ChangeTextureCommand();
+					final ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
@@ -1981,7 +1984,7 @@ public class MainFrame extends JFrame {
 			fullTextureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ChangeTextureCommand c = new ChangeTextureCommand();
+					final ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.Full);
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
@@ -2034,16 +2037,16 @@ public class MainFrame extends JFrame {
 					if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) { // apply to only this part
-						ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+						final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 						selectedPart.setColor(color);
 						SceneManager.getInstance().getUndoManager().addEdit(cmd);
 					} else {
-						ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
+						final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
 						Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
 						SceneManager.getInstance().getUndoManager().addEdit(cmd);
 					}
 				} else {
-					ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+					final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 					selectedPart.setColor(color);
 					SceneManager.getInstance().getUndoManager().addEdit(cmd);
 				}
