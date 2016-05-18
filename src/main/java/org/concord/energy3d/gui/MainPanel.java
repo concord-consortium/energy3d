@@ -75,7 +75,6 @@ public class MainPanel extends JPanel {
 	private JSplitPane energyCanvasNoteSplitPane;
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
-	private JToggleButton energyPanelToggleButton;
 	private JToggleButton energyViewButton;
 	private JSplitPane canvasNoteSplitPane;
 	private JScrollPane noteScrollPane;
@@ -95,7 +94,7 @@ public class MainPanel extends JPanel {
 	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
-	private final double buildingRotationAngleAbsolute = Math.PI / 180;
+	private final double buildingRotationAngleAbsolute = 5 * Math.PI / 180;
 	private double buildingRotationAngle = -buildingRotationAngleAbsolute;
 	private String noteString = "";
 
@@ -367,7 +366,6 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimationButton());
 			appToolbar.add(getEnergyViewButton());
-			appToolbar.add(getEnergyPanelToggleButton());
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(zoomButton);
@@ -689,7 +687,7 @@ public class MainPanel extends JPanel {
 		});
 	}
 
-	private JSplitPane getEnergyCanvasNoteSplitPane() {
+	JSplitPane getEnergyCanvasNoteSplitPane() {
 		if (energyCanvasNoteSplitPane == null) {
 			energyCanvasNoteSplitPane = new JSplitPane();
 			energyCanvasNoteSplitPane.setResizeWeight(1.0);
@@ -714,25 +712,6 @@ public class MainPanel extends JPanel {
 			canvasPanel.setLayout(new BorderLayout(0, 0));
 		}
 		return canvasPanel;
-	}
-
-	private JToggleButton getEnergyPanelToggleButton() {
-		if (energyPanelToggleButton == null) {
-			energyPanelToggleButton = new JToggleButton("");
-			energyPanelToggleButton.setToolTipText("Show properties panel");
-			energyPanelToggleButton.setSelected(true);
-			energyPanelToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/chart.png")));
-			energyPanelToggleButton.setFocusable(false);
-			energyPanelToggleButton.addMouseListener(refreshUponMouseExit);
-			energyPanelToggleButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					setSplitComponentVisible(energyPanelToggleButton.isSelected(), getEnergyCanvasNoteSplitPane(), EnergyPanel.getInstance());
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-		}
-		return energyPanelToggleButton;
 	}
 
 	public JToggleButton getEnergyViewButton() {
@@ -847,7 +826,7 @@ public class MainPanel extends JPanel {
 		return noteTextArea.isShowing();
 	}
 
-	private void setSplitComponentVisible(final boolean visible, final JSplitPane splitPane, final Component component) {
+	void setSplitComponentVisible(final boolean visible, final JSplitPane splitPane, final Component component) {
 		getCanvasNoteSplitPane().getSize();
 		getCanvasPanel().getPreferredSize();
 		component.setVisible(visible);
@@ -997,7 +976,7 @@ public class MainPanel extends JPanel {
 			rotateButton = new JButton();
 			rotateButton.addMouseListener(refreshUponMouseExit);
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-			rotateButton.setToolTipText("<html>Rotate in the clockwise direction.<br>Hold down the SHIFT key and press this button for counter-clockwise rotation.<br>Hold down the CTRL key while pressing this button to rotate faster.<br>If a building is selected, rotate around its center. Otherwise rotate all buildings around the origin.</html>");
+			rotateButton.setToolTipText("<html>Rotate in the clockwise direction.<br>Hold down the SHIFT key and press this button for counter-clockwise rotation.<br>Hold down the CTRL key while pressing this button to rotate more slowly.<br>If a building is selected, rotate around its center. Otherwise rotate all buildings around the origin.</html>");
 			rotateButton.setFocusable(false);
 			rotateButton.addMouseListener(new MouseAdapter() {
 				private volatile boolean mousePressed = false;
