@@ -399,9 +399,15 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
-		final ReadOnlyVector3 d_rel = toRelative(getAbsPoint(0).subtract(d, null)).subtractLocal(points.get(0)).negateLocal();
-		for (int i = 0; i < points.size(); i++)
-			houseMoveStartPoints.get(i).add(d_rel, points.get(i));
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p = toAbsolute(houseMoveStartPoints.get(0)).addLocal(d);
+		snapToGrid(p, p0, getGridSize(), false);
+		final Vector3 p_rel = toRelative(p);
+		final Vector3 d_snap_rel = p_rel.subtract(houseMoveStartPoints.get(0), null);
+		points.get(0).set(p_rel);
+
+		for (int i = 1; i < 4; i++)
+			points.get(i).set(houseMoveStartPoints.get(i).add(d_snap_rel, null));
 
 		draw();
 		container.draw();
@@ -649,7 +655,7 @@ public class Window extends HousePart implements Thermalizable {
 		return super.isDrawable();
 	}
 
-	public void setHorizontalBars(boolean horizontalBars) {
+	public void setHorizontalBars(final boolean horizontalBars) {
 		noHorizontalBars = !horizontalBars;
 	}
 
@@ -657,7 +663,7 @@ public class Window extends HousePart implements Thermalizable {
 		return !noHorizontalBars;
 	}
 
-	public void setVerticalBars(boolean verticalBars) {
+	public void setVerticalBars(final boolean verticalBars) {
 		noVerticalBars = !verticalBars;
 	}
 
