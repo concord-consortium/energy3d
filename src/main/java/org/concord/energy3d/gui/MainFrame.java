@@ -181,6 +181,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem specificationsMenuItem;
 	private JMenuItem propertiesMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
+	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
 
 	private final FileChooser fileChooser;
 	private final JColorChooser colorChooser;
@@ -284,7 +285,7 @@ public class MainFrame extends JFrame {
 			public boolean dispatchKeyEvent(final KeyEvent e) {
 				double a = MainPanel.getInstance().getBuildingRotationAngleAbsolute();
 				if (e.isControlDown())
-					a *= 5;
+					a *= 0.2;
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:
 					MainPanel.getInstance().getRotateButton().setIcon(e.isShiftDown() ? icon_ccw : icon_cw);
@@ -1103,6 +1104,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
 			viewMenu.addSeparator();
+			viewMenu.add(getInfoPanelCheckBoxMenuItem());
 			viewMenu.add(getNoteCheckBoxMenuItem());
 
 		}
@@ -1615,6 +1617,7 @@ public class MainFrame extends JFrame {
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
+					Util.selectSilently(infoPanelCheckBoxMenuItem, EnergyPanel.getInstance().isVisible());
 					MainPanel.getInstance().defaultTool();
 					if (Scene.getInstance().isStudentMode()) {
 						lockAllMenuItem.setEnabled(false);
@@ -2247,6 +2250,20 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return noteCheckBoxMenuItem;
+	}
+
+	private JCheckBoxMenuItem getInfoPanelCheckBoxMenuItem() {
+		if (infoPanelCheckBoxMenuItem == null) {
+			infoPanelCheckBoxMenuItem = new JCheckBoxMenuItem("Show Information Panel");
+			infoPanelCheckBoxMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MainPanel.getInstance().setSplitComponentVisible(infoPanelCheckBoxMenuItem.isSelected(), MainPanel.getInstance().getEnergyCanvasNoteSplitPane(), EnergyPanel.getInstance());
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				}
+			});
+		}
+		return infoPanelCheckBoxMenuItem;
 	}
 
 	private JCheckBoxMenuItem getAutoRecomputeEnergyMenuItem() {
