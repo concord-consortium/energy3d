@@ -120,10 +120,16 @@ public class SolarRadiation {
 		collidables.clear();
 		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
+			if (part instanceof Foundation || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
 				final Spatial s = part.getRadiationCollisionSpatial();
 				collidables.add(s);
 				collidablesToParts.put(s, part);
+			} else if (part instanceof Wall) {
+				if (((Wall) part).getType() == Wall.SOLID_WALL) {
+					final Spatial s = part.getRadiationCollisionSpatial();
+					collidables.add(s);
+					collidablesToParts.put(s, part);
+				}
 			} else if (part instanceof Roof) {
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
@@ -157,12 +163,15 @@ public class SolarRadiation {
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {
-					if (part.isDrawCompleted())
-						if (part instanceof Foundation || part instanceof Wall || part instanceof Window)
+					if (part.isDrawCompleted()) {
+						if (part instanceof Foundation || part instanceof Window) {
 							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
-						else if (part instanceof SolarPanel || part instanceof Sensor)
+						} else if (part instanceof Wall) {
+							if (((Wall) part).getType() == Wall.SOLID_WALL)
+								computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
+						} else if (part instanceof SolarPanel || part instanceof Sensor) {
 							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
-						else if (part instanceof Roof)
+						} else if (part instanceof Roof) {
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 									final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
@@ -170,6 +179,8 @@ public class SolarRadiation {
 									computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
 								}
 							}
+						}
+					}
 				}
 				computeOnLand(dayLength, directionTowardSun);
 				EnergyPanel.getInstance().progress(100 * step / totalSteps);

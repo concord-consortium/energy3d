@@ -27,6 +27,12 @@ public class Door extends HousePart implements Thermalizable {
 	@Override
 	protected void init() {
 		super.init();
+
+		if (Util.isZero(uValue))
+			uValue = 2;
+		if (Util.isZero(volumetricHeatCapacity))
+			volumetricHeatCapacity = 0.5;
+
 		mesh = new Mesh("Door");
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));

@@ -103,6 +103,14 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	@Override
 	protected void init() {
 		super.init();
+
+		if (Util.isZero(uValue))
+			uValue = 0.15;
+		if (Util.isZero(overhangLength))
+			overhangLength = 2;
+		if (Util.isZero(volumetricHeatCapacity))
+			volumetricHeatCapacity = 0.5;
+
 		orgCenters = new HashMap<Node, ReadOnlyVector3>();
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
@@ -170,7 +178,16 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		drawRoof();
 		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
-		drawDashLines();
+		if (Scene.getInstance().areDashedLinesOnRoofShown()) {
+			drawDashLines();
+		} else {
+			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+				if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+					final Mesh dashLinesMesh = (Mesh) ((Node) roofPart).getChild(5);
+					dashLinesMesh.setVisible(false);
+				}
+			}
+		}
 	}
 
 	public void drawRoof() {

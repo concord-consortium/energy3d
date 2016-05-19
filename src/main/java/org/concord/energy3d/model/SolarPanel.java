@@ -64,6 +64,15 @@ public class SolarPanel extends HousePart {
 	protected void init() {
 		super.init();
 
+		if (Util.isZero(efficiency))
+			efficiency = 0.1;
+		else if (efficiency > 1) // backward compatibility, efficiency used to range from 0 to 100
+			efficiency *= 0.01;
+		if (Util.isZero(panelWidth))
+			panelWidth = 1;
+		if (Util.isZero(panelHeight))
+			panelHeight = 1.65;
+
 		mesh = new Mesh("SolarPanel");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);

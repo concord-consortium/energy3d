@@ -106,6 +106,10 @@ public class Wall extends HousePart implements Thermalizable {
 		if (thicknessNormal != null)
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 
+		if (Util.isZero(uValue))
+			uValue = 0.28;
+		if (Util.isZero(volumetricHeatCapacity))
+			volumetricHeatCapacity = 0.5;
 		if (Util.isZero(columnRadius))
 			columnRadius = 1;
 		if (Util.isZero(railingRadius))

@@ -94,6 +94,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		super.init();
 		resizeHouseMode = false;
 
+		if (Util.isZero(uValue))
+			uValue = 0.19;
+		if (Util.isZero(volumetricHeatCapacity))
+			volumetricHeatCapacity = 0.5;
+		if (thermostat == null)
+			thermostat = new Thermostat();
+		if (utilityBill == null)
+			utilityBill = new UtilityBill();
+
 		mesh = new Mesh("Foundation");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
