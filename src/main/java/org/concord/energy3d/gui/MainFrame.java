@@ -1102,6 +1102,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
+			viewMenu.addSeparator();
 			viewMenu.add(getRoofLineMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
