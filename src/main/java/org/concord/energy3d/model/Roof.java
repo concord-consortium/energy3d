@@ -59,11 +59,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	public static final double OVERHANG_MIN = 0.01;
 
 	protected transient Node roofPartsRoot;
+	protected transient List<ReadOnlyVector3> wallUpperPoints;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient Map<Mesh, Double> areaByPartWithoutOverhang;
 	private transient Map<Mesh, Double> areaByPartWithOverhang;
-	private transient List<ReadOnlyVector3> wallUpperPoints;
 	private transient List<ReadOnlyVector3> wallNormals;
 	private transient List<Wall> walls;
 	private transient List<ReadOnlyVector3> wallUpperPointsWithoutOverhang;
@@ -1146,10 +1146,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				underlyingWallPath = new Path2D.Double();
 			else
 				underlyingWallPath.reset();
-			Vector2 v0 = underlyingWallVerticesOnFoundation.get(0);
+			final Vector2 v0 = underlyingWallVerticesOnFoundation.get(0);
 			underlyingWallPath.moveTo(v0.getX(), v0.getY());
 			for (int i = 1; i < underlyingWallVerticesOnFoundation.size(); i++) {
-				Vector2 v = underlyingWallVerticesOnFoundation.get(i);
+				final Vector2 v = underlyingWallVerticesOnFoundation.get(i);
 				underlyingWallPath.lineTo(v.getX(), v.getY());
 			}
 			underlyingWallPath.lineTo(v0.getX(), v0.getY());

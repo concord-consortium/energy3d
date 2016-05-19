@@ -16,10 +16,14 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class CustomRoof extends Roof {
 	private static final long serialVersionUID = 1L;
-	private transient boolean recalculateEditPoints;
+	protected transient boolean recalculateEditPoints;
 
 	public CustomRoof() {
 		super(1);
+	}
+
+	public CustomRoof(final int numOfPoints) {
+		super(numOfPoints);
 	}
 
 	@Override

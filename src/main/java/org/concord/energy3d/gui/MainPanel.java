@@ -53,7 +53,6 @@ import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
-
 	private static final long serialVersionUID = 1L;
 	private static final MainPanel instance = new MainPanel();
 	private MainFrame mainFrame;
@@ -142,6 +141,7 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miPyramidRoof = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
 		final JCheckBoxMenuItem miHipRoof = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
 		final JCheckBoxMenuItem miShedRoof = new JCheckBoxMenuItem("Shed Roof", new ImageIcon(getClass().getResource("icons/roof_shed.png")));
+		final JCheckBoxMenuItem miGambrelRoof = new JCheckBoxMenuItem("Gambrel Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
 		final JCheckBoxMenuItem miCustomRoof = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
 		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Conversion", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
 		final ActionListener roofAction = new ActionListener() {
@@ -158,6 +158,9 @@ public class MainPanel extends JPanel {
 				} else if (selected == miShedRoof) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_SHED;
 					roofButton.setToolTipText("Draw shed roof");
+				} else if (selected == miGambrelRoof) {
+					roofCommand = SceneManager.Operation.DRAW_ROOF_GAMBREL;
+					roofButton.setToolTipText("Draw gambrel roof");
 				} else if (selected == miCustomRoof) {
 					roofCommand = SceneManager.Operation.DRAW_ROOF_CUSTOM;
 					roofButton.setToolTipText("Draw custom roof");
@@ -173,12 +176,14 @@ public class MainPanel extends JPanel {
 		miPyramidRoof.addActionListener(roofAction);
 		miHipRoof.addActionListener(roofAction);
 		miShedRoof.addActionListener(roofAction);
+		miGambrelRoof.addActionListener(roofAction);
 		miCustomRoof.addActionListener(roofAction);
 		miGableRoof.addActionListener(roofAction);
 		roofMenu = new JPopupMenu();
 		roofMenu.add(miPyramidRoof);
 		roofMenu.add(miHipRoof);
 		roofMenu.add(miShedRoof);
+		roofMenu.add(miGambrelRoof);
 		roofMenu.add(miCustomRoof);
 		roofMenu.addSeparator();
 		roofMenu.add(miGableRoof);
@@ -186,6 +191,7 @@ public class MainPanel extends JPanel {
 		bg.add(miPyramidRoof);
 		bg.add(miHipRoof);
 		bg.add(miShedRoof);
+		bg.add(miGambrelRoof);
 		bg.add(miCustomRoof);
 		bg.add(miGableRoof);
 
@@ -503,7 +509,7 @@ public class MainPanel extends JPanel {
 			shadowButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ShowShadowCommand c = new ShowShadowCommand();
+					final ShowShadowCommand c = new ShowShadowCommand();
 					if (SceneManager.getInstance().isSunAnimation() || Heliodon.getInstance().isNightTime())
 						SceneManager.getInstance().setShading(shadowButton.isSelected());
 					else
@@ -548,7 +554,7 @@ public class MainPanel extends JPanel {
 			heliodonButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					ShowHeliodonCommand c = new ShowHeliodonCommand();
+					final ShowHeliodonCommand c = new ShowHeliodonCommand();
 					SceneManager.getInstance().setHeliodonVisible(heliodonButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
@@ -571,7 +577,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					AnimateSunCommand c = new AnimateSunCommand();
+					final AnimateSunCommand c = new AnimateSunCommand();
 					SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
 					if (shadowButton.isSelected())
 						SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
@@ -629,7 +635,7 @@ public class MainPanel extends JPanel {
 			annotationToggleButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ShowAnnotationCommand c = new ShowAnnotationCommand();
+					final ShowAnnotationCommand c = new ShowAnnotationCommand();
 					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					Scene.getInstance().setEdited(true, false);
@@ -796,7 +802,7 @@ public class MainPanel extends JPanel {
 					String s = null;
 					try {
 						s = noteTextArea.getDocument().getText(e.getOffset(), e.getLength());
-					} catch (BadLocationException e1) {
+					} catch (final BadLocationException e1) {
 						e1.printStackTrace();
 					}
 					if (s != null) {
@@ -1010,12 +1016,12 @@ public class MainPanel extends JPanel {
 									public Object call() throws Exception {
 										final HousePart hp = SceneManager.getInstance().getSelectedPart();
 										if (hp == null) {
-											RotateBuildingCommand c = new RotateBuildingCommand(null, buildingRotationAngle);
+											final RotateBuildingCommand c = new RotateBuildingCommand(null, buildingRotationAngle);
 											SceneManager.getInstance().rotateAllBuildings(buildingRotationAngle);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else {
 											if (hp instanceof Foundation) {
-												RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, buildingRotationAngle);
+												final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, buildingRotationAngle);
 												SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 												EventQueue.invokeLater(new Runnable() {
@@ -1079,7 +1085,7 @@ public class MainPanel extends JPanel {
 		return noteString;
 	}
 
-	public void setNoteString(String s) {
+	public void setNoteString(final String s) {
 		noteString = s;
 	}
 
