@@ -58,6 +58,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
+import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.UndoManager;
 import org.concord.energy3d.util.Blinker;
@@ -939,18 +940,24 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return; // Ctrl/Cmd+key is often used for other purposes such as Ctrl+S or Cmd+S
 		if (ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU))
 			v.multiplyLocal(0.1);
+		MoveBuildingCommand c = null;
 		if (selectedHousePart == null) {
+			c = new MoveBuildingCommand(null, v);
 			for (HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
 					move((Foundation) p, v);
 				}
 			}
 		} else if (selectedHousePart instanceof Foundation) {
+			c = new MoveBuildingCommand((Foundation) selectedHousePart, v);
 			move((Foundation) selectedHousePart, v);
 		}
+		if (c != null)
+			undoManager.addEdit(c);
+		Scene.getInstance().setEdited(true);
 	}
 
-	private void move(final Foundation foundation, final Vector3 v) {
+	public void move(final Foundation foundation, final Vector3 v) {
 		final ArrayList<Vector3> points = foundation.getPoints();
 		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points)

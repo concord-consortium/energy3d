@@ -199,6 +199,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllTreesMenuItem;
 	private JMenuItem removeAllHumansMenuItem;
 	private JMenuItem fixProblemsMenuItem;
+	private JMenuItem moveEastMenuItem;
+	private JMenuItem moveWestMenuItem;
+	private JMenuItem moveNorthMenuItem;
+	private JMenuItem moveSouthMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -1698,12 +1702,30 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
+
+			final JMenu removeAllMenu = new JMenu("Remove All");
+			removeAllMenu.add(getRemoveAllWindowsMenuItem());
+			removeAllMenu.add(getRemoveAllSolarPanelsMenuItem());
+			removeAllMenu.add(getRemoveAllTreesMenuItem());
+			removeAllMenu.add(getRemoveAllHumansMenuItem());
+			removeAllMenu.add(getRemoveAllRoofsMenuItem());
+			removeAllMenu.add(getRemoveAllFloorsMenuItem());
+			removeAllMenu.add(getRemoveAllLocksMenuItem());
+
+			final JMenu moveMenu = new JMenu("Move");
+			moveMenu.add(getMoveEastMenuItem());
+			moveMenu.add(getMoveWestMenuItem());
+			moveMenu.add(getMoveNorthMenuItem());
+			moveMenu.add(getMoveSouthMenuItem());
+
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getCutMenuItem());
 			editMenu.add(getCopyMenuItem());
 			editMenu.add(getPasteMenuItem());
+			editMenu.add(removeAllMenu);
+			editMenu.add(moveMenu);
 			editMenu.addSeparator();
 			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
@@ -1712,14 +1734,6 @@ public class MainFrame extends JFrame {
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
 			editMenu.add(getLockAllMenuItem());
-			editMenu.addSeparator();
-			editMenu.add(getRemoveAllWindowsMenuItem());
-			editMenu.add(getRemoveAllSolarPanelsMenuItem());
-			editMenu.add(getRemoveAllTreesMenuItem());
-			editMenu.add(getRemoveAllHumansMenuItem());
-			editMenu.add(getRemoveAllRoofsMenuItem());
-			editMenu.add(getRemoveAllFloorsMenuItem());
-			editMenu.add(getRemoveAllLocksMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getSpecificationsMenuItem());
 			editMenu.addSeparator();
@@ -2519,6 +2533,38 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllHumansMenuItem;
+	}
+
+	private JMenuItem getMoveEastMenuItem() {
+		if (moveEastMenuItem == null) {
+			moveEastMenuItem = new JMenuItem("Move East");
+			moveEastMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)); // use 0 to specify no modifier
+		}
+		return moveEastMenuItem;
+	}
+
+	private JMenuItem getMoveWestMenuItem() {
+		if (moveWestMenuItem == null) {
+			moveWestMenuItem = new JMenuItem("Move West");
+			moveWestMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0)); // use 0 to specify no modifier
+		}
+		return moveWestMenuItem;
+	}
+
+	private JMenuItem getMoveSouthMenuItem() {
+		if (moveSouthMenuItem == null) {
+			moveSouthMenuItem = new JMenuItem("Move South");
+			moveSouthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)); // use 0 to specify no modifier
+		}
+		return moveSouthMenuItem;
+	}
+
+	private JMenuItem getMoveNorthMenuItem() {
+		if (moveNorthMenuItem == null) {
+			moveNorthMenuItem = new JMenuItem("Move North");
+			moveNorthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)); // use 0 to specify no modifier
+		}
+		return moveNorthMenuItem;
 	}
 
 	private JMenuItem getFixProblemsMenuItem() {

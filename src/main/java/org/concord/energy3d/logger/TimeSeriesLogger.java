@@ -62,6 +62,7 @@ import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.EditPartCommand;
+import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
@@ -75,6 +76,7 @@ import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 
@@ -202,6 +204,16 @@ public class TimeSeriesLogger {
 						stateValue = "{\"Building\": " + f.getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
 					} else {
 						stateValue = "{\"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
+					}
+				} else if (lastEdit instanceof MoveBuildingCommand) {
+					MoveBuildingCommand c = (MoveBuildingCommand) lastEdit;
+					Foundation f = c.getFoundation();
+					Vector3 d = c.getDisplacement();
+					String s = "\"(" + d.getX() + ", " + d.getY() + ")\"";
+					if (f != null) {
+						stateValue = "{\"Building\": " + f.getId() + ", \"Displacement\": " + s + "}";
+					} else {
+						stateValue = "{\"Displacement\": " + s + "}";
 					}
 				}
 
