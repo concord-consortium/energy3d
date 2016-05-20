@@ -80,6 +80,7 @@ public class Wall extends HousePart implements Thermalizable {
 	private transient Mesh railings;
 	private double columnRadius = 1;
 	private double railingRadius = 0.1;
+	private Floor floor;
 
 	public static void resetDefaultWallHeight() {
 		userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -377,7 +378,6 @@ public class Wall extends HousePart implements Thermalizable {
 	@Override
 	protected void drawMesh() {
 		mesh.getSceneHints().setCullHint(isDrawable() && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always);
-		outlineMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
 		boolean b = isDrawable() && !isFrozen() && type == SOLID_WALL;
 		backMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
 		surroundMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
@@ -393,31 +393,37 @@ public class Wall extends HousePart implements Thermalizable {
 
 		switch (type) {
 		case EMPTY:
+			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			railings.getSceneHints().setCullHint(CullHint.Always);
 			break;
 		case VERTICAL_EDGES_ONLY:
+			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			railings.getSceneHints().setCullHint(CullHint.Always);
 			drawVerticalEdges();
 			break;
 		case COLUMNS_ONLY:
+			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			railings.getSceneHints().setCullHint(CullHint.Always);
 			drawColumns(10);
 			break;
 		case RAILINGS_ONLY:
+			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			railings.getSceneHints().setCullHint(CullHint.Inherit);
 			drawRailings(1);
 			break;
 		case COLUMNS_RAILINGS:
+			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			railings.getSceneHints().setCullHint(CullHint.Inherit);
 			drawColumns(10);
 			drawRailings(1);
 			break;
 		default:
+			outlineMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			railings.getSceneHints().setCullHint(CullHint.Always);
 			if (Scene.getInstance().isDrawThickness() && isShortWall) {
@@ -515,6 +521,14 @@ public class Wall extends HousePart implements Thermalizable {
 		columns.updateModelBound();
 	}
 
+	private Floor getFloor() {
+		for (HousePart hp : children) {
+			if (hp instanceof Floor)
+				return (Floor) hp;
+		}
+		return null;
+	}
+
 	private void drawRailings(final double distance) {
 		railings.setDefaultColor(getColor());
 		final FloatBuffer vertexBuffer = railings.getMeshData().getVertexBuffer();
@@ -524,22 +538,56 @@ public class Wall extends HousePart implements Thermalizable {
 		vertexBuffer.limit(vertexBuffer.capacity());
 		normalBuffer.limit(normalBuffer.capacity());
 
-		final double heightRatio = 0.33;
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
-		final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null).multiplyLocal(heightRatio);
+		final Vector3 v = getAbsPoint(1).subtract(o, null);
 		final int cols = (int) Math.max(2, u.length() / distance);
 
-		Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railingRadius * 3);
-		addPointToQuad(getAbsPoint(1).multiplyLocal(1, 1, heightRatio), getAbsPoint(3).multiplyLocal(1, 1, heightRatio), dir, vertexBuffer, normalBuffer);
-		dir = new Vector3(u).normalizeLocal().multiplyLocal(railingRadius);
-		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
-		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+		floor = getFloor();
+		if (floor == null) {
+			visitNeighbors(new WallVisitor() {
+				@Override
+				public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+					Floor f = currentWall.getFloor();
+					if (f != null)
+						floor = f;
+				}
+			});
+		}
+		if (floor == null) {
 
-		final Vector3 p = new Vector3();
-		for (int col = 1; col < cols; col++) {
-			u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), 0);
-			addPointToQuad(p, p.add(v, null), dir, vertexBuffer, normalBuffer);
+			final double heightRatio = 0.33;
+			v.multiplyLocal(heightRatio);
+			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railingRadius * 3);
+			addPointToQuad(getAbsPoint(1).multiplyLocal(1, 1, heightRatio), getAbsPoint(3).multiplyLocal(1, 1, heightRatio), dir, vertexBuffer, normalBuffer);
+			dir = new Vector3(u).normalizeLocal().multiplyLocal(railingRadius);
+			addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
+			addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+
+			final Vector3 p = new Vector3();
+			for (int col = 1; col < cols; col++) {
+				u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), 0);
+				addPointToQuad(p, p.add(v, null), dir, vertexBuffer, normalBuffer);
+			}
+
+		} else {
+
+			double z0 = floor.getAbsPoint(0).getZ();
+			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railingRadius * 3);
+			addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+			dir = new Vector3(u).normalizeLocal().multiplyLocal(railingRadius);
+			Vector3 q = getAbsPoint(1);
+			addPointToQuad(q, new Vector3(q.getX(), q.getY(), z0), dir, vertexBuffer, normalBuffer);
+			q = getAbsPoint(3);
+			addPointToQuad(q, new Vector3(q.getX(), q.getY(), z0), dir, vertexBuffer, normalBuffer);
+
+			q = new Vector3(0, 0, q.getZ() - z0);
+			final Vector3 p = new Vector3();
+			for (int col = 1; col < cols; col++) {
+				u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), z0);
+				addPointToQuad(p, p.add(q, null), dir, vertexBuffer, normalBuffer);
+			}
+
 		}
 
 		vertexBuffer.limit(vertexBuffer.position());

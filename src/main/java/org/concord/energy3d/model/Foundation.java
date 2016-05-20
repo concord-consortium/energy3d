@@ -1066,5 +1066,5 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		return count;
 	}
-
+	
 }

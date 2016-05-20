@@ -110,6 +110,7 @@ public class Scene implements Serializable {
 	private DesignSpecs designSpecs = new DesignSpecs();
 	private HousePart copyBuffer, originalCopy;
 	private boolean dashedlineOnRoofs = true;
+	private boolean onlySolarAnalysis;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -1372,6 +1373,14 @@ public class Scene implements Serializable {
 
 	public boolean areDashedLinesOnRoofShown() {
 		return dashedlineOnRoofs;
+	}
+
+	public void setOnlySolarAnalysis(boolean onlySolarAnalysis) {
+		this.onlySolarAnalysis = onlySolarAnalysis;
+	}
+
+	public boolean getOnlySolarAnalysis() {
+		return onlySolarAnalysis;
 	}
 
 }

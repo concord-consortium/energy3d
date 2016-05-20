@@ -147,7 +147,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
-	private JCheckBoxMenuItem roofLineMenuItem;
+	private JCheckBoxMenuItem roofDashedLineMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
 	private JMenuItem exitMenuItem;
 	private JMenu helpMenu;
@@ -1021,21 +1021,33 @@ public class MainFrame extends JFrame {
 		if (analysisMenu == null) {
 			analysisMenu = new JMenu("Analysis");
 			analysisMenu.addMenuListener(new MenuListener() {
+
+				private void enableEnergyAnalysis(boolean b) {
+					annualEnergyAnalysisMenuItem.setEnabled(b);
+					annualEnergyAnalysisForSelectionMenuItem.setEnabled(b);
+					dailyEnergyAnalysisMenuItem.setEnabled(b);
+					dailyEnergyAnalysisForSelectionMenuItem.setEnabled(b);
+					orientationalEnergyAnalysisMenuItem.setEnabled(b);
+				}
+
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 					simulationSettingsMenuItem.setEnabled(true);
+					enableEnergyAnalysis(true);
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
 					simulationSettingsMenuItem.setEnabled(true);
+					enableEnergyAnalysis(true);
 				}
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
 					MainPanel.getInstance().defaultTool();
 					simulationSettingsMenuItem.setEnabled(!Scene.getInstance().isStudentMode());
+					enableEnergyAnalysis(!Scene.getInstance().getOnlySolarAnalysis());
 				}
 			});
 			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
@@ -1080,7 +1092,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
-					Util.selectSilently(roofLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
+					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					MainPanel.getInstance().defaultTool();
 				}
 			});
@@ -1103,7 +1115,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
 			viewMenu.addSeparator();
-			viewMenu.add(getRoofLineMenuItem());
+			viewMenu.add(getRoofDashedLineMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
@@ -1176,19 +1188,19 @@ public class MainFrame extends JFrame {
 		return buildingLabelsMenuItem;
 	}
 
-	private JCheckBoxMenuItem getRoofLineMenuItem() {
-		if (roofLineMenuItem == null) {
-			roofLineMenuItem = new JCheckBoxMenuItem("Roof Lines", false);
-			roofLineMenuItem.addItemListener(new ItemListener() {
+	private JCheckBoxMenuItem getRoofDashedLineMenuItem() {
+		if (roofDashedLineMenuItem == null) {
+			roofDashedLineMenuItem = new JCheckBoxMenuItem("Roof Dashed Lines", false);
+			roofDashedLineMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					Scene.getInstance().setDashedLinesOnRoofShown(roofLineMenuItem.isSelected());
+					Scene.getInstance().setDashedLinesOnRoofShown(roofDashedLineMenuItem.isSelected());
 					Scene.getInstance().redrawAll();
 					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
-		return roofLineMenuItem;
+		return roofDashedLineMenuItem;
 	}
 
 	public JCheckBoxMenuItem getShadowMenuItem() {
