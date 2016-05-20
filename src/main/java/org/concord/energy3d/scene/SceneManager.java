@@ -940,6 +940,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return; // Ctrl/Cmd+key is often used for other purposes such as Ctrl+S or Cmd+S
 		if (ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU))
 			v.multiplyLocal(0.1);
+		move(v);
+	}
+
+	public void move(final Vector3 v) {
 		MoveBuildingCommand c = null;
 		if (selectedHousePart == null) {
 			c = new MoveBuildingCommand(null, v);

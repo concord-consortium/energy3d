@@ -98,6 +98,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class MainFrame extends JFrame {
@@ -2539,6 +2540,18 @@ public class MainFrame extends JFrame {
 		if (moveEastMenuItem == null) {
 			moveEastMenuItem = new JMenuItem("Move East");
 			moveEastMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)); // use 0 to specify no modifier
+			moveEastMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							SceneManager.getInstance().move(new Vector3(1, 0, 0));
+							return null;
+						}
+					});
+				}
+			});
 		}
 		return moveEastMenuItem;
 	}
@@ -2547,6 +2560,18 @@ public class MainFrame extends JFrame {
 		if (moveWestMenuItem == null) {
 			moveWestMenuItem = new JMenuItem("Move West");
 			moveWestMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0)); // use 0 to specify no modifier
+			moveWestMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							SceneManager.getInstance().move(new Vector3(-1, 0, 0));
+							return null;
+						}
+					});
+				}
+			});
 		}
 		return moveWestMenuItem;
 	}
@@ -2555,6 +2580,18 @@ public class MainFrame extends JFrame {
 		if (moveSouthMenuItem == null) {
 			moveSouthMenuItem = new JMenuItem("Move South");
 			moveSouthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)); // use 0 to specify no modifier
+			moveSouthMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							SceneManager.getInstance().move(new Vector3(0, -1, 0));
+							return null;
+						}
+					});
+				}
+			});
 		}
 		return moveSouthMenuItem;
 	}
@@ -2563,6 +2600,18 @@ public class MainFrame extends JFrame {
 		if (moveNorthMenuItem == null) {
 			moveNorthMenuItem = new JMenuItem("Move North");
 			moveNorthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)); // use 0 to specify no modifier
+			moveNorthMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							SceneManager.getInstance().move(new Vector3(0, 1, 0));
+							return null;
+						}
+					});
+				}
+			});
 		}
 		return moveNorthMenuItem;
 	}
