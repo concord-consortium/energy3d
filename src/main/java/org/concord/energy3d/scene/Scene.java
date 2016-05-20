@@ -204,16 +204,9 @@ public class Scene implements Serializable {
 				final ObjectInputStream in = new ObjectInputStream(file.openStream());
 				instance = (Scene) in.readObject();
 				in.close();
-
 				for (final HousePart part : instance.parts) {
-					if (part instanceof Window) {
-						final Window w = (Window) part;
-						if (w.getColor() == null)
-							w.setColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
-					}
 					part.getRoot();
 				}
-
 				instance.upgradeSceneToNewVersion();
 				instance.cleanup();
 				loadCameraLocation();

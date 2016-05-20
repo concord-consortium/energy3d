@@ -70,6 +70,8 @@ public class Window extends HousePart implements Thermalizable {
 			solarHeatGainCoefficient *= 0.01;
 		if (Util.isZero(volumetricHeatCapacity))
 			volumetricHeatCapacity = 0.5;
+		if (glassColor == null)
+			setColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
 
 		mesh = new Mesh("Window");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));

@@ -119,6 +119,7 @@
 			<manifest>
 				<attribute name="Application-Name" value="${app.name}" />
 				<attribute name="Permissions" value="all-permissions" />
+				<attribute name="SplashScreen-Image" value="gui/splash.png" />
 			</manifest>
 		</fx:jar>
 

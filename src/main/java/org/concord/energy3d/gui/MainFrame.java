@@ -183,6 +183,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem propertiesMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
+	private JMenu templatesMenu;
 
 	private final FileChooser fileChooser;
 	private final JColorChooser colorChooser;
@@ -374,6 +375,7 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getEditMenu());
 			appMenuBar.add(getViewMenu());
 			appMenuBar.add(getAnalysisMenu());
+			appMenuBar.add(getTemplatesMenu());
 			appMenuBar.add(getHelpMenu());
 
 			addCommonActionListeners(appMenuBar);
@@ -791,10 +793,11 @@ public class MainFrame extends JFrame {
 
 	public void updateTitleBar() {
 		final String star = Scene.getInstance().isEdited() ? "*" : "";
-		if (Scene.getURL() == null)
+		if (Scene.getURL() == null) {
 			setTitle("Energy3D V" + MainApplication.VERSION + star);
-		else
+		} else {
 			setTitle("Energy3D V" + MainApplication.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
+		}
 	}
 
 	private JMenuItem getSaveMenuItem() {
@@ -1069,6 +1072,61 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getSimulationSettingsMenuItem());
 		}
 		return analysisMenu;
+	}
+
+	private JMenu getTemplatesMenu() {
+		if (templatesMenu == null) {
+			templatesMenu = new JMenu("Templates");
+			templatesMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					MainPanel.getInstance().defaultTool();
+				}
+			});
+			JMenuItem mi = new JMenuItem("Colonial");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openTemplate(MainApplication.class.getResource("templates/colonial-template.ng3"));
+				}
+			});
+			templatesMenu.add(mi);
+			mi = new JMenuItem("Cape Cod");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openTemplate(MainApplication.class.getResource("templates/cape-cod-template.ng3"));
+				}
+			});
+			templatesMenu.add(mi);
+			mi = new JMenuItem("Gambrel");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openTemplate(MainApplication.class.getResource("templates/gambrel-template.ng3"));
+				}
+			});
+			templatesMenu.add(mi);
+			mi = new JMenuItem("Saltbox");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					openTemplate(MainApplication.class.getResource("templates/saltbox-template.ng3"));
+				}
+			});
+			templatesMenu.add(mi);
+		}
+		return templatesMenu;
 	}
 
 	private JMenu getViewMenu() {
@@ -2106,6 +2164,33 @@ public class MainFrame extends JFrame {
 			});
 		} catch (final Throwable e) {
 			Util.reportError(e);
+		}
+	}
+
+	private void openTemplate(final URL url) {
+		boolean ok = false;
+		if (Scene.getInstance().isEdited()) {
+			final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+			if (save == JOptionPane.YES_OPTION) {
+				save();
+				if (!Scene.getInstance().isEdited())
+					ok = true;
+			} else if (save != JOptionPane.CANCEL_OPTION)
+				ok = true;
+		} else
+			ok = true;
+		if (ok) {
+			try {
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						Scene.open(url);
+						return null;
+					}
+				});
+			} catch (final Throwable e) {
+				Util.reportError(e);
+			}
 		}
 	}
 
