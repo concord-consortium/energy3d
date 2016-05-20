@@ -741,6 +741,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
+
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
@@ -858,6 +859,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.replaying = false;
 					PlayControl.backward = true;
 				}
+				if (SceneManager.getInstance().isTopView()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
+				}
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.UP), new TriggerAction() {
@@ -866,6 +870,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (PlayControl.active) {
 					PlayControl.replaying = false;
 					PlayControl.backward = true;
+				}
+				if (SceneManager.getInstance().isTopView()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
 				}
 			}
 		}));
@@ -876,6 +883,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.replaying = false;
 					PlayControl.forward = true;
 				}
+				if (SceneManager.getInstance().isTopView()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
+				}
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DOWN), new TriggerAction() {
@@ -884,6 +894,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (PlayControl.active) {
 					PlayControl.replaying = false;
 					PlayControl.forward = true;
+				}
+				if (SceneManager.getInstance().isTopView()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
 				}
 			}
 		}));
@@ -894,6 +907,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 
+	}
+
+	private void moveWithKey(final KeyboardState ks, final Vector3 v) {
+		if (selectedHousePart instanceof Foundation) {
+			final ArrayList<Vector3> points = selectedHousePart.getPoints();
+			houseMovePoints = new ArrayList<Vector3>(points.size());
+			for (final Vector3 p : points)
+				houseMovePoints.add(p.clone());
+			if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
+				v.multiplyLocal(0.1);
+			((Foundation) selectedHousePart).move(v, houseMovePoints);
+		}
 	}
 
 	public void setCameraControl(final CameraMode type) {

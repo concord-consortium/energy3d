@@ -1078,7 +1078,6 @@ public class MainFrame extends JFrame {
 		if (templatesMenu == null) {
 			templatesMenu = new JMenu("Templates");
 			templatesMenu.addMenuListener(new MenuListener() {
-
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -1093,40 +1092,23 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
-			JMenuItem mi = new JMenuItem("Colonial");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openTemplate(MainApplication.class.getResource("templates/colonial-template.ng3"));
-				}
-			});
-			templatesMenu.add(mi);
-			mi = new JMenuItem("Cape Cod");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openTemplate(MainApplication.class.getResource("templates/cape-cod-template.ng3"));
-				}
-			});
-			templatesMenu.add(mi);
-			mi = new JMenuItem("Gambrel");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openTemplate(MainApplication.class.getResource("templates/gambrel-template.ng3"));
-				}
-			});
-			templatesMenu.add(mi);
-			mi = new JMenuItem("Saltbox");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					openTemplate(MainApplication.class.getResource("templates/saltbox-template.ng3"));
-				}
-			});
-			templatesMenu.add(mi);
+			addTemplate("Cape Cod", "templates/cape-cod-template.ng3");
+			addTemplate("Colonial", "templates/colonial-template.ng3");
+			addTemplate("Gambrel", "templates/gambrel-template.ng3");
+			addTemplate("Saltbox", "templates/saltbox-template.ng3");
 		}
 		return templatesMenu;
+	}
+
+	private void addTemplate(final String type, final String url) {
+		JMenuItem mi = new JMenuItem(type);
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				openTemplate(MainApplication.class.getResource(url));
+			}
+		});
+		templatesMenu.add(mi);
 	}
 
 	private JMenu getViewMenu() {
