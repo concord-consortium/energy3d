@@ -982,7 +982,7 @@ public class MainPanel extends JPanel {
 			rotateButton = new JButton();
 			rotateButton.addMouseListener(refreshUponMouseExit);
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
-			rotateButton.setToolTipText("<html>Rotate in the clockwise direction.<br>Hold down the SHIFT key and press this button for counter-clockwise rotation.<br>Hold down the CTRL key while pressing this button to rotate more slowly.<br>If a building is selected, rotate around its center. Otherwise rotate all buildings around the origin.</html>");
+			rotateButton.setToolTipText("<html>Rotate in the clockwise direction.<br>Hold down the SHIFT key and press this button for counter-clockwise rotation.<br>Hold down the ALT key while pressing this button to rotate more slowly.<br>If a building is selected, rotate around its center. Otherwise rotate all buildings around the origin.</html>");
 			rotateButton.setFocusable(false);
 			rotateButton.addMouseListener(new MouseAdapter() {
 				private volatile boolean mousePressed = false;

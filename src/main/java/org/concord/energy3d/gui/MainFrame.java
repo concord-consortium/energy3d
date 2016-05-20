@@ -286,7 +286,7 @@ public class MainFrame extends JFrame {
 			@Override
 			public boolean dispatchKeyEvent(final KeyEvent e) {
 				double a = MainPanel.getInstance().getBuildingRotationAngleAbsolute();
-				if (e.isControlDown())
+				if (e.isAltDown())
 					a *= 0.2;
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:

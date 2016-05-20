@@ -843,7 +843,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 
-		// XIE: Run/pause model replay
+		// Run/pause model replay
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.SPACE), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
@@ -907,18 +907,55 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.W), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.E), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.S), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
+			}
+		}));
+		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.N), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
+			}
+		}));
+
 	}
 
 	private void moveWithKey(final KeyboardState ks, final Vector3 v) {
-		if (selectedHousePart instanceof Foundation) {
-			final ArrayList<Vector3> points = selectedHousePart.getPoints();
-			houseMovePoints = new ArrayList<Vector3>(points.size());
-			for (final Vector3 p : points)
-				houseMovePoints.add(p.clone());
-			if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
-				v.multiplyLocal(0.1);
-			((Foundation) selectedHousePart).move(v, houseMovePoints);
+		if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL) || ks.isDown(Key.LMETA) || ks.isDown(Key.LMETA))
+			return; // Ctrl/Cmd+key is often used for other purposes such as Ctrl+S or Cmd+S
+		if (ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU))
+			v.multiplyLocal(0.1);
+		if (selectedHousePart == null) {
+			for (HousePart p : Scene.getInstance().getParts()) {
+				if (p instanceof Foundation) {
+					move((Foundation) p, v);
+				}
+			}
+		} else if (selectedHousePart instanceof Foundation) {
+			move((Foundation) selectedHousePart, v);
 		}
+	}
+
+	private void move(final Foundation foundation, final Vector3 v) {
+		final ArrayList<Vector3> points = foundation.getPoints();
+		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
+		for (final Vector3 p : points)
+			movePoints.add(p.clone());
+		foundation.move(v, movePoints);
 	}
 
 	public void setCameraControl(final CameraMode type) {
