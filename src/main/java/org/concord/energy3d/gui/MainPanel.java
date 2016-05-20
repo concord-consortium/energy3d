@@ -141,7 +141,7 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miPyramidRoof = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
 		final JCheckBoxMenuItem miHipRoof = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
 		final JCheckBoxMenuItem miShedRoof = new JCheckBoxMenuItem("Shed Roof", new ImageIcon(getClass().getResource("icons/roof_shed.png")));
-		final JCheckBoxMenuItem miGambrelRoof = new JCheckBoxMenuItem("Gambrel Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
+		final JCheckBoxMenuItem miGambrelRoof = new JCheckBoxMenuItem("Gambrel Roof", new ImageIcon(getClass().getResource("icons/roof_gambler.png")));
 		final JCheckBoxMenuItem miCustomRoof = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
 		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Conversion", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
 		final ActionListener roofAction = new ActionListener() {
