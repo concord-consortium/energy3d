@@ -28,7 +28,7 @@ class PropertiesDialog extends JDialog {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setTitle("Properties");
+		setTitle("Properties - " + Scene.getInstance().getParts().size() + " parts");
 
 		getContentPane().setLayout(new BorderLayout());
 		final JPanel panel = new JPanel(new GridLayout(5, 2, 8, 8));
