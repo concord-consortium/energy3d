@@ -667,14 +667,13 @@ public abstract class Graph extends JPanel {
 					g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
 					break;
 				default:
-					Color c = colors.get(key);
 					for (int i = 0; i < list.size(); i++) {
 						dataX = left + dx * i;
 						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-						if ("Solar".equals(key))
-							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
-						else if ("Heat Gain".equals(key))
-							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						if (key.startsWith("Solar"))
+							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
+						else if (key.startsWith("Heat Gain"))
+							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
 					}
 				}
 

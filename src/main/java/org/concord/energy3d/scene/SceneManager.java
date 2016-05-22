@@ -866,7 +866,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedHousePart instanceof Window) {
 						Vector3 v = selectedHousePart.getNormal().clone();
 						v.crossLocal(Vector3.UNIT_Z);
-						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.multiplyLocal(5));
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v);
 						Scene.getInstance().redrawAll();
 					}
 				}
@@ -885,7 +885,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedHousePart instanceof Window) {
 						Vector3 n = selectedHousePart.getNormal().clone();
 						Vector3 v = n.cross(Vector3.UNIT_Z, null);
-						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n).multiplyLocal(5));
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n));
 						Scene.getInstance().redrawAll();
 					}
 				}
@@ -904,7 +904,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedHousePart instanceof Window) {
 						Vector3 v = selectedHousePart.getNormal().clone();
 						v.crossLocal(Vector3.UNIT_Z).negateLocal();
-						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.multiplyLocal(5));
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v);
 						Scene.getInstance().redrawAll();
 					}
 				}
@@ -923,7 +923,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedHousePart instanceof Window) {
 						Vector3 n = selectedHousePart.getNormal().clone();
 						Vector3 v = n.cross(Vector3.UNIT_Z, null).negateLocal();
-						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n).multiplyLocal(5));
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n));
 						Scene.getInstance().redrawAll();
 					}
 				}
@@ -967,11 +967,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL) || ks.isDown(Key.LMETA) || ks.isDown(Key.LMETA))
 			return; // Ctrl/Cmd+key is often used for other purposes such as Ctrl+S or Cmd+S
 		if (ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU)) {
-			if (selectedHousePart instanceof Window) {
-				v.multiplyLocal(0.2);
-			} else {
-				v.multiplyLocal(0.1);
-			}
+			v.multiplyLocal(0.1);
 		}
 		move(v);
 	}

@@ -748,6 +748,14 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
+	public HousePart getPart(long id) {
+		for (HousePart p : parts) {
+			if (id == p.getId())
+				return p;
+		}
+		return null;
+	}
+
 	public void drawResizeBounds() {
 		for (final HousePart part : parts) {
 			if (part instanceof Foundation)
