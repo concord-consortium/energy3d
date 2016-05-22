@@ -1100,8 +1100,10 @@ public class MainFrame extends JFrame {
 			addTemplate("Box Gabled Roof", "templates/box-gabled-template.ng3");
 			addTemplate("Cape Cod", "templates/cape-cod-template.ng3");
 			addTemplate("Colonial", "templates/colonial-template.ng3");
+			addTemplate("Combination Roof", "templates/combination-roof-template.ng3");
 			addTemplate("Cross Gabled Roof", "templates/cross-gabled-template.ng3");
 			addTemplate("Cross Hipped Roof", "templates/cross-hipped-template.ng3");
+			addTemplate("Flat Roof", "templates/flat-roof-template.ng3");
 			addTemplate("Gable & Valley Roof", "templates/gable-valley-template.ng3");
 			addTemplate("Gambrel Roof", "templates/gambrel-template.ng3");
 			addTemplate("Hexagonal Gazebo", "templates/hexagonal-gazebo-template.ng3");
