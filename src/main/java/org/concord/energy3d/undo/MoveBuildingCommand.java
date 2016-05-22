@@ -53,11 +53,11 @@ public class MoveBuildingCommand extends AbstractUndoableEdit {
 			@Override
 			public Object call() throws Exception {
 				if (foundation != null) {
-					SceneManager.getInstance().move(foundation, v);
+					foundation.move(v);
 				} else {
 					for (HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Foundation) {
-							SceneManager.getInstance().move((Foundation) p, v);
+							((Foundation) p).move(v);
 						}
 					}
 				}

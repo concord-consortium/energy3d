@@ -862,6 +862,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
+				} else {
+					if (selectedHousePart instanceof Window) {
+						Vector3 v = selectedHousePart.getNormal().clone();
+						v.crossLocal(Vector3.UNIT_Z);
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.multiplyLocal(5));
+						Scene.getInstance().redrawAll();
+					}
 				}
 			}
 		}));
@@ -874,6 +881,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
+				} else {
+					if (selectedHousePart instanceof Window) {
+						Vector3 n = selectedHousePart.getNormal().clone();
+						Vector3 v = n.cross(Vector3.UNIT_Z, null);
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n).multiplyLocal(5));
+						Scene.getInstance().redrawAll();
+					}
 				}
 			}
 		}));
@@ -886,6 +900,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
+				} else {
+					if (selectedHousePart instanceof Window) {
+						Vector3 v = selectedHousePart.getNormal().clone();
+						v.crossLocal(Vector3.UNIT_Z).negateLocal();
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.multiplyLocal(5));
+						Scene.getInstance().redrawAll();
+					}
 				}
 			}
 		}));
@@ -898,6 +919,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
+				} else {
+					if (selectedHousePart instanceof Window) {
+						Vector3 n = selectedHousePart.getNormal().clone();
+						Vector3 v = n.cross(Vector3.UNIT_Z, null).negateLocal();
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n).multiplyLocal(5));
+						Scene.getInstance().redrawAll();
+					}
 				}
 			}
 		}));
@@ -938,8 +966,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void moveWithKey(final KeyboardState ks, final Vector3 v) {
 		if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL) || ks.isDown(Key.LMETA) || ks.isDown(Key.LMETA))
 			return; // Ctrl/Cmd+key is often used for other purposes such as Ctrl+S or Cmd+S
-		if (ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU))
-			v.multiplyLocal(0.1);
+		if (ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU)) {
+			if (selectedHousePart instanceof Window) {
+				v.multiplyLocal(0.2);
+			} else {
+				v.multiplyLocal(0.1);
+			}
+		}
 		move(v);
 	}
 
@@ -949,24 +982,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			c = new MoveBuildingCommand(null, v);
 			for (HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
-					move((Foundation) p, v);
+					((Foundation) p).move(v);
 				}
 			}
 		} else if (selectedHousePart instanceof Foundation) {
 			c = new MoveBuildingCommand((Foundation) selectedHousePart, v);
-			move((Foundation) selectedHousePart, v);
+			((Foundation) selectedHousePart).move(v);
+		} else if (selectedHousePart instanceof Window) {
+			((Window) selectedHousePart).move(v);
 		}
 		if (c != null)
 			undoManager.addEdit(c);
 		Scene.getInstance().setEdited(true);
-	}
-
-	public void move(final Foundation foundation, final Vector3 v) {
-		final ArrayList<Vector3> points = foundation.getPoints();
-		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
-		for (final Vector3 p : points)
-			movePoints.add(p.clone());
-		foundation.move(v, movePoints);
 	}
 
 	public void setCameraControl(final CameraMode type) {

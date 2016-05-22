@@ -848,6 +848,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		Scene.getInstance().redrawAll();
 	}
 
+	public void move(final Vector3 v) {
+		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
+		for (final Vector3 p : points)
+			movePoints.add(p.clone());
+		move(v, movePoints);
+	}
+
 	public double getBoundingHeight() {
 		// return boundingHeight; // do not just return the boundingHeight because it may represent a previous value
 		return scanChildrenHeight(this) - height;
@@ -1066,5 +1073,5 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		return count;
 	}
-	
+
 }

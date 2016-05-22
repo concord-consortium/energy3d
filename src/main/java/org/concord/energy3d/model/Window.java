@@ -425,6 +425,13 @@ public class Window extends HousePart implements Thermalizable {
 		container.draw();
 	}
 
+	public void move(final Vector3 v) {
+		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
+		for (final Vector3 p : points)
+			movePoints.add(p.clone());
+		move(v, movePoints);
+	}
+
 	public void setStyle(final int style) {
 		this.style = style;
 	}
@@ -502,7 +509,7 @@ public class Window extends HousePart implements Thermalizable {
 		if (check) {
 			if (container instanceof Wall) {
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-				final double shift = s * (points.get(0).distance(points.get(2)) + 0.01); // give it a small gap
+				final double shift = s * (points.get(0).distance(points.get(2)) * 2); // place the next window one width away
 				final int n = c.getPoints().size();
 				for (int i = 0; i < n; i++) {
 					final double newX = points.get(i).getX() + shift;
