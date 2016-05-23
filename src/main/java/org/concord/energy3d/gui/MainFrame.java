@@ -87,6 +87,7 @@ import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
@@ -142,6 +143,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyEnergyAnalysisMenuItem;
 	private JMenuItem dailyEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem groupDailyAnalysisMenuItem;
+	private JMenuItem groupAnnualAnalysisMenuItem;
 	private JMenuItem annualSolarAnalysisMenuItem;
 	private JMenuItem dailySolarAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
@@ -1073,6 +1075,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getAnnualSolarAnalysisMenuItem());
 			analysisMenu.add(getDailySolarAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getGroupAnnualAnalysisMenuItem());
 			analysisMenu.add(getGroupDailyAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
@@ -1568,6 +1571,78 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return groupDailyAnalysisMenuItem;
+	}
+
+	private JMenuItem getGroupAnnualAnalysisMenuItem() {
+		if (groupAnnualAnalysisMenuItem == null) {
+			groupAnnualAnalysisMenuItem = new JMenuItem("Annual Analysis for Group...");
+			groupAnnualAnalysisMenuItem.addActionListener(new ActionListener() {
+
+				private ArrayList<Long> getIdArray(Class<?> c) {
+					ArrayList<Long> idArray = new ArrayList<Long>();
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (c.isInstance(p)) {
+							idArray.add(p.getId());
+						}
+					}
+					Collections.sort(idArray);
+					return idArray;
+				}
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
+					final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Wall", "Window", "Roof", "Solar Panel" });
+					typeComboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(ItemEvent e) {
+							idListModel.clear();
+							String type = (String) typeComboBox.getSelectedItem();
+							Class<?> c = null;
+							if ("Wall".equals(type)) {
+								c = Wall.class;
+							} else if ("Window".equals(type)) {
+								c = Window.class;
+							} else if ("Roof".equals(type)) {
+								c = Roof.class;
+							} else if ("Solar Panel".equals(type)) {
+								c = SolarPanel.class;
+							}
+							if (c != null) {
+								ArrayList<Long> idArray = getIdArray(c);
+								for (Long id : idArray) {
+									idListModel.addElement(id);
+								}
+							}
+						}
+					});
+					ArrayList<Long> idArray = getIdArray(Wall.class);
+					for (Long id : idArray) {
+						idListModel.addElement(id);
+					}
+					JList<Long> idList = new JList<Long>(idListModel);
+					gui.add(typeComboBox, BorderLayout.NORTH);
+					gui.add(new JScrollPane(idList), BorderLayout.CENTER);
+					if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
+						return;
+					List<Long> selectedIds = idList.getSelectedValuesList();
+					if (selectedIds.isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.this, "You must select a group of parts first.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					GroupAnnualAnalysis a = new GroupAnnualAnalysis(selectedIds);
+					a.show(typeComboBox.getSelectedItem() + " " + selectedIds);
+				}
+			});
+		}
+		return groupAnnualAnalysisMenuItem;
 	}
 
 	private JMenuItem getAnnualSensorMenuItem() {

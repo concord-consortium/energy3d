@@ -206,6 +206,10 @@ public abstract class Graph extends JPanel {
 			setToolTipText("Double-click to enlarge this graph");
 	}
 
+	public static void setColor(String key, Color color) {
+		colors.put(key, color);
+	}
+
 	public void setCalendar(Calendar today) {
 		this.today = today;
 	}
@@ -671,9 +675,9 @@ public abstract class Graph extends JPanel {
 						dataX = left + dx * i;
 						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
 						if (key.startsWith("Solar"))
-							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
+							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get(key));
 						else if (key.startsWith("Heat Gain"))
-							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
+							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get(key));
 					}
 				}
 
@@ -719,24 +723,38 @@ public abstract class Graph extends JPanel {
 			}
 			break;
 		default:
+			boolean isAngularGraph = this instanceof AngularGraph;
+			boolean found = false;
 			x0 -= 100;
 			s = "Solar";
-			boolean isAngularGraph = this instanceof AngularGraph;
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
 				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				found = true;
 			}
 			s = "Heat Gain";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
 				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				found = true;
 			}
 			s = "Utility";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawCircle(g2, x0, y0, 8, colors.get(s));
 				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				found = true;
+			}
+			if (!found) {
+				for (String k : data.keySet()) {
+					y0 += 14;
+					if (k.startsWith("Solar"))
+						drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(k));
+					if (k.startsWith("Heat Gain"))
+						drawSquare(g2, x0, y0, 8, colors.get(k));
+					g2.drawString(isAngularGraph ? k : k + " (" + TWO_DECIMALS.format(getSum(k)) + ")", x0 + 14, y0 + 8);
+				}
 			}
 		}
 

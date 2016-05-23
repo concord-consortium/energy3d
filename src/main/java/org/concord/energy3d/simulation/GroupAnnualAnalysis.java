@@ -1,5 +1,18 @@
 package org.concord.energy3d.simulation;
 
+import static java.util.Calendar.APRIL;
+import static java.util.Calendar.AUGUST;
+import static java.util.Calendar.DECEMBER;
+import static java.util.Calendar.FEBRUARY;
+import static java.util.Calendar.JANUARY;
+import static java.util.Calendar.JULY;
+import static java.util.Calendar.JUNE;
+import static java.util.Calendar.MARCH;
+import static java.util.Calendar.MAY;
+import static java.util.Calendar.NOVEMBER;
+import static java.util.Calendar.OCTOBER;
+import static java.util.Calendar.SEPTEMBER;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,6 +25,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
@@ -29,23 +43,28 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
  * 
  */
-public class GroupDailyAnalysis extends Analysis {
+public class GroupAnnualAnalysis extends Analysis {
+
+	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	private List<HousePart> selectedParts;
 
-	public GroupDailyAnalysis(List<Long> ids) {
+	public GroupAnnualAnalysis(List<Long> ids) {
 		super();
 		selectedParts = new ArrayList<HousePart>();
 		for (Long i : ids) {
@@ -55,7 +74,7 @@ public class GroupDailyAnalysis extends Analysis {
 			Graph.setColor("Solar " + p.getId(), Color.RED);
 			Graph.setColor("Heat Gain " + p.getId(), Color.BLUE);
 		}
-		graph = new PartEnergyDailyGraph();
+		graph = new PartEnergyAnnualGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.WHITE);
 	}
@@ -66,13 +85,21 @@ public class GroupDailyAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
-				final Throwable t = compute();
-				if (t != null) {
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							Util.reportError(t);
+				for (final int m : MONTHS) {
+					if (!analysisStopped) {
+						final Calendar c = Heliodon.getInstance().getCalender();
+						c.set(Calendar.MONTH, m);
+						final Throwable t = compute();
+						if (t != null) {
+							stopAnalysis();
+							EventQueue.invokeLater(new Runnable() {
+								public void run() {
+									Util.reportError(t);
+								}
+							});
+							break;
 						}
-					});
+					}
 				}
 				EventQueue.invokeLater(new Runnable() {
 					@Override
@@ -86,32 +113,26 @@ public class GroupDailyAnalysis extends Analysis {
 
 	@Override
 	public void updateGraph() {
-		int n = (int) Math.round(60.0 / SolarRadiation.getInstance().getTimeStep());
-		for (int i = 0; i < 24; i++) {
-			SolarRadiation.getInstance().computeEnergyAtHour(i);
-			for (HousePart p : selectedParts) {
-				if (p instanceof Window) {
-					Window window = (Window) p;
-					final double solar = p.getSolarPotentialNow() * window.getSolarHeatGainCoefficient();
-					graph.addData("Solar " + p.getId(), solar);
-					final double[] loss = p.getHeatLoss();
-					int t0 = n * i;
-					double sum = 0;
-					for (int k = t0; k < t0 + n; k++)
-						sum += loss[k];
-					graph.addData("Heat Gain " + p.getId(), -sum);
-				} else if (p instanceof Wall || p instanceof Roof) {
-					final double[] loss = p.getHeatLoss();
-					int t0 = n * i;
-					double sum = 0;
-					for (int k = t0; k < t0 + n; k++)
-						sum += loss[k];
-					graph.addData("Heat Gain " + p.getId(), -sum);
-				} else if (p instanceof SolarPanel) {
-					final SolarPanel solarPanel = (SolarPanel) p;
-					final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getEfficiency();
-					graph.addData("Solar " + p.getId(), solar);
-				}
+		for (HousePart p : selectedParts) {
+			if (p instanceof Window) {
+				Window window = (Window) p;
+				final double solar = p.getSolarPotentialToday() * window.getSolarHeatGainCoefficient();
+				graph.addData("Solar " + p.getId(), solar);
+				final double[] loss = p.getHeatLoss();
+				double sum = 0;
+				for (final double x : loss)
+					sum += x;
+				graph.addData("Heat Gain " + p.getId(), -sum);
+			} else if (p instanceof Wall || p instanceof Roof) {
+				final double[] loss = p.getHeatLoss();
+				double sum = 0;
+				for (final double x : loss)
+					sum += x;
+				graph.addData("Heat Gain " + p.getId(), -sum);
+			} else if (p instanceof SolarPanel) {
+				final SolarPanel solarPanel = (SolarPanel) p;
+				final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiency();
+				graph.addData("Solar " + p.getId(), solar);
 			}
 		}
 		graph.repaint();
@@ -228,12 +249,12 @@ public class GroupDailyAnalysis extends Analysis {
 			@Override
 			public void menuSelected(MenuEvent e) {
 				showRunsMenu.removeAll();
-				if (!DailyGraph.records.isEmpty()) {
+				if (!AnnualGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : DailyGraph.records)
+							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), false);
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", true);
@@ -244,7 +265,7 @@ public class GroupDailyAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							for (Results r : DailyGraph.records)
+							for (Results r : AnnualGraph.records)
 								graph.hideRun(r.getID(), true);
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", false);
@@ -325,17 +346,24 @@ public class GroupDailyAnalysis extends Analysis {
 
 	@Override
 	public String toJson() {
-		String s = "{";
-		String[] names = new String[] { "Solar", "Heat Gain" };
-		s += "\"Part\": \"" + selectedParts + "\"";
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		String s = "{\"Months\": " + getNumberOfDataPoints();
+		String[] names;
+		if (selectedPart instanceof Foundation) {
+			s += ", \"Building\": " + selectedPart.getId();
+			names = new String[] { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+		} else {
+			s += ", \"Part\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			names = new String[] { "Solar", "Heat Gain" };
+		}
 		for (String name : names) {
 			List<Double> data = graph.getData(name);
 			if (data == null)
 				continue;
 			s += ", \"" + name + "\": {";
-			s += "\"Hourly\": [";
+			s += "\"Monthly\": [";
 			for (Double x : data) {
-				s += Graph.FIVE_DECIMALS.format(x) + ",";
+				s += Graph.ENERGY_FORMAT.format(x) + ",";
 			}
 			s = s.substring(0, s.length() - 1);
 			s += "]\n";
