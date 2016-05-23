@@ -27,6 +27,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -70,9 +71,14 @@ public class GroupAnnualAnalysis extends Analysis {
 		for (Long i : ids) {
 			selectedParts.add(Scene.getInstance().getPart(i));
 		}
+		double i = 0;
+		double n = selectedParts.size();
 		for (HousePart p : selectedParts) {
-			Graph.setColor("Solar " + p.getId(), Color.RED);
-			Graph.setColor("Heat Gain " + p.getId(), Color.BLUE);
+			int a = (int) ((n - i) / n * 128);
+			int b = 255 - a;
+			Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
+			Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
+			i++;
 		}
 		graph = new PartEnergyAnnualGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
@@ -272,6 +278,22 @@ public class GroupAnnualAnalysis extends Analysis {
 						}
 					});
 					showRunsMenu.add(mi);
+					showRunsMenu.addSeparator();
+					Map<String, Double> recordedResults = getRecordedResults("Net");
+					for (final Results r : AnnualGraph.records) {
+						String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
+						Double result = recordedResults.get(key);
+						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key) * 365.0 / 12.0) + " kWh"), !graph.isRunHidden(r.getID()));
+						cbmi.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(final ItemEvent e) {
+								graph.hideRun(r.getID(), !cbmi.isSelected());
+								graph.repaint();
+								TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "" + r.getID(), cbmi.isSelected());
+							}
+						});
+						showRunsMenu.add(cbmi);
+					}
 				}
 			}
 

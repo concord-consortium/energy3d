@@ -747,7 +747,11 @@ public abstract class Graph extends JPanel {
 				found = true;
 			}
 			if (!found) {
-				for (String k : data.keySet()) {
+				ArrayList<String> set = new ArrayList<String>(data.keySet());
+				Collections.sort(set);
+				for (String k : set) {
+					if (isDataHidden(k))
+						continue;
 					y0 += 14;
 					if (k.startsWith("Solar"))
 						drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(k));
