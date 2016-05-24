@@ -293,6 +293,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				if (!closestPoint.equals(currentPoint)) {
 					newBoundingHeight = Math.max(0, closestPoint.getZ() - height);
 					applyNewHeight(boundingHeight, newBoundingHeight, false);
+					System.out.println(boundingHeight + "\t" + newBoundingHeight);
 				}
 			}
 			syncUpperPoints();
@@ -471,7 +472,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	private void applyNewHeight(final double orgHeight, final double newHeight, final boolean finalize) {
-		if (newHeight == 0 || newHeight == orgHeight)
+		if (newHeight == 0)
 			return;
 		final double scale = newHeight / orgHeight;
 
@@ -847,7 +848,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void move(final Vector3 v) {
-		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
+		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points)
 			movePoints.add(p.clone());
 		move(v, movePoints);
@@ -1051,7 +1052,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		return thermostat;
 	}
 
-	public void setUtilityBill(UtilityBill utilityBill) {
+	public void setUtilityBill(final UtilityBill utilityBill) {
 		this.utilityBill = utilityBill;
 	}
 
