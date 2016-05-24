@@ -100,8 +100,6 @@ public class Foundation extends HousePart implements Thermalizable {
 			volumetricHeatCapacity = 0.5;
 		if (thermostat == null)
 			thermostat = new Thermostat();
-		if (utilityBill == null)
-			utilityBill = new UtilityBill();
 
 		mesh = new Mesh("Foundation");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -1049,16 +1047,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		return volumetricHeatCapacity;
 	}
 
-	public void setThermostat(final Thermostat t) {
-		thermostat = t;
-	}
-
 	public Thermostat getThermostat() {
 		return thermostat;
 	}
 
-	public void setUtilityBill(final UtilityBill b) {
-		utilityBill = b;
+	public void setUtilityBill(UtilityBill utilityBill) {
+		this.utilityBill = utilityBill;
 	}
 
 	public UtilityBill getUtilityBill() {

@@ -1114,7 +1114,8 @@ public class PopupMenuFactory {
 						return;
 					}
 					SolarAnnualAnalysis a = new SolarAnnualAnalysis();
-					a.setUtilityBill(foundation.getUtilityBill());
+					if (foundation.getUtilityBill() != null)
+						a.setUtilityBill(foundation.getUtilityBill());
 					a.show();
 				}
 			});

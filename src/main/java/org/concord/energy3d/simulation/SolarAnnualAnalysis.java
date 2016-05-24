@@ -163,6 +163,8 @@ public class SolarAnnualAnalysis extends Analysis {
 	}
 
 	public void setUtilityBill(UtilityBill utilityBill) {
+		if (utilityBill == null)
+			return;
 		this.utilityBill = utilityBill;
 		double[] bill = utilityBill.getMonthlyEnergy();
 		for (int i = 0; i < bill.length; i++)

@@ -91,6 +91,7 @@ import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
+import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
@@ -189,7 +190,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem exportImageMenuItem;
 	private JMenuItem exportLogMenuItem;
-	private JMenuItem removeAllLocksMenuItem;
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
 	private JMenuItem propertiesMenuItem;
@@ -210,6 +210,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllWindowsMenuItem;
 	private JMenuItem removeAllTreesMenuItem;
 	private JMenuItem removeAllHumansMenuItem;
+	private JMenuItem removeAllLocksMenuItem;
+	private JMenuItem removeAllUtilityBillsMenuItem;
 	private JMenuItem fixProblemsMenuItem;
 	private JMenuItem moveEastMenuItem;
 	private JMenuItem moveWestMenuItem;
@@ -1321,10 +1323,25 @@ public class MainFrame extends JFrame {
 			utilityBillMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().autoSelectBuilding(true);
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation) {
-						new UtilityBillDialog((Foundation) selectedPart).setVisible(true);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null) {
+						UtilityBill b = Scene.getInstance().getUtilityBill();
+						if (b == null) {
+							b = new UtilityBill();
+							Scene.getInstance().setUtilityBill(b);
+						}
+						new UtilityBillDialog(b).setVisible(true);
+					} else {
+						SceneManager.getInstance().autoSelectBuilding(true);
+						if (selectedPart instanceof Foundation) {
+							Foundation f = (Foundation) selectedPart;
+							UtilityBill b = f.getUtilityBill();
+							if (b == null) {
+								b = new UtilityBill();
+								f.setUtilityBill(b);
+							}
+							new UtilityBillDialog(b).setVisible(true);
+						}
 					}
 				}
 			});
@@ -1455,6 +1472,8 @@ public class MainFrame extends JFrame {
 							}
 							a.setUtilityBill(foundation.getUtilityBill());
 						}
+					} else {
+						a.setUtilityBill(Scene.getInstance().getUtilityBill());
 					}
 					a.show();
 				}
@@ -1881,6 +1900,7 @@ public class MainFrame extends JFrame {
 			removeAllMenu.add(getRemoveAllRoofsMenuItem());
 			removeAllMenu.add(getRemoveAllFloorsMenuItem());
 			removeAllMenu.add(getRemoveAllLocksMenuItem());
+			removeAllMenu.add(getRemoveAllUtilityBillsMenuItem());
 
 			final JMenu moveMenu = new JMenu("Move");
 			moveMenu.add(getMoveEastMenuItem());
@@ -2731,6 +2751,23 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllHumansMenuItem;
+	}
+
+	private JMenuItem getRemoveAllUtilityBillsMenuItem() {
+		if (removeAllUtilityBillsMenuItem == null) {
+			removeAllUtilityBillsMenuItem = new JMenuItem("Remove All Utility Bills");
+			removeAllUtilityBillsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					for (HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Foundation) {
+							((Foundation) p).setUtilityBill(null);
+						}
+					}
+				}
+			});
+		}
+		return removeAllUtilityBillsMenuItem;
 	}
 
 	private JMenuItem getMoveEastMenuItem() {

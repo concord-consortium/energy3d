@@ -37,6 +37,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
@@ -111,6 +112,7 @@ public class Scene implements Serializable {
 	private HousePart copyBuffer, originalCopy;
 	private boolean dashedlineOnRoofs = true;
 	private boolean onlySolarAnalysis;
+	private UtilityBill utilityBill;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -1382,6 +1384,14 @@ public class Scene implements Serializable {
 
 	public boolean getOnlySolarAnalysis() {
 		return onlySolarAnalysis;
+	}
+
+	public void setUtilityBill(UtilityBill utilityBill) {
+		this.utilityBill = utilityBill;
+	}
+
+	public UtilityBill getUtilityBill() {
+		return utilityBill;
 	}
 
 }

@@ -17,8 +17,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.simulation.AnnualGraph;
+import org.concord.energy3d.simulation.UtilityBill;
 
 /**
  * @author Charles Xie
@@ -29,7 +29,7 @@ class UtilityBillDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
 
-	public UtilityBillDialog(final Foundation foundation) {
+	public UtilityBillDialog(final UtilityBill utilityBill) {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -40,7 +40,7 @@ class UtilityBillDialog extends JDialog {
 		for (int i = 0; i < 12; i++) {
 			labels[i] = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i]);
 			labels[i].setFont(new Font("Courier New", Font.PLAIN, 12));
-			fields[i] = new JTextField(FORMAT1.format(foundation.getUtilityBill().getMonthlyEnergy(i)), 10);
+			fields[i] = new JTextField(FORMAT1.format(utilityBill.getMonthlyEnergy(i)), 10);
 		}
 
 		getContentPane().setLayout(new BorderLayout());
@@ -94,7 +94,7 @@ class UtilityBillDialog extends JDialog {
 						JOptionPane.showMessageDialog(UtilityBillDialog.this, "Energy usage cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					foundation.getUtilityBill().setMonthlyEnergy(i, x[i]);
+					utilityBill.setMonthlyEnergy(i, x[i]);
 				}
 
 				UtilityBillDialog.this.dispose();
