@@ -1487,6 +1487,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	}
 
+	public void zoom(boolean in) {
+		cameraControl.zoom(canvas, 0.1, in ? -1 : 1);
+	}
+
 	public void refresh() {
 		refresh = true;
 	}

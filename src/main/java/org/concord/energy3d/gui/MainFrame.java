@@ -179,6 +179,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem gridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
+	private JMenuItem zoomInMenuItem;
+	private JMenuItem zoomOutMenuItem;
 	private JMenu textureMenu;
 	private JRadioButtonMenuItem noTextureMenuItem;
 	private JRadioButtonMenuItem simpleTextureMenuItem;
@@ -1172,6 +1174,8 @@ public class MainFrame extends JFrame {
 			bg.add(firstPersonMenuItem);
 			viewMenu.add(getTopViewCheckBoxMenuItem());
 			viewMenu.add(getResetCameraMenuItem());
+			viewMenu.add(getZoomInMenuItem());
+			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getTextureMenu());
 			viewMenu.addSeparator();
@@ -2192,6 +2196,34 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return topViewCheckBoxMenuItem;
+	}
+
+	private JMenuItem getZoomInMenuItem() {
+		if (zoomInMenuItem == null) {
+			zoomInMenuItem = new JMenuItem("Zoom In");
+			zoomInMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
+			zoomInMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().zoom(true);
+				}
+			});
+		}
+		return zoomInMenuItem;
+	}
+
+	private JMenuItem getZoomOutMenuItem() {
+		if (zoomOutMenuItem == null) {
+			zoomOutMenuItem = new JMenuItem("Zoom Out");
+			zoomOutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
+			zoomOutMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().zoom(false);
+				}
+			});
+		}
+		return zoomOutMenuItem;
 	}
 
 	public JRadioButtonMenuItem getNoTextureMenuItem() {
