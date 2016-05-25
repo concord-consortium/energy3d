@@ -660,32 +660,23 @@ public class Foundation extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 width = p2.subtract(p0, null);
 		final ReadOnlyVector3 height = p1.subtract(p0, null);
 		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
-		final ReadOnlyVector3 pMiddle = width.add(height, null).multiplyLocal(0.5).addLocal(p0);
 
 		final int cols = (int) (width.length() / gridSize);
 
-		for (int col = 0; col < cols / 2 + 1; col++) {
-			for (int neg = -1; neg <= 1; neg += 2) {
-				final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(neg * col * gridSize).addLocal(pMiddle).subtractLocal(height.multiply(0.5, null));
-				points.add(lineP1);
-				final ReadOnlyVector3 lineP2 = lineP1.add(height, null);
-				points.add(lineP2);
-				if (col == 0)
-					break;
-			}
+		for (int col = 0; col < cols + 1; col++) {
+			final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(col * gridSize).addLocal(p0);
+			points.add(lineP1);
+			final ReadOnlyVector3 lineP2 = lineP1.add(height, null);
+			points.add(lineP2);
 		}
 
 		final int rows = (int) (height.length() / gridSize);
 
-		for (int row = 0; row < rows / 2 + 1; row++) {
-			for (int neg = -1; neg <= 1; neg += 2) {
-				final ReadOnlyVector3 lineP1 = height.normalize(null).multiplyLocal(neg * row * gridSize).addLocal(pMiddle).subtractLocal(width.multiply(0.5, null));
-				points.add(lineP1);
-				final ReadOnlyVector3 lineP2 = lineP1.add(width, null);
-				points.add(lineP2);
-				if (row == 0)
-					break;
-			}
+		for (int row = 0; row < rows + 1; row++) {
+			final ReadOnlyVector3 lineP1 = height.normalize(null).multiplyLocal(row * gridSize).addLocal(p0);
+			points.add(lineP1);
+			final ReadOnlyVector3 lineP2 = lineP1.add(width, null);
+			points.add(lineP2);
 		}
 		if (points.size() < 2)
 			return;
