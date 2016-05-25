@@ -58,6 +58,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -69,6 +71,7 @@ import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
@@ -1114,6 +1117,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			addTemplate("Box Gabled Roof", "templates/box-gabled-template.ng3");
+			addTemplate("Butterfly Roof", "templates/butterfly-template.ng3");
 			addTemplate("Cape Cod", "templates/cape-cod-template.ng3");
 			addTemplate("Colonial", "templates/colonial-template.ng3");
 			addTemplate("Combination Roof", "templates/combination-roof-template.ng3");
@@ -1121,10 +1125,12 @@ public class MainFrame extends JFrame {
 			addTemplate("Cross Hipped Roof", "templates/cross-hipped-template.ng3");
 			addTemplate("Flat Roof", "templates/flat-roof-template.ng3");
 			addTemplate("Gable & Valley Roof", "templates/gable-valley-template.ng3");
+			addTemplate("Gablet Roof", "templates/gablet-template.ng3");
 			addTemplate("Gambrel Roof", "templates/gambrel-template.ng3");
 			addTemplate("Hexagonal Gazebo", "templates/hexagonal-gazebo-template.ng3");
 			addTemplate("Hip & Valley Roof", "templates/hip-valley-template.ng3");
 			addTemplate("Mansard", "templates/mansard-template.ng3");
+			addTemplate("M-Shaped Roof", "templates/m-shaped-template.ng3");
 			addTemplate("Saltbox", "templates/saltbox-template.ng3");
 		}
 		return templatesMenu;
@@ -1327,6 +1333,8 @@ public class MainFrame extends JFrame {
 					if (selectedPart == null) {
 						UtilityBill b = Scene.getInstance().getUtilityBill();
 						if (b == null) {
+							if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+								return;
 							b = new UtilityBill();
 							Scene.getInstance().setUtilityBill(b);
 						}
@@ -1337,6 +1345,8 @@ public class MainFrame extends JFrame {
 							Foundation f = (Foundation) selectedPart;
 							UtilityBill b = f.getUtilityBill();
 							if (b == null) {
+								if (JOptionPane.showConfirmDialog(MainFrame.this, "No utility bill is found for this building. Create one?", "Utility Bill for Selected Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+									return;
 								b = new UtilityBill();
 								f.setUtilityBill(b);
 							}
@@ -1528,18 +1538,6 @@ public class MainFrame extends JFrame {
 		if (groupDailyAnalysisMenuItem == null) {
 			groupDailyAnalysisMenuItem = new JMenuItem("Daily Analysis for Group...");
 			groupDailyAnalysisMenuItem.addActionListener(new ActionListener() {
-
-				private ArrayList<Long> getIdArray(Class<?> c) {
-					ArrayList<Long> idArray = new ArrayList<Long>();
-					for (HousePart p : Scene.getInstance().getParts()) {
-						if (c.isInstance(p)) {
-							idArray.add(p.getId());
-						}
-					}
-					Collections.sort(idArray);
-					return idArray;
-				}
-
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -1547,49 +1545,11 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					JPanel gui = new JPanel(new BorderLayout(5, 5));
-					gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
-					final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Wall", "Window", "Roof", "Solar Panel" });
-					typeComboBox.addItemListener(new ItemListener() {
-						@Override
-						public void itemStateChanged(ItemEvent e) {
-							idListModel.clear();
-							String type = (String) typeComboBox.getSelectedItem();
-							Class<?> c = null;
-							if ("Wall".equals(type)) {
-								c = Wall.class;
-							} else if ("Window".equals(type)) {
-								c = Window.class;
-							} else if ("Roof".equals(type)) {
-								c = Roof.class;
-							} else if ("Solar Panel".equals(type)) {
-								c = SolarPanel.class;
-							}
-							if (c != null) {
-								ArrayList<Long> idArray = getIdArray(c);
-								for (Long id : idArray) {
-									idListModel.addElement(id);
-								}
-							}
-						}
-					});
-					ArrayList<Long> idArray = getIdArray(Wall.class);
-					for (Long id : idArray) {
-						idListModel.addElement(id);
+					PartGroup g = selectGroup();
+					if (g != null) {
+						GroupDailyAnalysis a = new GroupDailyAnalysis(g.getIds());
+						a.show(g.getType() + " " + g.getIds());
 					}
-					JList<Long> idList = new JList<Long>(idListModel);
-					gui.add(typeComboBox, BorderLayout.NORTH);
-					gui.add(new JScrollPane(idList), BorderLayout.CENTER);
-					if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
-						return;
-					List<Long> selectedIds = idList.getSelectedValuesList();
-					if (selectedIds.isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.this, "You must select a group of parts first.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					GroupDailyAnalysis a = new GroupDailyAnalysis(selectedIds);
-					a.show(typeComboBox.getSelectedItem() + " " + selectedIds);
 				}
 			});
 		}
@@ -1600,18 +1560,6 @@ public class MainFrame extends JFrame {
 		if (groupAnnualAnalysisMenuItem == null) {
 			groupAnnualAnalysisMenuItem = new JMenuItem("Annual Analysis for Group...");
 			groupAnnualAnalysisMenuItem.addActionListener(new ActionListener() {
-
-				private ArrayList<Long> getIdArray(Class<?> c) {
-					ArrayList<Long> idArray = new ArrayList<Long>();
-					for (HousePart p : Scene.getInstance().getParts()) {
-						if (c.isInstance(p)) {
-							idArray.add(p.getId());
-						}
-					}
-					Collections.sort(idArray);
-					return idArray;
-				}
-
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -1619,53 +1567,81 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					JPanel gui = new JPanel(new BorderLayout(5, 5));
-					gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
-					final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Wall", "Window", "Roof", "Solar Panel" });
-					typeComboBox.addItemListener(new ItemListener() {
-						@Override
-						public void itemStateChanged(ItemEvent e) {
-							idListModel.clear();
-							String type = (String) typeComboBox.getSelectedItem();
-							Class<?> c = null;
-							if ("Wall".equals(type)) {
-								c = Wall.class;
-							} else if ("Window".equals(type)) {
-								c = Window.class;
-							} else if ("Roof".equals(type)) {
-								c = Roof.class;
-							} else if ("Solar Panel".equals(type)) {
-								c = SolarPanel.class;
-							}
-							if (c != null) {
-								ArrayList<Long> idArray = getIdArray(c);
-								for (Long id : idArray) {
-									idListModel.addElement(id);
-								}
-							}
-						}
-					});
-					ArrayList<Long> idArray = getIdArray(Wall.class);
-					for (Long id : idArray) {
-						idListModel.addElement(id);
+					PartGroup g = selectGroup();
+					if (g != null) {
+						GroupAnnualAnalysis a = new GroupAnnualAnalysis(g.getIds());
+						a.show(g.getType() + " " + g.getIds());
 					}
-					JList<Long> idList = new JList<Long>(idListModel);
-					gui.add(typeComboBox, BorderLayout.NORTH);
-					gui.add(new JScrollPane(idList), BorderLayout.CENTER);
-					if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
-						return;
-					List<Long> selectedIds = idList.getSelectedValuesList();
-					if (selectedIds.isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.this, "You must select a group of parts first.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					GroupAnnualAnalysis a = new GroupAnnualAnalysis(selectedIds);
-					a.show(typeComboBox.getSelectedItem() + " " + selectedIds);
 				}
 			});
 		}
 		return groupAnnualAnalysisMenuItem;
+	}
+
+	private ArrayList<Long> getIdArray(Class<?> c) {
+		ArrayList<Long> idArray = new ArrayList<Long>();
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (c.isInstance(p)) {
+				idArray.add(p.getId());
+			}
+		}
+		Collections.sort(idArray);
+		return idArray;
+	}
+
+	private PartGroup selectGroup() {
+		JPanel gui = new JPanel(new BorderLayout(5, 5));
+		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
+		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Wall", "Window", "Roof", "Solar Panel" });
+		typeComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				idListModel.clear();
+				String type = (String) typeComboBox.getSelectedItem();
+				Class<?> c = null;
+				if ("Wall".equals(type)) {
+					c = Wall.class;
+				} else if ("Window".equals(type)) {
+					c = Window.class;
+				} else if ("Roof".equals(type)) {
+					c = Roof.class;
+				} else if ("Solar Panel".equals(type)) {
+					c = SolarPanel.class;
+				}
+				if (c != null) {
+					ArrayList<Long> idArray = getIdArray(c);
+					for (Long id : idArray) {
+						idListModel.addElement(id);
+					}
+				}
+			}
+		});
+		final ArrayList<Long> idArray = getIdArray(Wall.class);
+		for (Long id : idArray) {
+			idListModel.addElement(id);
+		}
+		final JList<Long> idList = new JList<Long>(idListModel);
+		idList.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				SceneManager.getInstance().hideAllEditPoints();
+				List<Long> selectedValues = idList.getSelectedValuesList();
+				for (Long i : selectedValues)
+					Scene.getInstance().getPart(i).setEditPointsVisible(true);
+				Scene.getInstance().redrawAll();
+			}
+		});
+		gui.add(typeComboBox, BorderLayout.NORTH);
+		gui.add(new JScrollPane(idList), BorderLayout.CENTER);
+		if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
+			return null;
+		List<Long> selectedIds = idList.getSelectedValuesList();
+		if (selectedIds.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.this, "You must select a group of parts first.", "Error", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		return new PartGroup((String) typeComboBox.getSelectedItem(), selectedIds);
 	}
 
 	private JMenuItem getAnnualSensorMenuItem() {
@@ -2759,11 +2735,21 @@ public class MainFrame extends JFrame {
 			removeAllUtilityBillsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					ArrayList<Foundation> list = new ArrayList<Foundation>();
 					for (HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof Foundation) {
-							((Foundation) p).setUtilityBill(null);
+						if (p instanceof Foundation && ((Foundation) p).getUtilityBill() != null) {
+							list.add((Foundation) p);
 						}
 					}
+					if (list.isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no utilitiy bill to remove.", "No Utility Bill", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + list.size() + " utility bills associated with buildings in this scene?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+						for (Foundation f : list)
+							f.setUtilityBill(null);
+					}
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}

@@ -161,4 +161,43 @@ class DataViewer {
 		showDataWindow("Data", column, header, parent);
 	}
 
+	static void viewRawData(final java.awt.Window parent, Graph graph, List<HousePart> selectedParts) {
+		if (selectedParts == null || selectedParts.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "No part is selected.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		ArrayList<String> headers = new ArrayList<String>();
+		if (graph instanceof PartEnergyDailyGraph) {
+			headers.add("Hour");
+		} else if (graph instanceof PartEnergyAnnualGraph) {
+			headers.add("Month");
+		}
+		for (HousePart p : selectedParts) {
+			if (p instanceof SolarPanel) {
+				headers.add("Solar " + p.getId());
+			} else if (p instanceof Wall || p instanceof Roof || p instanceof Door) {
+				headers.add("Heat Gain " + p.getId());
+			} else if (p instanceof Window) {
+				headers.add("Solar " + p.getId());
+				headers.add("Heat Gain " + p.getId());
+			}
+		}
+		String[] headersArray = new String[headers.size()];
+		for (int i = 0; i < headersArray.length; i++) {
+			headersArray[i] = headers.get(i);
+		}
+		final int m = headersArray.length;
+		final int n = graph.getLength();
+		final Object[][] column = new Object[n][m + 1];
+		for (int i = 0; i < n; i++)
+			column[i][0] = (i + 1);
+		for (int j = 1; j < m; j++) {
+			final List<Double> list = graph.getData(headersArray[j]);
+			for (int i = 0; i < n; i++) {
+				column[i][j] = list.get(i);
+			}
+		}
+		showDataWindow("Data", column, headersArray, parent);
+	}
+
 }
