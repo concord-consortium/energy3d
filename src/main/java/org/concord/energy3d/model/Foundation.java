@@ -64,7 +64,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.568; // default is R10 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private Thermostat thermostat = new Thermostat();
-	private UtilityBill utilityBill = new UtilityBill();
+	private UtilityBill utilityBill;
 
 	static {
 		format.setGroupingUsed(true);

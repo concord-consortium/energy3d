@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.AnnualGraph;
 import org.concord.energy3d.simulation.UtilityBill;
 
@@ -96,7 +97,7 @@ class UtilityBillDialog extends JDialog {
 					}
 					utilityBill.setMonthlyEnergy(i, x[i]);
 				}
-
+				Scene.getInstance().setEdited(true);
 				UtilityBillDialog.this.dispose();
 
 			}

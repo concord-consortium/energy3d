@@ -1114,6 +1114,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			addTemplate("Box Gabled Roof", "templates/box-gabled-template.ng3");
+			addTemplate("Butterfly Roof", "templates/butterfly-template.ng3");
 			addTemplate("Cape Cod", "templates/cape-cod-template.ng3");
 			addTemplate("Colonial", "templates/colonial-template.ng3");
 			addTemplate("Combination Roof", "templates/combination-roof-template.ng3");
@@ -1121,10 +1122,12 @@ public class MainFrame extends JFrame {
 			addTemplate("Cross Hipped Roof", "templates/cross-hipped-template.ng3");
 			addTemplate("Flat Roof", "templates/flat-roof-template.ng3");
 			addTemplate("Gable & Valley Roof", "templates/gable-valley-template.ng3");
+			addTemplate("Gablet Roof", "templates/gablet-template.ng3");
 			addTemplate("Gambrel Roof", "templates/gambrel-template.ng3");
 			addTemplate("Hexagonal Gazebo", "templates/hexagonal-gazebo-template.ng3");
 			addTemplate("Hip & Valley Roof", "templates/hip-valley-template.ng3");
 			addTemplate("Mansard", "templates/mansard-template.ng3");
+			addTemplate("M-Shaped Roof", "templates/m-shaped-template.ng3");
 			addTemplate("Saltbox", "templates/saltbox-template.ng3");
 		}
 		return templatesMenu;
@@ -1327,6 +1330,8 @@ public class MainFrame extends JFrame {
 					if (selectedPart == null) {
 						UtilityBill b = Scene.getInstance().getUtilityBill();
 						if (b == null) {
+							if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+								return;
 							b = new UtilityBill();
 							Scene.getInstance().setUtilityBill(b);
 						}
@@ -1337,6 +1342,8 @@ public class MainFrame extends JFrame {
 							Foundation f = (Foundation) selectedPart;
 							UtilityBill b = f.getUtilityBill();
 							if (b == null) {
+								if (JOptionPane.showConfirmDialog(MainFrame.this, "No utility bill is found for this building. Create one?", "Utility Bill for Selected Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+									return;
 								b = new UtilityBill();
 								f.setUtilityBill(b);
 							}
@@ -2759,11 +2766,21 @@ public class MainFrame extends JFrame {
 			removeAllUtilityBillsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					ArrayList<Foundation> list = new ArrayList<Foundation>();
 					for (HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof Foundation) {
-							((Foundation) p).setUtilityBill(null);
+						if (p instanceof Foundation && ((Foundation) p).getUtilityBill() != null) {
+							list.add((Foundation) p);
 						}
 					}
+					if (list.isEmpty()) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no utilitiy bill to remove.", "No Utility Bill", JOptionPane.INFORMATION_MESSAGE);
+						return;
+					}
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + list.size() + " utility bills associated with buildings in this scene?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+						for (Foundation f : list)
+							f.setUtilityBill(null);
+					}
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
