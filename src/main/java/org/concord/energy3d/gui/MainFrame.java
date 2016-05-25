@@ -307,8 +307,12 @@ public class MainFrame extends JFrame {
 			@Override
 			public boolean dispatchKeyEvent(final KeyEvent e) {
 				double a = MainPanel.getInstance().getBuildingRotationAngleAbsolute();
-				if (e.isAltDown())
+				if (e.isAltDown()) {
 					a *= 0.2;
+					SceneManager.getInstance().setFineGrid(true);
+				} else {
+					SceneManager.getInstance().setFineGrid(false);
+				}
 				switch (e.getID()) {
 				case KeyEvent.KEY_PRESSED:
 					MainPanel.getInstance().getRotateButton().setIcon(e.isShiftDown() ? icon_ccw : icon_cw);

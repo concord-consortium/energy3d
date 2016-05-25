@@ -252,6 +252,11 @@ public class Wall extends HousePart implements Thermalizable {
 			((Foundation) container).scanChildrenHeight();
 	}
 
+	@Override
+	public double getGridSize() {
+		return SceneManager.getInstance().isFineGrid() ? 0.5 : 2.5;
+	}
+
 	public Vector3 findClosestPointOnFoundation(final int x, final int y) {
 		final PickedHousePart floorPick = SelectUtil.pickPart(x, y, (HousePart) null);
 		if (floorPick != null) {

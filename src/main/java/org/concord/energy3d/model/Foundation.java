@@ -801,7 +801,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	@Override
 	public double getGridSize() {
-		return 5.0;
+		return SceneManager.getInstance().isFineGrid() ? 1.0 : 5.0;
 	}
 
 	@Override

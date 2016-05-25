@@ -223,6 +223,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Mesh sky;
 	private TextureState daySkyState, nightSkyState;
 	private boolean cameraChanged;
+	private boolean fineGrid;
 
 	public static SceneManager getInstance() {
 		return instance;
@@ -966,9 +967,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void moveWithKey(final KeyboardState ks, final Vector3 v) {
 		if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL) || ks.isDown(Key.LMETA) || ks.isDown(Key.LMETA))
 			return; // Ctrl/Cmd+key is often used for other purposes such as Ctrl+S or Cmd+S
-		if (ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU)) {
-			v.multiplyLocal(0.1);
-		}
+		fineGrid = ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU);
 		move(v);
 	}
 
@@ -1955,6 +1954,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 		return foundation;
+	}
+
+	public void setFineGrid(boolean b) {
+		fineGrid = b;
+	}
+
+	public boolean isFineGrid() {
+		return fineGrid;
 	}
 
 }

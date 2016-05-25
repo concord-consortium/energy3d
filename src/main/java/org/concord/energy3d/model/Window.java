@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.util.Util;
@@ -397,7 +398,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public double getGridSize() {
-		return 1.0;
+		return SceneManager.getInstance().isFineGrid() ? 1.0 : 2.0;
 	}
 
 	@Override
@@ -426,6 +427,7 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	public void move(final Vector3 v) {
+		v.multiplyLocal(getGridSize());
 		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points)
 			movePoints.add(p.clone());
