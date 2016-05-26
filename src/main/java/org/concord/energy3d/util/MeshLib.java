@@ -384,23 +384,23 @@ public class MeshLib {
 		if (Util.isEqual(sortedOutlinePoints.get(0), sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
 			sortedOutlinePoints.remove(sortedOutlinePoints.size() - 1);
 
-		for (int i = 0; i < sortedOutlinePoints.size(); i++) {
-			final ReadOnlyVector3 p1 = sortedOutlinePoints.get(i);
-			final ReadOnlyVector3 p2 = sortedOutlinePoints.get((i + 1) % sortedOutlinePoints.size());
-			final ReadOnlyVector3 p3 = sortedOutlinePoints.get((i + 2) % sortedOutlinePoints.size());
-
-			if (isAlmost180(p1, p2, p3)) {
-				sortedOutlinePoints.remove((i + 1) % sortedOutlinePoints.size());
-				i--;
-			}
-		}
+//		for (int i = 0; i < sortedOutlinePoints.size(); i++) {
+//			final ReadOnlyVector3 p1 = sortedOutlinePoints.get(i);
+//			final ReadOnlyVector3 p2 = sortedOutlinePoints.get((i + 1) % sortedOutlinePoints.size());
+//			final ReadOnlyVector3 p3 = sortedOutlinePoints.get((i + 2) % sortedOutlinePoints.size());
+//
+//			if (isAlmost180(p1, p2, p3)) {
+//				sortedOutlinePoints.remove((i + 1) % sortedOutlinePoints.size());
+//				i--;
+//			}
+//		}
 
 		return sortedOutlinePoints;
 	}
 
-	private static boolean isAlmost180(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
-		return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
-	}
+//	private static boolean isAlmost180(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
+//		return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
+//	}
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v, final boolean isWall) {
 		/* round all points */
@@ -423,7 +423,7 @@ public class MeshLib {
 						break;
 					}
 			}
-			// ensure holes don't collide with eachother
+			// ensure holes don't collide with each other
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
 				if (skipHoles.containsKey(hole1))
