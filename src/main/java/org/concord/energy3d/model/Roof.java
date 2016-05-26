@@ -148,6 +148,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	@Override
+	public double getGridSize() {
+		return SceneManager.getInstance().isFineGrid() ? 0.5 : 2.5;
+	}
+
+	@Override
 	protected void drawMesh() {
 		// undo the effect of wall stretch on all walls if roof is moved to new walls
 		if (previousContainer != container) {
@@ -705,6 +710,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (gableEditPointToWallMap == null)
 			return;
 		for (final int editPointIndex : gableEditPointToWallMap.keySet()) {
+//			if (editPointIndex >= points.size()) {
+//				gableEditPointToWallMap.clear();
+//				break;
+//			}
 			final Vector3 editPoint = getAbsPoint(editPointIndex);
 			final List<Wall> gableWalls = gableEditPointToWallMap.get(editPointIndex);
 			final List<ReadOnlyVector3> wallPoints = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);

@@ -780,13 +780,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.LSHIFT), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				SelectUtil.setPickLayer(0);
+				// SelectUtil.setPickLayer(0);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.LSHIFT), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				SelectUtil.setPickLayer(-1);
+				// SelectUtil.setPickLayer(-1);
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DELETE), new TriggerAction() {
@@ -967,8 +967,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void moveWithKey(final KeyboardState ks, final Vector3 v) {
 		if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL) || ks.isDown(Key.LMETA) || ks.isDown(Key.LMETA))
 			return; // Ctrl/Cmd+key is often used for other purposes such as Ctrl+S or Cmd+S
-		fineGrid = ks.isDown(Key.LMENU) || ks.isDown(Key.RMENU);
+		fineGrid = ks.isDown(Key.LSHIFT) || ks.isDown(Key.RSHIFT);
 		move(v);
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
 	}
 
 	public void move(final Vector3 v) {

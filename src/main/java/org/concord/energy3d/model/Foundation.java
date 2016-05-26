@@ -293,7 +293,6 @@ public class Foundation extends HousePart implements Thermalizable {
 				if (!closestPoint.equals(currentPoint)) {
 					newBoundingHeight = Math.max(0, closestPoint.getZ() - height);
 					applyNewHeight(boundingHeight, newBoundingHeight, false);
-					System.out.println(boundingHeight + "\t" + newBoundingHeight);
 				}
 			}
 			syncUpperPoints();
@@ -839,6 +838,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void move(final Vector3 v) {
+		v.multiplyLocal(getGridSize());
 		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points)
 			movePoints.add(p.clone());
