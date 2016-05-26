@@ -765,22 +765,27 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Foundation) {
 				Foundation foundation = (Foundation) selectedPart;
 				if (foundation.isDrawable()) {
-					Vector3 v2 = foundation.getAbsPoint(1);
+					Vector3 v1 = foundation.getAbsPoint(1);
+					Vector3 v2 = foundation.getAbsPoint(2);
+					Vector3 v3 = foundation.getAbsPoint(3);
+					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					double lx = v.distance(v2);
+					double ly = v.distance(v1);
 					partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 					partProperty1Label.setText("  Size:");
 					partProperty2Label.setText("  Position:");
 					partProperty3Label.setText("  Azimuth:");
-					partProperty1TextField.setText(oneDecimal.format(v.distance(foundation.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(v2) * scale)) + " m");
-					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m");
-					double distance = v.distance(v2);
-					double a = 90 + Math.toDegrees(Math.asin((v.getY() - v2.getY()) / distance));
-					if (v.getX() > v2.getX())
+					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
+					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
+					double a = 90 + Math.toDegrees(Math.asin((v.getY() - v1.getY()) / ly));
+					if (v.getX() > v1.getX())
 						a = 360 - a;
 					if (Util.isZero(a - 360)) // reset 360 to 0
 						a = 0;
 					partProperty3TextField.setText(noDecimal.format(a) + "\u00B0");
 					partProperty1TextField.setToolTipText("The length and width of the foundation");
-					partProperty2TextField.setToolTipText("The (x, y) coordinate of the anchor point (one of the corner points)");
+					partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the foundation");
 					partProperty3TextField.setToolTipText("The azimuth of the reference edge");
 				}
 			} else if (selectedPart instanceof Roof) {
@@ -791,7 +796,7 @@ public class EnergyPanel extends JPanel {
 					partProperty2Label.setText("  Rise:");
 					partProperty2TextField.setText(oneDecimal.format(roof.getHeight() * scale) + " m");
 					partProperty1TextField.setToolTipText("The total area of the roof");
-					partProperty2TextField.setToolTipText("The rise of the roof (the highest point of the roof to the top of the walls");
+					partProperty2TextField.setToolTipText("<html>The rise of the roof<br>(the highest point of the roof to the top of the walls</html>");
 					String id = "Roof (" + roof.getId() + ")";
 					String rval = oneDecimal.format(Util.toUsRValue(roof.getUValue()));
 					if (energyViewShown) {
@@ -809,8 +814,10 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Window) {
 				Window window = (Window) selectedPart;
 				if (window.isDrawable()) {
+					double lx = v.distance(window.getAbsPoint(2));
+					double ly = v.distance(window.getAbsPoint(1));
 					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(oneDecimal.format(v.distance(window.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(window.getAbsPoint(1)) * scale)) + " m");
+					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  U-value:");
 					partProperty2TextField.setText(twoDecimals.format(Util.toUsUValue(window.getUValue())) + " (US system)");
 					partProperty1TextField.setToolTipText("The width and height of the window");
@@ -832,12 +839,19 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Wall) {
 				Wall wall = (Wall) selectedPart;
 				if (wall.isDrawable()) {
+					Vector3 v1 = wall.getAbsPoint(1);
+					Vector3 v2 = wall.getAbsPoint(2);
+					Vector3 v3 = wall.getAbsPoint(3);
+					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					double lx = v.distance(v2);
+					double ly = v.distance(v1);
 					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(oneDecimal.format(v.distance(wall.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(wall.getAbsPoint(1)) * scale)) + " m");
+					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  Position:");
-					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m");
+					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
 					partProperty1TextField.setToolTipText("The width and height of the wall");
-					partProperty2TextField.setToolTipText("The (x, y) coordinate of the anchor point");
+					partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the wall");
 					String id = "Wall (" + wall.getId() + ")";
 					String rval = oneDecimal.format(Util.toUsRValue(wall.getUValue()));
 					if (energyViewShown) {
@@ -855,37 +869,49 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Door) {
 				Door door = (Door) selectedPart;
 				if (door.isDrawable()) {
+					Vector3 v1 = door.getAbsPoint(1);
+					Vector3 v2 = door.getAbsPoint(2);
+					Vector3 v3 = door.getAbsPoint(3);
+					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					double lx = v.distance(v2);
+					double ly = v.distance(v1);
 					partPanelBorder.setTitle("Door (" + door.getId() + ")");
 					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(oneDecimal.format(v.distance(door.getAbsPoint(2)) * scale) + "\u00d7" + (oneDecimal.format(v.distance(door.getAbsPoint(1)) * scale)) + " m");
+					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  Position:");
-					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m");
+					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
 					partProperty3Label.setText("  U-value:");
 					partProperty3TextField.setText(twoDecimals.format(Util.toUsUValue(door.getUValue())) + " (US system)");
 					partProperty1TextField.setToolTipText("The width and height of the door");
-					partProperty2TextField.setToolTipText("The (x, y) coordinates of the anchor point");
+					partProperty2TextField.setToolTipText("The (x, y) coordinates of the center of the door");
 					partProperty3TextField.setToolTipText("The U-value of the wall");
 				}
 			} else if (selectedPart instanceof Floor) {
 				Floor floor = (Floor) selectedPart;
 				if (floor.isDrawable()) {
+					Vector3 v1 = floor.getAbsPoint(1);
+					Vector3 v2 = floor.getAbsPoint(2);
+					Vector3 v3 = floor.getAbsPoint(3);
+					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
 					partPanelBorder.setTitle("Floor (" + floor.getId() + ")");
 					partProperty1Label.setText("  Area:");
 					partProperty2Label.setText("  Position:");
 					partProperty3Label.setText("  Height:");
 					partProperty1TextField.setText(oneDecimal.format(floor.getArea()) + " m\u00B2");
-					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m");
+					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
 					partProperty3TextField.setText(oneDecimal.format(v.getZ() * scale) + " m");
 					partProperty1TextField.setToolTipText("The area of the floor");
-					partProperty2TextField.setToolTipText("The (x, y) position of the anchor point");
+					partProperty2TextField.setToolTipText("The (x, y) position of the center of the floor");
 					partProperty3TextField.setToolTipText("The height of the floor");
 				}
 			}
 		} else {
 			partPanelBorder.setTitle("Part");
-			partProperty1Label.setText("  X:");
-			partProperty2Label.setText("  Y:");
-			partProperty3Label.setText("  Z:");
+			partProperty1Label.setText("  -");
+			partProperty2Label.setText("  -");
+			partProperty3Label.setText("  -");
 			partProperty1TextField.setText("");
 			partProperty2TextField.setText("");
 			partProperty3TextField.setText("");
