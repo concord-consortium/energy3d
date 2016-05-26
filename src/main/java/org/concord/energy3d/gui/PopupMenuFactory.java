@@ -58,6 +58,7 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
+import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
@@ -975,6 +976,43 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miAddUtilityBill = new JMenuItem("Add Utility Bill");
+			miAddUtilityBill.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						Foundation f = (Foundation) selectedPart;
+						UtilityBill b = f.getUtilityBill();
+						if (b == null) {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "No utility bill is found for this building. Create one?", "Utility Bill for Building #" + f.getId(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+								return;
+							b = new UtilityBill();
+							f.setUtilityBill(b);
+						}
+						new UtilityBillDialog(b).setVisible(true);
+					}
+				}
+			});
+
+			final JMenuItem miDeleteUtilityBill = new JMenuItem("Delete Utility Bill");
+			miDeleteUtilityBill.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						Foundation f = (Foundation) selectedPart;
+						if (f.getUtilityBill() == null) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no utilitiy bill associated with this building.", "No Utility Bill", JOptionPane.INFORMATION_MESSAGE);
+						} else {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove the utility bill associated with this building?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+								((Foundation) selectedPart).setUtilityBill(null);
+							}
+						}
+					}
+				}
+			});
+
 			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Lock");
 			miLock.addItemListener(new ItemListener() {
 				@Override
@@ -1027,6 +1065,7 @@ public class PopupMenuFactory {
 				public void run() {
 					HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
+						Foundation f = (Foundation) p;
 						if (Scene.getInstance().isStudentMode()) {
 							miLock.setEnabled(false);
 							miDisableEdits.setEnabled(false);
@@ -1036,8 +1075,9 @@ public class PopupMenuFactory {
 							miDisableEdits.setEnabled(true);
 							miThermostat.setEnabled(true);
 						}
-						Util.selectSilently(miLock, p.isFrozen());
-						Util.selectSilently(miDisableEdits, ((Foundation) p).getLockEdit());
+						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
+						Util.selectSilently(miLock, f.isFrozen());
+						Util.selectSilently(miDisableEdits, f.getLockEdit());
 					}
 				}
 			});
@@ -1053,6 +1093,8 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForFoundation.add(miThermostat);
 			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miAddUtilityBill);
+			popupMenuForFoundation.add(miDeleteUtilityBill);
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1483,7 +1525,9 @@ public class PopupMenuFactory {
 
 				}
 
-				while (true) {
+				while (true)
+
+				{
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						String newValue = siField.getText();
 						try {

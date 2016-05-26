@@ -44,14 +44,13 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
-import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
@@ -368,16 +367,28 @@ public class GroupAnnualAnalysis extends Analysis {
 
 	@Override
 	public String toJson() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		String s = "{\"Months\": " + getNumberOfDataPoints();
-		String[] names;
-		if (selectedPart instanceof Foundation) {
-			s += ", \"Building\": " + selectedPart.getId();
-			names = new String[] { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-		} else {
-			s += ", \"Part\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
-			names = new String[] { "Solar", "Heat Gain" };
+		String type = "Unknown";
+		ArrayList<String> names = new ArrayList<String>();
+		for (HousePart p : selectedParts) {
+			if (p instanceof SolarPanel) {
+				names.add("Solar " + p.getId());
+				type = "Solar Panel";
+			} else if (p instanceof Wall) {
+				names.add("Heat Gain " + p.getId());
+				type = "Wall";
+			} else if (p instanceof Roof) {
+				names.add("Heat Gain " + p.getId());
+				type = "Roof";
+			} else if (p instanceof Door) {
+				names.add("Heat Gain " + p.getId());
+				type = "Door";
+			} else if (p instanceof Window) {
+				names.add("Solar " + p.getId());
+				names.add("Heat Gain " + p.getId());
+				type = "Window";
+			}
 		}
+		String s = "{\"Type\": \"" + type + "\", \"Months\": " + getNumberOfDataPoints();
 		for (String name : names) {
 			List<Double> data = graph.getData(name);
 			if (data == null)

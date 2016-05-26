@@ -30,6 +30,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
@@ -347,9 +348,28 @@ public class GroupDailyAnalysis extends Analysis {
 
 	@Override
 	public String toJson() {
-		String s = "{";
-		String[] names = new String[] { "Solar", "Heat Gain" };
-		s += "\"Part\": \"" + selectedParts + "\"";
+		String type = "Unknown";
+		ArrayList<String> names = new ArrayList<String>();
+		for (HousePart p : selectedParts) {
+			if (p instanceof SolarPanel) {
+				names.add("Solar " + p.getId());
+				type = "Solar Panel";
+			} else if (p instanceof Wall) {
+				names.add("Heat Gain " + p.getId());
+				type = "Wall";
+			} else if (p instanceof Roof) {
+				names.add("Heat Gain " + p.getId());
+				type = "Roof";
+			} else if (p instanceof Door) {
+				names.add("Heat Gain " + p.getId());
+				type = "Door";
+			} else if (p instanceof Window) {
+				names.add("Solar " + p.getId());
+				names.add("Heat Gain " + p.getId());
+				type = "Window";
+			}
+		}
+		String s = "{\"Type\": \"" + type + "\"";
 		for (String name : names) {
 			List<Double> data = graph.getData(name);
 			if (data == null)

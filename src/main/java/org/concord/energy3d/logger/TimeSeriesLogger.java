@@ -36,6 +36,8 @@ import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.GroupAnnualAnalysis;
+import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.undo.AddPartCommand;
@@ -74,6 +76,7 @@ import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.undo.TopViewCommand;
+import org.concord.energy3d.undo.ZoomCommand;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.Vector3;
@@ -234,6 +237,8 @@ public class TimeSeriesLogger {
 					stateValue = "" + ((ShowHeliodonCommand) lastEdit).getNewValue();
 				} else if (lastEdit instanceof TopViewCommand) {
 					stateValue = "" + (SceneManager.getInstance().getViewMode() == ViewMode.TOP_VIEW);
+				} else if (lastEdit instanceof ZoomCommand) {
+					stateValue = "" + ((ZoomCommand) lastEdit).getValue();
 				}
 
 				// value changes
@@ -450,6 +455,11 @@ public class TimeSeriesLogger {
 					line += ((SolarDailyAnalysis) analysisRequester).toJson();
 				} else if (analysisRequester instanceof SolarAnnualAnalysis) {
 					line += ((SolarAnnualAnalysis) analysisRequester).toJson();
+				}
+				if (analysisRequester instanceof GroupDailyAnalysis) {
+					line += ((GroupDailyAnalysis) analysisRequester).toJson();
+				} else if (analysisRequester instanceof GroupAnnualAnalysis) {
+					line += ((GroupAnnualAnalysis) analysisRequester).toJson();
 				}
 			}
 		}

@@ -102,6 +102,7 @@ import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.TopViewCommand;
+import org.concord.energy3d.undo.ZoomCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Printout;
@@ -140,7 +141,7 @@ public class MainFrame extends JFrame {
 	private JMenu viewMenu;
 	private JMenu analysisMenu;
 	private JMenuItem rescaleMenuItem;
-	private JMenuItem utilityBillMenuItem;
+	private JMenuItem overallUtilityBillMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem annualEnergyAnalysisMenuItem;
 	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
@@ -436,6 +437,7 @@ public class MainFrame extends JFrame {
 					replayControlsMenu.setEnabled(b);
 					analyzeFolderMenuItem.setEnabled(b);
 					importColladaMenuItem.setEnabled(b);
+					saveMenuItem.setEnabled(b);
 				}
 
 				@Override
@@ -455,6 +457,9 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 
 					enableMenuItems(true);
+					if (Scene.getURL() != null)
+						saveMenuItem.setEnabled(Scene.getURL().toString().indexOf(".jar!") == -1); // cannot overwrite a template
+
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
 					replayFolderMenuItem.setEnabled(inactive);
@@ -1093,7 +1098,6 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getDailySensorMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
-			analysisMenu.add(getUtilityBillMenuItem());
 			analysisMenu.add(getSimulationSettingsMenuItem());
 		}
 		return analysisMenu;
@@ -1322,42 +1326,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return simulationSettingsMenuItem;
-	}
-
-	private JMenuItem getUtilityBillMenuItem() {
-		if (utilityBillMenuItem == null) {
-			utilityBillMenuItem = new JMenuItem("Input Utility Bill...");
-			utilityBillMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						UtilityBill b = Scene.getInstance().getUtilityBill();
-						if (b == null) {
-							if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
-								return;
-							b = new UtilityBill();
-							Scene.getInstance().setUtilityBill(b);
-						}
-						new UtilityBillDialog(b).setVisible(true);
-					} else {
-						SceneManager.getInstance().autoSelectBuilding(true);
-						if (selectedPart instanceof Foundation) {
-							Foundation f = (Foundation) selectedPart;
-							UtilityBill b = f.getUtilityBill();
-							if (b == null) {
-								if (JOptionPane.showConfirmDialog(MainFrame.this, "No utility bill is found for this building. Create one?", "Utility Bill for Selected Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
-									return;
-								b = new UtilityBill();
-								f.setUtilityBill(b);
-							}
-							new UtilityBillDialog(b).setVisible(true);
-						}
-					}
-				}
-			});
-		}
-		return utilityBillMenuItem;
 	}
 
 	private JMenuItem getAnnualEnergyAnalysisMenuItem() {
@@ -1902,6 +1870,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
 			editMenu.add(getLockAllMenuItem());
 			editMenu.addSeparator();
+			editMenu.add(getOverallUtilityBillMenuItem());
 			editMenu.add(getSpecificationsMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getPropertiesMenuItem());
@@ -2202,7 +2171,9 @@ public class MainFrame extends JFrame {
 			zoomInMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					ZoomCommand c = new ZoomCommand(true);
 					SceneManager.getInstance().zoom(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -2216,7 +2187,9 @@ public class MainFrame extends JFrame {
 			zoomOutMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					ZoomCommand c = new ZoomCommand(false);
 					SceneManager.getInstance().zoom(false);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -2520,7 +2493,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getSpecificationsMenuItem() {
 		if (specificationsMenuItem == null) {
-			specificationsMenuItem = new JMenuItem("Specifications");
+			specificationsMenuItem = new JMenuItem("Specifications...");
 			specificationsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2531,9 +2504,29 @@ public class MainFrame extends JFrame {
 		return specificationsMenuItem;
 	}
 
+	private JMenuItem getOverallUtilityBillMenuItem() {
+		if (overallUtilityBillMenuItem == null) {
+			overallUtilityBillMenuItem = new JMenuItem("Overall Utility Bill...");
+			overallUtilityBillMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					UtilityBill b = Scene.getInstance().getUtilityBill();
+					if (b == null) {
+						if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+							return;
+						b = new UtilityBill();
+						Scene.getInstance().setUtilityBill(b);
+					}
+					new UtilityBillDialog(b).setVisible(true);
+				}
+			});
+		}
+		return overallUtilityBillMenuItem;
+	}
+
 	private JMenuItem getPropertiesMenuItem() {
 		if (propertiesMenuItem == null) {
-			propertiesMenuItem = new JMenuItem("Properties");
+			propertiesMenuItem = new JMenuItem("Properties...");
 			propertiesMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
