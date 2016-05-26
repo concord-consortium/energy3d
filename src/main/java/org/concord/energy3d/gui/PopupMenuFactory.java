@@ -73,6 +73,7 @@ import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -991,6 +992,7 @@ public class PopupMenuFactory {
 							f.setUtilityBill(b);
 						}
 						new UtilityBillDialog(b).setVisible(true);
+						Scene.getInstance().setEdited(true);
 					}
 				}
 			});
@@ -1006,7 +1008,10 @@ public class PopupMenuFactory {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no utilitiy bill associated with this building.", "No Utility Bill", JOptionPane.INFORMATION_MESSAGE);
 						} else {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove the utility bill associated with this building?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-								((Foundation) selectedPart).setUtilityBill(null);
+								DeleteUtilityBillCommand c = new DeleteUtilityBillCommand(f);
+								f.setUtilityBill(null);
+								Scene.getInstance().setEdited(true);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
 							}
 						}
 					}

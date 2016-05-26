@@ -63,6 +63,7 @@ import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.PastePartCommand;
@@ -218,6 +219,10 @@ public class TimeSeriesLogger {
 					} else {
 						stateValue = "{\"Displacement\": " + s + "}";
 					}
+				} else if (lastEdit instanceof DeleteUtilityBillCommand) {
+					DeleteUtilityBillCommand c = (DeleteUtilityBillCommand) lastEdit;
+					Foundation f = c.getFoundation();
+					stateValue = "{\"Building\": " + f.getId() + "}";
 				}
 
 				// boolean switches
