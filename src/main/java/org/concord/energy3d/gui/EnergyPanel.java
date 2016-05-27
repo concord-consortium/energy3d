@@ -707,9 +707,15 @@ public class EnergyPanel extends JPanel {
 					partProperty1Label.setText("  Spread:");
 					partProperty2Label.setText("  Height:");
 					partProperty3Label.setText("  Position:");
+					double l = v.length();
+					double a = 90 + Math.toDegrees(Math.asin(-v.getY() / l));
+					if (v.getX() < 0)
+						a = 360 - a;
+					if (Util.isZero(a - 360)) // reset 360 to 0
+						a = 0;
 					partProperty1TextField.setText(oneDecimal.format(tree.getWidth() * scale) + " m");
 					partProperty2TextField.setText(oneDecimal.format(tree.getHeight() * scale) + " m");
-					partProperty3TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m");
+					partProperty3TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m or (" + oneDecimal.format(l * scale) + " m, " + oneDecimal.format(a) + "\u00B0)");
 					partProperty1TextField.setToolTipText("The spread of the tree");
 					partProperty2TextField.setToolTipText("The height of the tree");
 					partProperty3TextField.setToolTipText("The (x, y) coordinates on the land");

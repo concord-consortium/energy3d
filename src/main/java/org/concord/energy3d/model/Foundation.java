@@ -838,6 +838,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void move(final Vector3 v) {
+		v.normalizeLocal();
 		v.multiplyLocal(getGridSize());
 		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points)
