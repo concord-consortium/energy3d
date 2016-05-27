@@ -970,6 +970,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		fineGrid = ks.isDown(Key.LSHIFT) || ks.isDown(Key.RSHIFT);
 		move(v);
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				EnergyPanel.getInstance().updateProperties();
 			}
@@ -1961,7 +1962,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return foundation;
 	}
 
-	public void setFineGrid(boolean b) {
+	public void setFineGrid(final boolean b) {
 		fineGrid = b;
 	}
 

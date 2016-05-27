@@ -24,7 +24,6 @@ public class PyramidRoof extends Roof {
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;
-			;
 		} else {
 			final ReadOnlyVector3 base = new Vector3(getAbsPoint(0).getX(), getAbsPoint(0).getY(), getCenter().getZ());
 			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);

@@ -60,6 +60,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	protected transient Node roofPartsRoot;
 	protected transient List<ReadOnlyVector3> wallUpperPoints;
+	private transient Map<String, ReadOnlyVector3> intersectionCache;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient Map<Mesh, Double> areaByPartWithoutOverhang;
@@ -365,10 +366,16 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	private ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
-		final double offset = 0.001;
-		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
-		return pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
+		final String key = "" + getRoofPartsRoot().hashCode() + p.hashCode() + Vector3.UNIT_Z.hashCode();
+		ReadOnlyVector3 result = getIntersectionCache().get(key);
+		if (result == null) {
+			final double offset = 0.001;
+			final PickResults pickResults = new PrimitivePickResults();
+			PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
+			result = pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
+			getIntersectionCache().put(key, result);
+		}
+		return result;
 	}
 
 	protected void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon) {
@@ -710,10 +717,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (gableEditPointToWallMap == null)
 			return;
 		for (final int editPointIndex : gableEditPointToWallMap.keySet()) {
-//			if (editPointIndex >= points.size()) {
-//				gableEditPointToWallMap.clear();
-//				break;
-//			}
+			// if (editPointIndex >= points.size()) {
+			// gableEditPointToWallMap.clear();
+			// break;
+			// }
 			final Vector3 editPoint = getAbsPoint(editPointIndex);
 			final List<Wall> gableWalls = gableEditPointToWallMap.get(editPointIndex);
 			final List<ReadOnlyVector3> wallPoints = new ArrayList<ReadOnlyVector3>(gableWalls.size() * 2);
@@ -989,6 +996,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	protected void postEdit(final EditState editState) {
+		intersectionCache.clear();
 		draw();
 		drawWalls();
 
@@ -1321,6 +1329,12 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			}
 		}
 		return true;
+	}
+
+	public Map<String, ReadOnlyVector3> getIntersectionCache() {
+		if (intersectionCache == null)
+			intersectionCache = new HashMap<String, ReadOnlyVector3>();
+		return intersectionCache;
 	}
 
 }

@@ -750,8 +750,8 @@ public class Scene implements Serializable {
 		return parts;
 	}
 
-	public HousePart getPart(long id) {
-		for (HousePart p : parts) {
+	public HousePart getPart(final long id) {
+		for (final HousePart p : parts) {
 			if (id == p.getId())
 				return p;
 		}
@@ -840,6 +840,7 @@ public class Scene implements Serializable {
 	public void redrawAllNow() {
 		System.out.println("redrawAllNow()");
 		synchronized (SceneManager.getInstance()) {
+			final long t = System.nanoTime();
 			if (cleanup) {
 				cleanup();
 				cleanup = false;
@@ -854,8 +855,11 @@ public class Scene implements Serializable {
 					part.draw();
 			// need to draw roof again because roof holes depend on drawn windows
 			for (final HousePart part : parts)
-				if (part instanceof Roof)
+				if (part instanceof Roof) {
 					part.draw();
+					// System.out.println(((Roof) part).getIntersectionCache().size());
+				}
+			System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
 		}
 		// no need for redrawing print parts because they will be regenerated from original parts anyways
 		redrawAll = false;
@@ -1330,7 +1334,7 @@ public class Scene implements Serializable {
 		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
 	}
 
-	public void setAllowFoundationOverlap(boolean allowFoundationOverlap) {
+	public void setAllowFoundationOverlap(final boolean allowFoundationOverlap) {
 		this.allowFoundationOverlap = allowFoundationOverlap;
 	}
 
@@ -1370,7 +1374,7 @@ public class Scene implements Serializable {
 		return designSpecs;
 	}
 
-	public void setDashedLinesOnRoofShown(boolean dashedLineOnRoofs) {
+	public void setDashedLinesOnRoofShown(final boolean dashedLineOnRoofs) {
 		this.dashedlineOnRoofs = dashedLineOnRoofs;
 	}
 
@@ -1378,7 +1382,7 @@ public class Scene implements Serializable {
 		return dashedlineOnRoofs;
 	}
 
-	public void setOnlySolarAnalysis(boolean onlySolarAnalysis) {
+	public void setOnlySolarAnalysis(final boolean onlySolarAnalysis) {
 		this.onlySolarAnalysis = onlySolarAnalysis;
 	}
 
@@ -1386,7 +1390,7 @@ public class Scene implements Serializable {
 		return onlySolarAnalysis;
 	}
 
-	public void setUtilityBill(UtilityBill utilityBill) {
+	public void setUtilityBill(final UtilityBill utilityBill) {
 		this.utilityBill = utilityBill;
 	}
 

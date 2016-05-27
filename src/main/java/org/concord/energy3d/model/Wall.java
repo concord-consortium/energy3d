@@ -245,6 +245,7 @@ public class Wall extends HousePart implements Thermalizable {
 		}
 
 		Scene.getInstance().connectWalls();
+		roof.getIntersectionCache().clear();
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
 
@@ -383,7 +384,7 @@ public class Wall extends HousePart implements Thermalizable {
 	@Override
 	protected void drawMesh() {
 		mesh.getSceneHints().setCullHint(isDrawable() && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always);
-		boolean b = isDrawable() && !isFrozen() && type == SOLID_WALL;
+		final boolean b = isDrawable() && !isFrozen() && type == SOLID_WALL;
 		backMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
 		surroundMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
 		windowsSurroundMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
@@ -458,12 +459,12 @@ public class Wall extends HousePart implements Thermalizable {
 		root.updateWorldBound(true);
 	}
 
-	private void addPointToQuad(ReadOnlyVector3 v1, ReadOnlyVector3 v2, Vector3 dir, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
-		ReadOnlyVector3 p1 = new Vector3(v1).addLocal(dir);
-		ReadOnlyVector3 p3 = new Vector3(v2).addLocal(dir);
+	private void addPointToQuad(final ReadOnlyVector3 v1, final ReadOnlyVector3 v2, final Vector3 dir, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
+		final ReadOnlyVector3 p1 = new Vector3(v1).addLocal(dir);
+		final ReadOnlyVector3 p3 = new Vector3(v2).addLocal(dir);
 		dir.negateLocal();
-		ReadOnlyVector3 p2 = new Vector3(v1).addLocal(dir);
-		ReadOnlyVector3 p4 = new Vector3(v2).addLocal(dir);
+		final ReadOnlyVector3 p2 = new Vector3(v1).addLocal(dir);
+		final ReadOnlyVector3 p4 = new Vector3(v2).addLocal(dir);
 		vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
 		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
@@ -484,7 +485,7 @@ public class Wall extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 
-		Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
+		final Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
 		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
 		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 
@@ -510,7 +511,7 @@ public class Wall extends HousePart implements Thermalizable {
 
 		// Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(columnRadius);
 		// addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
-		Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
+		final Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
 		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
 		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 
@@ -527,14 +528,14 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	private Floor getFloor() {
-		for (HousePart hp : children) {
+		for (final HousePart hp : children) {
 			if (hp instanceof Floor)
 				return (Floor) hp;
 		}
 		return null;
 	}
 
-	private void drawRailings(final double distance, boolean fixedOnGround) {
+	private void drawRailings(final double distance, final boolean fixedOnGround) {
 		railings.setDefaultColor(getColor());
 		final FloatBuffer vertexBuffer = railings.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = railings.getMeshData().getNormalBuffer();
@@ -553,7 +554,7 @@ public class Wall extends HousePart implements Thermalizable {
 			visitNeighbors(new WallVisitor() {
 				@Override
 				public void visit(final Wall currentWall, final Snap prev, final Snap next) {
-					Floor f = currentWall.getFloor();
+					final Floor f = currentWall.getFloor();
 					if (f != null)
 						floor = f;
 				}
@@ -577,7 +578,7 @@ public class Wall extends HousePart implements Thermalizable {
 
 		} else {
 
-			double z0 = floor.getAbsPoint(0).getZ();
+			final double z0 = floor.getAbsPoint(0).getZ();
 			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railingRadius * 3);
 			addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 			dir = new Vector3(u).normalizeLocal().multiplyLocal(railingRadius);
@@ -757,12 +758,19 @@ public class Wall extends HousePart implements Thermalizable {
 	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 p, final ReadOnlyVector3 direction, final double offset) {
 		if (roof == null)
 			return p;
-		final PickResults pickResults = new PrimitivePickResults();
-		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ()), direction), pickResults, false);
-		if (pickResults.getNumber() > 0) {
-			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
+		final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
+		final String key = "" + roof.getRoofPartsRoot().hashCode() + origin.hashCode() + direction.hashCode();
+		ReadOnlyVector3 result = roof.getIntersectionCache().get(key);
+		if (result == null) {
+			final PickResults pickResults = new PrimitivePickResults();
+			PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
+			if (pickResults.getNumber() > 0)
+				result = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
+			else
+				result = p;
+			roof.getIntersectionCache().put(key, result);
 		}
-		return p;
+		return result;
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {
@@ -1561,7 +1569,7 @@ public class Wall extends HousePart implements Thermalizable {
 		return volumetricHeatCapacity;
 	}
 
-	public void setType(int type) {
+	public void setType(final int type) {
 		this.type = type;
 	}
 
