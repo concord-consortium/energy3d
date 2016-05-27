@@ -759,7 +759,7 @@ public class Wall extends HousePart implements Thermalizable {
 		if (roof == null)
 			return p;
 		final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
-		final String key = "" + roof.getRoofPartsRoot().hashCode() + origin.hashCode() + direction.hashCode();
+		final Integer key = p.hashCode();
 		ReadOnlyVector3 result = roof.getIntersectionCache().get(key);
 		if (result == null) {
 			final PickResults pickResults = new PrimitivePickResults();

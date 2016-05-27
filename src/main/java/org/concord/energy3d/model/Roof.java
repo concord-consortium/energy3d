@@ -57,10 +57,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	private static final long serialVersionUID = 1L;
 	public static final double OVERHANG_MIN = 0.01;
+	private static ReadOnlyVector3 nullVector = new Vector3();
 
 	protected transient Node roofPartsRoot;
 	protected transient List<ReadOnlyVector3> wallUpperPoints;
-	private transient Map<String, ReadOnlyVector3> intersectionCache;
+	private transient Map<Integer, ReadOnlyVector3> intersectionCache;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient Map<Mesh, Double> areaByPartWithoutOverhang;
@@ -366,14 +367,19 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	private ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
-		final String key = "" + getRoofPartsRoot().hashCode() + p.hashCode() + Vector3.UNIT_Z.hashCode();
+		final Integer key = p.hashCode();
 		ReadOnlyVector3 result = getIntersectionCache().get(key);
-		if (result == null) {
+		if (result == nullVector)
+			return null;
+		else if (result == null) {
 			final double offset = 0.001;
 			final PickResults pickResults = new PrimitivePickResults();
 			PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
 			result = pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
-			getIntersectionCache().put(key, result);
+			if (result == null)
+				getIntersectionCache().put(key, nullVector);
+			else
+				getIntersectionCache().put(key, result);
 		}
 		return result;
 	}
@@ -1331,9 +1337,9 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		return true;
 	}
 
-	public Map<String, ReadOnlyVector3> getIntersectionCache() {
+	public Map<Integer, ReadOnlyVector3> getIntersectionCache() {
 		if (intersectionCache == null)
-			intersectionCache = new HashMap<String, ReadOnlyVector3>();
+			intersectionCache = new HashMap<Integer, ReadOnlyVector3>();
 		return intersectionCache;
 	}
 
