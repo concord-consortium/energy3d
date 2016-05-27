@@ -298,6 +298,8 @@ public class Foundation extends HousePart implements Thermalizable {
 			syncUpperPoints();
 		}
 
+		clearRoofIntersectionCache(this);
+
 		if (resizeHouseMode)
 			drawChildren();
 		draw();
@@ -834,6 +836,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				return;
 			}
 		}
+		clearRoofIntersectionCache(this);
 		Scene.getInstance().redrawAll();
 	}
 
@@ -1059,6 +1062,14 @@ public class Foundation extends HousePart implements Thermalizable {
 				count++;
 		}
 		return count;
+	}
+
+	private void clearRoofIntersectionCache(final HousePart part) {
+		if (part instanceof Roof)
+			((Roof) part).getIntersectionCache().clear();
+		else if (part instanceof Foundation || part instanceof Wall)
+			for (final HousePart child : part.getChildren())
+				clearRoofIntersectionCache(child);
 	}
 
 }
