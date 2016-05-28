@@ -1007,7 +1007,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	protected void postEdit(final EditState editState) {
-		intersectionCache.clear();
+		if (intersectionCache != null)
+			intersectionCache.clear();
 		draw();
 		drawWalls();
 

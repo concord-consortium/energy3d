@@ -979,6 +979,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void drawAzimuthArrow() {
+		final double cos30 = Math.cos(Math.toRadians(30));
+		final double sin30 = Math.sin(Math.toRadians(30));
 		FloatBuffer arrowVertices = azimuthArrow.getMeshData().getVertexBuffer();
 		arrowVertices.clear();
 		Vector3 v = getAbsPoint(0).subtractLocal(getAbsPoint(1)).normalizeLocal().multiplyLocal(10).negateLocal();
@@ -986,25 +988,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		p.addLocal(v);
 		arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// final double angle = -Math.PI / 4;
-		// final double cos1 = Math.cos(angle);
-		// final double sin1 = Math.sin(angle);
-		// final double cos2 = v.getX() / v.length();
-		// final double sin2 = v.getY() / v.length();
-		// final float cos = (float) (cos1 * cos2 - sin1 * sin2);
-		// final float sin = (float) (cos1 * sin2 + sin1 * cos2);
-		// final float arrowLength = 5;
-		// arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// arrowVertices.put(p.getXf() - arrowLength * cos).put(p.getYf() - arrowLength * sin).put(p.getZf());
-		// arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		// arrowVertices.put(p.getXf() + arrowLength * cos).put(p.getYf() - arrowLength * sin).put(p.getZf());
+		final double arrowX = v.getX() / v.length();
+		final double arrowY = v.getY() / v.length();
+		final float r = 3;
+		float wingx = (float) (r * (arrowX * cos30 + arrowY * sin30));
+		float wingy = (float) (r * (arrowY * cos30 - arrowX * sin30));
+		arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		arrowVertices.put(p.getXf() - wingx).put(p.getYf() - wingy).put(p.getZf());
+		wingx = (float) (r * (arrowX * cos30 - arrowY * sin30));
+		wingy = (float) (r * (arrowY * cos30 + arrowX * sin30));
+		arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		arrowVertices.put(p.getXf() - wingx).put(p.getYf() - wingy).put(p.getZf());
 		azimuthArrow.getMeshData().updateVertexCount();
 		azimuthArrow.updateModelBound();
 		updateAzimuthArrowVisibility(SceneManager.getInstance().getSelectedPart() == this);
 	}
 
-	public void updateAzimuthArrowVisibility(boolean b){
-		azimuthArrow.setVisible(b);		
+	public void updateAzimuthArrowVisibility(boolean b) {
+		azimuthArrow.setVisible(b);
 	}
 
 	/* Draw the heat flux through the floor area on the foundation */

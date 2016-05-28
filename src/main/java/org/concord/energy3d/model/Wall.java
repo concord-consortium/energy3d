@@ -245,7 +245,8 @@ public class Wall extends HousePart implements Thermalizable {
 		}
 
 		Scene.getInstance().connectWalls();
-		roof.getIntersectionCache().clear();
+		if (roof != null)
+			roof.getIntersectionCache().clear();
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
 
