@@ -753,24 +753,32 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	public double findRoofIntersection(final ReadOnlyVector3 p) {
-		return findRoofIntersection(p, Vector3.UNIT_Z, -0.02).getZ();
+		return updateRoofIntersection(p, Vector3.UNIT_Z, -0.02).getZ();
 	}
 
 	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 p, final ReadOnlyVector3 direction, final double offset) {
 		if (roof == null)
 			return p;
-		final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
 		final Integer key = p.hashCode();
 		ReadOnlyVector3 result = roof.getIntersectionCache().get(key);
-		if (result == null) {
-			final PickResults pickResults = new PrimitivePickResults();
-			PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
-			if (pickResults.getNumber() > 0)
-				result = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
-			else
-				result = p;
-			roof.getIntersectionCache().put(key, result);
-		}
+		if (result == null)
+			result = updateRoofIntersection(p, direction, offset);
+		return result;
+	}
+
+	private ReadOnlyVector3 updateRoofIntersection(final ReadOnlyVector3 p, final ReadOnlyVector3 direction, final double offset) {
+		if (roof == null)
+			return p;
+		final Integer key = p.hashCode();
+		final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
+		final PickResults pickResults = new PrimitivePickResults();
+		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
+		ReadOnlyVector3 result;
+		if (pickResults.getNumber() > 0)
+			result = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
+		else
+			result = p;
+		roof.getIntersectionCache().put(key, result);
 		return result;
 	}
 

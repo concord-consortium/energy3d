@@ -1149,6 +1149,7 @@ public class MainFrame extends JFrame {
 			addTemplate("Mansard", "templates/mansard-template.ng3");
 			addTemplate("M-Shaped Roof", "templates/m-shaped-template.ng3");
 			addTemplate("Saltbox", "templates/saltbox-template.ng3");
+			addTemplate("Shed Roof", "templates/shed-roof-template.ng3");
 		}
 		return templatesMenu;
 	}

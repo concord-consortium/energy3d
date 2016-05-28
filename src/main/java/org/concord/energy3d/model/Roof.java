@@ -372,12 +372,12 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (result == nullVector)
 			return null;
 		else if (result == null) {
-			result = findRoofIntersectionNoCache(roofPart, p);
+			result = updateRoofIntersection(roofPart, p);
 		}
 		return result;
 	}
 
-	private ReadOnlyVector3 findRoofIntersectionNoCache(final Mesh roofPart, final ReadOnlyVector3 p) {
+	private ReadOnlyVector3 updateRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
 		final double offset = 0.001;
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
@@ -1252,7 +1252,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 						if (child.getSceneHints().getCullHint() != CullHint.Always) {
 							node = (Node) child;
 							mesh = (Mesh) node.getChild(6);
-							b = findRoofIntersectionNoCache(mesh, a);
+							b = updateRoofIntersection(mesh, a);
 							if (b != null)
 								break;
 						}
