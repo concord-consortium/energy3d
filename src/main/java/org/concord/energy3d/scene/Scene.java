@@ -777,6 +777,12 @@ public class Scene implements Serializable {
 		return url;
 	}
 
+	public static boolean isTemplate() {
+		if (Config.isEclipse())
+			return url != null && url.toString().indexOf("/energy3d/target/classes") != -1;
+		return url != null && url.toString().indexOf(".jar!") != -1;
+	}
+
 	public void setAnnotationsVisible(final boolean visible) {
 		isAnnotationsVisible = visible;
 		for (final HousePart part : parts)

@@ -457,8 +457,7 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 
 					enableMenuItems(true);
-					if (Scene.getURL() != null)
-						saveMenuItem.setEnabled(Scene.getURL().toString().indexOf(".jar!") == -1); // cannot overwrite a template
+					saveMenuItem.setEnabled(!Scene.isTemplate()); // cannot overwrite a template
 
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
@@ -823,7 +822,12 @@ public class MainFrame extends JFrame {
 		if (Scene.getURL() == null) {
 			setTitle("Energy3D V" + MainApplication.VERSION + star);
 		} else {
-			setTitle("Energy3D V" + MainApplication.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
+			if (Scene.isTemplate()) {
+				String s = Scene.getURL().toString();
+				setTitle("Energy3D V" + MainApplication.VERSION + " - TEMPLATE: " + s.substring(s.lastIndexOf("/") + 1).replaceAll("%20", " ") + star);
+			} else {
+				setTitle("Energy3D V" + MainApplication.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
+			}
 		}
 	}
 
@@ -966,6 +970,14 @@ public class MainFrame extends JFrame {
 			});
 			helpMenu.add(mi);
 			mi = new JMenuItem("View Examples...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Util.openBrowser("http://energy.concord.org/energy3d/styles.html");
+				}
+			});
+			helpMenu.add(mi);
+			mi = new JMenuItem("View User Work...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2385,10 +2397,15 @@ public class MainFrame extends JFrame {
 	private void save() {
 		try {
 			final URL url = Scene.getURL();
-			if (url != null)
-				Scene.save(url, false);
-			else
+			if (url != null) {
+				if (Scene.isTemplate()) {
+					saveFile();
+				} else {
+					Scene.save(url, false);
+				}
+			} else {
 				saveFile();
+			}
 			Scene.getInstance().setEdited(false, false);
 		} catch (final Throwable err) {
 			err.printStackTrace();
