@@ -1592,6 +1592,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							cameraControl.setLeftMouseButtonEnabled(false);
 						}
 
+						if (operation == Operation.SELECT || operation == Operation.ROTATE) {
+							if (previousSelectedHousePart instanceof Foundation) {
+								((Foundation) previousSelectedHousePart).updateAzimuthArrowVisibility(false);
+							}
+							if (selectedHousePart instanceof Foundation) {
+								((Foundation) selectedHousePart).drawAzimuthArrow();
+							}
+						}
 						if (operation == Operation.RESIZE && selectedHousePart != null) {
 							if (!(selectedHousePart instanceof Foundation)) {
 								selectedHousePart.setEditPointsVisible(false);

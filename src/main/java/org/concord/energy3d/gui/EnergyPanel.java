@@ -762,8 +762,8 @@ public class EnergyPanel extends JPanel {
 					partProperty2Label.setText("  Light:");
 					partProperty3Label.setText("  Heat:");
 					partProperty1TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
-					partProperty2TextField.setText(twoDecimals.format(sensor.getSolarPotentialToday() / sensor.getArea()));
-					partProperty3TextField.setText(twoDecimals.format(sensor.getTotalHeatLoss() / sensor.getArea()));
+					partProperty2TextField.setText(twoDecimals.format(sensor.getSolarPotentialToday() / sensor.getArea()) + " kWh/day/m\u00B2");
+					partProperty3TextField.setText(twoDecimals.format(sensor.getTotalHeatLoss() / sensor.getArea()) + " kWh/day/m\u00B2");
 					partProperty1TextField.setToolTipText("The (x, y, z) coordinates of the sensor");
 					partProperty2TextField.setToolTipText("The light intensity measured by the sensor");
 					partProperty3TextField.setToolTipText("The heat flux measured by the sensor");

@@ -372,15 +372,20 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (result == nullVector)
 			return null;
 		else if (result == null) {
-			final double offset = 0.001;
-			final PickResults pickResults = new PrimitivePickResults();
-			PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
-			result = pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
-			if (result == null)
-				getIntersectionCache().put(key, nullVector);
-			else
-				getIntersectionCache().put(key, result);
+			result = findRoofIntersectionNoCache(roofPart, p);
 		}
+		return result;
+	}
+
+	private ReadOnlyVector3 findRoofIntersectionNoCache(final Mesh roofPart, final ReadOnlyVector3 p) {
+		final double offset = 0.001;
+		final PickResults pickResults = new PrimitivePickResults();
+		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
+		ReadOnlyVector3 result = pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
+		if (result == null)
+			getIntersectionCache().put(p.hashCode(), nullVector);
+		else
+			getIntersectionCache().put(p.hashCode(), result);
 		return result;
 	}
 
@@ -1246,7 +1251,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 						if (child.getSceneHints().getCullHint() != CullHint.Always) {
 							node = (Node) child;
 							mesh = (Mesh) node.getChild(6);
-							b = findRoofIntersection(mesh, a);
+							b = findRoofIntersectionNoCache(mesh, a);
 							if (b != null)
 								break;
 						}
