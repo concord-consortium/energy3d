@@ -69,6 +69,7 @@ import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.logger.PostProcessor;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PartGroup;
@@ -1148,7 +1149,8 @@ public class MainFrame extends JFrame {
 			addTemplate("Hip & Valley Roof", "templates/hip-valley-template.ng3");
 			addTemplate("Mansard", "templates/mansard-template.ng3");
 			addTemplate("M-Shaped Roof", "templates/m-shaped-template.ng3");
-			addTemplate("Saltbox", "templates/saltbox-template.ng3");
+			addTemplate("Saltbox 1", "templates/saltbox-template-1.ng3");
+			addTemplate("Saltbox 2", "templates/saltbox-template-2.ng3");
 			addTemplate("Shed Roof", "templates/shed-roof-template.ng3");
 		}
 		return templatesMenu;
@@ -2314,10 +2316,20 @@ public class MainFrame extends JFrame {
 						Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
 						SceneManager.getInstance().getUndoManager().addEdit(cmd);
 					}
+					Scene.getInstance().setWallColor(color); // remember the color decision for the next wall
 				} else {
 					final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 					selectedPart.setColor(color);
 					SceneManager.getInstance().getUndoManager().addEdit(cmd);
+					if (selectedPart instanceof Roof) { // remember the color decision for the next part
+						Scene.getInstance().setRoofColor(color);
+					} else if (selectedPart instanceof Door) {
+						Scene.getInstance().setDoorColor(color);
+					} else if (selectedPart instanceof Floor) {
+						Scene.getInstance().setFloorColor(color);
+					} else if (selectedPart instanceof Foundation) {
+						Scene.getInstance().setFoundationColor(color);
+					}
 				}
 				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())

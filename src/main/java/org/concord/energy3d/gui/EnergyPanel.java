@@ -896,17 +896,19 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Floor) {
 				Floor floor = (Floor) selectedPart;
 				if (floor.isDrawable()) {
-					Vector3 v1 = floor.getAbsPoint(1);
-					Vector3 v2 = floor.getAbsPoint(2);
-					Vector3 v3 = floor.getAbsPoint(3);
-					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
-					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
 					partPanelBorder.setTitle("Floor (" + floor.getId() + ")");
 					partProperty1Label.setText("  Area:");
 					partProperty2Label.setText("  Position:");
 					partProperty3Label.setText("  Height:");
 					partProperty1TextField.setText(oneDecimal.format(floor.getArea()) + " m\u00B2");
-					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
+					if (floor.getPoints().size() > 1) {
+						Vector3 v1 = floor.getAbsPoint(1);
+						Vector3 v2 = floor.getAbsPoint(2);
+						Vector3 v3 = floor.getAbsPoint(3);
+						double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+						double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+						partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
+					}
 					partProperty3TextField.setText(oneDecimal.format(v.getZ() * scale) + " m");
 					partProperty1TextField.setToolTipText("The area of the floor");
 					partProperty2TextField.setToolTipText("The (x, y) position of the center of the floor");

@@ -420,14 +420,14 @@ public class Wall extends HousePart implements Thermalizable {
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			railings.getSceneHints().setCullHint(CullHint.Inherit);
-			drawRailings(1, false);
+			drawRailings(1);
 			break;
 		case COLUMNS_RAILINGS:
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			railings.getSceneHints().setCullHint(CullHint.Inherit);
 			drawColumns(10);
-			drawRailings(1, true);
+			drawRailings(1);
 			break;
 		default:
 			outlineMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
@@ -536,7 +536,7 @@ public class Wall extends HousePart implements Thermalizable {
 		return null;
 	}
 
-	private void drawRailings(final double distance, final boolean fixedOnGround) {
+	private void drawRailings(final double distance) {
 		railings.setDefaultColor(getColor());
 		final FloatBuffer vertexBuffer = railings.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = railings.getMeshData().getNormalBuffer();
@@ -561,7 +561,7 @@ public class Wall extends HousePart implements Thermalizable {
 				}
 			});
 		}
-		if (fixedOnGround || floor == null) {
+		if (floor == null) {
 
 			final double heightRatio = 0.33;
 			v.multiplyLocal(heightRatio);
