@@ -9,7 +9,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.swing.JOptionPane;
@@ -655,10 +657,41 @@ public class Scene implements Serializable {
 				c.getPoints().get(i).addLocal(shift);
 			}
 			add(c, true);
+			// copy gable info, too
+			Foundation oldFoundation = (Foundation) copyBuffer;
+			Foundation newFoundation = (Foundation) c;
+			final List<Roof> oldRoofs = oldFoundation.getRoofs();
+			final List<Roof> newRoofs = newFoundation.getRoofs();
+			if (!oldRoofs.isEmpty() && !newRoofs.isEmpty()) {
+				for (int i = 0; i < newRoofs.size(); i++) {
+					Map<Integer, List<Wall>> oldMap = oldRoofs.get(i).getGableEditPointToWallMap();
+					if (oldMap.isEmpty())
+						continue;
+					Map<Integer, List<Wall>> newMap = new HashMap<Integer, List<Wall>>();
+					for (Integer key : oldMap.keySet()) {
+						List<Wall> oldWalls = oldMap.get(key);
+						List<Wall> newWalls = new ArrayList<Wall>();
+						for (Wall w : oldWalls) {
+							newWalls.add(getCopiedWall(w, oldFoundation, newFoundation));
+						}
+						newMap.put(key, newWalls);
+					}
+					newRoofs.get(i).setGableEditPointToWallMap(newMap);
+				}
+			}
 			copyBuffer = c;
 			setIdOfChildren(c);
 			SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		}
+	}
+
+	private Wall getCopiedWall(Wall oldWall, Foundation oldFoundation, Foundation newFoundation) {
+		ArrayList<HousePart> oldWalls = oldFoundation.getChildren();
+		ArrayList<HousePart> newWalls = newFoundation.getChildren();
+		int index = oldWalls.indexOf(oldWall);
+		if (index < 0)
+			return null;
+		return (Wall) newWalls.get(index);
 	}
 
 	public void pasteToPickedLocationOnWall() {

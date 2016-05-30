@@ -761,7 +761,7 @@ public class Wall extends HousePart implements Thermalizable {
 			return p;
 		final Integer key = p.hashCode();
 		ReadOnlyVector3 result = roof.getIntersectionCache().get(key);
-		if (result == null){
+		if (result == null) {
 			final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
 			final PickResults pickResults = new PrimitivePickResults();
 			PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
@@ -1403,7 +1403,7 @@ public class Wall extends HousePart implements Thermalizable {
 	public boolean fits(final HousePart window) {
 		final List<Vector3> hole = computeWindowHole(window, Vector3.ZERO);
 		applyXYTransform(hole);
-		final double minDistanceToRoof = 0.3 / Scene.getInstance().getAnnotationScale();
+		final double minDistanceToRoof = 0.1 * getGridSize();
 		final ArrayList<Vector3> polygon = new ArrayList<Vector3>(wallAndWindowsPoints.get(0).size());
 		for (int i = 0; i < wallAndWindowsPoints.get(0).size(); i++) {
 			final Vector3 p = wallAndWindowsPoints.get(0).get(i).clone();

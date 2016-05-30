@@ -1099,6 +1099,20 @@ public class Foundation extends HousePart implements Thermalizable {
 		return utilityBill;
 	}
 
+	// assuming that there may be multiple roofs on this foundation, return a list of them
+	public List<Roof> getRoofs() {
+		final List<Roof> roofs = new ArrayList<Roof>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Wall && p.getTopContainer() == this) {
+				for (final HousePart c : p.getChildren()) {
+					if (c instanceof Roof && !roofs.contains(c))
+						roofs.add((Roof) c);
+				}
+			}
+		}
+		return roofs;
+	}
+
 	public int countParts(final Class<?> clazz) {
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {

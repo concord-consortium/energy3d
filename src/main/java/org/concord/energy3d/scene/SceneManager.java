@@ -1755,15 +1755,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							command.setGableInfo(gableInfo);
 						}
 					} else if (selectedHousePart instanceof Foundation) { // undo/redo all the gable roofs
-						final List<Roof> roofs = new ArrayList<Roof>();
-						for (final HousePart part : Scene.getInstance().getParts()) {
-							if (part instanceof Wall) {
-								for (final HousePart child : part.getChildren()) {
-									if (child instanceof Roof && !roofs.contains(child))
-										roofs.add((Roof) child);
-								}
-							}
-						}
+						final List<Roof> roofs = ((Foundation) selectedHousePart).getRoofs();
 						if (!roofs.isEmpty()) {
 							final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
 							for (final Roof r : roofs) {
