@@ -1645,6 +1645,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							System.out.println("deleting roof #" + pick.getIndex());
 							final int roofPartIndex = pick.getIndex();
 							final Roof roof = (Roof) selectedHousePart;
+							roof.getIntersectionCache().clear();
 							roof.setGable(roofPartIndex, true, undoManager);
 						}
 					}

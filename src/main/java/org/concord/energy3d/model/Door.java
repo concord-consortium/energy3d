@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -80,6 +81,11 @@ public class Door extends HousePart implements Thermalizable {
 			draw();
 			setEditPointsVisible(true);
 		}
+	}
+
+	@Override
+	public double getGridSize() {
+		return SceneManager.getInstance().isFineGrid() ? 1.0 : 2.0;
 	}
 
 	@Override
