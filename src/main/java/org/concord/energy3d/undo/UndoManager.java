@@ -7,7 +7,6 @@ import javax.swing.undo.UndoableEdit;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.util.Config;
 
 public class UndoManager extends javax.swing.undo.UndoManager {
 
@@ -60,8 +59,7 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	}
 
 	private void refreshUndoRedoGui() {
-		if (!Config.isApplet())
-			MainFrame.getInstance().refreshUndoRedo();
+		MainFrame.getInstance().refreshUndoRedo();
 	}
 
 }

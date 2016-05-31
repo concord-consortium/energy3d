@@ -2037,7 +2037,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	public void importFile() {
+	void importFile() {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
@@ -2124,6 +2124,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getImportMenuItem() {
 		if (importMenuItem == null) {
 			importMenuItem = new JMenuItem("Import...");
+			importMenuItem.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
 			importMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

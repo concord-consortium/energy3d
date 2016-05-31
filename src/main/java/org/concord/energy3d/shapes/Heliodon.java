@@ -9,7 +9,6 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
@@ -224,9 +223,6 @@ public class Heliodon {
 			Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), calendar.getTime());
 		} else
 			Util.setSilently(EnergyPanel.getInstance().getTimeSpinner(), timeAndDate);
-
-		if (Config.isHeliodonMode())
-			setSunRegionAlwaysVisible(true);
 
 		draw();
 

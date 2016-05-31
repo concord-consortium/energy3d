@@ -659,96 +659,91 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void initMouse() {
 
-		if (!Config.isHeliodonMode()) {
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				((Component) canvas).requestFocusInWindow();
+				if (Config.isMac()) { // control-click is mouse right-click on the Mac, skip
+					final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+					if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
+						return;
+				}
+				if (firstClickState == null) {
+					firstClickState = inputStates;
+					mousePressed(inputStates.getCurrent().getMouseState());
+				} else {
+					firstClickState = null;
+					mouseReleased(inputStates.getCurrent().getMouseState());
+				}
+			}
+		}));
 
-			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					((Component) canvas).requestFocusInWindow();
-					if (Config.isMac()) { // control-click is mouse right-click on the Mac, skip
-						final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
-						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
-							return;
-					}
-					if (firstClickState == null) {
-						firstClickState = inputStates;
-						mousePressed(inputStates.getCurrent().getMouseState());
-					} else {
+		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
+			@Override
+			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				if (Config.isMac()) { // control-click is mouse right-click on the Mac, skip
+					final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
+					if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
+						return;
+				}
+				// if editing object using select or resize then only mouse drag is allowed
+				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
+					firstClickState = null;
+					mouseReleased(inputStates.getCurrent().getMouseState());
+				} else if (firstClickState != null) {
+					final MouseState mouseState = inputStates.getCurrent().getMouseState();
+					final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
+					final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
+					final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
+					if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || selectedHousePart instanceof Human || p1.distance(p2) > 10) {
 						firstClickState = null;
 						mouseReleased(inputStates.getCurrent().getMouseState());
 					}
 				}
-			}));
+			}
+		}));
 
-			logicalLayer.registerTrigger(new InputTrigger(new MouseButtonReleasedCondition(MouseButton.LEFT), new TriggerAction() {
-				@Override
-				public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-					if (Config.isMac()) { // control-click is mouse right-click on the Mac, skip
-						final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
-						if (ks.isDown(Key.LCONTROL) || ks.isDown(Key.RCONTROL))
-							return;
-					}
-					// if editing object using select or resize then only mouse drag is allowed
-					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-						firstClickState = null;
-						mouseReleased(inputStates.getCurrent().getMouseState());
-					} else if (firstClickState != null) {
-						final MouseState mouseState = inputStates.getCurrent().getMouseState();
-						final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
-						final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
-						final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
-						if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || selectedHousePart instanceof Human || p1.distance(p2) > 10) {
-							firstClickState = null;
-							mouseReleased(inputStates.getCurrent().getMouseState());
-						}
+		((Component) canvas).addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					final JPanel cp = MainPanel.getInstance().getCanvasPanel();
+					mouseRightClicked(e.getX(), cp.getHeight() - e.getY());
+				}
+			}
+
+			@Override
+			public void mouseReleased(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					if (cameraChanged) {
+						TimeSeriesLogger.getInstance().logCamera("Pan");
+						cameraChanged = false;
 					}
 				}
-			}));
+			}
+		});
 
-			((Component) canvas).addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(final MouseEvent e) {
-					if (Util.isRightClick(e)) {
-						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-						mouseRightClicked(e.getX(), cp.getHeight() - e.getY());
-					}
-				}
+		((Component) canvas).addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(final MouseEvent e) {
+				EnergyPanel.getInstance().update();
+				cameraChanged = true;
+			}
+		});
 
-				@Override
-				public void mouseReleased(final MouseEvent e) {
-					if (Util.isRightClick(e)) {
-						if (cameraChanged) {
-							TimeSeriesLogger.getInstance().logCamera("Pan");
-							cameraChanged = false;
-						}
-					}
-				}
-			});
-
-			((Component) canvas).addMouseMotionListener(new MouseMotionAdapter() {
-				@Override
-				public void mouseDragged(final MouseEvent e) {
-					EnergyPanel.getInstance().update();
-					cameraChanged = true;
-				}
-			});
-
-			((Component) canvas).addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseWheelMoved(final MouseWheelEvent e) {
-					TimeSeriesLogger.getInstance().logCamera("Zoom");
-				}
-			});
-
-		}
+		((Component) canvas).addMouseWheelListener(new MouseWheelListener() {
+			@Override
+			public void mouseWheelMoved(final MouseWheelEvent e) {
+				TimeSeriesLogger.getInstance().logCamera("Zoom");
+			}
+		});
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
 
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
-				if (!Config.isHeliodonMode())
-					mouseState = inputStates.getCurrent().getMouseState();
+				mouseState = inputStates.getCurrent().getMouseState();
 			}
 		}));
 
@@ -810,8 +805,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ZERO), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!Config.isApplet())
-					return;
 				final KeyboardState ks = inputStates.getCurrent().getKeyboardState();
 				if (Config.isMac()) {
 					if (ks.isDown(Key.LMETA) || ks.isDown(Key.RMETA)) {
@@ -1042,10 +1035,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		if (viewMode == ViewMode.NORMAL) {
 			cameraControl.setMouseButtonActions(ButtonAction.ROTATE, ButtonAction.MOVE);
-			if (Config.isApplet()) {
-				loc = new Vector3(20, -80, 50);
-				lookAt = new Vector3(0, 0, 0);
-			}
 			camera.setProjectionMode(ProjectionMode.Perspective);
 			resizeCamera();
 		} else if (viewMode == ViewMode.TOP_VIEW) {
@@ -1471,9 +1460,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void init() {
 		if (Config.RENDER_MODE != RenderMode.LWJGL)
 			initCamera();
-		if (Config.isHeliodonMode())
-			MainPanel.getInstance().getHeliodonButton().setSelected(true);
-
 	}
 
 	public boolean isShadingEnabled() {

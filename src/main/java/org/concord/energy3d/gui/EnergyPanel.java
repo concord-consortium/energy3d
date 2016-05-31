@@ -718,7 +718,7 @@ public class EnergyPanel extends JPanel {
 					partProperty3TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m or (" + oneDecimal.format(l * scale) + " m, " + oneDecimal.format(a) + "\u00B0)");
 					partProperty1TextField.setToolTipText("The spread of the tree");
 					partProperty2TextField.setToolTipText("The height of the tree");
-					partProperty3TextField.setToolTipText("The (x, y) coordinates on the land");
+					partProperty3TextField.setToolTipText("The (x, y) or polar coordinates on the land");
 				}
 			} else if (selectedPart instanceof Human) {
 				final Human human = (Human) selectedPart;

@@ -238,14 +238,12 @@ public class Scene implements Serializable {
 
 			@Override
 			public void run() {
-				if (!Config.isApplet()) {
-					if (instance.textureMode == TextureMode.None)
-						MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
-					else if (instance.textureMode == TextureMode.Simple)
-						MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
-					else
-						MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
-				}
+				if (instance.textureMode == TextureMode.None)
+					MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
+				else if (instance.textureMode == TextureMode.Simple)
+					MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
+				else
+					MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
 				MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 			}
@@ -396,12 +394,10 @@ public class Scene implements Serializable {
 					}
 					final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
 					if (position != null) {
-						final Vector3 center = count == 0 ? new Vector3(0, 0, 0) : new Vector3(cx / count, cy / count, 0);
+						final Vector3 shift = position.subtractLocal(count == 0 ? new Vector3(0, 0, 0) : new Vector3(cx / count, cy / count, 0));
 						for (final HousePart p : instance.getParts()) {
 							if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
-								final Vector3 shift = position.subtractLocal(center).multiplyLocal(1, 1, 0);
-								final int n = p.getPoints().size();
-								for (int i = 0; i < n; i++) {
+								for (int i = 0; i < p.getPoints().size(); i++) {
 									p.getPoints().get(i).addLocal(shift);
 								}
 							}
@@ -409,14 +405,12 @@ public class Scene implements Serializable {
 					}
 				}
 				redrawAll = true;
-				System.out.println("done");
 			}
 
 			root.updateWorldBound(true);
 			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 			SceneManager.getInstance().getUndoManager().die();
-			if (!Config.isApplet())
-				MainFrame.getInstance().refreshUndoRedo();
+			MainFrame.getInstance().refreshUndoRedo();
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
@@ -1344,8 +1338,7 @@ public class Scene implements Serializable {
 		if (edited)
 			SnapshotLogger.getInstance().setSceneEdited(true);
 		this.edited = edited;
-		if (!Config.isApplet())
-			MainFrame.getInstance().updateTitleBar();
+		MainFrame.getInstance().updateTitleBar();
 	}
 
 	public void updateEditShapes() {

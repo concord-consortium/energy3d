@@ -50,9 +50,9 @@ import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
-import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
+
 	private static final long serialVersionUID = 1L;
 	private static final MainPanel instance = new MainPanel();
 	private MainFrame mainFrame;
@@ -627,7 +627,7 @@ public class MainPanel extends JPanel {
 	public JToggleButton getAnnotationToggleButton() {
 		if (annotationToggleButton == null) {
 			annotationToggleButton = new JToggleButton();
-			annotationToggleButton.setSelected(Config.isApplet() ? false : true);
+			annotationToggleButton.setSelected(true);
 			annotationToggleButton.addMouseListener(refreshUponMouseExit);
 			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
 			annotationToggleButton.setToolTipText("Show annotations");
@@ -774,8 +774,7 @@ public class MainPanel extends JPanel {
 
 				private void updateEditFlag() {
 					Scene.getInstance().setEdited(true, false);
-					if (!Config.isApplet())
-						MainFrame.getInstance().updateTitleBar();
+					MainFrame.getInstance().updateTitleBar();
 				}
 
 				@Override

@@ -172,6 +172,7 @@ public class PopupMenuFactory {
 			});
 
 			final JMenuItem miImport = new JMenuItem("Import...");
+			miImport.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
 			miImport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
