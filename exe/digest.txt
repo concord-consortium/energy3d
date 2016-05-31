@@ -1,3 +1,3 @@
 getdown.txt = 622702a35dd5db2c52afc28aa1bb6643
-energy3d.jar = b8087ed5823fbfc3571795f9ed71c70a
-digest.txt = bbc34c78765113939982b9c5dd2956a3
+energy3d.jar = 5853823403faa74098f8f17d7a3ae5e8
+digest.txt = 1c03834a21d5dde47dd262cf79611ca2
