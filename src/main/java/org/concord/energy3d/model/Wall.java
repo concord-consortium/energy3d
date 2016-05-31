@@ -775,7 +775,7 @@ public class Wall extends HousePart implements Thermalizable {
 				result = p;
 			roof.getIntersectionCache().put(key, result);
 		}
-		System.out.println(key + "\t " + result);
+		// System.out.println(key + "\t " + result);
 		return result;
 	}
 

@@ -380,10 +380,32 @@ public class Scene implements Serializable {
 
 			if (url != null) {
 				synchronized (SceneManager.getInstance()) {
-					for (final HousePart housePart : instance.getParts()) {
-						housePart.setId(max + housePart.getId());
-						Scene.getInstance().parts.add(housePart);
-						originalHouseRoot.attachChild(housePart.getRoot());
+					double cx = 0;
+					double cy = 0;
+					int count = 0;
+					for (final HousePart p : instance.getParts()) {
+						p.setId(max + p.getId());
+						Scene.getInstance().parts.add(p);
+						originalHouseRoot.attachChild(p.getRoot());
+						if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
+							Vector3 c = p.getAbsCenter();
+							cx += c.getX();
+							cy += c.getY();
+							count++;
+						}
+					}
+					final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
+					if (position != null) {
+						final Vector3 center = count == 0 ? new Vector3(0, 0, 0) : new Vector3(cx / count, cy / count, 0);
+						for (final HousePart p : instance.getParts()) {
+							if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
+								final Vector3 shift = position.subtractLocal(center).multiplyLocal(1, 1, 0);
+								final int n = p.getPoints().size();
+								for (int i = 0; i < n; i++) {
+									p.getPoints().get(i).addLocal(shift);
+								}
+							}
+						}
 					}
 				}
 				redrawAll = true;

@@ -171,6 +171,14 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miImport = new JMenuItem("Import...");
+			miImport.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					MainFrame.getInstance().importFile();
+				}
+			});
+
 			final JMenuItem miAlbedo = new JMenuItem("Albedo...");
 			miAlbedo.addActionListener(new ActionListener() {
 				@Override
@@ -253,6 +261,7 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miInfo);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miPaste);
+			popupMenuForLand.add(miImport);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miAlbedo);
 			popupMenuForLand.add(miThermalDiffusivity);

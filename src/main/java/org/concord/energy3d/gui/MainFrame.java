@@ -2037,7 +2037,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void importFile() {
+	public void importFile() {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
@@ -2046,12 +2046,18 @@ public class MainFrame extends JFrame {
 		fileChooser.setFileFilter(ng3Filter);
 		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
-			try {
-				Scene.importFile(fileChooser.getSelectedFile().toURI().toURL());
-			} catch (final Throwable err) {
-				err.printStackTrace();
-				JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			}
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					try {
+						Scene.importFile(fileChooser.getSelectedFile().toURI().toURL());
+					} catch (final Throwable err) {
+						err.printStackTrace();
+						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					return null;
+				}
+			});
 		}
 	}
 
