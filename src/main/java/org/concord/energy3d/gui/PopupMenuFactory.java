@@ -2,6 +2,7 @@ package org.concord.energy3d.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -636,6 +637,26 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miClear = new JMenuItem("Clear");
+			miClear.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllChildren(SceneManager.getInstance().getSelectedPart());
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+
 			popupMenuForWall = createPopupMenu(false, false, new Runnable() {
 				@Override
 				public void run() {
@@ -645,6 +666,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForWall.add(miPaste);
+			popupMenuForWall.add(miClear);
 			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
 			popupMenuForWall.add(createInsulationMenuItem(false));
@@ -837,6 +859,20 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miClear = new JMenuItem("Clear");
+			miClear.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllChildren(SceneManager.getInstance().getSelectedPart());
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miOverhang = new JMenuItem("Overhang Length...");
 			miOverhang.addActionListener(new ActionListener() {
 				@Override
@@ -885,6 +921,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForRoof.add(miPaste);
+			popupMenuForRoof.add(miClear);
 			popupMenuForRoof.addSeparator();
 			popupMenuForRoof.add(miOverhang);
 			popupMenuForRoof.add(colorAction);
@@ -976,6 +1013,71 @@ public class PopupMenuFactory {
 					}
 				}
 			});
+
+			final JMenu clearMenu = new JMenu("Clear");
+
+			final JMenuItem miRemoveAllWindows = new JMenuItem("Remove All Windows");
+			miRemoveAllWindows.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllWindows();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllWindows);
+
+			final JMenuItem miRemoveAllSolarPanels = new JMenuItem("Remove All Solar Panels");
+			miRemoveAllSolarPanels.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllSolarPanels();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllSolarPanels);
+
+			final JMenuItem removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
+			removeAllFloorsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllFloors();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(removeAllFloorsMenuItem);
 
 			final JMenuItem miAddUtilityBill = new JMenuItem("Add Utility Bill");
 			miAddUtilityBill.addActionListener(new ActionListener() {
@@ -1088,6 +1190,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForFoundation.add(miCopyBuilding);
+			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);

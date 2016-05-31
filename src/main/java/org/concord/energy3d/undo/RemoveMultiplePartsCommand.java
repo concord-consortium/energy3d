@@ -11,13 +11,31 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
-public class RemoveMultiplePartsOfSameTypeCommand extends AbstractUndoableEdit {
+public class RemoveMultiplePartsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final List<HousePart> parts;
+	private boolean sameType = true;
+	private boolean sameParent = true;
 
-	public RemoveMultiplePartsOfSameTypeCommand(final List<HousePart> parts) {
+	public RemoveMultiplePartsCommand(final List<HousePart> parts) {
 		this.parts = parts;
+		if (parts.size() > 1) {
+			Class<?> c = parts.get(0).getClass();
+			for (int i = 1; i < parts.size(); i++) {
+				if (!c.isInstance(parts.get(i))) {
+					sameType = false;
+					break;
+				}
+			}
+			HousePart parent = parts.get(0).getContainer();
+			for (int i = 1; i < parts.size(); i++) {
+				if (parts.get(i).getContainer() != parent) {
+					sameParent = false;
+					break;
+				}
+			}
+		}
 	}
 
 	// for action logging: Return the foundation if all the parts are on the same one; return null otherwise to indicate that all the parts are removed
@@ -56,7 +74,11 @@ public class RemoveMultiplePartsOfSameTypeCommand extends AbstractUndoableEdit {
 	public String getPresentationName() {
 		if (parts.isEmpty())
 			return "Remove Nothing";
-		return "Remove All " + parts.get(0).getClass().getSimpleName() + "s";
+		if (sameParent && !sameType)
+			return "Remove All Elements of a Container";
+		if (sameType)
+			return "Remove All " + parts.get(0).getClass().getSimpleName() + "s";
+		return "Remove Multiple Parts";
 	}
 
 }
