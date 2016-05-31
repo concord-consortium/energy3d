@@ -1135,6 +1135,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			addTemplate("Box Gabled Roof", "templates/box-gabled-template.ng3");
+			addTemplate("Bungalow", "templates/bungalow-template.ng3");
 			addTemplate("Butterfly Roof", "templates/butterfly-template.ng3");
 			addTemplate("Cape Cod", "templates/cape-cod-template.ng3");
 			addTemplate("Colonial", "templates/colonial-template.ng3");
@@ -1852,15 +1853,15 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			final JMenu removeAllMenu = new JMenu("Remove All");
-			removeAllMenu.add(getRemoveAllWindowsMenuItem());
-			removeAllMenu.add(getRemoveAllSolarPanelsMenuItem());
-			removeAllMenu.add(getRemoveAllTreesMenuItem());
-			removeAllMenu.add(getRemoveAllHumansMenuItem());
-			removeAllMenu.add(getRemoveAllRoofsMenuItem());
-			removeAllMenu.add(getRemoveAllFloorsMenuItem());
-			removeAllMenu.add(getRemoveAllLocksMenuItem());
-			removeAllMenu.add(getRemoveAllUtilityBillsMenuItem());
+			final JMenu clearMenu = new JMenu("Clear");
+			clearMenu.add(getRemoveAllWindowsMenuItem());
+			clearMenu.add(getRemoveAllSolarPanelsMenuItem());
+			clearMenu.add(getRemoveAllTreesMenuItem());
+			clearMenu.add(getRemoveAllHumansMenuItem());
+			clearMenu.add(getRemoveAllRoofsMenuItem());
+			clearMenu.add(getRemoveAllFloorsMenuItem());
+			clearMenu.add(getRemoveAllLocksMenuItem());
+			clearMenu.add(getRemoveAllUtilityBillsMenuItem());
 
 			final JMenu moveMenu = new JMenu("Move");
 			moveMenu.add(getMoveEastMenuItem());
@@ -1874,7 +1875,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getCutMenuItem());
 			editMenu.add(getCopyMenuItem());
 			editMenu.add(getPasteMenuItem());
-			editMenu.add(removeAllMenu);
+			editMenu.add(clearMenu);
 			editMenu.add(moveMenu);
 			editMenu.addSeparator();
 			editMenu.add(getRescaleMenuItem());

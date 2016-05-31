@@ -67,7 +67,7 @@ import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.PastePartCommand;
-import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
+import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
@@ -197,8 +197,8 @@ public class TimeSeriesLogger {
 					actedPart = ((EditPartCommand) lastEdit).getPart();
 				} else if (lastEdit instanceof RemovePartCommand) {
 					actedPart = ((RemovePartCommand) lastEdit).getPart();
-				} else if (lastEdit instanceof RemoveMultiplePartsOfSameTypeCommand) {
-					Foundation foundation = ((RemoveMultiplePartsOfSameTypeCommand) lastEdit).getFoundation();
+				} else if (lastEdit instanceof RemoveMultiplePartsCommand) {
+					Foundation foundation = ((RemoveMultiplePartsCommand) lastEdit).getFoundation();
 					if (foundation != null)
 						stateValue = "{\"Building\": " + foundation.getId() + "}";
 				} else if (lastEdit instanceof RotateBuildingCommand) {

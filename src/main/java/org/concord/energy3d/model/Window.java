@@ -515,7 +515,7 @@ public class Window extends HousePart implements Thermalizable {
 				final int n = c.getPoints().size();
 				for (int i = 0; i < n; i++) {
 					final double newX = points.get(i).getX() + shift;
-					if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
+					if (newX > 1 - shift / 20 || newX < shift / 20) // reject it if out of range
 						return null;
 				}
 				for (int i = 0; i < n; i++) {

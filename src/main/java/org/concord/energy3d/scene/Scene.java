@@ -42,7 +42,7 @@ import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
-import org.concord.energy3d.undo.RemoveMultiplePartsOfSameTypeCommand;
+import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -953,10 +953,11 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + trees.size() + " trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(trees);
 		for (final HousePart part : trees)
 			remove(part, false);
 		redrawAll();
-		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(trees));
+		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
 	}
 
@@ -971,10 +972,11 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + humans.size() + " humans?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(humans);
 		for (final HousePart part : humans)
 			remove(part, false);
 		redrawAll();
-		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(humans));
+		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
 	}
 
@@ -989,10 +991,11 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + roofs.size() + " roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(roofs);
 		for (final HousePart part : roofs)
 			remove(part, false);
 		redrawAll();
-		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(roofs));
+		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
 	}
 
@@ -1007,10 +1010,11 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + floors.size() + " floors?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(floors);
 		for (final HousePart part : floors)
 			remove(part, false);
 		redrawAll();
-		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(floors));
+		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
 	}
 
@@ -1035,11 +1039,12 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + panels.size() + " solar panels" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(panels);
 		for (final HousePart part : panels) {
 			remove(part, false);
 		}
 		redrawAll();
-		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(panels));
+		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
 	}
 
@@ -1064,11 +1069,36 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " windows" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
 		for (final HousePart part : windows) {
 			remove(part, false);
 		}
 		redrawAll();
-		SceneManager.getInstance().getUndoManager().addEdit(new RemoveMultiplePartsOfSameTypeCommand(windows));
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
+	public void removeAllChildren(HousePart parent) {
+		List<HousePart> children = parent.getChildren();
+		String s = parent.getClass().getSimpleName();
+		List<HousePart> copy = new ArrayList<HousePart>(); // make a copy to avoid ConcurrentModificationException
+		for (HousePart p : children) {
+			if (p instanceof Roof)
+				continue; // make an exception of roof (it is a child of a wall)
+			copy.add(p);
+		}
+		if (copy.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no element to remove from " + s + ".", "No Element", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + copy.size() + " elements of " + s + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(copy);
+		for (final HousePart p : copy) {
+			remove(p, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
 	}
 
