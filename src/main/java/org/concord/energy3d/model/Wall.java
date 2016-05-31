@@ -568,11 +568,11 @@ public class Wall extends HousePart implements Thermalizable {
 			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railingRadius * 3);
 			addPointToQuad(getAbsPoint(1).multiplyLocal(1, 1, heightRatio), getAbsPoint(3).multiplyLocal(1, 1, heightRatio), dir, vertexBuffer, normalBuffer);
 			dir = new Vector3(u).normalizeLocal().multiplyLocal(railingRadius);
-			addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
-			addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+			// addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
+			// addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 
 			final Vector3 p = new Vector3();
-			for (int col = 1; col < cols; col++) {
+			for (int col = 0; col <= cols; col++) {
 				u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), 0);
 				addPointToQuad(p, p.add(v, null), dir, vertexBuffer, normalBuffer);
 			}
