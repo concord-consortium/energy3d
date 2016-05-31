@@ -38,6 +38,7 @@ import javax.swing.event.MenuListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
@@ -149,6 +150,27 @@ public class PopupMenuFactory {
 		return onLand ? getPopupMenuForLand() : getPopupMenuForSky();
 	}
 
+	private static void addPrefabMenuItem(final String type, final String url, final JMenu menu) {
+		JMenuItem mi = new JMenuItem(type);
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						try {
+							Scene.importFile(MainApplication.class.getResource(url));
+						} catch (final Throwable err) {
+							Util.reportError(err);
+						}
+						return null;
+					}
+				});
+			}
+		});
+		menu.add(mi);
+	}
+
 	private static JPopupMenu getPopupMenuForLand() {
 
 		if (popupMenuForLand == null) {
@@ -179,6 +201,10 @@ public class PopupMenuFactory {
 					MainFrame.getInstance().importFile();
 				}
 			});
+
+			final JMenu miImportPrefabMenu = new JMenu("Import a Prefab");
+			addPrefabMenuItem("Chimney", "prefabs/chimney.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Hexagonal Gazebo", "prefabs/hexagonal-gazebo.ng3", miImportPrefabMenu);
 
 			final JMenuItem miAlbedo = new JMenuItem("Albedo...");
 			miAlbedo.addActionListener(new ActionListener() {
@@ -263,6 +289,7 @@ public class PopupMenuFactory {
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miPaste);
 			popupMenuForLand.add(miImport);
+			popupMenuForLand.add(miImportPrefabMenu);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miAlbedo);
 			popupMenuForLand.add(miThermalDiffusivity);
@@ -1678,6 +1705,7 @@ public class PopupMenuFactory {
 			}
 		});
 		return mi;
+
 	}
 
 	private static JMenuItem createVolumetricHeatCapacityMenuItem() {

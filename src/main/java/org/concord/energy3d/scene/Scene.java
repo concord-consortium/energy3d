@@ -419,7 +419,7 @@ public class Scene implements Serializable {
 			});
 		}
 	}
-
+	
 	/** This can be used by the user to fix problems that are caused by bugs based on our observations. This is different than cleanup() as the latter cannot be used to remove undrawables. */
 	public void fixProblems() {
 
