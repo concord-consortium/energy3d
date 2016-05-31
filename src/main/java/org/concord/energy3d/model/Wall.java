@@ -4,6 +4,7 @@ import java.awt.geom.Path2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -759,11 +760,8 @@ public class Wall extends HousePart implements Thermalizable {
 	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 p, final ReadOnlyVector3 direction, final double offset) {
 		if (roof == null)
 			return p;
-		int key = 16777619;
-		key = (key * 16777619) ^ Double.hashCode(p.getX());
-		key = (key * 16777619) ^ Double.hashCode(p.getY());
-		key = (key * 16777619) ^ Double.hashCode(p.getZ());
 
+		final int key = Objects.hash(p.getX(), p.getY(), p.getZ());
 		ReadOnlyVector3 result = roof.getIntersectionCache().get(key);
 		if (result == null) {
 			final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
@@ -775,7 +773,6 @@ public class Wall extends HousePart implements Thermalizable {
 				result = p;
 			roof.getIntersectionCache().put(key, result);
 		}
-		System.out.println(key + "\t " + result);
 		return result;
 	}
 
