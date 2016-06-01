@@ -184,7 +184,7 @@ public class SolarDailyAnalysis extends Analysis {
 		miView.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				DataViewer.viewRawData(dialog, graph);
+				DataViewer.viewRawData(dialog, graph, true);
 			}
 		});
 		menu.add(miView);
