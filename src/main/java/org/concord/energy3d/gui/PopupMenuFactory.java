@@ -71,6 +71,7 @@ import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
@@ -776,9 +777,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.SOLID_WALL);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.SOLID_WALL);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -791,9 +795,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.EMPTY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.EMPTY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -806,9 +813,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.VERTICAL_EDGES_ONLY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.VERTICAL_EDGES_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -821,9 +831,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.COLUMNS_ONLY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.COLUMNS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -836,24 +849,30 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.RAILINGS_ONLY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.RAILINGS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
 			typeMenu.add(rbmiRailings);
 			typeGroup.add(rbmiRailings);
 
-			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns and Railings");
+			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns & Railings");
 			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.COLUMNS_RAILINGS);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.COLUMNS_RAILINGS);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});

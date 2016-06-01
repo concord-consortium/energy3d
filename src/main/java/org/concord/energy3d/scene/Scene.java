@@ -40,6 +40,7 @@ import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
@@ -377,6 +378,7 @@ public class Scene implements Serializable {
 			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
+				AddMultiplePartsCommand cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
 				synchronized (SceneManager.getInstance()) {
 					double cx = 0;
 					double cy = 0;
@@ -405,6 +407,7 @@ public class Scene implements Serializable {
 					}
 				}
 				redrawAll = true;
+				SceneManager.getInstance().getUndoManager().addEdit(cmd);
 			}
 
 			root.updateWorldBound(true);
