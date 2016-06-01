@@ -116,7 +116,7 @@ public class GroupDailyAnalysis extends Analysis {
 					graph.addData("Heat Gain " + p.getId(), -sum);
 				} else if (p instanceof SolarPanel) {
 					final SolarPanel solarPanel = (SolarPanel) p;
-					final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getEfficiency();
+					final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
 					graph.addData("Solar " + p.getId(), solar);
 				}
 			}

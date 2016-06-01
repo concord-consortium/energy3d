@@ -138,7 +138,7 @@ public class EnergyDailyAnalysis extends Analysis {
 				graph.addData("Heat Gain", -sum);
 			} else if (selectedPart instanceof SolarPanel) {
 				final SolarPanel solarPanel = (SolarPanel) selectedPart;
-				final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getEfficiency();
+				final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
 				graph.addData("Solar", solar);
 			}
 		}

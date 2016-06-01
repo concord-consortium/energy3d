@@ -131,7 +131,7 @@ public class EnergyAngularAnalysis extends Analysis {
 			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiency();
+			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
 			graph.addData("Solar", solar);
 		}
 		graph.repaint();

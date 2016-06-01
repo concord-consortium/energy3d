@@ -741,11 +741,11 @@ public class EnergyPanel extends JPanel {
 					partProperty1TextField.setToolTipText("The length and width of the solar panel");
 					partProperty2TextField.setToolTipText("The (x, y, z) coordinates of the center of the solar panel");
 					String id = "Solar Panel (" + sp.getId() + ")";
-					String eff = oneDecimal.format(sp.getEfficiency() * 100) + "%";
+					String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
 					if (energyViewShown) {
 						partPanelBorder.setTitle(id + " - \u03B7 = " + eff);
 						partProperty3Label.setText("  Yield:");
-						partProperty3TextField.setText(twoDecimals.format(sp.getSolarPotentialToday() * sp.getEfficiency()) + " kWh");
+						partProperty3TextField.setText(twoDecimals.format(sp.getSolarPotentialToday() * sp.getCellEfficiency()) + " kWh");
 						partProperty3TextField.setToolTipText("The total yield of the solar panel of the day");
 					} else {
 						partPanelBorder.setTitle(id);

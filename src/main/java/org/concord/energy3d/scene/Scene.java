@@ -1328,10 +1328,40 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setSolarPanelEfficiencyOfBuilding(final Foundation foundation, final double eff) {
+	public List<SolarPanel> getAllSolarPanels() {
+		final List<SolarPanel> list = new ArrayList<SolarPanel>();
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel)
+				list.add((SolarPanel) p);
+		}
+		return list;
+	}
+
+	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-				((SolarPanel) p).setEfficiency(eff);
+				((SolarPanel) p).setCellEfficiency(eff);
+		}
+	}
+
+	public void setSolarCellEfficiencyForAll(final double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel)
+				((SolarPanel) p).setCellEfficiency(eff);
+		}
+	}
+
+	public void setSolarPanelInverterEfficiencyOfBuilding(final Foundation foundation, final double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+				((SolarPanel) p).setInverterEfficiency(eff);
+		}
+	}
+
+	public void setSolarPanelInverterEfficiencyForAll(final double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel)
+				((SolarPanel) p).setInverterEfficiency(eff);
 		}
 	}
 
