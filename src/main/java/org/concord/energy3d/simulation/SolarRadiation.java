@@ -603,7 +603,7 @@ public class SolarRadiation {
 								passiveSolar[i] += houseChild.getSolarPotential()[i] * window.getSolarHeatGainCoefficient();
 							} else if (houseChild instanceof SolarPanel) {
 								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getEfficiency();
+								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
 							}
 						}
 					}
@@ -683,7 +683,7 @@ public class SolarRadiation {
 								passiveSolar[i] += houseChild.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficient();
 							} else if (houseChild instanceof SolarPanel) {
 								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getEfficiency();
+								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
 							}
 						}
 					}

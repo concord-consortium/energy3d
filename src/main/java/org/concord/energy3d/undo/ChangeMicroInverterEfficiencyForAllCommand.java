@@ -6,29 +6,22 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
+public class ChangeMicroInverterEfficiencyForAllCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
-	private Foundation foundation;
 	private List<SolarPanel> panels;
 
-	public ChangeBuildingSolarPanelEfficiencyCommand(Foundation foundation) {
-		this.foundation = foundation;
-		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+	public ChangeMicroInverterEfficiencyForAllCommand() {
+		panels = Scene.getInstance().getAllSolarPanels();
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getEfficiency();
+			oldValues[i] = panels.get(i).getInverterEfficiency();
 		}
-	}
-
-	public Foundation getFoundation() {
-		return foundation;
 	}
 
 	@Override
@@ -37,8 +30,8 @@ public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableE
 		int n = panels.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newValues[i] = panels.get(i).getEfficiency();
-			panels.get(i).setEfficiency(oldValues[i]);
+			newValues[i] = panels.get(i).getInverterEfficiency();
+			panels.get(i).setInverterEfficiency(oldValues[i]);
 		}
 	}
 
@@ -47,13 +40,13 @@ public class ChangeBuildingSolarPanelEfficiencyCommand extends AbstractUndoableE
 		super.redo();
 		int n = panels.size();
 		for (int i = 0; i < n; i++) {
-			panels.get(i).setEfficiency(newValues[i]);
+			panels.get(i).setInverterEfficiency(newValues[i]);
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Efficiency Change for All Solar Panels of Selected Building";
+		return "Micro Inverter Efficiency Change for All Solar Panels";
 	}
 
 }

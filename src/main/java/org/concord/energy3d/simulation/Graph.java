@@ -118,7 +118,7 @@ public abstract class Graph extends JPanel {
 				mi.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						DataViewer.viewRawData(popup ? parent : MainFrame.getInstance(), Graph.this);
+						DataViewer.viewRawData(popup ? parent : MainFrame.getInstance(), Graph.this, false);
 					}
 				});
 				popupMenu.add(mi);

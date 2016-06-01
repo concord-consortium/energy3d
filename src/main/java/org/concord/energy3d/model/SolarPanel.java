@@ -27,6 +27,7 @@ public class SolarPanel extends HousePart {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private double efficiency = 0.1; // a number in (0, 1)
+	private double inverterEfficiency = 0.95;
 	private double panelWidth = 1.0; // 39"
 	private double panelHeight = 1.65; // 65"
 
@@ -35,13 +36,23 @@ public class SolarPanel extends HousePart {
 	}
 
 	/** a number between 0 and 1 */
-	public void setEfficiency(final double efficiency) {
+	public void setCellEfficiency(final double efficiency) {
 		this.efficiency = efficiency;
 	}
 
 	/** a number between 0 and 1 */
-	public double getEfficiency() {
+	public double getCellEfficiency() {
 		return efficiency;
+	}
+
+	/** a number between 0 and 1, typically 0.95 */
+	public void setInverterEfficiency(final double inverterEfficiency) {
+		this.inverterEfficiency = inverterEfficiency;
+	}
+
+	/** a number between 0 and 1, typically 0.95 */
+	public double getInverterEfficiency() {
+		return inverterEfficiency;
 	}
 
 	public void setPanelWidth(double panelWidth) {
@@ -72,6 +83,8 @@ public class SolarPanel extends HousePart {
 			panelWidth = 1;
 		if (Util.isZero(panelHeight))
 			panelHeight = 1.65;
+		if (Util.isZero(inverterEfficiency))
+			inverterEfficiency = 0.95;
 
 		mesh = new Mesh("SolarPanel");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));

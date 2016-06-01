@@ -719,7 +719,7 @@ public class EnergyPanel extends JPanel {
 					partProperty3TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m or (" + oneDecimal.format(l * scale) + " m, " + oneDecimal.format(a) + "\u00B0)");
 					partProperty1TextField.setToolTipText("The spread of the tree");
 					partProperty2TextField.setToolTipText("The height of the tree");
-					partProperty3TextField.setToolTipText("The (x, y) coordinates on the land");
+					partProperty3TextField.setToolTipText("The (x, y) or polar coordinates on the land");
 				}
 			} else if (selectedPart instanceof Human) {
 				final Human human = (Human) selectedPart;
@@ -741,12 +741,12 @@ public class EnergyPanel extends JPanel {
 					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
 					partProperty1TextField.setToolTipText("The length and width of the solar panel");
 					partProperty2TextField.setToolTipText("The (x, y, z) coordinates of the center of the solar panel");
-					final String id = "Solar Panel (" + sp.getId() + ")";
-					final String eff = oneDecimal.format(sp.getEfficiency() * 100) + "%";
+					String id = "Solar Panel (" + sp.getId() + ")";
+					String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
 					if (energyViewShown) {
 						partPanelBorder.setTitle(id + " - \u03B7 = " + eff);
 						partProperty3Label.setText("  Yield:");
-						partProperty3TextField.setText(twoDecimals.format(sp.getSolarPotentialToday() * sp.getEfficiency()) + " kWh");
+						partProperty3TextField.setText(twoDecimals.format(sp.getSolarPotentialToday() * sp.getCellEfficiency()) + " kWh");
 						partProperty3TextField.setToolTipText("The total yield of the solar panel of the day");
 					} else {
 						partPanelBorder.setTitle(id);

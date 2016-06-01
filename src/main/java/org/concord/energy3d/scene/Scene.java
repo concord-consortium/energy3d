@@ -40,6 +40,7 @@ import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
@@ -220,12 +221,17 @@ public class Scene implements Serializable {
 			if (cameraControl != null)
 				cameraControl.reset();
 
+			int count = 0;
+			Foundation first = null;
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation && !p.isFrozen()) {
-					SceneManager.getInstance().setSelectedPart(p);
-					break;
+					if (count == 0)
+						first = (Foundation) p;
+					count++;
 				}
 			}
+			if (count == 1)
+				SceneManager.getInstance().setSelectedPart(first);
 
 			initSceneNow();
 			initEnergy();
@@ -238,14 +244,12 @@ public class Scene implements Serializable {
 
 			@Override
 			public void run() {
-				if (!Config.isApplet()) {
-					if (instance.textureMode == TextureMode.None)
-						MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
-					else if (instance.textureMode == TextureMode.Simple)
-						MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
-					else
-						MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
-				}
+				if (instance.textureMode == TextureMode.None)
+					MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
+				else if (instance.textureMode == TextureMode.Simple)
+					MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
+				else
+					MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
 				MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 			}
@@ -379,6 +383,7 @@ public class Scene implements Serializable {
 			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
+				AddMultiplePartsCommand cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
 				synchronized (SceneManager.getInstance()) {
 					double cx = 0;
 					double cy = 0;
@@ -396,12 +401,10 @@ public class Scene implements Serializable {
 					}
 					final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
 					if (position != null) {
-						final Vector3 center = count == 0 ? new Vector3(0, 0, 0) : new Vector3(cx / count, cy / count, 0);
+						final Vector3 shift = position.subtractLocal(count == 0 ? new Vector3(0, 0, 0) : new Vector3(cx / count, cy / count, 0));
 						for (final HousePart p : instance.getParts()) {
 							if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
-								final Vector3 shift = position.subtractLocal(center).multiplyLocal(1, 1, 0);
-								final int n = p.getPoints().size();
-								for (int i = 0; i < n; i++) {
+								for (int i = 0; i < p.getPoints().size(); i++) {
 									p.getPoints().get(i).addLocal(shift);
 								}
 							}
@@ -409,21 +412,26 @@ public class Scene implements Serializable {
 					}
 				}
 				redrawAll = true;
-				System.out.println("done");
+				SceneManager.getInstance().getUndoManager().addEdit(cmd);
 			}
 
 			root.updateWorldBound(true);
 			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-			SceneManager.getInstance().getUndoManager().die();
-			if (!Config.isApplet())
-				MainFrame.getInstance().refreshUndoRedo();
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
+					// SceneManager.getInstance().getUndoManager().die();
+					// MainFrame.getInstance().refreshUndoRedo();
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
+
+		} else {
+
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "URL doesn't exist.", "Error", JOptionPane.ERROR_MESSAGE);
+
 		}
+
 	}
 
 	/** This can be used by the user to fix problems that are caused by bugs based on our observations. This is different than cleanup() as the latter cannot be used to remove undrawables. */
@@ -1100,6 +1108,27 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllFoundations() {
+		final ArrayList<HousePart> foundations = new ArrayList<HousePart>();
+		for (final HousePart part : parts) {
+			if (part instanceof Foundation && !part.isFrozen())
+				foundations.add(part);
+		}
+		if (foundations.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no activated foundation to remove.", "No Foundation", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + foundations.size() + " foundations?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(foundations);
+		for (final HousePart part : foundations) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
 	public void removeAllChildren(HousePart parent) {
 		List<HousePart> children = parent.getChildren();
 		String s = parent.getClass().getSimpleName();
@@ -1325,10 +1354,40 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setSolarPanelEfficiencyOfBuilding(final Foundation foundation, final double eff) {
+	public List<SolarPanel> getAllSolarPanels() {
+		final List<SolarPanel> list = new ArrayList<SolarPanel>();
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel)
+				list.add((SolarPanel) p);
+		}
+		return list;
+	}
+
+	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-				((SolarPanel) p).setEfficiency(eff);
+				((SolarPanel) p).setCellEfficiency(eff);
+		}
+	}
+
+	public void setSolarCellEfficiencyForAll(final double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel)
+				((SolarPanel) p).setCellEfficiency(eff);
+		}
+	}
+
+	public void setSolarPanelInverterEfficiencyOfBuilding(final Foundation foundation, final double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+				((SolarPanel) p).setInverterEfficiency(eff);
+		}
+	}
+
+	public void setSolarPanelInverterEfficiencyForAll(final double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel)
+				((SolarPanel) p).setInverterEfficiency(eff);
 		}
 	}
 
@@ -1344,8 +1403,7 @@ public class Scene implements Serializable {
 		if (edited)
 			SnapshotLogger.getInstance().setSceneEdited(true);
 		this.edited = edited;
-		if (!Config.isApplet())
-			MainFrame.getInstance().updateTitleBar();
+		MainFrame.getInstance().updateTitleBar();
 	}
 
 	public void updateEditShapes() {

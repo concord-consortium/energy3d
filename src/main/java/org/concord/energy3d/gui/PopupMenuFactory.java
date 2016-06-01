@@ -38,6 +38,7 @@ import javax.swing.event.MenuListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
@@ -62,17 +63,22 @@ import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
+import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
@@ -149,6 +155,27 @@ public class PopupMenuFactory {
 		return onLand ? getPopupMenuForLand() : getPopupMenuForSky();
 	}
 
+	private static void addPrefabMenuItem(final String type, final String url, final JMenu menu) {
+		JMenuItem mi = new JMenuItem(type);
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						try {
+							Scene.importFile(MainApplication.class.getResource(url));
+						} catch (final Throwable err) {
+							Util.reportError(err);
+						}
+						return null;
+					}
+				});
+			}
+		});
+		menu.add(mi);
+	}
+
 	private static JPopupMenu getPopupMenuForLand() {
 
 		if (popupMenuForLand == null) {
@@ -171,13 +198,91 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miRemoveAllTrees = new JMenuItem("Remove All Trees");
+			miRemoveAllTrees.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllTrees();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+
+			final JMenuItem miRemoveAllHumans = new JMenuItem("Remove All Humans");
+			miRemoveAllHumans.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllHumans();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+
+			final JMenuItem miRemoveAllBuildings = new JMenuItem("Remove All Buildings");
+			miRemoveAllBuildings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllFoundations();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miImport = new JMenuItem("Import...");
+			miImport.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
 			miImport.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					MainFrame.getInstance().importFile();
 				}
 			});
+
+			final JMenu miImportPrefabMenu = new JMenu("Import a Prefab");
+			addPrefabMenuItem("Back Hip Roof Porch", "prefabs/back-hip-roof-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Balcony", "prefabs/balcony1.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Chimney", "prefabs/chimney.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Connecting Porch", "prefabs/connecting-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Flat-Top Porch", "prefabs/flat-top-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Front Door Overhang", "prefabs/front-door-overhang.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Gable Dormer", "prefabs/gable-dormer.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Hexagonal Gazebo", "prefabs/hexagonal-gazebo.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Hexagonal Tower", "prefabs/hexagonal-tower.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Octagonal Tower", "prefabs/octagonal-tower.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Shed Dormer", "prefabs/shed-dormer.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Solarium", "prefabs/solarium1.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Square Tower", "prefabs/square-tower.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Tall Front Door Overhang", "prefabs/tall-front-door-overhang.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Waterfront Deck", "prefabs/waterfront-deck.ng3", miImportPrefabMenu);
 
 			final JMenuItem miAlbedo = new JMenuItem("Albedo...");
 			miAlbedo.addActionListener(new ActionListener() {
@@ -261,7 +366,12 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miInfo);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miPaste);
+			popupMenuForLand.add(miRemoveAllTrees);
+			popupMenuForLand.add(miRemoveAllHumans);
+			popupMenuForLand.add(miRemoveAllBuildings);
+			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miImport);
+			popupMenuForLand.add(miImportPrefabMenu);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miAlbedo);
 			popupMenuForLand.add(miThermalDiffusivity);
@@ -693,9 +803,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.SOLID_WALL);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.SOLID_WALL);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -708,9 +821,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.EMPTY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.EMPTY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -723,9 +839,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.VERTICAL_EDGES_ONLY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.VERTICAL_EDGES_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -738,9 +857,12 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.COLUMNS_ONLY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.COLUMNS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -753,24 +875,30 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.RAILINGS_ONLY);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.RAILINGS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
 			typeMenu.add(rbmiRailings);
 			typeGroup.add(rbmiRailings);
 
-			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns and Railings");
+			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns & Railings");
 			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
-						((Wall) selectedPart).setType(Wall.COLUMNS_RAILINGS);
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.COLUMNS_RAILINGS);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -1299,7 +1427,7 @@ public class PopupMenuFactory {
 
 			popupMenuForSolarPanel = createPopupMenu(true, true, null);
 
-			final JMenuItem miEff = new JMenuItem("Energy Conversion Efficiency...");
+			final JMenuItem miEff = new JMenuItem("Solar Cell Efficiency...");
 			miEff.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1308,37 +1436,105 @@ public class PopupMenuFactory {
 						return;
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Energy Conversion Efficiency (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<hr></html>";
+					final String title = "<html>Solar Cell Efficiency (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<br>As of 2016, the solar cell efficiencies of latest commercially available panels are between 20-25%.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
 					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
+					panel.add(rb3);
 					ButtonGroup bg = new ButtonGroup();
 					bg.add(rb1);
 					bg.add(rb2);
+					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getEfficiency() * 100);
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getCellEfficiency() * 100);
 						if (newValue == null)
 							break;
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 10 || val > 86) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Conversion efficiency must be between 10% and 86%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 86%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										ChangeSolarPanelEfficiencyCommand c = new ChangeSolarPanelEfficiencyCommand(solarPanel);
-										solarPanel.setEfficiency(val * 0.01);
+										ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(solarPanel);
+										solarPanel.setCellEfficiency(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
-										ChangeBuildingSolarPanelEfficiencyCommand c = new ChangeBuildingSolarPanelEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarPanelEfficiencyOfBuilding(foundation, val * 0.01);
+										ChangeBuildingSolarCellEfficiencyCommand c = new ChangeBuildingSolarCellEfficiencyCommand(foundation);
+										Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
+										Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miInverterEff = new JMenuItem("Micro Inverter Efficiency...");
+			miInverterEff.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final String title = "<html>Micro Inverter Efficiency (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The efficiency of a micro inverter for converting electricity from DC to AC is typically 95%.<hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getInverterEfficiency() * 100);
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 80 || val >= 100) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Micro inverter efficiency must be greater than 80% and less than 100%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										ChangeMicroInverterEfficiencyCommand c = new ChangeMicroInverterEfficiencyCommand(solarPanel);
+										solarPanel.setInverterEfficiency(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										Foundation foundation = solarPanel.getTopContainer();
+										ChangeBuildingMicroInverterEfficiencyCommand c = new ChangeBuildingMicroInverterEfficiencyCommand(foundation);
+										Scene.getInstance().setSolarPanelInverterEfficiencyOfBuilding(foundation, val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										ChangeMicroInverterEfficiencyForAllCommand c = new ChangeMicroInverterEfficiencyForAllCommand();
+										Scene.getInstance().setSolarPanelInverterEfficiencyForAll(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);
@@ -1355,6 +1551,7 @@ public class PopupMenuFactory {
 
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miEff);
+			popupMenuForSolarPanel.add(miInverterEff);
 			popupMenuForSolarPanel.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
@@ -1677,6 +1874,7 @@ public class PopupMenuFactory {
 			}
 		});
 		return mi;
+
 	}
 
 	private static JMenuItem createVolumetricHeatCapacityMenuItem() {

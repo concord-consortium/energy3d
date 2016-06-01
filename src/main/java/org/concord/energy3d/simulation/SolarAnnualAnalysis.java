@@ -128,13 +128,13 @@ public class SolarAnnualAnalysis extends Analysis {
 		if (selectedPart != null) {
 			if (selectedPart instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) selectedPart;
-				graph.addData("Solar", sp.getSolarPotentialToday() * sp.getEfficiency());
+				graph.addData("Solar", sp.getSolarPotentialToday() * sp.getCellEfficiency() * sp.getInverterEfficiency());
 			} else if (selectedPart instanceof Foundation) {
 				double output = 0;
 				for (HousePart p : Scene.getInstance().getParts()) {
 					if (p instanceof SolarPanel && p.getTopContainer() == selectedPart) {
 						final SolarPanel sp = (SolarPanel) p;
-						output += sp.getSolarPotentialToday() * sp.getEfficiency();
+						output += sp.getSolarPotentialToday() * sp.getCellEfficiency() * sp.getInverterEfficiency();
 					}
 				}
 				graph.addData("Solar", output);
@@ -143,7 +143,7 @@ public class SolarAnnualAnalysis extends Analysis {
 				for (HousePart p : Scene.getInstance().getParts()) {
 					if (p instanceof SolarPanel && p.getTopContainer() == selectedPart.getTopContainer()) {
 						final SolarPanel sp = (SolarPanel) p;
-						output += sp.getSolarPotentialToday() * sp.getEfficiency();
+						output += sp.getSolarPotentialToday() * sp.getCellEfficiency() * sp.getInverterEfficiency();
 					}
 				}
 				graph.addData("Solar", output);
@@ -153,7 +153,7 @@ public class SolarAnnualAnalysis extends Analysis {
 			for (HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof SolarPanel) {
 					final SolarPanel sp = (SolarPanel) p;
-					output += sp.getSolarPotentialToday() * sp.getEfficiency();
+					output += sp.getSolarPotentialToday() * sp.getCellEfficiency() * sp.getInverterEfficiency();
 				}
 			}
 			graph.addData("Solar", output);
@@ -241,7 +241,7 @@ public class SolarAnnualAnalysis extends Analysis {
 		miView.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				DataViewer.viewRawData(dialog, graph);
+				DataViewer.viewRawData(dialog, graph, true);
 			}
 		});
 		menu.add(miView);

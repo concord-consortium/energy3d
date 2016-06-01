@@ -40,12 +40,14 @@ import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
+import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.AdjustThermostatCommand;
 import org.concord.energy3d.undo.AnimateSunCommand;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
@@ -53,13 +55,17 @@ import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
+import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -187,6 +193,11 @@ public class TimeSeriesLogger {
 				// add, edit, or remove parts
 				if (lastEdit instanceof AddPartCommand) {
 					actedPart = ((AddPartCommand) lastEdit).getPart();
+				} else if (lastEdit instanceof AddMultiplePartsCommand) {
+					AddMultiplePartsCommand c = (AddMultiplePartsCommand) lastEdit;
+					if (c.getURL() != null) {
+						stateValue = "{\"Import\": \"" + c.getURL() + "\"}";
+					}
 				} else if (lastEdit instanceof PastePartCommand) {
 					actedPart = ((PastePartCommand) lastEdit).getPart();
 					if (actedPart instanceof Foundation) {
@@ -366,15 +377,38 @@ public class TimeSeriesLogger {
 				}
 
 				// solar panel properties
-				else if (lastEdit instanceof ChangeSolarPanelEfficiencyCommand) {
-					ChangeSolarPanelEfficiencyCommand c = (ChangeSolarPanelEfficiencyCommand) lastEdit;
+				else if (lastEdit instanceof ChangeSolarCellEfficiencyCommand) {
+					ChangeSolarCellEfficiencyCommand c = (ChangeSolarCellEfficiencyCommand) lastEdit;
 					SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
-					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getEfficiency() + "}";
-				} else if (lastEdit instanceof ChangeBuildingSolarPanelEfficiencyCommand) {
-					Foundation foundation = ((ChangeBuildingSolarPanelEfficiencyCommand) lastEdit).getFoundation();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getCellEfficiency() + "}";
+				} else if (lastEdit instanceof ChangeBuildingSolarCellEfficiencyCommand) {
+					Foundation foundation = ((ChangeBuildingSolarCellEfficiencyCommand) lastEdit).getFoundation();
 					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
-					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getEfficiency()) + "}";
+					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getCellEfficiency()) + "}";
+				} else if (lastEdit instanceof ChangeSolarCellEfficiencyForAllCommand) {
+					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
+					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getCellEfficiency()) + "}";
+				} else if (lastEdit instanceof ChangeMicroInverterEfficiencyCommand) {
+					ChangeMicroInverterEfficiencyCommand c = (ChangeMicroInverterEfficiencyCommand) lastEdit;
+					SolarPanel sp = c.getSolarPanel();
+					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getInverterEfficiency() + "}";
+				} else if (lastEdit instanceof ChangeBuildingMicroInverterEfficiencyCommand) {
+					Foundation foundation = ((ChangeBuildingMicroInverterEfficiencyCommand) lastEdit).getFoundation();
+					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
+				} else if (lastEdit instanceof ChangeMicroInverterEfficiencyForAllCommand) {
+					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
+					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
+				}
+
+				// wall properties
+				else if (lastEdit instanceof ChangeWallTypeCommand) {
+					ChangeWallTypeCommand c = (ChangeWallTypeCommand) lastEdit;
+					Wall w = c.getWall();
+					stateValue = "{\"Building\": " + w.getTopContainer().getId() + ", \"ID\": " + w.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + w.getType() + "}";
 				}
 
 				// window properties

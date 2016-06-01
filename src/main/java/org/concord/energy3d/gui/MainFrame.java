@@ -1146,7 +1146,6 @@ public class MainFrame extends JFrame {
 			addTemplate("Gable & Valley Roof", "templates/gable-valley-template.ng3");
 			addTemplate("Gablet Roof", "templates/gablet-template.ng3");
 			addTemplate("Gambrel Roof", "templates/gambrel-template.ng3");
-			addTemplate("Hexagonal Gazebo", "templates/hexagonal-gazebo-template.ng3");
 			addTemplate("Hip & Valley Roof", "templates/hip-valley-template.ng3");
 			addTemplate("Mansard", "templates/mansard-template.ng3");
 			addTemplate("M-Shaped Roof", "templates/m-shaped-template.ng3");
@@ -2037,7 +2036,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	public void importFile() {
+	void importFile() {
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.addChoosableFileFilter(ng3Filter);
 		fileChooser.removeChoosableFileFilter(pngFilter);
@@ -2052,8 +2051,7 @@ public class MainFrame extends JFrame {
 					try {
 						Scene.importFile(fileChooser.getSelectedFile().toURI().toURL());
 					} catch (final Throwable err) {
-						err.printStackTrace();
-						JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						Util.reportError(err);
 					}
 					return null;
 				}
@@ -2124,6 +2122,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getImportMenuItem() {
 		if (importMenuItem == null) {
 			importMenuItem = new JMenuItem("Import...");
+			importMenuItem.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
 			importMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

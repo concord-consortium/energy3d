@@ -131,7 +131,7 @@ public class EnergyAngularAnalysis extends Analysis {
 			graph.addData("Heat Gain", -sum);
 		} else if (selectedPart instanceof SolarPanel) {
 			final SolarPanel solarPanel = (SolarPanel) selectedPart;
-			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getEfficiency();
+			final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
 			graph.addData("Solar", solar);
 		}
 		graph.repaint();
@@ -199,7 +199,7 @@ public class EnergyAngularAnalysis extends Analysis {
 		miView.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				DataViewer.viewRawData(dialog, graph);
+				DataViewer.viewRawData(dialog, graph, false);
 			}
 		});
 		menu.add(miView);

@@ -6,15 +6,15 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
+public class ChangeMicroInverterEfficiencyCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldValue, newValue;
 	private SolarPanel solarPanel;
 
-	public ChangeSolarPanelEfficiencyCommand(SolarPanel solarPanel) {
+	public ChangeMicroInverterEfficiencyCommand(SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
-		oldValue = solarPanel.getEfficiency();
+		oldValue = solarPanel.getInverterEfficiency();
 	}
 
 	public SolarPanel getSolarPanel() {
@@ -28,19 +28,19 @@ public class ChangeSolarPanelEfficiencyCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = solarPanel.getEfficiency();
-		solarPanel.setEfficiency(oldValue);
+		newValue = solarPanel.getInverterEfficiency();
+		solarPanel.setInverterEfficiency(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		solarPanel.setEfficiency(newValue);
+		solarPanel.setInverterEfficiency(newValue);
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Efficiency Change for Selected Solar Panel";
+		return "Micro Inverter Efficiency Change for Selected Solar Panel";
 	}
 
 }
