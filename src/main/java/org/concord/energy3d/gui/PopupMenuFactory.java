@@ -193,6 +193,46 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miRemoveAllTrees = new JMenuItem("Remove All Trees");
+			miRemoveAllTrees.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllTrees();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+
+			final JMenuItem miRemoveAllHumans = new JMenuItem("Remove All Humans");
+			miRemoveAllHumans.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllHumans();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miImport = new JMenuItem("Import...");
 			miImport.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
 			miImport.addActionListener(new ActionListener() {
@@ -203,8 +243,20 @@ public class PopupMenuFactory {
 			});
 
 			final JMenu miImportPrefabMenu = new JMenu("Import a Prefab");
+			addPrefabMenuItem("Back Hip Roof Porch", "prefabs/back-hip-roof-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Balcony", "prefabs/balcony1.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Chimney", "prefabs/chimney.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Flat-Top Porch", "prefabs/flat-top-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Front Door Overhang", "prefabs/front-door-overhang.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Gable Dormer", "prefabs/gable-dormer.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Hexagonal Gazebo", "prefabs/hexagonal-gazebo.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Hexagonal Tower", "prefabs/hexagonal-tower.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Octagonal Tower", "prefabs/octagonal-tower.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Shed Dormer", "prefabs/shed-dormer.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Solarium", "prefabs/solarium1.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Square Tower", "prefabs/square-tower.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Tall Front Door Overhang", "prefabs/tall-front-door-overhang.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Waterfront Deck", "prefabs/waterfront-deck.ng3", miImportPrefabMenu);
 
 			final JMenuItem miAlbedo = new JMenuItem("Albedo...");
 			miAlbedo.addActionListener(new ActionListener() {
@@ -288,6 +340,9 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miInfo);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miPaste);
+			popupMenuForLand.add(miRemoveAllTrees);
+			popupMenuForLand.add(miRemoveAllHumans);
+			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miImport);
 			popupMenuForLand.add(miImportPrefabMenu);
 			popupMenuForLand.addSeparator();

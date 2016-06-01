@@ -409,17 +409,23 @@ public class Scene implements Serializable {
 
 			root.updateWorldBound(true);
 			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-			SceneManager.getInstance().getUndoManager().die();
-			MainFrame.getInstance().refreshUndoRedo();
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
+					// SceneManager.getInstance().getUndoManager().die();
+					// MainFrame.getInstance().refreshUndoRedo();
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
+
+		} else {
+
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "URL doesn't exist.", "Error", JOptionPane.ERROR_MESSAGE);
+
 		}
+
 	}
-	
+
 	/** This can be used by the user to fix problems that are caused by bugs based on our observations. This is different than cleanup() as the latter cannot be used to remove undrawables. */
 	public void fixProblems() {
 
