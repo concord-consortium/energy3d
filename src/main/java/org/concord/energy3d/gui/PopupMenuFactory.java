@@ -238,6 +238,26 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miRemoveAllBuildings = new JMenuItem("Remove All Buildings");
+			miRemoveAllBuildings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().removeAllFoundations();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miImport = new JMenuItem("Import...");
 			miImport.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
 			miImport.addActionListener(new ActionListener() {
@@ -251,6 +271,7 @@ public class PopupMenuFactory {
 			addPrefabMenuItem("Back Hip Roof Porch", "prefabs/back-hip-roof-porch.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Balcony", "prefabs/balcony1.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Chimney", "prefabs/chimney.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Connecting Porch", "prefabs/connecting-porch.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Flat-Top Porch", "prefabs/flat-top-porch.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Front Door Overhang", "prefabs/front-door-overhang.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Gable Dormer", "prefabs/gable-dormer.ng3", miImportPrefabMenu);
@@ -347,6 +368,7 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miPaste);
 			popupMenuForLand.add(miRemoveAllTrees);
 			popupMenuForLand.add(miRemoveAllHumans);
+			popupMenuForLand.add(miRemoveAllBuildings);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miImport);
 			popupMenuForLand.add(miImportPrefabMenu);

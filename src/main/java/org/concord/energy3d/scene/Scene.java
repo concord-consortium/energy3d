@@ -221,12 +221,17 @@ public class Scene implements Serializable {
 			if (cameraControl != null)
 				cameraControl.reset();
 
+			int count = 0;
+			Foundation first = null;
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation && !p.isFrozen()) {
-					SceneManager.getInstance().setSelectedPart(p);
-					break;
+					if (count == 0)
+						first = (Foundation) p;
+					count++;
 				}
 			}
+			if (count == 1)
+				SceneManager.getInstance().setSelectedPart(first);
 
 			initSceneNow();
 			initEnergy();
@@ -1096,6 +1101,27 @@ public class Scene implements Serializable {
 			return;
 		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
 		for (final HousePart part : windows) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
+	public void removeAllFoundations() {
+		final ArrayList<HousePart> foundations = new ArrayList<HousePart>();
+		for (final HousePart part : parts) {
+			if (part instanceof Foundation && !part.isFrozen())
+				foundations.add(part);
+		}
+		if (foundations.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no activated foundation to remove.", "No Foundation", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + foundations.size() + " foundations?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(foundations);
+		for (final HousePart part : foundations) {
 			remove(part, false);
 		}
 		redrawAll();
