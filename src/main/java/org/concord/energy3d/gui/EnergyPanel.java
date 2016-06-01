@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
 import javax.swing.BorderFactory;
@@ -166,12 +167,12 @@ public class EnergyPanel extends JPanel {
 					return;
 				}
 				if (!disableDateSpinner) {
-					ChangeDateCommand c = new ChangeDateCommand();
-					Date d = (Date) dateSpinner.getValue();
+					final ChangeDateCommand c = new ChangeDateCommand();
+					final Date d = (Date) dateSpinner.getValue();
 					if (lastDate != null) { // fix a bug that causes the spinner to fire when going from Dec into Jan
-						Calendar c0 = new GregorianCalendar();
+						final Calendar c0 = new GregorianCalendar();
 						c0.setTime(lastDate);
-						Calendar c1 = new GregorianCalendar();
+						final Calendar c1 = new GregorianCalendar();
 						c1.setTime(d);
 						if (c0.get(Calendar.MONTH) == c1.get(Calendar.MONTH) && c0.get(Calendar.DAY_OF_MONTH) == c1.get(Calendar.DAY_OF_MONTH))
 							return;
@@ -216,7 +217,7 @@ public class EnergyPanel extends JPanel {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
 					Scene.getInstance().setCity(city);
 				} else {
-					ChangeCityCommand c = new ChangeCityCommand();
+					final ChangeCityCommand c = new ChangeCityCommand();
 					setLatitude((int) LocationData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).floatValue());
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setCity(city);
@@ -251,12 +252,12 @@ public class EnergyPanel extends JPanel {
 					firstCall = false;
 					return;
 				}
-				ChangeTimeCommand c = new ChangeTimeCommand();
-				Date d = (Date) timeSpinner.getValue();
+				final ChangeTimeCommand c = new ChangeTimeCommand();
+				final Date d = (Date) timeSpinner.getValue();
 				if (lastDate != null) { // fix a bug that causes the spinner to fire when crossing day boundary
-					Calendar c0 = new GregorianCalendar();
+					final Calendar c0 = new GregorianCalendar();
 					c0.setTime(lastDate);
-					Calendar c1 = new GregorianCalendar();
+					final Calendar c1 = new GregorianCalendar();
 					c1.setTime(d);
 					if (c0.get(Calendar.HOUR_OF_DAY) == c1.get(Calendar.HOUR_OF_DAY) && c0.get(Calendar.MINUTE) == c1.get(Calendar.MINUTE))
 						return;
@@ -299,7 +300,7 @@ public class EnergyPanel extends JPanel {
 		latitudeSpinner.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				ChangeLatitudeCommand c = new ChangeLatitudeCommand();
+				final ChangeLatitudeCommand c = new ChangeLatitudeCommand();
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 				Scene.getInstance().setEdited(true);
@@ -357,7 +358,7 @@ public class EnergyPanel extends JPanel {
 		partPanel.setMaximumSize(new Dimension(partPanel.getMaximumSize().width, partPanel.getPreferredSize().height));
 		dataPanel.add(partPanel);
 
-		JPanel labelPanel = new JPanel(new GridLayout(3, 1, 2, 2));
+		final JPanel labelPanel = new JPanel(new GridLayout(3, 1, 2, 2));
 		partPanel.add(labelPanel, BorderLayout.WEST);
 		partProperty1Label = createLabel(" X:");
 		labelPanel.add(partProperty1Label);
@@ -366,7 +367,7 @@ public class EnergyPanel extends JPanel {
 		partProperty3Label = createLabel(" Z:");
 		labelPanel.add(partProperty3Label);
 
-		JPanel fieldPanel = new JPanel(new GridLayout(3, 1, 2, 2));
+		final JPanel fieldPanel = new JPanel(new GridLayout(3, 1, 2, 2));
 		partPanel.add(fieldPanel, BorderLayout.CENTER);
 		partProperty1TextField = createTextField();
 		partProperty1TextField.setEnabled(false);
@@ -400,8 +401,8 @@ public class EnergyPanel extends JPanel {
 		adjustThermostatButton.setFont(new Font(adjustThermostatButton.getFont().getName(), Font.PLAIN, adjustThermostatButton.getFont().getSize() - 2));
 		adjustThermostatButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			public void actionPerformed(final ActionEvent e) {
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart == null)
 					return;
 				Foundation foundation = null;
@@ -468,7 +469,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting()) {
-					ChangeSolarHeatMapColorContrastCommand c = new ChangeSolarHeatMapColorContrastCommand();
+					final ChangeSolarHeatMapColorContrastCommand c = new ChangeSolarHeatMapColorContrastCommand();
 					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
 					compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true, false);
@@ -697,7 +698,7 @@ public class EnergyPanel extends JPanel {
 		}
 		final double scale = Scene.getInstance().getAnnotationScale() * meterToFeet;
 
-		TitledBorder partPanelBorder = (TitledBorder) partPanel.getBorder();
+		final TitledBorder partPanelBorder = (TitledBorder) partPanel.getBorder();
 		if (selectedPart != null) {
 			final ReadOnlyVector3 v = selectedPart.getAbsPoint(0);
 			if (selectedPart instanceof Tree) {
@@ -707,7 +708,7 @@ public class EnergyPanel extends JPanel {
 					partProperty1Label.setText("  Spread:");
 					partProperty2Label.setText("  Height:");
 					partProperty3Label.setText("  Position:");
-					double l = v.length();
+					final double l = v.length();
 					double a = 90 + Math.toDegrees(Math.asin(-v.getY() / l));
 					if (v.getX() < 0)
 						a = 360 - a;
@@ -732,7 +733,7 @@ public class EnergyPanel extends JPanel {
 					partProperty3TextField.setText(oneDecimal.format(v.getZ() * scale) + " m");
 				}
 			} else if (selectedPart instanceof SolarPanel) {
-				SolarPanel sp = (SolarPanel) selectedPart;
+				final SolarPanel sp = (SolarPanel) selectedPart;
 				if (sp.isDrawable()) {
 					partProperty1Label.setText("  Size:");
 					partProperty1TextField.setText(oneDecimal.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + oneDecimal.format(sp.getPanelHeight() * meterToFeet) + " m");
@@ -740,8 +741,8 @@ public class EnergyPanel extends JPanel {
 					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
 					partProperty1TextField.setToolTipText("The length and width of the solar panel");
 					partProperty2TextField.setToolTipText("The (x, y, z) coordinates of the center of the solar panel");
-					String id = "Solar Panel (" + sp.getId() + ")";
-					String eff = oneDecimal.format(sp.getEfficiency() * 100) + "%";
+					final String id = "Solar Panel (" + sp.getId() + ")";
+					final String eff = oneDecimal.format(sp.getEfficiency() * 100) + "%";
 					if (energyViewShown) {
 						partPanelBorder.setTitle(id + " - \u03B7 = " + eff);
 						partProperty3Label.setText("  Yield:");
@@ -755,7 +756,7 @@ public class EnergyPanel extends JPanel {
 					}
 				}
 			} else if (selectedPart instanceof Sensor) {
-				Sensor sensor = (Sensor) selectedPart;
+				final Sensor sensor = (Sensor) selectedPart;
 				if (sensor.isDrawable()) {
 					partPanelBorder.setTitle("Sensor (" + sensor.getId() + ")");
 					partProperty1Label.setText("  Position:");
@@ -769,15 +770,15 @@ public class EnergyPanel extends JPanel {
 					partProperty3TextField.setToolTipText("The heat flux measured by the sensor");
 				}
 			} else if (selectedPart instanceof Foundation) {
-				Foundation foundation = (Foundation) selectedPart;
+				final Foundation foundation = (Foundation) selectedPart;
 				if (foundation.isDrawable()) {
-					Vector3 v1 = foundation.getAbsPoint(1);
-					Vector3 v2 = foundation.getAbsPoint(2);
-					Vector3 v3 = foundation.getAbsPoint(3);
-					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
-					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
-					double lx = v.distance(v2);
-					double ly = v.distance(v1);
+					final Vector3 v1 = foundation.getAbsPoint(1);
+					final Vector3 v2 = foundation.getAbsPoint(2);
+					final Vector3 v3 = foundation.getAbsPoint(3);
+					final double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double lx = v.distance(v2);
+					final double ly = v.distance(v1);
 					partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 					partProperty1Label.setText("  Size:");
 					partProperty2Label.setText("  Position:");
@@ -795,7 +796,7 @@ public class EnergyPanel extends JPanel {
 					partProperty3TextField.setToolTipText("The azimuth of the reference edge");
 				}
 			} else if (selectedPart instanceof Roof) {
-				Roof roof = (Roof) selectedPart;
+				final Roof roof = (Roof) selectedPart;
 				if (roof.isDrawable()) {
 					partProperty1Label.setText("  Area:");
 					partProperty1TextField.setText(oneDecimal.format(roof.getArea()) + " m\u00B2");
@@ -803,8 +804,8 @@ public class EnergyPanel extends JPanel {
 					partProperty2TextField.setText(oneDecimal.format(roof.getHeight() * scale) + " m");
 					partProperty1TextField.setToolTipText("The total area of the roof");
 					partProperty2TextField.setToolTipText("<html>The rise of the roof<br>(the highest point of the roof to the top of the walls</html>");
-					String id = "Roof (" + roof.getId() + ")";
-					String rval = oneDecimal.format(Util.toUsRValue(roof.getUValue()));
+					final String id = "Roof (" + roof.getId() + ")";
+					final String rval = oneDecimal.format(Util.toUsRValue(roof.getUValue()));
 					if (energyViewShown) {
 						partPanelBorder.setTitle(id + " - R-value = " + rval);
 						partProperty3Label.setText("  Solar:");
@@ -818,18 +819,18 @@ public class EnergyPanel extends JPanel {
 					}
 				}
 			} else if (selectedPart instanceof Window) {
-				Window window = (Window) selectedPart;
+				final Window window = (Window) selectedPart;
 				if (window.isDrawable()) {
-					double lx = v.distance(window.getAbsPoint(2));
-					double ly = v.distance(window.getAbsPoint(1));
+					final double lx = v.distance(window.getAbsPoint(2));
+					final double ly = v.distance(window.getAbsPoint(1));
 					partProperty1Label.setText("  Size:");
 					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  U-value:");
 					partProperty2TextField.setText(twoDecimals.format(Util.toUsUValue(window.getUValue())) + " (US system)");
 					partProperty1TextField.setToolTipText("The width and height of the window");
 					partProperty2TextField.setToolTipText("The U-value of the window");
-					String id = "Window (" + window.getId() + ")";
-					String shgc = twoDecimals.format(window.getSolarHeatGainCoefficient());
+					final String id = "Window (" + window.getId() + ")";
+					final String shgc = twoDecimals.format(window.getSolarHeatGainCoefficient());
 					if (energyViewShown) {
 						partPanelBorder.setTitle(id + " - SHGC = " + shgc);
 						partProperty3Label.setText("  Gain:");
@@ -843,23 +844,23 @@ public class EnergyPanel extends JPanel {
 					}
 				}
 			} else if (selectedPart instanceof Wall) {
-				Wall wall = (Wall) selectedPart;
+				final Wall wall = (Wall) selectedPart;
 				if (wall.isDrawable()) {
-					Vector3 v1 = wall.getAbsPoint(1);
-					Vector3 v2 = wall.getAbsPoint(2);
-					Vector3 v3 = wall.getAbsPoint(3);
-					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
-					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
-					double lx = v.distance(v2);
-					double ly = v.distance(v1);
+					final Vector3 v1 = wall.getAbsPoint(1);
+					final Vector3 v2 = wall.getAbsPoint(2);
+					final Vector3 v3 = wall.getAbsPoint(3);
+					final double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double lx = v.distance(v2);
+					final double ly = v.distance(v1);
 					partProperty1Label.setText("  Size:");
 					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  Position:");
 					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
 					partProperty1TextField.setToolTipText("The width and height of the wall");
 					partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the wall");
-					String id = "Wall (" + wall.getId() + ")";
-					String rval = oneDecimal.format(Util.toUsRValue(wall.getUValue()));
+					final String id = "Wall (" + wall.getId() + ")";
+					final String rval = oneDecimal.format(Util.toUsRValue(wall.getUValue()));
 					if (energyViewShown) {
 						partPanelBorder.setTitle(id + " - R-value = " + rval);
 						partProperty3Label.setText("  Solar:");
@@ -873,15 +874,15 @@ public class EnergyPanel extends JPanel {
 					}
 				}
 			} else if (selectedPart instanceof Door) {
-				Door door = (Door) selectedPart;
+				final Door door = (Door) selectedPart;
 				if (door.isDrawable()) {
-					Vector3 v1 = door.getAbsPoint(1);
-					Vector3 v2 = door.getAbsPoint(2);
-					Vector3 v3 = door.getAbsPoint(3);
-					double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
-					double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
-					double lx = v.distance(v2);
-					double ly = v.distance(v1);
+					final Vector3 v1 = door.getAbsPoint(1);
+					final Vector3 v2 = door.getAbsPoint(2);
+					final Vector3 v3 = door.getAbsPoint(3);
+					final double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double lx = v.distance(v2);
+					final double ly = v.distance(v1);
 					partPanelBorder.setTitle("Door (" + door.getId() + ")");
 					partProperty1Label.setText("  Size:");
 					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
@@ -894,7 +895,7 @@ public class EnergyPanel extends JPanel {
 					partProperty3TextField.setToolTipText("The U-value of the wall");
 				}
 			} else if (selectedPart instanceof Floor) {
-				Floor floor = (Floor) selectedPart;
+				final Floor floor = (Floor) selectedPart;
 				if (floor.isDrawable()) {
 					partPanelBorder.setTitle("Floor (" + floor.getId() + ")");
 					partProperty1Label.setText("  Area:");
@@ -902,11 +903,11 @@ public class EnergyPanel extends JPanel {
 					partProperty3Label.setText("  Height:");
 					partProperty1TextField.setText(oneDecimal.format(floor.getArea()) + " m\u00B2");
 					if (floor.getPoints().size() > 1) {
-						Vector3 v1 = floor.getAbsPoint(1);
-						Vector3 v2 = floor.getAbsPoint(2);
-						Vector3 v3 = floor.getAbsPoint(3);
-						double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
-						double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+						final Vector3 v1 = floor.getAbsPoint(1);
+						final Vector3 v2 = floor.getAbsPoint(2);
+						final Vector3 v3 = floor.getAbsPoint(3);
+						final double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+						final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
 						partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
 					}
 					partProperty3TextField.setText(oneDecimal.format(v.getZ() * scale) + " m");
@@ -942,7 +943,7 @@ public class EnergyPanel extends JPanel {
 		if (selectedBuilding != null) {
 			basicsPanel.update(selectedBuilding);
 			final Calendar c = Heliodon.getInstance().getCalender();
-			int temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
+			final int temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:
 				thermostatTemperatureField.setText(temp + " \u00B0C");
@@ -954,8 +955,8 @@ public class EnergyPanel extends JPanel {
 			thermostatPanel.add(adjustThermostatButton, BorderLayout.EAST);
 			String s2 = selectedBuilding.toString();
 			s2 = s2.substring(0, s2.indexOf(')') + 1);
-			int i1 = s2.indexOf('(');
-			int i2 = s2.indexOf(')');
+			final int i1 = s2.indexOf('(');
+			final int i2 = s2.indexOf(')');
 			((TitledBorder) buildingPanel.getBorder()).setTitle("Building #" + s2.substring(i1 + 1, i2));
 		} else {
 			basicsPanel.clear();
@@ -975,7 +976,7 @@ public class EnergyPanel extends JPanel {
 		final Foundation selectedBuilding = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 		if (selectedBuilding != null) {
 			final Calendar c = Heliodon.getInstance().getCalender();
-			double temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
+			final double temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:
 				thermostatTemperatureField.setText(temp + " \u00B0C");
@@ -996,7 +997,7 @@ public class EnergyPanel extends JPanel {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				String s = Scene.getInstance().getProjectName();
+				final String s = Scene.getInstance().getProjectName();
 				timeAndLocationPanel.setBorder(createTitledBorder("Project: " + (s != null ? s : ""), true));
 				basicsPanel.updateArea();
 				basicsPanel.updateHeight();
@@ -1004,7 +1005,13 @@ public class EnergyPanel extends JPanel {
 				basicsPanel.updateSolarPanel();
 				basicsPanel.updateWindow();
 				basicsPanel.updateWall();
-				updateProperties();
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						updateProperties();
+						return null;
+					}
+				});
 			}
 		});
 	}
@@ -1073,31 +1080,31 @@ public class EnergyPanel extends JPanel {
 		});
 	}
 
-	private JLabel createLabel(String text) {
-		JLabel label = new JLabel(text);
+	private JLabel createLabel(final String text) {
+		final JLabel label = new JLabel(text);
 		label.setFont(new Font(label.getFont().getName(), Font.PLAIN, label.getFont().getSize() - 2));
 		return label;
 	}
 
 	private JTextField createTextField() {
-		JTextField text = new JTextField();
+		final JTextField text = new JTextField();
 		text.setFont(new Font(text.getFont().getName(), Font.PLAIN, text.getFont().getSize() - 1));
 		return text;
 	}
 
-	private JSpinner createSpinner(SpinnerModel model) {
-		JSpinner spinner = new JSpinner(model);
+	private JSpinner createSpinner(final SpinnerModel model) {
+		final JSpinner spinner = new JSpinner(model);
 		spinner.setFont(new Font(spinner.getFont().getName(), Font.PLAIN, spinner.getFont().getSize() - 1));
 		return spinner;
 	}
 
-	static TitledBorder createTitledBorder(String title, boolean smaller) {
-		TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), title, TitledBorder.LEADING, TitledBorder.TOP);
+	static TitledBorder createTitledBorder(final String title, final boolean smaller) {
+		final TitledBorder b = BorderFactory.createTitledBorder(UIManager.getBorder("TitledBorder.border"), title, TitledBorder.LEADING, TitledBorder.TOP);
 		b.setTitleFont(new Font(b.getTitleFont().getFontName(), Font.PLAIN, b.getTitleFont().getSize() - (smaller ? 2 : 1)));
 		return b;
 	}
 
-	public void disableDateSpinner(boolean b) {
+	public void disableDateSpinner(final boolean b) {
 		disableDateSpinner = b;
 	}
 
