@@ -14,8 +14,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -580,7 +580,7 @@ public class Util {
 	// Point* points = an array of n+1 points in a 2D plane with V[n]=V[0]
 	// Point normal = a normal vector of the polygon's plane
 	// Return: the (float) area of the polygon
-	public static double area3D_Polygon(final ArrayList<ReadOnlyVector3> points, final ReadOnlyVector3 normal) {
+	public static double area3D_Polygon(final List<ReadOnlyVector3> points, final ReadOnlyVector3 normal) {
 		final int n = points.size() - 1;
 		double area = 0;
 		double an, ax, ay, az; // abs value of normal and its coords
@@ -681,6 +681,10 @@ public class Util {
 	private static double computeTriangleArea(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		return p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
+	}
+
+	public static int getHashCode(final ReadOnlyVector3 p) {
+		return Objects.hash(p.getX(), p.getY(), p.getZ());
 	}
 
 }

@@ -981,10 +981,10 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void drawAzimuthArrow() {
 		final double cos30 = Math.cos(Math.toRadians(30));
 		final double sin30 = Math.sin(Math.toRadians(30));
-		FloatBuffer arrowVertices = azimuthArrow.getMeshData().getVertexBuffer();
+		final FloatBuffer arrowVertices = azimuthArrow.getMeshData().getVertexBuffer();
 		arrowVertices.clear();
-		Vector3 v = getAbsPoint(0).subtractLocal(getAbsPoint(1)).normalizeLocal().multiplyLocal(10).negateLocal();
-		Vector3 p = getAbsPoint(1).addLocal(getAbsPoint(3)).multiplyLocal(0.5);
+		final Vector3 v = getAbsPoint(0).subtractLocal(getAbsPoint(1)).normalizeLocal().multiplyLocal(10).negateLocal();
+		final Vector3 p = getAbsPoint(1).addLocal(getAbsPoint(3)).multiplyLocal(0.5);
 		arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		p.addLocal(v);
 		arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -1004,7 +1004,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		updateAzimuthArrowVisibility(SceneManager.getInstance().getSelectedPart() == this);
 	}
 
-	public void updateAzimuthArrowVisibility(boolean b) {
+	public void updateAzimuthArrowVisibility(final boolean b) {
 		azimuthArrow.setVisible(b);
 	}
 
@@ -1124,7 +1124,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	private void clearRoofIntersectionCache(final HousePart part) {
 		if (part instanceof Roof)
-			((Roof) part).getIntersectionCache().clear();
+			((Roof) part).clearIntersectionCache();
 		else if (part instanceof Foundation || part instanceof Wall)
 			for (final HousePart child : part.getChildren())
 				clearRoofIntersectionCache(child);

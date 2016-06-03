@@ -61,6 +61,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	protected transient Node roofPartsRoot;
 	protected transient List<ReadOnlyVector3> wallUpperPoints;
+	private transient List<ReadOnlyVector3> dashPoints;
 	private transient Map<Integer, ReadOnlyVector3> intersectionCache;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
@@ -256,7 +257,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					final Node roofPartNode = (Node) roofPart;
 					final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(0);
 					final Mesh dashLinesMesh = (Mesh) roofPartNode.getChild(5);
-					final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
+					final List<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
 					if (result.isEmpty()) {
 						dashLinesMesh.setVisible(false);
 					} else {
@@ -280,36 +281,39 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		updateDashLinesColor();
 	}
 
-	public ArrayList<ReadOnlyVector3> computeDashPoints(final Mesh roofPartMesh) {
-		final ArrayList<ReadOnlyVector3> resultBeforeBreak = new ArrayList<ReadOnlyVector3>();
-		final ArrayList<ReadOnlyVector3> resultAfterBreak = new ArrayList<ReadOnlyVector3>();
-		final boolean[] foundBreak = { false };
-		((Wall) container).visitNeighbors(new WallVisitor() {
-			@Override
-			public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
-				final int indexP1, indexP2;
-				if (nextSnap != null) {
-					indexP2 = nextSnap.getSnapPointIndexOf(currentWall);
-					indexP1 = indexP2 == 2 ? 0 : 2;
-				} else if (prevSnap != null) {
-					indexP1 = prevSnap.getSnapPointIndexOf(currentWall);
-					indexP2 = indexP1 == 2 ? 0 : 2;
-				} else {
-					indexP1 = 0;
-					indexP2 = 2;
+	public List<ReadOnlyVector3> computeDashPoints(final Mesh roofPartMesh) {
+		if (dashPoints == null) {
+			final ArrayList<ReadOnlyVector3> resultBeforeBreak = new ArrayList<ReadOnlyVector3>();
+			final ArrayList<ReadOnlyVector3> resultAfterBreak = new ArrayList<ReadOnlyVector3>();
+			final boolean[] foundBreak = { false };
+			((Wall) container).visitNeighbors(new WallVisitor() {
+				@Override
+				public void visit(final Wall currentWall, final Snap prevSnap, final Snap nextSnap) {
+					final int indexP1, indexP2;
+					if (nextSnap != null) {
+						indexP2 = nextSnap.getSnapPointIndexOf(currentWall);
+						indexP1 = indexP2 == 2 ? 0 : 2;
+					} else if (prevSnap != null) {
+						indexP1 = prevSnap.getSnapPointIndexOf(currentWall);
+						indexP2 = indexP1 == 2 ? 0 : 2;
+					} else {
+						indexP1 = 0;
+						indexP2 = 2;
+					}
+					final ArrayList<ReadOnlyVector3> array = foundBreak[0] ? resultAfterBreak : resultBeforeBreak;
+					final int orgSize = array.size();
+					stretchToRoof(array, roofPartMesh, currentWall.getAbsPoint(indexP1), currentWall.getAbsPoint(indexP2));
+					if (!foundBreak[0] && array.size() == orgSize)
+						foundBreak[0] = true;
 				}
-				final ArrayList<ReadOnlyVector3> array = foundBreak[0] ? resultAfterBreak : resultBeforeBreak;
-				final int orgSize = array.size();
-				stretchToRoof(array, roofPartMesh, currentWall.getAbsPoint(indexP1), currentWall.getAbsPoint(indexP2));
-				if (!foundBreak[0] && array.size() == orgSize)
-					foundBreak[0] = true;
-			}
-		});
-		if (foundBreak[0]) {
-			resultAfterBreak.addAll(resultBeforeBreak);
-			return resultAfterBreak;
-		} else
-			return resultBeforeBreak;
+			});
+			if (foundBreak[0]) {
+				resultAfterBreak.addAll(resultBeforeBreak);
+				dashPoints = resultAfterBreak;
+			} else
+				dashPoints = resultBeforeBreak;
+		}
+		return dashPoints;
 	}
 
 	public void updateDashLinesColor() {
@@ -333,8 +337,9 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 		final double step = 0.1;
 		final double minDistance = step * 3;
+		final Vector3 p = new Vector3();
 		for (double d = step; d < length; d += step) {
-			final Vector3 p = dir.multiply(d, null).addLocal(p1);
+			dir.multiply(d, p).addLocal(p1);
 			final ReadOnlyVector3 currentStretchPoint = findRoofIntersection(roof, p);
 
 			if (currentStretchPoint != null && !firstInsert) {
@@ -367,7 +372,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	private ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
-		final Integer key = p.hashCode();
+		final int key = Util.getHashCode(p);
 		ReadOnlyVector3 result = getIntersectionCache().get(key);
 		if (result == nullVector)
 			return null;
@@ -381,11 +386,12 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		final double offset = 0.001;
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
-		ReadOnlyVector3 result = pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
+		final ReadOnlyVector3 result = pickResults.getNumber() > 0 ? pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(0, 0, offset, null) : null;
+		final int key = Util.getHashCode(p);
 		if (result == null)
-			getIntersectionCache().put(p.hashCode(), nullVector);
+			getIntersectionCache().put(key, nullVector);
 		else
-			getIntersectionCache().put(p.hashCode(), result);
+			getIntersectionCache().put(key, result);
 		return result;
 	}
 
@@ -709,6 +715,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			for (final int removedEditPoint : toBeRemoved)
 				gableEditPointToWallMap.remove(removedEditPoint);
 		}
+
+		clearIntersectionCache();
 
 		if (redraw) {
 			draw();
@@ -1055,7 +1063,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					areaByPartWithoutOverhang.put(roofPartMesh, a);
 					area += a;
 				} else {
-					final ArrayList<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
+					final List<ReadOnlyVector3> result = computeDashPoints(roofPartMesh);
 					if (result.isEmpty()) {
 						vertexBuffer.rewind();
 						p.set(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
@@ -1347,6 +1355,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		if (intersectionCache == null)
 			intersectionCache = new HashMap<Integer, ReadOnlyVector3>();
 		return intersectionCache;
+	}
+
+	public void clearIntersectionCache() {
+		intersectionCache.clear();
+		dashPoints = null;
 	}
 
 }
