@@ -1425,7 +1425,27 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			popupMenuForSolarPanel = createPopupMenu(true, true, null);
+			final JCheckBoxMenuItem miRotate = new JCheckBoxMenuItem("Rotate 90\u00B0");
+			miRotate.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					((SolarPanel) selectedPart).setRotated(miRotate.isSelected());
+					Scene.getInstance().redrawAll();
+				}
+			});
+
+			popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
+				@Override
+				public void run() {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					Util.selectSilently(miRotate, ((SolarPanel) selectedPart).isRotated());
+				}
+			});
 
 			final JMenuItem miEff = new JMenuItem("Solar Cell Efficiency...");
 			miEff.addActionListener(new ActionListener() {
@@ -1549,6 +1569,7 @@ public class PopupMenuFactory {
 				}
 			});
 
+			popupMenuForSolarPanel.add(miRotate);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miEff);
 			popupMenuForSolarPanel.add(miInverterEff);

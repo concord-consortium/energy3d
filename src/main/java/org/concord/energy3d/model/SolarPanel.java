@@ -30,8 +30,9 @@ public class SolarPanel extends HousePart {
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 1.0; // 39"
 	private double panelHeight = 1.65; // 65"
+	private boolean rotated = false;
 
-	public SolarPanel() {
+	public SolarPanel(boolean rotated) {
 		super(1, 1, 0.0);
 	}
 
@@ -134,7 +135,11 @@ public class SolarPanel extends HousePart {
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0.5), panelWidth / 2.0 / annotationScale, panelHeight / 2.0 / annotationScale, 0.15);
+		if (rotated) {
+			surround.setData(new Vector3(0, 0, 0.5), panelHeight / 2.0 / annotationScale, panelWidth / 2.0 / annotationScale, 0.15);
+		} else {
+			surround.setData(new Vector3(0, 0, 0.5), panelWidth / 2.0 / annotationScale, panelHeight / 2.0 / annotationScale, 0.15);
+		}
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -280,7 +285,7 @@ public class SolarPanel extends HousePart {
 				if (Util.isZero(d.length()))
 					d.set(1, 0, 0);
 				final Vector3 d0 = d.clone();
-				d.multiplyLocal(panelWidth / Scene.getInstance().getAnnotationScale());
+				d.multiplyLocal((rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale());
 				d.addLocal(getContainerRelative().getPoints().get(0));
 				final Vector3 v = toRelative(d);
 				final Vector3 originalCenter = Scene.getInstance().getOriginalCopy().getAbsCenter();
@@ -298,7 +303,7 @@ public class SolarPanel extends HousePart {
 				}
 			} else if (container instanceof Wall) {
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-				final double shift = panelWidth / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
+				final double shift = (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
 				final double newX = points.get(0).getX() + s * shift;
 				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;
@@ -310,6 +315,14 @@ public class SolarPanel extends HousePart {
 			}
 		}
 		return c;
+	}
+
+	public void setRotated(boolean b) {
+		rotated = b;
+	}
+
+	public boolean isRotated() {
+		return rotated;
 	}
 
 }
