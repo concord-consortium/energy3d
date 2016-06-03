@@ -26,7 +26,7 @@ public class SolarPanel extends HousePart {
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
-	private double efficiency = 0.1; // a number in (0, 1)
+	private double efficiency = 0.15; // a number in (0, 1)
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 1.0; // 39"
 	private double panelHeight = 1.65; // 65"
@@ -77,9 +77,7 @@ public class SolarPanel extends HousePart {
 		super.init();
 
 		if (Util.isZero(efficiency))
-			efficiency = 0.1;
-		else if (efficiency > 1) // backward compatibility, efficiency used to range from 0 to 100
-			efficiency *= 0.01;
+			efficiency = 0.15;
 		if (Util.isZero(panelWidth))
 			panelWidth = 1;
 		if (Util.isZero(panelHeight))

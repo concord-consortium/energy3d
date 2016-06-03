@@ -82,6 +82,7 @@ import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
+import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -1432,7 +1433,11 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
-					((SolarPanel) selectedPart).setRotated(miRotate.isSelected());
+					SolarPanel s = (SolarPanel) selectedPart;
+					RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+					s.setRotated(miRotate.isSelected());
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 				}
 			});

@@ -76,6 +76,7 @@ import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
+import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
@@ -401,6 +402,11 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeMicroInverterEfficiencyForAllCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
+				} else if (lastEdit instanceof RotateSolarPanelCommand) {
+					RotateSolarPanelCommand c = (RotateSolarPanelCommand) lastEdit;
+					SolarPanel sp = c.getSolarPanel();
+					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
+					stateValue += ", \"New Value\": " + sp.isRotated() + "}";
 				}
 
 				// wall properties
