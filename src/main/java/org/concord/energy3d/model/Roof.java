@@ -74,8 +74,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	private double overhangLength = 2.0;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.15; // default is R38 (IECC for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
-	private Path2D.Double underlyingWallPath;
-	private List<Vector2> underlyingWallVerticesOnFoundation;
+	private transient Path2D.Double underlyingWallPath;
+	private transient List<Vector2> underlyingWallVerticesOnFoundation;
 
 	protected class EditState {
 		final boolean fitTestRequired;

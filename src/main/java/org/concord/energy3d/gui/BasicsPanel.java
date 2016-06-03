@@ -170,7 +170,7 @@ public class BasicsPanel extends JPanel {
 		heightBar.setValue(0);
 		areaBar.setValue(0);
 		windowToFloorBar.setValue(0);
-		solarPanelCountBar.setValue(0);
+		solarPanelCountBar.setValue(Scene.getInstance().getNumberOfSolarPanels());
 		windowCountBar.setValue(0);
 		wallCountBar.setValue(0);
 	}
