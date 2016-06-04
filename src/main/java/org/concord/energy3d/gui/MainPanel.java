@@ -517,8 +517,8 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().setShadow(shadowButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
-					// Scene.getInstance().setEdited(true, false); // shadow not saved -- make sense because it doesn't work on some machines
 					SceneManager.getInstance().getUndoManager().addEdit(c);
+					// Scene.getInstance().setEdited(false); // shadow not saved -- make sense because it doesn't work on some machines
 				}
 			});
 		}
