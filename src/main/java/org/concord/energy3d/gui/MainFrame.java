@@ -1142,13 +1142,15 @@ public class MainFrame extends JFrame {
 			addTemplate("Combination Roof", "templates/combination-roof-template.ng3");
 			addTemplate("Cross Gabled Roof", "templates/cross-gabled-template.ng3");
 			addTemplate("Cross Hipped Roof", "templates/cross-hipped-template.ng3");
+			addTemplate("Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
 			addTemplate("Flat Roof", "templates/flat-roof-template.ng3");
 			addTemplate("Gable & Valley Roof", "templates/gable-valley-template.ng3");
 			addTemplate("Gablet Roof", "templates/gablet-template.ng3");
 			addTemplate("Gambrel Roof", "templates/gambrel-template.ng3");
 			addTemplate("Hip & Valley Roof", "templates/hip-valley-template.ng3");
-			addTemplate("Mansard", "templates/mansard-template.ng3");
 			addTemplate("M-Shaped Roof", "templates/m-shaped-template.ng3");
+			addTemplate("Mansard", "templates/mansard-template.ng3");
+			addTemplate("Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
 			addTemplate("Saltbox 1", "templates/saltbox-template-1.ng3");
 			addTemplate("Saltbox 2", "templates/saltbox-template-2.ng3");
 			addTemplate("Shed Roof", "templates/shed-roof-template.ng3");
