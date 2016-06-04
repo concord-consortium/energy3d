@@ -201,6 +201,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
 	private JMenu templatesMenu;
+	private JMenu otherTemplatesMenu;
 
 	private final FileChooser fileChooser;
 	private final JColorChooser colorChooser;
@@ -1134,31 +1135,36 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
-			addTemplate("Box Gabled Roof", "templates/box-gabled-template.ng3");
-			addTemplate("Bungalow", "templates/bungalow-template.ng3");
-			addTemplate("Butterfly Roof", "templates/butterfly-template.ng3");
-			addTemplate("Cape Cod", "templates/cape-cod-template.ng3");
-			addTemplate("Colonial", "templates/colonial-template.ng3");
-			addTemplate("Combination Roof", "templates/combination-roof-template.ng3");
-			addTemplate("Cross Gabled Roof", "templates/cross-gabled-template.ng3");
-			addTemplate("Cross Hipped Roof", "templates/cross-hipped-template.ng3");
-			addTemplate("Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
-			addTemplate("Flat Roof", "templates/flat-roof-template.ng3");
-			addTemplate("Gable & Valley Roof", "templates/gable-valley-template.ng3");
-			addTemplate("Gablet Roof", "templates/gablet-template.ng3");
-			addTemplate("Gambrel Roof", "templates/gambrel-template.ng3");
-			addTemplate("Hip & Valley Roof", "templates/hip-valley-template.ng3");
-			addTemplate("M-Shaped Roof", "templates/m-shaped-template.ng3");
-			addTemplate("Mansard", "templates/mansard-template.ng3");
-			addTemplate("Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
-			addTemplate("Saltbox 1", "templates/saltbox-template-1.ng3");
-			addTemplate("Saltbox 2", "templates/saltbox-template-2.ng3");
-			addTemplate("Shed Roof", "templates/shed-roof-template.ng3");
+			addTemplate(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
+			addTemplate(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
+			addTemplate(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
+			addTemplate(templatesMenu, "Cape Cod", "templates/cape-cod-template.ng3");
+			addTemplate(templatesMenu, "Colonial", "templates/colonial-template.ng3");
+			addTemplate(templatesMenu, "Combination Roof", "templates/combination-roof-template.ng3");
+			addTemplate(templatesMenu, "Cross Gabled Roof", "templates/cross-gabled-template.ng3");
+			addTemplate(templatesMenu, "Cross Hipped Roof", "templates/cross-hipped-template.ng3");
+			addTemplate(templatesMenu, "Dutch Colonial", "templates/gambrel-template.ng3");
+			addTemplate(templatesMenu, "Flat Roof", "templates/flat-roof-template.ng3");
+			addTemplate(templatesMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
+			addTemplate(templatesMenu, "Gablet Roof", "templates/gablet-template.ng3");
+			addTemplate(templatesMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
+			addTemplate(templatesMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
+			addTemplate(templatesMenu, "Mansard", "templates/mansard-template.ng3");
+			addTemplate(templatesMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
+			addTemplate(templatesMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
+			addTemplate(templatesMenu, "Shed Roof", "templates/shed-roof-template.ng3");
+			templatesMenu.addSeparator();
+			otherTemplatesMenu = new JMenu("Others");
+			templatesMenu.add(otherTemplatesMenu);
+			addTemplate(otherTemplatesMenu, "Dome", "templates/dome-template.ng3");
+			addTemplate(otherTemplatesMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
+			addTemplate(otherTemplatesMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
+			addTemplate(otherTemplatesMenu, "Stadium", "templates/stadium-template.ng3");
 		}
 		return templatesMenu;
 	}
 
-	private void addTemplate(final String type, final String url) {
+	private void addTemplate(final JMenu menu, final String type, final String url) {
 		JMenuItem mi = new JMenuItem(type);
 		mi.addActionListener(new ActionListener() {
 			@Override
@@ -1166,7 +1172,7 @@ public class MainFrame extends JFrame {
 				openTemplate(MainApplication.class.getResource(url));
 			}
 		});
-		templatesMenu.add(mi);
+		menu.add(mi);
 	}
 
 	private JMenu getViewMenu() {
