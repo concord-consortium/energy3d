@@ -14,8 +14,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -684,7 +684,8 @@ public class Util {
 	}
 
 	public static int getHashCode(final ReadOnlyVector3 p) {
-		return Objects.hash(p.getX(), p.getY(), p.getZ());
+		// return Objects.hash(p.getX(), p.getY(), p.getZ());
+		return Arrays.hashCode(new double[] { p.getX(), p.getY(), p.getZ() });
 	}
 
 }
