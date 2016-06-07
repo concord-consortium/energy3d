@@ -75,6 +75,7 @@ import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
+import org.concord.energy3d.undo.RescaleCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
@@ -259,7 +260,10 @@ public class TimeSeriesLogger {
 				}
 
 				// value changes
-				else if (lastEdit instanceof ChangeBackgroundAlbedoCommand) {
+				else if (lastEdit instanceof RescaleCommand) {
+					RescaleCommand c = (RescaleCommand) lastEdit;
+					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getAnnotationScale() + "}";
+				} else if (lastEdit instanceof ChangeBackgroundAlbedoCommand) {
 					ChangeBackgroundAlbedoCommand c = (ChangeBackgroundAlbedoCommand) lastEdit;
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getGround().getAlbedo() + "}";
 				} else if (lastEdit instanceof ChangeGroundThermalDiffusivityCommand) {
