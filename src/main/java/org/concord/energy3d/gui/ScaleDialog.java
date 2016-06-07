@@ -22,8 +22,11 @@ import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.RescaleCommand;
 
 class ScaleDialog extends JDialog {
+
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField currentTextField;
@@ -162,8 +165,10 @@ class ScaleDialog extends JDialog {
 								scale = Double.parseDouble(newTextField.getText()) / Double.parseDouble(currentTextField.getText());
 							else
 								scale = Double.parseDouble(scaleTextField.getText());
+							RescaleCommand c = new RescaleCommand();
 							Scene.getInstance().setAnnotationScale(Scene.getInstance().getAnnotationScale() * scale);
 							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 							ScaleDialog.this.dispose();
 							Scene.getInstance().redrawAll();
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);

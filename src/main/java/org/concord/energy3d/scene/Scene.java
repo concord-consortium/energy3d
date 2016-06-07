@@ -255,7 +255,7 @@ public class Scene implements Serializable {
 			}
 
 		});
-
+		
 	}
 
 	public static void initSceneNow() {
@@ -506,7 +506,6 @@ public class Scene implements Serializable {
 				if (part instanceof Foundation)
 					((Foundation) part).scaleHouse(10);
 			cameraLocation = cameraLocation.multiply(10, null);
-			// setOverhangLength(getOverhangLength() * 10);
 			setAnnotationScale(1.0);
 		}
 

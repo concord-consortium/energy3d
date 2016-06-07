@@ -892,6 +892,24 @@ public class PopupMenuFactory {
 			typeMenu.add(rbmiRailings);
 			typeGroup.add(rbmiRailings);
 
+			final JRadioButtonMenuItem rbmiBoard = new JRadioButtonMenuItem("Board");
+			rbmiBoard.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.BOARD_ONLY);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			typeMenu.add(rbmiBoard);
+			typeGroup.add(rbmiBoard);
+
 			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns & Railings");
 			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
 				@Override
