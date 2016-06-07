@@ -683,9 +683,8 @@ public class Util {
 		return p3.subtract(p1, null).crossLocal(p3.subtract(p2, null)).length() * annotationScale * annotationScale / 2.0;
 	}
 
-	public static int getHashCode(final ReadOnlyVector3 p) {
-		// return Objects.hash(p.getX(), p.getY(), p.getZ());
-		return Arrays.hashCode(new double[] { p.getX(), p.getY(), p.getZ() });
+	public static int getHashCode(final ReadOnlyVector3 p, final ReadOnlyVector3 direction) {
+		return Arrays.hashCode(new double[] { p.getX(), p.getY(), p.getZ(), direction.getX(), direction.getY(), direction.getZ() });
 	}
 
 }
