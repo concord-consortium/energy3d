@@ -842,12 +842,15 @@ public class Wall extends HousePart implements Thermalizable {
 			final PickResults pickResults = new PrimitivePickResults();
 			PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
 			if (pickResults.getNumber() > 0)
-				result = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
+				result = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
 			else
-				result = p;
+				result = Roof.nullVector;
 			roof.getIntersectionCache().put(key, result);
 		}
-		return result;
+		if (result == Roof.nullVector)
+			return p;
+		else
+			return result.add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {

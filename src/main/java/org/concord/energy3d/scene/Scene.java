@@ -255,7 +255,7 @@ public class Scene implements Serializable {
 			}
 
 		});
-		
+
 	}
 
 	public static void initSceneNow() {
