@@ -61,8 +61,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	protected transient Node roofPartsRoot;
 	protected transient List<ReadOnlyVector3> wallUpperPoints;
-	private transient List<ReadOnlyVector3> dashPoints;
 	private transient Map<Integer, ReadOnlyVector3> intersectionCache;
+	private transient Map<Mesh, List<ReadOnlyVector3>> dashPointsCache;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
 	private transient Map<Mesh, Double> areaByPartWithoutOverhang;
@@ -118,6 +118,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
 		roofPartPrintVerticalMap = new HashMap<Spatial, Boolean>();
+		intersectionCache = new HashMap<Integer, ReadOnlyVector3>();
+		dashPointsCache = new HashMap<Mesh, List<ReadOnlyVector3>>();
 
 		roofPartsRoot = new Node("Roof Meshes Root");
 		root.attachChild(roofPartsRoot);
@@ -282,7 +284,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	public List<ReadOnlyVector3> computeDashPoints(final Mesh roofPartMesh) {
-		if (dashPoints == null) {
+		if (dashPointsCache.get(roofPartMesh) == null) {
 			final ArrayList<ReadOnlyVector3> resultBeforeBreak = new ArrayList<ReadOnlyVector3>();
 			final ArrayList<ReadOnlyVector3> resultAfterBreak = new ArrayList<ReadOnlyVector3>();
 			final boolean[] foundBreak = { false };
@@ -309,11 +311,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			});
 			if (foundBreak[0]) {
 				resultAfterBreak.addAll(resultBeforeBreak);
-				dashPoints = resultAfterBreak;
+				dashPointsCache.put(roofPartMesh, resultAfterBreak);
 			} else
-				dashPoints = resultBeforeBreak;
+				dashPointsCache.put(roofPartMesh, resultBeforeBreak);
 		}
-		return dashPoints;
+		return dashPointsCache.get(roofPartMesh);
 	}
 
 	public void updateDashLinesColor() {
@@ -1015,8 +1017,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	protected void postEdit(final EditState editState) {
-		if (intersectionCache != null)
-			intersectionCache.clear();
+		clearIntersectionCache();
 		draw();
 		drawWalls();
 
@@ -1345,21 +1346,19 @@ public abstract class Roof extends HousePart implements Thermalizable {
 						allInside = false;
 				}
 				if (!allInside && !allOutside)
-					return false;
+					return false; 
 			}
 		}
 		return true;
 	}
 
 	public Map<Integer, ReadOnlyVector3> getIntersectionCache() {
-		if (intersectionCache == null)
-			intersectionCache = new HashMap<Integer, ReadOnlyVector3>();
 		return intersectionCache;
 	}
 
 	public void clearIntersectionCache() {
 		intersectionCache.clear();
-		dashPoints = null;
+		dashPointsCache.clear();
 	}
 
 }

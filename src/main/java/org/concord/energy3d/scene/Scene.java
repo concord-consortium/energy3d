@@ -383,7 +383,7 @@ public class Scene implements Serializable {
 			instance.upgradeSceneToNewVersion();
 
 			if (url != null) {
-				AddMultiplePartsCommand cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
+				final AddMultiplePartsCommand cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
 				synchronized (SceneManager.getInstance()) {
 					double cx = 0;
 					double cy = 0;
@@ -393,7 +393,7 @@ public class Scene implements Serializable {
 						Scene.getInstance().parts.add(p);
 						originalHouseRoot.attachChild(p.getRoot());
 						if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
-							Vector3 c = p.getAbsCenter();
+							final Vector3 c = p.getAbsCenter();
 							cx += c.getX();
 							cy += c.getY();
 							count++;
@@ -489,6 +489,11 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts)
 			if (!p.isDrawCompleted())
 				p.complete();
+
+		// clear intersection cache
+		for (final HousePart p : parts)
+			if (p instanceof Roof)
+				((Roof) p).clearIntersectionCache();
 	}
 
 	private void upgradeSceneToNewVersion() {
@@ -688,20 +693,20 @@ public class Scene implements Serializable {
 			}
 			add(c, true);
 			// copy gable info, too
-			Foundation oldFoundation = (Foundation) copyBuffer;
-			Foundation newFoundation = (Foundation) c;
+			final Foundation oldFoundation = (Foundation) copyBuffer;
+			final Foundation newFoundation = (Foundation) c;
 			final List<Roof> oldRoofs = oldFoundation.getRoofs();
 			final List<Roof> newRoofs = newFoundation.getRoofs();
 			if (!oldRoofs.isEmpty() && !newRoofs.isEmpty()) {
 				for (int i = 0; i < newRoofs.size(); i++) {
-					Map<Integer, List<Wall>> oldMap = oldRoofs.get(i).getGableEditPointToWallMap();
+					final Map<Integer, List<Wall>> oldMap = oldRoofs.get(i).getGableEditPointToWallMap();
 					if (oldMap.isEmpty())
 						continue;
-					Map<Integer, List<Wall>> newMap = new HashMap<Integer, List<Wall>>();
-					for (Integer key : oldMap.keySet()) {
-						List<Wall> oldWalls = oldMap.get(key);
-						List<Wall> newWalls = new ArrayList<Wall>();
-						for (Wall w : oldWalls) {
+					final Map<Integer, List<Wall>> newMap = new HashMap<Integer, List<Wall>>();
+					for (final Integer key : oldMap.keySet()) {
+						final List<Wall> oldWalls = oldMap.get(key);
+						final List<Wall> newWalls = new ArrayList<Wall>();
+						for (final Wall w : oldWalls) {
 							newWalls.add(getCopiedWall(w, oldFoundation, newFoundation));
 						}
 						newMap.put(key, newWalls);
@@ -715,10 +720,10 @@ public class Scene implements Serializable {
 		}
 	}
 
-	private Wall getCopiedWall(Wall oldWall, Foundation oldFoundation, Foundation newFoundation) {
-		ArrayList<HousePart> oldWalls = oldFoundation.getChildren();
-		ArrayList<HousePart> newWalls = newFoundation.getChildren();
-		int index = oldWalls.indexOf(oldWall);
+	private Wall getCopiedWall(final Wall oldWall, final Foundation oldFoundation, final Foundation newFoundation) {
+		final ArrayList<HousePart> oldWalls = oldFoundation.getChildren();
+		final ArrayList<HousePart> newWalls = newFoundation.getChildren();
+		final int index = oldWalls.indexOf(oldWall);
 		if (index < 0)
 			return null;
 		return (Wall) newWalls.get(index);
@@ -983,7 +988,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + trees.size() + " trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(trees);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(trees);
 		for (final HousePart part : trees)
 			remove(part, false);
 		redrawAll();
@@ -1002,7 +1007,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + humans.size() + " humans?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(humans);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(humans);
 		for (final HousePart part : humans)
 			remove(part, false);
 		redrawAll();
@@ -1021,7 +1026,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + roofs.size() + " roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(roofs);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(roofs);
 		for (final HousePart part : roofs)
 			remove(part, false);
 		redrawAll();
@@ -1040,7 +1045,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + floors.size() + " floors?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(floors);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(floors);
 		for (final HousePart part : floors)
 			remove(part, false);
 		redrawAll();
@@ -1069,7 +1074,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + panels.size() + " solar panels" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(panels);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(panels);
 		for (final HousePart part : panels) {
 			remove(part, false);
 		}
@@ -1099,7 +1104,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " windows" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
 		for (final HousePart part : windows) {
 			remove(part, false);
 		}
@@ -1120,7 +1125,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + foundations.size() + " foundations?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(foundations);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(foundations);
 		for (final HousePart part : foundations) {
 			remove(part, false);
 		}
@@ -1129,11 +1134,11 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
-	public void removeAllChildren(HousePart parent) {
-		List<HousePart> children = parent.getChildren();
-		String s = parent.getClass().getSimpleName();
-		List<HousePart> copy = new ArrayList<HousePart>(); // make a copy to avoid ConcurrentModificationException
-		for (HousePart p : children) {
+	public void removeAllChildren(final HousePart parent) {
+		final List<HousePart> children = parent.getChildren();
+		final String s = parent.getClass().getSimpleName();
+		final List<HousePart> copy = new ArrayList<HousePart>(); // make a copy to avoid ConcurrentModificationException
+		for (final HousePart p : children) {
 			if (p instanceof Roof)
 				continue; // make an exception of roof (it is a child of a wall)
 			copy.add(p);
@@ -1144,7 +1149,7 @@ public class Scene implements Serializable {
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + copy.size() + " elements of " + s + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
 			return;
-		RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(copy);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(copy);
 		for (final HousePart p : copy) {
 			remove(p, false);
 		}
