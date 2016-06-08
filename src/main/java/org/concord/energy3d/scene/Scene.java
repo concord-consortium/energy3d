@@ -509,7 +509,7 @@ public class Scene implements Serializable {
 		if (version < 1) {
 			for (final HousePart part : parts)
 				if (part instanceof Foundation)
-					((Foundation) part).scaleHouse(10);
+					((Foundation) part).scaleHouseForNewVersion(10);
 			cameraLocation = cameraLocation.multiply(10, null);
 			setAnnotationScale(1.0);
 		}

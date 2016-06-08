@@ -1825,6 +1825,7 @@ public class MainFrame extends JFrame {
 					removeAllLocksMenuItem.setEnabled(true);
 					specificationsMenuItem.setEnabled(true);
 					autoRecomputeEnergyMenuItem.setEnabled(true);
+					rescaleMenuItem.setEnabled(true);
 				}
 
 				@Override
@@ -1856,6 +1857,7 @@ public class MainFrame extends JFrame {
 						removeAllLocksMenuItem.setEnabled(false);
 						specificationsMenuItem.setEnabled(false);
 						autoRecomputeEnergyMenuItem.setEnabled(false);
+						rescaleMenuItem.setEnabled(false);
 					}
 				}
 			});

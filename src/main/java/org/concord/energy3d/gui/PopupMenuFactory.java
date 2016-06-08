@@ -907,8 +907,8 @@ public class PopupMenuFactory {
 					}
 				}
 			});
-			typeMenu.add(rbmiBoard);
-			typeGroup.add(rbmiBoard);
+			// typeMenu.add(rbmiBoard);
+			// typeGroup.add(rbmiBoard);
 
 			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns & Railings");
 			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
@@ -1174,6 +1174,18 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miRescale = new JMenuItem("Rescale...");
+			miRescale.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation))
+						return;
+//					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+//					final Foundation foundation = (Foundation) selectedPart;
+				}
+			});
+
 			final JMenu clearMenu = new JMenu("Clear");
 
 			final JMenuItem miRemoveAllWindows = new JMenuItem("Remove All Windows");
@@ -1350,6 +1362,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForFoundation.add(miCopyBuilding);
+			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miLock);

@@ -486,7 +486,6 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (newHeight == 0)
 			return;
 		final double scale = newHeight / orgHeight;
-
 		applyNewHeight(children, scale, finalize);
 		if (finalize)
 			boundingHeight = newHeight;
@@ -501,10 +500,21 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	public void scaleHouse(final double scale) {
+	public void rescale(final double scaleL, final double scaleW, final double scaleH) {
+		for (int i = 0; i < points.size(); i++) {
+			points.get(i).multiplyLocal(scaleL, scaleW, 1);
+		}
+		applyNewHeight(children, scaleH, true);
+		List<Roof> roofs = getRoofs();
+		for (Roof r : roofs) {
+			r.setOverhangLength(r.getOverhangLength() * scaleH);
+		}
+	}
+
+	/** Scale house for upgrading to new version. This can be removed in 2017. Don't call this if you intend to scale a building. Call rescale instead. */
+	public void scaleHouseForNewVersion(final double scale) {
 		final double h = points.get(4).getZ() - height;
 		applyNewHeight(h, h * 10, true);
-
 		final double oldHeight = height;
 		height *= scale;
 		final double addHeight = height - oldHeight;
@@ -515,7 +525,6 @@ public class Foundation extends HousePart implements Thermalizable {
 				if (floor instanceof Floor)
 					floor.setHeight(floor.getHeight() + addHeight);
 		}
-
 		for (int i = 0; i < points.size(); i++)
 			points.get(i).multiplyLocal(10);
 	}
@@ -1056,8 +1065,8 @@ public class Foundation extends HousePart implements Thermalizable {
 			final Vector3 p1 = getAbsPoint(1);
 			final Vector3 p2 = getAbsPoint(2);
 			final double C = 100.0;
-			final double annotationScale = Scene.getInstance().getAnnotationScale();
-			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
+			final double scale = Scene.getInstance().getAnnotationScale();
+			area = Math.round(Math.round(p2.subtract(p0, null).length() * scale * C) / C * Math.round(p1.subtract(p0, null).length() * scale * C) / C * C) / C;
 		} else
 			area = 0.0;
 	}
