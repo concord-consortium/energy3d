@@ -500,6 +500,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
+	/** Rescale the building in the original X, Y, Z directions. */
 	public void rescale(final double scaleX, final double scaleY, final double scaleZ) {
 		double a = Math.toRadians(getAzimuth());
 		if (!Util.isZero(a))

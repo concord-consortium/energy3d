@@ -25,6 +25,10 @@ public class RescaleBuildingCommand extends AbstractUndoableEdit {
 		this.newZLength = newZLength;
 	}
 
+	public Foundation getFoundation() {
+		return foundation;
+	}
+
 	public double getOldXLength() {
 		return oldXLength;
 	}

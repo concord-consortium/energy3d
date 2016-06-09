@@ -1496,7 +1496,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
 					final String title = "<html>Solar Cell Efficiency (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34%, but the theoretical limit for multilayer cells is 86%.<br>As of 2016, the solar cell efficiencies of latest commercially available panels are between 20-25%.<hr></html>";
+					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 22%.<br>So the highest efficiency you can choose is limited to 25%.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -1518,8 +1518,8 @@ public class PopupMenuFactory {
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
-								if (val < 10 || val > 86) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 86%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 10 || val > 25) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 25%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(solarPanel);

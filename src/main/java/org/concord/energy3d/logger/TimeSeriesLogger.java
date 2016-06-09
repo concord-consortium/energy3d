@@ -75,6 +75,7 @@ import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
+import org.concord.energy3d.undo.RescaleBuildingCommand;
 import org.concord.energy3d.undo.RescaleCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
@@ -221,6 +222,16 @@ public class TimeSeriesLogger {
 						stateValue = "{\"Building\": " + f.getId() + ", \"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
 					} else {
 						stateValue = "{\"Angle\": " + Math.toDegrees(c.getRotationAngle()) + "}";
+					}
+				} else if (lastEdit instanceof RescaleBuildingCommand) {
+					RescaleBuildingCommand c = (RescaleBuildingCommand) lastEdit;
+					Foundation f = c.getFoundation();
+					if (f != null) {
+						stateValue = "{\"Building\": " + f.getId();
+						stateValue += ", \"Old X Length\": " + c.getOldXLength() + ", \"New X Length\": " + c.getNewXLength();
+						stateValue += ", \"Old Y Length\": " + c.getOldYLength() + ", \"New Y Length\": " + c.getNewYLength();
+						stateValue += ", \"Old Z Length\": " + c.getOldZLength() + ", \"New Z Length\": " + c.getNewZLength();
+						stateValue += "}";
 					}
 				} else if (lastEdit instanceof MoveBuildingCommand) {
 					MoveBuildingCommand c = (MoveBuildingCommand) lastEdit;
