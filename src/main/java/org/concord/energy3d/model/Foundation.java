@@ -500,15 +500,20 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	public void rescale(final double scaleL, final double scaleW, final double scaleH) {
+	public void rescale(final double scaleX, final double scaleY, final double scaleZ) {
+		double a = Math.toRadians(getAzimuth());
+		if (!Util.isZero(a))
+			rotate(a, null);
 		for (int i = 0; i < points.size(); i++) {
-			points.get(i).multiplyLocal(scaleL, scaleW, 1);
+			points.get(i).multiplyLocal(scaleX, scaleY, 1);
 		}
-		applyNewHeight(children, scaleH, true);
+		applyNewHeight(children, scaleZ, true);
 		List<Roof> roofs = getRoofs();
 		for (Roof r : roofs) {
-			r.setOverhangLength(r.getOverhangLength() * scaleH);
+			r.setOverhangLength(r.getOverhangLength() * scaleZ);
 		}
+		if (!Util.isZero(a))
+			rotate(-a, null);
 	}
 
 	/** Scale house for upgrading to new version. This can be removed in 2017. Don't call this if you intend to scale a building. Call rescale instead. */
@@ -969,6 +974,18 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (SceneManager.getInstance().getSelectedPart() == this)
 			drawAzimuthArrow();
+	}
+
+	public double getAzimuth() {
+		final Vector3 v = getAbsPoint(0);
+		final Vector3 v1 = getAbsPoint(1);
+		final double ly = v.distance(v1);
+		double a = 90 + Math.toDegrees(Math.asin((v.getY() - v1.getY()) / ly));
+		if (v.getX() > v1.getX())
+			a = 360 - a;
+		if (Util.isZero(a - 360)) // reset 360 to 0
+			a = 0;
+		return a;
 	}
 
 	@Override

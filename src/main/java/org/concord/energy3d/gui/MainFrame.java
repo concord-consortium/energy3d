@@ -1331,7 +1331,14 @@ public class MainFrame extends JFrame {
 			rescaleMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new ScaleDialog().setVisible(true);
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						new RescaleBuildingDialog((Foundation) selectedPart).setVisible(true);
+						return;
+					}
+					if (selectedPart == null) {
+						new ScaleDialog().setVisible(true);
+					}
 				}
 			});
 		}
@@ -1858,6 +1865,8 @@ public class MainFrame extends JFrame {
 						specificationsMenuItem.setEnabled(false);
 						autoRecomputeEnergyMenuItem.setEnabled(false);
 						rescaleMenuItem.setEnabled(false);
+					} else {
+						rescaleMenuItem.setEnabled(selectedPart instanceof Foundation || selectedPart == null);
 					}
 				}
 			});
@@ -1884,16 +1893,15 @@ public class MainFrame extends JFrame {
 			editMenu.add(getCutMenuItem());
 			editMenu.add(getCopyMenuItem());
 			editMenu.add(getPasteMenuItem());
-			editMenu.add(clearMenu);
 			editMenu.add(moveMenu);
-			editMenu.addSeparator();
-			editMenu.add(getRescaleMenuItem());
+			editMenu.add(clearMenu);
 			editMenu.addSeparator();
 			editMenu.add(getFixProblemsMenuItem());
 			editMenu.add(getGridsMenuItem());
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
 			editMenu.add(getLockAllMenuItem());
+			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getOverallUtilityBillMenuItem());
 			editMenu.add(getSpecificationsMenuItem());

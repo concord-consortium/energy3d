@@ -785,12 +785,7 @@ public class EnergyPanel extends JPanel {
 					partProperty3Label.setText("  Azimuth:");
 					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
-					double a = 90 + Math.toDegrees(Math.asin((v.getY() - v1.getY()) / ly));
-					if (v.getX() > v1.getX())
-						a = 360 - a;
-					if (Util.isZero(a - 360)) // reset 360 to 0
-						a = 0;
-					partProperty3TextField.setText(noDecimal.format(a) + "\u00B0");
+					partProperty3TextField.setText(noDecimal.format(foundation.getAzimuth()) + "\u00B0");
 					partProperty1TextField.setToolTipText("The length and width of the foundation");
 					partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the foundation");
 					partProperty3TextField.setToolTipText("The azimuth of the reference edge");

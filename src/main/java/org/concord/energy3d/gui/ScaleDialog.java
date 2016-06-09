@@ -42,7 +42,7 @@ class ScaleDialog extends JDialog {
 	public ScaleDialog() {
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setTitle("Rescale");
+		setTitle("Rescale Scene");
 		setBounds(100, 100, 310, 215);
 		super.setLocationRelativeTo(MainFrame.getInstance());
 		getContentPane().setLayout(new BorderLayout());

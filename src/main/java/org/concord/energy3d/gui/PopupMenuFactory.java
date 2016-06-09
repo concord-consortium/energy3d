@@ -1181,8 +1181,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof Foundation))
 						return;
-//					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-//					final Foundation foundation = (Foundation) selectedPart;
+					new RescaleBuildingDialog((Foundation) selectedPart).setVisible(true);
 				}
 			});
 
