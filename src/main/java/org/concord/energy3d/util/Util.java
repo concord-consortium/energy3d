@@ -684,7 +684,7 @@ public class Util {
 	}
 
 	public static int getHashCode(final ReadOnlyVector3 p, final ReadOnlyVector3 direction) {
-		return Arrays.hashCode(new double[] { p.getX(), p.getY(), p.getZ(), direction.getX(), direction.getY(), direction.getZ() });
+		return Arrays.hashCode(new double[] { 5 + Math.signum(p.getX()), 5 + Math.signum(p.getY()), p.getX(), p.getY(), p.getZ(), direction.getX(), direction.getY(), direction.getZ() });
 	}
 
 }

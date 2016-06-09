@@ -787,6 +787,12 @@ public class Wall extends HousePart implements Thermalizable {
 		if (!extendToRoofEnabled)
 			return;
 
+		final ReadOnlyVector3 o = polygon.get(0).clone();
+		final Vector3 dir = polygon.get(3).subtract(o, null);
+		dir.setZ(0);
+		final double length = dir.length();
+		dir.normalizeLocal();
+
 		final int[] upper = { 0, 3 };
 
 		for (final int i : upper) {
@@ -794,14 +800,6 @@ public class Wall extends HousePart implements Thermalizable {
 			final double z = findRoofIntersection(tp);
 			tp.set(tp.getX(), tp.getY(), z);
 		}
-
-		Vector3 tp = polygon.get(0);
-		final ReadOnlyVector3 o = tp;
-		tp = polygon.get(3);
-		final Vector3 dir = tp.subtract(o, null);
-		dir.setZ(0);
-		final double length = dir.length();
-		dir.normalizeLocal();
 
 		if (roof != null && !isFrozen()) {
 			Vector3 direction = null;
@@ -837,7 +835,6 @@ public class Wall extends HousePart implements Thermalizable {
 
 		final int key = Util.getHashCode(p, direction);
 		ReadOnlyVector3 result = roof.getIntersectionCache().get(key);
-		result = null;
 		if (result == null) {
 			final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
 			final PickResults pickResults = new PrimitivePickResults();
