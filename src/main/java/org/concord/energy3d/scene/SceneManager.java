@@ -976,12 +976,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			c = new MoveBuildingCommand(null, v);
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
-					((Foundation) p).move(v);
+					((Foundation) p).move(v, p.getGridSize());
 				}
 			}
 		} else if (selectedHousePart instanceof Foundation) {
 			c = new MoveBuildingCommand((Foundation) selectedHousePart, v);
-			((Foundation) selectedHousePart).move(v);
+			((Foundation) selectedHousePart).move(v, selectedHousePart.getGridSize());
 		} else if (selectedHousePart instanceof Window) {
 			((Window) selectedHousePart).move(v);
 		}

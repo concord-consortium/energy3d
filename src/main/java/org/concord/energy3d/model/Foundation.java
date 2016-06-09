@@ -504,6 +504,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		double a = Math.toRadians(getAzimuth());
 		if (!Util.isZero(a))
 			rotate(a, null);
+		Vector3 center = getAbsCenter().multiplyLocal(1, 1, 0);
+		move(center.negateLocal(), center.length());
 		for (int i = 0; i < points.size(); i++) {
 			points.get(i).multiplyLocal(scaleX, scaleY, 1);
 		}
@@ -512,6 +514,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (Roof r : roofs) {
 			r.setOverhangLength(r.getOverhangLength() * scaleZ);
 		}
+		move(center.negateLocal(), center.length());
 		if (!Util.isZero(a))
 			rotate(-a, null);
 	}
@@ -866,9 +869,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		Scene.getInstance().redrawAll();
 	}
 
-	public void move(final Vector3 v) {
+	public void move(final Vector3 v, final double steplength) {
 		v.normalizeLocal();
-		v.multiplyLocal(getGridSize());
+		v.multiplyLocal(steplength);
 		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points)
 			movePoints.add(p.clone());
