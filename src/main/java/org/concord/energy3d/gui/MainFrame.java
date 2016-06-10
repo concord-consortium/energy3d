@@ -1139,6 +1139,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			addTemplate(templatesMenu, "Apartment 1", "templates/apartment-template-1.ng3");
+			addTemplate(templatesMenu, "Apartment 2", "templates/apartment-template-2.ng3");
 			addTemplate(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
 			addTemplate(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
 			addTemplate(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
