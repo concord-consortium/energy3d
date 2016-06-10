@@ -33,6 +33,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.PieChart;
+import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -110,6 +111,14 @@ public class ConstructionCostGraph extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Cost.getInstance().showItemizedCost();
+			}
+		});
+		popupMenu.add(mi);
+		mi = new JMenuItem("Copy Image");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ClipImage().copyImageToClipboard(ConstructionCostGraph.this);
 			}
 		});
 		popupMenu.add(mi);

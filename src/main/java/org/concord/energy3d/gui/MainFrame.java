@@ -104,6 +104,7 @@ import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.undo.ZoomCommand;
+import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Printout;
@@ -194,6 +195,7 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem exportImageMenuItem;
+	private JMenuItem copyImageMenuItem;
 	private JMenuItem exportLogMenuItem;
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
@@ -530,6 +532,7 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getSaveMenuItem());
 			addItemToFileMenu(getSaveasMenuItem());
 			addItemToFileMenu(new JSeparator());
+			addItemToFileMenu(getCopyImageMenuItem());
 			addItemToFileMenu(getExportImageMenuItem());
 			addItemToFileMenu(getExportLogMenuItem());
 			addItemToFileMenu(getImportMenuItem());
@@ -1135,6 +1138,7 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
+			addTemplate(templatesMenu, "Apartment 1", "templates/apartment-template-1.ng3");
 			addTemplate(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
 			addTemplate(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
 			addTemplate(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
@@ -1147,6 +1151,7 @@ public class MainFrame extends JFrame {
 			addTemplate(templatesMenu, "Flat Roof", "templates/flat-roof-template.ng3");
 			addTemplate(templatesMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
 			addTemplate(templatesMenu, "Gablet Roof", "templates/gablet-template.ng3");
+			addTemplate(templatesMenu, "Hip Roof", "templates/hip-roof-template.ng3");
 			addTemplate(templatesMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
 			addTemplate(templatesMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
 			addTemplate(templatesMenu, "Mansard", "templates/mansard-template.ng3");
@@ -2497,6 +2502,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return exportLogMenuItem;
+	}
+
+	private JMenuItem getCopyImageMenuItem() {
+		if (copyImageMenuItem == null) {
+			copyImageMenuItem = new JMenuItem("Copy Image");
+			copyImageMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new ClipImage().copyImageToClipboard(MainPanel.getInstance().getCanvasPanel());
+				}
+			});
+		}
+		return copyImageMenuItem;
 	}
 
 	private JMenuItem getExportImageMenuItem() {

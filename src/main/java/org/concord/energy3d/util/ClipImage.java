@@ -1,60 +1,61 @@
 package org.concord.energy3d.util;
 
+import java.awt.Component;
+import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
-public class ClipImage implements Transferable, ClipboardOwner {
+public class ClipImage implements ClipboardOwner {
 
-	private byte[] image;
-
-	public ClipImage(byte[] im)
-
-	{
-
-		image = im;
-
+	@Override
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
 	}
 
-	public DataFlavor[] getTransferDataFlavors()
-
-	{
-
-		return new DataFlavor[] { DataFlavor.imageFlavor };
-
+	public void copyImageToClipboard(Component c) {
+		BufferedImage bi = new BufferedImage(c.getWidth(), c.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		c.paintAll(bi.createGraphics());
+		try {
+			TransferableImage trans = new TransferableImage(bi);
+			Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clip.setContents(trans, this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	public boolean isDataFlavorSupported(DataFlavor flavor)
+	private class TransferableImage implements Transferable {
 
-	{
+		private Image image;
 
-		return DataFlavor.imageFlavor.equals(flavor);
+		public TransferableImage(Image image) {
+			this.image = image;
+		}
 
-	}
-
-	public Object getTransferData(DataFlavor flavor) throws
-
-	UnsupportedFlavorException
-
-	{
-
-		if (!isDataFlavorSupported(flavor))
-
+		public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+			if (flavor.equals(DataFlavor.imageFlavor) && image != null)
+				return image;
 			throw new UnsupportedFlavorException(flavor);
+		}
 
-		return Toolkit.getDefaultToolkit().createImage(image);
+		public DataFlavor[] getTransferDataFlavors() {
+			return new DataFlavor[] { DataFlavor.imageFlavor };
+		}
 
-	}
-
-	public void lostOwnership(java.awt.datatransfer.Clipboard clip,
-
-	java.awt.datatransfer.Transferable tr)
-
-	{
-
-		return;
+		public boolean isDataFlavorSupported(DataFlavor flavor) {
+			DataFlavor[] flavors = getTransferDataFlavors();
+			for (int i = 0; i < flavors.length; i++) {
+				if (flavor.equals(flavors[i])) {
+					return true;
+				}
+			}
+			return false;
+		}
 
 	}
 

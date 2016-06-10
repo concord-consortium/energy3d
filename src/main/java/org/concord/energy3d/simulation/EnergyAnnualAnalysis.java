@@ -54,6 +54,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -225,6 +226,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
 		final JMenuItem miView = new JMenuItem("View Raw Data...");
+		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
 
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
@@ -264,6 +266,14 @@ public class EnergyAnnualAnalysis extends Analysis {
 			}
 		});
 		menu.add(miView);
+
+		miCopyImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ClipImage().copyImageToClipboard(graph);
+			}
+		});
+		menu.add(miCopyImage);
 
 		final JMenu showTypeMenu = new JMenu("Types");
 		showTypeMenu.addMenuListener(new MenuListener() {

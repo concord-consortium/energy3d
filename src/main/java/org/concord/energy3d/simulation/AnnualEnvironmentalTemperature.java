@@ -27,6 +27,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -36,6 +37,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -457,6 +459,18 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 			}
 		});
 		menuView.add(cbmiShowAverage);
+
+		final JMenu menuAction = new JMenu("Action");
+		menuBar.add(menuAction);
+
+		JMenuItem mi = new JMenuItem("Copy Image");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ClipImage().copyImageToClipboard(AnnualEnvironmentalTemperature.this);
+			}
+		});
+		menuAction.add(mi);
 
 		final JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());

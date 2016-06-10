@@ -33,6 +33,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -149,6 +150,7 @@ public class SolarDailyAnalysis extends Analysis {
 
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
 		final JMenuItem miView = new JMenuItem("View Raw Data...");
+		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
 
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
@@ -188,6 +190,14 @@ public class SolarDailyAnalysis extends Analysis {
 			}
 		});
 		menu.add(miView);
+
+		miCopyImage.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new ClipImage().copyImageToClipboard(graph);
+			}
+		});
+		menu.add(miCopyImage);
 
 		final JMenu showRunsMenu = new JMenu("Runs");
 		showRunsMenu.addMenuListener(new MenuListener() {

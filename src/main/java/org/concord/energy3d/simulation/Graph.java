@@ -39,6 +39,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -119,6 +120,14 @@ public abstract class Graph extends JPanel {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						DataViewer.viewRawData(popup ? parent : MainFrame.getInstance(), Graph.this, false);
+					}
+				});
+				popupMenu.add(mi);
+				mi = new JMenuItem("Copy Image");
+				mi.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						new ClipImage().copyImageToClipboard(Graph.this);
 					}
 				});
 				popupMenu.add(mi);
