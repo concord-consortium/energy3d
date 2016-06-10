@@ -2829,6 +2829,8 @@ public class MainFrame extends JFrame {
 			moveEastMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -2849,6 +2851,8 @@ public class MainFrame extends JFrame {
 			moveWestMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -2869,6 +2873,8 @@ public class MainFrame extends JFrame {
 			moveSouthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -2889,6 +2895,8 @@ public class MainFrame extends JFrame {
 			moveNorthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
