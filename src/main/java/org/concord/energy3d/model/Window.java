@@ -521,7 +521,7 @@ public class Window extends HousePart implements Thermalizable {
 				for (int i = 0; i < n; i++) {
 					c.points.get(i).setX(points.get(i).getX() + shift);
 				}
-				if (c.overlap(0.1)) {
+				if (c.overlap(0.9)) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
@@ -560,7 +560,7 @@ public class Window extends HousePart implements Thermalizable {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a window outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-				if (c.overlap(0.1)) {
+				if (c.overlap(0.9)) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}

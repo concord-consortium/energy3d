@@ -2508,6 +2508,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getCopyImageMenuItem() {
 		if (copyImageMenuItem == null) {
 			copyImageMenuItem = new JMenuItem("Copy Image");
+			copyImageMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, (Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK) | KeyEvent.ALT_MASK));
 			copyImageMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
