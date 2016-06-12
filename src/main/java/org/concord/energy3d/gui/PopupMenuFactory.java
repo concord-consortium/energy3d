@@ -1,5 +1,6 @@
 package org.concord.energy3d.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
@@ -21,6 +22,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -1476,6 +1478,57 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miSize = new JMenuItem("Size...");
+			miSize.addActionListener(new ActionListener() {
+
+				private double w = 0.99;
+				private double h = 1.65;
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel s = (SolarPanel) selectedPart;
+					final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Size of " + partInfo));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
+					if (Util.isZero(s.getPanelHeight() - 1.65)) {
+						typeComboBox.setSelectedIndex(0);
+					} else if (Util.isZero(s.getPanelHeight() - 1.55)) {
+						typeComboBox.setSelectedIndex(1);
+					}
+					typeComboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(ItemEvent e) {
+							switch (typeComboBox.getSelectedIndex()) {
+							case 0:
+								w = 0.99;
+								h = 1.65;
+								break;
+							case 1:
+								w = 1.04;
+								h = 1.55;
+								break;
+							case 2:
+								w = 0.99;
+								h = 1.96;
+								break;
+							}
+						}
+					});
+					gui.add(typeComboBox, BorderLayout.NORTH);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
+						return;
+					s.setPanelWidth(w);
+					s.setPanelHeight(h);
+					Scene.getInstance().setEdited(true);
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().redrawAll();
+				}
+			});
+
 			popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
@@ -1610,6 +1663,7 @@ public class PopupMenuFactory {
 
 			popupMenuForSolarPanel.add(miRotate);
 			popupMenuForSolarPanel.addSeparator();
+			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miEff);
 			popupMenuForSolarPanel.add(miInverterEff);
 			popupMenuForSolarPanel.addSeparator();

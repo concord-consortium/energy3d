@@ -28,7 +28,7 @@ public class SolarPanel extends HousePart {
 	private transient Box surround;
 	private double efficiency = 0.15; // a number in (0, 1)
 	private double inverterEfficiency = 0.95;
-	private double panelWidth = 1.0; // 39"
+	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
 	private boolean rotated = false;
 
@@ -79,7 +79,7 @@ public class SolarPanel extends HousePart {
 		if (Util.isZero(efficiency))
 			efficiency = 0.15;
 		if (Util.isZero(panelWidth))
-			panelWidth = 1;
+			panelWidth = 0.99;
 		if (Util.isZero(panelHeight))
 			panelHeight = 1.65;
 		if (Util.isZero(inverterEfficiency))

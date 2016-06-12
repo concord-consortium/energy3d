@@ -736,7 +736,7 @@ public class EnergyPanel extends JPanel {
 				final SolarPanel sp = (SolarPanel) selectedPart;
 				if (sp.isDrawable()) {
 					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(oneDecimal.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + oneDecimal.format(sp.getPanelHeight() * meterToFeet) + " m");
+					partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFeet) + " m");
 					partProperty2Label.setText("  Position:");
 					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
 					partProperty1TextField.setToolTipText("The length and width of the solar panel");
@@ -783,8 +783,8 @@ public class EnergyPanel extends JPanel {
 					partProperty1Label.setText("  Size:");
 					partProperty2Label.setText("  Position:");
 					partProperty3Label.setText("  Azimuth:");
-					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
-					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
+					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
+					partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
 					partProperty3TextField.setText(noDecimal.format(foundation.getAzimuth()) + "\u00B0");
 					partProperty1TextField.setToolTipText("The length and width of the foundation");
 					partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the foundation");
@@ -794,9 +794,9 @@ public class EnergyPanel extends JPanel {
 				final Roof roof = (Roof) selectedPart;
 				if (roof.isDrawable()) {
 					partProperty1Label.setText("  Area:");
-					partProperty1TextField.setText(oneDecimal.format(roof.getArea()) + " m\u00B2");
+					partProperty1TextField.setText(twoDecimals.format(roof.getArea()) + " m\u00B2");
 					partProperty2Label.setText("  Rise:");
-					partProperty2TextField.setText(oneDecimal.format(roof.getHeight() * scale) + " m");
+					partProperty2TextField.setText(twoDecimals.format(roof.getHeight() * scale) + " m");
 					partProperty1TextField.setToolTipText("The total area of the roof");
 					partProperty2TextField.setToolTipText("<html>The rise of the roof<br>(the highest point of the roof to the top of the walls</html>");
 					final String id = "Roof (" + roof.getId() + ")";
@@ -819,7 +819,7 @@ public class EnergyPanel extends JPanel {
 					final double lx = v.distance(window.getAbsPoint(2));
 					final double ly = v.distance(window.getAbsPoint(1));
 					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
+					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  U-value:");
 					partProperty2TextField.setText(twoDecimals.format(Util.toUsUValue(window.getUValue())) + " (US system)");
 					partProperty1TextField.setToolTipText("The width and height of the window");
@@ -849,9 +849,9 @@ public class EnergyPanel extends JPanel {
 					final double lx = v.distance(v2);
 					final double ly = v.distance(v1);
 					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
+					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  Position:");
-					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
+					partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
 					partProperty1TextField.setToolTipText("The width and height of the wall");
 					partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the wall");
 					final String id = "Wall (" + wall.getId() + ")";
@@ -880,9 +880,9 @@ public class EnergyPanel extends JPanel {
 					final double ly = v.distance(v1);
 					partPanelBorder.setTitle("Door (" + door.getId() + ")");
 					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(oneDecimal.format(lx * scale) + "\u00d7" + (oneDecimal.format(ly * scale)) + " m \u2248 " + oneDecimal.format(lx * ly * scale * scale) + " m\u00B2");
+					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2Label.setText("  Position:");
-					partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
+					partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
 					partProperty3Label.setText("  U-value:");
 					partProperty3TextField.setText(twoDecimals.format(Util.toUsUValue(door.getUValue())) + " (US system)");
 					partProperty1TextField.setToolTipText("The width and height of the door");
