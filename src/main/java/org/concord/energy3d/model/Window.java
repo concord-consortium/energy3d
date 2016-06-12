@@ -492,14 +492,16 @@ public class Window extends HousePart implements Thermalizable {
 		return true;
 	}
 
-	/** tolerance is a fraction relative to the width of a window */
-	private boolean overlap(double tolerance) {
-		tolerance *= getAbsPoint(0).distance(getAbsPoint(2));
+	private boolean overlap() {
+		double w1 = getAbsPoint(0).distance(getAbsPoint(2));
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Window && p != this && p.getContainer() == container) {
-				if (p.getAbsCenter().distance(center) < tolerance)
-					return true;
+			if (p != this && p.getContainer() == container) {
+				if (p instanceof Window) {
+					double w2 = p.getAbsPoint(0).distance(p.getAbsPoint(2));
+					if (p.getAbsCenter().distance(center) < (w1 + w2) * 0.55)
+						return true;
+				}
 			}
 		}
 		return false;
@@ -521,7 +523,7 @@ public class Window extends HousePart implements Thermalizable {
 				for (int i = 0; i < n; i++) {
 					c.points.get(i).setX(points.get(i).getX() + shift);
 				}
-				if (c.overlap(0.9)) {
+				if (c.overlap()) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
@@ -560,7 +562,7 @@ public class Window extends HousePart implements Thermalizable {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a window outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-				if (c.overlap(0.9)) {
+				if (c.overlap()) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new window is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}

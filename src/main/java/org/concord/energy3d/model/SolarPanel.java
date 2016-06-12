@@ -254,14 +254,17 @@ public class SolarPanel extends HousePart {
 		return true;
 	}
 
-	/** tolerance is a fraction relative to the width of a solar panel */
-	private boolean overlap(double tolerance) {
-		tolerance *= panelWidth / Scene.getInstance().getAnnotationScale();
+	private boolean overlap() {
+		double w1 = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof SolarPanel && p != this && p.getContainer() == container) {
-				if (p.getAbsCenter().distance(center) < tolerance)
-					return true;
+			if (p.getContainer() == container && p != this) {
+				if (p instanceof SolarPanel) {
+					SolarPanel s2 = (SolarPanel) p;
+					double w2 = (s2.rotated ? s2.panelHeight : s2.panelWidth) / Scene.getInstance().getAnnotationScale();
+					if (p.getAbsCenter().distance(center) < (w1 + w2) * 0.499)
+						return true;
+				}
 			}
 		}
 		return false;
@@ -295,7 +298,7 @@ public class SolarPanel extends HousePart {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-				if (c.overlap(0.9)) {
+				if (c.overlap()) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new solar panel is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
@@ -306,7 +309,7 @@ public class SolarPanel extends HousePart {
 				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;
 				c.points.get(0).setX(newX);
-				if (c.overlap(0.9)) {
+				if (c.overlap()) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new solar panel is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
