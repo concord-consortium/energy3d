@@ -69,6 +69,7 @@ import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
@@ -393,7 +394,13 @@ public class TimeSeriesLogger {
 				}
 
 				// solar panel properties
-				else if (lastEdit instanceof ChangeSolarCellEfficiencyCommand) {
+				else if (lastEdit instanceof ChooseSolarPanelSizeCommand) {
+					ChooseSolarPanelSizeCommand c = (ChooseSolarPanelSizeCommand) lastEdit;
+					SolarPanel sp = c.getSolarPanel();
+					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
+					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + sp.getPanelWidth();
+					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + sp.getPanelHeight() + "}";
+				} else if (lastEdit instanceof ChangeSolarCellEfficiencyCommand) {
 					ChangeSolarCellEfficiencyCommand c = (ChangeSolarCellEfficiencyCommand) lastEdit;
 					SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();

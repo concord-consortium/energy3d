@@ -82,6 +82,7 @@ import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
@@ -1492,12 +1493,14 @@ public class PopupMenuFactory {
 					final SolarPanel s = (SolarPanel) selectedPart;
 					final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					JPanel gui = new JPanel(new BorderLayout(5, 5));
-					gui.setBorder(BorderFactory.createTitledBorder("Size of " + partInfo));
+					gui.setBorder(BorderFactory.createTitledBorder("Choose Size for " + partInfo));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 					if (Util.isZero(s.getPanelHeight() - 1.65)) {
 						typeComboBox.setSelectedIndex(0);
 					} else if (Util.isZero(s.getPanelHeight() - 1.55)) {
 						typeComboBox.setSelectedIndex(1);
+					} else if (Util.isZero(s.getPanelHeight() - 1.96)) {
+						typeComboBox.setSelectedIndex(2);
 					}
 					typeComboBox.addItemListener(new ItemListener() {
 						@Override
@@ -1521,11 +1524,13 @@ public class PopupMenuFactory {
 					gui.add(typeComboBox, BorderLayout.NORTH);
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
 						return;
+					ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
 					s.setPanelWidth(w);
 					s.setPanelHeight(h);
 					Scene.getInstance().setEdited(true);
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().redrawAll();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 
