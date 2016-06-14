@@ -383,13 +383,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				} catch (final Throwable e) {
 					e.printStackTrace();
-					if (shadowPass.isEnabled()) {
-						JOptionPane.showMessageDialog(MainPanel.getInstance(), "FrameHandler.updateFrame() error!", "Warning", JOptionPane.WARNING_MESSAGE);
-						shadowPass.setEnabled(false);
-					} else {
-						Util.reportError(e);
-						return;
-					}
+					Util.reportError(e);
+					return;
 				}
 				synchronized (this) {
 					notifyAll();
@@ -467,8 +462,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		} catch (final Throwable e) {
 			e.printStackTrace();
+			Util.reportError(e);
 			if (shadowPass.isEnabled()) {
-				JOptionPane.showMessageDialog(MainPanel.getInstance(), "Your graphics card driver does not support shadows!\nUpdating your the driver may fix this issue.\nShadow rendering will be disabled now.", "Warning", JOptionPane.WARNING_MESSAGE);
 				shadowPass.setEnabled(false);
 			}
 		}
@@ -1656,7 +1651,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 						} else {
-							editHousePartCommand.undo();
+							if (editHousePartCommand != null)
+								editHousePartCommand.undo();
 							selectedHousePart.setHighlight(false);
 							// selectedHousePart = null;
 						}

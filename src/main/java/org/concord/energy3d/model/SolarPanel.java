@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -227,7 +228,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return panelWidth / Scene.getInstance().getAnnotationScale() / 5.0;
+		return panelWidth / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
 	}
 
 	@Override

@@ -662,6 +662,7 @@ public class Scene implements Serializable {
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().update();
 	}
 
 	public void pasteToPickedLocationOnLand() {
