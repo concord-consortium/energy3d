@@ -255,8 +255,6 @@ public class Wall extends HousePart implements Thermalizable {
 		}
 
 		Scene.getInstance().connectWalls();
-		if (roof != null)
-			roof.clearIntersectionCache();
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
 
@@ -833,22 +831,13 @@ public class Wall extends HousePart implements Thermalizable {
 		if (roof == null)
 			return p;
 
-		final int key = Util.getHashCode(p, direction);
-		ReadOnlyVector3 result = roof.getIntersectionCache().get(key);
-		if (result == null) {
-			final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
-			final PickResults pickResults = new PrimitivePickResults();
-			PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
-			if (pickResults.getNumber() > 0)
-				result = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
-			else
-				result = Roof.nullVector;
-			roof.getIntersectionCache().put(key, result);
-		}
-		if (result == Roof.nullVector)
-			return p;
+		final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
+		final PickResults pickResults = new PrimitivePickResults();
+		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
+		if (pickResults.getNumber() > 0)
+			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
 		else
-			return result.add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
+			return p;
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {

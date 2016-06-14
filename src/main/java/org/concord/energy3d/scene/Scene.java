@@ -489,11 +489,6 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts)
 			if (!p.isDrawCompleted())
 				p.complete();
-
-		// clear intersection cache
-		for (final HousePart p : parts)
-			if (p instanceof Roof)
-				((Roof) p).clearIntersectionCache();
 	}
 
 	private void upgradeSceneToNewVersion() {

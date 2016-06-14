@@ -61,7 +61,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	protected transient Node roofPartsRoot;
 	protected transient List<ReadOnlyVector3> wallUpperPoints;
-	private transient Map<Integer, ReadOnlyVector3> intersectionCache;
 	private transient Map<Mesh, List<ReadOnlyVector3>> dashPointsCache;
 	private transient Map<Spatial, Boolean> roofPartPrintVerticalMap;
 	private transient Map<Node, ReadOnlyVector3> orgCenters;
@@ -118,7 +117,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		wallNormals = new ArrayList<ReadOnlyVector3>();
 		walls = new ArrayList<Wall>();
 		roofPartPrintVerticalMap = new HashMap<Spatial, Boolean>();
-		intersectionCache = new HashMap<Integer, ReadOnlyVector3>();
 		dashPointsCache = new HashMap<Mesh, List<ReadOnlyVector3>>();
 
 		roofPartsRoot = new Node("Roof Meshes Root");
@@ -168,6 +166,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			}
 		}
 
+		dashPointsCache.clear();
 		if (wallUpperPoints == null)
 			wallUpperPoints = new ArrayList<ReadOnlyVector3>();
 		else
@@ -381,37 +380,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		else
 			return null;
 	}
-
-	// private ReadOnlyVector3 findRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
-	// final int key = Util.getHashCode(p);
-	// ReadOnlyVector3 result = getIntersectionCache().get(key);
-	// // result = null;
-	// if (result == nullVector)
-	// return null;
-	// else if (result == null)
-	// result = updateRoofIntersection(roofPart, p);
-	// if (result == null)
-	// return null;
-	// else
-	// return result;
-	// }
-	//
-	// private ReadOnlyVector3 updateRoofIntersection(final Mesh roofPart, final ReadOnlyVector3 p) {
-	// // final double offset = 0.001;
-	// final PickResults pickResults = new PrimitivePickResults();
-	// PickingUtil.findPick(roofPart, new Ray3(p, Vector3.UNIT_Z), pickResults, false);
-	// final int key = Util.getHashCode(p);
-	// final ReadOnlyVector3 result;
-	// if (pickResults.getNumber() > 0) {
-	// result = pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0);
-	// getIntersectionCache().put(key, result);
-	// return result;
-	// } else {
-	// getIntersectionCache().put(key, nullVector);
-	// return null;
-	// }
-	// // return result.add(0, 0, offset, null);
-	// }
 
 	protected void fillMeshWithPolygon(final Mesh mesh, final Polygon polygon) {
 		try {
@@ -734,8 +702,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				gableEditPointToWallMap.remove(removedEditPoint);
 		}
 
-		clearIntersectionCache();
-
 		if (redraw) {
 			draw();
 			drawWalls();
@@ -1033,7 +999,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	}
 
 	protected void postEdit(final EditState editState) {
-		clearIntersectionCache();
 		draw();
 		drawWalls();
 
@@ -1366,15 +1331,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			}
 		}
 		return true;
-	}
-
-	public Map<Integer, ReadOnlyVector3> getIntersectionCache() {
-		return intersectionCache;
-	}
-
-	public void clearIntersectionCache() {
-		intersectionCache.clear();
-		dashPointsCache.clear();
 	}
 
 }

@@ -308,8 +308,6 @@ public class Foundation extends HousePart implements Thermalizable {
 			syncUpperPoints();
 		}
 
-		clearRoofIntersectionCache(this);
-
 		if (resizeHouseMode)
 			drawChildren();
 		draw();
@@ -502,17 +500,17 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	/** Rescale the building in the original X, Y, Z directions. */
 	public void rescale(final double scaleX, final double scaleY, final double scaleZ) {
-		double a = Math.toRadians(getAzimuth());
+		final double a = Math.toRadians(getAzimuth());
 		if (!Util.isZero(a))
 			rotate(a, null);
-		Vector3 center = getAbsCenter().multiplyLocal(1, 1, 0);
+		final Vector3 center = getAbsCenter().multiplyLocal(1, 1, 0);
 		move(center.negateLocal(), center.length());
 		for (int i = 0; i < points.size(); i++) {
 			points.get(i).multiplyLocal(scaleX, scaleY, 1);
 		}
 		applyNewHeight(children, scaleZ, true);
-		List<Roof> roofs = getRoofs();
-		for (Roof r : roofs) {
+		final List<Roof> roofs = getRoofs();
+		for (final Roof r : roofs) {
 			r.setOverhangLength(r.getOverhangLength() * scaleZ);
 		}
 		move(center.negateLocal(), center.length());
@@ -866,7 +864,6 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (SceneManager.getInstance().getSelectedPart() == this)
 			drawAzimuthArrow();
-		clearRoofIntersectionCache(this);
 		Scene.getInstance().redrawAll();
 	}
 
@@ -1150,14 +1147,6 @@ public class Foundation extends HousePart implements Thermalizable {
 				count++;
 		}
 		return count;
-	}
-
-	private void clearRoofIntersectionCache(final HousePart part) {
-		if (part instanceof Roof)
-			((Roof) part).clearIntersectionCache();
-		else if (part instanceof Foundation || part instanceof Wall)
-			for (final HousePart child : part.getChildren())
-				clearRoofIntersectionCache(child);
 	}
 
 }
