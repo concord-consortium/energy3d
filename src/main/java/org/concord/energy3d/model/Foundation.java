@@ -864,7 +864,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (SceneManager.getInstance().getSelectedPart() == this)
 			drawAzimuthArrow();
-		Scene.getInstance().redrawAll();
+		draw();
+		drawChildren();
 	}
 
 	public void move(final Vector3 v, final double steplength) {
