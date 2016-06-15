@@ -44,6 +44,7 @@ import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
+import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -1102,6 +1103,44 @@ public class Scene implements Serializable {
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
 		for (final HousePart part : windows) {
 			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
+	public void removeAllWindowShutters() {
+		final ArrayList<Window> windows = new ArrayList<Window>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation) {
+					Window w = (Window) part;
+					if (w.getLeftShutter() || w.getRightShutter())
+						windows.add(w);
+				}
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen()) {
+					Window w = (Window) part;
+					if (w.getLeftShutter() || w.getRightShutter())
+						windows.add(w);
+				}
+			}
+		}
+		if (windows.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no window shutter to remove.", "No Shutter", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " window shutters" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final RemoveMultipleShuttersCommand c = new RemoveMultipleShuttersCommand(windows);
+		for (final HousePart part : windows) {
+			Window w = (Window) part;
+			w.setLeftShutter(false);
+			w.setRightShutter(false);
 		}
 		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(c);

@@ -1388,6 +1388,27 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllWindows);
 
+			final JMenuItem miRemoveAllWindowShutters = new JMenuItem("Remove All Window Shutters");
+			miRemoveAllWindowShutters.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllWindowShutters();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllWindowShutters);
+
 			final JMenuItem miRemoveAllSolarPanels = new JMenuItem("Remove All Solar Panels");
 			miRemoveAllSolarPanels.addActionListener(new ActionListener() {
 				@Override

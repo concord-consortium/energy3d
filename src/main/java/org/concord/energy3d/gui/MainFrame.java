@@ -216,6 +216,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllFloorsMenuItem;
 	private JMenuItem removeAllSolarPanelsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
+	private JMenuItem removeAllWindowShuttersMenuItem;
 	private JMenuItem removeAllTreesMenuItem;
 	private JMenuItem removeAllHumansMenuItem;
 	private JMenuItem removeAllLocksMenuItem;
@@ -1879,6 +1880,7 @@ public class MainFrame extends JFrame {
 
 			final JMenu clearMenu = new JMenu("Clear");
 			clearMenu.add(getRemoveAllWindowsMenuItem());
+			clearMenu.add(getRemoveAllWindowShuttersMenuItem());
 			clearMenu.add(getRemoveAllSolarPanelsMenuItem());
 			clearMenu.add(getRemoveAllTreesMenuItem());
 			clearMenu.add(getRemoveAllHumansMenuItem());
@@ -2751,6 +2753,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllWindowsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllWindowShuttersMenuItem() {
+		if (removeAllWindowShuttersMenuItem == null) {
+			removeAllWindowShuttersMenuItem = new JMenuItem("Remove All Window Shutters");
+			removeAllWindowShuttersMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllWindowShutters();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+		}
+		return removeAllWindowShuttersMenuItem;
 	}
 
 	private JMenuItem getRemoveAllTreesMenuItem() {
