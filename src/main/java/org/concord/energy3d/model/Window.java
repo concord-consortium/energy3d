@@ -22,6 +22,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.MaterialState;
@@ -53,6 +54,12 @@ public class Window extends HousePart implements Thermalizable {
 	private boolean noHorizontalBars; // has to use negative as serialization defaults to false
 	private boolean noVerticalBars;
 	private ReadOnlyColorRGBA glassColor;
+	private transient Mesh leftShutter;
+	private transient Mesh rightShutter;
+	private boolean hasLeftShutter;
+	private boolean hasRightShutter;
+	private double shutterLength = 0.5;
+	private ReadOnlyColorRGBA shutterColor = ColorRGBA.DARK_GRAY;
 
 	public Window() {
 		super(2, 4, 30.0);
@@ -71,8 +78,12 @@ public class Window extends HousePart implements Thermalizable {
 			solarHeatGainCoefficient *= 0.01;
 		if (Util.isZero(volumetricHeatCapacity))
 			volumetricHeatCapacity = 0.5;
+		if (Util.isZero(shutterLength))
+			shutterLength = 0.5;
 		if (glassColor == null)
 			setColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
+		if (shutterColor == null)
+			shutterColor = ColorRGBA.DARK_GRAY;
 
 		mesh = new Mesh("Window");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -108,6 +119,23 @@ public class Window extends HousePart implements Thermalizable {
 		Util.disablePickShadowLight(bars);
 		bars.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		root.attachChild(bars);
+
+		leftShutter = new Mesh("Left Shutter");
+		leftShutter.getMeshData().setIndexMode(IndexMode.Quads);
+		leftShutter.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		leftShutter.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+		leftShutter.setRenderState(offsetState);
+		leftShutter.setModelBound(new BoundingBox());
+		root.attachChild(leftShutter);
+
+		rightShutter = new Mesh("Right Shutter");
+		rightShutter.getMeshData().setIndexMode(IndexMode.Quads);
+		rightShutter.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		rightShutter.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
+		rightShutter.setRenderState(offsetState);
+		rightShutter.setModelBound(new BoundingBox());
+		root.attachChild(rightShutter);
+
 	}
 
 	@Override
@@ -279,6 +307,57 @@ public class Window extends HousePart implements Thermalizable {
 			bars.getMeshData().updateVertexCount();
 			bars.updateModelBound();
 		}
+
+		if (hasLeftShutter) {
+			leftShutter.getSceneHints().setCullHint(CullHint.Inherit);
+			drawShutter(leftShutter);
+		} else {
+			leftShutter.getSceneHints().setCullHint(CullHint.Always);
+		}
+
+		if (hasRightShutter) {
+			rightShutter.getSceneHints().setCullHint(CullHint.Inherit);
+			drawShutter(rightShutter);
+		} else {
+			rightShutter.getSceneHints().setCullHint(CullHint.Always);
+		}
+
+	}
+
+	private void drawShutter(Mesh shutter) {
+		if (!(container instanceof Wall))
+			return;
+		shutter.setDefaultColor(shutterColor);
+		final FloatBuffer shutterVertexBuffer = shutter.getMeshData().getVertexBuffer();
+		final FloatBuffer shutterNormalBuffer = shutter.getMeshData().getNormalBuffer();
+		shutterVertexBuffer.rewind();
+		shutterNormalBuffer.rewind();
+		shutterVertexBuffer.limit(shutterVertexBuffer.capacity());
+		shutterNormalBuffer.limit(shutterNormalBuffer.capacity());
+		Vector3 out = new Vector3(normal).multiplyLocal(0.01);
+		final boolean isLeft = shutter == leftShutter;
+		final Vector3 v0 = (isLeft ? getAbsPoint(0) : getAbsPoint(2)).addLocal(out);
+		final Vector3 v1 = (isLeft ? getAbsPoint(1) : getAbsPoint(3)).addLocal(out);
+		final Vector3 u = isLeft ? getAbsPoint(0).subtractLocal(getAbsPoint(2)) : getAbsPoint(3).subtractLocal(getAbsPoint(1));
+		final double gap = 0.1;
+		final Vector3 p1 = new Vector3();
+		u.multiply(gap, p1).addLocal(v1);
+		final Vector3 p2 = new Vector3();
+		u.multiply(gap, p2).addLocal(v0);
+		final Vector3 p3 = new Vector3();
+		u.multiply(shutterLength, p3).addLocal(p2);
+		final Vector3 p4 = new Vector3();
+		u.multiply(shutterLength, p4).addLocal(p1);
+		shutterVertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+		shutterVertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+		shutterVertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+		shutterVertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
+		for (int i = 0; i < 4; i++)
+			shutterNormalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		shutterVertexBuffer.limit(shutterVertexBuffer.position());
+		shutterNormalBuffer.limit(shutterNormalBuffer.position());
+		shutter.getMeshData().updateVertexCount();
+		shutter.updateModelBound();
 	}
 
 	private void fillRectangleBuffer(final FloatBuffer vertexBuffer, final ReadOnlyVector3 meshOffset) {
@@ -692,6 +771,38 @@ public class Window extends HousePart implements Thermalizable {
 
 	public boolean getVerticalBars() {
 		return !noVerticalBars;
+	}
+
+	public void setLeftShutter(final boolean hasLeftShutter) {
+		this.hasLeftShutter = hasLeftShutter;
+	}
+
+	public boolean getLeftShutter() {
+		return hasLeftShutter;
+	}
+
+	public void setRightShutter(final boolean hasRightShutter) {
+		this.hasRightShutter = hasRightShutter;
+	}
+
+	public boolean getRightShutter() {
+		return hasRightShutter;
+	}
+
+	public void setShutterColor(ReadOnlyColorRGBA shutterColor) {
+		this.shutterColor = shutterColor;
+	}
+
+	public ReadOnlyColorRGBA getShutterColor() {
+		return shutterColor;
+	}
+
+	public void setShutterLength(double shutterLength) {
+		this.shutterLength = shutterLength;
+	}
+
+	public double getShutterLength() {
+		return shutterLength;
 	}
 
 }

@@ -188,6 +188,7 @@ public class SolarPanel extends HousePart {
 
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
+
 	}
 
 	@Override

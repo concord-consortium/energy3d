@@ -66,9 +66,11 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
@@ -79,6 +81,8 @@ import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
+import org.concord.energy3d.undo.ChangeShutterColorCommand;
+import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -478,7 +482,17 @@ public class PopupMenuFactory {
 
 		if (popupMenuForWindow == null) {
 
-			popupMenuForWindow = createPopupMenu(true, true, null);
+			final JMenu shutterMenu = new JMenu("Shutters");
+
+			popupMenuForWindow = createPopupMenu(true, true, new Runnable() {
+				@Override
+				public void run() {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						shutterMenu.setEnabled(selectedPart.getContainer() instanceof Wall);
+					}
+				}
+			});
 
 			final JMenu muntinMenu = new JMenu("Muntins");
 
@@ -594,6 +608,168 @@ public class PopupMenuFactory {
 
 			});
 
+			final JCheckBoxMenuItem cbmiBothShutters = new JCheckBoxMenuItem("Both Shutters");
+			final JCheckBoxMenuItem cbmiLeftShutter = new JCheckBoxMenuItem("Left Shutter");
+			final JCheckBoxMenuItem cbmiRightShutter = new JCheckBoxMenuItem("Right Shutter");
+
+			cbmiLeftShutter.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setLeftShutter(cbmiLeftShutter.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			shutterMenu.add(cbmiLeftShutter);
+
+			cbmiRightShutter.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						((Window) selectedPart).setRightShutter(cbmiRightShutter.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			shutterMenu.add(cbmiRightShutter);
+
+			cbmiBothShutters.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						Window window = (Window) selectedPart;
+						window.setLeftShutter(cbmiBothShutters.isSelected());
+						window.setRightShutter(cbmiBothShutters.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+			shutterMenu.add(cbmiBothShutters);
+			shutterMenu.addSeparator();
+
+			final JMenuItem miShutterColor = new JMenuItem("Color...");
+			miShutterColor.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window))
+						return;
+					final Window window = (Window) selectedPart;
+					final JColorChooser colorChooser = MainFrame.getInstance().getColorChooser();
+					ReadOnlyColorRGBA color = window.getShutterColor();
+					if (color != null)
+						colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+					final ActionListener actionListener = new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							final Color c = colorChooser.getColor();
+							final float[] newColor = c.getComponents(null);
+							final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], 1);
+							JPanel panel = new JPanel();
+							panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+							panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+							final JRadioButton rb1 = new JRadioButton("Only this Window", true);
+							final JRadioButton rb2 = new JRadioButton("All Windows on this " + (window.getContainer() instanceof Wall ? "Wall" : "Roof"));
+							final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
+							panel.add(rb1);
+							panel.add(rb2);
+							panel.add(rb3);
+							ButtonGroup bg = new ButtonGroup();
+							bg.add(rb1);
+							bg.add(rb2);
+							bg.add(rb3);
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+								return;
+							if (rb1.isSelected()) { // apply to only this window
+								ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
+								window.setShutterColor(color);
+								Scene.getInstance().redrawAll();
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
+							} else if (rb2.isSelected()) {
+								ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
+								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, true);
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
+							} else {
+								ChangeBuildingShutterColorCommand cmd = new ChangeBuildingShutterColorCommand(window);
+								Scene.getInstance().setShutterColorOfBuilding(window, color);
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
+							}
+							Scene.getInstance().setEdited(true);
+						}
+					};
+					JColorChooser.createDialog(MainFrame.getInstance(), "Select Shutter Color", true, colorChooser, actionListener, null).setVisible(true);
+				}
+			});
+			shutterMenu.add(miShutterColor);
+
+			final JMenuItem miShutterLength = new JMenuItem("Relative Length...");
+			miShutterLength.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window))
+						return;
+					final Window window = (Window) selectedPart;
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Shutter Length (Relative to Window Width)", window.getShutterLength());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								double val = Double.parseDouble(newValue);
+								if (val <= 0 || val > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Relative shutter length must be within (0, 1).", "Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									ChangeShutterLengthCommand c = new ChangeShutterLengthCommand(window);
+									window.setShutterLength(val);
+									Scene.getInstance().redrawAll();
+									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								exception.printStackTrace();
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+			shutterMenu.add(miShutterLength);
+
+			shutterMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						Window window = (Window) selectedPart;
+						Util.selectSilently(cbmiLeftShutter, window.getLeftShutter());
+						Util.selectSilently(cbmiRightShutter, window.getRightShutter());
+						Util.selectSilently(cbmiBothShutters, window.getLeftShutter() && window.getRightShutter());
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+					shutterMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+					shutterMenu.setEnabled(true);
+				}
+
+			});
+
 			final JMenuItem miShgc = new JMenuItem("Solar Heat Gain Coefficient...");
 			miShgc.addActionListener(new ActionListener() {
 				@Override
@@ -694,7 +870,7 @@ public class PopupMenuFactory {
 								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else if (rb2.isSelected()) {
 								ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
-								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color);
+								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, false);
 								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else {
 								ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(window);
@@ -713,6 +889,7 @@ public class PopupMenuFactory {
 			popupMenuForWindow.add(createInsulationMenuItem(true));
 			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(muntinMenu);
+			popupMenuForWindow.add(shutterMenu);
 			popupMenuForWindow.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");

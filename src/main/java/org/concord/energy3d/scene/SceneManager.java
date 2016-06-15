@@ -1395,50 +1395,53 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return;
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
+		try {
+			if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
+				EnergyPanel.getInstance().cancel();
 
-		if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
-			EnergyPanel.getInstance().cancel();
-
-		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
-			selectedHousePart.setPreviewPoint(x, y);
-		} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedHousePart instanceof Foundation) && selectedHousePart.isDrawCompleted()) {
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
-			if (pick != null) {
-				if (selectedHousePart instanceof Foundation) {
-					final Foundation foundation = (Foundation) selectedHousePart;
-					final Vector3 pickPoint = pick.getPoint().clone();
-					// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
-					final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-					foundation.move(d, houseMovePoints);
+			if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
+				selectedHousePart.setPreviewPoint(x, y);
+			} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedHousePart instanceof Foundation) && selectedHousePart.isDrawCompleted()) {
+				final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
+				if (pick != null) {
+					if (selectedHousePart instanceof Foundation) {
+						final Foundation foundation = (Foundation) selectedHousePart;
+						final Vector3 pickPoint = pick.getPoint().clone();
+						// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
+						final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+						foundation.move(d, houseMovePoints);
+					}
 				}
-			}
-		} else if (houseMoveStartPoint != null && selectedHousePart != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Tree) {
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
-			if (pick != null) {
-				final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-				((Tree) selectedHousePart).move(d, houseMovePoints);
-			}
-		} else if (houseMoveStartPoint != null && selectedHousePart != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Window) {
-			final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedHousePart.getContainer());
-			if (pick != null) {
-				final Vector3 d = pick.getPoint().clone().subtractLocal(houseMoveStartPoint);
-				((Window) selectedHousePart).move(d, houseMovePoints);
-			}
-		} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
-			final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);
-			pick = selectHousePart == null ? null : selectHousePart.getUserData();
-			final HousePart housePart = pick == null ? null : pick.getHousePart();
-			if (pick != null) {
-				hoveredHousePart = housePart;
-				if (hoveredHousePart.isFrozen())
+			} else if (houseMoveStartPoint != null && selectedHousePart != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Tree) {
+				final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
+				if (pick != null) {
+					final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+					((Tree) selectedHousePart).move(d, houseMovePoints);
+				}
+			} else if (houseMoveStartPoint != null && selectedHousePart != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Window) {
+				final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedHousePart.getContainer());
+				if (pick != null) {
+					final Vector3 d = pick.getPoint().clone().subtractLocal(houseMoveStartPoint);
+					((Window) selectedHousePart).move(d, houseMovePoints);
+				}
+			} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
+				final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);
+				pick = selectHousePart == null ? null : selectHousePart.getUserData();
+				final HousePart housePart = pick == null ? null : pick.getHousePart();
+				if (pick != null) {
+					hoveredHousePart = housePart;
+					if (hoveredHousePart.isFrozen())
+						hoveredHousePart = null;
+					if (pick.getIndex() != -1)
+						lastSelectedEditPointMouseState = mouseState;
+				} else
 					hoveredHousePart = null;
-				if (pick.getIndex() != -1)
-					lastSelectedEditPointMouseState = mouseState;
-			} else
-				hoveredHousePart = null;
+			}
+			mouseState = null;
+		} catch (Throwable t) {
+			t.printStackTrace();
+			Util.reportError(t);
 		}
-		mouseState = null;
-
 		final Component canvasComponent = (Component) canvas;
 		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredHousePart != null && pick.getIndex() == -1 && (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human))
 			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
@@ -1531,27 +1534,32 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				if (operation == Operation.SELECT) {
-					final HousePart previousSelectedHousePart = selectedHousePart;
-					if (mouseState == null) // for some reason, there is a small chance that mouseState is nullified here
-						mouseState = new MouseState(x, y, 0, 0, 0, null, null);
-					final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-					final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
-					selectedHousePart = pick == null ? null : pick.getHousePart();
-					System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
-					if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
-						previousSelectedHousePart.setEditPointsVisible(false);
-						previousSelectedHousePart.setGridsVisible(false);
+				try {
+					if (operation == Operation.SELECT) {
+						final HousePart previousSelectedHousePart = selectedHousePart;
+						if (mouseState == null) // for some reason, there is a small chance that mouseState is nullified here
+							mouseState = new MouseState(x, y, 0, 0, 0, null, null);
+						final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+						final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
+						selectedHousePart = pick == null ? null : pick.getHousePart();
+						System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
+						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
+							previousSelectedHousePart.setEditPointsVisible(false);
+							previousSelectedHousePart.setGridsVisible(false);
+						}
+						if (selectedHousePart != null) {
+							selectedHousePart.complete(); // to undo edit flag set by SelectUtil above
+							if (!PrintController.getInstance().isPrintPreview())
+								selectedHousePart.setEditPointsVisible(true);
+							EnergyPanel.getInstance().update();
+						}
+						EnergyPanel.getInstance().updateGraphs();
+						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
+						PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 					}
-					if (selectedHousePart != null) {
-						selectedHousePart.complete(); // to undo edit flag set by SelectUtil above
-						if (!PrintController.getInstance().isPrintPreview())
-							selectedHousePart.setEditPointsVisible(true);
-						EnergyPanel.getInstance().update();
-					}
-					EnergyPanel.getInstance().updateGraphs();
-					final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-					PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
+				} catch (Throwable t) {
+					t.printStackTrace();
+					Util.reportError(t);
 				}
 				return null;
 			}
@@ -1566,71 +1574,76 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (zoomLock)
 					return null;
 				System.out.println("OPERATION: " + operation);
-				if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.ROTATE || operation == Operation.DRAW_ROOF_GABLE) {
-					if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
-						final HousePart previousSelectedHousePart = selectedHousePart;
-						final PickedHousePart selectHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-						final UserData pick = selectHousePart == null ? null : selectHousePart.getUserData();
-						if (pick == null)
-							selectedHousePart = null;
-						else
-							selectedHousePart = pick.getHousePart();
-						if (selectedHousePart != null && selectedHousePart.isFrozen())
-							selectedHousePart = null;
-						System.out.println("Clicked on: " + pick);
-						if (pick != null && pick.isEditPoint()) {
-							cameraControl.setLeftMouseButtonEnabled(false);
-						}
+				try {
+					if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.ROTATE || operation == Operation.DRAW_ROOF_GABLE) {
+						if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
+							final HousePart previousSelectedHousePart = selectedHousePart;
+							final PickedHousePart selectHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+							final UserData pick = selectHousePart == null ? null : selectHousePart.getUserData();
+							if (pick == null)
+								selectedHousePart = null;
+							else
+								selectedHousePart = pick.getHousePart();
+							if (selectedHousePart != null && selectedHousePart.isFrozen())
+								selectedHousePart = null;
+							System.out.println("Clicked on: " + pick);
+							if (pick != null && pick.isEditPoint()) {
+								cameraControl.setLeftMouseButtonEnabled(false);
+							}
 
-						if (operation == Operation.SELECT || operation == Operation.ROTATE) {
-							if (previousSelectedHousePart instanceof Foundation) {
-								((Foundation) previousSelectedHousePart).updateAzimuthArrowVisibility(false);
+							if (operation == Operation.SELECT || operation == Operation.ROTATE) {
+								if (previousSelectedHousePart instanceof Foundation) {
+									((Foundation) previousSelectedHousePart).updateAzimuthArrowVisibility(false);
+								}
+								if (selectedHousePart instanceof Foundation) {
+									((Foundation) selectedHousePart).drawAzimuthArrow();
+								}
 							}
-							if (selectedHousePart instanceof Foundation) {
-								((Foundation) selectedHousePart).drawAzimuthArrow();
+							if (operation == Operation.RESIZE && selectedHousePart != null) {
+								if (!(selectedHousePart instanceof Foundation)) {
+									selectedHousePart.setEditPointsVisible(false);
+									selectedHousePart = selectedHousePart.getTopContainer();
+								}
 							}
-						}
-						if (operation == Operation.RESIZE && selectedHousePart != null) {
-							if (!(selectedHousePart instanceof Foundation)) {
-								selectedHousePart.setEditPointsVisible(false);
-								selectedHousePart = selectedHousePart.getTopContainer();
+							if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
+								cameraControl.setLeftMouseButtonEnabled(false);
+								houseMoveStartPoint = selectHousePart.getPoint().clone();
+								collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
+								final ArrayList<Vector3> points = selectedHousePart.getPoints();
+								houseMovePoints = new ArrayList<Vector3>(points.size());
+								for (final Vector3 p : points)
+									houseMovePoints.add(p.clone());
 							}
-						}
-						if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
-							cameraControl.setLeftMouseButtonEnabled(false);
-							houseMoveStartPoint = selectHousePart.getPoint().clone();
-							collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
-							final ArrayList<Vector3> points = selectedHousePart.getPoints();
-							houseMovePoints = new ArrayList<Vector3>(points.size());
-							for (final Vector3 p : points)
-								houseMovePoints.add(p.clone());
-						}
 
-						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart && operation != Operation.RESIZE) {
-							previousSelectedHousePart.setEditPointsVisible(false);
-							previousSelectedHousePart.setGridsVisible(false);
-						}
-						if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
-							selectedHousePart.setEditPointsVisible(true);
-							if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
-								selectedHousePart.setGridsVisible(true);
-								if (selectedHousePart instanceof Foundation)
-									editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
-								else
-									editHousePartCommand = new EditPartCommand(selectedHousePart);
+							if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart && operation != Operation.RESIZE) {
+								previousSelectedHousePart.setEditPointsVisible(false);
+								previousSelectedHousePart.setGridsVisible(false);
+							}
+							if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
+								selectedHousePart.setEditPointsVisible(true);
+								if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
+									selectedHousePart.setGridsVisible(true);
+									if (selectedHousePart instanceof Foundation)
+										editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
+									else
+										editHousePartCommand = new EditPartCommand(selectedHousePart);
+								}
+							}
+							SelectUtil.nextPickLayer();
+							if (operation == Operation.DRAW_ROOF_GABLE && selectedHousePart instanceof Roof) {
+								System.out.println(selectedHousePart);
+								System.out.println("deleting roof #" + pick.getIndex());
+								final int roofPartIndex = pick.getIndex();
+								final Roof roof = (Roof) selectedHousePart;
+								roof.setGable(roofPartIndex, true, undoManager);
 							}
 						}
-						SelectUtil.nextPickLayer();
-						if (operation == Operation.DRAW_ROOF_GABLE && selectedHousePart instanceof Roof) {
-							System.out.println(selectedHousePart);
-							System.out.println("deleting roof #" + pick.getIndex());
-							final int roofPartIndex = pick.getIndex();
-							final Roof roof = (Roof) selectedHousePart;
-							roof.setGable(roofPartIndex, true, undoManager);
-						}
+					} else {
+						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
 					}
-				} else {
-					selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
+				} catch (Throwable t) {
+					t.printStackTrace();
+					Util.reportError(t);
 				}
 				return null;
 			}
@@ -1642,65 +1655,70 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				if (selectedHousePart != null)
-					selectedHousePart.setGridsVisible(false);
-				if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-					if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
-						if (selectedHousePart.isDrawable()) {
-							selectedHousePart.complete();
-							if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
-								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-						} else {
-							if (editHousePartCommand != null)
-								editHousePartCommand.undo();
-							selectedHousePart.setHighlight(false);
-							// selectedHousePart = null;
+				try {
+					if (selectedHousePart != null)
+						selectedHousePart.setGridsVisible(false);
+					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
+						if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
+							if (selectedHousePart.isDrawable()) {
+								selectedHousePart.complete();
+								if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							} else {
+								if (editHousePartCommand != null)
+									editHousePartCommand.undo();
+								selectedHousePart.setHighlight(false);
+								// selectedHousePart = null;
+							}
+							if (editHousePartCommand != null) {
+								if (editHousePartCommand.isReallyEdited())
+									undoManager.addEdit(editHousePartCommand);
+								editHousePartCommand = null;
+							}
 						}
-						if (editHousePartCommand != null) {
-							if (editHousePartCommand.isReallyEdited())
-								undoManager.addEdit(editHousePartCommand);
-							editHousePartCommand = null;
+						if (!zoomLock)
+							cameraControl.setLeftMouseButtonEnabled(true);
+						houseMoveStartPoint = null;
+						houseMovePoints = null;
+						if (cameraChanged) {
+							TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
+							cameraChanged = false;
 						}
-					}
-					if (!zoomLock)
-						cameraControl.setLeftMouseButtonEnabled(true);
-					houseMoveStartPoint = null;
-					houseMovePoints = null;
-					if (cameraChanged) {
-						TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
-						cameraChanged = false;
-					}
-				} else {
-					if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
-						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
-						if (selectedHousePart.isDrawCompleted() && !selectedHousePart.isDrawable()) {
-							addHousePartCommand = null;
-							Scene.getInstance().remove(selectedHousePart, true);
+					} else {
+						if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
+							selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
+							if (selectedHousePart.isDrawCompleted() && !selectedHousePart.isDrawable()) {
+								addHousePartCommand = null;
+								Scene.getInstance().remove(selectedHousePart, true);
+								selectedHousePart = null;
+								if (operationStick)
+									operationFlag = true;
+							}
+						}
+						if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
+							if (selectedHousePart.isDrawable()) {
+								if (addHousePartCommand != null)
+									undoManager.addEdit(addHousePartCommand);
+								addHousePartCommand = null;
+							} else
+								Scene.getInstance().remove(selectedHousePart, true);
+							selectedHousePart.setEditPointsVisible(false);
 							selectedHousePart = null;
 							if (operationStick)
 								operationFlag = true;
+							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+						}
+						if (!operationFlag) {
+							MainPanel.getInstance().defaultTool();
+							cameraControl.setLeftMouseButtonEnabled(true);
 						}
 					}
-					if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
-						if (selectedHousePart.isDrawable()) {
-							if (addHousePartCommand != null)
-								undoManager.addEdit(addHousePartCommand);
-							addHousePartCommand = null;
-						} else
-							Scene.getInstance().remove(selectedHousePart, true);
-						selectedHousePart.setEditPointsVisible(false);
-						selectedHousePart = null;
-						if (operationStick)
-							operationFlag = true;
-						EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					}
-					if (!operationFlag) {
-						MainPanel.getInstance().defaultTool();
-						cameraControl.setLeftMouseButtonEnabled(true);
-					}
+					updateHeliodonAndAnnotationSize();
+					EnergyPanel.getInstance().update();
+				} catch (Throwable t) {
+					t.printStackTrace();
+					Util.reportError(t);
 				}
-				updateHeliodonAndAnnotationSize();
-				EnergyPanel.getInstance().update();
 				return null;
 			}
 		});

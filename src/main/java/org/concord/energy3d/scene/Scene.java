@@ -1269,11 +1269,28 @@ public class Scene implements Serializable {
 		this.roofColor = roofColor;
 	}
 
-	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c) {
+	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c, boolean shutter) {
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == container)
-				((Window) p).setColor(c);
+			if (p instanceof Window && p.getContainer() == container) {
+				Window w = (Window) p;
+				if (shutter) {
+					w.setShutterColor(c);
+				} else {
+					w.setColor(c);
+				}
+			}
 		}
+		Scene.getInstance().redrawAll();
+	}
+
+	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
+		if (part instanceof Foundation)
+			return;
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer())
+				((Window) p).setShutterColor(color);
+		}
+		Scene.getInstance().redrawAll();
 	}
 
 	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
