@@ -367,10 +367,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		useOrgPoints = true;
 		final List<Vector2> insidePoints = new ArrayList<Vector2>(children.size() * 2);
 		for (final HousePart part : children) {
-			final Vector3 p0 = part.getAbsPoint(0);
-			final Vector3 p2 = part.getAbsPoint(2);
-			insidePoints.add(new Vector2(p0.getX(), p0.getY()));
-			insidePoints.add(new Vector2(p2.getX(), p2.getY()));
+			if (part.children.size() > 2) {
+				final Vector3 p0 = part.getAbsPoint(0);
+				final Vector3 p2 = part.getAbsPoint(2);
+				insidePoints.add(new Vector2(p0.getX(), p0.getY()));
+				insidePoints.add(new Vector2(p2.getX(), p2.getY()));
+			} else { // if the child is a solar panel
+				final Vector3 p0 = part.getAbsPoint(0);
+				insidePoints.add(new Vector2(p0.getX(), p0.getY()));
+			}
 		}
 
 		final Vector3 p0 = getAbsPoint(0);
@@ -782,16 +787,24 @@ public class Foundation extends HousePart implements Thermalizable {
 			maxX = -Double.MAX_VALUE;
 			maxY = -Double.MAX_VALUE;
 			for (final HousePart part : children) {
-				final Vector3 p1 = part.getAbsPoint(0);
-				final Vector3 p2 = part.getAbsPoint(2);
-				minX = Math.min(p1.getX(), minX);
-				minX = Math.min(p2.getX(), minX);
-				minY = Math.min(p1.getY(), minY);
-				minY = Math.min(p2.getY(), minY);
-				maxX = Math.max(p1.getX(), maxX);
-				maxX = Math.max(p2.getX(), maxX);
-				maxY = Math.max(p1.getY(), maxY);
-				maxY = Math.max(p2.getY(), maxY);
+				if (part.children.size() > 2) {
+					final Vector3 p1 = part.getAbsPoint(0);
+					final Vector3 p2 = part.getAbsPoint(2);
+					minX = Math.min(p1.getX(), minX);
+					minX = Math.min(p2.getX(), minX);
+					minY = Math.min(p1.getY(), minY);
+					minY = Math.min(p2.getY(), minY);
+					maxX = Math.max(p1.getX(), maxX);
+					maxX = Math.max(p2.getX(), maxX);
+					maxY = Math.max(p1.getY(), maxY);
+					maxY = Math.max(p2.getY(), maxY);
+				} else { // if the child is a solar panel
+					final Vector3 p1 = part.getAbsPoint(0);
+					minX = Math.min(p1.getX(), minX);
+					minY = Math.min(p1.getY(), minY);
+					maxX = Math.max(p1.getX(), maxX);
+					maxY = Math.max(p1.getY(), maxY);
+				}
 			}
 		}
 	}

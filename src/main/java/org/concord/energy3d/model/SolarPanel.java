@@ -32,9 +32,10 @@ public class SolarPanel extends HousePart {
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
 	private boolean rotated = false;
+	private double tiltAngle = 90; // the tilt angle relative to the surface of the parent
 
 	public SolarPanel(boolean rotated) {
-		super(1, 1, 0.0);
+		super(1, 1, 0);
 	}
 
 	/** a number between 0 and 1 */
@@ -77,12 +78,14 @@ public class SolarPanel extends HousePart {
 	protected void init() {
 		super.init();
 
-		if (Util.isZero(efficiency))
-			efficiency = 0.15;
 		if (Util.isZero(panelWidth))
 			panelWidth = 0.99;
 		if (Util.isZero(panelHeight))
 			panelHeight = 1.65;
+		if (Util.isZero(tiltAngle))
+			tiltAngle = 90;
+		if (Util.isZero(efficiency))
+			efficiency = 0.15;
 		if (Util.isZero(inverterEfficiency))
 			inverterEfficiency = 0.95;
 
@@ -177,11 +180,25 @@ public class SolarPanel extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		mesh.setTranslation(getAbsPoint(0));
-		if (Util.isEqual(normal, Vector3.UNIT_Z))
-			mesh.setRotation(new Matrix3());
-		else
-			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		if (Util.isZero(tiltAngle - 90)) {
+			mesh.setTranslation(getAbsPoint(0));
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+				mesh.setRotation(new Matrix3());
+			} else {
+				mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+			}
+		} else {
+			double t = Math.toRadians(tiltAngle);
+			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
+			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t)));
+			Foundation foundation = getTopContainer();
+			Vector3 v1 = foundation.getAbsPoint(1).subtractLocal(foundation.getAbsPoint(0));
+			Vector3 v2 = foundation.getAbsPoint(2).subtractLocal(foundation.getAbsPoint(0));
+			Vector3 v3 = new Matrix3().fromAngleAxis(t, v2).applyPost(v1, null);
+			if (v3.getZ() < 0)
+				v3.negateLocal();
+			mesh.setRotation(new Matrix3().lookAt(v3, Vector3.UNIT_Z));
+		}
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -304,7 +321,7 @@ public class SolarPanel extends HousePart {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new solar panel is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-			} else if (container instanceof Wall) {
+			} else if (container instanceof Wall || container instanceof Foundation) {
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
 				final double shift = (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
 				final double newX = points.get(0).getX() + s * shift;
@@ -326,6 +343,14 @@ public class SolarPanel extends HousePart {
 
 	public boolean isRotated() {
 		return rotated;
+	}
+
+	public void setTiltAngle(double tiltAngle) {
+		this.tiltAngle = tiltAngle;
+	}
+
+	public double getTiltAngle() {
+		return tiltAngle;
 	}
 
 }

@@ -86,6 +86,7 @@ import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
@@ -617,9 +618,11 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand((Window) selectedPart);
 						((Window) selectedPart).setLeftShutter(cbmiLeftShutter.isSelected());
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -630,9 +633,11 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand((Window) selectedPart);
 						((Window) selectedPart).setRightShutter(cbmiRightShutter.isSelected());
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -644,10 +649,12 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
 						Window window = (Window) selectedPart;
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(window);
 						window.setLeftShutter(cbmiBothShutters.isSelected());
 						window.setRightShutter(cbmiBothShutters.isSelected());
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
@@ -1343,6 +1350,21 @@ public class PopupMenuFactory {
 
 		if (popupMenuForFoundation == null) {
 
+			final JMenuItem miPaste = new JMenuItem("Paste");
+			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miPaste.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().pasteToPickedLocationOnFoundation();
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miCopyBuilding = new JMenuItem("Copy Building");
 			miCopyBuilding.addActionListener(new ActionListener() {
 				@Override
@@ -1561,6 +1583,7 @@ public class PopupMenuFactory {
 				}
 			});
 
+			popupMenuForFoundation.add(miPaste);
 			popupMenuForFoundation.add(miCopyBuilding);
 			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(clearMenu);
@@ -1674,6 +1697,68 @@ public class PopupMenuFactory {
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
+				}
+			});
+
+			final JMenuItem miTilt = new JMenuItem("Tilt Angle...");
+			miTilt.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final String title = "<html>Tilt Angle (&deg;) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Optimal titl angle captures most sun.<hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getTiltAngle());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < -90 || val > 90) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel tilt angle must be between 0 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(solarPanel);
+										solarPanel.setTiltAngle(val);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										// Foundation foundation = solarPanel.getTopContainer();
+										// ChangeBuildingSolarCellEfficiencyCommand c = new ChangeBuildingSolarCellEfficiencyCommand(foundation);
+										// Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										// ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
+										// Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									Scene.getInstance().setEdited(true);
+									Scene.getInstance().redrawAll();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
 				}
 			});
 
@@ -1864,8 +1949,9 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForSolarPanel.add(miRotate);
 			popupMenuForSolarPanel.addSeparator();
+			popupMenuForSolarPanel.add(miRotate);
+			popupMenuForSolarPanel.add(miTilt);
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miEff);
 			popupMenuForSolarPanel.add(miInverterEff);

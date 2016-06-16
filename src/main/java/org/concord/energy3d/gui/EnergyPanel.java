@@ -737,8 +737,8 @@ public class EnergyPanel extends JPanel {
 				if (sp.isDrawable()) {
 					partProperty1Label.setText("  Size:");
 					partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFeet) + " m");
-					partProperty2Label.setText("  Position:");
-					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+					partProperty2Label.setText("  Position & Tilt:");
+					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m, tilt = " + oneDecimal.format(sp.getTiltAngle()) + "\u00B0");
 					partProperty1TextField.setToolTipText("The length and width of the solar panel");
 					partProperty2TextField.setToolTipText("The (x, y, z) coordinates of the center of the solar panel");
 					String id = "Solar Panel (" + sp.getId() + ")";
