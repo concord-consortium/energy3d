@@ -197,7 +197,8 @@ public class SolarPanel extends HousePart {
 			Vector3 v3 = new Matrix3().fromAngleAxis(t, v2).applyPost(v1, null);
 			if (v3.getZ() < 0)
 				v3.negateLocal();
-			mesh.setRotation(new Matrix3().lookAt(v3, Vector3.UNIT_Z));
+			normal = v3.normalizeLocal();
+			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 		}
 
 		surround.setTranslation(mesh.getTranslation());

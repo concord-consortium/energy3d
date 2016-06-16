@@ -68,6 +68,7 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
@@ -85,6 +86,8 @@ import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
@@ -1733,21 +1736,21 @@ public class PopupMenuFactory {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel tilt angle must be between 0 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										// ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(solarPanel);
+										ChangeSolarPanelTiltAngleCommand c = new ChangeSolarPanelTiltAngleCommand(solarPanel);
 										solarPanel.setTiltAngle(val);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
-										// Foundation foundation = solarPanel.getTopContainer();
-										// ChangeBuildingSolarCellEfficiencyCommand c = new ChangeBuildingSolarCellEfficiencyCommand(foundation);
-										// Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										Foundation foundation = solarPanel.getTopContainer();
+										ChangeBuildingSolarPanelTiltAngleCommand c = new ChangeBuildingSolarPanelTiltAngleCommand(foundation);
+										Scene.getInstance().setTiltAngleForSolarPanelsOfBuilding(foundation, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										// ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
-										// Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
+										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									Scene.getInstance().setEdited(true);
@@ -1823,7 +1826,13 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
-					Util.selectSilently(miRotate, ((SolarPanel) selectedPart).isRotated());
+					SolarPanel sp = (SolarPanel) selectedPart;
+					Util.selectSilently(miRotate, sp.isRotated());
+					miTilt.setEnabled(true);
+					if (sp.getContainer() instanceof Roof) {
+						Roof roof = (Roof) sp.getContainer();
+						miTilt.setEnabled(roof.getHeight() == 0);
+					}
 				}
 			});
 
