@@ -504,7 +504,7 @@ public class EnergyPanel extends JPanel {
 							final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
 							if (doCompute) {
 								alreadyRenderedHeatmap = true;
-								computeNow(false);
+								computeNow();
 								if (!cancel) {
 									SceneManager.getInstance().getSolarLand().setVisible(true);
 									SceneManager.getInstance().refresh();
@@ -541,7 +541,7 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public void computeNow(boolean onlySolarPanels) {
+	public void computeNow() {
 		try {
 			System.out.println("EnergyPanel.computeNow()");
 			EventQueue.invokeLater(new Runnable() {
@@ -556,7 +556,7 @@ public class EnergyPanel extends JPanel {
 				final int timeStep = SolarRadiation.getInstance().getTimeStep();
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
-				SolarRadiation.getInstance().compute(onlySolarPanels);
+				SolarRadiation.getInstance().compute();
 				final Calendar c = (Calendar) Heliodon.getInstance().getCalender().clone();
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();

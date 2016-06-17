@@ -92,7 +92,7 @@ public class SolarRadiation {
 		return instance;
 	}
 
-	public void compute(boolean onlySolarPanels) {
+	public void compute() {
 		System.out.println("computeSolarRadiation()");
 		initCollidables();
 		onMesh.clear();

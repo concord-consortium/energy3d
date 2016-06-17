@@ -61,10 +61,10 @@ public abstract class Analysis {
 	}
 
 	// return the exception if unsuccessful
-	Throwable compute(boolean onlySolarPanels) {
+	Throwable compute() {
 		graph.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		try {
-			EnergyPanel.getInstance().computeNow(onlySolarPanels);
+			EnergyPanel.getInstance().computeNow();
 		} catch (final Throwable e) {
 			Util.reportError(e);
 			return e;

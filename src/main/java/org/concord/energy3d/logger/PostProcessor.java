@@ -95,7 +95,7 @@ public class PostProcessor extends PlayControl {
 							Scene.openNow(files[i].toURI().toURL());
 							// Scene.initSceneNow();
 							// Scene.initEnergy();
-							EnergyPanel.getInstance().computeNow(false);
+							EnergyPanel.getInstance().computeNow();
 							SceneManager.getInstance().refresh();
 							update.run();
 							EventQueue.invokeLater(new Runnable(){
