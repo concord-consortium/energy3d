@@ -80,7 +80,7 @@ public class SolarAnnualAnalysis extends Analysis {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalender();
 						c.set(Calendar.MONTH, m);
-						final Throwable t = compute();
+						final Throwable t = compute(true);
 						if (t != null) {
 							stopAnalysis();
 							EventQueue.invokeLater(new Runnable() {

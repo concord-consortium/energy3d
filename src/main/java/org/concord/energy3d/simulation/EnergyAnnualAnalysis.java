@@ -89,7 +89,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 						final Calendar c = Heliodon.getInstance().getCalender();
 						c.set(Calendar.MONTH, m);
 						today = (Calendar) c.clone();
-						final Throwable t = compute();
+						final Throwable t = compute(false);
 						if (t != null) {
 							stopAnalysis();
 							EventQueue.invokeLater(new Runnable() {

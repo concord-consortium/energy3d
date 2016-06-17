@@ -62,7 +62,7 @@ public class EnergyDailyAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
-				final Throwable t = compute();
+				final Throwable t = compute(false);
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {
 						public void run() {
