@@ -66,9 +66,12 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeBuildingSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
@@ -79,9 +82,14 @@ import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
+import org.concord.energy3d.undo.ChangeShutterColorCommand;
+import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
@@ -277,6 +285,7 @@ public class PopupMenuFactory {
 			addPrefabMenuItem("Bell Tower", "prefabs/bell-tower.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Chimney", "prefabs/chimney.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Connecting Porch", "prefabs/connecting-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Fence", "prefabs/fence1.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Flat-Top Porch", "prefabs/flat-top-porch.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Fountain", "prefabs/fountain.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Front Door Overhang", "prefabs/front-door-overhang.ng3", miImportPrefabMenu);
@@ -478,7 +487,17 @@ public class PopupMenuFactory {
 
 		if (popupMenuForWindow == null) {
 
-			popupMenuForWindow = createPopupMenu(true, true, null);
+			final JMenu shutterMenu = new JMenu("Shutters");
+
+			popupMenuForWindow = createPopupMenu(true, true, new Runnable() {
+				@Override
+				public void run() {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						shutterMenu.setEnabled(selectedPart.getContainer() instanceof Wall);
+					}
+				}
+			});
 
 			final JMenu muntinMenu = new JMenu("Muntins");
 
@@ -594,6 +613,196 @@ public class PopupMenuFactory {
 
 			});
 
+			final JCheckBoxMenuItem cbmiBothShutters = new JCheckBoxMenuItem("Both Shutters");
+			final JCheckBoxMenuItem cbmiLeftShutter = new JCheckBoxMenuItem("Left Shutter");
+			final JCheckBoxMenuItem cbmiRightShutter = new JCheckBoxMenuItem("Right Shutter");
+
+			cbmiLeftShutter.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand((Window) selectedPart);
+						((Window) selectedPart).setLeftShutter(cbmiLeftShutter.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			shutterMenu.add(cbmiLeftShutter);
+
+			cbmiRightShutter.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand((Window) selectedPart);
+						((Window) selectedPart).setRightShutter(cbmiRightShutter.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			shutterMenu.add(cbmiRightShutter);
+
+			cbmiBothShutters.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						Window window = (Window) selectedPart;
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(window);
+						window.setLeftShutter(cbmiBothShutters.isSelected());
+						window.setRightShutter(cbmiBothShutters.isSelected());
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			shutterMenu.add(cbmiBothShutters);
+			shutterMenu.addSeparator();
+
+			final JMenuItem miShutterColor = new JMenuItem("Color...");
+			miShutterColor.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window))
+						return;
+					final Window window = (Window) selectedPart;
+					final JColorChooser colorChooser = MainFrame.getInstance().getColorChooser();
+					ReadOnlyColorRGBA color = window.getShutterColor();
+					if (color != null)
+						colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+					final ActionListener actionListener = new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							final Color c = colorChooser.getColor();
+							final float[] newColor = c.getComponents(null);
+							final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], 1);
+							JPanel panel = new JPanel();
+							panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+							panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+							final JRadioButton rb1 = new JRadioButton("Only this Window", true);
+							final JRadioButton rb2 = new JRadioButton("All Windows on this " + (window.getContainer() instanceof Wall ? "Wall" : "Roof"));
+							final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
+							panel.add(rb1);
+							panel.add(rb2);
+							panel.add(rb3);
+							ButtonGroup bg = new ButtonGroup();
+							bg.add(rb1);
+							bg.add(rb2);
+							bg.add(rb3);
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+								return;
+							if (rb1.isSelected()) { // apply to only this window
+								ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
+								window.setShutterColor(color);
+								Scene.getInstance().redrawAll();
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
+							} else if (rb2.isSelected()) {
+								ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
+								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, true);
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
+							} else {
+								ChangeBuildingShutterColorCommand cmd = new ChangeBuildingShutterColorCommand(window);
+								Scene.getInstance().setShutterColorOfBuilding(window, color);
+								SceneManager.getInstance().getUndoManager().addEdit(cmd);
+							}
+							Scene.getInstance().setEdited(true);
+						}
+					};
+					JColorChooser.createDialog(MainFrame.getInstance(), "Select Shutter Color", true, colorChooser, actionListener, null).setVisible(true);
+				}
+			});
+			shutterMenu.add(miShutterColor);
+
+			final JMenuItem miShutterLength = new JMenuItem("Relative Length...");
+			miShutterLength.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window))
+						return;
+					final Window window = (Window) selectedPart;
+					final String partInfo = window.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final String title = "<html>Relative Length of Shutter for " + partInfo + "</html>";
+					final String footnote = "<html><hr width=400></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Window Shutter", true);
+					final JRadioButton rb2 = new JRadioButton("All Window Shutters on this Wall");
+					final JRadioButton rb3 = new JRadioButton("All Window Shutters of this Building");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), params, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, window.getShutterLength());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val <= 0 || val > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Relative shutter length must be within (0, 1).", "Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										ChangeShutterLengthCommand c = new ChangeShutterLengthCommand(window);
+										window.setShutterLength(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										Scene.getInstance().setShutterLengthInContainer(window.getContainer(), val);
+									} else if (rb3.isSelected()) {
+										Scene.getInstance().setShutterLengthOfBuilding(window, val);
+									}
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									Scene.getInstance().redrawAll();
+									Scene.getInstance().setEdited(true);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+			shutterMenu.add(miShutterLength);
+
+			shutterMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(MenuEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						Window window = (Window) selectedPart;
+						Util.selectSilently(cbmiLeftShutter, window.getLeftShutter());
+						Util.selectSilently(cbmiRightShutter, window.getRightShutter());
+						Util.selectSilently(cbmiBothShutters, window.getLeftShutter() && window.getRightShutter());
+					}
+				}
+
+				@Override
+				public void menuDeselected(MenuEvent e) {
+					shutterMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(MenuEvent e) {
+					shutterMenu.setEnabled(true);
+				}
+
+			});
+
 			final JMenuItem miShgc = new JMenuItem("Solar Heat Gain Coefficient...");
 			miShgc.addActionListener(new ActionListener() {
 				@Override
@@ -694,7 +903,7 @@ public class PopupMenuFactory {
 								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else if (rb2.isSelected()) {
 								ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
-								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color);
+								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, false);
 								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else {
 								ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(window);
@@ -713,6 +922,7 @@ public class PopupMenuFactory {
 			popupMenuForWindow.add(createInsulationMenuItem(true));
 			popupMenuForWindow.add(miShgc);
 			popupMenuForWindow.add(muntinMenu);
+			popupMenuForWindow.add(shutterMenu);
 			popupMenuForWindow.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
@@ -877,41 +1087,23 @@ public class PopupMenuFactory {
 			typeMenu.add(rbmiColumns);
 			typeGroup.add(rbmiColumns);
 
-			final JRadioButtonMenuItem rbmiRailings = new JRadioButtonMenuItem("Railings");
-			rbmiRailings.addActionListener(new ActionListener() {
+			final JRadioButtonMenuItem rbmiRails = new JRadioButtonMenuItem("Rails");
+			rbmiRails.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.RAILINGS_ONLY);
+						wall.setType(Wall.RAILS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
-			typeMenu.add(rbmiRailings);
-			typeGroup.add(rbmiRailings);
-
-			final JRadioButtonMenuItem rbmiBoard = new JRadioButtonMenuItem("Board");
-			rbmiBoard.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						Wall wall = (Wall) selectedPart;
-						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.BOARD_ONLY);
-						Scene.getInstance().redrawAll();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			// typeMenu.add(rbmiBoard);
-			// typeGroup.add(rbmiBoard);
+			typeMenu.add(rbmiRails);
+			typeGroup.add(rbmiRails);
 
 			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns & Railings");
 			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
@@ -921,7 +1113,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.COLUMNS_RAILINGS);
+						wall.setType(Wall.COLUMNS_RAILS);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -930,6 +1122,24 @@ public class PopupMenuFactory {
 			});
 			typeMenu.add(rbmiColumnsAndRailings);
 			typeGroup.add(rbmiColumnsAndRailings);
+
+			final JRadioButtonMenuItem rbmiFence = new JRadioButtonMenuItem("Fence");
+			rbmiFence.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.FENCE);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			typeMenu.add(rbmiFence);
+			typeGroup.add(rbmiFence);
 
 			typeMenu.addMenuListener(new MenuListener() {
 
@@ -951,10 +1161,10 @@ public class PopupMenuFactory {
 						case Wall.COLUMNS_ONLY:
 							Util.selectSilently(rbmiColumns, true);
 							break;
-						case Wall.RAILINGS_ONLY:
-							Util.selectSilently(rbmiRailings, true);
+						case Wall.RAILS_ONLY:
+							Util.selectSilently(rbmiRails, true);
 							break;
-						case Wall.COLUMNS_RAILINGS:
+						case Wall.COLUMNS_RAILS:
 							Util.selectSilently(rbmiColumnsAndRailings, true);
 							break;
 						}
@@ -1166,6 +1376,21 @@ public class PopupMenuFactory {
 
 		if (popupMenuForFoundation == null) {
 
+			final JMenuItem miPaste = new JMenuItem("Paste");
+			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miPaste.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().pasteToPickedLocationOnFoundation();
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miCopyBuilding = new JMenuItem("Copy Building");
 			miCopyBuilding.addActionListener(new ActionListener() {
 				@Override
@@ -1210,6 +1435,27 @@ public class PopupMenuFactory {
 				}
 			});
 			clearMenu.add(miRemoveAllWindows);
+
+			final JMenuItem miRemoveAllWindowShutters = new JMenuItem("Remove All Window Shutters");
+			miRemoveAllWindowShutters.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllWindowShutters();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllWindowShutters);
 
 			final JMenuItem miRemoveAllSolarPanels = new JMenuItem("Remove All Solar Panels");
 			miRemoveAllSolarPanels.addActionListener(new ActionListener() {
@@ -1363,6 +1609,7 @@ public class PopupMenuFactory {
 				}
 			});
 
+			popupMenuForFoundation.add(miPaste);
 			popupMenuForFoundation.add(miCopyBuilding);
 			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(clearMenu);
@@ -1479,6 +1726,68 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miTilt = new JMenuItem("Tilt Angle...");
+			miTilt.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final String title = "<html>Tilt Angle (&deg;) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Optimal titl angle captures most sun.<hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getTiltAngle());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < -90 || val > 90) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										ChangeSolarPanelTiltAngleCommand c = new ChangeSolarPanelTiltAngleCommand(solarPanel);
+										solarPanel.setTiltAngle(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										Foundation foundation = solarPanel.getTopContainer();
+										ChangeBuildingSolarPanelTiltAngleCommand c = new ChangeBuildingSolarPanelTiltAngleCommand(foundation);
+										Scene.getInstance().setTiltAngleForSolarPanelsOfBuilding(foundation, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
+										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									Scene.getInstance().setEdited(true);
+									Scene.getInstance().redrawAll();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			final JMenuItem miSize = new JMenuItem("Size...");
 			miSize.addActionListener(new ActionListener() {
 
@@ -1540,7 +1849,13 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
-					Util.selectSilently(miRotate, ((SolarPanel) selectedPart).isRotated());
+					SolarPanel sp = (SolarPanel) selectedPart;
+					Util.selectSilently(miRotate, sp.isRotated());
+					miTilt.setEnabled(true);
+					if (sp.getContainer() instanceof Roof) {
+						Roof roof = (Roof) sp.getContainer();
+						miTilt.setEnabled(roof.getHeight() == 0);
+					}
 				}
 			});
 
@@ -1666,8 +1981,9 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForSolarPanel.add(miRotate);
 			popupMenuForSolarPanel.addSeparator();
+			popupMenuForSolarPanel.add(miRotate);
+			popupMenuForSolarPanel.add(miTilt);
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miEff);
 			popupMenuForSolarPanel.add(miInverterEff);

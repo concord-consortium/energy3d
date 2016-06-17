@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
@@ -14,6 +15,8 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -31,9 +34,10 @@ public class SolarPanel extends HousePart {
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
 	private boolean rotated = false;
+	private double tiltAngle = 90; // the tilt angle relative to the surface of the parent
 
 	public SolarPanel(boolean rotated) {
-		super(1, 1, 0.0);
+		super(1, 1, 0);
 	}
 
 	/** a number between 0 and 1 */
@@ -76,12 +80,14 @@ public class SolarPanel extends HousePart {
 	protected void init() {
 		super.init();
 
-		if (Util.isZero(efficiency))
-			efficiency = 0.15;
 		if (Util.isZero(panelWidth))
 			panelWidth = 0.99;
 		if (Util.isZero(panelHeight))
 			panelHeight = 1.65;
+		if (Util.isZero(tiltAngle))
+			tiltAngle = 90;
+		if (Util.isZero(efficiency))
+			efficiency = 0.15;
 		if (Util.isZero(inverterEfficiency))
 			inverterEfficiency = 0.95;
 
@@ -111,7 +117,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class });
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class });
 		if (picked != null) {
 			final Vector3 p = picked.getPoint().clone();
 			snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
@@ -122,6 +128,33 @@ public class SolarPanel extends HousePart {
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
+	}
+
+	@Override
+	public void updateEditShapes() {
+		final Vector3 p = Vector3.fetchTempInstance();
+		try {
+			for (int i = 0; i < points.size(); i++) {
+				getAbsPoint(i, p);
+				final Camera camera = SceneManager.getInstance().getCamera();
+				if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
+					final double distance = camera.getLocation().distance(p);
+					getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
+				} else {
+					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
+				}
+				if (!Util.isZero(tiltAngle - 90)) {
+					double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
+					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(tiltAngle)));
+				}
+				getEditPointShape(i).setTranslation(p);
+			}
+		} finally {
+			Vector3.releaseTempInstance(p);
+		}
+		/* remove remaining edit shapes */
+		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
+			pointsRoot.detachChildAt(points.size());
 	}
 
 	@Override
@@ -176,17 +209,33 @@ public class SolarPanel extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		mesh.setTranslation(getAbsPoint(0));
-		if (Util.isEqual(normal, Vector3.UNIT_Z))
-			mesh.setRotation(new Matrix3());
-		else
+		if (Util.isZero(tiltAngle - 90)) {
+			mesh.setTranslation(getAbsPoint(0));
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+				mesh.setRotation(new Matrix3());
+			} else {
+				mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+			}
+		} else {
+			double t = Math.toRadians(tiltAngle);
+			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
+			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t)));
+			Foundation foundation = getTopContainer();
+			Vector3 v1 = foundation.getAbsPoint(1).subtractLocal(foundation.getAbsPoint(0));
+			Vector3 v2 = foundation.getAbsPoint(2).subtractLocal(foundation.getAbsPoint(0));
+			Vector3 v3 = new Matrix3().fromAngleAxis(t, v2).applyPost(v1, null);
+			if (v3.getZ() < 0)
+				v3.negateLocal();
+			normal = v3.normalizeLocal();
 			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		}
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
 
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
+
 	}
 
 	@Override
@@ -227,7 +276,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return panelWidth / Scene.getInstance().getAnnotationScale() / 5.0;
+		return panelWidth / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
 	}
 
 	@Override
@@ -302,7 +351,7 @@ public class SolarPanel extends HousePart {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new solar panel is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-			} else if (container instanceof Wall) {
+			} else if (container instanceof Wall || container instanceof Foundation) {
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
 				final double shift = (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
 				final double newX = points.get(0).getX() + s * shift;
@@ -324,6 +373,14 @@ public class SolarPanel extends HousePart {
 
 	public boolean isRotated() {
 		return rotated;
+	}
+
+	public void setTiltAngle(double tiltAngle) {
+		this.tiltAngle = tiltAngle;
+	}
+
+	public double getTiltAngle() {
+		return tiltAngle;
 	}
 
 }

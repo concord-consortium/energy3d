@@ -44,6 +44,7 @@ import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
+import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -662,6 +663,7 @@ public class Scene implements Serializable {
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().update();
 	}
 
 	public void pasteToPickedLocationOnLand() {
@@ -795,6 +797,32 @@ public class Scene implements Serializable {
 				((SolarPanel) c).moveTo(selectedPart);
 			}
 		}
+		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
+		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+		position = position.subtractLocal(center);
+		final int n = c.getPoints().size();
+		for (int i = 0; i < n; i++) {
+			final Vector3 v = c.getPoints().get(i);
+			v.addLocal(position);
+		}
+		add(c, true);
+		copyBuffer = c;
+		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+	}
+
+	public void pasteToPickedLocationOnFoundation() {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (!(selectedPart instanceof Foundation))
+			return;
+		if (copyBuffer == null)
+			return;
+		final HousePart c = copyBuffer.copy(false);
+		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
+			return;
+		Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
+		if (position == null)
+			return;
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
 		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
 		position = position.subtractLocal(center);
@@ -1107,6 +1135,44 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllWindowShutters() {
+		final ArrayList<Window> windows = new ArrayList<Window>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation) {
+					Window w = (Window) part;
+					if (w.getLeftShutter() || w.getRightShutter())
+						windows.add(w);
+				}
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Window && !part.isFrozen()) {
+					Window w = (Window) part;
+					if (w.getLeftShutter() || w.getRightShutter())
+						windows.add(w);
+				}
+			}
+		}
+		if (windows.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no window shutter to remove.", "No Shutter", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " window shutters" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final RemoveMultipleShuttersCommand c = new RemoveMultipleShuttersCommand(windows);
+		for (final HousePart part : windows) {
+			Window w = (Window) part;
+			w.setLeftShutter(false);
+			w.setRightShutter(false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
 	public void removeAllFoundations() {
 		final ArrayList<HousePart> foundations = new ArrayList<HousePart>();
 		for (final HousePart part : parts) {
@@ -1268,11 +1334,47 @@ public class Scene implements Serializable {
 		this.roofColor = roofColor;
 	}
 
-	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c) {
+	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c, boolean shutter) {
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == container)
-				((Window) p).setColor(c);
+			if (p instanceof Window && p.getContainer() == container) {
+				Window w = (Window) p;
+				if (shutter) {
+					w.setShutterColor(c);
+				} else {
+					w.setColor(c);
+				}
+			}
 		}
+		Scene.getInstance().redrawAll();
+	}
+
+	public void setShutterLengthInContainer(final HousePart container, final double length) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == container) {
+				((Window) p).setShutterLength(length);
+			}
+		}
+		Scene.getInstance().redrawAll();
+	}
+
+	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
+		if (part instanceof Foundation)
+			return;
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer())
+				((Window) p).setShutterColor(color);
+		}
+		Scene.getInstance().redrawAll();
+	}
+
+	public void setShutterLengthOfBuilding(final HousePart part, final double length) {
+		if (part instanceof Foundation)
+			return;
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer())
+				((Window) p).setShutterLength(length);
+		}
+		Scene.getInstance().redrawAll();
 	}
 
 	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
@@ -1360,6 +1462,22 @@ public class Scene implements Serializable {
 				list.add((SolarPanel) p);
 		}
 		return list;
+	}
+
+	public void setTiltAngleForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+				((SolarPanel) p).setTiltAngle(angle);
+		}
+		redrawAll();
+	}
+
+	public void setTiltAngleForAllSolarPanels(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel)
+				((SolarPanel) p).setTiltAngle(angle);
+		}
+		redrawAll();
 	}
 
 	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {
