@@ -3,7 +3,6 @@ package org.concord.energy3d;
 import java.awt.EventQueue;
 import java.awt.Frame;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -18,9 +17,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
-import org.concord.energy3d.util.UpdateStub;
-
-import com.threerings.getdown.launcher.GetdownApp;
+import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
@@ -50,7 +47,6 @@ public class MainApplication {
 		}
 
 		System.setProperty("jogl.gljpanel.noglsl", "true");
-		System.setProperty("direct", "true");
 
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -75,6 +71,8 @@ public class MainApplication {
 		Scene.getInstance();
 		new Thread(sceneManager, "Energy3D Application").start();
 
+		Updater.download();
+
 		/* initialize data logging */
 		addShutdownHook(new Runnable() {
 			@Override
@@ -85,34 +83,30 @@ public class MainApplication {
 		TimeSeriesLogger.getInstance().start();
 		SnapshotLogger.getInstance().start(20);
 
-		try {
-			new Thread() {
-				@Override
-				public void run() {
-					try {
-						if (isMacOpeningFile)
-							return;
-						if (Config.isWebStart()) {
-							if (args.length > 1 && !args[args.length - 1].startsWith("-"))
-								mainFrame.open(args[args.length - 1]);
-							else
-								Scene.newFile();
-						} else {
-							if (args.length > 0)
-								mainFrame.open(args[0]);
-							else
-								Scene.newFile();
-						}
-					} catch (final Exception e) {
-						e.printStackTrace();
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					if (isMacOpeningFile)
+						return;
+					if (Config.isWebStart()) {
+						if (args.length > 1 && !args[args.length - 1].startsWith("-"))
+							mainFrame.open(args[args.length - 1]);
+						else
+							Scene.newFile();
+					} else {
+						if (args.length > 0)
+							mainFrame.open(args[0]);
+						else
+							Scene.newFile();
 					}
+				} catch (final Exception e) {
+					e.printStackTrace();
 				}
-			}.start();
+			}
+		}.start();
 
-			System.out.println("Initiatialization phase 2 done.");
-		} catch (final Throwable e) {
-			e.printStackTrace();
-		}
+		System.out.println("Initiatialization phase 2 done.");
 	}
 
 	public static void addShutdownHook(final Runnable r) {
@@ -127,31 +121,9 @@ public class MainApplication {
 			for (final Runnable r : shutdownHooks)
 				r.run();
 		}
+		Updater.install();
 		System.out.println("exit.");
-		try {
-			System.out.println(new File(".").getCanonicalPath());
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		if (Config.isWebStart() || Config.isEclipse())
-			System.exit(0);
-		else {
-			if (appDirectoryWritable) {
-				MainFrame.getInstance().setVisible(false);
-				new Thread() {
-					@Override
-					public void run() {
-						GetdownApp.main(new String[] { "." });
-						while (!UpdateStub.receivedCall)
-							Thread.yield();
-						UpdateStub.receivedCall = false;
-						System.exit(0);
-					};
-				}.start();
-			} else {
-				System.exit(0);
-			}
-		}
+		System.exit(0);
 	}
 
 	public static void setupLibraryPath() {

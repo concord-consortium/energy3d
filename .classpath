@@ -19,7 +19,6 @@
 	<classpathentry kind="lib" path="exe/lib/google-collections.jar"/>
 	<classpathentry kind="lib" path="exe/lib/jdom2.jar"/>
 	<classpathentry kind="lib" path="exe/lib/orange-extensions.jar"/>
-	<classpathentry kind="lib" path="exe/lib/slf4j-api.jar"/>
 	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-animation.jar" sourcepath="exe/lib/ardor3d/ardor3d-animation-1.0-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-awt.jar" sourcepath="exe/lib/ardor3d/ardor3d-awt-1.0-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-collada.jar" sourcepath="exe/lib/ardor3d/ardor3d-collada-1.0-SNAPSHOT-sources.jar"/>
@@ -30,5 +29,6 @@
 	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-savable.jar" sourcepath="exe/lib/ardor3d/ardor3d-savable-1.0-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="exe/lib/poly2tri/poly2tri-ardor3d.jar"/>
 	<classpathentry kind="lib" path="exe/lib/poly2tri/poly2tri-core.jar"/>
+	<classpathentry kind="lib" path="exe/lib/samskivert.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
