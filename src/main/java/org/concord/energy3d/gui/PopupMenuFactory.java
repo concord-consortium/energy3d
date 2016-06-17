@@ -285,6 +285,7 @@ public class PopupMenuFactory {
 			addPrefabMenuItem("Bell Tower", "prefabs/bell-tower.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Chimney", "prefabs/chimney.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Connecting Porch", "prefabs/connecting-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Fence", "prefabs/fence1.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Flat-Top Porch", "prefabs/flat-top-porch.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Fountain", "prefabs/fountain.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Front Door Overhang", "prefabs/front-door-overhang.ng3", miImportPrefabMenu);
@@ -727,26 +728,48 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof Window))
 						return;
 					final Window window = (Window) selectedPart;
+					final String partInfo = window.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final String title = "<html>Relative Length of Shutter for " + partInfo + "</html>";
+					final String footnote = "<html><hr width=400></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Window Shutter", true);
+					final JRadioButton rb2 = new JRadioButton("All Window Shutters on this Wall");
+					final JRadioButton rb3 = new JRadioButton("All Window Shutters of this Building");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Shutter Length (Relative to Window Width)", window.getShutterLength());
+						final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), params, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, window.getShutterLength());
 						if (newValue == null)
 							break;
 						else {
 							try {
-								double val = Double.parseDouble(newValue);
+								final double val = Double.parseDouble(newValue);
 								if (val <= 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Relative shutter length must be within (0, 1).", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									ChangeShutterLengthCommand c = new ChangeShutterLengthCommand(window);
-									window.setShutterLength(val);
+									if (rb1.isSelected()) {
+										ChangeShutterLengthCommand c = new ChangeShutterLengthCommand(window);
+										window.setShutterLength(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										Scene.getInstance().setShutterLengthInContainer(window.getContainer(), val);
+									} else if (rb3.isSelected()) {
+										Scene.getInstance().setShutterLengthOfBuilding(window, val);
+									}
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									Scene.getInstance().redrawAll();
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
 							} catch (final NumberFormatException exception) {
-								exception.printStackTrace();
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
@@ -1064,41 +1087,23 @@ public class PopupMenuFactory {
 			typeMenu.add(rbmiColumns);
 			typeGroup.add(rbmiColumns);
 
-			final JRadioButtonMenuItem rbmiRailings = new JRadioButtonMenuItem("Railings");
-			rbmiRailings.addActionListener(new ActionListener() {
+			final JRadioButtonMenuItem rbmiRails = new JRadioButtonMenuItem("Rails");
+			rbmiRails.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Wall) {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.RAILINGS_ONLY);
+						wall.setType(Wall.RAILS_ONLY);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 				}
 			});
-			typeMenu.add(rbmiRailings);
-			typeGroup.add(rbmiRailings);
-
-			final JRadioButtonMenuItem rbmiBoard = new JRadioButtonMenuItem("Board");
-			rbmiBoard.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						Wall wall = (Wall) selectedPart;
-						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.BOARD_ONLY);
-						Scene.getInstance().redrawAll();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-				}
-			});
-			// typeMenu.add(rbmiBoard);
-			// typeGroup.add(rbmiBoard);
+			typeMenu.add(rbmiRails);
+			typeGroup.add(rbmiRails);
 
 			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns & Railings");
 			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
@@ -1108,7 +1113,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Wall) {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.COLUMNS_RAILINGS);
+						wall.setType(Wall.COLUMNS_RAILS);
 						Scene.getInstance().redrawAll();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1117,6 +1122,24 @@ public class PopupMenuFactory {
 			});
 			typeMenu.add(rbmiColumnsAndRailings);
 			typeGroup.add(rbmiColumnsAndRailings);
+
+			final JRadioButtonMenuItem rbmiFence = new JRadioButtonMenuItem("Fence");
+			rbmiFence.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						Wall wall = (Wall) selectedPart;
+						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.FENCE);
+						Scene.getInstance().redrawAll();
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			typeMenu.add(rbmiFence);
+			typeGroup.add(rbmiFence);
 
 			typeMenu.addMenuListener(new MenuListener() {
 
@@ -1138,10 +1161,10 @@ public class PopupMenuFactory {
 						case Wall.COLUMNS_ONLY:
 							Util.selectSilently(rbmiColumns, true);
 							break;
-						case Wall.RAILINGS_ONLY:
-							Util.selectSilently(rbmiRailings, true);
+						case Wall.RAILS_ONLY:
+							Util.selectSilently(rbmiRails, true);
 							break;
-						case Wall.COLUMNS_RAILINGS:
+						case Wall.COLUMNS_RAILS:
 							Util.selectSilently(rbmiColumnsAndRailings, true);
 							break;
 						}

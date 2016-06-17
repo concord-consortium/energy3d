@@ -1348,12 +1348,31 @@ public class Scene implements Serializable {
 		Scene.getInstance().redrawAll();
 	}
 
+	public void setShutterLengthInContainer(final HousePart container, final double length) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == container) {
+				((Window) p).setShutterLength(length);
+			}
+		}
+		Scene.getInstance().redrawAll();
+	}
+
 	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
 		if (part instanceof Foundation)
 			return;
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == part.getTopContainer())
 				((Window) p).setShutterColor(color);
+		}
+		Scene.getInstance().redrawAll();
+	}
+
+	public void setShutterLengthOfBuilding(final HousePart part, final double length) {
+		if (part instanceof Foundation)
+			return;
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer())
+				((Window) p).setShutterLength(length);
 		}
 		Scene.getInstance().redrawAll();
 	}

@@ -15,6 +15,8 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -126,6 +128,33 @@ public class SolarPanel extends HousePart {
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
+	}
+
+	@Override
+	public void updateEditShapes() {
+		final Vector3 p = Vector3.fetchTempInstance();
+		try {
+			for (int i = 0; i < points.size(); i++) {
+				getAbsPoint(i, p);
+				final Camera camera = SceneManager.getInstance().getCamera();
+				if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
+					final double distance = camera.getLocation().distance(p);
+					getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
+				} else {
+					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
+				}
+				if (!Util.isZero(tiltAngle - 90)) {
+					double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
+					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(tiltAngle)));
+				}
+				getEditPointShape(i).setTranslation(p);
+			}
+		} finally {
+			Vector3.releaseTempInstance(p);
+		}
+		/* remove remaining edit shapes */
+		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
+			pointsRoot.detachChildAt(points.size());
 	}
 
 	@Override
