@@ -982,6 +982,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 		if (c != null)
 			undoManager.addEdit(c);
+		Scene.getInstance().redrawAll();
 		Scene.getInstance().setEdited(true);
 	}
 
