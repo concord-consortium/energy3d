@@ -25,7 +25,7 @@ public class Updater {
 					System.setProperty("silent", "true");
 					if (Config.isEclipse())
 						System.setProperty("no_log_redir", "true");
-					GetdownApp.main(new String[] { "C:\\Users\\presi\\AppData\\Local\\Energy3D\\app" });
+					GetdownApp.main(new String[] { "." });
 				};
 			}.start();
 	}
