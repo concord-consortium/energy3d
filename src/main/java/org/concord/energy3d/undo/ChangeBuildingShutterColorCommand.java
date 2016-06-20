@@ -42,8 +42,8 @@ public class ChangeBuildingShutterColorCommand extends AbstractUndoableEdit {
 			Window w = (Window) parts.get(i);
 			newColors[i] = w.getShutterColor();
 			w.setShutterColor(oldColors[i]);
+			w.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -51,9 +51,10 @@ public class ChangeBuildingShutterColorCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = parts.size();
 		for (int i = 0; i < n; i++) {
-			((Window) parts.get(i)).setShutterColor(newColors[i]);
+			Window w = (Window) parts.get(i);
+			w.setShutterColor(newColors[i]);
+			w.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override

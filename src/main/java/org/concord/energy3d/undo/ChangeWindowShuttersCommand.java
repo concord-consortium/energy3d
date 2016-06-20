@@ -5,7 +5,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
 
 public class ChangeWindowShuttersCommand extends AbstractUndoableEdit {
 
@@ -39,7 +38,7 @@ public class ChangeWindowShuttersCommand extends AbstractUndoableEdit {
 		window.setLeftShutter(oldLeftShutter);
 		newRightShutter = window.getRightShutter();
 		window.setRightShutter(oldRightShutter);
-		Scene.getInstance().redrawAll();
+		window.draw();
 	}
 
 	@Override
@@ -47,7 +46,7 @@ public class ChangeWindowShuttersCommand extends AbstractUndoableEdit {
 		super.redo();
 		window.setLeftShutter(newLeftShutter);
 		window.setRightShutter(newRightShutter);
-		Scene.getInstance().redrawAll();
+		window.draw();
 	}
 
 	@Override

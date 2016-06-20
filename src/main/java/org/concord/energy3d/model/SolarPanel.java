@@ -33,8 +33,9 @@ public class SolarPanel extends HousePart {
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
-	private boolean rotated = false;
-	private double tiltAngle = 90; // the tilt angle relative to the surface of the parent
+	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
+	private boolean rotatedAroundZ = false; // rotation around the z-axis currently takes only two angles: 0 or 90, so we use a boolean here
+	private double zenithAngle = 90; // the zenith angle relative to the surface of the parent
 
 	public SolarPanel(boolean rotated) {
 		super(1, 1, 0);
@@ -84,8 +85,8 @@ public class SolarPanel extends HousePart {
 			panelWidth = 0.99;
 		if (Util.isZero(panelHeight))
 			panelHeight = 1.65;
-		if (Util.isZero(tiltAngle))
-			tiltAngle = 90;
+		if (Util.isZero(zenithAngle))
+			zenithAngle = 90;
 		if (Util.isZero(efficiency))
 			efficiency = 0.15;
 		if (Util.isZero(inverterEfficiency))
@@ -143,9 +144,9 @@ public class SolarPanel extends HousePart {
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
-				if (!Util.isZero(tiltAngle - 90)) {
+				if (!Util.isZero(zenithAngle - 90)) {
 					double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(tiltAngle)));
+					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(zenithAngle)));
 				}
 				getEditPointShape(i).setTranslation(p);
 			}
@@ -209,26 +210,18 @@ public class SolarPanel extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		if (Util.isZero(tiltAngle - 90)) {
+		if (Util.isZero(zenithAngle - 90)) {
 			mesh.setTranslation(getAbsPoint(0));
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
-				mesh.setRotation(new Matrix3());
-			} else {
-				mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+				setNormal(Math.PI / 2 * 0.999999); // exactly 90 degrees will cause the solar panel to disappear
 			}
 		} else {
-			double t = Math.toRadians(tiltAngle);
+			double t = Math.toRadians(zenithAngle);
 			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
 			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t)));
-			Foundation foundation = getTopContainer();
-			Vector3 v1 = foundation.getAbsPoint(1).subtractLocal(foundation.getAbsPoint(0));
-			Vector3 v2 = foundation.getAbsPoint(2).subtractLocal(foundation.getAbsPoint(0));
-			Vector3 v3 = new Matrix3().fromAngleAxis(t, v2).applyPost(v1, null);
-			if (v3.getZ() < 0)
-				v3.negateLocal();
-			normal = v3.normalizeLocal();
-			mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+			setNormal(t);
 		}
+		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -236,6 +229,24 @@ public class SolarPanel extends HousePart {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
+	}
+
+	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
+	private void setNormal(double angle) {
+		Foundation foundation = getTopContainer();
+		Vector3 v = foundation.getAbsPoint(0);
+		int i = 2;
+		int j = 1;
+		if (rotatedAroundZ) {
+			i = 1;
+			j = 2;
+		}
+		Vector3 vx = foundation.getAbsPoint(i).subtractLocal(v); // x direction
+		Vector3 vy = foundation.getAbsPoint(j).subtractLocal(v); // y direction
+		v = new Matrix3().fromAngleAxis(angle, vx).applyPost(vy, null);
+		if (v.getZ() < 0)
+			v.negateLocal();
+		normal = v.normalizeLocal();
 	}
 
 	@Override
@@ -352,12 +363,21 @@ public class SolarPanel extends HousePart {
 					return null;
 				}
 			} else if (container instanceof Wall || container instanceof Foundation) {
-				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-				final double shift = (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
-				final double newX = points.get(0).getX() + s * shift;
-				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
-					return null;
-				c.points.get(0).setX(newX);
+				if (rotatedAroundZ) {
+					final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_Y));
+					final double shift = (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(1)) * Scene.getInstance().getAnnotationScale());
+					final double newY = points.get(0).getY() + s * shift;
+					if (newY > 1 - shift / 2 || newY < shift / 2) // reject it if out of range
+						return null;
+					c.points.get(0).setY(newY);
+				} else {
+					final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
+					final double shift = (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
+					final double newX = points.get(0).getX() + s * shift;
+					if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
+						return null;
+					c.points.get(0).setX(newX);
+				}
 				if (c.overlap()) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new solar panel is too close to an existing one.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
@@ -375,12 +395,20 @@ public class SolarPanel extends HousePart {
 		return rotated;
 	}
 
-	public void setTiltAngle(double tiltAngle) {
-		this.tiltAngle = tiltAngle;
+	public void setRotatedAroundZ(boolean b) {
+		this.rotatedAroundZ = b;
 	}
 
-	public double getTiltAngle() {
-		return tiltAngle;
+	public boolean isRotatedAroundZ() {
+		return rotatedAroundZ;
+	}
+
+	public void setZenithAngle(double zenithAngle) {
+		this.zenithAngle = zenithAngle;
+	}
+
+	public double getZenithAngle() {
+		return zenithAngle;
 	}
 
 }

@@ -9,18 +9,18 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeTiltAngleForAllSolarPanelsCommand extends AbstractUndoableEdit {
+public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
 	private List<SolarPanel> panels;
 
-	public ChangeTiltAngleForAllSolarPanelsCommand() {
+	public ChangeZenithAngleForAllSolarPanelsCommand() {
 		panels = Scene.getInstance().getAllSolarPanels();
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getTiltAngle();
+			oldValues[i] = panels.get(i).getZenithAngle();
 		}
 	}
 
@@ -30,8 +30,8 @@ public class ChangeTiltAngleForAllSolarPanelsCommand extends AbstractUndoableEdi
 		int n = panels.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newValues[i] = panels.get(i).getTiltAngle();
-			panels.get(i).setTiltAngle(oldValues[i]);
+			newValues[i] = panels.get(i).getZenithAngle();
+			panels.get(i).setZenithAngle(oldValues[i]);
 		}
 		Scene.getInstance().redrawAll();
 	}
@@ -41,7 +41,7 @@ public class ChangeTiltAngleForAllSolarPanelsCommand extends AbstractUndoableEdi
 		super.redo();
 		int n = panels.size();
 		for (int i = 0; i < n; i++) {
-			panels.get(i).setTiltAngle(newValues[i]);
+			panels.get(i).setZenithAngle(newValues[i]);
 		}
 		Scene.getInstance().redrawAll();
 	}

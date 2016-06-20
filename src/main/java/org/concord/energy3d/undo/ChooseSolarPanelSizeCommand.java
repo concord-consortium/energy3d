@@ -5,7 +5,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.scene.Scene;
 
 public class ChooseSolarPanelSizeCommand extends AbstractUndoableEdit {
 
@@ -39,7 +38,7 @@ public class ChooseSolarPanelSizeCommand extends AbstractUndoableEdit {
 		newHeight = solarPanel.getPanelHeight();
 		solarPanel.setPanelWidth(oldWidth);
 		solarPanel.setPanelHeight(oldHeight);
-		Scene.getInstance().redrawAll();
+		solarPanel.draw();
 	}
 
 	@Override
@@ -47,7 +46,7 @@ public class ChooseSolarPanelSizeCommand extends AbstractUndoableEdit {
 		super.redo();
 		solarPanel.setPanelWidth(newWidth);
 		solarPanel.setPanelHeight(newHeight);
-		Scene.getInstance().redrawAll();
+		solarPanel.draw();
 	}
 
 	@Override

@@ -45,10 +45,11 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 		int n = parts.size();
 		newColors = new ReadOnlyColorRGBA[n];
 		for (int i = 0; i < n; i++) {
-			newColors[i] = parts.get(i).getColor();
-			parts.get(i).setColor(oldColors[i]);
+			HousePart p = parts.get(i);
+			newColors[i] = p.getColor();
+			p.setColor(oldColors[i]);
+			p.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -56,9 +57,10 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = parts.size();
 		for (int i = 0; i < n; i++) {
-			parts.get(i).setColor(newColors[i]);
+			HousePart p = parts.get(i);
+			p.setColor(newColors[i]);
+			p.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override

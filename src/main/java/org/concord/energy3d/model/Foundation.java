@@ -991,6 +991,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawAzimuthArrow();
 	}
 
+	/** @return the azimuth of the reference vector of this foundation in degrees */
 	public double getAzimuth() {
 		final Vector3 v = getAbsPoint(0);
 		final Vector3 v1 = getAbsPoint(1);

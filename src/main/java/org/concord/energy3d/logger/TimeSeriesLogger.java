@@ -48,7 +48,7 @@ import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeBuildingSolarPanelZenithAngleCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
@@ -65,11 +65,11 @@ import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelZenithAngleCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeZenithAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
@@ -403,18 +403,18 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
 					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + sp.getPanelWidth();
 					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + sp.getPanelHeight() + "}";
-				} else if (lastEdit instanceof ChangeSolarPanelTiltAngleCommand) {
-					ChangeSolarPanelTiltAngleCommand c = (ChangeSolarPanelTiltAngleCommand) lastEdit;
+				} else if (lastEdit instanceof ChangeSolarPanelZenithAngleCommand) {
+					ChangeSolarPanelZenithAngleCommand c = (ChangeSolarPanelZenithAngleCommand) lastEdit;
 					SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
-					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getTiltAngle() + "}";
-				} else if (lastEdit instanceof ChangeBuildingSolarPanelTiltAngleCommand) {
-					Foundation foundation = ((ChangeBuildingSolarPanelTiltAngleCommand) lastEdit).getFoundation();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getZenithAngle() + "}";
+				} else if (lastEdit instanceof ChangeBuildingSolarPanelZenithAngleCommand) {
+					Foundation foundation = ((ChangeBuildingSolarPanelZenithAngleCommand) lastEdit).getFoundation();
 					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
-					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTiltAngle()) + "}";
-				} else if (lastEdit instanceof ChangeTiltAngleForAllSolarPanelsCommand) {
+					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getZenithAngle()) + "}";
+				} else if (lastEdit instanceof ChangeZenithAngleForAllSolarPanelsCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
-					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTiltAngle()) + "}";
+					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getZenithAngle()) + "}";
 				} else if (lastEdit instanceof ChangeSolarCellEfficiencyCommand) {
 					ChangeSolarCellEfficiencyCommand c = (ChangeSolarCellEfficiencyCommand) lastEdit;
 					SolarPanel sp = c.getSolarPanel();
@@ -442,8 +442,12 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof RotateSolarPanelCommand) {
 					RotateSolarPanelCommand c = (RotateSolarPanelCommand) lastEdit;
 					SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
-					stateValue += ", \"New Value\": " + sp.isRotated() + "}";
+					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Type\": " + c.getType();
+					if ("Normal".equals(c.getType()))
+						stateValue += ", \"New Value\": " + sp.isRotated();
+					else if ("Z-Axis".equals(c.getType()))
+						stateValue += ", \"New Value\": " + sp.isRotatedAroundZ();
+					stateValue += "}";
 				}
 
 				// wall properties

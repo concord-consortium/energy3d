@@ -5,7 +5,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
@@ -33,14 +32,14 @@ public class ChangePartColorCommand extends AbstractUndoableEdit {
 		super.undo();
 		newColor = part.getColor();
 		part.setColor(oldColor);
-		Scene.getInstance().redrawAll();
+		part.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		part.setColor(newColor);
-		Scene.getInstance().redrawAll();
+		part.draw();
 	}
 
 	@Override

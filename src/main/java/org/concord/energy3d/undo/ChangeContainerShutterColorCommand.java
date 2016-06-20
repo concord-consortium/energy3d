@@ -40,10 +40,11 @@ public class ChangeContainerShutterColorCommand extends AbstractUndoableEdit {
 		int n = windows.size();
 		newColors = new ColorRGBA[n];
 		for (int i = 0; i < n; i++) {
+			Window w = windows.get(i);
 			newColors[i] = windows.get(i).getShutterColor();
-			windows.get(i).setShutterColor(oldColors[i]);
+			w.setShutterColor(oldColors[i]);
+			w.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -51,9 +52,10 @@ public class ChangeContainerShutterColorCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = windows.size();
 		for (int i = 0; i < n; i++) {
-			windows.get(i).setShutterColor(newColors[i]);
+			Window w = windows.get(i);
+			w.setShutterColor(newColors[i]);
+			w.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
