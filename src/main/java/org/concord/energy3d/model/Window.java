@@ -339,7 +339,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	}
 
-	private void drawShutter(Mesh shutter) {
+	private void drawShutter(final Mesh shutter) {
 		if (!(container instanceof Wall))
 			return;
 		shutter.setDefaultColor(shutterColor);
@@ -350,7 +350,7 @@ public class Window extends HousePart implements Thermalizable {
 		shutterNormalBuffer.rewind();
 		shutterVertexBuffer.limit(shutterVertexBuffer.capacity());
 		shutterNormalBuffer.limit(shutterNormalBuffer.capacity());
-		Vector3 out = new Vector3(normal).multiplyLocal(0.01);
+		final Vector3 out = new Vector3(normal).multiplyLocal(0.01);
 		final boolean isLeft = shutter == leftShutter;
 		final Vector3 v0 = (isLeft ? getAbsPoint(0) : getAbsPoint(2)).addLocal(out);
 		final Vector3 v1 = (isLeft ? getAbsPoint(1) : getAbsPoint(3)).addLocal(out);
@@ -533,7 +533,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	public void move(final Vector3 v) {
 		v.multiplyLocal(getGridSize());
-		ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
+		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
 		for (final Vector3 p : points)
 			movePoints.add(p.clone());
 		move(v, movePoints);
@@ -598,12 +598,12 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	private boolean overlap() {
-		double w1 = getAbsPoint(0).distance(getAbsPoint(2));
+		final double w1 = getAbsPoint(0).distance(getAbsPoint(2));
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p != this && p.getContainer() == container) {
 				if (p instanceof Window) {
-					double w2 = p.getAbsPoint(0).distance(p.getAbsPoint(2));
+					final double w2 = p.getAbsPoint(0).distance(p.getAbsPoint(2));
 					if (p.getAbsCenter().distance(center) < (w1 + w2) * 0.55)
 						return true;
 				}
@@ -738,7 +738,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isDrawable() {
-		if (container == null) // FIXME: There is a chance that a solar panel can be left without a container
+		if (container == null)
 			return true;
 		if (!super.isDrawable())
 			return false;
@@ -764,8 +764,8 @@ public class Window extends HousePart implements Thermalizable {
 		else
 			transform = null;
 		Rectangle2D thisWindow = null;
-		for (int i = 0; i < window.getPoints().size(); i++) {
-			final Vector3 p = isRoof ? window.getAbsPoint(i) : window.points.get(i);
+		for (int i = 0; i < window.points.size(); i++) {
+			final Vector3 p = window.points.get(i);
 			if (isRoof)
 				transform.applyInverse(p);
 			final double y = isRoof ? p.getY() : p.getZ();
@@ -815,7 +815,7 @@ public class Window extends HousePart implements Thermalizable {
 		return hasRightShutter;
 	}
 
-	public void setShutterColor(ReadOnlyColorRGBA shutterColor) {
+	public void setShutterColor(final ReadOnlyColorRGBA shutterColor) {
 		this.shutterColor = shutterColor;
 	}
 
@@ -823,7 +823,7 @@ public class Window extends HousePart implements Thermalizable {
 		return shutterColor;
 	}
 
-	public void setShutterLength(double shutterLength) {
+	public void setShutterLength(final double shutterLength) {
 		this.shutterLength = shutterLength;
 	}
 
