@@ -735,11 +735,14 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) selectedPart;
 				if (sp.isDrawable()) {
-					Foundation foundation = (Foundation) sp.getTopContainer();
+					Foundation f = (Foundation) sp.getTopContainer();
 					partProperty1Label.setText("  Size & Position:");
 					partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFeet) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
 					partProperty2Label.setText("  Angles:");
-					partProperty2TextField.setText("zenith: " + oneDecimal.format(sp.getZenithAngle()) + "\u00B0, azimuth: " + oneDecimal.format(foundation.getAzimuth()) + "\u00B0");
+					double a = sp.getRelativeAzimuth() + f.getAzimuth();
+					if (a > 360)
+						a -= 360;
+					partProperty2TextField.setText("zenith: " + oneDecimal.format(sp.getZenith()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0");
 					partProperty1TextField.setToolTipText("The length and width of the solar panel");
 					partProperty2TextField.setToolTipText("The (x, y, z) coordinates of the center of the solar panel");
 					String id = "Solar Panel (" + sp.getId() + ")";

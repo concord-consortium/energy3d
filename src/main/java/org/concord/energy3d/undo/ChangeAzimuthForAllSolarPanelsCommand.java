@@ -9,18 +9,18 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableEdit {
+public class ChangeAzimuthForAllSolarPanelsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
 	private List<SolarPanel> panels;
 
-	public ChangeZenithAngleForAllSolarPanelsCommand() {
+	public ChangeAzimuthForAllSolarPanelsCommand() {
 		panels = Scene.getInstance().getAllSolarPanels();
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getZenith();
+			oldValues[i] = panels.get(i).getRelativeAzimuth();
 		}
 	}
 
@@ -32,7 +32,7 @@ public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableE
 		for (int i = 0; i < n; i++) {
 			SolarPanel p = panels.get(i);
 			newValues[i] = p.getZenith();
-			p.setZenith(oldValues[i]);
+			p.setRelativeAzimuth(oldValues[i]);
 			p.draw();
 		}
 	}
@@ -50,7 +50,7 @@ public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableE
 
 	@Override
 	public String getPresentationName() {
-		return "Change Zenith Angle for All Solar Panels";
+		return "Change Azimuth for All Solar Panels";
 	}
 
 }

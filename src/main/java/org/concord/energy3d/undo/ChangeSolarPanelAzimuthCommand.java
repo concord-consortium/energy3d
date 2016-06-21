@@ -6,43 +6,43 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class RotateSolarPanelCommand extends AbstractUndoableEdit {
+public class ChangeSolarPanelAzimuthCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private boolean oldValue, newValue;
+	private double oldValue, newValue;
 	private SolarPanel solarPanel;
 
-	public RotateSolarPanelCommand(SolarPanel solarPanel) {
+	public ChangeSolarPanelAzimuthCommand(SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
-		oldValue = solarPanel.isRotated();
+		oldValue = solarPanel.getRelativeAzimuth();
 	}
 
 	public SolarPanel getSolarPanel() {
 		return solarPanel;
 	}
 
-	public boolean getOldValue() {
+	public double getOldValue() {
 		return oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = solarPanel.isRotated();
-		solarPanel.setRotated(oldValue);
+		newValue = solarPanel.getRelativeAzimuth();
+		solarPanel.setRelativeAzimuth(oldValue);
 		solarPanel.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		solarPanel.setRotated(newValue);
+		solarPanel.setRelativeAzimuth(newValue);
 		solarPanel.draw();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Rotate Solar Panel";
+		return "Change Azimuth for Selected Solar Panel";
 	}
 
 }

@@ -23,7 +23,7 @@ public class ChangeBuildingSolarPanelZenithAngleCommand extends AbstractUndoable
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getZenithAngle();
+			oldValues[i] = panels.get(i).getZenith();
 		}
 	}
 
@@ -37,10 +37,11 @@ public class ChangeBuildingSolarPanelZenithAngleCommand extends AbstractUndoable
 		int n = panels.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newValues[i] = panels.get(i).getZenithAngle();
-			panels.get(i).setZenithAngle(oldValues[i]);
+			SolarPanel p = panels.get(i);
+			newValues[i] = p.getZenith();
+			p.setZenith(oldValues[i]);
+			p.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -48,9 +49,10 @@ public class ChangeBuildingSolarPanelZenithAngleCommand extends AbstractUndoable
 		super.redo();
 		int n = panels.size();
 		for (int i = 0; i < n; i++) {
-			panels.get(i).setZenithAngle(newValues[i]);
+			SolarPanel p = panels.get(i);
+			p.setZenith(newValues[i]);
+			p.draw();
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override

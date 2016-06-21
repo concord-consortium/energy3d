@@ -1464,20 +1464,40 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setTiltAngleForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
+	public void setZenithAngleForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-				((SolarPanel) p).setZenithAngle(angle);
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setZenith(angle);
+				p.draw();
+			}
 		}
-		redrawAll();
 	}
 
-	public void setTiltAngleForAllSolarPanels(final double angle) {
+	public void setZenithAngleForAllSolarPanels(final double angle) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel)
-				((SolarPanel) p).setZenithAngle(angle);
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setZenith(angle);
+				p.draw();
+			}
 		}
-		redrawAll();
+	}
+
+	public void setAzimuthForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+	}
+
+	public void setAzimuthForAllSolarPanels(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
 	}
 
 	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {
