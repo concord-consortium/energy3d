@@ -1759,10 +1759,12 @@ public class PopupMenuFactory {
 							break;
 						else {
 							try {
-								final double val = Double.parseDouble(newValue);
+								double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The zenith angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									if (Util.isZero(val - 90))
+										val = 89.999;
 									if (rb1.isSelected()) {
 										ChangeSolarPanelZenithCommand c = new ChangeSolarPanelZenithCommand(solarPanel);
 										solarPanel.setZenith(val);
