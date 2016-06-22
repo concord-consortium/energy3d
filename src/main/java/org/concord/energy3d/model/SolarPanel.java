@@ -36,6 +36,7 @@ public class SolarPanel extends HousePart {
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
+	private transient double layoutGap = 0.01;
 
 	public SolarPanel(boolean rotated) {
 		super(1, 1, 0);
@@ -344,7 +345,7 @@ public class SolarPanel extends HousePart {
 					Foundation foundation = getTopContainer();
 					double a = -Math.toRadians(relativeAzimuth); // not sure why the relative azimuth needs to be negative here for roof (for foundation it is positive)
 					Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-					final double length = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
+					final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
 					final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(v));
 					Vector3 p0 = foundation.getAbsPoint(0);
 					double tx = length / p0.distance(foundation.getAbsPoint(2));
@@ -359,7 +360,7 @@ public class SolarPanel extends HousePart {
 					if (Util.isZero(d.length()))
 						d.set(1, 0, 0);
 					final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(d));
-					d.multiplyLocal((rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale());
+					d.multiplyLocal((1 + layoutGap) * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale());
 					d.addLocal(getContainerRelative().getPoints().get(0));
 					final Vector3 v = toRelative(d);
 					c.points.get(0).setX(points.get(0).getX() + s * v.getX());
@@ -378,7 +379,7 @@ public class SolarPanel extends HousePart {
 			} else if (container instanceof Foundation) {
 				double a = Math.toRadians(relativeAzimuth);
 				Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-				final double length = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
+				final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(v));
 				Vector3 p0 = container.getAbsPoint(0);
 				double tx = length / p0.distance(container.getAbsPoint(2));
@@ -400,7 +401,7 @@ public class SolarPanel extends HousePart {
 				}
 			} else if (container instanceof Wall) {
 				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
-				final double shift = (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
+				final double shift = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / (container.getAbsPoint(0).distance(container.getAbsPoint(2)) * Scene.getInstance().getAnnotationScale());
 				final double newX = points.get(0).getX() + s * shift;
 				if (newX > 1 - shift / 2 || newX < shift / 2) // reject it if out of range
 					return null;

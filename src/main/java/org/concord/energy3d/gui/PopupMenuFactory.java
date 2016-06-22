@@ -1922,7 +1922,12 @@ public class PopupMenuFactory {
 					miZenith.setEnabled(true);
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
-						miZenith.setEnabled(roof.getHeight() == 0);
+						boolean flat = roof.getHeight() == 0;
+						miZenith.setEnabled(flat);
+						miAzimuth.setEnabled(flat);
+					} else if (sp.getContainer() instanceof Wall) {
+						miZenith.setEnabled(false);
+						miAzimuth.setEnabled(false);
 					}
 				}
 			});
