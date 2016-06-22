@@ -121,7 +121,8 @@ public class MainApplication {
 			for (final Runnable r : shutdownHooks)
 				r.run();
 		}
-		Updater.install();
+		if (!Config.isWebStart())
+			Updater.install();
 		System.out.println("exit.");
 		System.exit(0);
 	}
