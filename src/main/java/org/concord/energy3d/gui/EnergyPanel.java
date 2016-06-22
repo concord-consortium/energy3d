@@ -740,7 +740,7 @@ public class EnergyPanel extends JPanel {
 					partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFeet) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
 					partProperty2Label.setText("  Angles:");
 					double a = sp.getRelativeAzimuth() + f.getAzimuth();
-					if (a > 360)
+					if (a >= 360)
 						a -= 360;
 					boolean flat = (sp.getContainer() instanceof Roof && Util.isZero(sp.getContainer().getHeight())) || (sp.getContainer() instanceof Foundation);
 					partProperty2TextField.setText(flat ? "zenith: " + oneDecimal.format(sp.getZenith()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0" : " --- ");

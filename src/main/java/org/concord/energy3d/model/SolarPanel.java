@@ -382,15 +382,17 @@ public class SolarPanel extends HousePart {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Normal of solar panel [" + c + "] is null. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
-				if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+				if (Util.isEqual(normal, Vector3.UNIT_Z)) { // flat roof
 					Foundation foundation = getTopContainer();
-					double a = -Math.toRadians(relativeAzimuth); // not sure why the relative azimuth needs to be negative here for roof (for foundation it is positive)
+					Vector3 p0 = foundation.getAbsPoint(0);
+					Vector3 p1 = foundation.getAbsPoint(1);
+					Vector3 p2 = foundation.getAbsPoint(2);
+					double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 					Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
 					final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
-					final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(v));
-					Vector3 p0 = foundation.getAbsPoint(0);
-					double tx = length / p0.distance(foundation.getAbsPoint(2));
-					double ty = length / p0.distance(foundation.getAbsPoint(1));
+					final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+					double tx = length / p0.distance(p2);
+					double ty = length / p0.distance(p1);
 					double lx = s * v.getX() * tx;
 					double ly = s * v.getY() * ty;
 					c.points.get(0).setX(points.get(0).getX() + lx);
@@ -418,13 +420,15 @@ public class SolarPanel extends HousePart {
 					return null;
 				}
 			} else if (container instanceof Foundation) {
-				double a = Math.toRadians(relativeAzimuth);
+				Vector3 p0 = container.getAbsPoint(0);
+				Vector3 p1 = container.getAbsPoint(1);
+				Vector3 p2 = container.getAbsPoint(2);
+				double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 				Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
 				final double length = (1 + layoutGap) * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
-				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(v));
-				Vector3 p0 = container.getAbsPoint(0);
-				double tx = length / p0.distance(container.getAbsPoint(2));
-				double ty = length / p0.distance(container.getAbsPoint(1));
+				final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+				double tx = length / p0.distance(p2);
+				double ty = length / p0.distance(p1);
 				double lx = s * v.getX() * tx;
 				double ly = s * v.getY() * ty;
 				final double newX = points.get(0).getX() + lx;
