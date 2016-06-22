@@ -10,12 +10,14 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
@@ -29,6 +31,7 @@ public class SolarPanel extends HousePart {
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
+	private transient Mesh supportFrame;
 	private double efficiency = 0.15; // a number in (0, 1)
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 0.99; // 39"
@@ -113,6 +116,14 @@ public class SolarPanel extends HousePart {
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
+
+		supportFrame = new Mesh("Supporting Frame");
+		supportFrame.getMeshData().setIndexMode(IndexMode.Quads);
+		supportFrame.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
+		supportFrame.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(12));
+		supportFrame.setRenderState(offsetState);
+		supportFrame.setModelBound(new BoundingBox());
+		root.attachChild(supportFrame);
 
 		updateTextureAndColor();
 	}
@@ -231,6 +242,8 @@ public class SolarPanel extends HousePart {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
+		drawSupporFrame();
+
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -246,6 +259,34 @@ public class SolarPanel extends HousePart {
 		if (v.getZ() < 0)
 			v.negateLocal();
 		normal = v.normalizeLocal();
+	}
+
+	private void drawSupporFrame() {
+		supportFrame.setDefaultColor(getColor());
+		final FloatBuffer vertexBuffer = supportFrame.getMeshData().getVertexBuffer();
+		final FloatBuffer normalBuffer = supportFrame.getMeshData().getNormalBuffer();
+		vertexBuffer.rewind();
+		normalBuffer.rewind();
+		vertexBuffer.limit(vertexBuffer.capacity());
+		normalBuffer.limit(normalBuffer.capacity());
+		final ReadOnlyVector3 o = getAbsPoint(0);
+		double t = Math.toRadians(zenith);
+		double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
+		final Vector3 p = o.add(0, 0, 0.5 * h * Math.cos(t), null);
+		Vector3 dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
+		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
+		double w = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
+		dir.normalizeLocal().multiplyLocal(w * 0.5);
+		Vector3 v1 = p.add(dir, null);
+		dir.negateLocal();
+		Vector3 v2 = p.add(dir, null);
+		dir = new Vector3(normal).multiplyLocal(0.2);
+		Util.addPointToQuad(normal, v1, v2, dir, vertexBuffer, normalBuffer);
+
+		vertexBuffer.limit(vertexBuffer.position());
+		normalBuffer.limit(normalBuffer.position());
+		supportFrame.getMeshData().updateVertexCount();
+		supportFrame.updateModelBound();
 	}
 
 	@Override
