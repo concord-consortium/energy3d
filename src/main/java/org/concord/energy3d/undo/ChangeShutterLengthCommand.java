@@ -5,7 +5,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
 
 public class ChangeShutterLengthCommand extends AbstractUndoableEdit {
 
@@ -31,14 +30,14 @@ public class ChangeShutterLengthCommand extends AbstractUndoableEdit {
 		super.undo();
 		newValue = window.getShutterLength();
 		window.setShutterLength(oldValue);
-		Scene.getInstance().redrawAll();
+		window.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		window.setShutterLength(newValue);
-		Scene.getInstance().redrawAll();
+		window.draw();
 	}
 
 	@Override

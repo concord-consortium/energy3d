@@ -38,6 +38,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
 import org.concord.energy3d.scene.Scene;
@@ -45,6 +46,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AnimateSunCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
@@ -93,8 +95,8 @@ public class MainPanel extends JPanel {
 	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
-	private final double buildingRotationAngleAbsolute = 5 * Math.PI / 180;
-	private double buildingRotationAngle = -buildingRotationAngleAbsolute;
+	private final double rotationAngleAbsolute = 5 * Math.PI / 180;
+	private double rotationAngle = -rotationAngleAbsolute;
 	private String noteString = "";
 
 	private final MouseAdapter refreshUponMouseExit = new MouseAdapter() {
@@ -1015,13 +1017,25 @@ public class MainPanel extends JPanel {
 									public Object call() throws Exception {
 										final HousePart hp = SceneManager.getInstance().getSelectedPart();
 										if (hp == null) {
-											final RotateBuildingCommand c = new RotateBuildingCommand(null, buildingRotationAngle);
-											SceneManager.getInstance().rotateAllBuildings(buildingRotationAngle);
+											final RotateBuildingCommand c = new RotateBuildingCommand(null, rotationAngle);
+											SceneManager.getInstance().rotateAllBuildings(rotationAngle);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else {
 											if (hp instanceof Foundation) {
-												final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, buildingRotationAngle);
-												SceneManager.getInstance().rotateBuilding(buildingRotationAngle, true);
+												final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, rotationAngle);
+												SceneManager.getInstance().rotateBuilding(rotationAngle, true);
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+												EventQueue.invokeLater(new Runnable() {
+													@Override
+													public void run() {
+														EnergyPanel.getInstance().updateProperties();
+													}
+												});
+											} else if (hp instanceof SolarPanel) {
+												SolarPanel solarPanel = (SolarPanel) hp;
+												ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(solarPanel);
+												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
+												solarPanel.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 												EventQueue.invokeLater(new Runnable() {
 													@Override
@@ -1071,12 +1085,12 @@ public class MainPanel extends JPanel {
 		return noteButton;
 	}
 
-	public void setBuildingRotationAngle(final double x) {
-		buildingRotationAngle = x;
+	public void setRotationAngle(final double x) {
+		rotationAngle = x;
 	}
 
-	public double getBuildingRotationAngleAbsolute() {
-		return buildingRotationAngleAbsolute;
+	public double getRotationAngleAbsolute() {
+		return rotationAngleAbsolute;
 	}
 
 	/** the string that gets inserted or removed in the note area */

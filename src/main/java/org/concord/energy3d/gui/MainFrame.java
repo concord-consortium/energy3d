@@ -97,6 +97,7 @@ import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
@@ -312,7 +313,7 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public boolean dispatchKeyEvent(final KeyEvent e) {
-				double a = MainPanel.getInstance().getBuildingRotationAngleAbsolute();
+				double a = MainPanel.getInstance().getRotationAngleAbsolute();
 				if (e.isShiftDown()) {
 					a *= 0.2;
 					SceneManager.getInstance().setFineGrid(true);
@@ -323,7 +324,7 @@ public class MainFrame extends JFrame {
 				case KeyEvent.KEY_PRESSED:
 				case KeyEvent.KEY_RELEASED:
 					MainPanel.getInstance().getRotateButton().setIcon(e.isControlDown() ? icon_ccw : icon_cw);
-					MainPanel.getInstance().setBuildingRotationAngle(e.isControlDown() ? a : -a);
+					MainPanel.getInstance().setRotationAngle(e.isControlDown() ? a : -a);
 					break;
 				}
 				return false;
@@ -1556,6 +1557,7 @@ public class MainFrame extends JFrame {
 						GroupDailyAnalysis a = new GroupDailyAnalysis(g.getIds());
 						a.show(g.getType() + " " + g.getIds());
 					}
+					SceneManager.getInstance().hideAllEditPoints();
 				}
 			});
 		}
@@ -1578,6 +1580,7 @@ public class MainFrame extends JFrame {
 						GroupAnnualAnalysis a = new GroupAnnualAnalysis(g.getIds());
 						a.show(g.getType() + " " + g.getIds());
 					}
+					SceneManager.getInstance().hideAllEditPoints();
 				}
 			});
 		}
@@ -2302,74 +2305,88 @@ public class MainFrame extends JFrame {
 	}
 
 	void showColorDialogForParts() {
-		if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
-			if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
-				return;
-			noTextureMenuItem.setSelected(true);
-			Scene.getInstance().setTextureMode(TextureMode.None);
-		}
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		ActionListener actionListener;
 		if (selectedPart == null) {
-			JOptionPane.showMessageDialog(this, "<html>You must select a part.</html>", "Selection missing", JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-		final ReadOnlyColorRGBA color = selectedPart.getColor();
-		if (color != null)
-			colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
-		final ActionListener actionListener = new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart == null)
+			final ReadOnlyColorRGBA color = Scene.getInstance().getLandColor();
+			if (color != null)
+				colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+			actionListener = new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ChangeLandColorCommand cmd = new ChangeLandColorCommand();
+					final Color c = colorChooser.getColor();
+					final float[] newColor = c.getComponents(null);
+					Scene.getInstance().setLandColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], 0.5f));
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(cmd);
+				}
+			};
+		} else {
+			if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
+				if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
 					return;
-				final Color c = colorChooser.getColor();
-				final float[] newColor = c.getComponents(null);
-				final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
-				final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
-				if (selectedPart instanceof Wall) {
-					final JPanel panel = new JPanel();
-					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
-					final JRadioButton rb2 = new JRadioButton("All Walls of this Building");
-					panel.add(rb1);
-					panel.add(rb2);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+				noTextureMenuItem.setSelected(true);
+				Scene.getInstance().setTextureMode(TextureMode.None);
+			}
+			final ReadOnlyColorRGBA color = selectedPart.getColor();
+			if (color != null)
+				colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+			actionListener = new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null)
 						return;
-					if (rb1.isSelected()) { // apply to only this part
+					final Color c = colorChooser.getColor();
+					final float[] newColor = c.getComponents(null);
+					final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
+					final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
+					if (selectedPart instanceof Wall) {
+						final JPanel panel = new JPanel();
+						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+						final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
+						final JRadioButton rb2 = new JRadioButton("All Walls of this Building");
+						panel.add(rb1);
+						panel.add(rb2);
+						final ButtonGroup bg = new ButtonGroup();
+						bg.add(rb1);
+						bg.add(rb2);
+						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+							return;
+						if (rb1.isSelected()) { // apply to only this part
+							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+							selectedPart.setColor(color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						} else {
+							final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
+							Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						}
+						Scene.getInstance().setWallColor(color); // remember the color decision for the next wall
+					} else {
 						final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 						selectedPart.setColor(color);
 						SceneManager.getInstance().getUndoManager().addEdit(cmd);
-					} else {
-						final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
-						Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
-						SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						if (selectedPart instanceof Roof) { // remember the color decision for the next part
+							Scene.getInstance().setRoofColor(color);
+						} else if (selectedPart instanceof Door) {
+							Scene.getInstance().setDoorColor(color);
+						} else if (selectedPart instanceof Floor) {
+							Scene.getInstance().setFloorColor(color);
+						} else if (selectedPart instanceof Foundation) {
+							Scene.getInstance().setFoundationColor(color);
+						}
 					}
-					Scene.getInstance().setWallColor(color); // remember the color decision for the next wall
-				} else {
-					final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-					selectedPart.setColor(color);
-					SceneManager.getInstance().getUndoManager().addEdit(cmd);
-					if (selectedPart instanceof Roof) { // remember the color decision for the next part
-						Scene.getInstance().setRoofColor(color);
-					} else if (selectedPart instanceof Door) {
-						Scene.getInstance().setDoorColor(color);
-					} else if (selectedPart instanceof Floor) {
-						Scene.getInstance().setFloorColor(color);
-					} else if (selectedPart instanceof Foundation) {
-						Scene.getInstance().setFoundationColor(color);
-					}
+					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
+					if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
+						PrintController.getInstance().restartAnimation();
+					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					Scene.getInstance().setEdited(true);
 				}
-				Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
-				if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
-					PrintController.getInstance().restartAnimation();
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-				Scene.getInstance().setEdited(true);
-			}
-		};
+			};
+		}
 		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
 	}
 

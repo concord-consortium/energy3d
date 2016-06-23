@@ -735,12 +735,17 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) selectedPart;
 				if (sp.isDrawable()) {
-					partProperty1Label.setText("  Size:");
-					partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFeet) + " m");
-					partProperty2Label.setText("  Position & Tilt:");
-					partProperty2TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m, \u03b8 = " + oneDecimal.format(sp.getTiltAngle()) + "\u00B0");
-					partProperty1TextField.setToolTipText("The length and width of the solar panel");
-					partProperty2TextField.setToolTipText("The (x, y, z) coordinates of the center of the solar panel");
+					Foundation f = (Foundation) sp.getTopContainer();
+					partProperty1Label.setText("  Size & Position:");
+					partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFeet) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+					partProperty2Label.setText("  Angles:");
+					double a = sp.getRelativeAzimuth() + f.getAzimuth();
+					if (a >= 360)
+						a -= 360;
+					boolean flat = (sp.getContainer() instanceof Roof && Util.isZero(sp.getContainer().getHeight())) || (sp.getContainer() instanceof Foundation);
+					partProperty2TextField.setText(flat ? "zenith: " + oneDecimal.format(sp.getZenith()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0" : " --- ");
+					partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
+					partProperty2TextField.setToolTipText("The angles of the solar panel");
 					String id = "Solar Panel (" + sp.getId() + ")";
 					String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
 					if (energyViewShown) {
@@ -750,7 +755,7 @@ public class EnergyPanel extends JPanel {
 						partProperty3TextField.setToolTipText("The total yield of the solar panel of the day");
 					} else {
 						partPanelBorder.setTitle(id);
-						partProperty3Label.setText("  \u03B7:");
+						partProperty3Label.setText("  Efficiency:");
 						partProperty3TextField.setText(eff);
 						partProperty3TextField.setToolTipText("The solar cell efficiency of the solar panel");
 					}

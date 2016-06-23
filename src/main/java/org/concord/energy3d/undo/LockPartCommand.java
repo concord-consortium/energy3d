@@ -27,13 +27,15 @@ public class LockPartCommand extends AbstractUndoableEdit {
 		part.setFreeze(oldValue);
 		if (part instanceof Foundation) {
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p.getTopContainer() == part)
+				if (p.getTopContainer() == part) {
 					p.setFreeze(oldValue);
+					p.draw();
+				}
 			}
 		}
 		if (oldValue)
 			SceneManager.getInstance().hideAllEditPoints();
-		Scene.getInstance().redrawAll();
+		part.draw();
 	}
 
 	@Override
@@ -42,13 +44,15 @@ public class LockPartCommand extends AbstractUndoableEdit {
 		part.setFreeze(newValue);
 		if (part instanceof Foundation) {
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p.getTopContainer() == part)
+				if (p.getTopContainer() == part) {
 					p.setFreeze(newValue);
+					p.draw();
+				}
 			}
 		}
 		if (newValue)
 			SceneManager.getInstance().hideAllEditPoints();
-		Scene.getInstance().redrawAll();
+		part.draw();
 	}
 
 	@Override

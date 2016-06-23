@@ -687,4 +687,18 @@ public class Util {
 		return Arrays.hashCode(new double[] { 5 + Math.signum(p.getX()), 5 + Math.signum(p.getY()), p.getX(), p.getY(), p.getZ(), direction.getX(), direction.getY(), direction.getZ() });
 	}
 
+	public static void addPointToQuad(final ReadOnlyVector3 normal, final ReadOnlyVector3 v1, final ReadOnlyVector3 v2, final Vector3 dir, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
+		final ReadOnlyVector3 p1 = new Vector3(v1).addLocal(dir);
+		final ReadOnlyVector3 p3 = new Vector3(v2).addLocal(dir);
+		dir.negateLocal();
+		final ReadOnlyVector3 p2 = new Vector3(v1).addLocal(dir);
+		final ReadOnlyVector3 p4 = new Vector3(v2).addLocal(dir);
+		vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
+		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+		for (int i = 0; i < 4; i++)
+			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+	}
+
 }

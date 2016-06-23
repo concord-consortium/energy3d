@@ -86,6 +86,7 @@ public class Scene implements Serializable {
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
+	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1, 0, 0.5f);
 	private ReadOnlyColorRGBA foundationColor;
 	private ReadOnlyColorRGBA wallColor;
 	private ReadOnlyColorRGBA doorColor;
@@ -291,6 +292,9 @@ public class Scene implements Serializable {
 		});
 		instance.setEdited(false);
 		instance.setCopyBuffer(null);
+
+		SceneManager.getInstance().getLand().setDefaultColor(instance.landColor != null ? instance.landColor : new ColorRGBA(0, 1, 0, 0.5f));
+
 	}
 
 	public static void initEnergy() {
@@ -1274,6 +1278,15 @@ public class Scene implements Serializable {
 				((Roof) part).removeAllGables();
 	}
 
+	public ReadOnlyColorRGBA getLandColor() {
+		return landColor;
+	}
+
+	public void setLandColor(final ReadOnlyColorRGBA c) {
+		landColor = c;
+		SceneManager.getInstance().getLand().setDefaultColor(landColor);
+	}
+
 	/** get the default color for foundations */
 	public ReadOnlyColorRGBA getFoundationColor() {
 		if (foundationColor == null)
@@ -1464,20 +1477,40 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setTiltAngleForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
+	public void setZenithAngleForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-				((SolarPanel) p).setTiltAngle(angle);
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setZenith(angle);
+				p.draw();
+			}
 		}
-		redrawAll();
 	}
 
-	public void setTiltAngleForAllSolarPanels(final double angle) {
+	public void setZenithAngleForAllSolarPanels(final double angle) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel)
-				((SolarPanel) p).setTiltAngle(angle);
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setZenith(angle);
+				p.draw();
+			}
 		}
-		redrawAll();
+	}
+
+	public void setAzimuthForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+	}
+
+	public void setAzimuthForAllSolarPanels(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
 	}
 
 	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {

@@ -57,7 +57,8 @@ public class Window extends HousePart implements Thermalizable {
 	private ReadOnlyColorRGBA glassColor;
 	private transient Mesh leftShutter;
 	private transient Mesh rightShutter;
-	private transient Mesh shutterOutline;
+	private transient Mesh leftShutterOutline;
+	private transient Mesh rightShutterOutline;
 	private boolean hasLeftShutter;
 	private boolean hasRightShutter;
 	private double shutterLength = 0.5;
@@ -138,11 +139,17 @@ public class Window extends HousePart implements Thermalizable {
 		rightShutter.setModelBound(new BoundingBox());
 		root.attachChild(rightShutter);
 
-		shutterOutline = new Line("Left Shutter (Outline)");
-		shutterOutline.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
-		shutterOutline.setDefaultColor(ColorRGBA.BLACK);
-		shutterOutline.setModelBound(new BoundingBox());
-		root.attachChild(shutterOutline);
+		leftShutterOutline = new Line("Left Shutter (Outline)");
+		leftShutterOutline.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
+		leftShutterOutline.setDefaultColor(ColorRGBA.BLACK);
+		leftShutterOutline.setModelBound(new BoundingBox());
+		root.attachChild(leftShutterOutline);
+
+		rightShutterOutline = new Line("Right Shutter (Outline)");
+		rightShutterOutline.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
+		rightShutterOutline.setDefaultColor(ColorRGBA.BLACK);
+		rightShutterOutline.setModelBound(new BoundingBox());
+		root.attachChild(rightShutterOutline);
 
 	}
 
@@ -316,30 +323,27 @@ public class Window extends HousePart implements Thermalizable {
 			bars.updateModelBound();
 		}
 
-		if (hasLeftShutter || hasRightShutter) {
-			shutterOutline.getMeshData().getVertexBuffer().rewind();
-			shutterOutline.getSceneHints().setCullHint(CullHint.Inherit);
-		} else {
-			shutterOutline.getSceneHints().setCullHint(CullHint.Always);
-		}
-
 		if (hasLeftShutter) {
 			leftShutter.getSceneHints().setCullHint(CullHint.Inherit);
-			drawShutter(leftShutter);
+			leftShutterOutline.getSceneHints().setCullHint(CullHint.Inherit);
+			drawShutter(leftShutter, leftShutterOutline);
 		} else {
 			leftShutter.getSceneHints().setCullHint(CullHint.Always);
+			leftShutterOutline.getSceneHints().setCullHint(CullHint.Always);
 		}
 
 		if (hasRightShutter) {
 			rightShutter.getSceneHints().setCullHint(CullHint.Inherit);
-			drawShutter(rightShutter);
+			rightShutterOutline.getSceneHints().setCullHint(CullHint.Inherit);
+			drawShutter(rightShutter, rightShutterOutline);
 		} else {
 			rightShutter.getSceneHints().setCullHint(CullHint.Always);
+			rightShutterOutline.getSceneHints().setCullHint(CullHint.Always);
 		}
 
 	}
 
-	private void drawShutter(final Mesh shutter) {
+	private void drawShutter(final Mesh shutter, final Mesh shutterOutline) {
 		if (!(container instanceof Wall))
 			return;
 		shutter.setDefaultColor(shutterColor);
@@ -348,8 +352,10 @@ public class Window extends HousePart implements Thermalizable {
 		final FloatBuffer outlineBuffer = shutterOutline.getMeshData().getVertexBuffer();
 		shutterVertexBuffer.rewind();
 		shutterNormalBuffer.rewind();
+		outlineBuffer.rewind();
 		shutterVertexBuffer.limit(shutterVertexBuffer.capacity());
 		shutterNormalBuffer.limit(shutterNormalBuffer.capacity());
+		outlineBuffer.limit(outlineBuffer.capacity());
 		final Vector3 out = new Vector3(normal).multiplyLocal(0.01);
 		final boolean isLeft = shutter == leftShutter;
 		final Vector3 v0 = (isLeft ? getAbsPoint(0) : getAbsPoint(2)).addLocal(out);

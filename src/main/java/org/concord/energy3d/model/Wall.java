@@ -489,20 +489,6 @@ public class Wall extends HousePart implements Thermalizable {
 		root.updateWorldBound(true);
 	}
 
-	private void addPointToQuad(final ReadOnlyVector3 v1, final ReadOnlyVector3 v2, final Vector3 dir, final FloatBuffer vertexBuffer, final FloatBuffer normalBuffer) {
-		final ReadOnlyVector3 p1 = new Vector3(v1).addLocal(dir);
-		final ReadOnlyVector3 p3 = new Vector3(v2).addLocal(dir);
-		dir.negateLocal();
-		final ReadOnlyVector3 p2 = new Vector3(v1).addLocal(dir);
-		final ReadOnlyVector3 p4 = new Vector3(v2).addLocal(dir);
-		vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
-		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
-		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-		for (int i = 0; i < 4; i++)
-			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
-	}
-
 	private void drawVerticalEdges() {
 		columns.setDefaultColor(getColor());
 		final FloatBuffer vertexBuffer = columns.getMeshData().getVertexBuffer();
@@ -516,8 +502,8 @@ public class Wall extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 
 		final Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
-		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
-		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+		Util.addPointToQuad(normal, o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
+		Util.addPointToQuad(normal, getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
@@ -594,13 +580,13 @@ public class Wall extends HousePart implements Thermalizable {
 		// Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(columnRadius);
 		// addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 		final Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
-		addPointToQuad(o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
-		addPointToQuad(getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+		Util.addPointToQuad(normal, o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
+		Util.addPointToQuad(normal, getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 
 		final Vector3 p = new Vector3();
 		for (int col = 1; col < cols; col++) {
 			u.multiply((double) col / cols, p).addLocal(o);
-			addPointToQuad(p, p.add(v, null), dir, vertexBuffer, normalBuffer);
+			Util.addPointToQuad(normal, p, p.add(v, null), dir, vertexBuffer, normalBuffer);
 		}
 
 		vertexBuffer.limit(vertexBuffer.position());
@@ -634,8 +620,8 @@ public class Wall extends HousePart implements Thermalizable {
 		if (fence) {
 
 			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railRadius * 2);
-			addPointToQuad(getAbsPoint(1).multiplyLocal(1, 1, 0.7), getAbsPoint(3).multiplyLocal(1, 1, 0.7), dir, vertexBuffer, normalBuffer);
-			addPointToQuad(getAbsPoint(1).multiplyLocal(1, 1, 0.3), getAbsPoint(3).multiplyLocal(1, 1, 0.3), dir, vertexBuffer, normalBuffer);
+			Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, 0.7), getAbsPoint(3).multiplyLocal(1, 1, 0.7), dir, vertexBuffer, normalBuffer);
+			Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, 0.3), getAbsPoint(3).multiplyLocal(1, 1, 0.3), dir, vertexBuffer, normalBuffer);
 			dir = new Vector3(u).normalizeLocal().multiplyLocal(railRadius);
 			Vector3 dir5 = new Vector3(u).normalizeLocal().multiplyLocal(railRadius * 3);
 
@@ -643,7 +629,7 @@ public class Wall extends HousePart implements Thermalizable {
 			final Vector3 p = new Vector3();
 			for (int col = 0; col <= cols; col++) {
 				u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), o.getZ());
-				addPointToQuad(p, p.add(v, null), col % 10 == 0 ? dir5 : dir, vertexBuffer, normalBuffer);
+				Util.addPointToQuad(normal, p, p.add(v, null), col % 10 == 0 ? dir5 : dir, vertexBuffer, normalBuffer);
 			}
 
 		} else {
@@ -664,31 +650,31 @@ public class Wall extends HousePart implements Thermalizable {
 				final double heightRatio = 0.33;
 				v.multiplyLocal(heightRatio);
 				Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railRadius * 3);
-				addPointToQuad(getAbsPoint(1).multiplyLocal(1, 1, heightRatio), getAbsPoint(3).multiplyLocal(1, 1, heightRatio), dir, vertexBuffer, normalBuffer);
+				Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, heightRatio), getAbsPoint(3).multiplyLocal(1, 1, heightRatio), dir, vertexBuffer, normalBuffer);
 				dir = new Vector3(u).normalizeLocal().multiplyLocal(railRadius);
 
 				final Vector3 p = new Vector3();
 				for (int col = 0; col <= cols; col++) {
 					u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), 0);
-					addPointToQuad(p, p.add(v, null), dir, vertexBuffer, normalBuffer);
+					Util.addPointToQuad(normal, p, p.add(v, null), dir, vertexBuffer, normalBuffer);
 				}
 
 			} else {
 
 				final double z0 = floor.getAbsPoint(0).getZ();
 				Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railRadius * 3);
-				addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
+				Util.addPointToQuad(normal, getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
 				dir = new Vector3(u).normalizeLocal().multiplyLocal(railRadius);
 				Vector3 q = getAbsPoint(1);
-				addPointToQuad(q, new Vector3(q.getX(), q.getY(), z0), dir, vertexBuffer, normalBuffer);
+				Util.addPointToQuad(normal, q, new Vector3(q.getX(), q.getY(), z0), dir, vertexBuffer, normalBuffer);
 				q = getAbsPoint(3);
-				addPointToQuad(q, new Vector3(q.getX(), q.getY(), z0), dir, vertexBuffer, normalBuffer);
+				Util.addPointToQuad(normal, q, new Vector3(q.getX(), q.getY(), z0), dir, vertexBuffer, normalBuffer);
 
 				q = new Vector3(0, 0, q.getZ() - z0);
 				final Vector3 p = new Vector3();
 				for (int col = 1; col < cols; col++) {
 					u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), z0);
-					addPointToQuad(p, p.add(q, null), dir, vertexBuffer, normalBuffer);
+					Util.addPointToQuad(normal, p, p.add(q, null), dir, vertexBuffer, normalBuffer);
 				}
 
 			}
