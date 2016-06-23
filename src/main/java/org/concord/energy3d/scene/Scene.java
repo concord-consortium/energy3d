@@ -69,6 +69,9 @@ public class Scene implements Serializable {
 	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
 	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.LIGHT_GRAY;
 
+	public static final int BLUE_SKY_GREEN_LAND = 0;
+	public static final int DESERT = 1;
+
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
 	private static final Node originalHouseRoot = new Node("Original House Root");
@@ -118,6 +121,7 @@ public class Scene implements Serializable {
 	private boolean dashedlineOnRoofs = true;
 	private boolean onlySolarAnalysis;
 	private UtilityBill utilityBill;
+	private int theme;
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -293,6 +297,7 @@ public class Scene implements Serializable {
 		instance.setEdited(false);
 		instance.setCopyBuffer(null);
 
+		instance.setTheme(instance.theme);
 		SceneManager.getInstance().getLand().setDefaultColor(instance.landColor != null ? instance.landColor : new ColorRGBA(0, 1, 0, 0.5f));
 
 	}
@@ -1695,6 +1700,24 @@ public class Scene implements Serializable {
 
 	public UtilityBill getUtilityBill() {
 		return utilityBill;
+	}
+
+	public void setTheme(int theme) {
+		this.theme = theme;
+		ReadOnlyColorRGBA c;
+		switch (theme) {
+		case DESERT:
+			c = new ColorRGBA(1, 1, 1, 0.5f);
+			break;
+		default:
+			c = new ColorRGBA(0, 1, 0, 0.5f);
+		}
+		setLandColor(c);
+		SceneManager.getInstance().changeSkyTexture();
+	}
+
+	public int getTheme() {
+		return theme;
 	}
 
 }

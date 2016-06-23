@@ -218,7 +218,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean showBuildingLabels = false;
 	private boolean showHeatFlux = false;
 	private final Mesh sky;
-	private TextureState daySkyState, nightSkyState;
+	private TextureState daySkyState, nightSkyState, desertState;
 	private boolean cameraChanged;
 	private boolean fineGrid;
 
@@ -585,6 +585,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		daySkyState.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		nightSkyState = new TextureState();
 		nightSkyState.setTexture(TextureManager.load("nightsky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		desertState = new TextureState();
+		desertState.setTexture(TextureManager.load("desert.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		final Dome sky = new Dome("Sky", 100, 100, SKY_RADIUS);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
 		sky.setRenderState(daySkyState);
@@ -594,8 +596,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void changeSkyTexture() {
-		if (sky != null)
-			sky.setRenderState(Heliodon.getInstance().isNightTime() ? nightSkyState : daySkyState);
+		if (sky != null) {
+			TextureState ts;
+			switch (Scene.getInstance().getTheme()) {
+			case Scene.DESERT:
+				ts = desertState;
+				break;
+			default:
+				ts = daySkyState;
+			}
+			sky.setRenderState(Heliodon.getInstance().isNightTime() ? nightSkyState : ts);
+		}
 	}
 
 	private Spatial createAxes() {

@@ -194,6 +194,10 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem simpleTextureMenuItem;
 	private JRadioButtonMenuItem fullTextureMenuItem;
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
+	private JMenu themeMenu;
+	private JRadioButtonMenuItem blueSkyGreenLandMenuItem;
+	private JRadioButtonMenuItem desertMenuItem;
+	private final ButtonGroup themeButtonGroup = new ButtonGroup();
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem exportImageMenuItem;
 	private JMenuItem copyImageMenuItem;
@@ -1222,6 +1226,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getTextureMenu());
+			viewMenu.add(getThemeMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(getSolarAbsorptionHeatMapMenuItem());
@@ -1269,6 +1274,35 @@ public class MainFrame extends JFrame {
 
 		}
 		return textureMenu;
+
+	}
+
+	public JMenu getThemeMenu() {
+
+		if (themeMenu == null) {
+			themeMenu = new JMenu("Theme");
+			themeMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					Util.selectSilently(blueSkyGreenLandMenuItem, Scene.getInstance().getTheme() == Scene.BLUE_SKY_GREEN_LAND);
+					Util.selectSilently(desertMenuItem, Scene.getInstance().getTheme() == Scene.DESERT);
+				}
+			});
+
+			themeMenu.add(getBlueSkyGreenLandMenuItem());
+			themeMenu.add(getDesertMenuItem());
+
+		}
+		return themeMenu;
 
 	}
 
@@ -2302,6 +2336,40 @@ public class MainFrame extends JFrame {
 			textureButtonGroup.add(fullTextureMenuItem);
 		}
 		return fullTextureMenuItem;
+	}
+
+	public JRadioButtonMenuItem getBlueSkyGreenLandMenuItem() {
+		if (blueSkyGreenLandMenuItem == null) {
+			blueSkyGreenLandMenuItem = new JRadioButtonMenuItem("Blue Sky Green Land");
+			blueSkyGreenLandMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					// final ChangeTextureCommand c = new ChangeTextureCommand();
+					Scene.getInstance().setTheme(Scene.BLUE_SKY_GREEN_LAND);
+					Scene.getInstance().setEdited(true);
+					// SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(blueSkyGreenLandMenuItem);
+		}
+		return blueSkyGreenLandMenuItem;
+	}
+
+	public JRadioButtonMenuItem getDesertMenuItem() {
+		if (desertMenuItem == null) {
+			desertMenuItem = new JRadioButtonMenuItem("Desert");
+			desertMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					// final ChangeTextureCommand c = new ChangeTextureCommand();
+					Scene.getInstance().setTheme(Scene.DESERT);
+					Scene.getInstance().setEdited(true);
+					// SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(desertMenuItem);
+		}
+		return desertMenuItem;
 	}
 
 	void showColorDialogForParts() {
