@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -73,12 +75,12 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public Foundation() {
-		super(2, 8, 1);
+		super(2, 12, 1);
 		root.getSceneHints().setCullHint(CullHint.Always);
 	}
 
 	public Foundation(final double xLength, final double yLength) {
-		super(2, 8, 1, true);
+		super(2, 12, 1, true);
 		points.get(0).set(-xLength / 2.0, -yLength / 2.0, 0);
 		points.get(2).set(xLength / 2.0, -yLength / 2.0, 0);
 		points.get(1).set(-xLength / 2.0, yLength / 2.0, 0);
@@ -154,6 +156,12 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		updateTextureAndColor();
 
+		if (points.size() == 8)
+			for (int i = 0; i < 4; i++)
+				points.add(new Vector3());
+
+		for (int i = 8; i < points.size(); i++)
+			getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
 	}
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
@@ -173,7 +181,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	@Override
 	public void setEditPointsVisible(final boolean visible) {
 		for (int i = 0; i < points.size(); i++) {
-			final boolean visible_i = visible && (resizeHouseMode || i < 4);
+			final boolean visible_i = visible && (resizeHouseMode || i < 4 || i > 7);
 			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
 			sceneHints.setCullHint(visible_i ? CullHint.Inherit : CullHint.Always);
 			sceneHints.setAllPickingHints(visible_i);
@@ -292,7 +300,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						points.get(3).set(Util.projectPointOnLine(p, points.get(1), points.get(3), false));
 					}
 				}
-			} else {
+			} else if (index < 8) {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
 				final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
@@ -305,6 +313,8 @@ public class Foundation extends HousePart implements Thermalizable {
 					applyNewHeight(boundingHeight, newBoundingHeight, false);
 				}
 			}
+			// else
+			// move(p, )
 			syncUpperPoints();
 		}
 
@@ -545,13 +555,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	protected void drawMesh() {
 		if (boundingHeight == 0)
 			scanChildrenHeight();
-		final boolean drawable = points.size() == 8;
+		final boolean drawable = points.size() == 12;
 		if (drawable) {
 			drawTopMesh();
 			drawSurroundMesh();
 			drawOutline(boundingMesh, points.get(7).getZf());
 			drawOutline(outlineMesh, (float) height);
 			updateSolarLabelPosition();
+			updateHandles();
 		}
 	}
 
@@ -777,9 +788,13 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	@Override
 	public void setEditPoint(int editPoint) {
-		if (!resizeHouseMode && editPoint > 3)
+		if (!resizeHouseMode && editPoint > 3 && editPoint < 8)
 			editPoint -= 4;
-		super.setEditPoint(editPoint);
+		// super.setEditPoint(editPoint);
+		editPointIndex = editPoint;
+		if (editPoint < 8)
+			drawCompleted = false;
+
 		if (!resizeHouseMode) {
 			saveOrgPoints();
 			minX = Double.MAX_VALUE;
@@ -1161,6 +1176,46 @@ public class Foundation extends HousePart implements Thermalizable {
 				count++;
 		}
 		return count;
+	}
+
+	public void updateHandles() {
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 u = getAbsPoint(2).subtractLocal(p0).multiplyLocal(0.5);
+		final Vector3 v = getAbsPoint(1).subtractLocal(p0).multiplyLocal(0.5);
+		updateHandle(points.get(8), u);
+		updateHandle(points.get(9), u.negateLocal());
+		updateHandle(points.get(10), v);
+		updateHandle(points.get(11), v.negateLocal());
+	}
+
+	private void updateHandle(final Vector3 p, final ReadOnlyVector3 dir) {
+		final ReadOnlyVector3 step = dir.normalize(null).multiplyLocal(3);
+		final ReadOnlyVector3 center = getCenter();
+
+		p.set(center).addLocal(dir).addLocal(step);
+
+		final Point2D p2D = new Point2D.Double();
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part != this && part instanceof Foundation) {
+				final ArrayList<Vector3> points = part.getPoints();
+				final Path2D foundationPoly = new Path2D.Double();
+				foundationPoly.moveTo(points.get(0).getX(), points.get(0).getY());
+				foundationPoly.lineTo(points.get(2).getX(), points.get(2).getY());
+				foundationPoly.lineTo(points.get(3).getX(), points.get(3).getY());
+				foundationPoly.lineTo(points.get(1).getX(), points.get(1).getY());
+				foundationPoly.closePath();
+
+				p2D.setLocation(p.getX(), p.getY());
+				while (foundationPoly.contains(p2D)) {
+					while (foundationPoly.contains(p2D)) {
+						p.addLocal(step);
+						p2D.setLocation(p.getX(), p.getY());
+					}
+					p.addLocal(step);
+					p2D.setLocation(p.getX(), p.getY());
+				}
+			}
+		}
 	}
 
 }
