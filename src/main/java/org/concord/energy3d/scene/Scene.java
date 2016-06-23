@@ -86,6 +86,7 @@ public class Scene implements Serializable {
 	private TextureMode textureMode = TextureMode.Full;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
+	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1, 0, 0.5f);
 	private ReadOnlyColorRGBA foundationColor;
 	private ReadOnlyColorRGBA wallColor;
 	private ReadOnlyColorRGBA doorColor;
@@ -291,6 +292,9 @@ public class Scene implements Serializable {
 		});
 		instance.setEdited(false);
 		instance.setCopyBuffer(null);
+
+		SceneManager.getInstance().getLand().setDefaultColor(instance.landColor != null ? instance.landColor : new ColorRGBA(0, 1, 0, 0.5f));
+
 	}
 
 	public static void initEnergy() {
@@ -1272,6 +1276,15 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts)
 			if (part instanceof Roof)
 				((Roof) part).removeAllGables();
+	}
+
+	public ReadOnlyColorRGBA getLandColor() {
+		return landColor;
+	}
+
+	public void setLandColor(final ReadOnlyColorRGBA c) {
+		landColor = c;
+		SceneManager.getInstance().getLand().setDefaultColor(landColor);
 	}
 
 	/** get the default color for foundations */

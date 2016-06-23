@@ -205,9 +205,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean zoomLock = false;
 
 	public static final double SKY_RADIUS = 1000;
-	public final static byte DEFAULT_THEME = 0;
-	public final static byte SKETCHUP_THEME = 1;
-	private final byte theme = DEFAULT_THEME;
 
 	private Sphere kinectPointer;
 	private MouseState lastSelectedEditPointMouseState;
@@ -521,22 +518,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createLand() {
-		switch (theme) {
-		case DEFAULT_THEME:
-			land.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
-			break;
-		case SKETCHUP_THEME:
-			land.setDefaultColor(new ColorRGBA(1, 1, 1, 0.9f));
-			break;
-		}
-
+		land.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
 		land.setRenderState(HousePart.offsetState);
-
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		land.setRenderState(blendState);
 		land.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
-
 		final MaterialState ms = new MaterialState();
 		ms.setColorMaterial(ColorMaterial.Diffuse);
 		land.setRenderState(ms);
