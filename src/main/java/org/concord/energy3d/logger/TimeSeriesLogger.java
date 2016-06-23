@@ -55,6 +55,7 @@ import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
+import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
@@ -362,6 +363,9 @@ public class TimeSeriesLogger {
 					s += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
 					s += ", \"New Color\": \"" + Util.toString(p.getColor()) + "\"}";
 					stateValue = s;
+				} else if (lastEdit instanceof ChangeLandColorCommand) {
+					ChangeLandColorCommand c = (ChangeLandColorCommand) lastEdit;
+					stateValue = "{\"Old Color\": \"" + Util.toString(c.getOldColor()) + "\", \"New Color\": \"" + Util.toString(Scene.getInstance().getLandColor()) + "\"}";
 				}
 
 				// u-values and thermal masses

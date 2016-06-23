@@ -388,11 +388,11 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miRemoveAllTrees);
 			popupMenuForLand.add(miRemoveAllHumans);
 			popupMenuForLand.add(miRemoveAllBuildings);
-			popupMenuForLand.add(colorAction);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miImport);
 			popupMenuForLand.add(miImportPrefabMenu);
 			popupMenuForLand.addSeparator();
+			popupMenuForLand.add(colorAction);
 			popupMenuForLand.add(miAlbedo);
 			popupMenuForLand.add(miThermalDiffusivity);
 

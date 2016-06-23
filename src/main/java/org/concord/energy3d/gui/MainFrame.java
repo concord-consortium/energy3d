@@ -97,6 +97,7 @@ import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
@@ -2313,10 +2314,12 @@ public class MainFrame extends JFrame {
 			actionListener = new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					final ChangeLandColorCommand cmd = new ChangeLandColorCommand();
 					final Color c = colorChooser.getColor();
 					final float[] newColor = c.getComponents(null);
 					Scene.getInstance().setLandColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], 0.5f));
 					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(cmd);
 				}
 			};
 		} else {

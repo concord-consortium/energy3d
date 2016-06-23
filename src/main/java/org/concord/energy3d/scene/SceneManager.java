@@ -1542,6 +1542,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							EnergyPanel.getInstance().update();
 						}
 						EnergyPanel.getInstance().updateGraphs();
+						EnergyPanel.getInstance().updateProperties();
 						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
 						PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 					}
