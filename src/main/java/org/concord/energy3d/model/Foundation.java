@@ -322,6 +322,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawChildren();
 		draw();
 		setEditPointsVisible(true);
+		updateHandlesOfAllFoudations();
 	}
 
 	@Override
@@ -894,6 +895,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawAzimuthArrow();
 		draw();
 		drawChildren();
+		updateHandlesOfAllFoudations();
 	}
 
 	public void move(final Vector3 v, final double steplength) {
@@ -1177,6 +1179,12 @@ public class Foundation extends HousePart implements Thermalizable {
 				count++;
 		}
 		return count;
+	}
+
+	public void updateHandlesOfAllFoudations() {
+		for (final HousePart part : Scene.getInstance().getParts())
+			if (part instanceof Foundation)
+				((Foundation) part).updateHandles();
 	}
 
 	public void updateHandles() {
