@@ -218,7 +218,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean showBuildingLabels = false;
 	private boolean showHeatFlux = false;
 	private final Mesh sky;
-	private TextureState daySkyState, nightSkyState, desertState;
+	private TextureState daySky, nightSky, desertView, grasslandView, forestView;
 	private boolean cameraChanged;
 	private boolean fineGrid;
 
@@ -581,15 +581,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
-		daySkyState = new TextureState();
-		daySkyState.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		nightSkyState = new TextureState();
-		nightSkyState.setTexture(TextureManager.load("nightsky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		desertState = new TextureState();
-		desertState.setTexture(TextureManager.load("desert.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		daySky = new TextureState();
+		daySky.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		nightSky = new TextureState();
+		nightSky.setTexture(TextureManager.load("nightsky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		desertView = new TextureState();
+		desertView.setTexture(TextureManager.load("desert.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		grasslandView = new TextureState();
+		grasslandView.setTexture(TextureManager.load("grassland.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		forestView = new TextureState();
+		forestView.setTexture(TextureManager.load("forest.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		final Dome sky = new Dome("Sky", 100, 100, SKY_RADIUS);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		sky.setRenderState(daySkyState);
+		sky.setRenderState(daySky);
 		sky.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		sky.getSceneHints().setAllPickingHints(false);
 		return sky;
@@ -600,12 +604,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			TextureState ts;
 			switch (Scene.getInstance().getTheme()) {
 			case Scene.DESERT:
-				ts = desertState;
+				ts = desertView;
+				break;
+			case Scene.GRASSLAND:
+				ts = grasslandView;
+				break;
+			case Scene.FOREST:
+				ts = forestView;
 				break;
 			default:
-				ts = daySkyState;
+				ts = daySky;
 			}
-			sky.setRenderState(Heliodon.getInstance().isNightTime() ? nightSkyState : ts);
+			sky.setRenderState(Heliodon.getInstance().isNightTime() ? nightSky : ts);
 		}
 	}
 
