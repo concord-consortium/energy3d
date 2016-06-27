@@ -43,6 +43,7 @@ import org.concord.energy3d.model.GambrelRoof;
 import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Roof;
@@ -154,7 +155,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_MIRROR, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
 	}
 
 	public enum CameraMode {
@@ -1182,6 +1183,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn.setColor(Scene.getInstance().getFloorColor());
 		} else if (operation == Operation.DRAW_SOLAR_PANEL) {
 			drawn = new SolarPanel(false);
+		} else if (operation == Operation.DRAW_MIRROR) {
+			drawn = new Mirror(false);
 		} else if (operation == Operation.DRAW_SENSOR) {
 			drawn = new Sensor();
 		} else if (operation == Operation.DRAW_FOUNDATION) {
