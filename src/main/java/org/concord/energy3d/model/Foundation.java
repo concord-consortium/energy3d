@@ -1188,6 +1188,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void updateHandles() {
+		if (points.size() < 8)
+			return;
 		final Vector3 p0 = getAbsPoint(0);
 		final Vector3 u = getAbsPoint(2).subtractLocal(p0).multiplyLocal(0.5);
 		final Vector3 v = getAbsPoint(1).subtractLocal(p0).multiplyLocal(0.5);
