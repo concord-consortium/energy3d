@@ -100,6 +100,7 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
+import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
@@ -195,8 +196,10 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem fullTextureMenuItem;
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
 	private JMenu themeMenu;
-	private JRadioButtonMenuItem blueSkyGreenLandMenuItem;
+	private JRadioButtonMenuItem cloudySkyMenuItem;
 	private JRadioButtonMenuItem desertMenuItem;
+	private JRadioButtonMenuItem grasslandMenuItem;
+	private JRadioButtonMenuItem forestMenuItem;
 	private final ButtonGroup themeButtonGroup = new ButtonGroup();
 	private JMenuItem importColladaMenuItem;
 	private JMenuItem exportImageMenuItem;
@@ -1293,13 +1296,17 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(blueSkyGreenLandMenuItem, Scene.getInstance().getTheme() == Scene.BLUE_SKY_GREEN_LAND);
+					Util.selectSilently(cloudySkyMenuItem, Scene.getInstance().getTheme() == Scene.CLOUDY_SKY);
 					Util.selectSilently(desertMenuItem, Scene.getInstance().getTheme() == Scene.DESERT);
+					Util.selectSilently(grasslandMenuItem, Scene.getInstance().getTheme() == Scene.GRASSLAND);
+					Util.selectSilently(forestMenuItem, Scene.getInstance().getTheme() == Scene.FOREST);
 				}
 			});
 
-			themeMenu.add(getBlueSkyGreenLandMenuItem());
+			themeMenu.add(getCloudySkyMenuItem());
 			themeMenu.add(getDesertMenuItem());
+			themeMenu.add(getGrasslandMenuItem());
+			themeMenu.add(getForestMenuItem());
 
 		}
 		return themeMenu;
@@ -2338,21 +2345,21 @@ public class MainFrame extends JFrame {
 		return fullTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getBlueSkyGreenLandMenuItem() {
-		if (blueSkyGreenLandMenuItem == null) {
-			blueSkyGreenLandMenuItem = new JRadioButtonMenuItem("Blue Sky Green Land");
-			blueSkyGreenLandMenuItem.addActionListener(new ActionListener() {
+	public JRadioButtonMenuItem getCloudySkyMenuItem() {
+		if (cloudySkyMenuItem == null) {
+			cloudySkyMenuItem = new JRadioButtonMenuItem("Cloudy Sky");
+			cloudySkyMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					// final ChangeTextureCommand c = new ChangeTextureCommand();
-					Scene.getInstance().setTheme(Scene.BLUE_SKY_GREEN_LAND);
+					final ChangeThemeCommand c = new ChangeThemeCommand();
+					Scene.getInstance().setTheme(Scene.CLOUDY_SKY);
 					Scene.getInstance().setEdited(true);
-					// SceneManager.getInstance().getUndoManager().addEdit(c);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
-			themeButtonGroup.add(blueSkyGreenLandMenuItem);
+			themeButtonGroup.add(cloudySkyMenuItem);
 		}
-		return blueSkyGreenLandMenuItem;
+		return cloudySkyMenuItem;
 	}
 
 	public JRadioButtonMenuItem getDesertMenuItem() {
@@ -2361,15 +2368,49 @@ public class MainFrame extends JFrame {
 			desertMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					// final ChangeTextureCommand c = new ChangeTextureCommand();
+					final ChangeThemeCommand c = new ChangeThemeCommand();
 					Scene.getInstance().setTheme(Scene.DESERT);
 					Scene.getInstance().setEdited(true);
-					// SceneManager.getInstance().getUndoManager().addEdit(c);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 			themeButtonGroup.add(desertMenuItem);
 		}
 		return desertMenuItem;
+	}
+
+	public JRadioButtonMenuItem getGrasslandMenuItem() {
+		if (grasslandMenuItem == null) {
+			grasslandMenuItem = new JRadioButtonMenuItem("Grassland");
+			grasslandMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ChangeThemeCommand c = new ChangeThemeCommand();
+					Scene.getInstance().setTheme(Scene.GRASSLAND);
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(grasslandMenuItem);
+		}
+		return grasslandMenuItem;
+	}
+
+	public JRadioButtonMenuItem getForestMenuItem() {
+		if (forestMenuItem == null) {
+			forestMenuItem = new JRadioButtonMenuItem("Forest");
+			forestMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ChangeThemeCommand c = new ChangeThemeCommand();
+					Scene.getInstance().setTheme(Scene.FOREST);
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(forestMenuItem);
+		}
+		return forestMenuItem;
 	}
 
 	void showColorDialogForParts() {

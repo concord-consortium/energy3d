@@ -38,6 +38,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
@@ -80,7 +81,7 @@ public class MainPanel extends JPanel {
 	private JSplitPane canvasNoteSplitPane;
 	private JScrollPane noteScrollPane;
 	private JTextArea noteTextArea;
-	private JToggleButton solarPanelButton;
+	private JToggleButton solarButton;
 	private JToggleButton treeButton;
 	private JToggleButton sensorButton;
 	private JToggleButton miscButton;
@@ -88,13 +89,16 @@ public class MainPanel extends JPanel {
 	private JButton treeArrowButton;
 	private JButton roofArrowButton;
 	private JButton miscArrowButton;
+	private JButton solaArrowButton;
 	private int defaultDividerSize = -1;
 	private final JPopupMenu treeMenu;
 	private final JPopupMenu roofMenu;
 	private final JPopupMenu miscMenu;
+	private final JPopupMenu solaMenu;
 	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
+	private Operation solaCommand = SceneManager.Operation.DRAW_SOLAR_PANEL;
 	private final double rotationAngleAbsolute = 5 * Math.PI / 180;
 	private double rotationAngle = -rotationAngleAbsolute;
 	private String noteString = "";
@@ -333,6 +337,35 @@ public class MainPanel extends JPanel {
 		bg.add(miJohn);
 		bg.add(miJose);
 
+		// create solar menu
+		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")), true);
+		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Reflecting Mirror", new ImageIcon(getClass().getResource("icons/mirror.png")), true);
+		final ActionListener solarAction = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
+				solarButton.setIcon(selected.getIcon());
+				if (selected == miSolarPanel) {
+					solaCommand = SceneManager.Operation.DRAW_SOLAR_PANEL;
+					solarButton.setToolTipText("Insert a solar panel");
+				} else if (selected == miMirror) {
+					solaCommand = SceneManager.Operation.DRAW_MIRROR;
+					solarButton.setToolTipText("Insert a reflecting mirror");
+				}
+				SceneManager.getInstance().setOperation(solaCommand);
+				solarButton.setSelected(true);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+			}
+		};
+		miSolarPanel.addActionListener(solarAction);
+		miMirror.addActionListener(solarAction);
+		solaMenu = new JPopupMenu();
+		solaMenu.add(miSolarPanel);
+		solaMenu.add(miMirror);
+		bg = new ButtonGroup();
+		bg.add(miSolarPanel);
+		bg.add(miMirror);
+
 		System.out.println("done");
 	}
 
@@ -361,14 +394,15 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getPlatformButton());
 			appToolbar.add(getWallButton());
 			appToolbar.add(getWindowButton());
-			appToolbar.add(getSolarPanelButton());
-			appToolbar.add(getSensorButton());
 			appToolbar.add(getRoofButton());
 			appToolbar.add(getRoofArrowButton());
 			appToolbar.add(getMiscButton());
 			appToolbar.add(getMiscArrowButton());
 			appToolbar.add(getTreeButton());
 			appToolbar.add(getTreeArrowButton());
+			appToolbar.add(getSolarButton());
+			appToolbar.add(getSolaArrowButton());
+			appToolbar.add(getSensorButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getShadowButton());
 			appToolbar.add(getHeliodonButton());
@@ -382,7 +416,7 @@ public class MainPanel extends JPanel {
 			bg.add(wallButton);
 			bg.add(windowButton);
 			bg.add(roofButton);
-			bg.add(solarPanelButton);
+			bg.add(solarButton);
 			bg.add(sensorButton);
 			bg.add(treeButton);
 			bg.add(miscButton);
@@ -850,22 +884,41 @@ public class MainPanel extends JPanel {
 		}
 	}
 
-	private JToggleButton getSolarPanelButton() {
-		if (solarPanelButton == null) {
-			solarPanelButton = new JToggleButton("");
-			solarPanelButton.setToolTipText("Add solar panel");
-			solarPanelButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
-			solarPanelButton.setFocusable(false);
-			solarPanelButton.addActionListener(new ActionListener() {
+	private JToggleButton getSolarButton() {
+		if (solarButton == null) {
+			solarButton = new JToggleButton("");
+			solarButton.setToolTipText("Add solar panel");
+			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+			solarButton.setFocusable(false);
+			solarButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_SOLAR_PANEL);
+					SceneManager.getInstance().setOperation(solaCommand);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			solarPanelButton.addMouseListener(operationStickAndRefreshUponExit);
+			solarButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
-		return solarPanelButton;
+		return solarButton;
+	}
+
+	private JButton getSolaArrowButton() {
+		if (solaArrowButton == null) {
+			solaArrowButton = new JButton();
+			solaArrowButton.setFocusable(false);
+			final Dimension d = new Dimension(12, solarButton.getMaximumSize().height);
+			solaArrowButton.setMaximumSize(d);
+			solaArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
+			solaArrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					solaMenu.show(solarButton, 0, solarButton.getHeight());
+				}
+			});
+			solaArrowButton.setBorder(BorderFactory.createEmptyBorder());
+			solaArrowButton.setFocusPainted(false);
+		}
+		return solaArrowButton;
 	}
 
 	private JToggleButton getSensorButton() {
@@ -1037,6 +1090,18 @@ public class MainPanel extends JPanel {
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												solarPanel.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
+												EventQueue.invokeLater(new Runnable() {
+													@Override
+													public void run() {
+														EnergyPanel.getInstance().updateProperties();
+													}
+												});
+											} else if (hp instanceof Mirror) {
+												Mirror mirror = (Mirror) hp;
+												//ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(mirror);
+												mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
+												mirror.draw();
+												//SceneManager.getInstance().getUndoManager().addEdit(c);
 												EventQueue.invokeLater(new Runnable() {
 													@Override
 													public void run() {

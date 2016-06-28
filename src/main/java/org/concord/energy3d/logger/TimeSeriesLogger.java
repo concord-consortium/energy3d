@@ -70,6 +70,7 @@ import org.concord.energy3d.undo.ChangeSolarPanelZenithCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
+import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeZenithAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -328,6 +329,8 @@ public class TimeSeriesLogger {
 						stateValue += "\"None\"";
 					}
 					stateValue += "}";
+				} else if (lastEdit instanceof ChangeThemeCommand) {
+					stateValue = "{\"Old Value\": " + ((ChangeThemeCommand) lastEdit).getOldValue() + ", \"New Value\": " + Scene.getInstance().getTheme() + "}";
 				}
 
 				// building properties

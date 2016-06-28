@@ -43,6 +43,7 @@ import org.concord.energy3d.model.GambrelRoof;
 import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
 import org.concord.energy3d.model.Roof;
@@ -154,7 +155,7 @@ import com.ardor3d.util.resource.URLResourceSource;
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_MIRROR, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
 	}
 
 	public enum CameraMode {
@@ -218,7 +219,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean showBuildingLabels = false;
 	private boolean showHeatFlux = false;
 	private final Mesh sky;
-	private TextureState daySkyState, nightSkyState, desertState;
+	private TextureState daySky, nightSky, desertView, grasslandView, forestView;
 	private boolean cameraChanged;
 	private boolean fineGrid;
 
@@ -581,15 +582,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
-		daySkyState = new TextureState();
-		daySkyState.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		nightSkyState = new TextureState();
-		nightSkyState.setTexture(TextureManager.load("nightsky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		desertState = new TextureState();
-		desertState.setTexture(TextureManager.load("desert.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		daySky = new TextureState();
+		daySky.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		nightSky = new TextureState();
+		nightSky.setTexture(TextureManager.load("nightsky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		desertView = new TextureState();
+		desertView.setTexture(TextureManager.load("desert.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		grasslandView = new TextureState();
+		grasslandView.setTexture(TextureManager.load("grassland.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		forestView = new TextureState();
+		forestView.setTexture(TextureManager.load("forest.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		final Dome sky = new Dome("Sky", 100, 100, SKY_RADIUS);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		sky.setRenderState(daySkyState);
+		sky.setRenderState(daySky);
 		sky.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		sky.getSceneHints().setAllPickingHints(false);
 		return sky;
@@ -600,12 +605,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			TextureState ts;
 			switch (Scene.getInstance().getTheme()) {
 			case Scene.DESERT:
-				ts = desertState;
+				ts = desertView;
+				break;
+			case Scene.GRASSLAND:
+				ts = grasslandView;
+				break;
+			case Scene.FOREST:
+				ts = forestView;
 				break;
 			default:
-				ts = daySkyState;
+				ts = daySky;
 			}
-			sky.setRenderState(Heliodon.getInstance().isNightTime() ? nightSkyState : ts);
+			sky.setRenderState(Heliodon.getInstance().isNightTime() ? nightSky : ts);
 		}
 	}
 
@@ -688,7 +699,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
 					final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
 					final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
-					if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || selectedHousePart instanceof Human || p1.distance(p2) > 10) {
+					if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Mirror || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || selectedHousePart instanceof Human || p1.distance(p2) > 10) {
 						firstClickState = null;
 						mouseReleased(inputStates.getCurrent().getMouseState());
 					}
@@ -1172,6 +1183,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn.setColor(Scene.getInstance().getFloorColor());
 		} else if (operation == Operation.DRAW_SOLAR_PANEL) {
 			drawn = new SolarPanel(false);
+		} else if (operation == Operation.DRAW_MIRROR) {
+			drawn = new Mirror(false);
 		} else if (operation == Operation.DRAW_SENSOR) {
 			drawn = new Sensor();
 		} else if (operation == Operation.DRAW_FOUNDATION) {
