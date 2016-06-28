@@ -38,6 +38,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
@@ -1089,6 +1090,18 @@ public class MainPanel extends JPanel {
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												solarPanel.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
+												EventQueue.invokeLater(new Runnable() {
+													@Override
+													public void run() {
+														EnergyPanel.getInstance().updateProperties();
+													}
+												});
+											} else if (hp instanceof Mirror) {
+												Mirror mirror = (Mirror) hp;
+												//ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(mirror);
+												mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
+												mirror.draw();
+												//SceneManager.getInstance().getUndoManager().addEdit(c);
 												EventQueue.invokeLater(new Runnable() {
 													@Override
 													public void run() {

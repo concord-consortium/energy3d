@@ -35,7 +35,6 @@ public class Mirror extends HousePart {
 	private double reflectivity = 0.75; // a number in (0, 1)
 	private double mirrorWidth = 2;
 	private double mirrorHeight = 3;
-	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
 	private transient double layoutGap = 0.01;
@@ -50,7 +49,7 @@ public class Mirror extends HousePart {
 	}
 
 	/** a number between 0 and 1 */
-	public double getCellEfficiency() {
+	public double getReflectivity() {
 		return reflectivity;
 	}
 
@@ -117,10 +116,10 @@ public class Mirror extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class });
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
 		if (picked != null) {
 			final Vector3 p = picked.getPoint().clone();
-			snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
+			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 			points.get(0).set(toRelative(p));
 		}
 		if (container != null) {
@@ -144,7 +143,7 @@ public class Mirror extends HousePart {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
 				if (!Util.isZero(zenith - 90)) {
-					double h = (rotated ? mirrorWidth : mirrorHeight) / Scene.getInstance().getAnnotationScale();
+					double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
 					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 				}
 				getEditPointShape(i).setTranslation(p);
@@ -166,11 +165,7 @@ public class Mirror extends HousePart {
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		if (rotated) {
-			surround.setData(new Vector3(0, 0, 0), mirrorHeight / 2.0 / annotationScale, mirrorWidth / 2.0 / annotationScale, 0.15);
-		} else {
-			surround.setData(new Vector3(0, 0, 0), mirrorWidth / 2.0 / annotationScale, mirrorHeight / 2.0 / annotationScale, 0.15);
-		}
+		surround.setData(new Vector3(0, 0, 0), mirrorWidth / 2.0 / annotationScale, mirrorHeight / 2.0 / annotationScale, 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -217,7 +212,7 @@ public class Mirror extends HousePart {
 			}
 		} else {
 			double t = Math.toRadians(zenith);
-			double h = (rotated ? mirrorWidth : mirrorHeight) / Scene.getInstance().getAnnotationScale();
+			double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
 			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t)));
 			setNormal(t, Math.toRadians(relativeAzimuth));
 		}
@@ -258,11 +253,11 @@ public class Mirror extends HousePart {
 		normalBuffer.limit(normalBuffer.capacity());
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		double t = Math.toRadians(zenith);
-		double h = (rotated ? mirrorWidth : mirrorHeight) / Scene.getInstance().getAnnotationScale();
+		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 p = o.add(0, 0, 0.5 * h * Math.cos(t), null);
 		Vector3 dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
-		double w = (rotated ? mirrorHeight : mirrorWidth) / Scene.getInstance().getAnnotationScale();
+		double w = mirrorWidth / Scene.getInstance().getAnnotationScale();
 		dir.normalizeLocal().multiplyLocal(w * 0.5);
 		Vector3 v1 = p.add(dir, null);
 		dir.negateLocal();
@@ -342,13 +337,13 @@ public class Mirror extends HousePart {
 	}
 
 	private double overlap() {
-		double w1 = (rotated ? mirrorHeight : mirrorWidth) / Scene.getInstance().getAnnotationScale();
+		double w1 = mirrorWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getContainer() == container && p != this) {
 				if (p instanceof Mirror) {
 					Mirror s2 = (Mirror) p;
-					double w2 = (s2.rotated ? s2.mirrorHeight : s2.mirrorWidth) / Scene.getInstance().getAnnotationScale();
+					double w2 = s2.mirrorWidth / Scene.getInstance().getAnnotationScale();
 					double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499)
 						return distance;
@@ -369,7 +364,7 @@ public class Mirror extends HousePart {
 				Vector3 p2 = container.getAbsPoint(2);
 				double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 				Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-				final double length = (1 + layoutGap) * (rotated ? mirrorHeight : mirrorWidth) / Scene.getInstance().getAnnotationScale();
+				final double length = (1 + layoutGap) * mirrorWidth / Scene.getInstance().getAnnotationScale();
 				final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 				double tx = length / p0.distance(p2);
 				double ty = length / p0.distance(p1);
@@ -391,14 +386,6 @@ public class Mirror extends HousePart {
 			}
 		}
 		return c;
-	}
-
-	public void setRotated(boolean b) {
-		rotated = b;
-	}
-
-	public boolean isRotated() {
-		return rotated;
 	}
 
 	public void setRelativeAzimuth(double relativeAzimuth) {

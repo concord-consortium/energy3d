@@ -52,6 +52,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -759,6 +760,27 @@ public class EnergyPanel extends JPanel {
 						partProperty3TextField.setText(eff);
 						partProperty3TextField.setToolTipText("The solar cell efficiency of the solar panel");
 					}
+				}
+			} else if (selectedPart instanceof Mirror) {
+				final Mirror m = (Mirror) selectedPart;
+				if (m.isDrawable()) {
+					Foundation f = (Foundation) m.getTopContainer();
+					partProperty1Label.setText("  Size & Position:");
+					partProperty1TextField.setText(twoDecimals.format(m.getMirrorWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(m.getMirrorHeight() * meterToFeet) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+					partProperty2Label.setText("  Angles:");
+					double a = m.getRelativeAzimuth() + f.getAzimuth();
+					if (a >= 360)
+						a -= 360;
+					boolean flat = m.getContainer() instanceof Foundation;
+					partProperty2TextField.setText(flat ? "zenith: " + oneDecimal.format(m.getZenith()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0" : " --- ");
+					partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
+					partProperty2TextField.setToolTipText("The angles of the solar panel");
+					String id = "Mirror (" + m.getId() + ")";
+					String reflectivity = oneDecimal.format(m.getReflectivity() * 100) + "%";
+					partPanelBorder.setTitle(id);
+					partProperty3Label.setText("  Reflectivity:");
+					partProperty3TextField.setText(reflectivity);
+					partProperty3TextField.setToolTipText("The reflectivity of this mirror");
 				}
 			} else if (selectedPart instanceof Sensor) {
 				final Sensor sensor = (Sensor) selectedPart;

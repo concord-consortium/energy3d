@@ -48,6 +48,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -90,6 +91,7 @@ import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelZenithCommand;
 import org.concord.energy3d.undo.ChangeZenithAngleForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChooseMirrorSizeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
@@ -128,6 +130,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForHuman;
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
+	private static JPopupMenu popupMenuForMirror;
 	private static JPopupMenu popupMenuForSensor;
 	private static JPopupMenu popupMenuForLand;
 	private static JPopupMenu popupMenuForSky;
@@ -160,6 +163,8 @@ public class PopupMenuFactory {
 			return getPopupMenuForFoundation();
 		if (selectedPart instanceof SolarPanel)
 			return getPopupMenuForSolarPanel();
+		if (selectedPart instanceof Mirror)
+			return getPopupMenuForMirror();
 		if (selectedPart instanceof Sensor)
 			return getPopupMenuForSensor();
 		if (selectedPart instanceof Tree)
@@ -2092,6 +2097,263 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenuForSolarPanel;
+
+	}
+
+	private static JPopupMenu getPopupMenuForMirror() {
+
+		if (popupMenuForMirror == null) {
+
+			final JMenuItem miZenith = new JMenuItem("Zenith Angle...");
+			miZenith.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Mirror mirror = (Mirror) selectedPart;
+					final String title = "<html>Zenith Angle (&deg;) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The zenith angle is measured from the direction perpendicular to the base surface.<hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Mirrors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, mirror.getZenith());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								double val = Double.parseDouble(newValue);
+								if (val < -90 || val > 90) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The zenith angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (Util.isZero(val - 90))
+										val = 89.999;
+									if (rb1.isSelected()) {
+										// ChangeSolarPanelZenithCommand c = new ChangeSolarPanelZenithCommand(mirror);
+										mirror.setZenith(val);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										Foundation foundation = mirror.getTopContainer();
+										ChangeBuildingSolarPanelZenithAngleCommand c = new ChangeBuildingSolarPanelZenithAngleCommand(foundation);
+										Scene.getInstance().setZenithAngleForSolarPanelsOfBuilding(foundation, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										ChangeZenithAngleForAllSolarPanelsCommand c = new ChangeZenithAngleForAllSolarPanelsCommand();
+										Scene.getInstance().setZenithAngleForAllSolarPanels(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									Scene.getInstance().setEdited(true);
+									mirror.draw();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
+			miAzimuth.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Mirror mirror = (Mirror) selectedPart;
+					final Foundation foundation = mirror.getTopContainer();
+					final String title = "<html>Azimuth Angle (&deg;) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Mirrors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						double a = mirror.getRelativeAzimuth() + foundation.getAzimuth();
+						if (a > 360)
+							a -= 360;
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								a = val - foundation.getAzimuth();
+								if (a < 0)
+									a += 360;
+								if (rb1.isSelected()) {
+									// ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(mirror);
+									mirror.setRelativeAzimuth(a);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb2.isSelected()) {
+									ChangeBuildingSolarPanelAzimuthCommand c = new ChangeBuildingSolarPanelAzimuthCommand(foundation);
+									Scene.getInstance().setAzimuthForSolarPanelsOfBuilding(foundation, val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
+									ChangeZenithAngleForAllSolarPanelsCommand c = new ChangeZenithAngleForAllSolarPanelsCommand();
+									Scene.getInstance().setAzimuthForAllSolarPanels(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								Scene.getInstance().setEdited(true);
+								mirror.draw();
+								break;
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miSize = new JMenuItem("Size...");
+			miSize.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final Mirror m = (Mirror) selectedPart;
+					final String partInfo = m.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					JPanel gui = new JPanel(new GridLayout(2, 2, 5, 5));
+					JLabel widthLabel = new JLabel("Width: ");
+					gui.add(widthLabel);
+					JTextField widthField = new JTextField(twoDecimalsFormat.format(m.getMirrorWidth()));
+					gui.add(widthField);
+					JLabel heightLabel = new JLabel("Height: ");
+					gui.add(heightLabel);
+					JTextField heightField = new JTextField(twoDecimalsFormat.format(m.getMirrorHeight()));
+					gui.add(heightField);
+					gui.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
+						return;
+					ChooseMirrorSizeCommand c = new ChooseMirrorSizeCommand(m);
+					try {
+						final double w = Double.parseDouble(widthField.getText());
+						if (w < 1 || w > 5) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						} else {
+							m.setMirrorWidth(w);
+						}
+					} catch (NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					try {
+						final double h = Double.parseDouble(heightField.getText());
+						if (h < 1 || h > 5) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						} else {
+							m.setMirrorHeight(h);
+						}
+					} catch (NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					Scene.getInstance().setEdited(true);
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					m.draw();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+
+			popupMenuForMirror = createPopupMenu(true, true, null);
+
+			final JMenuItem miReflectivity = new JMenuItem("Reflectivity...");
+			miReflectivity.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Mirror m = (Mirror) selectedPart;
+					final String title = "<html>Reflectivity (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Mirrors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getReflectivity() * 100);
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 10 || val > 25) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 25%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(m);
+										m.setReflectivity(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										Foundation foundation = m.getTopContainer();
+										ChangeBuildingSolarCellEfficiencyCommand c = new ChangeBuildingSolarCellEfficiencyCommand(foundation);
+										Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
+										Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			popupMenuForMirror.addSeparator();
+			popupMenuForMirror.add(miZenith);
+			popupMenuForMirror.add(miAzimuth);
+			popupMenuForMirror.add(miSize);
+			popupMenuForMirror.add(miReflectivity);
+
+		}
+
+		return popupMenuForMirror;
 
 	}
 
