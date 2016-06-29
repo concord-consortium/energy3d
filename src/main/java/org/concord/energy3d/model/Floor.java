@@ -80,7 +80,9 @@ public class Floor extends HousePart {
 		}
 		draw();
 		setEditPointsVisible(container != null);
-		Scene.getInstance().redrawAll(); // need to redraw the walls when the floor is part of a balcony
+		Foundation f = getTopContainer();
+		f.draw();
+		f.drawChildren(); // need to redraw the walls when the floor is part of a balcony
 	}
 
 	private PolygonWithHoles makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {

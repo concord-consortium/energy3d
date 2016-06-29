@@ -5,7 +5,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class RescaleBuildingCommand extends AbstractUndoableEdit {
 
@@ -57,14 +57,18 @@ public class RescaleBuildingCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		foundation.rescale(oldXLength / newXLength, oldYLength / newYLength, oldZLength / newZLength);
-		Scene.getInstance().redrawAll();
+		foundation.draw();
+		foundation.drawChildren();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		foundation.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);
-		Scene.getInstance().redrawAll();
+		foundation.draw();
+		foundation.drawChildren();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.Vector3;
 
@@ -41,7 +40,8 @@ public class EditPartCommand extends AbstractUndoableEdit {
 		housePart.setHeight(orgHeight);
 		for (int i = 0; i < orgPoints.size(); i++)
 			housePart.getPoints().set(i, orgPoints.get(i).clone());
-		Scene.getInstance().redrawAll();
+		housePart.draw();
+		housePart.getContainer().draw();
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
@@ -51,7 +51,8 @@ public class EditPartCommand extends AbstractUndoableEdit {
 		housePart.setHeight(newHeight);
 		for (int i = 0; i < newPoints.size(); i++)
 			housePart.getPoints().set(i, newPoints.get(i).clone());
-		Scene.getInstance().redrawAll();
+		housePart.draw();
+		housePart.getContainer().draw();
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 

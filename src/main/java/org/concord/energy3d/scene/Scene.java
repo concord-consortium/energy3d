@@ -1363,38 +1363,43 @@ public class Scene implements Serializable {
 				} else {
 					w.setColor(c);
 				}
+				w.draw();
 			}
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	public void setShutterLengthInContainer(final HousePart container, final double length) {
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getContainer() == container) {
-				((Window) p).setShutterLength(length);
+				Window w = (Window) p;
+				w.setShutterLength(length);
+				w.draw();
 			}
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
 		if (part instanceof Foundation)
 			return;
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == part.getTopContainer())
-				((Window) p).setShutterColor(color);
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()){
+				Window w = (Window) p;
+				w.setShutterColor(color);
+				w.draw();
+			}
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	public void setShutterLengthOfBuilding(final HousePart part, final double length) {
 		if (part instanceof Foundation)
 			return;
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == part.getTopContainer())
-				((Window) p).setShutterLength(length);
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()){
+				Window w = (Window) p;
+				w.setShutterLength(length);
+				w.draw();
+			}
 		}
-		Scene.getInstance().redrawAll();
 	}
 
 	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
@@ -1491,6 +1496,7 @@ public class Scene implements Serializable {
 				p.draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setZenithAngleForAllSolarPanels(final double angle) {
@@ -1500,6 +1506,7 @@ public class Scene implements Serializable {
 				p.draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setAzimuthForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
@@ -1509,6 +1516,7 @@ public class Scene implements Serializable {
 				p.draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setAzimuthForAllSolarPanels(final double angle) {
@@ -1518,6 +1526,7 @@ public class Scene implements Serializable {
 				p.draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {

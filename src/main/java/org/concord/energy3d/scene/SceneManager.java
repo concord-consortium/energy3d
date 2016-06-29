@@ -983,15 +983,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					((Foundation) p).move(v, p.getGridSize());
 				}
 			}
+			Scene.getInstance().redrawAll();
 		} else if (selectedHousePart instanceof Foundation) {
 			c = new MoveBuildingCommand((Foundation) selectedHousePart, v);
-			((Foundation) selectedHousePart).move(v, selectedHousePart.getGridSize());
+			Foundation f = (Foundation) selectedHousePart;
+			f.move(v, selectedHousePart.getGridSize());
+			f.draw();
+			f.drawChildren();
+			SceneManager.getInstance().refresh();
 		} else if (selectedHousePart instanceof Window) {
-			((Window) selectedHousePart).move(v);
+			Window w = (Window) selectedHousePart;
+			w.move(v);
+			w.draw();
 		}
 		if (c != null)
 			undoManager.addEdit(c);
-		Scene.getInstance().redrawAll();
 		Scene.getInstance().setEdited(true);
 	}
 

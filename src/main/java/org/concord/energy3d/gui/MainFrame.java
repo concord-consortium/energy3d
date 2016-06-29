@@ -1677,9 +1677,11 @@ public class MainFrame extends JFrame {
 			public void valueChanged(ListSelectionEvent e) {
 				SceneManager.getInstance().hideAllEditPoints();
 				List<Long> selectedValues = idList.getSelectedValuesList();
-				for (Long i : selectedValues)
-					Scene.getInstance().getPart(i).setEditPointsVisible(true);
-				Scene.getInstance().redrawAll();
+				for (Long i : selectedValues) {
+					HousePart p = Scene.getInstance().getPart(i);
+					p.setEditPointsVisible(true);
+					p.draw();
+				}
 			}
 		});
 		gui.add(typeComboBox, BorderLayout.NORTH);

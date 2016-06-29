@@ -8,7 +8,6 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
 
 public class RemoveMultipleShuttersCommand extends AbstractUndoableEdit {
 
@@ -36,10 +35,10 @@ public class RemoveMultipleShuttersCommand extends AbstractUndoableEdit {
 			if (w.isDrawable()) { // as an extra defense of potential invisible ghost part
 				w.setLeftShutter(leftShutters[i]);
 				w.setRightShutter(rightShutters[i]);
+				w.draw();
 			}
 		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -49,10 +48,10 @@ public class RemoveMultipleShuttersCommand extends AbstractUndoableEdit {
 			if (w.isDrawable()) { // as an extra defense of potential invisible ghost part
 				w.setLeftShutter(false);
 				w.setRightShutter(false);
+				w.draw();
 			}
 		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override

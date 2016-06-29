@@ -8,6 +8,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class ChangeAzimuthForAllSolarPanelsCommand extends AbstractUndoableEdit {
 
@@ -35,6 +36,7 @@ public class ChangeAzimuthForAllSolarPanelsCommand extends AbstractUndoableEdit 
 			p.setRelativeAzimuth(oldValues[i]);
 			p.draw();
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override
@@ -46,6 +48,7 @@ public class ChangeAzimuthForAllSolarPanelsCommand extends AbstractUndoableEdit 
 			p.setZenith(newValues[i]);
 			p.draw();
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

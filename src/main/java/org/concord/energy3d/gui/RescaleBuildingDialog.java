@@ -146,7 +146,8 @@ class RescaleBuildingDialog extends JDialog {
 					@Override
 					public Object call() {
 						foundation.rescale(scaleX, scaleY, scaleZ);
-						Scene.getInstance().redrawAll();
+						foundation.draw();
+						foundation.drawChildren();
 						return null;
 					}
 				});

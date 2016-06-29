@@ -516,8 +516,9 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setHorizontalBars(cbmiHorizontalBars.isSelected());
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						w.setHorizontalBars(cbmiHorizontalBars.isSelected());
+						w.draw();
 						Scene.getInstance().setEdited(true);
 					}
 				}
@@ -530,8 +531,9 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setVerticalBars(cbmiVerticalBars.isSelected());
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						w.setVerticalBars(cbmiVerticalBars.isSelected());
+						w.draw();
 						Scene.getInstance().setEdited(true);
 					}
 				}
@@ -547,8 +549,9 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setStyle(Window.MORE_MUNTIN_BARS);
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						w.setStyle(Window.MORE_MUNTIN_BARS);
+						w.draw();
 						Scene.getInstance().setEdited(true);
 					}
 				}
@@ -562,8 +565,9 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setStyle(Window.MEDIUM_MUNTIN_BARS);
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						w.setStyle(Window.MEDIUM_MUNTIN_BARS);
+						w.draw();
 						Scene.getInstance().setEdited(true);
 					}
 				}
@@ -577,8 +581,9 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						((Window) selectedPart).setStyle(Window.LESS_MUNTIN_BARS);
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						w.setStyle(Window.LESS_MUNTIN_BARS);
+						w.draw();
 						Scene.getInstance().setEdited(true);
 					}
 				}
@@ -631,9 +636,10 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand((Window) selectedPart);
-						((Window) selectedPart).setLeftShutter(cbmiLeftShutter.isSelected());
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+						w.setLeftShutter(cbmiLeftShutter.isSelected());
+						w.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -646,9 +652,10 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand((Window) selectedPart);
-						((Window) selectedPart).setRightShutter(cbmiRightShutter.isSelected());
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+						w.setRightShutter(cbmiRightShutter.isSelected());
+						w.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -661,11 +668,11 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Window) {
-						Window window = (Window) selectedPart;
-						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(window);
-						window.setLeftShutter(cbmiBothShutters.isSelected());
-						window.setRightShutter(cbmiBothShutters.isSelected());
-						Scene.getInstance().redrawAll();
+						Window w = (Window) selectedPart;
+						ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+						w.setLeftShutter(cbmiBothShutters.isSelected());
+						w.setRightShutter(cbmiBothShutters.isSelected());
+						w.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -710,7 +717,7 @@ public class PopupMenuFactory {
 							if (rb1.isSelected()) { // apply to only this window
 								ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
 								window.setShutterColor(color);
-								Scene.getInstance().redrawAll();
+								window.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(cmd);
 							} else if (rb2.isSelected()) {
 								ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
@@ -767,6 +774,7 @@ public class PopupMenuFactory {
 									if (rb1.isSelected()) {
 										ChangeShutterLengthCommand c = new ChangeShutterLengthCommand(window);
 										window.setShutterLength(val);
+										window.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Scene.getInstance().setShutterLengthInContainer(window.getContainer(), val);
@@ -774,7 +782,6 @@ public class PopupMenuFactory {
 										Scene.getInstance().setShutterLengthOfBuilding(window, val);
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-									Scene.getInstance().redrawAll();
 									Scene.getInstance().setEdited(true);
 									break;
 								}
@@ -1033,7 +1040,7 @@ public class PopupMenuFactory {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
 						wall.setType(Wall.SOLID_WALL);
-						Scene.getInstance().redrawAll();
+						wall.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -1051,7 +1058,7 @@ public class PopupMenuFactory {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
 						wall.setType(Wall.EMPTY);
-						Scene.getInstance().redrawAll();
+						wall.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -1069,7 +1076,7 @@ public class PopupMenuFactory {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
 						wall.setType(Wall.VERTICAL_EDGES_ONLY);
-						Scene.getInstance().redrawAll();
+						wall.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -1087,7 +1094,7 @@ public class PopupMenuFactory {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
 						wall.setType(Wall.COLUMNS_ONLY);
-						Scene.getInstance().redrawAll();
+						wall.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -1105,7 +1112,7 @@ public class PopupMenuFactory {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
 						wall.setType(Wall.RAILS_ONLY);
-						Scene.getInstance().redrawAll();
+						wall.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -1123,7 +1130,7 @@ public class PopupMenuFactory {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
 						wall.setType(Wall.COLUMNS_RAILS);
-						Scene.getInstance().redrawAll();
+						wall.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -1141,7 +1148,7 @@ public class PopupMenuFactory {
 						Wall wall = (Wall) selectedPart;
 						ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
 						wall.setType(Wall.FENCE);
-						Scene.getInstance().redrawAll();
+						wall.draw();
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -1568,7 +1575,8 @@ public class PopupMenuFactory {
 						}
 						if (lock)
 							SceneManager.getInstance().hideAllEditPoints();
-						Scene.getInstance().redrawAll();
+						foundation.draw();
+						foundation.drawChildren();
 					}
 				}
 			});
@@ -2426,7 +2434,7 @@ public class PopupMenuFactory {
 						tree.setFreeze(lock);
 						if (lock)
 							SceneManager.getInstance().hideAllEditPoints();
-						Scene.getInstance().redrawAll();
+						tree.draw();
 					}
 				}
 			});
