@@ -5,6 +5,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.scene.SceneManager;
 
 public class ChangeFoundationHeightCommand extends AbstractUndoableEdit {
 
@@ -32,6 +33,7 @@ public class ChangeFoundationHeightCommand extends AbstractUndoableEdit {
 		foundation.setHeight(oldValue);
 		foundation.draw();
 		foundation.drawChildren();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override
@@ -40,6 +42,7 @@ public class ChangeFoundationHeightCommand extends AbstractUndoableEdit {
 		foundation.setHeight(newValue);
 		foundation.draw();
 		foundation.drawChildren();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

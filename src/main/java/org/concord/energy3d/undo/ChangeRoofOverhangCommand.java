@@ -4,8 +4,9 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Roof;
-import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
 
@@ -31,14 +32,22 @@ public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
 		super.undo();
 		newValue = roof.getOverhangLength();
 		roof.setOverhangLength(oldValue);
-		Scene.getInstance().redrawAll(); // can't just use Roof.draw() as we also need to draw the wall parts
+		roof.draw();
+		// can't just use Roof.draw() as we also need to draw the wall parts
+		Foundation f = roof.getTopContainer();
+		f.drawChildren();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		roof.setOverhangLength(newValue);
-		Scene.getInstance().redrawAll(); // can't just use Roof.draw() as we also need to draw the wall parts
+		roof.draw();
+		// can't just use Roof.draw() as we also need to draw the wall parts
+		Foundation f = roof.getTopContainer();
+		f.drawChildren();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

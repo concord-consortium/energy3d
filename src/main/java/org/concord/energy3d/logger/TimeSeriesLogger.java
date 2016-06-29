@@ -341,13 +341,13 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + r.getTopContainer().getId() + ", \"ID\": " + r.getId();
 					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
 					stateValue += ", \"New Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
-				} else if (lastEdit instanceof AdjustThermostatCommand) {
+				} else if (lastEdit instanceof ChangeFoundationHeightCommand) {
 					ChangeFoundationHeightCommand c = (ChangeFoundationHeightCommand) lastEdit;
 					Foundation f = c.getFoundation();
 					stateValue = "{\"Building\": " + f.getId();
 					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
 					stateValue += ", \"New Value\": " + f.getHeight() * Scene.getInstance().getAnnotationScale() + "}";
-				} else if (lastEdit instanceof ChangeFoundationHeightCommand) {
+				} else if (lastEdit instanceof AdjustThermostatCommand) {
 					Foundation foundation = ((AdjustThermostatCommand) lastEdit).getFoundation();
 					stateValue = "{\"Building\":" + foundation.getId() + "}";
 				}

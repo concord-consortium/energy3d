@@ -1279,7 +1279,10 @@ public class PopupMenuFactory {
 								} else {
 									ChangeRoofOverhangCommand c = new ChangeRoofOverhangCommand(roof);
 									roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
-									Scene.getInstance().redrawAll();
+									roof.draw();
+									Foundation f = roof.getTopContainer();
+									f.drawChildren();
+									SceneManager.getInstance().refresh();
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1617,7 +1620,9 @@ public class PopupMenuFactory {
 								} else {
 									ChangeFoundationHeightCommand c = new ChangeFoundationHeightCommand(f);
 									f.setHeight(val / Scene.getInstance().getAnnotationScale());
-									Scene.getInstance().redrawAll();
+									f.draw();
+									f.drawChildren();
+									SceneManager.getInstance().refresh();
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
