@@ -54,6 +54,7 @@ import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
+import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
@@ -341,6 +342,12 @@ public class TimeSeriesLogger {
 					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
 					stateValue += ", \"New Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
 				} else if (lastEdit instanceof AdjustThermostatCommand) {
+					ChangeFoundationHeightCommand c = (ChangeFoundationHeightCommand) lastEdit;
+					Foundation f = c.getFoundation();
+					stateValue = "{\"Building\": " + f.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
+					stateValue += ", \"New Value\": " + f.getHeight() * Scene.getInstance().getAnnotationScale() + "}";
+				} else if (lastEdit instanceof ChangeFoundationHeightCommand) {
 					Foundation foundation = ((AdjustThermostatCommand) lastEdit).getFoundation();
 					stateValue = "{\"Building\":" + foundation.getId() + "}";
 				}

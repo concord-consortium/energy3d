@@ -326,7 +326,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	@Override
-	protected void drawChildren() {
+	public void drawChildren() {
 		final List<HousePart> children = new ArrayList<HousePart>();
 		collectChildren(this, children);
 		for (final HousePart part : children)
@@ -1225,6 +1225,18 @@ public class Foundation extends HousePart implements Thermalizable {
 					p.addLocal(step);
 					p2D.setLocation(p.getX(), p.getY());
 				}
+			}
+		}
+	}
+
+	public void setHeight(final double height) {
+		double delta = height - this.height;
+		this.height = height;
+		for (final HousePart c : children) {
+			int n = c.points.size();
+			for (int i = 0; i < n; i++) {
+				Vector3 v = c.points.get(i);
+				v.setZ(v.getZ() + delta);
 			}
 		}
 	}

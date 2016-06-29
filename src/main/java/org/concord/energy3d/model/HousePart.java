@@ -819,7 +819,7 @@ public abstract class HousePart implements Serializable {
 		return toAbsolute(points.get(index), result);
 	}
 
-	protected void drawChildren() {
+	public void drawChildren() {
 		for (final HousePart child : children) {
 			child.drawChildren();
 			child.draw();

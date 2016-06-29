@@ -83,6 +83,7 @@ import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
@@ -1614,12 +1615,12 @@ public class PopupMenuFactory {
 								if (val < 0 || val > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0 and 10 m.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									// ChangeRoofOverhangCommand c = new ChangeRoofOverhangCommand(roof);
+									ChangeFoundationHeightCommand c = new ChangeFoundationHeightCommand(f);
 									f.setHeight(val / Scene.getInstance().getAnnotationScale());
-									f.draw();
+									Scene.getInstance().redrawAll();
 									Scene.getInstance().setEdited(true);
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
 							} catch (final NumberFormatException exception) {
