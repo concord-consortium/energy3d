@@ -1595,6 +1595,42 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miHeight = new JMenuItem("Height...");
+			miHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation))
+						return;
+					final Foundation f = (Foundation) selectedPart;
+					while (true) {
+						SceneManager.getInstance().refresh(1);
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Height (m)", f.getHeight() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								double val = Double.parseDouble(newValue);
+								if (val < 0 || val > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0 and 10 m.", "Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									// ChangeRoofOverhangCommand c = new ChangeRoofOverhangCommand(roof);
+									f.setHeight(val / Scene.getInstance().getAnnotationScale());
+									f.draw();
+									Scene.getInstance().setEdited(true);
+									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								exception.printStackTrace();
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForFoundation = createPopupMenu(false, true, new Runnable() {
 				@Override
 				public void run() {
@@ -1625,6 +1661,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miHeight);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createInsulationMenuItem(false));
