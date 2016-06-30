@@ -393,13 +393,16 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	protected void drawMesh() {
-		mesh.getSceneHints().setCullHint(isDrawable() && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always);
-		final boolean b = isDrawable() && !isFrozen() && type == SOLID_WALL;
-		backMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
-		surroundMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
-		windowsSurroundMesh.getSceneHints().setCullHint(b ? CullHint.Inherit : CullHint.Always);
+		final boolean drawable = isDrawable();
+		final CullHint drawableSolidWall = drawable && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always;
+		mesh.getSceneHints().setCullHint(drawableSolidWall);
+		outlineMesh.getSceneHints().setCullHint(drawableSolidWall);
+		final CullHint drawableSolidNoneFrozenWall = drawable && !isFrozen() && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always;
+		backMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
+		surroundMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
+		windowsSurroundMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
 
-		if (!isDrawable())
+		if (!drawable)
 			return;
 
 		computeNormalAndXYTransform();
@@ -458,7 +461,7 @@ public class Wall extends HousePart implements Thermalizable {
 			drawBoard();
 			break;
 		default:
-			outlineMesh.getSceneHints().setCullHint(isDrawable() ? CullHint.Inherit : CullHint.Always);
+			outlineMesh.getSceneHints().setCullHint(drawable ? CullHint.Inherit : CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			rails.getSceneHints().setCullHint(CullHint.Always);
 			board.getSceneHints().setCullHint(CullHint.Always);
@@ -603,7 +606,7 @@ public class Wall extends HousePart implements Thermalizable {
 		return null;
 	}
 
-	private void drawRails(final double distance, boolean fence) {
+	private void drawRails(final double distance, final boolean fence) {
 		rails.setDefaultColor(getColor());
 		final FloatBuffer vertexBuffer = rails.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = rails.getMeshData().getNormalBuffer();
@@ -623,7 +626,7 @@ public class Wall extends HousePart implements Thermalizable {
 			Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, 0.7), getAbsPoint(3).multiplyLocal(1, 1, 0.7), dir, vertexBuffer, normalBuffer);
 			Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, 0.3), getAbsPoint(3).multiplyLocal(1, 1, 0.3), dir, vertexBuffer, normalBuffer);
 			dir = new Vector3(u).normalizeLocal().multiplyLocal(railRadius);
-			Vector3 dir5 = new Vector3(u).normalizeLocal().multiplyLocal(railRadius * 3);
+			final Vector3 dir5 = new Vector3(u).normalizeLocal().multiplyLocal(railRadius * 3);
 
 			// v.multiplyLocal(1.2);
 			final Vector3 p = new Vector3();
