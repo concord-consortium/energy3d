@@ -623,8 +623,12 @@ public class Wall extends HousePart implements Thermalizable {
 		if (fence) {
 
 			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railRadius * 2);
-			Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, 0.7), getAbsPoint(3).multiplyLocal(1, 1, 0.7), dir, vertexBuffer, normalBuffer);
-			Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, 0.3), getAbsPoint(3).multiplyLocal(1, 1, 0.3), dir, vertexBuffer, normalBuffer);
+			Vector3 p10 = getAbsPoint(1).subtractLocal(getAbsPoint(0));
+			Vector3 p32 = getAbsPoint(3).subtractLocal(getAbsPoint(2));
+			p10.multiplyLocal(1, 1, 0.3);
+			p32.multiplyLocal(1, 1, 0.3);
+			Util.addPointToQuad(normal, getAbsPoint(0).addLocal(p10), getAbsPoint(2).addLocal(p32), dir, vertexBuffer, normalBuffer);
+			Util.addPointToQuad(normal, getAbsPoint(1).subtractLocal(p10), getAbsPoint(3).subtractLocal(p32), dir, vertexBuffer, normalBuffer);
 			dir = new Vector3(u).normalizeLocal().multiplyLocal(railRadius);
 			final Vector3 dir5 = new Vector3(u).normalizeLocal().multiplyLocal(railRadius * 3);
 
