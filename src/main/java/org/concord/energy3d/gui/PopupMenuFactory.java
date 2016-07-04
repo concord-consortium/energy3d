@@ -77,14 +77,17 @@ import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
+import org.concord.energy3d.undo.ChangeReflectivityForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorZenithAngleCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeShutterColorCommand;
@@ -96,7 +99,7 @@ import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeZenithCommand;
 import org.concord.energy3d.undo.ChangeZenithAngleForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChooseMirrorSizeCommand;
+import org.concord.energy3d.undo.SetMirrorSizeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChangeZenithAngleForAllMirrorsCommand;
@@ -1502,6 +1505,27 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllSolarPanels);
 
+			final JMenuItem miRemoveAllMirrors = new JMenuItem("Remove All Mirrors");
+			miRemoveAllMirrors.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllMirrors();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllMirrors);
+
 			final JMenuItem removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
 			removeAllFloorsMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -2026,8 +2050,8 @@ public class PopupMenuFactory {
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
-								if (val < 10 || val > 25) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 25%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 10 || val > 30) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 30%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(solarPanel);
@@ -2310,7 +2334,7 @@ public class PopupMenuFactory {
 					gui.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
 						return;
-					ChooseMirrorSizeCommand c = new ChooseMirrorSizeCommand(m);
+					SetMirrorSizeCommand c = new SetMirrorSizeCommand(m);
 					try {
 						final double w = Double.parseDouble(widthField.getText());
 						if (w < 1 || w > 5) {
@@ -2372,21 +2396,21 @@ public class PopupMenuFactory {
 						else {
 							try {
 								final double val = Double.parseDouble(newValue);
-								if (val < 10 || val > 25) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 25%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 50 || val > 99) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror reflectivity must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										// ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(m);
+										ChangeMirrorReflectivityCommand c = new ChangeMirrorReflectivityCommand(m);
 										m.setReflectivity(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = m.getTopContainer();
-										ChangeBuildingSolarCellEfficiencyCommand c = new ChangeBuildingSolarCellEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
+										ChangeFoundationMirrorReflectivityCommand c = new ChangeFoundationMirrorReflectivityCommand(foundation);
+										Scene.getInstance().setReflectivityForMirrorsOnFoundation(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
-										Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
+										ChangeReflectivityForAllMirrorsCommand c = new ChangeReflectivityForAllMirrorsCommand();
+										Scene.getInstance().setReflectivityForAllMirrors(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);

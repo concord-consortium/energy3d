@@ -1117,6 +1117,36 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllMirrors() {
+		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Mirror && !part.isFrozen() && part.getTopContainer() == foundation)
+					mirrors.add(part);
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Mirror && !part.isFrozen())
+					mirrors.add(part);
+			}
+		}
+		if (mirrors.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + mirrors.size() + " mirrors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+			return;
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(mirrors);
+		for (final HousePart part : mirrors) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
 	public void removeAllWindows() {
 		final ArrayList<HousePart> windows = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1614,6 +1644,20 @@ public class Scene implements Serializable {
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	public void setReflectivityForMirrorsOnFoundation(final Foundation foundation, final double reflectivity) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation)
+				((Mirror) p).setReflectivity(reflectivity);
+		}
+	}
+
+	public void setReflectivityForAllMirrors(final double reflectivity) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror)
+				((Mirror) p).setReflectivity(reflectivity);
+		}
 	}
 
 	public boolean isEdited() {

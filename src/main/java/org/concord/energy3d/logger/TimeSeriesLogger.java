@@ -61,14 +61,17 @@ import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorZenithAngleCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
+import org.concord.energy3d.undo.ChangeReflectivityForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
@@ -94,6 +97,7 @@ import org.concord.energy3d.undo.RescaleBuildingCommand;
 import org.concord.energy3d.undo.RescaleCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
+import org.concord.energy3d.undo.SetMirrorSizeCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
@@ -495,6 +499,27 @@ public class TimeSeriesLogger {
 					SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
 					stateValue += ", \"New Value\": " + sp.isRotated() + "}";
+				}
+
+				// mirror properties
+				else if (lastEdit instanceof SetMirrorSizeCommand) {
+					SetMirrorSizeCommand c = (SetMirrorSizeCommand) lastEdit;
+					Mirror m = c.getMirror();
+					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
+					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + m.getMirrorWidth();
+					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + m.getMirrorHeight() + "}";
+				} else if (lastEdit instanceof ChangeMirrorReflectivityCommand) {
+					ChangeMirrorReflectivityCommand c = (ChangeMirrorReflectivityCommand) lastEdit;
+					Mirror m = c.getMirror();
+					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + m.getReflectivity() + "}";
+				} else if (lastEdit instanceof ChangeFoundationMirrorReflectivityCommand) {
+					Foundation foundation = ((ChangeFoundationMirrorReflectivityCommand) lastEdit).getFoundation();
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectivity()) + "}";
+				} else if (lastEdit instanceof ChangeReflectivityForAllMirrorsCommand) {
+					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectivity()) + "}";
 				}
 
 				// wall properties

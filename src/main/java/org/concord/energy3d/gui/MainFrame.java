@@ -223,6 +223,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllRoofsMenuItem;
 	private JMenuItem removeAllFloorsMenuItem;
 	private JMenuItem removeAllSolarPanelsMenuItem;
+	private JMenuItem removeAllMirrorsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
 	private JMenuItem removeAllWindowShuttersMenuItem;
 	private JMenuItem removeAllTreesMenuItem;
@@ -1928,6 +1929,7 @@ public class MainFrame extends JFrame {
 			clearMenu.add(getRemoveAllWindowsMenuItem());
 			clearMenu.add(getRemoveAllWindowShuttersMenuItem());
 			clearMenu.add(getRemoveAllSolarPanelsMenuItem());
+			clearMenu.add(getRemoveAllMirrorsMenuItem());
 			clearMenu.add(getRemoveAllTreesMenuItem());
 			clearMenu.add(getRemoveAllHumansMenuItem());
 			clearMenu.add(getRemoveAllRoofsMenuItem());
@@ -2858,6 +2860,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllSolarPanelsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllMirrorsMenuItem() {
+		if (removeAllMirrorsMenuItem == null) {
+			removeAllMirrorsMenuItem = new JMenuItem("Remove All Mirrors");
+			removeAllMirrorsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllMirrors();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+		}
+		return removeAllMirrorsMenuItem;
 	}
 
 	private JMenuItem getRemoveAllWindowsMenuItem() {

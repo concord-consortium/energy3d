@@ -6,14 +6,14 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Mirror;
 
-public class ChooseMirrorSizeCommand extends AbstractUndoableEdit {
+public class SetMirrorSizeCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldWidth, newWidth;
 	private double oldHeight, newHeight;
 	private Mirror mirror;
 
-	public ChooseMirrorSizeCommand(Mirror solarPanel) {
+	public SetMirrorSizeCommand(Mirror solarPanel) {
 		this.mirror = solarPanel;
 		oldWidth = solarPanel.getMirrorWidth();
 		oldHeight = solarPanel.getMirrorHeight();
@@ -51,7 +51,7 @@ public class ChooseMirrorSizeCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Choose Size for Selected Mirror";
+		return "Set Size for Selected Mirror";
 	}
 
 }
