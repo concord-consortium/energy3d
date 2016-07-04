@@ -26,6 +26,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
@@ -1382,7 +1383,7 @@ public class Scene implements Serializable {
 		if (part instanceof Foundation)
 			return;
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()){
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
 				Window w = (Window) p;
 				w.setShutterColor(color);
 				w.draw();
@@ -1394,7 +1395,7 @@ public class Scene implements Serializable {
 		if (part instanceof Foundation)
 			return;
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()){
+			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
 				Window w = (Window) p;
 				w.setShutterLength(length);
 				w.draw();
@@ -1555,6 +1556,64 @@ public class Scene implements Serializable {
 			if (p instanceof SolarPanel)
 				((SolarPanel) p).setInverterEfficiency(eff);
 		}
+	}
+
+	public List<Mirror> getMirrorsOfFoundation(final Foundation foundation) {
+		final List<Mirror> list = new ArrayList<Mirror>();
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation)
+				list.add((Mirror) p);
+		}
+		return list;
+	}
+
+	public List<Mirror> getAllMirrors() {
+		final List<Mirror> list = new ArrayList<Mirror>();
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror)
+				list.add((Mirror) p);
+		}
+		return list;
+	}
+
+	public void setZenithAngleForMirrorsOfFoundation(final Foundation foundation, final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
+				((Mirror) p).setZenith(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setZenithAngleForAllMirrors(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror) {
+				((Mirror) p).setZenith(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAzimuthForMirrorsOfFoundation(final Foundation foundation, final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
+				((Mirror) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAzimuthForAllMirrors(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror) {
+				((Mirror) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public boolean isEdited() {

@@ -2479,6 +2479,8 @@ public class MainFrame extends JFrame {
 					} else {
 						final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 						selectedPart.setColor(color);
+						selectedPart.draw();
+						SceneManager.getInstance().refresh();
 						SceneManager.getInstance().getUndoManager().addEdit(cmd);
 						if (selectedPart instanceof Roof) { // remember the color decision for the next part
 							Scene.getInstance().setRoofColor(color);

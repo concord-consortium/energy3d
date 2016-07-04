@@ -39,42 +39,42 @@ public class Human extends HousePart {
 	protected void init() {
 		super.init();
 
-		final double height;
-		final double width;
+		final double h;
+		final double w;
 		switch (humanType) {
 		case JANE:
-			width = 2.5;
-			height = 8;
+			w = 2.5;
+			h = 8;
 			break;
 		case JENI:
-			width = 3;
-			height = 9;
+			w = 3;
+			h = 9;
 			break;
 		case JILL:
-			width = 3;
-			height = 8;
+			w = 3;
+			h = 8;
 			break;
 		case JACK:
-			width = 2.8;
-			height = 9;
+			w = 2.8;
+			h = 9;
 			break;
 		case JOHN:
-			width = 4;
-			height = 10;
+			w = 4;
+			h = 10;
 			break;
 		case JOSE:
-			width = 8;
-			height = 8;
+			w = 8;
+			h = 8;
 			break;
 		default:
-			width = 2.5;
-			height = 8;
+			w = 2.5;
+			h = 8;
 		}
-		mesh = new Quad("Human Quad", width, height);
+		mesh = new Quad("Human Quad", w, h);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		mesh.setTranslation(0, width / 2, height / 2 + 1); // foundation height = 1
+		translate(w, h, 1); // foundation height = 1 by default
 		mesh.setUserData(new UserData(this, 0, true));
 
 		final BlendState bs = new BlendState();
@@ -92,6 +92,11 @@ public class Human extends HousePart {
 		root.attachChild(billboard);
 
 		updateTextureAndColor();
+	}
+
+	/** TODO: Called when we want this person to stand at a certain height */
+	public void translate(double w, double h, double z) {
+		mesh.setTranslation(0, w / 2, h / 2 + z);
 	}
 
 	@Override

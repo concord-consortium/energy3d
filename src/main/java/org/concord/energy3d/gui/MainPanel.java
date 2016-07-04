@@ -47,7 +47,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AnimateSunCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelAzimuthCommand;
+import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
@@ -1086,7 +1086,7 @@ public class MainPanel extends JPanel {
 												});
 											} else if (hp instanceof SolarPanel) {
 												SolarPanel solarPanel = (SolarPanel) hp;
-												ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(solarPanel);
+												ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												solarPanel.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);

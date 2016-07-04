@@ -84,17 +84,22 @@ import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorZenithAngleCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelAzimuthCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelZenithCommand;
+import org.concord.energy3d.undo.ChangeAzimuthCommand;
+import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeZenithCommand;
 import org.concord.energy3d.undo.ChangeZenithAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChooseMirrorSizeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
+import org.concord.energy3d.undo.ChangeZenithAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
@@ -1823,7 +1828,7 @@ public class PopupMenuFactory {
 									if (Util.isZero(val - 90))
 										val = 89.999;
 									if (rb1.isSelected()) {
-										ChangeSolarPanelZenithCommand c = new ChangeSolarPanelZenithCommand(solarPanel);
+										ChangeZenithCommand c = new ChangeZenithCommand(solarPanel);
 										solarPanel.setZenith(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
@@ -1889,7 +1894,7 @@ public class PopupMenuFactory {
 								if (a < 0)
 									a += 360;
 								if (rb1.isSelected()) {
-									ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(solarPanel);
+									ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 									solarPanel.setRelativeAzimuth(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
@@ -1897,7 +1902,7 @@ public class PopupMenuFactory {
 									Scene.getInstance().setAzimuthForSolarPanelsOfBuilding(foundation, val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
-									ChangeZenithAngleForAllSolarPanelsCommand c = new ChangeZenithAngleForAllSolarPanelsCommand();
+									ChangeAzimuthForAllSolarPanelsCommand c = new ChangeAzimuthForAllSolarPanelsCommand();
 									Scene.getInstance().setAzimuthForAllSolarPanels(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
@@ -1999,7 +2004,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
 					final String title = "<html>Solar Cell Efficiency (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 22%.<br>So the highest efficiency you can choose is limited to 25%.<hr></html>";
+					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 24%.<br>So the highest efficiency you can choose is limited to 30%.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -2193,17 +2198,17 @@ public class PopupMenuFactory {
 									if (Util.isZero(val - 90))
 										val = 89.999;
 									if (rb1.isSelected()) {
-										// ChangeSolarPanelZenithCommand c = new ChangeSolarPanelZenithCommand(mirror);
+										ChangeZenithCommand c = new ChangeZenithCommand(mirror);
 										mirror.setZenith(val);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = mirror.getTopContainer();
-										ChangeBuildingSolarPanelZenithAngleCommand c = new ChangeBuildingSolarPanelZenithAngleCommand(foundation);
-										Scene.getInstance().setZenithAngleForSolarPanelsOfBuilding(foundation, val);
+										ChangeFoundationMirrorZenithAngleCommand c = new ChangeFoundationMirrorZenithAngleCommand(foundation);
+										Scene.getInstance().setZenithAngleForMirrorsOfFoundation(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										ChangeZenithAngleForAllSolarPanelsCommand c = new ChangeZenithAngleForAllSolarPanelsCommand();
-										Scene.getInstance().setZenithAngleForAllSolarPanels(val);
+										ChangeZenithAngleForAllMirrorsCommand c = new ChangeZenithAngleForAllMirrorsCommand();
+										Scene.getInstance().setZenithAngleForAllMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2259,16 +2264,16 @@ public class PopupMenuFactory {
 								if (a < 0)
 									a += 360;
 								if (rb1.isSelected()) {
-									// ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(mirror);
+									ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 									mirror.setRelativeAzimuth(a);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
-									ChangeBuildingSolarPanelAzimuthCommand c = new ChangeBuildingSolarPanelAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForSolarPanelsOfBuilding(foundation, val);
+									ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
+									Scene.getInstance().setAzimuthForMirrorsOfFoundation(foundation, val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
-									ChangeZenithAngleForAllSolarPanelsCommand c = new ChangeZenithAngleForAllSolarPanelsCommand();
-									Scene.getInstance().setAzimuthForAllSolarPanels(val);
+									ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
+									Scene.getInstance().setAzimuthForAllMirrors(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
