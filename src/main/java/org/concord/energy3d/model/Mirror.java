@@ -8,6 +8,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -32,6 +33,7 @@ public class Mirror extends HousePart {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Mesh supportFrame;
+	private transient Line lightBeams;
 	private double reflectivity = 0.75; // a number in (0, 1)
 	private double mirrorWidth = 2;
 	private double mirrorHeight = 3;
@@ -111,7 +113,16 @@ public class Mirror extends HousePart {
 		supportFrame.setModelBound(new BoundingBox());
 		root.attachChild(supportFrame);
 
+		lightBeams = new Line("Light Beams");
+		lightBeams.setLineWidth(2);
+		lightBeams.setModelBound(null);
+		Util.disablePickShadowLight(lightBeams);
+		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		lightBeams.setDefaultColor(new ColorRGBA(254.0f / 255.0f, 239.0f / 255.0f, 97.0f / 255.0f, 1));
+		root.attachChild(lightBeams);
+
 		updateTextureAndColor();
+
 	}
 
 	@Override
@@ -207,7 +218,7 @@ public class Mirror extends HousePart {
 		if (Util.isZero(zenith - 90)) {
 			mesh.setTranslation(getAbsPoint(0));
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
-				double a = Math.PI / 2 * 0.9999; // exactly 90 degrees will cause the solar panel to disappear
+				double a = Math.PI / 2 * 0.9999; // exactly 90 degrees will cause the mirror to disappear
 				setNormal(a, 0);
 			}
 		} else {
@@ -226,9 +237,11 @@ public class Mirror extends HousePart {
 
 		drawSupporFrame();
 
+		drawLightBeams();
+
 	}
 
-	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
+	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
 	private void setNormal(double zenith, double azimuth) {
 		Foundation foundation = getTopContainer();
 		Vector3 v = foundation.getAbsPoint(0);
@@ -241,6 +254,31 @@ public class Mirror extends HousePart {
 		if (v.getZ() < 0)
 			v.negateLocal();
 		normal = v.normalizeLocal();
+	}
+
+	public void drawLightBeams() {
+		if (Heliodon.getInstance().isNightTime()) {
+			lightBeams.setVisible(false);
+			return;
+		}
+		final double length = 120;
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
+		beamsVertices.rewind();
+		double t = Math.toRadians(zenith);
+		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+		final Vector3 o = getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t));
+		Vector3 p = new Vector3(o);
+		Vector3 s = sunLocation.multiplyLocal(length);
+		p.addLocal(s);
+		//beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		//beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
+		p.addLocal(o);
+		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		lightBeams.updateModelBound();
+		lightBeams.setVisible(true);
 	}
 
 	private void drawSupporFrame() {
@@ -264,7 +302,6 @@ public class Mirror extends HousePart {
 		Vector3 v2 = p.add(dir, null);
 		dir = new Vector3(normal).multiplyLocal(0.2);
 		Util.addPointToQuad(normal, v1, v2, dir, vertexBuffer, normalBuffer);
-
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
 		supportFrame.getMeshData().updateVertexCount();
@@ -273,7 +310,7 @@ public class Mirror extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		if (container == null) // FIXME: There is a chance that a solar panel can be left without a container
+		if (container == null)
 			return true;
 		if (mesh.getWorldBound() == null)
 			return true;
@@ -380,7 +417,7 @@ public class Mirror extends HousePart {
 				c.points.get(0).setY(newY);
 				double o = c.overlap();
 				if (o >= 0) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new solar panel is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new mirror is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
 			}

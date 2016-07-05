@@ -276,9 +276,25 @@ public class EnergyPanel extends JPanel {
 				}
 				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible()) { // for now, only heat flow arrows need to call redrawAll
 					SceneManager.getInstance().setHeatFluxDaily(false);
-					for (final HousePart part : Scene.getInstance().getParts())
-						part.drawHeatFlux();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							for (final HousePart part : Scene.getInstance().getParts())
+								part.drawHeatFlux();
+							return null;
+						}
+					});
 				}
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						for (final HousePart part : Scene.getInstance().getParts()) {
+							if (part instanceof Mirror)
+								((Mirror) part).drawLightBeams();
+						}
+						return null;
+					}
+				});
 				lastDate = d;
 				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}

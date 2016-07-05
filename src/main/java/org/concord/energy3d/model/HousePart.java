@@ -1041,7 +1041,6 @@ public abstract class HousePart implements Serializable {
 			heatFlux.getMeshData().updateVertexCount();
 			heatFlux.updateModelBound();
 		}
-
 		updateHeatFluxVisibility();
 	}
 
