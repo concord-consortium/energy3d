@@ -28,6 +28,9 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Mirror extends HousePart {
 
+	public static final int HELIOSTAT_NONE = 0;
+	public static final int HELIOSTAT_ALTAZIMUTH_MOUNT = 1;
+
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -40,6 +43,8 @@ public class Mirror extends HousePart {
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
 	private transient double layoutGap = 0.01;
+	private int heliostatType = HELIOSTAT_NONE;
+	private Foundation target;
 
 	public Mirror(boolean rotated) {
 		super(1, 1, 0);
@@ -268,12 +273,12 @@ public class Mirror extends HousePart {
 		double t = Math.toRadians(zenith);
 		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 o = getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t));
-		Vector3 p = new Vector3(o);
 		Vector3 s = sunLocation.multiplyLocal(length);
-		p.addLocal(s);
-		//beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		//beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
+		// Vector3 p = new Vector3(o);
+		// p.addLocal(s);
+		// beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		// beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
 		p.addLocal(o);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -439,6 +444,27 @@ public class Mirror extends HousePart {
 
 	public double getZenith() {
 		return zenith;
+	}
+
+	public void setHeliostatType(int heliostatType) {
+		this.heliostatType = heliostatType;
+		switch (heliostatType) {
+		case HELIOSTAT_ALTAZIMUTH_MOUNT:
+			break;
+		}
+		draw();
+	}
+
+	public int getHeliostatType() {
+		return heliostatType;
+	}
+
+	public void setTarget(Foundation target) {
+		this.target = target;
+	}
+
+	public Foundation getTarget() {
+		return target;
 	}
 
 }
