@@ -224,7 +224,7 @@ public class Mirror extends HousePart {
 			mesh.setTranslation(getAbsPoint(0));
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 				double a = Math.PI / 2 * 0.9999; // exactly 90 degrees will cause the mirror to disappear
-				setNormal(a, 0);
+				setNormal(a, Math.toRadians(relativeAzimuth));
 			}
 		} else {
 			double t = Math.toRadians(zenith);
@@ -431,6 +431,10 @@ public class Mirror extends HousePart {
 	}
 
 	public void setRelativeAzimuth(double relativeAzimuth) {
+		if (relativeAzimuth < 0)
+			relativeAzimuth += 360;
+		else if (relativeAzimuth > 360)
+			relativeAzimuth -= 360;
 		this.relativeAzimuth = relativeAzimuth;
 	}
 
@@ -450,6 +454,15 @@ public class Mirror extends HousePart {
 		this.heliostatType = heliostatType;
 		switch (heliostatType) {
 		case HELIOSTAT_ALTAZIMUTH_MOUNT:
+			Vector3 o = new Vector3();
+			if (target != null) {
+				o = target.getAbsCenter();
+			}
+			Vector3 p = getAbsPoint(0).subtractLocal(o).normalizeLocal();
+			double a = Math.toDegrees(Math.acos(p.dot(Vector3.UNIT_Y)));
+			if (p.getX() < 0)
+				a = 360 - a;
+			relativeAzimuth = a;
 			break;
 		}
 		draw();

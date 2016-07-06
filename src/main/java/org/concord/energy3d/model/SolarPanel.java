@@ -226,7 +226,7 @@ public class SolarPanel extends HousePart {
 			mesh.setTranslation(getAbsPoint(0));
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 				double a = Math.PI / 2 * 0.9999; // exactly 90 degrees will cause the solar panel to disappear
-				setNormal(a, 0);
+				setNormal(a, Math.toRadians(relativeAzimuth));
 			}
 		} else {
 			double t = Math.toRadians(zenith);
@@ -469,6 +469,10 @@ public class SolarPanel extends HousePart {
 	}
 
 	public void setRelativeAzimuth(double relativeAzimuth) {
+		if (relativeAzimuth < 0)
+			relativeAzimuth += 360;
+		else if (relativeAzimuth > 360)
+			relativeAzimuth -= 360;
 		this.relativeAzimuth = relativeAzimuth;
 	}
 

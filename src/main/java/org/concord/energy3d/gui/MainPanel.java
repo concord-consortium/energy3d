@@ -1098,10 +1098,10 @@ public class MainPanel extends JPanel {
 												});
 											} else if (hp instanceof Mirror) {
 												Mirror mirror = (Mirror) hp;
-												//ChangeSolarPanelAzimuthCommand c = new ChangeSolarPanelAzimuthCommand(mirror);
+												ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 												mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												mirror.draw();
-												//SceneManager.getInstance().getUndoManager().addEdit(c);
+												SceneManager.getInstance().getUndoManager().addEdit(c);
 												EventQueue.invokeLater(new Runnable() {
 													@Override
 													public void run() {
@@ -1110,6 +1110,7 @@ public class MainPanel extends JPanel {
 												});
 											}
 										}
+										Scene.getInstance().setEdited(true);
 										return null;
 									}
 								});
