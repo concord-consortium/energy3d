@@ -2215,6 +2215,7 @@ public class PopupMenuFactory {
 							return;
 						final Mirror mirror = (Mirror) selectedPart;
 						mirror.setHeliostatType(Mirror.HELIOSTAT_ALTAZIMUTH_MOUNT);
+						mirror.draw();
 						Scene.getInstance().setEdited(true);
 					}
 				}

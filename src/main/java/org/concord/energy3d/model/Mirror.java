@@ -119,7 +119,7 @@ public class Mirror extends HousePart {
 		root.attachChild(supportFrame);
 
 		lightBeams = new Line("Light Beams");
-		lightBeams.setLineWidth(2);
+		lightBeams.setLineWidth(0.1f);
 		lightBeams.setModelBound(null);
 		Util.disablePickShadowLight(lightBeams);
 		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
@@ -220,28 +220,44 @@ public class Mirror extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
+		switch (heliostatType) {
+		case HELIOSTAT_NONE:
+			if (Util.isZero(zenith - 90)) {
+				if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+					setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
+				}
+			} else {
+				setNormal(Math.toRadians(zenith), Math.toRadians(relativeAzimuth));
+			}
+			break;
+		case HELIOSTAT_ALTAZIMUTH_MOUNT:
+			Vector3 o;
+			if (target != null) {
+				o = target.getAbsCenter();
+				o.setZ(target.getBoundingHeight());
+			} else {
+				o = new Vector3();
+			}
+			final Vector3 p = getAbsPoint(0).subtractLocal(o).negateLocal().normalizeLocal();
+			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
+			zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
+			break;
+		}
 		if (Util.isZero(zenith - 90)) {
 			mesh.setTranslation(getAbsPoint(0));
-			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
-				double a = Math.PI / 2 * 0.9999; // exactly 90 degrees will cause the mirror to disappear
-				setNormal(a, Math.toRadians(relativeAzimuth));
-			}
 		} else {
-			double t = Math.toRadians(zenith);
 			double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t)));
-			setNormal(t, Math.toRadians(relativeAzimuth));
+			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(Math.toRadians(zenith))));
 		}
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
-
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
 		drawSupporFrame();
-
 		drawLightBeams();
 
 	}
@@ -266,7 +282,13 @@ public class Mirror extends HousePart {
 			lightBeams.setVisible(false);
 			return;
 		}
-		final double length = 120;
+		double length = 100;
+		if (target != null) {
+			Vector3 a = target.getAbsCenter();
+			a.setZ(target.getBoundingHeight());
+			length = a.distance(getAbsPoint(0));
+		}
+
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
@@ -452,20 +474,6 @@ public class Mirror extends HousePart {
 
 	public void setHeliostatType(int heliostatType) {
 		this.heliostatType = heliostatType;
-		switch (heliostatType) {
-		case HELIOSTAT_ALTAZIMUTH_MOUNT:
-			Vector3 o = new Vector3();
-			if (target != null) {
-				o = target.getAbsCenter();
-			}
-			Vector3 p = getAbsPoint(0).subtractLocal(o).normalizeLocal();
-			double a = Math.toDegrees(Math.acos(p.dot(Vector3.UNIT_Y)));
-			if (p.getX() < 0)
-				a = 360 - a;
-			relativeAzimuth = a;
-			break;
-		}
-		draw();
 	}
 
 	public int getHeliostatType() {

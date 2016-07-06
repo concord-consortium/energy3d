@@ -433,6 +433,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true, false);
 				SceneManager.getInstance().changeSkyTexture();
 				SceneManager.getInstance().setShading(heliodon.isNightTime());
+				boolean night = Heliodon.getInstance().isNightTime();
+				for (final HousePart part : Scene.getInstance().getParts()) {
+					if (part instanceof Mirror) {
+						Mirror m = (Mirror) part;
+						if (night) {
+							m.drawLightBeams();
+						} else {
+							if (m.getTarget() != null && m.getHeliostatType() != Mirror.HELIOSTAT_NONE)
+								m.draw();
+						}
+					}
+				}
 			}
 			heliodon.update();
 		}
