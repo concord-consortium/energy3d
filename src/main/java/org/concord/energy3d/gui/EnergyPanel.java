@@ -288,9 +288,16 @@ public class EnergyPanel extends JPanel {
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {
+						boolean night = Heliodon.getInstance().isNightTime();
 						for (final HousePart part : Scene.getInstance().getParts()) {
-							if (part instanceof Mirror)
-								((Mirror) part).drawLightBeams();
+							if (part instanceof Mirror) {
+								Mirror m = (Mirror) part;
+								if (night) {
+									m.drawLightBeams();
+								} else {
+									m.draw();
+								}
+							}
 						}
 						return null;
 					}

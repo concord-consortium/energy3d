@@ -1660,6 +1660,26 @@ public class Scene implements Serializable {
 		}
 	}
 
+	public void setTargetForMirrorsOfFoundation(final Foundation foundation, final Foundation target) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
+				((Mirror) p).setTarget(target);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTargetForAllMirrors(final Foundation target) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror) {
+				((Mirror) p).setTarget(target);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public boolean isEdited() {
 		return edited;
 	}
