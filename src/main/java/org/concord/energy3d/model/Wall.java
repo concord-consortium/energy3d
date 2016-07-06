@@ -373,7 +373,9 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isDrawable() {
-		return super.isDrawable() && !isAtSamePlaceAsAnotherPart(this);
+		final double minLength = 0.2;
+		final boolean biggerThanMinimum = points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= minLength && getAbsPoint(0).distance(getAbsPoint(1)) >= minLength;
+		return biggerThanMinimum && !isAtSamePlaceAsAnotherPart(this);
 	}
 
 	private boolean isAtSamePlaceAsAnotherPart(final HousePart selectedHousePart) {
@@ -479,7 +481,10 @@ public class Wall extends HousePart implements Thermalizable {
 			}
 			drawOutline(wallAndWindowsPoints);
 			if (!isFrozen()) {
-				drawBackMesh(computeWallAndWindowPolygon(true));
+				if (isDrawBackMesh())
+					drawBackMesh(computeWallAndWindowPolygon(true));
+				else
+					backMesh.getSceneHints().setCullHint(CullHint.Always);
 				drawSurroundMesh(thicknessNormal);
 				drawWindowsSurroundMesh(thicknessNormal);
 			}
@@ -490,6 +495,16 @@ public class Wall extends HousePart implements Thermalizable {
 		CollisionTreeManager.INSTANCE.removeCollisionTree(invisibleMesh);
 
 		root.updateWorldBound(true);
+	}
+
+	private boolean isDrawBackMesh() {
+		for (int i = 0; i < 2; i++)
+			if (neighbors[i] != null) {
+				final Wall neighbor = neighbors[i].getNeighborOf(this);
+				if (neighbor.getAbsPoint(0).distance(neighbor.getAbsPoint(2)) < 1)
+					return false;
+			}
+		return true;
 	}
 
 	private void drawVerticalEdges() {
@@ -623,8 +638,8 @@ public class Wall extends HousePart implements Thermalizable {
 		if (fence) {
 
 			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railRadius * 2);
-			Vector3 p10 = getAbsPoint(1).subtractLocal(getAbsPoint(0));
-			Vector3 p32 = getAbsPoint(3).subtractLocal(getAbsPoint(2));
+			final Vector3 p10 = getAbsPoint(1).subtractLocal(getAbsPoint(0));
+			final Vector3 p32 = getAbsPoint(3).subtractLocal(getAbsPoint(2));
 			p10.multiplyLocal(1, 1, 0.3);
 			p32.multiplyLocal(1, 1, 0.3);
 			Util.addPointToQuad(normal, getAbsPoint(0).addLocal(p10), getAbsPoint(2).addLocal(p32), dir, vertexBuffer, normalBuffer);
