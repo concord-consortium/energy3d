@@ -638,8 +638,8 @@ public class Wall extends HousePart implements Thermalizable {
 
 		if (fence) {
 
-			Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railRadius * 2);
-			final Vector3 p10 = getAbsPoint(1).subtractLocal(getAbsPoint(0));
+			Vector3 dir = v.clone().normalizeLocal().multiplyLocal(railRadius * 2);
+			final Vector3 p10 = v.clone();
 			final Vector3 p32 = getAbsPoint(3).subtractLocal(getAbsPoint(2));
 			p10.multiplyLocal(1, 1, 0.3);
 			p32.multiplyLocal(1, 1, 0.3);
@@ -670,15 +670,18 @@ public class Wall extends HousePart implements Thermalizable {
 			}
 			if (floor == null) {
 
+				Vector3 dir = v.clone().normalizeLocal().multiplyLocal(railRadius * 3);
 				final double heightRatio = 0.33;
-				v.multiplyLocal(heightRatio);
-				Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(railRadius * 3);
-				Util.addPointToQuad(normal, getAbsPoint(1).multiplyLocal(1, 1, heightRatio), getAbsPoint(3).multiplyLocal(1, 1, heightRatio), dir, vertexBuffer, normalBuffer);
+				final Vector3 p10 = v.clone();
+				final Vector3 p32 = getAbsPoint(3).subtractLocal(getAbsPoint(2));
+				p10.multiplyLocal(1, 1, heightRatio);
+				p32.multiplyLocal(1, 1, heightRatio);
+				Util.addPointToQuad(normal, getAbsPoint(0).addLocal(p10), getAbsPoint(2).addLocal(p32), dir, vertexBuffer, normalBuffer);
 				dir = new Vector3(u).normalizeLocal().multiplyLocal(railRadius);
-
+				v.multiplyLocal(heightRatio);
 				final Vector3 p = new Vector3();
 				for (int col = 0; col <= cols; col++) {
-					u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), 0);
+					u.multiply((double) col / cols, p).addLocal(o.getX(), o.getY(), o.getZ());
 					Util.addPointToQuad(normal, p, p.add(v, null), dir, vertexBuffer, normalBuffer);
 				}
 

@@ -26,10 +26,12 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
+import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -44,6 +46,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh outlineMesh;
 	private transient Mesh surroundMesh;
 	private transient BMText buildingLabel;
+	private transient Box tank;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient double minX;
@@ -153,6 +156,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		azimuthArrow.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		azimuthArrow.setDefaultColor(ColorRGBA.WHITE);
 		root.attachChild(azimuthArrow);
+
+		tank = new Box("Tower Tank");
+		tank.setDefaultColor(ColorRGBA.WHITE);
+		final MaterialState material = new MaterialState();
+		material.setEmissive(ColorRGBA.WHITE);
+		tank.setRenderState(material);
+		tank.setModelBound(null);
+		tank.setVisible(false);
+		root.attachChild(tank);
 
 		updateTextureAndColor();
 
@@ -564,6 +576,29 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawOutline(outlineMesh, (float) height);
 			updateSolarLabelPosition();
 			updateHandles();
+			drawTank();
+		}
+	}
+
+	public void drawTank() {
+		boolean focused = false;
+		for (HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror) {
+				Mirror m = (Mirror) p;
+				if (m.getTarget() == this) {
+					focused = true;
+					break;
+				}
+			}
+		}
+		tank.setVisible(focused);
+		if (focused) {
+			Vector3 v = getAbsPoint(0);
+			double vx = getAbsPoint(2).distance(v); // x direction
+			double vy = getAbsPoint(1).distance(v); // y direction
+			Vector3 o = getAbsCenter();
+			o.setZ(getBoundingHeight());
+			tank.setData(o, vx / 4, vy / 4, 10);
 		}
 	}
 
