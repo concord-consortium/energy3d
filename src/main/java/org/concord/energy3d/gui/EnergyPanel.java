@@ -182,6 +182,7 @@ public class EnergyPanel extends JPanel {
 					Heliodon.getInstance().setDate(d);
 					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setTreeLeaves();
+					Scene.getInstance().updateMirrors();
 					Scene.getInstance().setEdited(true);
 					updateThermostat();
 					EnergyPanel.this.validate();
@@ -224,6 +225,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().setCity(city);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
+				Scene.getInstance().updateMirrors();
 				Scene.getInstance().setTreeLeaves();
 				Scene.getInstance().setEdited(true);
 			}
@@ -285,23 +287,7 @@ public class EnergyPanel extends JPanel {
 						}
 					});
 				}
-				SceneManager.getTaskManager().update(new Callable<Object>() {
-					@Override
-					public Object call() throws Exception {
-						boolean night = Heliodon.getInstance().isNightTime();
-						for (final HousePart part : Scene.getInstance().getParts()) {
-							if (part instanceof Mirror) {
-								Mirror m = (Mirror) part;
-								if (night) {
-									m.drawLightBeams();
-								} else {
-									m.draw();
-								}
-							}
-						}
-						return null;
-					}
-				});
+				Scene.getInstance().updateMirrors();
 				lastDate = d;
 				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}
@@ -327,6 +313,7 @@ public class EnergyPanel extends JPanel {
 				final ChangeLatitudeCommand c = new ChangeLatitudeCommand();
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				Scene.getInstance().updateMirrors();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}
@@ -584,8 +571,8 @@ public class EnergyPanel extends JPanel {
 				final Calendar c = (Calendar) Heliodon.getInstance().getCalender().clone();
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
-				Scene.getInstance().setTreeLeaves();
 			}
+			Scene.getInstance().setTreeLeaves();
 
 			EventQueue.invokeLater(new Runnable() {
 				@Override
