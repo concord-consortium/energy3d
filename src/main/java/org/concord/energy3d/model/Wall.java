@@ -373,9 +373,7 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isDrawable() {
-		final double minLength = 0.2;
-		final boolean biggerThanMinimum = points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= minLength && getAbsPoint(0).distance(getAbsPoint(1)) >= minLength;
-		return biggerThanMinimum && !isAtSamePlaceAsAnotherPart(this);
+		return isValid() && !isAtSamePlaceAsAnotherPart(this);
 	}
 
 	private boolean isAtSamePlaceAsAnotherPart(final HousePart selectedHousePart) {
@@ -498,10 +496,13 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	private boolean isDrawBackMesh() {
+		final double MIN_WIDTH = 2;
+		if (getAbsPoint(0).distance(getAbsPoint(2)) < MIN_WIDTH)
+			return false;
 		for (int i = 0; i < 2; i++)
 			if (neighbors[i] != null) {
 				final Wall neighbor = neighbors[i].getNeighborOf(this);
-				if (neighbor.getAbsPoint(0).distance(neighbor.getAbsPoint(2)) < 1)
+				if (neighbor.getAbsPoint(0).distance(neighbor.getAbsPoint(2)) < MIN_WIDTH)
 					return false;
 			}
 		return true;
@@ -1681,7 +1682,8 @@ public class Wall extends HousePart implements Thermalizable {
 	public boolean isValid() {
 		if (!super.isValid())
 			return false;
-		return super.isDrawable();
+		final double minLength = 0.2;
+		return points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= minLength && getAbsPoint(0).distance(getAbsPoint(1)) >= minLength;
 	}
 
 }
