@@ -61,14 +61,19 @@ import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorHeliostatCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorZenithAngleCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
+import org.concord.energy3d.undo.ChangeHeliostatCommand;
+import org.concord.energy3d.undo.ChangeHeliostatForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
+import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeReflectivityForAllMirrorsCommand;
@@ -77,6 +82,7 @@ import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
+import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeZenithCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
@@ -520,6 +526,30 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeReflectivityForAllMirrorsCommand) {
 					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
 					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectivity()) + "}";
+				} else if (lastEdit instanceof ChangeHeliostatCommand) {
+					ChangeHeliostatCommand c = (ChangeHeliostatCommand) lastEdit;
+					Mirror m = c.getMirror();
+					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + m.getReflectivity() + "}";
+				} else if (lastEdit instanceof ChangeFoundationMirrorHeliostatCommand) {
+					Foundation foundation = ((ChangeFoundationMirrorHeliostatCommand) lastEdit).getFoundation();
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getHeliostatType()) + "}";
+				} else if (lastEdit instanceof ChangeHeliostatForAllMirrorsCommand) {
+					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getHeliostatType()) + "}";
+				} else if (lastEdit instanceof ChangeMirrorTargetCommand) {
+					ChangeMirrorTargetCommand c = (ChangeMirrorTargetCommand) lastEdit;
+					Mirror m = c.getMirror();
+					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue().getId() + ", \"New Value\": " + c.getNewValue().getId() + "}";
+				} else if (lastEdit instanceof ChangeFoundationMirrorTargetCommand) {
+					Foundation foundation = ((ChangeFoundationMirrorTargetCommand) lastEdit).getFoundation();
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTarget().getId()) + "}";
+				} else if (lastEdit instanceof ChangeTargetForAllMirrorsCommand) {
+					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTarget().getId()) + "}";
 				}
 
 				// wall properties

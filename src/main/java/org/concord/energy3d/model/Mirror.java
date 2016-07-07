@@ -120,6 +120,7 @@ public class Mirror extends HousePart {
 
 		lightBeams = new Line("Light Beams");
 		lightBeams.setLineWidth(0.1f);
+		lightBeams.setStipplePattern((short) 0x5555);
 		lightBeams.setModelBound(null);
 		Util.disablePickShadowLight(lightBeams);
 		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));

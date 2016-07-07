@@ -1680,6 +1680,26 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setHeliostatForMirrorsOfFoundation(final Foundation foundation, final int heliostatType) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
+				((Mirror) p).setHeliostatType(heliostatType);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeliostatForAllMirrors(final int heliostatType) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror) {
+				((Mirror) p).setHeliostatType(heliostatType);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public boolean isEdited() {
 		return edited;
 	}
@@ -1799,9 +1819,35 @@ public class Scene implements Serializable {
 
 	// XIE: This needs to be called for trees to change texture when the month changes
 	public void setTreeLeaves() {
-		for (final HousePart p : Scene.getInstance().getParts())
-			if (p instanceof Tree)
-				p.updateTextureAndColor();
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				for (final HousePart p : parts)
+					if (p instanceof Tree)
+						p.updateTextureAndColor();
+				return null;
+			}
+		});
+	}
+
+	public void updateMirrors() {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				boolean night = Heliodon.getInstance().isNightTime();
+				for (final HousePart part : parts) {
+					if (part instanceof Mirror) {
+						Mirror m = (Mirror) part;
+						if (night) {
+							m.drawLightBeams();
+						} else {
+							m.draw();
+						}
+					}
+				}
+				return null;
+			}
+		});
 	}
 
 	public Ground getGround() {
