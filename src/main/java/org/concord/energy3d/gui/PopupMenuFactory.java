@@ -319,6 +319,7 @@ public class PopupMenuFactory {
 			addPrefabMenuItem("Shed Dormer", "prefabs/shed-dormer.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Solarium", "prefabs/solarium1.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Square Tower", "prefabs/square-tower.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Stair", "prefabs/stair1.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Tall Front Door Overhang", "prefabs/tall-front-door-overhang.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Temple Front", "prefabs/temple-front.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Waterfront Deck", "prefabs/waterfront-deck.ng3", miImportPrefabMenu);
