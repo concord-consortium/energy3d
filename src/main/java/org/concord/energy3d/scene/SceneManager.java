@@ -1654,10 +1654,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								selectedHousePart.setEditPointsVisible(true);
 								if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
 									selectedHousePart.setGridsVisible(true);
-									if (selectedHousePart instanceof Foundation)
+									if (selectedHousePart instanceof Foundation) {
 										editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
-									else
+									} else {
 										editHousePartCommand = new EditPartCommand(selectedHousePart);
+									}
 								}
 							}
 							SelectUtil.nextPickLayer();
@@ -1745,6 +1746,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 					}
 					updateHeliodonAndAnnotationSize();
+					if (selectedHousePart instanceof Foundation)
+						Scene.getInstance().updateMirrors();
 					EnergyPanel.getInstance().update();
 				} catch (Throwable t) {
 					t.printStackTrace();

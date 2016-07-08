@@ -471,7 +471,7 @@ public class Heliodon {
 		getBloomRenderPass();
 		if (!bloomRenderPass.contains(sun))
 			bloomRenderPass.add(sun);
-		bloomRenderPass.setEnabled(visible);
+		// bloomRenderPass.setEnabled(visible);
 		root.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 
 		if (visible)

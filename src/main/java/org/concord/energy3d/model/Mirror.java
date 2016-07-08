@@ -232,13 +232,7 @@ public class Mirror extends HousePart {
 			}
 			break;
 		case HELIOSTAT_ALTAZIMUTH_MOUNT:
-			Vector3 o;
-			if (target != null) {
-				o = target.getAbsCenter();
-				o.setZ(target.getBoundingHeight());
-			} else {
-				o = new Vector3();
-			}
+			Vector3 o = target != null ? target.getTankCenter() : new Vector3();
 			final Vector3 p = getAbsPoint(0).subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();

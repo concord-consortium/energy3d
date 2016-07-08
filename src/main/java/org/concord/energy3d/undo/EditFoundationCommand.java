@@ -6,6 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.Operation;
 
@@ -31,8 +32,8 @@ public class EditFoundationCommand extends EditPartCommand {
 	@Override
 	public void undo() throws CannotUndoException {
 		foundation.setResizeHouseMode(isResizeMode);
-//		if (!isResizeMode)
-//			foundation.saveOrgPoints();
+		// if (!isResizeMode)
+		// foundation.saveOrgPoints();
 		foundation.setEditPoint(editPoint);
 		super.undo();
 		try {
@@ -41,14 +42,19 @@ public class EditFoundationCommand extends EditPartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
+		foundation.draw();
+		foundation.drawChildren();
+		foundation.updateHandlesOfAllFoudations();
+		Scene.getInstance().updateMirrors();
+		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		foundation.setResizeHouseMode(isResizeMode);
-//		if (!isResizeMode)
-//			foundation.saveOrgPoints();
+		// if (!isResizeMode)
+		// foundation.saveOrgPoints();
 		foundation.setEditPoint(editPoint);
 		super.redo();
 		try {
@@ -57,6 +63,11 @@ public class EditFoundationCommand extends EditPartCommand {
 			e.printStackTrace();
 		}
 		foundation.setResizeHouseMode(SceneManager.getInstance().getOperation() == Operation.RESIZE);
+		foundation.draw();
+		foundation.drawChildren();
+		foundation.updateHandlesOfAllFoudations();
+		Scene.getInstance().updateMirrors();
+		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 

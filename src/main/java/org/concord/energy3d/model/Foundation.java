@@ -601,13 +601,61 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (!bloom.contains(tank)) {
 				bloom.add(tank);
 			}
-			Vector3 v = getAbsPoint(0);
-			double vx = getAbsPoint(2).distance(v); // x direction
-			double vy = getAbsPoint(1).distance(v); // y direction
-			Vector3 o = getAbsCenter();
-			o.setZ(getBoundingHeight());
-			tank.setData(o, vx / 4, vy / 4, 10);
+			double rx = 0;
+			double ry = 0;
+			double xmin = Double.MAX_VALUE;
+			double xmax = -Double.MAX_VALUE;
+			double ymin = Double.MAX_VALUE;
+			double ymax = -Double.MAX_VALUE;
+			int count = 0;
+			for (HousePart p : children) {
+				if (p instanceof Wall) {
+					Vector3 c = p.getAbsCenter();
+					rx += c.getX();
+					ry += c.getY();
+					if (xmin > c.getX())
+						xmin = c.getX();
+					else if (xmax < c.getX())
+						xmax = c.getX();
+					if (ymin > c.getY())
+						ymin = c.getY();
+					else if (ymax < c.getY())
+						ymax = c.getY();
+					count++;
+				}
+			}
+			Vector3 o;
+			if (count == 0) {
+				o = getAbsCenter();
+				o.setZ(getBoundingHeight() + height);
+				tank.setData(o, 10, 10, 10);
+			} else {
+				o = new Vector3(rx / count, ry / count, getBoundingHeight() + height);
+				tank.setData(o, (xmax - xmin) * 0.6, (ymax - ymin) * 0.6, 10);
+			}
 		}
+	}
+
+	Vector3 getTankCenter() {
+		double rx = 0;
+		double ry = 0;
+		int count = 0;
+		for (HousePart p : children) {
+			if (p instanceof Wall) {
+				Vector3 c = p.getAbsCenter();
+				rx += c.getX();
+				ry += c.getY();
+				count++;
+			}
+		}
+		Vector3 o;
+		if (count == 0) {
+			o = getAbsCenter();
+			o.setZ(getBoundingHeight() + height);
+		} else {
+			o = new Vector3(rx / count, ry / count, getBoundingHeight() + height);
+		}
+		return o;
 	}
 
 	public void drawSurroundMesh() {
