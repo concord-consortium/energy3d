@@ -46,6 +46,7 @@ public class Mirror extends HousePart {
 	private transient double layoutGap = 0.01;
 	private int heliostatType = HELIOSTAT_NONE;
 	private Foundation target;
+	private double baseHeight = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 
 	public Mirror(boolean rotated) {
@@ -90,6 +91,8 @@ public class Mirror extends HousePart {
 			zenith = 90;
 		if (Util.isZero(reflectivity))
 			reflectivity = 0.75;
+		if (Util.isZero(baseHeight))
+			baseHeight = 5;
 
 		mesh = new Mesh("Reflecting Mirror");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -167,7 +170,7 @@ public class Mirror extends HousePart {
 				}
 				if (!Util.isZero(zenith - 90)) {
 					double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
+					p.setZ(p.getZ() + baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 				}
 				getEditPointShape(i).setTranslation(p);
 			}
@@ -227,6 +230,14 @@ public class Mirror extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
+		Vector3 a;
+		if (Util.isZero(zenith - 90)) {
+			a = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		} else {
+			double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+			a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
+		}
+
 		switch (heliostatType) {
 		case HELIOSTAT_NONE:
 			if (Util.isZero(zenith - 90)) {
@@ -239,18 +250,13 @@ public class Mirror extends HousePart {
 			break;
 		case HELIOSTAT_ALTAZIMUTH_MOUNT:
 			Vector3 o = target != null ? target.getTankCenter() : new Vector3();
-			final Vector3 p = getAbsPoint(0).subtractLocal(o).negateLocal().normalizeLocal();
+			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
 			zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
 			break;
 		}
-		if (Util.isZero(zenith - 90)) {
-			mesh.setTranslation(getAbsPoint(0));
-		} else {
-			double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(Math.toRadians(zenith))));
-		}
+		mesh.setTranslation(a);
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
@@ -295,12 +301,12 @@ public class Mirror extends HousePart {
 		beamsVertices.rewind();
 		double t = Math.toRadians(zenith);
 		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-		final Vector3 o = getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t));
+		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(t));
 		Vector3 s = sunLocation.multiplyLocal(length);
-		// Vector3 p = new Vector3(o);
-		// p.addLocal(s);
+		// Vector3 r = new Vector3(o);
+		// r.addLocal(s);
 		// beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		// beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		// beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 		Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
 		p.addLocal(o);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
@@ -329,8 +335,8 @@ public class Mirror extends HousePart {
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		double t = Math.toRadians(zenith);
 		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-		final Vector3 p = o.add(0, 0, 0.5 * h * Math.cos(t), null);
-		Vector3 dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
+		final Vector3 p = o.add(0, 0, baseHeight + 0.5 * h * Math.cos(t), null);
+		Vector3 dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(1);
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
 		double w = mirrorWidth / Scene.getInstance().getAnnotationScale();
 		dir.normalizeLocal().multiplyLocal(w * 0.5);
