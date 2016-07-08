@@ -31,6 +31,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
 import com.ardor3d.scenegraph.shape.Box;
@@ -141,6 +142,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
+		surroundMesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
 
 		setLabelOffset(-0.11);
@@ -1270,16 +1272,22 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
+	@Override
 	public void setHeight(final double height) {
-		double delta = height - this.height;
+		final double delta = height - this.height;
 		this.height = height;
 		for (final HousePart c : children) {
-			int n = c.points.size();
+			final int n = c.points.size();
 			for (int i = 0; i < n; i++) {
-				Vector3 v = c.points.get(i);
+				final Vector3 v = c.points.get(i);
 				v.setZ(v.getZ() + delta);
 			}
 		}
+	}
+
+	@Override
+	public Spatial getCollisionSpatial() {
+		return root;
 	}
 
 }
