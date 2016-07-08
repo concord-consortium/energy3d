@@ -13,6 +13,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -45,6 +46,7 @@ public class Mirror extends HousePart {
 	private transient double layoutGap = 0.01;
 	private int heliostatType = HELIOSTAT_NONE;
 	private Foundation target;
+	private static transient BloomRenderPass bloomRenderPass;
 
 	public Mirror(boolean rotated) {
 		super(1, 1, 0);
@@ -119,12 +121,16 @@ public class Mirror extends HousePart {
 		root.attachChild(supportFrame);
 
 		lightBeams = new Line("Light Beams");
-		lightBeams.setLineWidth(0.1f);
-		lightBeams.setStipplePattern((short) 0x5555);
+		lightBeams.setLineWidth(0.01f);
+		lightBeams.setStipplePattern((short) 0xffff);
 		lightBeams.setModelBound(null);
+		// final BlendState blendState = new BlendState();
+		// blendState.setBlendEnabled(true);
+		// lightBeams.setRenderState(blendState);
+		// lightBeams.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		Util.disablePickShadowLight(lightBeams);
 		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		lightBeams.setDefaultColor(new ColorRGBA(254.0f / 255.0f, 239.0f / 255.0f, 97.0f / 255.0f, 1));
+		lightBeams.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
 		root.attachChild(lightBeams);
 
 		updateTextureAndColor();
@@ -301,6 +307,15 @@ public class Mirror extends HousePart {
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		lightBeams.updateModelBound();
 		lightBeams.setVisible(true);
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
+			bloomRenderPass.setBlurIntensityMultiplier(0.2f);
+			bloomRenderPass.setNrBlurPasses(1);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+		}
+		if (!bloomRenderPass.contains(lightBeams)) {
+			bloomRenderPass.add(lightBeams);
+		}
 	}
 
 	private void drawSupporFrame() {
@@ -481,6 +496,15 @@ public class Mirror extends HousePart {
 
 	public Foundation getTarget() {
 		return target;
+	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		if (bloomRenderPass != null) {
+			if (bloomRenderPass.contains(lightBeams))
+				bloomRenderPass.remove(lightBeams);
+		}
 	}
 
 }

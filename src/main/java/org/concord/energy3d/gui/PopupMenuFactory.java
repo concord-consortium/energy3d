@@ -1786,6 +1786,8 @@ public class PopupMenuFactory {
 
 			popupMenuForFoundation.add(miPaste);
 			popupMenuForFoundation.add(miCopyBuilding);
+			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miHeight);
 			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(rotateMenu);
 			popupMenuForFoundation.add(clearMenu);
@@ -1793,7 +1795,6 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.addSeparator();
-			popupMenuForFoundation.add(miHeight);
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createInsulationMenuItem(false));
@@ -1802,6 +1803,10 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miAddUtilityBill);
 			popupMenuForFoundation.add(miDeleteUtilityBill);
+			popupMenuForFoundation.addSeparator();
+
+			final JMenu analysisMenu = new JMenu("Analysis");
+			popupMenuForFoundation.add(analysisMenu);
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1816,7 +1821,7 @@ public class PopupMenuFactory {
 					analysis.show("Daily Energy");
 				}
 			});
-			popupMenuForFoundation.add(mi);
+			analysisMenu.add(mi);
 
 			mi = new JMenuItem("Annual Energy Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1828,7 +1833,8 @@ public class PopupMenuFactory {
 					new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
-			popupMenuForFoundation.add(mi);
+			analysisMenu.add(mi);
+			analysisMenu.addSeparator();
 
 			mi = new JMenuItem("Daily Solar Panel Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1848,7 +1854,7 @@ public class PopupMenuFactory {
 					a.show();
 				}
 			});
-			popupMenuForFoundation.add(mi);
+			analysisMenu.add(mi);
 
 			mi = new JMenuItem("Annual Solar Panel Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1868,7 +1874,7 @@ public class PopupMenuFactory {
 					a.show();
 				}
 			});
-			popupMenuForFoundation.add(mi);
+			analysisMenu.add(mi);
 
 		}
 

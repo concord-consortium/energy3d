@@ -326,8 +326,6 @@ public class Foundation extends HousePart implements Thermalizable {
 					applyNewHeight(boundingHeight, newBoundingHeight, false);
 				}
 			}
-			// else
-			// move(p, )
 			syncUpperPoints();
 		}
 
@@ -1333,6 +1331,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	@Override
 	public Spatial getCollisionSpatial() {
 		return root;
+	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		BloomRenderPass bloom = Heliodon.getInstance().getBloomRenderPass();
+		if (bloom.contains(tank))
+			bloom.remove(tank);
 	}
 
 }

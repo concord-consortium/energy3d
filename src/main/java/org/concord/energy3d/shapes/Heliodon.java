@@ -663,9 +663,8 @@ public class Heliodon {
 			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
 			bloomRenderPass.setBlurIntensityMultiplier(0.75f);
 			bloomRenderPass.setExposureCutoff(1);
-		}
-		if (!passManager.contains(bloomRenderPass))
 			passManager.add(bloomRenderPass);
+		}
 		return bloomRenderPass;
 	}
 

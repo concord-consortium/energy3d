@@ -2026,4 +2026,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return fineGrid;
 	}
 
+	public BasicPassManager getPassManager() {
+		return passManager;
+	}
+
 }

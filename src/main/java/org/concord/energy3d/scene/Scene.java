@@ -210,6 +210,8 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 			Wall.resetDefaultWallHeight();
 
+			if (instance != null)
+				instance.deleteAll();
 			if (url == null) {
 				instance = new Scene();
 				System.out.println("done");
@@ -464,6 +466,12 @@ public class Scene implements Serializable {
 		cleanup();
 		redrawAll(true);
 
+	}
+
+	private void deleteAll() {
+		for (HousePart p : parts) {
+			p.delete();
+		}
 	}
 
 	private void cleanup() {
