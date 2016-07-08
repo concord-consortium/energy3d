@@ -112,7 +112,6 @@ import org.concord.energy3d.undo.ChangeZenithAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
-import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -1454,24 +1453,7 @@ public class PopupMenuFactory {
 			mi180.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-							if (selectedPart instanceof Foundation) {
-								final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, Math.PI);
-								SceneManager.getInstance().rotateBuilding(Math.PI, true);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								EventQueue.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										EnergyPanel.getInstance().updateProperties();
-									}
-								});
-							}
-							return null;
-						}
-					});
+					SceneManager.getInstance().rotate(Math.PI);
 				}
 			});
 			rotateMenu.add(mi180);
@@ -1480,24 +1462,7 @@ public class PopupMenuFactory {
 			mi90CW.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-							if (selectedPart instanceof Foundation) {
-								final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, -Math.PI / 2);
-								SceneManager.getInstance().rotateBuilding(-Math.PI / 2, true);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								EventQueue.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										EnergyPanel.getInstance().updateProperties();
-									}
-								});
-							}
-							return null;
-						}
-					});
+					SceneManager.getInstance().rotate(-Math.PI / 2);
 				}
 			});
 			rotateMenu.add(mi90CW);
@@ -1506,24 +1471,7 @@ public class PopupMenuFactory {
 			mi90CCW.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-							if (selectedPart instanceof Foundation) {
-								final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, Math.PI / 2);
-								SceneManager.getInstance().rotateBuilding(Math.PI / 2, true);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								EventQueue.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										EnergyPanel.getInstance().updateProperties();
-									}
-								});
-							}
-							return null;
-						}
-					});
+					SceneManager.getInstance().rotate(Math.PI / 2);
 				}
 			});
 			rotateMenu.add(mi90CCW);

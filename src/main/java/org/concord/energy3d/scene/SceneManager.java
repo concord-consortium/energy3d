@@ -61,6 +61,7 @@ import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
+import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.UndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
@@ -1907,6 +1908,31 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 		Scene.getInstance().redrawAll();
+	}
+
+	public void rotate(final double angle) {
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Foundation) {
+					final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, angle);
+					SceneManager.getInstance().rotateBuilding(angle, true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							EnergyPanel.getInstance().updateProperties();
+						}
+					});
+				} else if (selectedPart == null) {
+					final RotateBuildingCommand c = new RotateBuildingCommand(null, angle);
+					rotateAllBuildings(angle);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+				return null;
+			}
+		});
 	}
 
 	public boolean isRefreshOnlyMode() {

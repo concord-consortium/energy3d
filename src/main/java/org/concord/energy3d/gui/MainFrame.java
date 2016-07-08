@@ -235,6 +235,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem moveWestMenuItem;
 	private JMenuItem moveNorthMenuItem;
 	private JMenuItem moveSouthMenuItem;
+	private JMenuItem rotate180MenuItem;
+	private JMenuItem rotate90CwMenuItem;
+	private JMenuItem rotate90CcwMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -1943,13 +1946,20 @@ public class MainFrame extends JFrame {
 			moveMenu.add(getMoveNorthMenuItem());
 			moveMenu.add(getMoveSouthMenuItem());
 
+			final JMenu rotateMenu = new JMenu("Rotate");
+			rotateMenu.add(getRotate180MenuItem());
+			rotateMenu.add(getRotate90CwMenuItem());
+			rotateMenu.add(getRotate90CcwMenuItem());
+
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getCutMenuItem());
 			editMenu.add(getCopyMenuItem());
 			editMenu.add(getPasteMenuItem());
+			editMenu.addSeparator();
 			editMenu.add(moveMenu);
+			editMenu.add(rotateMenu);
 			editMenu.add(clearMenu);
 			editMenu.addSeparator();
 			editMenu.add(getFixProblemsMenuItem());
@@ -3006,6 +3016,45 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllUtilityBillsMenuItem;
+	}
+
+	private JMenuItem getRotate180MenuItem() {
+		if (rotate180MenuItem == null) {
+			rotate180MenuItem = new JMenuItem("180\u00B0");
+			rotate180MenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().rotate(Math.PI);
+				}
+			});
+		}
+		return rotate180MenuItem;
+	}
+
+	private JMenuItem getRotate90CwMenuItem() {
+		if (rotate90CwMenuItem == null) {
+			rotate90CwMenuItem = new JMenuItem("90\u00B0 Clockwise");
+			rotate90CwMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().rotate(-Math.PI / 2);
+				}
+			});
+		}
+		return rotate90CwMenuItem;
+	}
+
+	private JMenuItem getRotate90CcwMenuItem() {
+		if (rotate90CcwMenuItem == null) {
+			rotate90CcwMenuItem = new JMenuItem("90\u00B0 Counter Clockwise");
+			rotate90CcwMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().rotate(Math.PI / 2);
+				}
+			});
+		}
+		return rotate90CcwMenuItem;
 	}
 
 	private JMenuItem getMoveEastMenuItem() {
