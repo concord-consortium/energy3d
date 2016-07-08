@@ -112,6 +112,7 @@ import org.concord.energy3d.undo.ChangeZenithAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
+import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -1447,6 +1448,86 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu rotateMenu = new JMenu("Rotate");
+
+			final JMenuItem mi180 = new JMenuItem("180\u00B0");
+			mi180.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (selectedPart instanceof Foundation) {
+								final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, Math.PI);
+								SceneManager.getInstance().rotateBuilding(Math.PI, true);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								EventQueue.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										EnergyPanel.getInstance().updateProperties();
+									}
+								});
+							}
+							return null;
+						}
+					});
+				}
+			});
+			rotateMenu.add(mi180);
+
+			final JMenuItem mi90CW = new JMenuItem("90\u00B0 Clockwise");
+			mi90CW.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (selectedPart instanceof Foundation) {
+								final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, -Math.PI / 2);
+								SceneManager.getInstance().rotateBuilding(-Math.PI / 2, true);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								EventQueue.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										EnergyPanel.getInstance().updateProperties();
+									}
+								});
+							}
+							return null;
+						}
+					});
+				}
+			});
+			rotateMenu.add(mi90CW);
+
+			final JMenuItem mi90CCW = new JMenuItem("90\u00B0 Counter Clockwise");
+			mi90CCW.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (selectedPart instanceof Foundation) {
+								final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, Math.PI / 2);
+								SceneManager.getInstance().rotateBuilding(Math.PI / 2, true);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								EventQueue.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										EnergyPanel.getInstance().updateProperties();
+									}
+								});
+							}
+							return null;
+						}
+					});
+				}
+			});
+			rotateMenu.add(mi90CCW);
+
 			final JMenu clearMenu = new JMenu("Clear");
 
 			final JMenuItem miRemoveAllWindows = new JMenuItem("Remove All Windows");
@@ -1706,6 +1787,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miPaste);
 			popupMenuForFoundation.add(miCopyBuilding);
 			popupMenuForFoundation.add(miRescale);
+			popupMenuForFoundation.add(rotateMenu);
 			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miLock);

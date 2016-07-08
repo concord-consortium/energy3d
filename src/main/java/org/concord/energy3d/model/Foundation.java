@@ -28,7 +28,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
-import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Spatial;
@@ -163,10 +162,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		tank = new Box("Tower Tank");
 		tank.setDefaultColor(ColorRGBA.WHITE);
-		final MaterialState material = new MaterialState();
-		material.setEmissive(ColorRGBA.WHITE);
-		tank.setRenderState(material);
-		tank.setModelBound(null);
+		tank.setRenderState(offsetState);
+		tank.setModelBound(new BoundingBox());
 		tank.setVisible(false);
 		root.attachChild(tank);
 
