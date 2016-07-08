@@ -10,6 +10,7 @@ import java.util.List;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -19,6 +20,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
@@ -593,6 +595,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		tank.setVisible(focused);
 		if (focused) {
+			BloomRenderPass bloom = Heliodon.getInstance().getBloomRenderPass();
+			if (!bloom.contains(tank)) {
+				bloom.add(tank);
+			}
 			Vector3 v = getAbsPoint(0);
 			double vx = getAbsPoint(2).distance(v); // x direction
 			double vy = getAbsPoint(1).distance(v); // y direction

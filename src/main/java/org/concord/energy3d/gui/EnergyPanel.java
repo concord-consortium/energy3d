@@ -816,11 +816,12 @@ public class EnergyPanel extends JPanel {
 					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
 					final double lx = v.distance(v2);
 					final double ly = v.distance(v1);
+					final double lz = foundation.getHeight();
 					partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 					partProperty1Label.setText("  Size:");
 					partProperty2Label.setText("  Position:");
 					partProperty3Label.setText("  Azimuth:");
-					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
+					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + "\u00d7" + (twoDecimals.format(lz * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
 					partProperty3TextField.setText(noDecimal.format(foundation.getAzimuth()) + "\u00B0");
 					partProperty1TextField.setToolTipText("The length and width of the foundation");

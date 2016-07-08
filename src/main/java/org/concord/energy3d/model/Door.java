@@ -8,9 +8,11 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -20,6 +22,7 @@ public class Door extends HousePart implements Thermalizable {
 	private static final double DEFAULT_DOOR_HEIGHT = 10;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 2; // default is IECC code for Massachusetts (https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
+	private transient Line outlineMesh;
 
 	public Door() {
 		super(2, 4, DEFAULT_DOOR_HEIGHT);
@@ -45,6 +48,15 @@ public class Door extends HousePart implements Thermalizable {
 		mesh.setModelBound(new BoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
+
+		outlineMesh = new Line("Door (Outline)");
+		outlineMesh.setLineWidth(2);
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
+		outlineMesh.setModelBound(new BoundingBox());
+		Util.disablePickShadowLight(outlineMesh);
+		root.attachChild(outlineMesh);
+
 	}
 
 	@Override
@@ -119,6 +131,19 @@ public class Door extends HousePart implements Thermalizable {
 		textureBuffer.put(1).put(1);
 
 		mesh.updateModelBound();
+
+		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
+		outlineBuffer.rewind();
+		final Vector3 p0 = getAbsPoint(0);
+		final Vector3 p1 = getAbsPoint(1);
+		final Vector3 p2 = getAbsPoint(2);
+		final Vector3 p3 = getAbsPoint(3);
+		outlineBuffer.put(p0.getXf()).put(p0.getYf()).put(p0.getZf());
+		outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+		outlineBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+		outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+		outlineMesh.updateModelBound();
+
 	}
 
 	@Override
@@ -129,6 +154,7 @@ public class Door extends HousePart implements Thermalizable {
 	@Override
 	public void updateTextureAndColor() {
 		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor(), Scene.getInstance().getTextureMode() == TextureMode.None ? TextureMode.Simple : Scene.getInstance().getTextureMode());
+		// updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getDoorColor() : getColor(), Scene.getInstance().getTextureMode());
 	}
 
 	@Override

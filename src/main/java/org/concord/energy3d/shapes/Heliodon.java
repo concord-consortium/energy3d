@@ -184,7 +184,7 @@ public class Heliodon {
 		westLabel.setTranslation(-radius, 0, 0);
 
 		// TODO: Not exactly working at they do not lie on the ground
-		// NE = 45, SE = 135, NW = 315, SW = 225 
+		// NE = 45, SE = 135, NW = 315, SW = 225
 		final BMText northEastLabel = createText("45\u00B0");
 		northEastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.QUARTER_PI, 0, -MathUtils.QUARTER_PI));
 		northEastLabel.setTranslation(radius * Math.cos(MathUtils.QUARTER_PI), radius * Math.sin(MathUtils.QUARTER_PI), 0);
@@ -468,11 +468,9 @@ public class Heliodon {
 
 	public void setVisible(final boolean visible) {
 		this.visible = visible;
-		if (bloomRenderPass == null) {
-			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
-			passManager.add(bloomRenderPass);
+		getBloomRenderPass();
+		if (!bloomRenderPass.contains(sun))
 			bloomRenderPass.add(sun);
-		}
 		bloomRenderPass.setEnabled(visible);
 		root.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 
@@ -658,6 +656,17 @@ public class Heliodon {
 	public void updateBloom() {
 		if (bloomRenderPass != null)
 			bloomRenderPass.markNeedsRefresh();
+	}
+
+	public BloomRenderPass getBloomRenderPass() {
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
+			bloomRenderPass.setBlurIntensityMultiplier(0.75f);
+			bloomRenderPass.setExposureCutoff(1);
+		}
+		if (!passManager.contains(bloomRenderPass))
+			passManager.add(bloomRenderPass);
+		return bloomRenderPass;
 	}
 
 	public void setTime(final Date time) {
