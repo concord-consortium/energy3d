@@ -253,7 +253,7 @@ public class Mirror extends HousePart {
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
-			zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
+			// zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
 			break;
 		}
 		mesh.setTranslation(a);
@@ -289,24 +289,23 @@ public class Mirror extends HousePart {
 			lightBeams.setVisible(false);
 			return;
 		}
-		double length = 100;
-		if (target != null) {
-			Vector3 a = target.getAbsCenter();
-			a.setZ(target.getBoundingHeight());
-			length = a.distance(getAbsPoint(0));
-		}
-
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
-		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
-		beamsVertices.rewind();
 		double t = Math.toRadians(zenith);
 		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(t));
-		Vector3 s = sunLocation.multiplyLocal(length);
+		double length = 100;
+		if (target != null)
+			length = target.getTankCenter().distance(o);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
+		beamsVertices.rewind();
+
+		// draw sun beam
 		// Vector3 r = new Vector3(o);
-		// r.addLocal(s);
+		// r.addLocal(sunLocation.multiply(5, null));
 		// beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		// beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+
+		Vector3 s = sunLocation.multiplyLocal(length);
 		Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
 		p.addLocal(o);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());

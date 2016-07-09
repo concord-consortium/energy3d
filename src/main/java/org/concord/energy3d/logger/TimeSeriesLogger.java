@@ -542,14 +542,26 @@ public class TimeSeriesLogger {
 					ChangeMirrorTargetCommand c = (ChangeMirrorTargetCommand) lastEdit;
 					Mirror m = c.getMirror();
 					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
-					stateValue += ", \"Old Value\": " + c.getOldValue().getId() + ", \"New Value\": " + c.getNewValue().getId() + "}";
+					stateValue += ", \"Old Value\": " + (c.getOldValue() == null ? -1 : c.getOldValue().getId()) + ", \"New Value\": " + (c.getNewValue() == null ? -1 : c.getNewValue().getId()) + "}";
 				} else if (lastEdit instanceof ChangeFoundationMirrorTargetCommand) {
 					Foundation foundation = ((ChangeFoundationMirrorTargetCommand) lastEdit).getFoundation();
 					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
-					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTarget().getId()) + "}";
+					long newValue = -1;
+					if (!mirrors.isEmpty()) {
+						Foundation t = mirrors.get(0).getTarget();
+						if (t != null)
+							newValue = t.getId();
+					}
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + newValue + "}";
 				} else if (lastEdit instanceof ChangeTargetForAllMirrorsCommand) {
 					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
-					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTarget().getId()) + "}";
+					long newValue = -1;
+					if (!mirrors.isEmpty()) {
+						Foundation t = mirrors.get(0).getTarget();
+						if (t != null)
+							newValue = t.getId();
+					}
+					stateValue = "{\"New Value\": " + newValue + "}";
 				}
 
 				// wall properties
