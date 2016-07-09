@@ -618,7 +618,7 @@ public class Heliodon {
 		dirtySunPath = false;
 	}
 
-	private void drawSun() {
+	public void drawSun() {
 		final Vector3 sunLocation = computeSunLocation(hourAngle, declinationAngle, latitude);
 		setSunLocation(sunLocation);
 	}
@@ -661,7 +661,7 @@ public class Heliodon {
 	public BloomRenderPass getBloomRenderPass() {
 		if (bloomRenderPass == null) {
 			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
-			bloomRenderPass.setBlurIntensityMultiplier(0.8f);
+			// bloomRenderPass.setBlurIntensityMultiplier(0.8f);
 			passManager.add(bloomRenderPass);
 		}
 		return bloomRenderPass;

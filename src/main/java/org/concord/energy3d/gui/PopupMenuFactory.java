@@ -1562,6 +1562,30 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllMirrors);
 
+			final JMenuItem miRemoveHeliostatsForAllMirrors = new JMenuItem("Remove Heliostats for All Mirrors");
+			miRemoveHeliostatsForAllMirrors.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							final HousePart p = SceneManager.getInstance().getSelectedPart();
+							if (p instanceof Foundation) {
+								Scene.getInstance().removeHeliostatsForAllMirrors((Foundation) p);
+								EventQueue.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									}
+								});
+							}
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveHeliostatsForAllMirrors);
+
 			final JMenuItem removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
 			removeAllFloorsMenuItem.addActionListener(new ActionListener() {
 				@Override

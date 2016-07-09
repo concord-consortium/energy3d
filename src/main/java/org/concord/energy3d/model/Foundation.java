@@ -10,7 +10,6 @@ import java.util.List;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -48,7 +47,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh outlineMesh;
 	private transient Mesh surroundMesh;
 	private transient BMText buildingLabel;
-	private transient Box tank;
+	private transient Box tank; // this is temporarily used to model a power tower (there got to be a better solution)
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient double minX;
@@ -73,6 +72,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private Thermostat thermostat = new Thermostat();
 	private UtilityBill utilityBill;
 	private transient Line azimuthArrow;
+	private static transient BloomRenderPass bloomRenderPass;
 
 	static {
 		format.setGroupingUsed(true);
@@ -580,22 +580,24 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void drawTank() {
-		boolean focused = false;
+		int countMirrors = 0;
 		for (HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				Mirror m = (Mirror) p;
 				if (m.getTarget() == this) {
-					focused = true;
-					break;
+					countMirrors++;
 				}
 			}
 		}
-		tank.setVisible(focused);
-		if (focused) {
-			BloomRenderPass bloom = Heliodon.getInstance().getBloomRenderPass();
-			if (!bloom.contains(tank)) {
-				bloom.add(tank);
+		tank.setVisible(countMirrors > 0);
+		if (tank.isVisible()) {
+			if (bloomRenderPass == null) {
+				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
+				SceneManager.getInstance().getPassManager().add(bloomRenderPass);
 			}
+			if (!bloomRenderPass.contains(tank))
+				bloomRenderPass.add(tank);
+			bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countMirrors, 0.8f));
 			double rx = 0;
 			double ry = 0;
 			double xmin = Double.MAX_VALUE;
@@ -1336,9 +1338,10 @@ public class Foundation extends HousePart implements Thermalizable {
 	@Override
 	public void delete() {
 		super.delete();
-		BloomRenderPass bloom = Heliodon.getInstance().getBloomRenderPass();
-		if (bloom.contains(tank))
-			bloom.remove(tank);
+		if (bloomRenderPass != null) {
+			if (bloomRenderPass.contains(tank))
+				bloomRenderPass.remove(tank);
+		}
 	}
 
 }

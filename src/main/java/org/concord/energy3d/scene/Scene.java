@@ -322,6 +322,7 @@ public class Scene implements Serializable {
 			Util.selectSilently(energyPanel.getCityComboBox(), instance.city);
 			Scene.getInstance().setTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
+			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().changeSkyTexture();
 			// SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 		}
@@ -1153,6 +1154,17 @@ public class Scene implements Serializable {
 		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
+	}
+
+	public void removeHeliostatsForAllMirrors(Foundation foundation) {
+		for (HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
+				Mirror m = (Mirror) p;
+				m.setHeliostatType(Mirror.HELIOSTAT_NONE);
+				m.setTarget(null);
+				m.draw();
+			}
+		}
 	}
 
 	public void removeAllWindows() {
