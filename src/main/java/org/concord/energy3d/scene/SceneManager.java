@@ -57,6 +57,7 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddPartCommand;
+import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
@@ -1919,17 +1920,29 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, angle);
 					SceneManager.getInstance().rotateBuilding(angle, true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							EnergyPanel.getInstance().updateProperties();
-						}
-					});
+				} else if (selectedPart instanceof SolarPanel) {
+					SolarPanel solarPanel = (SolarPanel) selectedPart;
+					ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
+					solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(angle));
+					solarPanel.draw();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				} else if (selectedPart instanceof Mirror) {
+					Mirror mirror = (Mirror) selectedPart;
+					ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
+					mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(angle));
+					mirror.draw();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				} else if (selectedPart == null) {
 					final RotateBuildingCommand c = new RotateBuildingCommand(null, angle);
 					rotateAllBuildings(angle);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						EnergyPanel.getInstance().updateProperties();
+					}
+				});
 				return null;
 			}
 		});

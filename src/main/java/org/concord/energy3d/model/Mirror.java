@@ -115,7 +115,7 @@ public class Mirror extends HousePart {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		post = new Cylinder("Post Cylindr", 10, 10, 10, 20);
+		post = new Cylinder("Post Cylindr", 10, 10, 10, 0);
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRenderState(offsetState);
 		post.setModelBound(new BoundingBox());
@@ -252,7 +252,6 @@ public class Mirror extends HousePart {
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
-			// zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
 			break;
 		}
 		mesh.setTranslation(a);
@@ -465,6 +464,9 @@ public class Mirror extends HousePart {
 	}
 
 	public void setHeliostatType(int heliostatType) {
+		if (this.heliostatType != HELIOSTAT_NONE) {
+			zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
+		}
 		this.heliostatType = heliostatType;
 	}
 

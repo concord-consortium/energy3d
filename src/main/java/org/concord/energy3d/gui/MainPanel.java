@@ -83,7 +83,6 @@ public class MainPanel extends JPanel {
 	private JTextArea noteTextArea;
 	private JToggleButton solarButton;
 	private JToggleButton treeButton;
-	private JToggleButton sensorButton;
 	private JToggleButton miscButton;
 	private JButton rotateButton;
 	private JButton treeArrowButton;
@@ -340,6 +339,7 @@ public class MainPanel extends JPanel {
 		// create solar menu
 		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")), true);
 		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Reflecting Mirror", new ImageIcon(getClass().getResource("icons/mirror.png")), true);
+		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")), true);
 		final ActionListener solarAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -351,6 +351,9 @@ public class MainPanel extends JPanel {
 				} else if (selected == miMirror) {
 					solaCommand = SceneManager.Operation.DRAW_MIRROR;
 					solarButton.setToolTipText("Insert a reflecting mirror");
+				} else if (selected == miSensor) {
+					solaCommand = SceneManager.Operation.DRAW_SENSOR;
+					solarButton.setToolTipText("Insert a sensor module");
 				}
 				SceneManager.getInstance().setOperation(solaCommand);
 				solarButton.setSelected(true);
@@ -359,12 +362,15 @@ public class MainPanel extends JPanel {
 		};
 		miSolarPanel.addActionListener(solarAction);
 		miMirror.addActionListener(solarAction);
+		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
 		solaMenu.add(miSolarPanel);
 		solaMenu.add(miMirror);
+		solaMenu.add(miSensor);
 		bg = new ButtonGroup();
 		bg.add(miSolarPanel);
 		bg.add(miMirror);
+		bg.add(miSensor);
 
 		System.out.println("done");
 	}
@@ -402,7 +408,6 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getTreeArrowButton());
 			appToolbar.add(getSolarButton());
 			appToolbar.add(getSolaArrowButton());
-			appToolbar.add(getSensorButton());
 			appToolbar.addSeparator();
 			appToolbar.add(getShadowButton());
 			appToolbar.add(getHeliodonButton());
@@ -417,7 +422,6 @@ public class MainPanel extends JPanel {
 			bg.add(windowButton);
 			bg.add(roofButton);
 			bg.add(solarButton);
-			bg.add(sensorButton);
 			bg.add(treeButton);
 			bg.add(miscButton);
 		}
@@ -921,24 +925,6 @@ public class MainPanel extends JPanel {
 		return solaArrowButton;
 	}
 
-	private JToggleButton getSensorButton() {
-		if (sensorButton == null) {
-			sensorButton = new JToggleButton("");
-			sensorButton.setToolTipText("Add sensor module");
-			sensorButton.setIcon(new ImageIcon(getClass().getResource("icons/sensor.png")));
-			sensorButton.setFocusable(false);
-			sensorButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_SENSOR);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			sensorButton.addMouseListener(operationStickAndRefreshUponExit);
-		}
-		return sensorButton;
-	}
-
 	private JToggleButton getTreeButton() {
 		if (treeButton == null) {
 			treeButton = new JToggleButton();
@@ -1078,39 +1064,27 @@ public class MainPanel extends JPanel {
 												final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, rotationAngle);
 												SceneManager.getInstance().rotateBuilding(rotationAngle, true);
 												SceneManager.getInstance().getUndoManager().addEdit(c);
-												EventQueue.invokeLater(new Runnable() {
-													@Override
-													public void run() {
-														EnergyPanel.getInstance().updateProperties();
-													}
-												});
 											} else if (hp instanceof SolarPanel) {
 												SolarPanel solarPanel = (SolarPanel) hp;
 												ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												solarPanel.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
-												EventQueue.invokeLater(new Runnable() {
-													@Override
-													public void run() {
-														EnergyPanel.getInstance().updateProperties();
-													}
-												});
 											} else if (hp instanceof Mirror) {
 												Mirror mirror = (Mirror) hp;
 												ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 												mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												mirror.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
-												EventQueue.invokeLater(new Runnable() {
-													@Override
-													public void run() {
-														EnergyPanel.getInstance().updateProperties();
-													}
-												});
 											}
 										}
 										Scene.getInstance().setEdited(true);
+										EventQueue.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												EnergyPanel.getInstance().updateProperties();
+											}
+										});
 										return null;
 									}
 								});
