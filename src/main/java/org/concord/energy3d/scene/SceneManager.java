@@ -1475,7 +1475,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Util.reportError(t);
 		}
 		final Component canvasComponent = (Component) canvas;
-		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null && pick.getIndex() == -1 && (hoveredPart instanceof Foundation || hoveredPart instanceof SolarPanel || hoveredPart instanceof Sensor || hoveredPart instanceof Window || hoveredPart instanceof Tree || hoveredPart instanceof Human))
+		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null && pick.getIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Sensor || hoveredPart instanceof Window || hoveredPart instanceof Tree || hoveredPart instanceof Human))
 			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 		else
 			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1638,7 +1638,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									selectedPart = selectedPart.getTopContainer();
 								}
 							}
-							if (selectedPart instanceof Window || selectedPart instanceof Tree || selectedPart instanceof Foundation) {
+							if (selectedPart instanceof Window || selectedPart instanceof Tree || (selectedPart instanceof Foundation && pick.getIndex() != -1)) {
 								cameraControl.setLeftMouseButtonEnabled(false);
 								houseMoveStartPoint = pickedPart.getPoint().clone();
 								collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
