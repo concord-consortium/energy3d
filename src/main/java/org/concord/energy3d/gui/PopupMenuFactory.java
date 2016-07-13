@@ -76,8 +76,6 @@ import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
-import org.concord.energy3d.undo.ChangeHeliostatForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeHeliostatCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
@@ -90,7 +88,6 @@ import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorHeliostatCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorZenithAngleCommand;
@@ -1562,30 +1559,6 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllMirrors);
 
-			final JMenuItem miRemoveHeliostatsForAllMirrors = new JMenuItem("Remove Heliostats for All Mirrors");
-			miRemoveHeliostatsForAllMirrors.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							final HousePart p = SceneManager.getInstance().getSelectedPart();
-							if (p instanceof Foundation) {
-								Scene.getInstance().removeHeliostatsForAllMirrors((Foundation) p);
-								EventQueue.invokeLater(new Runnable() {
-									@Override
-									public void run() {
-										MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-									}
-								});
-							}
-							return null;
-						}
-					});
-				}
-			});
-			clearMenu.add(miRemoveHeliostatsForAllMirrors);
-
 			final JMenuItem removeAllFloorsMenuItem = new JMenuItem("Remove All Floors");
 			removeAllFloorsMenuItem.addActionListener(new ActionListener() {
 				@Override
@@ -2251,113 +2224,8 @@ public class PopupMenuFactory {
 
 		if (popupMenuForMirror == null) {
 
-			final JMenu heliostatMenu = new JMenu("Heliostat");
-			final ButtonGroup heliostatButtonGroup = new ButtonGroup();
-
-			final JRadioButtonMenuItem rbmiNoHeliostat = new JRadioButtonMenuItem("None");
-			rbmiNoHeliostat.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					if (rbmiNoHeliostat.isSelected()) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Mirror))
-							return;
-						final Mirror m = (Mirror) selectedPart;
-						final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
-						final String title = "<html>Remove heliostat for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2><hr></html>";
-						JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-						final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-						final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
-						final JRadioButton rb3 = new JRadioButton("All Mirrors");
-						panel.add(rb1);
-						panel.add(rb2);
-						panel.add(rb3);
-						ButtonGroup bg = new ButtonGroup();
-						bg.add(rb1);
-						bg.add(rb2);
-						bg.add(rb3);
-						Object[] params = { title, footnote, panel };
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Remove heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
-							return;
-						if (rb1.isSelected()) {
-							ChangeHeliostatCommand c = new ChangeHeliostatCommand(m);
-							m.setHeliostatType(Mirror.HELIOSTAT_NONE);
-							m.draw();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb2.isSelected()) {
-							Foundation foundation = m.getTopContainer();
-							ChangeFoundationMirrorHeliostatCommand c = new ChangeFoundationMirrorHeliostatCommand(foundation);
-							Scene.getInstance().setHeliostatForMirrorsOfFoundation(foundation, Mirror.HELIOSTAT_NONE);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb3.isSelected()) {
-							ChangeHeliostatForAllMirrorsCommand c = new ChangeHeliostatForAllMirrorsCommand();
-							Scene.getInstance().setHeliostatForAllMirrors(Mirror.HELIOSTAT_NONE);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						}
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
-			heliostatMenu.add(rbmiNoHeliostat);
-			heliostatButtonGroup.add(rbmiNoHeliostat);
-
-			final JRadioButtonMenuItem rbmiAltazimuth = new JRadioButtonMenuItem("Altazimuth Mount");
-			rbmiAltazimuth.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					if (rbmiAltazimuth.isSelected()) {
-						HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Mirror))
-							return;
-						final Mirror m = (Mirror) selectedPart;
-						final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
-						final String title = "<html>Set heliostat for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2>Altazimuth mount is a simple two-axis mount for supporting and rotating a mirror<br>about a vertical axis and a horizontal axis.<hr></html>";
-						JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-						final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-						final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
-						final JRadioButton rb3 = new JRadioButton("All Mirrors");
-						panel.add(rb1);
-						panel.add(rb2);
-						panel.add(rb3);
-						ButtonGroup bg = new ButtonGroup();
-						bg.add(rb1);
-						bg.add(rb2);
-						bg.add(rb3);
-						Object[] params = { title, footnote, panel };
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Choose heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
-							return;
-						if (rb1.isSelected()) {
-							ChangeHeliostatCommand c = new ChangeHeliostatCommand(m);
-							m.setHeliostatType(Mirror.HELIOSTAT_ALTAZIMUTH_MOUNT);
-							m.draw();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb2.isSelected()) {
-							Foundation foundation = m.getTopContainer();
-							ChangeFoundationMirrorHeliostatCommand c = new ChangeFoundationMirrorHeliostatCommand(foundation);
-							Scene.getInstance().setHeliostatForMirrorsOfFoundation(foundation, Mirror.HELIOSTAT_ALTAZIMUTH_MOUNT);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb3.isSelected()) {
-							ChangeHeliostatForAllMirrorsCommand c = new ChangeHeliostatForAllMirrorsCommand();
-							Scene.getInstance().setHeliostatForAllMirrors(Mirror.HELIOSTAT_ALTAZIMUTH_MOUNT);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						}
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
-			heliostatMenu.add(rbmiAltazimuth);
-			heliostatButtonGroup.add(rbmiAltazimuth);
-
-			heliostatMenu.addSeparator();
-
-			final JMenuItem miTarget = new JMenuItem("Target...");
-			miTarget.addActionListener(new ActionListener() {
+			final JMenuItem miSetHeliostat = new JMenuItem("Set Heliostat...");
+			miSetHeliostat.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2365,8 +2233,6 @@ public class PopupMenuFactory {
 						return;
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
-					final String title = "<html>Set the ID of the target platform of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The light beams reflected by this mirror will focus on the highest point<br>of the structure on the target platform.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -2380,6 +2246,8 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					final String title = "<html>Set the ID of the target platform of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The light beams reflected by this mirror will focus on the highest point<br>of the structure on the target platform.<hr></html>";
 					Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getTarget() == null ? "" : m.getTarget().getId());
@@ -2397,6 +2265,7 @@ public class PopupMenuFactory {
 										if (rb1.isSelected()) {
 											ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
 											m.setTarget(f);
+											m.draw();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else if (rb2.isSelected()) {
 											Foundation foundation = m.getTopContainer();
@@ -2422,7 +2291,53 @@ public class PopupMenuFactory {
 					}
 				}
 			});
-			heliostatMenu.add(miTarget);
+
+			final JMenuItem miDisableHeliostat = new JMenuItem("Disable Heliostat...");
+			miDisableHeliostat.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final Mirror m = (Mirror) selectedPart;
+					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Mirrors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final String title = "<html>Disable heliostat for " + partInfo + "</html>";
+					final String footnote = "<html><hr></html>";
+					Object[] params = { title, footnote, panel };
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						return;
+					if (rb1.isSelected()) {
+						ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
+						m.setTarget(null);
+						m.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						Foundation foundation = m.getTopContainer();
+						ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
+						Scene.getInstance().setTargetForMirrorsOfFoundation(foundation, null);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
+						Scene.getInstance().setTargetForAllMirrors(null);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true);
+				}
+			});
 
 			final JMenuItem miZenith = new JMenuItem("Zenith Angle...");
 			miZenith.addActionListener(new ActionListener() {
@@ -2609,17 +2524,12 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof Mirror))
 						return;
 					final Mirror m = (Mirror) selectedPart;
-					switch (m.getHeliostatType()) {
-					case Mirror.HELIOSTAT_NONE:
-						Util.selectSilently(rbmiNoHeliostat, true);
+					if (m.getTarget() == null) {
 						miZenith.setEnabled(true);
 						miAzimuth.setEnabled(true);
-						break;
-					case Mirror.HELIOSTAT_ALTAZIMUTH_MOUNT:
-						Util.selectSilently(rbmiAltazimuth, true);
+					} else {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
-						break;
 					}
 				}
 			});
@@ -2686,7 +2596,8 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForMirror.addSeparator();
-			popupMenuForMirror.add(heliostatMenu);
+			popupMenuForMirror.add(miSetHeliostat);
+			popupMenuForMirror.add(miDisableHeliostat);
 			popupMenuForMirror.add(miZenith);
 			popupMenuForMirror.add(miAzimuth);
 			popupMenuForMirror.addSeparator();

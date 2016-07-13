@@ -29,9 +29,6 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Mirror extends HousePart {
 
-	public static final int HELIOSTAT_NONE = 0;
-	public static final int HELIOSTAT_ALTAZIMUTH_MOUNT = 1;
-
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -44,7 +41,6 @@ public class Mirror extends HousePart {
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
 	private transient double layoutGap = 0.01;
-	private int heliostatType = HELIOSTAT_NONE;
 	private Foundation target;
 	private double baseHeight = 5;
 	private static transient BloomRenderPass bloomRenderPass;
@@ -237,8 +233,7 @@ public class Mirror extends HousePart {
 			a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 		}
 
-		switch (heliostatType) {
-		case HELIOSTAT_NONE:
+		if (target == null) {
 			if (Util.isZero(zenith - 90)) {
 				if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 					setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
@@ -246,13 +241,11 @@ public class Mirror extends HousePart {
 			} else {
 				setNormal(Math.toRadians(zenith), Math.toRadians(relativeAzimuth));
 			}
-			break;
-		case HELIOSTAT_ALTAZIMUTH_MOUNT:
-			Vector3 o = target != null ? target.getTankCenter() : new Vector3();
+		} else {
+			ReadOnlyVector3 o = target.getTankCenter();
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
-			break;
 		}
 		mesh.setTranslation(a);
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
@@ -461,17 +454,6 @@ public class Mirror extends HousePart {
 
 	public double getZenith() {
 		return zenith;
-	}
-
-	public void setHeliostatType(int heliostatType) {
-		if (this.heliostatType != HELIOSTAT_NONE) {
-			zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
-		}
-		this.heliostatType = heliostatType;
-	}
-
-	public int getHeliostatType() {
-		return heliostatType;
 	}
 
 	public void setTarget(Foundation target) {

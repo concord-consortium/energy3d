@@ -442,7 +442,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (night) {
 							m.drawLightBeams();
 						} else {
-							if (m.getTarget() != null && m.getHeliostatType() != Mirror.HELIOSTAT_NONE)
+							if (m.getTarget() != null)
 								m.draw();
 						}
 					}

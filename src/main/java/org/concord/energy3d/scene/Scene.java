@@ -1156,17 +1156,6 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
-	public void removeHeliostatsForAllMirrors(Foundation foundation) {
-		for (HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				Mirror m = (Mirror) p;
-				m.setHeliostatType(Mirror.HELIOSTAT_NONE);
-				m.setTarget(null);
-				m.draw();
-			}
-		}
-	}
-
 	public void removeAllWindows() {
 		final ArrayList<HousePart> windows = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1694,26 +1683,6 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setTarget(target);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setHeliostatForMirrorsOfFoundation(final Foundation foundation, final int heliostatType) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setHeliostatType(heliostatType);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setHeliostatForAllMirrors(final int heliostatType) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror) {
-				((Mirror) p).setHeliostatType(heliostatType);
 				p.draw();
 			}
 		}
