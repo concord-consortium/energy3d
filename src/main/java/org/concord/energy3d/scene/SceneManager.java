@@ -442,7 +442,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (night) {
 							m.drawLightBeams();
 						} else {
-							if (m.getTarget() != null)
+							if (m.getHeliostatTarget() != null)
 								m.draw();
 						}
 					}
@@ -1204,7 +1204,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.DRAW_SOLAR_PANEL) {
 			drawn = new SolarPanel(false);
 		} else if (operation == Operation.DRAW_MIRROR) {
-			drawn = new Mirror(false);
+			drawn = new Mirror();
 		} else if (operation == Operation.DRAW_SENSOR) {
 			drawn = new Sensor();
 		} else if (operation == Operation.DRAW_FOUNDATION) {

@@ -533,7 +533,7 @@ public class TimeSeriesLogger {
 					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
 					long newValue = -1;
 					if (!mirrors.isEmpty()) {
-						Foundation t = mirrors.get(0).getTarget();
+						Foundation t = mirrors.get(0).getHeliostatTarget();
 						if (t != null)
 							newValue = t.getId();
 					}
@@ -542,7 +542,7 @@ public class TimeSeriesLogger {
 					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
 					long newValue = -1;
 					if (!mirrors.isEmpty()) {
-						Foundation t = mirrors.get(0).getTarget();
+						Foundation t = mirrors.get(0).getHeliostatTarget();
 						if (t != null)
 							newValue = t.getId();
 					}

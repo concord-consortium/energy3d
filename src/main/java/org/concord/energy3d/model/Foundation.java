@@ -584,7 +584,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				Mirror m = (Mirror) p;
-				if (m.getTarget() == this) {
+				if (m.getHeliostatTarget() == this) {
 					countMirrors++;
 				}
 			}
@@ -1341,6 +1341,38 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (bloomRenderPass != null) {
 			if (bloomRenderPass.contains(tank))
 				bloomRenderPass.remove(tank);
+		}
+	}
+
+	public int getMirrorCount() {
+		int count = 0;
+		for (HousePart p : children) {
+			if (p instanceof Mirror)
+				count++;
+		}
+		return count;
+	}
+
+	public void addCircularMirrorArrays() {
+		List<Mirror> mirrors = new ArrayList<Mirror>();
+		for (HousePart p : children) {
+			if (p instanceof Mirror) {
+				mirrors.add((Mirror) p);
+			}
+		}
+		if (mirrors.isEmpty())
+			return;
+		double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
+		final Vector3 center = getAbsCenter();
+		int n = mirrors.size();
+		for (int i = 0; i < n; i++) {
+			Mirror m = mirrors.get(i);
+			double theta = i * 2.0 * Math.PI / n;
+			m.setRelativeAzimuth(90 - Math.toDegrees(theta));
+			Vector3 v = m.toRelative(new Vector3(center.getX() + a * Math.cos(theta), center.getY() + a * Math.sin(theta), 0));
+			m.points.get(0).setX(v.getX());
+			m.points.get(0).setY(v.getY());
+			m.draw();
 		}
 	}
 

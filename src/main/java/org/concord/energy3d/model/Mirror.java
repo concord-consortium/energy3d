@@ -41,11 +41,11 @@ public class Mirror extends HousePart {
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
 	private transient double layoutGap = 0.01;
-	private Foundation target;
+	private Foundation heliostatTarget;
 	private double baseHeight = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 
-	public Mirror(boolean rotated) {
+	public Mirror() {
 		super(1, 1, 0);
 	}
 
@@ -233,7 +233,7 @@ public class Mirror extends HousePart {
 			a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 		}
 
-		if (target == null) {
+		if (heliostatTarget == null) {
 			if (Util.isZero(zenith - 90)) {
 				if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 					setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
@@ -242,7 +242,7 @@ public class Mirror extends HousePart {
 				setNormal(Math.toRadians(zenith), Math.toRadians(relativeAzimuth));
 			}
 		} else {
-			ReadOnlyVector3 o = target.getTankCenter();
+			ReadOnlyVector3 o = heliostatTarget.getTankCenter();
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
@@ -281,7 +281,7 @@ public class Mirror extends HousePart {
 	}
 
 	public void drawLightBeams() {
-		if (Heliodon.getInstance().isNightTime()) {
+		if (Heliodon.getInstance().isNightTime() || heliostatTarget == null) {
 			lightBeams.setVisible(false);
 			return;
 		}
@@ -289,8 +289,8 @@ public class Mirror extends HousePart {
 		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(t));
 		double length = 100;
-		if (target != null)
-			length = target.getTankCenter().distance(o);
+		if (heliostatTarget != null)
+			length = heliostatTarget.getTankCenter().distance(o);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
@@ -456,12 +456,12 @@ public class Mirror extends HousePart {
 		return zenith;
 	}
 
-	public void setTarget(Foundation target) {
-		this.target = target;
+	public void setHeliostatTarget(Foundation heliostatTarget) {
+		this.heliostatTarget = heliostatTarget;
 	}
 
-	public Foundation getTarget() {
-		return target;
+	public Foundation getHeliostatTarget() {
+		return heliostatTarget;
 	}
 
 	@Override

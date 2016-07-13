@@ -1580,6 +1580,22 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(removeAllFloorsMenuItem);
 
+			final JMenu arrangeMenu = new JMenu("Arrange");
+
+			final JMenuItem miMirrorCircularArrays = new JMenuItem("Circular Mirror Arrays");
+			arrangeMenu.add(miMirrorCircularArrays);
+			miMirrorCircularArrays.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						Foundation f = (Foundation) selectedPart;
+						f.addCircularMirrorArrays();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+
 			final JMenuItem miAddUtilityBill = new JMenuItem("Add Utility Bill");
 			miAddUtilityBill.addActionListener(new ActionListener() {
 				@Override
@@ -1725,6 +1741,7 @@ public class PopupMenuFactory {
 						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
 						Util.selectSilently(miLock, f.isFrozen());
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
+						miMirrorCircularArrays.setText("Circular Mirror Arrays (" + f.getMirrorCount() + ")");
 					}
 				}
 			});
@@ -1736,6 +1753,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(rotateMenu);
 			popupMenuForFoundation.add(clearMenu);
+			popupMenuForFoundation.add(arrangeMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
@@ -2250,7 +2268,7 @@ public class PopupMenuFactory {
 					final String footnote = "<html><hr><font size=2>The light beams reflected by this mirror will focus on the highest point<br>of the structure on the target platform.<hr></html>";
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getTarget() == null ? "" : m.getTarget().getId());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getHeliostatTarget() == null ? "" : m.getHeliostatTarget().getId());
 						if (newValue == null)
 							break;
 						else {
@@ -2264,7 +2282,7 @@ public class PopupMenuFactory {
 										Foundation f = (Foundation) p;
 										if (rb1.isSelected()) {
 											ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-											m.setTarget(f);
+											m.setHeliostatTarget(f);
 											m.draw();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else if (rb2.isSelected()) {
@@ -2321,7 +2339,7 @@ public class PopupMenuFactory {
 						return;
 					if (rb1.isSelected()) {
 						ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-						m.setTarget(null);
+						m.setHeliostatTarget(null);
 						m.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
@@ -2524,7 +2542,7 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof Mirror))
 						return;
 					final Mirror m = (Mirror) selectedPart;
-					if (m.getTarget() == null) {
+					if (m.getHeliostatTarget() == null) {
 						miZenith.setEnabled(true);
 						miAzimuth.setEnabled(true);
 					} else {
@@ -2598,6 +2616,7 @@ public class PopupMenuFactory {
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSetHeliostat);
 			popupMenuForMirror.add(miDisableHeliostat);
+			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miZenith);
 			popupMenuForMirror.add(miAzimuth);
 			popupMenuForMirror.addSeparator();
