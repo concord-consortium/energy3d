@@ -110,6 +110,7 @@ public class Scene implements Serializable {
 	private String note;
 	private int solarContrast;
 	private boolean hideAxes;
+	private boolean hideLightBeams;
 	private boolean showBuildingLabels;
 	private double solarStep = 2.0;
 	private int timeStep = 15; // in minutes
@@ -1893,6 +1894,14 @@ public class Scene implements Serializable {
 
 	public int getTheme() {
 		return theme;
+	}
+
+	public void setLightBeamsVisible(boolean showLightBeams) {
+		hideLightBeams = !showLightBeams;
+	}
+
+	public boolean areLightBeamsVisible() {
+		return !hideLightBeams;
 	}
 
 }

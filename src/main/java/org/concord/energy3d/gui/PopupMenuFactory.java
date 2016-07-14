@@ -304,6 +304,7 @@ public class PopupMenuFactory {
 			addPrefabMenuItem("Bell Tower", "prefabs/bell-tower.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Chimney", "prefabs/chimney.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Connecting Porch", "prefabs/connecting-porch.ng3", miImportPrefabMenu);
+			addPrefabMenuItem("Cylinder Tower", "prefabs/cylinder-tower.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Fence", "prefabs/fence1.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Flat-Top Porch", "prefabs/flat-top-porch.ng3", miImportPrefabMenu);
 			addPrefabMenuItem("Fountain", "prefabs/fountain.ng3", miImportPrefabMenu);
@@ -1589,8 +1590,14 @@ public class PopupMenuFactory {
 				public void actionPerformed(ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						Foundation f = (Foundation) selectedPart;
-						f.addCircularMirrorArrays();
+						final Foundation f = (Foundation) selectedPart;
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() {
+								f.addCircularMirrorArrays();
+								return null;
+							}
+						});
 						Scene.getInstance().setEdited(true);
 					}
 				}

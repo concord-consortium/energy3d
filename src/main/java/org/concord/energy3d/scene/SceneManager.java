@@ -1654,7 +1654,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							}
 							if (selectedPart != null && !PrintController.getInstance().isPrintPreview()) {
 								selectedPart.setEditPointsVisible(true);
-								if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedPart instanceof Window || selectedPart instanceof Tree || selectedPart instanceof Foundation) {
+								if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedPart instanceof Window || selectedPart instanceof Tree) {
 									selectedPart.setGridsVisible(true);
 									if (selectedPart instanceof Foundation) {
 										editPartCommand = new EditFoundationCommand((Foundation) selectedPart, !pick.isEditPoint());

@@ -592,7 +592,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		tank.setVisible(countMirrors > 0);
 		if (tank.isVisible()) {
 			if (bloomRenderPass == null) {
-				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
+				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+				// bloomRenderPass.setNrBlurPasses(1);
 				SceneManager.getInstance().getPassManager().add(bloomRenderPass);
 			}
 			if (!bloomRenderPass.contains(tank))
@@ -1353,7 +1354,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		return count;
 	}
 
-	public void addCircularMirrorArrays() {
+	public void makeCircularMirrorArrays() {
 		List<Mirror> mirrors = new ArrayList<Mirror>();
 		for (HousePart p : children) {
 			if (p instanceof Mirror) {
@@ -1373,6 +1374,31 @@ public class Foundation extends HousePart implements Thermalizable {
 			m.points.get(0).setX(v.getX());
 			m.points.get(0).setY(v.getY());
 			m.draw();
+		}
+	}
+
+	public void addCircularMirrorArrays() {
+		double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
+		final Vector3 center = getAbsCenter();
+		Mirror m = new Mirror();
+		double w = 1.5 * m.getMirrorWidth() / Scene.getInstance().getAnnotationScale();
+		double h = 1.5 * m.getMirrorHeight() / Scene.getInstance().getAnnotationScale();
+		double rows = a / h;
+		int nrows = (int) (rows > 2 ? rows - 2 : rows);
+		for (int r = 0; r < nrows; r++) {
+			double b = a * (1.0 - r / rows);
+			int n = (int) (2 * Math.PI * b / w);
+			for (int i = 0; i < n; i++) {
+				m = new Mirror();
+				m.setContainer(this);
+				Scene.getInstance().add(m, true);
+				double theta = i * 2.0 * Math.PI / n;
+				m.setRelativeAzimuth(90 - Math.toDegrees(theta));
+				Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
+				m.points.get(0).setX(v.getX());
+				m.points.get(0).setY(v.getY());
+				m.draw();
+			}
 		}
 	}
 

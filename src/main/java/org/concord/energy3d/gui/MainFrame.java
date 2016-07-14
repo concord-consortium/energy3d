@@ -165,6 +165,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem solarAbsorptionHeatMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
+	private JCheckBoxMenuItem lightBeamsMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem roofDashedLineMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
@@ -1214,6 +1215,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
+					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					MainPanel.getInstance().defaultTool();
@@ -1240,6 +1242,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
+			viewMenu.add(getLightBeamsMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getRoofDashedLineMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
@@ -1331,6 +1334,23 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return axesMenuItem;
+	}
+
+	private JCheckBoxMenuItem getLightBeamsMenuItem() {
+		if (lightBeamsMenuItem == null) {
+			lightBeamsMenuItem = new JCheckBoxMenuItem("Reflector Light Beams", true);
+			lightBeamsMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					// final ShowAxesCommand c = new ShowAxesCommand();
+					Scene.getInstance().setLightBeamsVisible(lightBeamsMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAll();
+					// SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+		}
+		return lightBeamsMenuItem;
 	}
 
 	private JCheckBoxMenuItem getBuildingLabelsMenuItem() {

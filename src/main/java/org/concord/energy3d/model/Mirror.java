@@ -281,7 +281,7 @@ public class Mirror extends HousePart {
 	}
 
 	public void drawLightBeams() {
-		if (Heliodon.getInstance().isNightTime() || heliostatTarget == null) {
+		if (Heliodon.getInstance().isNightTime() || heliostatTarget == null || !Scene.getInstance().areLightBeamsVisible()) {
 			lightBeams.setVisible(false);
 			return;
 		}
@@ -309,9 +309,9 @@ public class Mirror extends HousePart {
 		lightBeams.updateModelBound();
 		lightBeams.setVisible(true);
 		if (bloomRenderPass == null) {
-			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
-			bloomRenderPass.setBlurIntensityMultiplier(0.2f);
-			bloomRenderPass.setNrBlurPasses(1);
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
+			bloomRenderPass.setNrBlurPasses(2);
 			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
 		}
 		if (!bloomRenderPass.contains(lightBeams)) {
