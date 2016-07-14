@@ -1581,7 +1581,7 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(removeAllFloorsMenuItem);
 
-			final JMenu arrangeMenu = new JMenu("Arrange");
+			final JMenu arrangeMenu = new JMenu("Layout");
 
 			final JMenuItem miMirrorCircularArrays = new JMenuItem("Circular Mirror Arrays");
 			arrangeMenu.add(miMirrorCircularArrays);
@@ -1748,7 +1748,6 @@ public class PopupMenuFactory {
 						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
 						Util.selectSilently(miLock, f.isFrozen());
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
-						miMirrorCircularArrays.setText("Circular Mirror Arrays (" + f.getMirrorCount() + ")");
 					}
 				}
 			});

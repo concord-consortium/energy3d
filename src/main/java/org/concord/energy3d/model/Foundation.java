@@ -1354,30 +1354,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		return count;
 	}
 
-	public void makeCircularMirrorArrays() {
-		List<Mirror> mirrors = new ArrayList<Mirror>();
-		for (HousePart p : children) {
-			if (p instanceof Mirror) {
-				mirrors.add((Mirror) p);
-			}
-		}
-		if (mirrors.isEmpty())
-			return;
-		double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
-		final Vector3 center = getAbsCenter();
-		int n = mirrors.size();
-		for (int i = 0; i < n; i++) {
-			Mirror m = mirrors.get(i);
-			double theta = i * 2.0 * Math.PI / n;
-			m.setRelativeAzimuth(90 - Math.toDegrees(theta));
-			Vector3 v = m.toRelative(new Vector3(center.getX() + a * Math.cos(theta), center.getY() + a * Math.sin(theta), 0));
-			m.points.get(0).setX(v.getX());
-			m.points.get(0).setY(v.getY());
-			m.draw();
-		}
-	}
-
 	public void addCircularMirrorArrays() {
+		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
+		for (final HousePart c : children) {
+			if (c instanceof Mirror)
+				mirrors.add(c);
+		}
+		for (final HousePart m : mirrors) {
+			Scene.getInstance().remove(m, false);
+		}
 		double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
 		Mirror m = new Mirror();
@@ -1391,7 +1376,8 @@ public class Foundation extends HousePart implements Thermalizable {
 			for (int i = 0; i < n; i++) {
 				m = new Mirror();
 				m.setContainer(this);
-				Scene.getInstance().add(m, true);
+				Scene.getInstance().add(m, false);
+				m.complete();
 				double theta = i * 2.0 * Math.PI / n;
 				m.setRelativeAzimuth(90 - Math.toDegrees(theta));
 				Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));

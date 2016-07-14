@@ -13,6 +13,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -120,7 +121,7 @@ public class SolarRadiation {
 		collidables.clear();
 		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
+			if (part instanceof Foundation || part instanceof SolarPanel || part instanceof Mirror || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
 				final Spatial s = part.getRadiationCollisionSpatial();
 				collidables.add(s);
 				collidablesToParts.put(s, part);
@@ -169,8 +170,8 @@ public class SolarRadiation {
 						} else if (part instanceof Wall) {
 							if (((Wall) part).getType() == Wall.SOLID_WALL)
 								computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
-						} else if (part instanceof SolarPanel || part instanceof Sensor) {
-							computeOnMeshSolarPanel(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
+						} else if (part instanceof SolarPanel || part instanceof Mirror || part instanceof Sensor) {
+							computeOnMeshPlate(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						} else if (part instanceof Roof) {
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
@@ -299,14 +300,14 @@ public class SolarRadiation {
 
 	}
 
-	private void computeOnMeshSolarPanel(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+	private void computeOnMeshPlate(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 
 		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent. This is a temporary fix.
 			return;
 
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
-			data = initMeshTextureDataSolarPanel(drawMesh, collisionMesh, normal);
+			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal);
 
 		final double OFFSET = 3;
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
@@ -352,10 +353,15 @@ public class SolarRadiation {
 
 				data.dailySolarIntensity[row][col] += radiation;
 				double area = 1;
-				if (housePart instanceof SolarPanel)
-					area = ((SolarPanel) housePart).getPanelWidth() * ((SolarPanel) housePart).getPanelHeight();
-				else if (housePart instanceof Sensor)
+				if (housePart instanceof SolarPanel) {
+					SolarPanel sp = (SolarPanel) housePart;
+					area = sp.getPanelWidth() * sp.getPanelHeight();
+				} else if (housePart instanceof Mirror) {
+					Mirror m = (Mirror) housePart;
+					area = m.getMirrorWidth() * m.getMirrorHeight();
+				} else if (housePart instanceof Sensor) {
 					area = Sensor.WIDTH * Sensor.HEIGHT;
+				}
 				housePart.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
 				// ABOVE: 4x60: 4 is to get the 1/4 area of the 2x2 grid; 60 is to convert the unit of timeStep from minute to kWh
 
@@ -452,14 +458,12 @@ public class SolarRadiation {
 		return data;
 	}
 
-	private MeshData initMeshTextureDataSolarPanel(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 		final MeshData data = new MeshData();
-
 		data.rows = 4;
 		data.cols = 4;
 		if (data.dailySolarIntensity == null)
 			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
-
 		onMesh.put(drawMesh, data);
 		return data;
 	}
@@ -553,7 +557,7 @@ public class SolarRadiation {
 	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Sensor)
+			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Mirror || part instanceof Sensor)
 				applyTexture(part.getRadiationMesh());
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
@@ -729,16 +733,20 @@ public class SolarRadiation {
 		}
 
 		final double[][] solarData = onMesh.get(mesh).dailySolarIntensity;
-		if (mesh.getUserData() != null && ((UserData) mesh.getUserData()).getHousePart() instanceof SolarPanel) {
-			solarData[3][0] = solarData[2][0] = solarData[1][0];
-			solarData[3][1] = solarData[2][1] = solarData[1][0];
-			solarData[3][2] = solarData[2][2] = solarData[1][1];
-			solarData[3][3] = solarData[2][3] = solarData[1][1];
+		Object userData = mesh.getUserData();
+		if (userData instanceof UserData) {
+			UserData ud = (UserData) userData;
+			if (ud.getHousePart() instanceof SolarPanel || ud.getHousePart() instanceof Mirror) {
+				solarData[3][0] = solarData[2][0] = solarData[1][0];
+				solarData[3][1] = solarData[2][1] = solarData[1][0];
+				solarData[3][2] = solarData[2][2] = solarData[1][1];
+				solarData[3][3] = solarData[2][3] = solarData[1][1];
 
-			solarData[0][2] = solarData[1][2] = solarData[0][1];
-			solarData[0][3] = solarData[1][3] = solarData[0][1];
-			solarData[0][0] = solarData[1][0] = solarData[0][0];
-			solarData[0][1] = solarData[1][1] = solarData[0][0];
+				solarData[0][2] = solarData[1][2] = solarData[0][1];
+				solarData[0][3] = solarData[1][3] = solarData[0][1];
+				solarData[0][0] = solarData[1][0] = solarData[0][0];
+				solarData[0][1] = solarData[1][1] = solarData[0][0];
+			}
 		}
 
 		fillBlanksWithNeighboringValues(solarData);

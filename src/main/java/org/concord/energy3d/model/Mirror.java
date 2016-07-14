@@ -163,10 +163,8 @@ public class Mirror extends HousePart {
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
-				if (!Util.isZero(zenith - 90)) {
-					double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-					p.setZ(p.getZ() + baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
-				}
+				double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+				p.setZ(p.getZ() + baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 				getEditPointShape(i).setTranslation(p);
 			}
 		} finally {
