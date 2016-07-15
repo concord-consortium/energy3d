@@ -111,6 +111,7 @@ public class Scene implements Serializable {
 	private int solarContrast;
 	private boolean hideAxes;
 	private boolean hideLightBeams;
+	private boolean showSunTriangle;
 	private boolean showBuildingLabels;
 	private double solarStep = 2.0;
 	private int timeStep = 15; // in minutes
@@ -262,7 +263,7 @@ public class Scene implements Serializable {
 					MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
 				else
 					MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
-				MainPanel.getInstance().getAnnotationToggleButton().setSelected(instance.isAnnotationsVisible);
+				MainPanel.getInstance().getAnnotationButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 			}
 
@@ -1902,6 +1903,14 @@ public class Scene implements Serializable {
 
 	public boolean areLightBeamsVisible() {
 		return !hideLightBeams;
+	}
+
+	public void setSunTriangleVisible(boolean showSunTriangle) {
+		this.showSunTriangle = showSunTriangle;
+	}
+
+	public boolean isSunTriangleVisible() {
+		return showSunTriangle;
 	}
 
 }

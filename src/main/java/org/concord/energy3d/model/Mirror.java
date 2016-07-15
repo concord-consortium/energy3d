@@ -295,7 +295,7 @@ public class Mirror extends HousePart {
 
 		// draw sun beam
 		// Vector3 r = new Vector3(o);
-		// r.addLocal(sunLocation.multiply(5, null));
+		// r.addLocal(sunLocation.multiply(5000, null));
 		// beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		// beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 

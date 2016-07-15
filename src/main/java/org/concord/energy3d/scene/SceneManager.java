@@ -140,7 +140,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
-import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.GameTaskQueue;
@@ -209,7 +208,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public static final double SKY_RADIUS = 1000;
 
-	private Sphere kinectPointer;
 	private MouseState lastSelectedEditPointMouseState;
 	private MouseState pasteMouseState;
 	private Node newImport;
@@ -316,7 +314,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.attachChild(gridsMesh);
 		axes = createAxes();
 		backgroundRoot.attachChild(axes);
-		backgroundRoot.attachChild(createKinectPointer());
 		root.attachChild(backgroundRoot);
 		root.attachChild(Scene.getRoot());
 
@@ -340,15 +337,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final Date today = Calendar.getInstance().getTime();
 		new Heliodon(root, light, passManager, logicalLayer, today);
-
-		// taskManager.update(new Callable<Object>() {
-		// @Override
-		// public Object call() throws Exception {
-		// final Date today = Calendar.getInstance().getTime();
-		// new Heliodon(root, light, passManager, logicalLayer, today);
-		// return null;
-		// }
-		// });
 
 		initMouse();
 
@@ -668,11 +656,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		axisRoot.attachChild(line);
 
 		return axisRoot;
-	}
-
-	private Mesh createKinectPointer() {
-		kinectPointer = new Sphere("Kinect Pointer", 10, 10, 0.01);
-		return kinectPointer;
 	}
 
 	private void initMouse() {

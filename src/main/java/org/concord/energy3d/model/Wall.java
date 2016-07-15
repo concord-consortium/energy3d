@@ -788,8 +788,7 @@ public class Wall extends HousePart implements Thermalizable {
 	public List<List<Vector3>> computeWallAndWindowPolygon(final boolean backMesh) {
 		final List<List<Vector3>> polygonPoints = new ArrayList<List<Vector3>>();
 		final ReadOnlyVector3 trans = backMesh ? getThicknessNormal() : Vector3.ZERO;
-		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof
-		// points are appended to the end of vertex list
+		// Start the polygon with (1) then 0, 2, 3, [roof points] so that roof points are appended to the end of vertex list
 		final ArrayList<Vector3> wallPoints = new ArrayList<Vector3>(4);
 		addPolygonPoint(wallPoints, this, 1, trans);
 		addPolygonPoint(wallPoints, this, 0, trans);

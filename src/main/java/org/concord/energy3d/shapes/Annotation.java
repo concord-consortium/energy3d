@@ -13,15 +13,15 @@ import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
 
 public abstract class Annotation extends Node {
-	private static double fontSize = 1.0;
-	protected final Line mesh;
-	protected final BMText label = makeNewLabel();
 
-	public static void setFontSize(final double fontSize) {
-		Annotation.fontSize = fontSize;
+	protected final Line mesh;
+	protected final BMText label = makeNewLabel(1);
+
+	public void setFontSize(final double fontSize) {
+		label.setFontScale(fontSize);
 	}
 
-	public static BMText makeNewLabel() {
+	public static BMText makeNewLabel(double fontSize) {
 		final BMText label = new BMText("Annotation Label", "", FontManager.getInstance().getAnnotationFont(), BMText.Align.Center, BMText.Justify.Center);
 		label.setTextColor(ColorRGBA.BLACK);
 		label.setAutoScale(AutoScale.Off);
@@ -50,6 +50,10 @@ public abstract class Annotation extends Node {
 
 	public void setLineWidth(final float lineWidth) {
 		mesh.setLineWidth(lineWidth);
+	}
+
+	public void setStipplePattern(short stipplePattern) {
+		mesh.setStipplePattern(stipplePattern);
 	}
 
 	public abstract void draw();

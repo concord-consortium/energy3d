@@ -70,7 +70,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton resizeButton;
 	private JToggleButton heliodonButton;
 	private JToggleButton sunAnimButton;
-	private JToggleButton annotationToggleButton;
+	private JToggleButton annotationButton;
 	private JToggleButton previewButton;
 	private JToggleButton zoomButton;
 	private JToggleButton noteButton;
@@ -393,7 +393,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getPreviewButton());
 			appToolbar.add(getNoteButton());
 			appToolbar.addSeparator();
-			appToolbar.add(getAnnotationToggleButton());
+			appToolbar.add(getAnnotationButton());
 			appToolbar.add(getResizeButton());
 			appToolbar.add(getRotateButton());
 			appToolbar.addSeparator();
@@ -664,26 +664,26 @@ public class MainPanel extends JPanel {
 		SceneManager.getInstance().refresh();
 	}
 
-	public JToggleButton getAnnotationToggleButton() {
-		if (annotationToggleButton == null) {
-			annotationToggleButton = new JToggleButton();
-			annotationToggleButton.setSelected(true);
-			annotationToggleButton.addMouseListener(refreshUponMouseExit);
-			annotationToggleButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
-			annotationToggleButton.setToolTipText("Show annotations");
-			annotationToggleButton.setFocusable(false);
-			annotationToggleButton.addActionListener(new ActionListener() {
+	public JToggleButton getAnnotationButton() {
+		if (annotationButton == null) {
+			annotationButton = new JToggleButton();
+			annotationButton.setSelected(true);
+			annotationButton.addMouseListener(refreshUponMouseExit);
+			annotationButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
+			annotationButton.setToolTipText("Show annotations");
+			annotationButton.setFocusable(false);
+			annotationButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ShowAnnotationCommand c = new ShowAnnotationCommand();
-					Scene.getInstance().setAnnotationsVisible(annotationToggleButton.isSelected());
+					Scene.getInstance().setAnnotationsVisible(annotationButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					Scene.getInstance().setEdited(true, false);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
-		return annotationToggleButton;
+		return annotationButton;
 	}
 
 	private JToggleButton getZoomButton() {
@@ -710,7 +710,7 @@ public class MainPanel extends JPanel {
 			@Override
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
-					if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
+					if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
 						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
 							c.setEnabled(enabled);
 					}
@@ -724,7 +724,7 @@ public class MainPanel extends JPanel {
 			@Override
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
-					if (c != getNoteButton() && c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationToggleButton() && c != getZoomButton() && c != getSpinViewButton()) {
+					if (c != getNoteButton() && c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
 						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
 							c.setEnabled(enabled);
 					}
