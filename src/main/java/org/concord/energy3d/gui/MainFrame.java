@@ -215,6 +215,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
 	private JMenu templatesMenu;
 	private JMenu otherTemplatesMenu;
+	private JMenu tutorialsMenu;
 
 	private final FileChooser fileChooser;
 	private final JColorChooser colorChooser;
@@ -419,6 +420,7 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getViewMenu());
 			appMenuBar.add(getAnalysisMenu());
 			appMenuBar.add(getTemplatesMenu());
+			appMenuBar.add(getTutorialsMenu());
 			appMenuBar.add(getHelpMenu());
 
 			addCommonActionListeners(appMenuBar);
@@ -1154,47 +1156,71 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
-			addTemplate(templatesMenu, "Apartment 1", "templates/apartment-template-1.ng3");
-			addTemplate(templatesMenu, "Apartment 2", "templates/apartment-template-2.ng3");
-			addTemplate(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
-			addTemplate(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
-			addTemplate(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
-			addTemplate(templatesMenu, "Cape Cod", "templates/cape-cod-template.ng3");
-			addTemplate(templatesMenu, "Colonial", "templates/colonial-template.ng3");
-			addTemplate(templatesMenu, "Combination Roof", "templates/combination-roof-template.ng3");
-			addTemplate(templatesMenu, "Cross Gabled Roof", "templates/cross-gabled-template.ng3");
-			addTemplate(templatesMenu, "Cross Hipped Roof", "templates/cross-hipped-template.ng3");
-			addTemplate(templatesMenu, "Dutch Colonial", "templates/gambrel-template.ng3");
-			addTemplate(templatesMenu, "Flat Roof", "templates/flat-roof-template.ng3");
-			addTemplate(templatesMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
-			addTemplate(templatesMenu, "Gablet Roof", "templates/gablet-template.ng3");
-			addTemplate(templatesMenu, "Hip Roof", "templates/hip-roof-template.ng3");
-			addTemplate(templatesMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
-			addTemplate(templatesMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
-			addTemplate(templatesMenu, "Mansard", "templates/mansard-template.ng3");
-			addTemplate(templatesMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
-			addTemplate(templatesMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
-			addTemplate(templatesMenu, "Shed Roof", "templates/shed-roof-template.ng3");
+			addModel(templatesMenu, "Apartment 1", "templates/apartment-template-1.ng3");
+			addModel(templatesMenu, "Apartment 2", "templates/apartment-template-2.ng3");
+			addModel(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
+			addModel(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
+			addModel(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
+			addModel(templatesMenu, "Cape Cod", "templates/cape-cod-template.ng3");
+			addModel(templatesMenu, "Colonial", "templates/colonial-template.ng3");
+			addModel(templatesMenu, "Combination Roof", "templates/combination-roof-template.ng3");
+			addModel(templatesMenu, "Cross Gabled Roof", "templates/cross-gabled-template.ng3");
+			addModel(templatesMenu, "Cross Hipped Roof", "templates/cross-hipped-template.ng3");
+			addModel(templatesMenu, "Dutch Colonial", "templates/gambrel-template.ng3");
+			addModel(templatesMenu, "Flat Roof", "templates/flat-roof-template.ng3");
+			addModel(templatesMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
+			addModel(templatesMenu, "Gablet Roof", "templates/gablet-template.ng3");
+			addModel(templatesMenu, "Hip Roof", "templates/hip-roof-template.ng3");
+			addModel(templatesMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
+			addModel(templatesMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
+			addModel(templatesMenu, "Mansard", "templates/mansard-template.ng3");
+			addModel(templatesMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
+			addModel(templatesMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
+			addModel(templatesMenu, "Shed Roof", "templates/shed-roof-template.ng3");
 			templatesMenu.addSeparator();
 			otherTemplatesMenu = new JMenu("Others");
 			templatesMenu.add(otherTemplatesMenu);
-			addTemplate(otherTemplatesMenu, "Dome", "templates/dome-template.ng3");
-			addTemplate(otherTemplatesMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
-			addTemplate(otherTemplatesMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
-			addTemplate(otherTemplatesMenu, "Stadium", "templates/stadium-template.ng3");
+			addModel(otherTemplatesMenu, "Dome", "templates/dome-template.ng3");
+			addModel(otherTemplatesMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
+			addModel(otherTemplatesMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
+			addModel(otherTemplatesMenu, "Stadium", "templates/stadium-template.ng3");
 		}
 		return templatesMenu;
 	}
 
-	private void addTemplate(final JMenu menu, final String type, final String url) {
+	private void addModel(final JMenu menu, final String type, final String url) {
 		JMenuItem mi = new JMenuItem(type);
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openTemplate(MainApplication.class.getResource(url));
+				openModel(MainApplication.class.getResource(url));
 			}
 		});
 		menu.add(mi);
+	}
+
+	private JMenu getTutorialsMenu() {
+		if (tutorialsMenu == null) {
+			tutorialsMenu = new JMenu("Tutorials");
+			tutorialsMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					MainPanel.getInstance().defaultTool();
+				}
+			});
+			addModel(tutorialsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
+			addModel(tutorialsMenu, "Solar Box", "tutorials/solar-box.ng3");
+		}
+		return tutorialsMenu;
 	}
 
 	private JMenu getViewMenu() {
@@ -2571,7 +2597,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void openTemplate(final URL url) {
+	private void openModel(final URL url) {
 		boolean ok = false;
 		if (Scene.getInstance().isEdited()) {
 			final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);

@@ -74,7 +74,7 @@ public class Human extends HousePart {
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		translate(w, h, 1); // foundation height = 1 by default
+		translate(w, h, 0); // stand on the ground by default
 		mesh.setUserData(new UserData(this, 0, true));
 
 		final BlendState bs = new BlendState();
