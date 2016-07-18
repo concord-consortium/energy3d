@@ -111,7 +111,7 @@ public class Scene implements Serializable {
 	private int solarContrast;
 	private boolean hideAxes;
 	private boolean hideLightBeams;
-	private boolean showSunTriangle;
+	private boolean showSunAngles;
 	private boolean showBuildingLabels;
 	private double solarStep = 2.0;
 	private int timeStep = 15; // in minutes
@@ -1905,12 +1905,12 @@ public class Scene implements Serializable {
 		return !hideLightBeams;
 	}
 
-	public void setSunTriangleVisible(boolean showSunTriangle) {
-		this.showSunTriangle = showSunTriangle;
+	public void setSunAnglesVisible(boolean showSunAngles) {
+		this.showSunAngles = showSunAngles;
 	}
 
-	public boolean isSunTriangleVisible() {
-		return showSunTriangle;
+	public boolean areSunAnglesVisible() {
+		return showSunAngles;
 	}
 
 }

@@ -166,7 +166,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem solarAbsorptionHeatMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
-	private JCheckBoxMenuItem sunTriangleMenuItem;
+	private JCheckBoxMenuItem sunAnglesMenuItem;
 	private JCheckBoxMenuItem lightBeamsMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem roofDashedLineMenuItem;
@@ -1217,6 +1217,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
+					Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
@@ -1244,7 +1245,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
-			viewMenu.add(getSunTriangleMenuItem());
+			viewMenu.add(getSunAnglesMenuItem());
 			viewMenu.add(getLightBeamsMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getRoofDashedLineMenuItem());
@@ -1339,21 +1340,21 @@ public class MainFrame extends JFrame {
 		return axesMenuItem;
 	}
 
-	private JCheckBoxMenuItem getSunTriangleMenuItem() {
-		if (sunTriangleMenuItem == null) {
-			sunTriangleMenuItem = new JCheckBoxMenuItem("Sun Triangle");
-			sunTriangleMenuItem.addItemListener(new ItemListener() {
+	private JCheckBoxMenuItem getSunAnglesMenuItem() {
+		if (sunAnglesMenuItem == null) {
+			sunAnglesMenuItem = new JCheckBoxMenuItem("Sun Angles");
+			sunAnglesMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					// final ShowAxesCommand c = new ShowAxesCommand();
-					Scene.getInstance().setSunTriangleVisible(sunTriangleMenuItem.isSelected());
+					Scene.getInstance().setSunAnglesVisible(sunAnglesMenuItem.isSelected());
 					Heliodon.getInstance().drawSunTriangle();
 					Scene.getInstance().setEdited(true);
 					// SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
-		return sunTriangleMenuItem;
+		return sunAnglesMenuItem;
 	}
 
 	private JCheckBoxMenuItem getLightBeamsMenuItem() {

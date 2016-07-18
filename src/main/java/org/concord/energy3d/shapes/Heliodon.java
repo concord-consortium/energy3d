@@ -128,7 +128,7 @@ public class Heliodon {
 		// Sun Triangle
 		sunTriangle = new Line("Sun Triangle", BufferUtils.createVector3Buffer(SUN_PATH_VERTICES), null, null, null);
 		sunTriangle.setLineWidth(1);
-		sunTriangle.setStipplePattern((short) 0xcccc);
+		//sunTriangle.setStipplePattern((short) 0xcccc);
 		sunTriangle.setDefaultColor(ColorRGBA.WHITE);
 		sunTriangle.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
 		Util.disablePickShadowLight(sunTriangle);
@@ -142,25 +142,28 @@ public class Heliodon {
 		AngleAnnotation zenith = new AngleAnnotation();
 		zenith.setColor(ColorRGBA.WHITE);
 		zenith.setLineWidth(1);
-		zenith.setStipplePattern((short) 0xcccc);
-		zenith.setFontSize(3);
-		zenith.setCustomRadius(1);
+		//zenith.setStipplePattern((short) 0xcccc);
+		zenith.setFontSize(2.5);
+		zenith.setCustomRadius(1.5);
+		zenith.setCustomText("Z");
 		angles.attachChild(zenith);
 
 		AngleAnnotation elevation = new AngleAnnotation();
 		elevation.setColor(ColorRGBA.WHITE);
 		elevation.setLineWidth(1);
-		elevation.setStipplePattern((short) 0xcccc);
-		elevation.setFontSize(3);
-		elevation.setCustomRadius(1.5);
+		//elevation.setStipplePattern((short) 0xcccc);
+		elevation.setFontSize(2.5);
+		elevation.setCustomRadius(1.75);
+		elevation.setCustomText("h");
 		angles.attachChild(elevation);
 
 		AngleAnnotation azimuth = new AngleAnnotation();
 		azimuth.setColor(ColorRGBA.WHITE);
 		azimuth.setLineWidth(1);
-		azimuth.setStipplePattern((short) 0xcccc);
+		//azimuth.setStipplePattern((short) 0xcccc);
 		azimuth.setFontSize(3);
 		azimuth.setCustomRadius(1);
+		azimuth.setCustomText("A");
 		angles.attachChild(azimuth);
 
 		// Sun Region
@@ -671,7 +674,7 @@ public class Heliodon {
 	}
 
 	public void drawSunTriangle() {
-		if (isNightTime() || ((SceneManager.getInstance() != null && !Scene.getInstance().isSunTriangleVisible()))) {
+		if (isNightTime() || ((SceneManager.getInstance() != null && !Scene.getInstance().areSunAnglesVisible()))) {
 			showSunTriangle(false);
 			return;
 		}
@@ -696,7 +699,7 @@ public class Heliodon {
 		a = (AngleAnnotation) angles.getChild(1); // draw elevation angle
 		a.setRange(o, p, t, n);
 		a = (AngleAnnotation) angles.getChild(2); // draw azimuth angle
-		a.setRange(o, t, Vector3.UNIT_Y, Vector3.UNIT_Z);
+		a.setRange(o, Vector3.UNIT_Y, t, Vector3.UNIT_Z);
 	}
 
 	public void drawSun() {

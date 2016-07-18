@@ -15,6 +15,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -157,6 +159,17 @@ public class EnergyPanel extends JPanel {
 
 		dateSpinner = createSpinner(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
 		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		Date d = null;
+		try {
+			d = sdf.parse("9/30/2016");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		if (d != null) {
+			dateSpinner.setValue(d);
+			dateSpinner.setPreferredSize(dateSpinner.getPreferredSize());
+		}
 		dateSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
 			private Date lastDate;

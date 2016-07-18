@@ -77,7 +77,7 @@ public class AngleAnnotation extends Annotation {
 		} else {
 			((Arc) mesh).set(radius, start, end);
 			mesh.setRotation(toFlat.invertLocal());
-			label.setText((customText != null ? customText + " = " : "") + angleDegrees + "\u00B0");
+			label.setText((customText != null ? customText + "=" : "") + angleDegrees + "\u00B0");
 			final double start360 = start < 0 ? MathUtils.TWO_PI + start : start;
 			final double angle360 = angle < 0 ? MathUtils.TWO_PI + angle : angle;
 			final double end360 = start360 + angle360;
