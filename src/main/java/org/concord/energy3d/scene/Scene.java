@@ -478,6 +478,18 @@ public class Scene implements Serializable {
 	}
 
 	private void cleanup() {
+
+		// fix if roof and wall are not linked from each other
+		for (final HousePart p : parts) {
+			if (p instanceof Roof) {
+				Roof r = (Roof) p;
+				HousePart c = r.getContainer();
+				if (c != null && !c.getChildren().contains(r)) {
+					c.getChildren().add(r);
+				}
+			}
+		}
+
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 
 		// remove all invalid parts or orphan parts without a top container
@@ -513,6 +525,7 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts)
 			if (!p.isDrawCompleted())
 				p.complete();
+
 	}
 
 	private void upgradeSceneToNewVersion() {

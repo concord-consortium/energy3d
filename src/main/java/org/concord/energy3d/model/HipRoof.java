@@ -63,8 +63,8 @@ public class HipRoof extends Roof {
 			recalculateEditPoints = false;
 			points.add(toRelative(getCenter()));
 			final Vector3 hipDirection = container.getAbsPoint(2).subtractLocal(container.getAbsPoint(0)).normalizeLocal();
-			Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(-50, null), null));
-			Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(50, null), null));
+			Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(-1000, null), null));
+			Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(1000, null), null));
 			if (point1 == null)
 				point1 = center.clone();
 			if (point2 == null)
