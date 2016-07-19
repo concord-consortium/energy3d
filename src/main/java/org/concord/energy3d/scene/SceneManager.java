@@ -1614,6 +1614,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (selectedPart instanceof Foundation) {
 									((Foundation) selectedPart).drawAzimuthArrow();
 								}
+								if (selectedPart != null) {
+									Foundation foundationOfSelectedPart = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+									if (foundationOfSelectedPart != null) {
+										foundationOfSelectedPart.setEditPointsVisible(true);
+									}
+								}
 							}
 							if (operation == Operation.RESIZE && selectedPart != null) {
 								if (!(selectedPart instanceof Foundation)) {
@@ -1634,6 +1640,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (previousSelectedPart != null && previousSelectedPart != selectedPart && operation != Operation.RESIZE) {
 								previousSelectedPart.setEditPointsVisible(false);
 								previousSelectedPart.setGridsVisible(false);
+								if (previousSelectedPart != null) {
+									Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
+									if (foundationOfPreviousSelectedPart != null) {
+										if (selectedPart == null) {
+											foundationOfPreviousSelectedPart.setEditPointsVisible(false);
+										} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
+											foundationOfPreviousSelectedPart.setEditPointsVisible(false);
+										}
+									}
+								}
 							}
 							if (selectedPart != null && !PrintController.getInstance().isPrintPreview()) {
 								selectedPart.setEditPointsVisible(true);
@@ -1665,6 +1681,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
+
 	}
 
 	private void mouseReleased(final MouseState mouseState) {
