@@ -149,11 +149,11 @@ public class Scene implements Serializable {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		final Foundation foundation = new Foundation(xLength, yLength);
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				instance.add(foundation, true);
+				instance.add(new Human(Human.JACK, 1));
+				instance.add(new Foundation(xLength, yLength), true);
 				return null;
 			}
 		});

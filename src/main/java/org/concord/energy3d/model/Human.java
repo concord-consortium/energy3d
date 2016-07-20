@@ -27,10 +27,16 @@ public class Human extends HousePart {
 	public static final int JOSE = 5;
 	private transient BillboardNode billboard;
 	private final int humanType;
+	private transient double feetHeight;
 
 	public Human(final int humanType) {
+		this(humanType, 0);
+	}
+
+	public Human(final int humanType, double feetHeight) {
 		super(1, 1, 1);
 		this.humanType = humanType;
+		this.feetHeight = feetHeight;
 		init();
 		root.getSceneHints().setCullHint(CullHint.Always);
 	}
@@ -74,7 +80,7 @@ public class Human extends HousePart {
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		translate(w, h, 0); // stand on the ground by default
+		translate(w, h, feetHeight); // stand on the ground by default
 		mesh.setUserData(new UserData(this, 0, true));
 
 		final BlendState bs = new BlendState();

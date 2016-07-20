@@ -1581,10 +1581,10 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(removeAllFloorsMenuItem);
 
-			final JMenu arrangeMenu = new JMenu("Layout");
+			final JMenu layoutMenu = new JMenu("Layout");
 
 			final JMenuItem miMirrorCircularArrays = new JMenuItem("Circular Mirror Arrays");
-			arrangeMenu.add(miMirrorCircularArrays);
+			layoutMenu.add(miMirrorCircularArrays);
 			miMirrorCircularArrays.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -1759,7 +1759,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(rotateMenu);
 			popupMenuForFoundation.add(clearMenu);
-			popupMenuForFoundation.add(arrangeMenu);
+			popupMenuForFoundation.add(layoutMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
@@ -1852,10 +1852,55 @@ public class PopupMenuFactory {
 	}
 
 	private static JPopupMenu getPopupMenuForSensor() {
+
 		if (popupMenuForSensor == null) {
-			popupMenuForSensor = createPopupMenu(false, false, null);
+
+			final JCheckBoxMenuItem miLight = new JCheckBoxMenuItem("Light", true);
+			miLight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Sensor))
+						return;
+					Sensor s = (Sensor) selectedPart;
+					s.setLightOff(!miLight.isSelected());
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			final JCheckBoxMenuItem miHeatFlux = new JCheckBoxMenuItem("Heat Flux", true);
+			miHeatFlux.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Sensor))
+						return;
+					Sensor s = (Sensor) selectedPart;
+					s.setHeatFluxOff(!miHeatFlux.isSelected());
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			popupMenuForSensor = createPopupMenu(false, false, new Runnable() {
+				@Override
+				public void run() {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Sensor))
+						return;
+					Sensor s = (Sensor) selectedPart;
+					Util.selectSilently(miLight, !s.isLightOff());
+					Util.selectSilently(miHeatFlux, !s.isHeatFluxOff());
+				}
+			});
+
+			popupMenuForSensor.addSeparator();
+			popupMenuForSensor.add(miLight);
+			popupMenuForSensor.add(miHeatFlux);
+
 		}
+
 		return popupMenuForSensor;
+
 	}
 
 	private static JPopupMenu getPopupMenuForSolarPanel() {
