@@ -321,7 +321,13 @@ public class MeshLib {
 				}
 
 				final Mesh meshWithHoles = (Mesh) ((Node) roofPart).getChild(6);
-				fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u, false);
+				try {
+					fillMeshWithPolygon(meshWithHoles, polygon, fromXY, true, o, v, u, false);
+				} catch (final RuntimeException e) {
+					e.printStackTrace();
+					final Mesh meshWithoutHoles = (Mesh) ((Node) roofPart).getChild(0);
+					meshWithHoles.setMeshData(meshWithoutHoles.getMeshData());
+				}
 			}
 		}
 	}
@@ -384,23 +390,23 @@ public class MeshLib {
 		if (Util.isEqual(sortedOutlinePoints.get(0), sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
 			sortedOutlinePoints.remove(sortedOutlinePoints.size() - 1);
 
-//		for (int i = 0; i < sortedOutlinePoints.size(); i++) {
-//			final ReadOnlyVector3 p1 = sortedOutlinePoints.get(i);
-//			final ReadOnlyVector3 p2 = sortedOutlinePoints.get((i + 1) % sortedOutlinePoints.size());
-//			final ReadOnlyVector3 p3 = sortedOutlinePoints.get((i + 2) % sortedOutlinePoints.size());
-//
-//			if (isAlmost180(p1, p2, p3)) {
-//				sortedOutlinePoints.remove((i + 1) % sortedOutlinePoints.size());
-//				i--;
-//			}
-//		}
+		// for (int i = 0; i < sortedOutlinePoints.size(); i++) {
+		// final ReadOnlyVector3 p1 = sortedOutlinePoints.get(i);
+		// final ReadOnlyVector3 p2 = sortedOutlinePoints.get((i + 1) % sortedOutlinePoints.size());
+		// final ReadOnlyVector3 p3 = sortedOutlinePoints.get((i + 2) % sortedOutlinePoints.size());
+		//
+		// if (isAlmost180(p1, p2, p3)) {
+		// sortedOutlinePoints.remove((i + 1) % sortedOutlinePoints.size());
+		// i--;
+		// }
+		// }
 
 		return sortedOutlinePoints;
 	}
 
-//	private static boolean isAlmost180(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
-//		return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
-//	}
+	// private static boolean isAlmost180(final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
+	// return Math.abs(p1.subtract(p2, null).normalizeLocal().smallestAngleBetween(p3.subtract(p1, null).normalizeLocal())) > Math.PI - Math.PI / 180.0;
+	// }
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v, final boolean isWall) {
 		/* round all points */
@@ -467,22 +473,34 @@ public class MeshLib {
 				polygon.getHoles().remove(hole);
 		}
 
-		Poly2Tri.triangulate(polygon);
-		if (fromXY == null)
-			ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
-		else
-			ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
-
-		if (generateNormals) {
+		try {
+			Poly2Tri.triangulate(polygon);
 			if (fromXY == null)
-				ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+				ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
 			else
-				ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+				ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+
+			if (generateNormals) {
+				if (fromXY == null)
+					ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
+				else
+					ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+			}
+			if (o != null)
+				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1.0, o, u, v);
+			mesh.getMeshData().updateVertexCount();
+			mesh.updateModelBound();
+		} catch (final RuntimeException e) {
+			System.err.println("Points:");
+			for (final Point p : polygon.getPoints())
+				System.err.println(p);
+			System.err.println("Holes:");
+			if (polygon.getHoles() != null)
+				for (final Polygon hole : polygon.getHoles())
+					for (final Point p : hole.getPoints())
+						System.err.println(p);
+			throw e;
 		}
-		if (o != null)
-			ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1.0, o, u, v);
-		mesh.getMeshData().updateVertexCount();
-		mesh.updateModelBound();
 	}
 
 }

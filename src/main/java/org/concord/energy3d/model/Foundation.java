@@ -25,10 +25,10 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
@@ -45,7 +45,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
-	private transient Mesh surroundMesh;
+	private transient Mesh sideMesh[];
 	private transient BMText buildingLabel;
 	private transient Box tank;
 	private transient double newBoundingHeight;
@@ -116,13 +116,19 @@ public class Foundation extends HousePart implements Thermalizable {
 		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
 
-		surroundMesh = new Mesh("Foundation (Surround)");
-		surroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
-		surroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(16));
-		surroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(16));
-		surroundMesh.setRenderState(offsetState);
-		surroundMesh.setModelBound(new BoundingBox());
-		root.attachChild(surroundMesh);
+		sideMesh = new Mesh[4];
+		for (int i = 0; i < 4; i++) {
+			final Mesh mesh = new Mesh("Foundation (Side " + i + ")");
+			mesh.setUserData(new UserData(this));
+			mesh.setRenderState(offsetState);
+			mesh.setModelBound(new BoundingBox());
+			final MeshData meshData = mesh.getMeshData();
+			meshData.setVertexBuffer(BufferUtils.createVector3Buffer(6));
+			meshData.setNormalBuffer(BufferUtils.createVector3Buffer(6));
+			mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
+			root.attachChild(mesh);
+			sideMesh[i] = mesh;
+		}
 
 		boundingMesh = new Line("Foundation (Bounding)");
 		boundingMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
@@ -140,7 +146,6 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
-		surroundMesh.setUserData(userData);
 		boundingMesh.setUserData(userData);
 
 		setLabelOffset(-0.11);
@@ -573,7 +578,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final boolean drawable = points.size() == 12;
 		if (drawable) {
 			drawTopMesh();
-			drawSurroundMesh();
+			drawSideMesh();
 			drawOutline(boundingMesh, points.get(7).getZf());
 			drawOutline(outlineMesh, (float) height);
 			updateSolarLabelPosition();
@@ -584,9 +589,9 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void drawTank() {
 		boolean focused = false;
-		for (HousePart p : Scene.getInstance().getParts()) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
-				Mirror m = (Mirror) p;
+				final Mirror m = (Mirror) p;
 				if (m.getTarget() == this) {
 					focused = true;
 					break;
@@ -595,65 +600,88 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		tank.setVisible(focused);
 		if (focused) {
-			Vector3 v = getAbsPoint(0);
-			double vx = getAbsPoint(2).distance(v); // x direction
-			double vy = getAbsPoint(1).distance(v); // y direction
-			Vector3 o = getAbsCenter();
+			final Vector3 v = getAbsPoint(0);
+			final double vx = getAbsPoint(2).distance(v); // x direction
+			final double vy = getAbsPoint(1).distance(v); // y direction
+			final Vector3 o = getAbsCenter();
 			o.setZ(getBoundingHeight());
 			tank.setData(o, vx / 4, vy / 4, 10);
 		}
 	}
 
-	public void drawSurroundMesh() {
-		final FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
-		vertexBuffer.rewind();
-		ReadOnlyVector3 p;
+	public void drawSideMesh() {
+		final FloatBuffer vertexBuffer0 = sideMesh[0].getMeshData().getVertexBuffer();
+		final FloatBuffer vertexBuffer1 = sideMesh[1].getMeshData().getVertexBuffer();
+		final FloatBuffer vertexBuffer2 = sideMesh[2].getMeshData().getVertexBuffer();
+		final FloatBuffer vertexBuffer3 = sideMesh[3].getMeshData().getVertexBuffer();
+		vertexBuffer0.rewind();
+		vertexBuffer1.rewind();
+		vertexBuffer2.rewind();
+		vertexBuffer3.rewind();
 		final Vector3 p0 = getAbsPoint(0);
 		final Vector3 p1 = getAbsPoint(1);
 		final Vector3 p2 = getAbsPoint(2);
 		final Vector3 p3 = getAbsPoint(3);
-		p = p0;
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		p = p2;
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		p = p3;
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		p = p1;
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		p = p0;
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put(0f);
-		vertexBuffer.put(p.getXf()).put(p.getYf()).put((float) height);
+		vertexBuffer0.put(p0.getXf()).put(p0.getYf()).put((float) height);
+		vertexBuffer0.put(p0.getXf()).put(p0.getYf()).put(0f);
+		vertexBuffer0.put(p2.getXf()).put(p2.getYf()).put(0f);
+		vertexBuffer0.put(p2.getXf()).put(p2.getYf()).put(0f);
+		vertexBuffer0.put(p2.getXf()).put(p2.getYf()).put((float) height);
+		vertexBuffer0.put(p0.getXf()).put(p0.getYf()).put((float) height);
 
-		final FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
-		normalBuffer.rewind();
+		vertexBuffer1.put(p2.getXf()).put(p2.getYf()).put((float) height);
+		vertexBuffer1.put(p2.getXf()).put(p2.getYf()).put(0f);
+		vertexBuffer1.put(p3.getXf()).put(p3.getYf()).put(0f);
+		vertexBuffer1.put(p3.getXf()).put(p3.getYf()).put(0f);
+		vertexBuffer1.put(p3.getXf()).put(p3.getYf()).put((float) height);
+		vertexBuffer1.put(p2.getXf()).put(p2.getYf()).put((float) height);
+
+		vertexBuffer2.put(p3.getXf()).put(p3.getYf()).put((float) height);
+		vertexBuffer2.put(p3.getXf()).put(p3.getYf()).put(0f);
+		vertexBuffer2.put(p1.getXf()).put(p1.getYf()).put(0f);
+		vertexBuffer2.put(p1.getXf()).put(p1.getYf()).put(0f);
+		vertexBuffer2.put(p1.getXf()).put(p1.getYf()).put((float) height);
+		vertexBuffer2.put(p3.getXf()).put(p3.getYf()).put((float) height);
+
+		vertexBuffer3.put(p1.getXf()).put(p1.getYf()).put((float) height);
+		vertexBuffer3.put(p1.getXf()).put(p1.getYf()).put(0f);
+		vertexBuffer3.put(p0.getXf()).put(p0.getYf()).put(0f);
+		vertexBuffer3.put(p0.getXf()).put(p0.getYf()).put(0f);
+		vertexBuffer3.put(p0.getXf()).put(p0.getYf()).put((float) height);
+		vertexBuffer3.put(p1.getXf()).put(p1.getYf()).put((float) height);
+
+		final FloatBuffer normalBuffer0 = sideMesh[0].getMeshData().getNormalBuffer();
+		final FloatBuffer normalBuffer1 = sideMesh[1].getMeshData().getNormalBuffer();
+		final FloatBuffer normalBuffer2 = sideMesh[2].getMeshData().getNormalBuffer();
+		final FloatBuffer normalBuffer3 = sideMesh[3].getMeshData().getNormalBuffer();
+		normalBuffer0.rewind();
+		normalBuffer1.rewind();
+		normalBuffer2.rewind();
+		normalBuffer3.rewind();
 		final ReadOnlyVector3 n1 = p2.subtract(p0, null).normalizeLocal().crossLocal(Vector3.UNIT_Z);
 		final ReadOnlyVector3 n2 = p3.subtract(p2, null).normalizeLocal().crossLocal(Vector3.UNIT_Z);
 		ReadOnlyVector3 normal;
 		normal = n1;
-		for (int i = 0; i < 4; i++)
-			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		((UserData) sideMesh[0].getUserData()).setNormal(normal);
+		for (int i = 0; i < 6; i++)
+			normalBuffer0.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 		normal = n2;
-		for (int i = 0; i < 4; i++)
-			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		((UserData) sideMesh[1].getUserData()).setNormal(normal);
+		for (int i = 0; i < 6; i++)
+			normalBuffer1.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 		normal = n1.negate(null);
-		for (int i = 0; i < 4; i++)
-			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		((UserData) sideMesh[2].getUserData()).setNormal(normal);
+		for (int i = 0; i < 6; i++)
+			normalBuffer2.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 		normal = n2.negate(null);
-		for (int i = 0; i < 4; i++)
-			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		((UserData) sideMesh[3].getUserData()).setNormal(normal);
+		for (int i = 0; i < 6; i++)
+			normalBuffer3.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
 
-		surroundMesh.updateModelBound();
-		CollisionTreeManager.INSTANCE.removeCollisionTree(surroundMesh);
+		for (int i = 0; i < 4; i++) {
+			sideMesh[i].updateModelBound();
+			CollisionTreeManager.INSTANCE.removeCollisionTree(sideMesh[i]);
+		}
 	}
 
 	public void drawTopMesh() {
@@ -890,7 +918,10 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	@Override
 	public void updateTextureAndColor() {
-		surroundMesh.setDefaultColor(Scene.getInstance().getTextureMode() == TextureMode.Full ? ColorRGBA.GRAY : (getColor() == null ? Scene.getInstance().getFoundationColor() : getColor()));
+		for (final Mesh mesh : sideMesh) {
+			mesh.setDefaultColor(Scene.getInstance().getTextureMode() == TextureMode.Full ? ColorRGBA.GRAY : (getColor() == null ? Scene.getInstance().getFoundationColor() : getColor()));
+			updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
+		}
 		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
 	}
 
@@ -1282,6 +1313,27 @@ public class Foundation extends HousePart implements Thermalizable {
 	@Override
 	public Spatial getCollisionSpatial() {
 		return root;
+	}
+
+	@Override
+	public Mesh getRadiationMesh() {
+		throw new RuntimeException("Not supported for foundation");
+	}
+
+	@Override
+	public Spatial getRadiationCollisionSpatial() {
+		throw new RuntimeException("Not supported for foundation");
+	}
+
+	public Mesh getRadiationMesh(final int index) {
+		if (index == 0)
+			return mesh;
+		else
+			return sideMesh[index - 1];
+	}
+
+	public Mesh getRadiationCollisionSpatial(final int index) {
+		return getRadiationMesh(index);
 	}
 
 }

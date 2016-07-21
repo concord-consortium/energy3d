@@ -120,10 +120,17 @@ public class SolarRadiation {
 		collidables.clear();
 		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
+			if (part instanceof SolarPanel || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
 				final Spatial s = part.getRadiationCollisionSpatial();
 				collidables.add(s);
 				collidablesToParts.put(s, part);
+			} else if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
+				for (int i = 0; i < 4; i++) {
+					final Spatial s = foundation.getRadiationCollisionSpatial(i);
+					collidables.add(s);
+					collidablesToParts.put(s, part);
+				}
 			} else if (part instanceof Wall) {
 				if (((Wall) part).getType() == Wall.SOLID_WALL) {
 					final Spatial s = part.getRadiationCollisionSpatial();
@@ -164,8 +171,15 @@ public class SolarRadiation {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isDrawCompleted()) {
-						if (part instanceof Foundation || part instanceof Window) {
+						if (part instanceof Window) {
 							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
+						} else if (part instanceof Foundation) {
+							final Foundation foundation = (Foundation) part;
+							for (int i = 0; i < 5; i++) {
+								final Mesh radiationMesh = foundation.getRadiationMesh(i);
+								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
+								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
+							}
 						} else if (part instanceof Wall) {
 							if (((Wall) part).getType() == Wall.SOLID_WALL)
 								computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
@@ -414,8 +428,8 @@ public class SolarRadiation {
 		fromXY.transform(tmp);
 		data.p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
-		data.rows = (int) Math.ceil(data.p1.subtract(data.p0, null).length() / solarStep);
-		data.cols = (int) Math.ceil(data.p2.subtract(data.p0, null).length() / solarStep);
+		data.rows = Math.max(1, (int) Math.ceil(data.p1.subtract(data.p0, null).length() / solarStep));
+		data.cols = Math.max(1, (int) Math.ceil(data.p2.subtract(data.p0, null).length() / solarStep));
 		if (data.dailySolarIntensity == null)
 			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
 
@@ -553,8 +567,11 @@ public class SolarRadiation {
 	public void computeTotalEnergyForBuildings() {
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation || part instanceof Wall || part instanceof SolarPanel || part instanceof Sensor)
+			if (part instanceof Wall || part instanceof SolarPanel || part instanceof Sensor)
 				applyTexture(part.getRadiationMesh());
+			if (part instanceof Foundation)
+				for (int i = 0; i < 5; i++)
+					applyTexture(((Foundation) part).getRadiationMesh(i));
 			else if (part instanceof Roof)
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
