@@ -1468,7 +1468,14 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public List<HousePart> getHousePartsOfSameTypeInBuilding(final HousePart x) {
+	public void setColorOfAllPartsOfSameType(final HousePart part, final ReadOnlyColorRGBA color) {
+		for (final HousePart p : parts) {
+			if (p.getClass().equals(part.getClass()))
+				p.setColor(color);
+		}
+	}
+
+	public List<HousePart> getPartsOfSameTypeInBuilding(final HousePart x) {
 		final List<HousePart> list = new ArrayList<HousePart>();
 		if (x instanceof Foundation) {
 			list.add(x);
@@ -1477,6 +1484,15 @@ public class Scene implements Serializable {
 				if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer())
 					list.add(p);
 			}
+		}
+		return list;
+	}
+
+	public List<HousePart> getAllPartsOfSameType(final HousePart x) {
+		final List<HousePart> list = new ArrayList<HousePart>();
+		for (final HousePart p : parts) {
+			if (p.getClass().equals(x.getClass()))
+				list.add(p);
 		}
 		return list;
 	}
