@@ -21,7 +21,7 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 		this.part = part;
 		if (!(part instanceof Thermalizable))
 			throw new IllegalArgumentException(part + "is not thermalizable!");
-		parts = Scene.getInstance().getHousePartsOfSameTypeInBuilding(part);
+		parts = Scene.getInstance().getPartsOfSameTypeInBuilding(part);
 		int n = parts.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {

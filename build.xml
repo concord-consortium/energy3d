@@ -78,7 +78,7 @@
 			<fx:bundleargument arg="mac.CFBundleIdentifier" value="org.concord.Energy3D"/>
 			<fx:bundleargument arg="mac.CFBundleVersion" value="5.0.0"/>
 			<fx:bundleargument arg="mac.signing-key-developer-id-app" value="Developer ID Application: Concord"/>
-			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2010-2015 Concord Consortium Inc.">
+			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2010-2016 Concord Consortium Inc.">
 				<fx:association extension="ng3" description="${app.name} File" mimetype="application/energy3d" icon="${icon}">
 				</fx:association>
 			</fx:info>

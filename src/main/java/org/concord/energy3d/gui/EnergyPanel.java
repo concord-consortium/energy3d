@@ -156,7 +156,9 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(createLabel("Date: "), gbc_dateLabel);
 
 		dateSpinner = createSpinner(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
-		dateSpinner.setEditor(new JSpinner.DateEditor(dateSpinner, "MMMM dd"));
+		JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "MMMM dd");
+		dateSpinner.setEditor(dateEditor);
+		dateEditor.getTextField().setColumns((int) ("September 30".length() * 0.7));
 		dateSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
 			private Date lastDate;
@@ -271,11 +273,12 @@ public class EnergyPanel extends JPanel {
 				updateThermostat();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
-				if (MainPanel.getInstance().getShadowButton().isSelected()) {
-					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
-				} else {
-					SceneManager.getInstance().setShading(false);
-				}
+				SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+				// if (MainPanel.getInstance().getShadowButton().isSelected()) {
+				// SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+				// } else {
+				// SceneManager.getInstance().setShading(false);
+				// }
 				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible()) { // for now, only heat flow arrows need to call redrawAll
 					SceneManager.getInstance().setHeatFluxDaily(false);
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -816,11 +819,12 @@ public class EnergyPanel extends JPanel {
 					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
 					final double lx = v.distance(v2);
 					final double ly = v.distance(v1);
+					final double lz = foundation.getHeight();
 					partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 					partProperty1Label.setText("  Size:");
 					partProperty2Label.setText("  Position:");
 					partProperty3Label.setText("  Azimuth:");
-					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
+					partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + "\u00d7" + (twoDecimals.format(lz * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
 					partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
 					partProperty3TextField.setText(noDecimal.format(foundation.getAzimuth()) + "\u00B0");
 					partProperty1TextField.setToolTipText("The length and width of the foundation");

@@ -37,6 +37,8 @@ public class Sensor extends HousePart {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient BMText label;
+	private boolean lightOff;
+	private boolean heatFluxOff;
 
 	public Sensor() {
 		super(1, 1, 0.0);
@@ -223,6 +225,11 @@ public class Sensor extends HousePart {
 	}
 
 	@Override
+	public double getArea() { // FIXME: Sometimes computeArea is not called because this sensor might not be drawable, so we temporarily override this method to work around the problem
+		return WIDTH * HEIGHT;
+	}
+
+	@Override
 	protected HousePart getContainerRelative() {
 		return container instanceof Wall ? container : getTopContainer();
 	}
@@ -239,6 +246,22 @@ public class Sensor extends HousePart {
 	@Override
 	public boolean isCopyable() {
 		return false;
+	}
+
+	public void setLightOff(boolean lightOff) {
+		this.lightOff = lightOff;
+	}
+
+	public boolean isLightOff() {
+		return lightOff;
+	}
+
+	public void setHeatFluxOff(boolean heatFluxOff) {
+		this.heatFluxOff = heatFluxOff;
+	}
+
+	public boolean isHeatFluxOff() {
+		return heatFluxOff;
 	}
 
 }

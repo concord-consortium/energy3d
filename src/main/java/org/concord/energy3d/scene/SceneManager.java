@@ -57,10 +57,12 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddPartCommand;
+import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
+import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.UndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
@@ -138,7 +140,6 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.shape.Dome;
 import com.ardor3d.scenegraph.shape.Quad;
-import com.ardor3d.scenegraph.shape.Sphere;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.GameTaskQueue;
@@ -181,16 +182,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
 	private final UndoManager undoManager = new UndoManager();
-	private HousePart selectedHousePart = null;
-	private HousePart hoveredHousePart = null;
+	private HousePart selectedPart = null;
+	private HousePart hoveredPart = null;
 	private Operation operation = Operation.SELECT;
 	private CameraControl cameraControl;
 	private final ParallelSplitShadowMapPass shadowPass;
 	private ViewMode viewMode = ViewMode.NORMAL;
 	private CameraNode cameraNode;
 	private MouseState mouseState;
-	private AddPartCommand addHousePartCommand;
-	private EditPartCommand editHousePartCommand;
+	private AddPartCommand addPartCommand;
+	private EditPartCommand editPartCommand;
 	private UserData pick;
 	private TwoInputStates firstClickState;
 	private double refreshTime = -1;
@@ -207,7 +208,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public static final double SKY_RADIUS = 1000;
 
-	private Sphere kinectPointer;
 	private MouseState lastSelectedEditPointMouseState;
 	private MouseState pasteMouseState;
 	private Node newImport;
@@ -314,7 +314,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.attachChild(gridsMesh);
 		axes = createAxes();
 		backgroundRoot.attachChild(axes);
-		backgroundRoot.attachChild(createKinectPointer());
 		root.attachChild(backgroundRoot);
 		root.attachChild(Scene.getRoot());
 
@@ -338,15 +337,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final Date today = Calendar.getInstance().getTime();
 		new Heliodon(root, light, passManager, logicalLayer, today);
-
-		// taskManager.update(new Callable<Object>() {
-		// @Override
-		// public Object call() throws Exception {
-		// final Date today = Calendar.getInstance().getTime();
-		// new Heliodon(root, light, passManager, logicalLayer, today);
-		// return null;
-		// }
-		// });
 
 		initMouse();
 
@@ -440,7 +430,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (night) {
 							m.drawLightBeams();
 						} else {
-							if (m.getTarget() != null && m.getHeliostatType() != Mirror.HELIOSTAT_NONE)
+							if (m.getHeliostatTarget() != null)
 								m.draw();
 						}
 					}
@@ -668,11 +658,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return axisRoot;
 	}
 
-	private Mesh createKinectPointer() {
-		kinectPointer = new Sphere("Kinect Pointer", 10, 10, 0.01);
-		return kinectPointer;
-	}
-
 	private void initMouse() {
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
@@ -711,7 +696,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
 					final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
 					final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
-					if (selectedHousePart instanceof Roof || selectedHousePart instanceof Floor || selectedHousePart instanceof SolarPanel || selectedHousePart instanceof Mirror || selectedHousePart instanceof Sensor || selectedHousePart instanceof Tree || selectedHousePart instanceof Human || p1.distance(p2) > 10) {
+					if (selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof SolarPanel || selectedPart instanceof Mirror || selectedPart instanceof Sensor || selectedPart instanceof Tree || selectedPart instanceof Human || p1.distance(p2) > 10) {
 						firstClickState = null;
 						mouseReleased(inputStates.getCurrent().getMouseState());
 					}
@@ -873,8 +858,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
 				} else {
-					if (selectedHousePart instanceof Window) {
-						final Vector3 v = selectedHousePart.getNormal().clone();
+					if (selectedPart instanceof Window) {
+						final Vector3 v = selectedPart.getNormal().clone();
 						v.crossLocal(Vector3.UNIT_Z);
 						moveWithKey(inputStates.getCurrent().getKeyboardState(), v);
 						Scene.getInstance().redrawAll();
@@ -892,8 +877,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
 				} else {
-					if (selectedHousePart instanceof Window) {
-						final Vector3 n = selectedHousePart.getNormal().clone();
+					if (selectedPart instanceof Window) {
+						final Vector3 n = selectedPart.getNormal().clone();
 						final Vector3 v = n.cross(Vector3.UNIT_Z, null);
 						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n));
 						Scene.getInstance().redrawAll();
@@ -911,8 +896,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
 				} else {
-					if (selectedHousePart instanceof Window) {
-						final Vector3 v = selectedHousePart.getNormal().clone();
+					if (selectedPart instanceof Window) {
+						final Vector3 v = selectedPart.getNormal().clone();
 						v.crossLocal(Vector3.UNIT_Z).negateLocal();
 						moveWithKey(inputStates.getCurrent().getKeyboardState(), v);
 						Scene.getInstance().redrawAll();
@@ -930,8 +915,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (SceneManager.getInstance().isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
 				} else {
-					if (selectedHousePart instanceof Window) {
-						final Vector3 n = selectedHousePart.getNormal().clone();
+					if (selectedPart instanceof Window) {
+						final Vector3 n = selectedPart.getNormal().clone();
 						final Vector3 v = n.cross(Vector3.UNIT_Z, null).negateLocal();
 						moveWithKey(inputStates.getCurrent().getKeyboardState(), v.crossLocal(n));
 						Scene.getInstance().redrawAll();
@@ -988,7 +973,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void move(final Vector3 v) {
 		MoveBuildingCommand c = null;
-		if (selectedHousePart == null) {
+		if (selectedPart == null) {
 			c = new MoveBuildingCommand(null, v);
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
@@ -996,15 +981,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 			Scene.getInstance().redrawAll();
-		} else if (selectedHousePart instanceof Foundation) {
-			c = new MoveBuildingCommand((Foundation) selectedHousePart, v);
-			Foundation f = (Foundation) selectedHousePart;
-			f.move(v, selectedHousePart.getGridSize());
+		} else if (selectedPart instanceof Foundation) {
+			c = new MoveBuildingCommand((Foundation) selectedPart, v);
+			Foundation f = (Foundation) selectedPart;
+			f.move(v, selectedPart.getGridSize());
 			f.draw();
 			f.drawChildren();
 			SceneManager.getInstance().refresh();
-		} else if (selectedHousePart instanceof Window) {
-			Window w = (Window) selectedHousePart;
+		} else if (selectedPart instanceof Window) {
+			Window w = (Window) selectedPart;
 			w.move(v);
 			w.draw();
 		}
@@ -1034,7 +1019,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			part.setEditPointsVisible(false);
 			part.setGridsVisible(false);
 		}
-		selectedHousePart = null;
+		selectedPart = null;
 		refresh = true;
 	}
 
@@ -1139,12 +1124,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					if (selectedHousePart != null) {
-						if (selectedHousePart.isDrawCompleted())
-							selectedHousePart.setEditPointsVisible(false);
+					if (selectedPart != null) {
+						if (selectedPart.isDrawCompleted())
+							selectedPart.setEditPointsVisible(false);
 						else
-							Scene.getInstance().remove(selectedHousePart, false);
-						selectedHousePart = null;
+							Scene.getInstance().remove(selectedPart, false);
+						selectedPart = null;
 					}
 					return null;
 				}
@@ -1165,8 +1150,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (viewMode != ViewMode.PRINT_PREVIEW)
 			Scene.getInstance().drawResizeBounds();
 
-		selectedHousePart = newHousePart();
-		if (selectedHousePart != null)
+		selectedPart = newHousePart();
+		if (selectedPart != null)
 			cameraControl.setLeftMouseButtonEnabled(false);
 	}
 
@@ -1202,7 +1187,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.DRAW_SOLAR_PANEL) {
 			drawn = new SolarPanel(false);
 		} else if (operation == Operation.DRAW_MIRROR) {
-			drawn = new Mirror(false);
+			drawn = new Mirror();
 		} else if (operation == Operation.DRAW_SENSOR) {
 			drawn = new Sensor();
 		} else if (operation == Operation.DRAW_FOUNDATION) {
@@ -1252,7 +1237,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return null;
 
 		Scene.getInstance().add(drawn, false);
-		addHousePartCommand = new AddPartCommand(drawn);
+		addPartCommand = new AddPartCommand(drawn);
 		return drawn;
 
 	}
@@ -1292,7 +1277,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (!mouseControlEnabled)
 			return;
 
-		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (selectedHousePart == null || selectedHousePart.isDrawCompleted()))
+		if ((operation == Operation.SELECT || operation == Operation.RESIZE) && (selectedPart == null || selectedPart.isDrawCompleted()))
 			cameraControl.setMouseEnabled(true);
 		else
 			cameraControl.setMouseEnabled(false);
@@ -1304,15 +1289,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public HousePart getSelectedPart() {
-		return selectedHousePart;
+		return selectedPart;
 	}
 
 	public void setSelectedPart(final HousePart p) {
-		if (p == null && selectedHousePart != null)
-			selectedHousePart.setEditPointsVisible(false);
-		selectedHousePart = p;
-		if (selectedHousePart != null)
-			selectedHousePart.setEditPointsVisible(true);
+		if (p == null && selectedPart != null)
+			selectedPart.setEditPointsVisible(false);
+		selectedPart = p;
+		if (selectedPart != null)
+			selectedPart.setEditPointsVisible(true);
 	}
 
 	public boolean isTopView() {
@@ -1426,46 +1411,46 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
 		try {
-			if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
+			if (editPartCommand != null && editPartCommand.isReallyEdited())
 				EnergyPanel.getInstance().cancel();
 
-			if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
-				selectedHousePart.setPreviewPoint(x, y);
-			} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedHousePart instanceof Foundation) && selectedHousePart.isDrawCompleted()) {
+			if (selectedPart != null && !selectedPart.isDrawCompleted()) {
+				selectedPart.setPreviewPoint(x, y);
+			} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedPart instanceof Foundation) && selectedPart.isDrawCompleted()) {
 				final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 				if (pick != null) {
-					if (selectedHousePart instanceof Foundation) {
-						final Foundation foundation = (Foundation) selectedHousePart;
+					if (selectedPart instanceof Foundation) {
+						final Foundation foundation = (Foundation) selectedPart;
 						final Vector3 pickPoint = pick.getPoint().clone();
 						// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
 						final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
 						foundation.move(d, houseMovePoints);
 					}
 				}
-			} else if (houseMoveStartPoint != null && selectedHousePart != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Tree) {
+			} else if (houseMoveStartPoint != null && selectedPart != null && selectedPart.isDrawCompleted() && selectedPart instanceof Tree) {
 				final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 				if (pick != null) {
 					final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-					((Tree) selectedHousePart).move(d, houseMovePoints);
+					((Tree) selectedPart).move(d, houseMovePoints);
 				}
-			} else if (houseMoveStartPoint != null && selectedHousePart != null && selectedHousePart.isDrawCompleted() && selectedHousePart instanceof Window) {
-				final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedHousePart.getContainer());
+			} else if (houseMoveStartPoint != null && selectedPart != null && selectedPart.isDrawCompleted() && selectedPart instanceof Window) {
+				final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedPart.getContainer());
 				if (pick != null) {
 					final Vector3 d = pick.getPoint().clone().subtractLocal(houseMoveStartPoint);
-					((Window) selectedHousePart).move(d, houseMovePoints);
+					((Window) selectedPart).move(d, houseMovePoints);
 				}
 			} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
-				final PickedHousePart selectHousePart = SelectUtil.selectHousePart(x, y, false);
-				pick = selectHousePart == null ? null : selectHousePart.getUserData();
+				final PickedHousePart pickedPart = SelectUtil.selectHousePart(x, y, false);
+				pick = pickedPart == null ? null : pickedPart.getUserData();
 				final HousePart housePart = pick == null ? null : pick.getHousePart();
 				if (pick != null) {
-					hoveredHousePart = housePart;
-					if (hoveredHousePart.isFrozen())
-						hoveredHousePart = null;
+					hoveredPart = housePart;
+					if (hoveredPart.isFrozen())
+						hoveredPart = null;
 					if (pick.getIndex() != -1)
 						lastSelectedEditPointMouseState = mouseState;
 				} else
-					hoveredHousePart = null;
+					hoveredPart = null;
 			}
 			mouseState = null;
 		} catch (Throwable t) {
@@ -1473,7 +1458,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Util.reportError(t);
 		}
 		final Component canvasComponent = (Component) canvas;
-		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredHousePart != null && pick.getIndex() == -1 && (hoveredHousePart instanceof Foundation || hoveredHousePart instanceof SolarPanel || hoveredHousePart instanceof Sensor || hoveredHousePart instanceof Window || hoveredHousePart instanceof Tree || hoveredHousePart instanceof Human))
+		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null && pick.getIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Sensor || hoveredPart instanceof Window || hoveredPart instanceof Tree || hoveredPart instanceof Human))
 			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 		else
 			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -1566,21 +1551,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			public Object call() {
 				try {
 					if (operation == Operation.SELECT) {
-						final HousePart previousSelectedHousePart = selectedHousePart;
+						final HousePart previousSelectedHousePart = selectedPart;
 						if (mouseState == null) // for some reason, there is a small chance that mouseState is nullified here
 							mouseState = new MouseState(x, y, 0, 0, 0, null, null);
 						final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 						final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
-						selectedHousePart = pick == null ? null : pick.getHousePart();
+						selectedPart = pick == null ? null : pick.getHousePart();
 						System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
-						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart) {
+						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedPart) {
 							previousSelectedHousePart.setEditPointsVisible(false);
 							previousSelectedHousePart.setGridsVisible(false);
 						}
-						if (selectedHousePart != null) {
-							selectedHousePart.complete(); // to undo edit flag set by SelectUtil above
+						if (selectedPart != null) {
+							selectedPart.complete(); // to undo edit flag set by SelectUtil above
 							if (!PrintController.getInstance().isPrintPreview())
-								selectedHousePart.setEditPointsVisible(true);
+								selectedPart.setEditPointsVisible(true);
 							EnergyPanel.getInstance().update();
 						}
 						EnergyPanel.getInstance().updateGraphs();
@@ -1607,70 +1592,87 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				System.out.println("OPERATION: " + operation);
 				try {
 					if (operation == Operation.SELECT || operation == Operation.RESIZE || operation == Operation.ROTATE || operation == Operation.DRAW_ROOF_GABLE) {
-						if (selectedHousePart == null || selectedHousePart.isDrawCompleted()) {
-							final HousePart previousSelectedHousePart = selectedHousePart;
-							final PickedHousePart selectHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
-							final UserData pick = selectHousePart == null ? null : selectHousePart.getUserData();
+						if (selectedPart == null || selectedPart.isDrawCompleted()) {
+							final HousePart previousSelectedPart = selectedPart;
+							final PickedHousePart pickedPart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
+							final UserData pick = pickedPart == null ? null : pickedPart.getUserData();
 							if (pick == null)
-								selectedHousePart = null;
+								selectedPart = null;
 							else
-								selectedHousePart = pick.getHousePart();
-							if (selectedHousePart != null && selectedHousePart.isFrozen())
-								selectedHousePart = null;
+								selectedPart = pick.getHousePart();
+							if (selectedPart != null && selectedPart.isFrozen())
+								selectedPart = null;
 							System.out.println("Clicked on: " + pick);
 							if (pick != null && pick.isEditPoint()) {
 								cameraControl.setLeftMouseButtonEnabled(false);
 							}
 
 							if (operation == Operation.SELECT || operation == Operation.ROTATE) {
-								if (previousSelectedHousePart instanceof Foundation) {
-									((Foundation) previousSelectedHousePart).updateAzimuthArrowVisibility(false);
+								if (previousSelectedPart instanceof Foundation) {
+									((Foundation) previousSelectedPart).updateAzimuthArrowVisibility(false);
 								}
-								if (selectedHousePart instanceof Foundation) {
-									((Foundation) selectedHousePart).drawAzimuthArrow();
+								if (selectedPart instanceof Foundation) {
+									((Foundation) selectedPart).drawAzimuthArrow();
+								}
+								if (selectedPart != null) {
+									Foundation foundationOfSelectedPart = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+									if (foundationOfSelectedPart != null) {
+										foundationOfSelectedPart.setMovePointsVisible(true);
+									}
 								}
 							}
-							if (operation == Operation.RESIZE && selectedHousePart != null) {
-								if (!(selectedHousePart instanceof Foundation)) {
-									selectedHousePart.setEditPointsVisible(false);
-									selectedHousePart = selectedHousePart.getTopContainer();
+							if (operation == Operation.RESIZE && selectedPart != null) {
+								if (!(selectedPart instanceof Foundation)) {
+									selectedPart.setEditPointsVisible(false);
+									selectedPart = selectedPart.getTopContainer();
 								}
 							}
-							if (selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
+							if (selectedPart instanceof Window || selectedPart instanceof Tree || (selectedPart instanceof Foundation && pick.getIndex() != -1)) {
 								cameraControl.setLeftMouseButtonEnabled(false);
-								houseMoveStartPoint = selectHousePart.getPoint().clone();
+								houseMoveStartPoint = pickedPart.getPoint().clone();
 								collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
-								final ArrayList<Vector3> points = selectedHousePart.getPoints();
+								final ArrayList<Vector3> points = selectedPart.getPoints();
 								houseMovePoints = new ArrayList<Vector3>(points.size());
 								for (final Vector3 p : points)
 									houseMovePoints.add(p.clone());
 							}
 
-							if (previousSelectedHousePart != null && previousSelectedHousePart != selectedHousePart && operation != Operation.RESIZE) {
-								previousSelectedHousePart.setEditPointsVisible(false);
-								previousSelectedHousePart.setGridsVisible(false);
+							if (previousSelectedPart != null && previousSelectedPart != selectedPart && operation != Operation.RESIZE) {
+								previousSelectedPart.setEditPointsVisible(false);
+								previousSelectedPart.setGridsVisible(false);
+								if (previousSelectedPart != null) {
+									Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
+									if (foundationOfPreviousSelectedPart != null) {
+										if (selectedPart == null) {
+											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
+										} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
+											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
+										}
+									}
+								}
 							}
-							if (selectedHousePart != null && !PrintController.getInstance().isPrintPreview()) {
-								selectedHousePart.setEditPointsVisible(true);
-								if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedHousePart instanceof Window || selectedHousePart instanceof Tree || selectedHousePart instanceof Foundation) {
-									selectedHousePart.setGridsVisible(true);
-									if (selectedHousePart instanceof Foundation)
-										editHousePartCommand = new EditFoundationCommand((Foundation) selectedHousePart, !pick.isEditPoint());
-									else
-										editHousePartCommand = new EditPartCommand(selectedHousePart);
+							if (selectedPart != null && !PrintController.getInstance().isPrintPreview()) {
+								selectedPart.setEditPointsVisible(true);
+								if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedPart instanceof Window || selectedPart instanceof Tree) {
+									selectedPart.setGridsVisible(true);
+									if (selectedPart instanceof Foundation) {
+										editPartCommand = new EditFoundationCommand((Foundation) selectedPart, !pick.isEditPoint());
+									} else {
+										editPartCommand = new EditPartCommand(selectedPart);
+									}
 								}
 							}
 							SelectUtil.nextPickLayer();
-							if (operation == Operation.DRAW_ROOF_GABLE && selectedHousePart instanceof Roof) {
-								System.out.println(selectedHousePart);
+							if (operation == Operation.DRAW_ROOF_GABLE && selectedPart instanceof Roof) {
+								System.out.println(selectedPart);
 								System.out.println("deleting roof #" + pick.getIndex());
 								final int roofPartIndex = pick.getIndex();
-								final Roof roof = (Roof) selectedHousePart;
+								final Roof roof = (Roof) selectedPart;
 								roof.setGable(roofPartIndex, true, undoManager);
 							}
 						}
 					} else {
-						selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
+						selectedPart.addPoint(mouseState.getX(), mouseState.getY());
 					}
 				} catch (Throwable t) {
 					t.printStackTrace();
@@ -1679,6 +1681,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
+
 	}
 
 	private void mouseReleased(final MouseState mouseState) {
@@ -1687,24 +1690,24 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public Object call() {
 				try {
-					if (selectedHousePart != null)
-						selectedHousePart.setGridsVisible(false);
+					if (selectedPart != null)
+						selectedPart.setGridsVisible(false);
 					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-						if (selectedHousePart != null && (!selectedHousePart.isDrawCompleted() || houseMoveStartPoint != null)) {
-							if (selectedHousePart.isDrawable()) {
-								selectedHousePart.complete();
-								if (editHousePartCommand != null && editHousePartCommand.isReallyEdited())
+						if (selectedPart != null && (!selectedPart.isDrawCompleted() || houseMoveStartPoint != null)) {
+							if (selectedPart.isDrawable()) {
+								selectedPart.complete();
+								if (editPartCommand != null && editPartCommand.isReallyEdited())
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 							} else {
-								if (editHousePartCommand != null)
-									editHousePartCommand.undo();
-								selectedHousePart.setHighlight(false);
+								if (editPartCommand != null)
+									editPartCommand.undo();
+								selectedPart.setHighlight(false);
 								// selectedHousePart = null;
 							}
-							if (editHousePartCommand != null) {
-								if (editHousePartCommand.isReallyEdited())
-									undoManager.addEdit(editHousePartCommand);
-								editHousePartCommand = null;
+							if (editPartCommand != null) {
+								if (editPartCommand.isReallyEdited())
+									undoManager.addEdit(editPartCommand);
+								editPartCommand = null;
 							}
 						}
 						if (!zoomLock)
@@ -1716,25 +1719,25 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							cameraChanged = false;
 						}
 					} else {
-						if (selectedHousePart != null && !selectedHousePart.isDrawCompleted()) {
-							selectedHousePart.addPoint(mouseState.getX(), mouseState.getY());
-							if (selectedHousePart.isDrawCompleted() && !selectedHousePart.isDrawable()) {
-								addHousePartCommand = null;
-								Scene.getInstance().remove(selectedHousePart, true);
-								selectedHousePart = null;
+						if (selectedPart != null && !selectedPart.isDrawCompleted()) {
+							selectedPart.addPoint(mouseState.getX(), mouseState.getY());
+							if (selectedPart.isDrawCompleted() && !selectedPart.isDrawable()) {
+								addPartCommand = null;
+								Scene.getInstance().remove(selectedPart, true);
+								selectedPart = null;
 								if (operationStick)
 									operationFlag = true;
 							}
 						}
-						if (selectedHousePart != null && selectedHousePart.isDrawCompleted()) {
-							if (selectedHousePart.isDrawable()) {
-								if (addHousePartCommand != null)
-									undoManager.addEdit(addHousePartCommand);
-								addHousePartCommand = null;
+						if (selectedPart != null && selectedPart.isDrawCompleted()) {
+							if (selectedPart.isDrawable()) {
+								if (addPartCommand != null)
+									undoManager.addEdit(addPartCommand);
+								addPartCommand = null;
 							} else
-								Scene.getInstance().remove(selectedHousePart, true);
-							selectedHousePart.setEditPointsVisible(false);
-							selectedHousePart = null;
+								Scene.getInstance().remove(selectedPart, true);
+							selectedPart.setEditPointsVisible(false);
+							selectedPart = null;
 							if (operationStick)
 								operationFlag = true;
 							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -1745,6 +1748,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 					}
 					updateHeliodonAndAnnotationSize();
+					if (selectedPart instanceof Foundation)
+						Scene.getInstance().updateMirrors();
 					EnergyPanel.getInstance().update();
 				} catch (Throwable t) {
 					t.printStackTrace();
@@ -1757,35 +1762,35 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void grabOrRelease() {
-		if (selectedHousePart != null && !selectedHousePart.isDrawCompleted())
+		if (selectedPart != null && !selectedPart.isDrawCompleted())
 			mouseReleased(lastSelectedEditPointMouseState);
 		else
 			mousePressed(lastSelectedEditPointMouseState);
 	}
 
 	public void deleteCurrentHousePart() {
-		if (selectedHousePart instanceof Foundation) {
-			if (((Foundation) selectedHousePart).getLockEdit())
+		if (selectedPart instanceof Foundation) {
+			if (((Foundation) selectedPart).getLockEdit())
 				return;
-			if (!selectedHousePart.getChildren().isEmpty())
+			if (!selectedPart.getChildren().isEmpty())
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Deleting the platform also deletes the building on it. Are you sure?", "Confirmation", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
 					return;
 		}
-		if (selectedHousePart != null)
+		if (selectedPart != null)
 			taskManager.update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					final RemovePartCommand command = new RemovePartCommand(selectedHousePart);
-					if (selectedHousePart instanceof Wall) { // undo/redo a gable roof
-						final Roof roof = ((Wall) selectedHousePart).getRoof();
+					final RemovePartCommand command = new RemovePartCommand(selectedPart);
+					if (selectedPart instanceof Wall) { // undo/redo a gable roof
+						final Roof roof = ((Wall) selectedPart).getRoof();
 						if (roof != null) {
 							final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
 							if (roof.getGableEditPointToWallMap() != null)
 								gableInfo.add(roof.getGableEditPointToWallMap());
 							command.setGableInfo(gableInfo);
 						}
-					} else if (selectedHousePart instanceof Foundation) { // undo/redo all the gable roofs
-						final List<Roof> roofs = ((Foundation) selectedHousePart).getRoofs();
+					} else if (selectedPart instanceof Foundation) { // undo/redo all the gable roofs
+						final List<Roof> roofs = ((Foundation) selectedPart).getRoofs();
 						if (!roofs.isEmpty()) {
 							final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
 							for (final Roof r : roofs) {
@@ -1796,8 +1801,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 					}
 					undoManager.addEdit(command);
-					Scene.getInstance().remove(selectedHousePart, true);
-					selectedHousePart = null;
+					Scene.getInstance().remove(selectedPart, true);
+					selectedPart = null;
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -1883,11 +1888,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
 	public void rotateBuilding(final double angle, final boolean redraw) {
 		System.out.println("rotateBuilding()");
-		if (selectedHousePart != null) {
-			if (selectedHousePart instanceof Foundation) {
-				((Foundation) selectedHousePart).rotate(angle, null);
+		if (selectedPart != null) {
+			if (selectedPart instanceof Foundation) {
+				((Foundation) selectedPart).rotate(angle, null);
 			} else {
-				selectedHousePart.getTopContainer().rotate(angle, null);
+				selectedPart.getTopContainer().rotate(angle, null);
 			}
 			if (redraw)
 				Scene.getInstance().redrawAll();
@@ -1904,6 +1909,43 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}
 		Scene.getInstance().redrawAll();
+	}
+
+	public void rotate(final double angle) {
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() {
+				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				if (selectedPart instanceof Foundation) {
+					final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, angle);
+					SceneManager.getInstance().rotateBuilding(angle, true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				} else if (selectedPart instanceof SolarPanel) {
+					SolarPanel solarPanel = (SolarPanel) selectedPart;
+					ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
+					solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(angle));
+					solarPanel.draw();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				} else if (selectedPart instanceof Mirror) {
+					Mirror mirror = (Mirror) selectedPart;
+					ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
+					mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(angle));
+					mirror.draw();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				} else if (selectedPart == null) {
+					final RotateBuildingCommand c = new RotateBuildingCommand(null, angle);
+					rotateAllBuildings(angle);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						EnergyPanel.getInstance().updateProperties();
+					}
+				});
+				return null;
+			}
+		});
 	}
 
 	public boolean isRefreshOnlyMode() {
@@ -2021,6 +2063,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public boolean isFineGrid() {
 		return fineGrid;
+	}
+
+	public BasicPassManager getPassManager() {
+		return passManager;
 	}
 
 }

@@ -24,7 +24,7 @@ public class ChangeFoundationMirrorTargetCommand extends AbstractUndoableEdit {
 		int n = mirrors.size();
 		oldValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = mirrors.get(i).getTarget();
+			oldValues[i] = mirrors.get(i).getHeliostatTarget();
 		}
 	}
 
@@ -39,8 +39,8 @@ public class ChangeFoundationMirrorTargetCommand extends AbstractUndoableEdit {
 		newValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
 			Mirror m = mirrors.get(i);
-			newValues[i] = m.getTarget();
-			m.setTarget(oldValues[i]);
+			newValues[i] = m.getHeliostatTarget();
+			m.setHeliostatTarget(oldValues[i]);
 			m.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -52,7 +52,7 @@ public class ChangeFoundationMirrorTargetCommand extends AbstractUndoableEdit {
 		int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
 			Mirror m = mirrors.get(i);
-			m.setTarget(newValues[i]);
+			m.setHeliostatTarget(newValues[i]);
 			m.draw();
 		}
 		SceneManager.getInstance().refresh();

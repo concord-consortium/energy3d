@@ -13,40 +13,39 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Mirror extends HousePart {
-
-	public static final int HELIOSTAT_NONE = 0;
-	public static final int HELIOSTAT_ALTAZIMUTH_MOUNT = 1;
 
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
-	private transient Mesh supportFrame;
 	private transient Line lightBeams;
+	private transient Cylinder post;
 	private double reflectivity = 0.75; // a number in (0, 1)
 	private double mirrorWidth = 2;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
 	private transient double layoutGap = 0.01;
-	private int heliostatType = HELIOSTAT_NONE;
-	private Foundation target;
+	private Foundation heliostatTarget;
+	private double baseHeight = 5;
+	private static transient BloomRenderPass bloomRenderPass;
 
-	public Mirror(boolean rotated) {
+	public Mirror() {
 		super(1, 1, 0);
 	}
 
@@ -88,6 +87,8 @@ public class Mirror extends HousePart {
 			zenith = 90;
 		if (Util.isZero(reflectivity))
 			reflectivity = 0.75;
+		if (Util.isZero(baseHeight))
+			baseHeight = 5;
 
 		mesh = new Mesh("Reflecting Mirror");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -110,21 +111,24 @@ public class Mirror extends HousePart {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		supportFrame = new Mesh("Supporting Frame");
-		supportFrame.getMeshData().setIndexMode(IndexMode.Quads);
-		supportFrame.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
-		supportFrame.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(12));
-		supportFrame.setRenderState(offsetState);
-		supportFrame.setModelBound(new BoundingBox());
-		root.attachChild(supportFrame);
+		post = new Cylinder("Post Cylindr", 10, 10, 10, 0);
+		post.setDefaultColor(ColorRGBA.WHITE);
+		post.setRenderState(offsetState);
+		post.setModelBound(new BoundingBox());
+		post.updateModelBound();
+		root.attachChild(post);
 
 		lightBeams = new Line("Light Beams");
-		lightBeams.setLineWidth(0.1f);
-		lightBeams.setStipplePattern((short) 0x5555);
+		lightBeams.setLineWidth(0.01f);
+		lightBeams.setStipplePattern((short) 0xffff);
 		lightBeams.setModelBound(null);
+		// final BlendState blendState = new BlendState();
+		// blendState.setBlendEnabled(true);
+		// lightBeams.setRenderState(blendState);
+		// lightBeams.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		Util.disablePickShadowLight(lightBeams);
 		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		lightBeams.setDefaultColor(new ColorRGBA(254.0f / 255.0f, 239.0f / 255.0f, 97.0f / 255.0f, 1));
+		lightBeams.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
 		root.attachChild(lightBeams);
 
 		updateTextureAndColor();
@@ -159,10 +163,8 @@ public class Mirror extends HousePart {
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
-				if (!Util.isZero(zenith - 90)) {
-					double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
-				}
+				double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+				p.setZ(p.getZ() + baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 				getEditPointShape(i).setTranslation(p);
 			}
 		} finally {
@@ -221,8 +223,15 @@ public class Mirror extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		switch (heliostatType) {
-		case HELIOSTAT_NONE:
+		Vector3 a;
+		if (Util.isZero(zenith - 90)) {
+			a = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		} else {
+			double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+			a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
+		}
+
+		if (heliostatTarget == null) {
 			if (Util.isZero(zenith - 90)) {
 				if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 					setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
@@ -230,27 +239,13 @@ public class Mirror extends HousePart {
 			} else {
 				setNormal(Math.toRadians(zenith), Math.toRadians(relativeAzimuth));
 			}
-			break;
-		case HELIOSTAT_ALTAZIMUTH_MOUNT:
-			Vector3 o;
-			if (target != null) {
-				o = target.getAbsCenter();
-				o.setZ(target.getBoundingHeight());
-			} else {
-				o = new Vector3();
-			}
-			final Vector3 p = getAbsPoint(0).subtractLocal(o).negateLocal().normalizeLocal();
+		} else {
+			ReadOnlyVector3 o = heliostatTarget.getTankCenter();
+			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
-			zenith = 90 - Math.toDegrees(Math.acos(normal.dot(Vector3.UNIT_Z)));
-			break;
 		}
-		if (Util.isZero(zenith - 90)) {
-			mesh.setTranslation(getAbsPoint(0));
-		} else {
-			double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(Math.toRadians(zenith))));
-		}
+		mesh.setTranslation(a);
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
@@ -258,7 +253,12 @@ public class Mirror extends HousePart {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
-		drawSupporFrame();
+		double t = Math.toRadians(zenith);
+		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+		post.setRadius(0.6);
+		post.setHeight(baseHeight + 0.5 * h * Math.cos(t) - 0.5 * post.getRadius());
+		post.setTranslation(getAbsPoint(0).addLocal(0, 0, post.getHeight() / 2));
+
 		drawLightBeams();
 
 	}
@@ -279,61 +279,42 @@ public class Mirror extends HousePart {
 	}
 
 	public void drawLightBeams() {
-		if (Heliodon.getInstance().isNightTime()) {
+		if (Heliodon.getInstance().isNightTime() || heliostatTarget == null || !Scene.getInstance().areLightBeamsVisible()) {
 			lightBeams.setVisible(false);
 			return;
 		}
+		double t = Math.toRadians(zenith);
+		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(t));
 		double length = 100;
-		if (target != null) {
-			Vector3 a = target.getAbsCenter();
-			a.setZ(target.getBoundingHeight());
-			length = a.distance(getAbsPoint(0));
-		}
-
+		if (heliostatTarget != null)
+			length = heliostatTarget.getTankCenter().distance(o);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
-		double t = Math.toRadians(zenith);
-		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-		final Vector3 o = getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t));
-		Vector3 s = sunLocation.multiplyLocal(length);
-		// Vector3 p = new Vector3(o);
-		// p.addLocal(s);
+
+		// draw sun beam
+		// Vector3 r = new Vector3(o);
+		// r.addLocal(sunLocation.multiply(5000, null));
 		// beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		// beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		// beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+
+		Vector3 s = sunLocation.multiplyLocal(length);
 		Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
 		p.addLocal(o);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		lightBeams.updateModelBound();
 		lightBeams.setVisible(true);
-	}
-
-	private void drawSupporFrame() {
-		supportFrame.setDefaultColor(getColor());
-		final FloatBuffer vertexBuffer = supportFrame.getMeshData().getVertexBuffer();
-		final FloatBuffer normalBuffer = supportFrame.getMeshData().getNormalBuffer();
-		vertexBuffer.rewind();
-		normalBuffer.rewind();
-		vertexBuffer.limit(vertexBuffer.capacity());
-		normalBuffer.limit(normalBuffer.capacity());
-		final ReadOnlyVector3 o = getAbsPoint(0);
-		double t = Math.toRadians(zenith);
-		double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
-		final Vector3 p = o.add(0, 0, 0.5 * h * Math.cos(t), null);
-		Vector3 dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
-		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
-		double w = mirrorWidth / Scene.getInstance().getAnnotationScale();
-		dir.normalizeLocal().multiplyLocal(w * 0.5);
-		Vector3 v1 = p.add(dir, null);
-		dir.negateLocal();
-		Vector3 v2 = p.add(dir, null);
-		dir = new Vector3(normal).multiplyLocal(0.2);
-		Util.addPointToQuad(normal, v1, v2, dir, vertexBuffer, normalBuffer);
-		vertexBuffer.limit(vertexBuffer.position());
-		normalBuffer.limit(normalBuffer.position());
-		supportFrame.getMeshData().updateVertexCount();
-		supportFrame.updateModelBound();
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
+			bloomRenderPass.setNrBlurPasses(2);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+		}
+		if (!bloomRenderPass.contains(lightBeams)) {
+			bloomRenderPass.add(lightBeams);
+		}
 	}
 
 	@Override
@@ -473,20 +454,21 @@ public class Mirror extends HousePart {
 		return zenith;
 	}
 
-	public void setHeliostatType(int heliostatType) {
-		this.heliostatType = heliostatType;
+	public void setHeliostatTarget(Foundation heliostatTarget) {
+		this.heliostatTarget = heliostatTarget;
 	}
 
-	public int getHeliostatType() {
-		return heliostatType;
+	public Foundation getHeliostatTarget() {
+		return heliostatTarget;
 	}
 
-	public void setTarget(Foundation target) {
-		this.target = target;
-	}
-
-	public Foundation getTarget() {
-		return target;
+	@Override
+	public void delete() {
+		super.delete();
+		if (bloomRenderPass != null) {
+			if (bloomRenderPass.contains(lightBeams))
+				bloomRenderPass.remove(lightBeams);
+		}
 	}
 
 }

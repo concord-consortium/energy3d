@@ -83,6 +83,7 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.CameraMode;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
@@ -97,6 +98,7 @@ import org.concord.energy3d.simulation.SolarAnnualAnalysis;
 import org.concord.energy3d.simulation.SolarDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
@@ -165,6 +167,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem solarAbsorptionHeatMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
+	private JCheckBoxMenuItem sunAnglesMenuItem;
+	private JCheckBoxMenuItem lightBeamsMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem roofDashedLineMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
@@ -212,6 +216,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
 	private JMenu templatesMenu;
 	private JMenu otherTemplatesMenu;
+	private JMenu tutorialsMenu;
 
 	private final FileChooser fileChooser;
 	private final JColorChooser colorChooser;
@@ -235,6 +240,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem moveWestMenuItem;
 	private JMenuItem moveNorthMenuItem;
 	private JMenuItem moveSouthMenuItem;
+	private JMenuItem rotate180MenuItem;
+	private JMenuItem rotate90CwMenuItem;
+	private JMenuItem rotate90CcwMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -413,6 +421,7 @@ public class MainFrame extends JFrame {
 			appMenuBar.add(getViewMenu());
 			appMenuBar.add(getAnalysisMenu());
 			appMenuBar.add(getTemplatesMenu());
+			appMenuBar.add(getTutorialsMenu());
 			appMenuBar.add(getHelpMenu());
 
 			addCommonActionListeners(appMenuBar);
@@ -1148,47 +1157,72 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
-			addTemplate(templatesMenu, "Apartment 1", "templates/apartment-template-1.ng3");
-			addTemplate(templatesMenu, "Apartment 2", "templates/apartment-template-2.ng3");
-			addTemplate(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
-			addTemplate(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
-			addTemplate(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
-			addTemplate(templatesMenu, "Cape Cod", "templates/cape-cod-template.ng3");
-			addTemplate(templatesMenu, "Colonial", "templates/colonial-template.ng3");
-			addTemplate(templatesMenu, "Combination Roof", "templates/combination-roof-template.ng3");
-			addTemplate(templatesMenu, "Cross Gabled Roof", "templates/cross-gabled-template.ng3");
-			addTemplate(templatesMenu, "Cross Hipped Roof", "templates/cross-hipped-template.ng3");
-			addTemplate(templatesMenu, "Dutch Colonial", "templates/gambrel-template.ng3");
-			addTemplate(templatesMenu, "Flat Roof", "templates/flat-roof-template.ng3");
-			addTemplate(templatesMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
-			addTemplate(templatesMenu, "Gablet Roof", "templates/gablet-template.ng3");
-			addTemplate(templatesMenu, "Hip Roof", "templates/hip-roof-template.ng3");
-			addTemplate(templatesMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
-			addTemplate(templatesMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
-			addTemplate(templatesMenu, "Mansard", "templates/mansard-template.ng3");
-			addTemplate(templatesMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
-			addTemplate(templatesMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
-			addTemplate(templatesMenu, "Shed Roof", "templates/shed-roof-template.ng3");
+			addModel(templatesMenu, "Apartment 1", "templates/apartment-template-1.ng3");
+			addModel(templatesMenu, "Apartment 2", "templates/apartment-template-2.ng3");
+			addModel(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
+			addModel(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
+			addModel(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
+			addModel(templatesMenu, "Cape Cod", "templates/cape-cod-template.ng3");
+			addModel(templatesMenu, "Colonial", "templates/colonial-template.ng3");
+			addModel(templatesMenu, "Combination Roof", "templates/combination-roof-template.ng3");
+			addModel(templatesMenu, "Cross Gabled Roof", "templates/cross-gabled-template.ng3");
+			addModel(templatesMenu, "Cross Hipped Roof", "templates/cross-hipped-template.ng3");
+			addModel(templatesMenu, "Dutch Colonial", "templates/gambrel-template.ng3");
+			addModel(templatesMenu, "Flat Roof", "templates/flat-roof-template.ng3");
+			addModel(templatesMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
+			addModel(templatesMenu, "Gablet Roof", "templates/gablet-template.ng3");
+			addModel(templatesMenu, "Hip Roof", "templates/hip-roof-template.ng3");
+			addModel(templatesMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
+			addModel(templatesMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
+			addModel(templatesMenu, "Mansard", "templates/mansard-template.ng3");
+			addModel(templatesMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
+			addModel(templatesMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
+			addModel(templatesMenu, "Shed Roof", "templates/shed-roof-template.ng3");
 			templatesMenu.addSeparator();
 			otherTemplatesMenu = new JMenu("Others");
 			templatesMenu.add(otherTemplatesMenu);
-			addTemplate(otherTemplatesMenu, "Dome", "templates/dome-template.ng3");
-			addTemplate(otherTemplatesMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
-			addTemplate(otherTemplatesMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
-			addTemplate(otherTemplatesMenu, "Stadium", "templates/stadium-template.ng3");
+			addModel(otherTemplatesMenu, "Dome", "templates/dome-template.ng3");
+			addModel(otherTemplatesMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
+			addModel(otherTemplatesMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
+			addModel(otherTemplatesMenu, "Stadium", "templates/stadium-template.ng3");
 		}
 		return templatesMenu;
 	}
 
-	private void addTemplate(final JMenu menu, final String type, final String url) {
+	private void addModel(final JMenu menu, final String type, final String url) {
 		JMenuItem mi = new JMenuItem(type);
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openTemplate(MainApplication.class.getResource(url));
+				openModel(MainApplication.class.getResource(url));
 			}
 		});
 		menu.add(mi);
+	}
+
+	private JMenu getTutorialsMenu() {
+		if (tutorialsMenu == null) {
+			tutorialsMenu = new JMenu("Tutorials");
+			tutorialsMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					MainPanel.getInstance().defaultTool();
+				}
+			});
+			addModel(tutorialsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
+			addModel(tutorialsMenu, "Solar Box", "tutorials/solar-box.ng3");
+			addModel(tutorialsMenu, "Solar Heat Map", "tutorials/solar-heat-map.ng3");
+		}
+		return tutorialsMenu;
 	}
 
 	private JMenu getViewMenu() {
@@ -1211,6 +1245,8 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
+					Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
+					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					MainPanel.getInstance().defaultTool();
@@ -1237,6 +1273,8 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
+			viewMenu.add(getSunAnglesMenuItem());
+			viewMenu.add(getLightBeamsMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getRoofDashedLineMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
@@ -1328,6 +1366,40 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return axesMenuItem;
+	}
+
+	private JCheckBoxMenuItem getSunAnglesMenuItem() {
+		if (sunAnglesMenuItem == null) {
+			sunAnglesMenuItem = new JCheckBoxMenuItem("Sun Angles");
+			sunAnglesMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					// final ShowAxesCommand c = new ShowAxesCommand();
+					Scene.getInstance().setSunAnglesVisible(sunAnglesMenuItem.isSelected());
+					Heliodon.getInstance().drawSunTriangle();
+					Scene.getInstance().setEdited(true);
+					// SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+		}
+		return sunAnglesMenuItem;
+	}
+
+	private JCheckBoxMenuItem getLightBeamsMenuItem() {
+		if (lightBeamsMenuItem == null) {
+			lightBeamsMenuItem = new JCheckBoxMenuItem("Reflector Light Beams", true);
+			lightBeamsMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					// final ShowAxesCommand c = new ShowAxesCommand();
+					Scene.getInstance().setLightBeamsVisible(lightBeamsMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAll();
+					// SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+		}
+		return lightBeamsMenuItem;
 	}
 
 	private JCheckBoxMenuItem getBuildingLabelsMenuItem() {
@@ -1943,13 +2015,20 @@ public class MainFrame extends JFrame {
 			moveMenu.add(getMoveNorthMenuItem());
 			moveMenu.add(getMoveSouthMenuItem());
 
+			final JMenu rotateMenu = new JMenu("Rotate");
+			rotateMenu.add(getRotate180MenuItem());
+			rotateMenu.add(getRotate90CwMenuItem());
+			rotateMenu.add(getRotate90CcwMenuItem());
+
 			editMenu.add(getUndoMenuItem());
 			editMenu.add(getRedoMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getCutMenuItem());
 			editMenu.add(getCopyMenuItem());
 			editMenu.add(getPasteMenuItem());
+			editMenu.addSeparator();
 			editMenu.add(moveMenu);
+			editMenu.add(rotateMenu);
 			editMenu.add(clearMenu);
 			editMenu.addSeparator();
 			editMenu.add(getFixProblemsMenuItem());
@@ -2461,6 +2540,36 @@ public class MainFrame extends JFrame {
 						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 						final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
 						final JRadioButton rb2 = new JRadioButton("All Walls of this Building");
+						final JRadioButton rb3 = new JRadioButton("All Walls");
+						panel.add(rb1);
+						panel.add(rb2);
+						panel.add(rb3);
+						final ButtonGroup bg = new ButtonGroup();
+						bg.add(rb1);
+						bg.add(rb2);
+						bg.add(rb3);
+						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+							return;
+						if (rb1.isSelected()) { // apply to only this part
+							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+							selectedPart.setColor(color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						} else if (rb2.isSelected()) {
+							final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
+							Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						} else {
+							final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+							Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						}
+						Scene.getInstance().setWallColor(color); // remember the color decision for the next wall to be added
+					} else if (selectedPart instanceof Roof) {
+						final JPanel panel = new JPanel();
+						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+						final JRadioButton rb1 = new JRadioButton("Only this Roof", true);
+						final JRadioButton rb2 = new JRadioButton("All Roofs");
 						panel.add(rb1);
 						panel.add(rb2);
 						final ButtonGroup bg = new ButtonGroup();
@@ -2473,25 +2582,44 @@ public class MainFrame extends JFrame {
 							selectedPart.setColor(color);
 							SceneManager.getInstance().getUndoManager().addEdit(cmd);
 						} else {
-							final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
-							Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+							final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+							Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
 							SceneManager.getInstance().getUndoManager().addEdit(cmd);
 						}
-						Scene.getInstance().setWallColor(color); // remember the color decision for the next wall
+						Scene.getInstance().setRoofColor(color); // remember the color decision for the next roof to be added
+					} else if (selectedPart instanceof Foundation) {
+						final JPanel panel = new JPanel();
+						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+						final JRadioButton rb1 = new JRadioButton("Only this Foundation", true);
+						final JRadioButton rb2 = new JRadioButton("All Foundations");
+						panel.add(rb1);
+						panel.add(rb2);
+						final ButtonGroup bg = new ButtonGroup();
+						bg.add(rb1);
+						bg.add(rb2);
+						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+							return;
+						if (rb1.isSelected()) { // apply to only this part
+							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+							selectedPart.setColor(color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						} else {
+							final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+							Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						}
+						Scene.getInstance().setFoundationColor(color); // remember the color decision for the next foundation to be added
 					} else {
 						final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 						selectedPart.setColor(color);
 						selectedPart.draw();
 						SceneManager.getInstance().refresh();
 						SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						if (selectedPart instanceof Roof) { // remember the color decision for the next part
-							Scene.getInstance().setRoofColor(color);
-						} else if (selectedPart instanceof Door) {
+						if (selectedPart instanceof Door) { // remember the color decision for the next part
 							Scene.getInstance().setDoorColor(color);
 						} else if (selectedPart instanceof Floor) {
 							Scene.getInstance().setFloorColor(color);
-						} else if (selectedPart instanceof Foundation) {
-							Scene.getInstance().setFoundationColor(color);
 						}
 					}
 					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
@@ -2520,7 +2648,7 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void openTemplate(final URL url) {
+	private void openModel(final URL url) {
 		boolean ok = false;
 		if (Scene.getInstance().isEdited()) {
 			final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -3006,6 +3134,45 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllUtilityBillsMenuItem;
+	}
+
+	private JMenuItem getRotate180MenuItem() {
+		if (rotate180MenuItem == null) {
+			rotate180MenuItem = new JMenuItem("180\u00B0");
+			rotate180MenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().rotate(Math.PI);
+				}
+			});
+		}
+		return rotate180MenuItem;
+	}
+
+	private JMenuItem getRotate90CwMenuItem() {
+		if (rotate90CwMenuItem == null) {
+			rotate90CwMenuItem = new JMenuItem("90\u00B0 Clockwise");
+			rotate90CwMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().rotate(-Math.PI / 2);
+				}
+			});
+		}
+		return rotate90CwMenuItem;
+	}
+
+	private JMenuItem getRotate90CcwMenuItem() {
+		if (rotate90CcwMenuItem == null) {
+			rotate90CcwMenuItem = new JMenuItem("90\u00B0 Counter Clockwise");
+			rotate90CcwMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					SceneManager.getInstance().rotate(Math.PI / 2);
+				}
+			});
+		}
+		return rotate90CcwMenuItem;
 	}
 
 	private JMenuItem getMoveEastMenuItem() {

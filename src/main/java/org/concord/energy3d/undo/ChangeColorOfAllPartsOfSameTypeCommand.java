@@ -7,30 +7,29 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeBuildingShutterColorCommand extends AbstractUndoableEdit {
+public class ChangeColorOfAllPartsOfSameTypeCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private ReadOnlyColorRGBA[] oldColors, newColors;
-	private Window window;
+	private HousePart part;
 	private List<HousePart> parts;
 
-	public ChangeBuildingShutterColorCommand(Window window) {
-		this.window = window;
-		parts = Scene.getInstance().getPartsOfSameTypeInBuilding(window);
+	public ChangeColorOfAllPartsOfSameTypeCommand(HousePart part) {
+		this.part = part;
+		parts = Scene.getInstance().getAllPartsOfSameType(part);
 		int n = parts.size();
 		oldColors = new ReadOnlyColorRGBA[n];
 		for (int i = 0; i < n; i++) {
-			oldColors[i] = ((Window) parts.get(i)).getShutterColor();
+			oldColors[i] = parts.get(i).getColor();
 		}
 	}
 
-	public Window getWindow() {
-		return window;
+	public HousePart getPart() {
+		return part;
 	}
 
 	@Override
@@ -39,10 +38,10 @@ public class ChangeBuildingShutterColorCommand extends AbstractUndoableEdit {
 		int n = parts.size();
 		newColors = new ReadOnlyColorRGBA[n];
 		for (int i = 0; i < n; i++) {
-			Window w = (Window) parts.get(i);
-			newColors[i] = w.getShutterColor();
-			w.setShutterColor(oldColors[i]);
-			w.draw();
+			HousePart p = parts.get(i);
+			newColors[i] = p.getColor();
+			p.setColor(oldColors[i]);
+			p.draw();
 		}
 	}
 
@@ -51,15 +50,15 @@ public class ChangeBuildingShutterColorCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = parts.size();
 		for (int i = 0; i < n; i++) {
-			Window w = (Window) parts.get(i);
-			w.setShutterColor(newColors[i]);
-			w.draw();
+			HousePart p = parts.get(i);
+			p.setColor(newColors[i]);
+			p.draw();
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Shutter Color Change for Whole Building";
+		return "Color Change for All Parts of Same Type";
 	}
 
 }

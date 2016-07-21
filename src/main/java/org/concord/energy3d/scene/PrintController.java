@@ -385,7 +385,7 @@ public class PrintController implements Updater {
 		pageRight = (pageFormat.getImageableX() + pageFormat.getImageableWidth()) * fromPageToWorldCoord - spaceBetweenParts / 2.0;
 		pageTop = pageFormat.getImageableY() * fromPageToWorldCoord + spaceBetweenParts / 2.0;
 		if (labelHeight == 0.0) {
-			final BMText label = Annotation.makeNewLabel();
+			final BMText label = Annotation.makeNewLabel(1);
 			label.setFontScale(0.5);
 			labelHeight = label.getHeight();
 		}
@@ -431,7 +431,7 @@ public class PrintController implements Updater {
 			box.updateModelBound();
 			pagesRoot.attachChild(box);
 
-			final BMText footNote = Annotation.makeNewLabel();
+			final BMText footNote = Annotation.makeNewLabel(1);
 			final String url = Scene.getURL() != null ? Scene.getURL().getFile().substring(Scene.getURL().getFile().lastIndexOf('/') + 1, Scene.getURL().getFile().length()) + " -" : "";
 			footNote.setText(url.replaceAll("%20", " ") + " Page " + printCenters.size() + " / " + pages.size() + " - http://energy.concord.org/");
 			footNote.setFontScale(0.5);

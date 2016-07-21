@@ -474,7 +474,7 @@ public abstract class Graph extends JPanel {
 					if (i == 0) {
 						path.moveTo(dataX, dataY);
 						g2.setColor(Color.GRAY);
-						g2.drawString(Integer.toString(r.getID()), (int) dataX - 8, (int) dataY + 5);
+						g2.drawString(r.getID() + "", (int) dataX - 8, (int) dataY + 5);
 					} else {
 						path.lineTo(dataX, dataY);
 					}
@@ -676,6 +676,8 @@ public abstract class Graph extends JPanel {
 					}
 					int pound = key.indexOf("#");
 					String s = key.substring(pound);
+					if (key.startsWith("Light"))
+						s = s + " (" + TWO_DECIMALS.format(getSum(key)) + ")";
 					FontMetrics fm = g2.getFontMetrics();
 					g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
 					break;

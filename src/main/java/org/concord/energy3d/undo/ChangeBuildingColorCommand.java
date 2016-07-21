@@ -23,7 +23,7 @@ public class ChangeBuildingColorCommand extends AbstractUndoableEdit {
 	public ChangeBuildingColorCommand(HousePart part) {
 		this.part = part;
 		foundation = part instanceof Foundation ? (Foundation) part : part.getTopContainer();
-		parts = Scene.getInstance().getHousePartsOfSameTypeInBuilding(part);
+		parts = Scene.getInstance().getPartsOfSameTypeInBuilding(part);
 		int n = parts.size();
 		oldColors = new ReadOnlyColorRGBA[n];
 		for (int i = 0; i < n; i++) {

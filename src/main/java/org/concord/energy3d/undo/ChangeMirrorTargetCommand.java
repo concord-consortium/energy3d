@@ -15,7 +15,7 @@ public class ChangeMirrorTargetCommand extends AbstractUndoableEdit {
 
 	public ChangeMirrorTargetCommand(Mirror mirror) {
 		this.mirror = mirror;
-		oldValue = mirror.getTarget();
+		oldValue = mirror.getHeliostatTarget();
 	}
 
 	public Mirror getMirror() {
@@ -27,22 +27,22 @@ public class ChangeMirrorTargetCommand extends AbstractUndoableEdit {
 	}
 
 	public Foundation getNewValue() {
-		newValue = mirror.getTarget();
+		newValue = mirror.getHeliostatTarget();
 		return newValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = mirror.getTarget();
-		mirror.setTarget(oldValue);
+		newValue = mirror.getHeliostatTarget();
+		mirror.setHeliostatTarget(oldValue);
 		mirror.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		mirror.setTarget(newValue);
+		mirror.setHeliostatTarget(newValue);
 		mirror.draw();
 	}
 

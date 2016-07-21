@@ -34,24 +34,26 @@ public class DailySensorData extends EnergyDailyAnalysis {
 		for (final HousePart p : parts) {
 			if (p instanceof Sensor) {
 				final Sensor sensor = (Sensor) p;
+				String lid = "Light: #" + sensor.getId();
+				String hid = "Heat Flux: #" + sensor.getId();
+				graph.hideData(lid, sensor.isLightOff());
+				graph.hideData(hid, sensor.isHeatFluxOff());
 				final double area = sensor.getArea();
 				int n = (int) Math.round(60.0 / SolarRadiation.getInstance().getTimeStep());
 				for (int i = 0; i < 24; i++) {
 					SolarRadiation.getInstance().computeEnergyAtHour(i);
 					final double solar = sensor.getSolarPotentialNow();
-					graph.addData("Light: #" + sensor.getId(), solar / area);
+					graph.addData(lid, solar / area);
 					final double[] loss = sensor.getHeatLoss();
 					int t0 = n * i;
 					double sum = 0;
 					for (int k = t0; k < t0 + n; k++)
 						sum += loss[k];
-					graph.addData("Heat Flux: #" + sensor.getId(), -sum / area);
+					graph.addData(hid, -sum / area);
 				}
 			}
 		}
-
 		graph.repaint();
-
 	}
 
 	@Override

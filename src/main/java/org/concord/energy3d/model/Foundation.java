@@ -7,6 +7,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -19,13 +21,13 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
@@ -47,7 +49,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh outlineMesh;
 	private transient Mesh sideMesh[];
 	private transient BMText buildingLabel;
-	private transient Box tank;
+	private transient Box tank; // this is temporarily used to model a power tower (there got to be a better solution)
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient double minX;
@@ -72,6 +74,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private Thermostat thermostat = new Thermostat();
 	private UtilityBill utilityBill;
 	private transient Line azimuthArrow;
+	private static transient BloomRenderPass bloomRenderPass;
 
 	static {
 		format.setGroupingUsed(true);
@@ -166,10 +169,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		tank = new Box("Tower Tank");
 		tank.setDefaultColor(ColorRGBA.WHITE);
-		final MaterialState material = new MaterialState();
-		material.setEmissive(ColorRGBA.WHITE);
-		tank.setRenderState(material);
-		tank.setModelBound(null);
+		tank.setRenderState(offsetState);
+		tank.setModelBound(new BoundingBox());
 		tank.setVisible(false);
 		root.attachChild(tank);
 
@@ -179,8 +180,9 @@ public class Foundation extends HousePart implements Thermalizable {
 			for (int i = 0; i < 4; i++)
 				points.add(new Vector3());
 
-		for (int i = 8; i < points.size(); i++)
-			getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+		// for (int i = 8; i < points.size(); i++)
+		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+
 	}
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
@@ -204,6 +206,15 @@ public class Foundation extends HousePart implements Thermalizable {
 			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
 			sceneHints.setCullHint(visible_i ? CullHint.Inherit : CullHint.Always);
 			sceneHints.setAllPickingHints(visible_i);
+		}
+	}
+
+	public void setMovePointsVisible(final boolean visible) {
+		final int n = points.size();
+		for (int i = n - 4; i < n; i++) {
+			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
+			sceneHints.setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+			sceneHints.setAllPickingHints(visible);
 		}
 	}
 
@@ -332,8 +343,6 @@ public class Foundation extends HousePart implements Thermalizable {
 					applyNewHeight(boundingHeight, newBoundingHeight, false);
 				}
 			}
-			// else
-			// move(p, )
 			syncUpperPoints();
 		}
 
@@ -588,25 +597,80 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void drawTank() {
-		boolean focused = false;
+		int countMirrors = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
-				if (m.getTarget() == this) {
-					focused = true;
-					break;
+				if (m.getHeliostatTarget() == this) {
+					countMirrors++;
 				}
 			}
 		}
-		tank.setVisible(focused);
-		if (focused) {
-			final Vector3 v = getAbsPoint(0);
-			final double vx = getAbsPoint(2).distance(v); // x direction
-			final double vy = getAbsPoint(1).distance(v); // y direction
-			final Vector3 o = getAbsCenter();
-			o.setZ(getBoundingHeight());
-			tank.setData(o, vx / 4, vy / 4, 10);
+		tank.setVisible(countMirrors > 0);
+		if (tank.isVisible()) {
+			if (bloomRenderPass == null) {
+				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+				// bloomRenderPass.setNrBlurPasses(1);
+				SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+			}
+			if (!bloomRenderPass.contains(tank))
+				bloomRenderPass.add(tank);
+			bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countMirrors, 0.8f));
+			double rx = 0;
+			double ry = 0;
+			double xmin = Double.MAX_VALUE;
+			double xmax = -Double.MAX_VALUE;
+			double ymin = Double.MAX_VALUE;
+			double ymax = -Double.MAX_VALUE;
+			int count = 0;
+			for (final HousePart p : children) {
+				if (p instanceof Wall) {
+					final Vector3 c = p.getAbsCenter();
+					rx += c.getX();
+					ry += c.getY();
+					if (xmin > c.getX())
+						xmin = c.getX();
+					else if (xmax < c.getX())
+						xmax = c.getX();
+					if (ymin > c.getY())
+						ymin = c.getY();
+					else if (ymax < c.getY())
+						ymax = c.getY();
+					count++;
+				}
+			}
+			Vector3 o;
+			if (count == 0) {
+				o = getAbsCenter();
+				o.setZ(getBoundingHeight() + height);
+				tank.setData(o, 10, 10, 10);
+			} else {
+				o = new Vector3(rx / count, ry / count, getBoundingHeight() + height);
+				tank.setData(o, (xmax - xmin) * 0.6, (ymax - ymin) * 0.6, 10);
+			}
 		}
+	}
+
+	Vector3 getTankCenter() {
+		double rx = 0;
+		double ry = 0;
+		int count = 0;
+		for (final HousePart p : children) {
+			if (p instanceof Wall) {
+				final Vector3 c = p.getAbsCenter();
+				rx += c.getX();
+				ry += c.getY();
+				count++;
+			}
+		}
+		Vector3 o;
+		if (count == 0) {
+			o = getAbsCenter();
+			o.setZ(getBoundingHeight() + height);
+		} else {
+			o = new Vector3(rx / count, ry / count, getBoundingHeight() + height);
+		}
+		return o;
 	}
 
 	public void drawSideMesh() {
@@ -1265,6 +1329,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		updateHandle(points.get(9), u.negateLocal());
 		updateHandle(points.get(10), v);
 		updateHandle(points.get(11), v.negateLocal());
+		if (pointsRoot.getNumberOfChildren() > 8) {
+			for (int i = 8; i < 12; i++)
+				getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+		}
 	}
 
 	private void updateHandle(final Vector3 p, final ReadOnlyVector3 dir) {
@@ -1334,6 +1402,59 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public Mesh getRadiationCollisionSpatial(final int index) {
 		return getRadiationMesh(index);
+	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		if (bloomRenderPass != null) {
+			if (bloomRenderPass.contains(tank))
+				bloomRenderPass.remove(tank);
+		}
+	}
+
+	public int getMirrorCount() {
+		int count = 0;
+		for (final HousePart p : children) {
+			if (p instanceof Mirror)
+				count++;
+		}
+		return count;
+	}
+
+	public void addCircularMirrorArrays() {
+		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
+		for (final HousePart c : children) {
+			if (c instanceof Mirror)
+				mirrors.add(c);
+		}
+		for (final HousePart m : mirrors) {
+			Scene.getInstance().remove(m, false);
+		}
+		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
+		final Vector3 center = getAbsCenter();
+		Mirror m = new Mirror();
+		final double w = 1.5 * m.getMirrorWidth() / Scene.getInstance().getAnnotationScale();
+		final double h = 1.5 * m.getMirrorHeight() / Scene.getInstance().getAnnotationScale();
+		final double rows = a / h;
+		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
+		for (int r = 0; r < nrows; r++) {
+			final double b = a * (1.0 - r / rows);
+			final int n = (int) (2 * Math.PI * b / w);
+			for (int i = 0; i < n; i++) {
+				m = new Mirror();
+				m.setContainer(this);
+				Scene.getInstance().add(m, false);
+				m.complete();
+				final double theta = i * 2.0 * Math.PI / n;
+				m.setRelativeAzimuth(90 - Math.toDegrees(theta));
+				final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
+				m.points.get(0).setX(v.getX());
+				m.points.get(0).setY(v.getY());
+				m.draw();
+			}
+		}
 	}
 
 }

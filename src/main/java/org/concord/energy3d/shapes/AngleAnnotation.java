@@ -10,10 +10,13 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 
 public class AngleAnnotation extends Annotation {
+
 	private ReadOnlyVector3 mainPoint;
 	private ReadOnlyVector3 p2;
 	private ReadOnlyVector3 p3;
 	private ReadOnlyVector3 n;
+	private double customRadius = -1;
+	private String customText;
 
 	public AngleAnnotation() {
 		super(new Arc("Angle annotation arc", 10));
@@ -25,6 +28,14 @@ public class AngleAnnotation extends Annotation {
 		this.p3 = p3;
 		this.n = n;
 		draw();
+	}
+
+	public void setCustomText(String customText) {
+		this.customText = customText;
+	}
+
+	public void setCustomRadius(double customRadius) {
+		this.customRadius = customRadius;
 	}
 
 	@Override
@@ -48,7 +59,7 @@ public class AngleAnnotation extends Annotation {
 		final double end = start + angle;
 		final long angleDegrees = Math.round((end - start) * 180.0 / Math.PI);
 
-		final double radius = end == start ? 0.0 : 3.0 / Math.sqrt(end - start);
+		double radius = customRadius > 0 ? customRadius : (end == start ? 0.0 : 3.0 / Math.sqrt(end - start));
 		if (angleDegrees == 90) {
 			final ReadOnlyVector3[] p = new ReadOnlyVector3[3];
 			p[0] = a.normalize(null).multiplyLocal(2.0);
@@ -64,9 +75,9 @@ public class AngleAnnotation extends Annotation {
 			mesh.setRotation(new Matrix3());
 			detachChild(label);
 		} else {
-			((Arc)mesh).set(radius, start, end);
+			((Arc) mesh).set(radius, start, end);
 			mesh.setRotation(toFlat.invertLocal());
-			label.setText("" + angleDegrees + "\u00B0");
+			label.setText((customText != null ? customText + "=" : "") + angleDegrees + "\u00B0");
 			final double start360 = start < 0 ? MathUtils.TWO_PI + start : start;
 			final double angle360 = angle < 0 ? MathUtils.TWO_PI + angle : angle;
 			final double end360 = start360 + angle360;

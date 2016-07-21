@@ -70,7 +70,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	protected void init() {
-		label1 = Annotation.makeNewLabel();
+		label1 = Annotation.makeNewLabel(1);
 		super.init();
 
 		if (Util.isZero(uValue))

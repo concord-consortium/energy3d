@@ -34,19 +34,21 @@ public class AnnualSensorData extends EnergyAnnualAnalysis {
 		for (final HousePart p : parts) {
 			if (p instanceof Sensor) {
 				final Sensor sensor = (Sensor) p;
+				String lid = "Light: #" + sensor.getId();
+				String hid = "Heat Flux: #" + sensor.getId();
+				graph.hideData(lid, sensor.isLightOff());
+				graph.hideData(hid, sensor.isHeatFluxOff());
 				final double area = sensor.getArea();
 				final double solar = sensor.getSolarPotentialToday();
-				graph.addData("Light: #" + sensor.getId(), solar / area);
+				graph.addData(lid, solar / area);
 				final double[] loss = sensor.getHeatLoss();
 				double sum = 0;
 				for (final double x : loss)
 					sum += x;
-				graph.addData("Heat Flux: #" + sensor.getId(), -sum / area);
+				graph.addData(hid, -sum / area);
 			}
 		}
-
 		graph.repaint();
-
 	}
 
 	@Override

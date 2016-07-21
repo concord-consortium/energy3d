@@ -54,6 +54,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.TransparencyType;
@@ -78,6 +79,8 @@ public class Heliodon {
 	private final Mesh sun = new Sphere("Sun", 20, 20, 0.3);
 	private final DirectionalLight light;
 	private final Line sunPath;
+	private Line sunTriangle;
+	private Node angles;
 	private final Mesh sunRegion;
 	private final PickResults pickResults;
 	private final Mesh base;
@@ -121,6 +124,47 @@ public class Heliodon {
 		sunPath.getMeshData().setIndexMode(IndexMode.LineStrip);
 		Util.disablePickShadowLight(sunPath);
 		root.attachChild(sunPath);
+
+		// Sun Triangle
+		sunTriangle = new Line("Sun Triangle", BufferUtils.createVector3Buffer(SUN_PATH_VERTICES), null, null, null);
+		sunTriangle.setLineWidth(1);
+		//sunTriangle.setStipplePattern((short) 0xcccc);
+		sunTriangle.setDefaultColor(ColorRGBA.WHITE);
+		sunTriangle.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(12));
+		Util.disablePickShadowLight(sunTriangle);
+		root.attachChild(sunTriangle);
+
+		angles = new Node("Sun Angles");
+		angles.getSceneHints().setAllPickingHints(false);
+		Util.disablePickShadowLight(angles);
+		root.attachChild(angles);
+
+		AngleAnnotation zenith = new AngleAnnotation();
+		zenith.setColor(ColorRGBA.WHITE);
+		zenith.setLineWidth(1);
+		//zenith.setStipplePattern((short) 0xcccc);
+		zenith.setFontSize(2.5);
+		zenith.setCustomRadius(1.5);
+		zenith.setCustomText("Z");
+		angles.attachChild(zenith);
+
+		AngleAnnotation elevation = new AngleAnnotation();
+		elevation.setColor(ColorRGBA.WHITE);
+		elevation.setLineWidth(1);
+		//elevation.setStipplePattern((short) 0xcccc);
+		elevation.setFontSize(2.5);
+		elevation.setCustomRadius(1.75);
+		elevation.setCustomText("h");
+		angles.attachChild(elevation);
+
+		AngleAnnotation azimuth = new AngleAnnotation();
+		azimuth.setColor(ColorRGBA.WHITE);
+		azimuth.setLineWidth(1);
+		//azimuth.setStipplePattern((short) 0xcccc);
+		azimuth.setFontSize(3);
+		azimuth.setCustomRadius(1);
+		azimuth.setCustomText("A");
+		angles.attachChild(azimuth);
 
 		// Sun Region
 		sunRegion = new Mesh("Sun Region");
@@ -184,7 +228,7 @@ public class Heliodon {
 		westLabel.setTranslation(-radius, 0, 0);
 
 		// TODO: Not exactly working at they do not lie on the ground
-		// NE = 45, SE = 135, NW = 315, SW = 225 
+		// NE = 45, SE = 135, NW = 315, SW = 225
 		final BMText northEastLabel = createText("45\u00B0");
 		northEastLabel.setRotation(new Matrix3().fromAngles(-MathUtils.QUARTER_PI, 0, -MathUtils.QUARTER_PI));
 		northEastLabel.setTranslation(radius * Math.cos(MathUtils.QUARTER_PI), radius * Math.sin(MathUtils.QUARTER_PI), 0);
@@ -420,8 +464,10 @@ public class Heliodon {
 			});
 		}
 
-		if (redrawHeliodon)
+		if (redrawHeliodon) {
 			drawSun();
+			drawSunTriangle();
+		}
 
 		if (SceneManager.getInstance() != null)
 			SceneManager.getInstance().refresh();
@@ -468,12 +514,10 @@ public class Heliodon {
 
 	public void setVisible(final boolean visible) {
 		this.visible = visible;
-		if (bloomRenderPass == null) {
-			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
-			passManager.add(bloomRenderPass);
+		getBloomRenderPass();
+		if (!bloomRenderPass.contains(sun))
 			bloomRenderPass.add(sun);
-		}
-		bloomRenderPass.setEnabled(visible);
+		// bloomRenderPass.setEnabled(visible);
 		root.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 
 		if (visible)
@@ -620,7 +664,45 @@ public class Heliodon {
 		dirtySunPath = false;
 	}
 
-	private void drawSun() {
+	public void showSunTriangle(boolean b) {
+		sunTriangle.setVisible(b);
+		for (Spatial s : angles.getChildren()) {
+			AngleAnnotation a = (AngleAnnotation) s;
+			a.mesh.setVisible(b);
+			a.label.setVisible(b);
+		}
+	}
+
+	public void drawSunTriangle() {
+		if (isNightTime() || ((SceneManager.getInstance() != null && !Scene.getInstance().areSunAnglesVisible()))) {
+			showSunTriangle(false);
+			return;
+		}
+		showSunTriangle(true);
+		FloatBuffer buf = sunTriangle.getMeshData().getVertexBuffer();
+		buf.rewind();
+		Vector3 o = new Vector3();
+		buf.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		ReadOnlyVector3 s = getSunLocation();
+		buf.put(s.getXf()).put(s.getYf()).put(s.getZf());
+		buf.put(s.getXf()).put(s.getYf()).put(s.getZf());
+		Vector3 t = new Vector3(s.getX(), s.getY(), 0);
+		buf.put(t.getXf()).put(t.getYf()).put(t.getZf());
+		buf.put(t.getXf()).put(t.getYf()).put(t.getZf());
+		buf.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		sunTriangle.updateModelBound();
+		sunTriangle.getSceneHints().setCullHint(CullHint.Inherit);
+		AngleAnnotation a = (AngleAnnotation) angles.getChild(0); // draw zenith angle
+		Vector3 n = s.cross(Vector3.UNIT_Z, null);
+		Vector3 p = s.normalize(null);
+		a.setRange(o, p, Vector3.UNIT_Z, n);
+		a = (AngleAnnotation) angles.getChild(1); // draw elevation angle
+		a.setRange(o, p, t, n);
+		a = (AngleAnnotation) angles.getChild(2); // draw azimuth angle
+		a.setRange(o, Vector3.UNIT_Y, t, Vector3.UNIT_Z);
+	}
+
+	public void drawSun() {
 		final Vector3 sunLocation = computeSunLocation(hourAngle, declinationAngle, latitude);
 		setSunLocation(sunLocation);
 	}
@@ -653,11 +735,21 @@ public class Heliodon {
 		drawSunRegion();
 		drawSunPath();
 		drawSun();
+		drawSunTriangle();
 	}
 
 	public void updateBloom() {
 		if (bloomRenderPass != null)
 			bloomRenderPass.markNeedsRefresh();
+	}
+
+	public BloomRenderPass getBloomRenderPass() {
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 4);
+			// bloomRenderPass.setBlurIntensityMultiplier(0.8f);
+			passManager.add(bloomRenderPass);
+		}
+		return bloomRenderPass;
 	}
 
 	public void setTime(final Date time) {
@@ -697,6 +789,7 @@ public class Heliodon {
 		if (dirtySunPath) {
 			drawSunPath();
 			drawSun();
+			drawSunTriangle();
 		}
 	}
 
