@@ -273,11 +273,12 @@ public class EnergyPanel extends JPanel {
 				updateThermostat();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().changeSkyTexture();
-				if (MainPanel.getInstance().getShadowButton().isSelected()) {
-					SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
-				} else {
-					SceneManager.getInstance().setShading(false);
-				}
+				SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+				// if (MainPanel.getInstance().getShadowButton().isSelected()) {
+				// SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+				// } else {
+				// SceneManager.getInstance().setShading(false);
+				// }
 				if (Scene.getInstance().getAlwaysComputeHeatFluxVectors() && SceneManager.getInstance().areHeatFluxVectorsVisible()) { // for now, only heat flow arrows need to call redrawAll
 					SceneManager.getInstance().setHeatFluxDaily(false);
 					SceneManager.getTaskManager().update(new Callable<Object>() {

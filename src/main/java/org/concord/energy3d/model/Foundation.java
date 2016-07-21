@@ -175,11 +175,11 @@ public class Foundation extends HousePart implements Thermalizable {
 			for (int i = 0; i < 4; i++)
 				points.add(new Vector3());
 
-		for (int i = 8; i < points.size(); i++)
-			getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
-		
+		// for (int i = 8; i < points.size(); i++)
+		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+
 	}
-	
+
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
 		this.resizeHouseMode = resizeHouseMode;
 		if (!isFrozen()) {
@@ -1298,6 +1298,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		updateHandle(points.get(9), u.negateLocal());
 		updateHandle(points.get(10), v);
 		updateHandle(points.get(11), v.negateLocal());
+		if (pointsRoot.getNumberOfChildren() > 8) {
+			for (int i = 8; i < 12; i++)
+				getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+		}
 	}
 
 	private void updateHandle(final Vector3 p, final ReadOnlyVector3 dir) {
