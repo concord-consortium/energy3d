@@ -177,8 +177,9 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		for (int i = 8; i < points.size(); i++)
 			getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+		
 	}
-
+	
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
 		this.resizeHouseMode = resizeHouseMode;
 		if (!isFrozen()) {
@@ -200,6 +201,15 @@ public class Foundation extends HousePart implements Thermalizable {
 			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
 			sceneHints.setCullHint(visible_i ? CullHint.Inherit : CullHint.Always);
 			sceneHints.setAllPickingHints(visible_i);
+		}
+	}
+
+	public void setMovePointsVisible(final boolean visible) {
+		int n = points.size();
+		for (int i = n - 4; i < n; i++) {
+			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
+			sceneHints.setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+			sceneHints.setAllPickingHints(visible);
 		}
 	}
 

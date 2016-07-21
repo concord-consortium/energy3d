@@ -1617,7 +1617,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								if (selectedPart != null) {
 									Foundation foundationOfSelectedPart = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 									if (foundationOfSelectedPart != null) {
-										foundationOfSelectedPart.setEditPointsVisible(true);
+										foundationOfSelectedPart.setMovePointsVisible(true);
 									}
 								}
 							}
@@ -1644,9 +1644,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
 									if (foundationOfPreviousSelectedPart != null) {
 										if (selectedPart == null) {
-											foundationOfPreviousSelectedPart.setEditPointsVisible(false);
+											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
 										} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
-											foundationOfPreviousSelectedPart.setEditPointsVisible(false);
+											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
 										}
 									}
 								}

@@ -225,6 +225,11 @@ public class Sensor extends HousePart {
 	}
 
 	@Override
+	public double getArea() { // FIXME: Sometimes computeArea is not called because this sensor might not be drawable, so we temporarily override this method to work around the problem
+		return WIDTH * HEIGHT;
+	}
+
+	@Override
 	protected HousePart getContainerRelative() {
 		return container instanceof Wall ? container : getTopContainer();
 	}

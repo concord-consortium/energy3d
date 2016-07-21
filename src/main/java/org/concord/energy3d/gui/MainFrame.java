@@ -1219,6 +1219,7 @@ public class MainFrame extends JFrame {
 			});
 			addModel(tutorialsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
 			addModel(tutorialsMenu, "Solar Box", "tutorials/solar-box.ng3");
+			addModel(tutorialsMenu, "Solar Heat Map", "tutorials/solar-heat-map.ng3");
 		}
 		return tutorialsMenu;
 	}
