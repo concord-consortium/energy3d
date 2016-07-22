@@ -70,8 +70,8 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Heat arrow length must be greater than 1000.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (timeStep < 5 || timeStep > 30) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-30.", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (timeStep < 5 || timeStep > 60) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-60 seconds.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				SolarRadiation.getInstance().setSolarStep(cellSize);

@@ -72,6 +72,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
@@ -94,8 +95,9 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
-import org.concord.energy3d.simulation.SolarAnnualAnalysis;
-import org.concord.energy3d.simulation.SolarDailyAnalysis;
+import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.PvAnnualAnalysis;
+import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
@@ -155,8 +157,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem groupDailyAnalysisMenuItem;
 	private JMenuItem groupAnnualAnalysisMenuItem;
-	private JMenuItem annualSolarAnalysisMenuItem;
-	private JMenuItem dailySolarAnalysisMenuItem;
+	private JMenuItem annualPvAnalysisMenuItem;
+	private JMenuItem dailyPvAnalysisMenuItem;
+	private JMenuItem dailyMirrorAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
@@ -1121,8 +1124,10 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getDailyEnergyAnalysisMenuItem());
 			analysisMenu.add(getDailyEnergyAnalysisForSelectionMenuItem());
 			analysisMenu.addSeparator();
-			analysisMenu.add(getAnnualSolarAnalysisMenuItem());
-			analysisMenu.add(getDailySolarAnalysisMenuItem());
+			analysisMenu.add(getAnnualPvAnalysisMenuItem());
+			analysisMenu.add(getDailyPvAnalysisMenuItem());
+			analysisMenu.addSeparator();
+			analysisMenu.add(getDailyMirrorAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getGroupAnnualAnalysisMenuItem());
 			analysisMenu.add(getGroupDailyAnalysisMenuItem());
@@ -1569,11 +1574,11 @@ public class MainFrame extends JFrame {
 		return dailyEnergyAnalysisForSelectionMenuItem;
 	}
 
-	private JMenuItem getAnnualSolarAnalysisMenuItem() {
-		if (annualSolarAnalysisMenuItem == null) {
-			annualSolarAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Solar Panels...");
-			annualSolarAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
-			annualSolarAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getAnnualPvAnalysisMenuItem() {
+		if (annualPvAnalysisMenuItem == null) {
+			annualPvAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Solar Panels...");
+			annualPvAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F4"));
+			annualPvAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -1586,7 +1591,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					final SolarAnnualAnalysis a = new SolarAnnualAnalysis();
+					final PvAnnualAnalysis a = new PvAnnualAnalysis();
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart != null) {
 						Foundation foundation;
@@ -1610,13 +1615,13 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return annualSolarAnalysisMenuItem;
+		return annualPvAnalysisMenuItem;
 	}
 
-	private JMenuItem getDailySolarAnalysisMenuItem() {
-		if (dailySolarAnalysisMenuItem == null) {
-			dailySolarAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Solar Panels...");
-			dailySolarAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getDailyPvAnalysisMenuItem() {
+		if (dailyPvAnalysisMenuItem == null) {
+			dailyPvAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Solar Panels...");
+			dailyPvAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -1645,14 +1650,56 @@ public class MainFrame extends JFrame {
 							}
 						}
 					}
-					final SolarDailyAnalysis a = new SolarDailyAnalysis();
+					final PvDailyAnalysis a = new PvDailyAnalysis();
 					if (SceneManager.getInstance().getSolarHeatMap())
 						a.updateGraph();
 					a.show();
 				}
 			});
 		}
-		return dailySolarAnalysisMenuItem;
+		return dailyPvAnalysisMenuItem;
+	}
+
+	private JMenuItem getDailyMirrorAnalysisMenuItem() {
+		if (dailyMirrorAnalysisMenuItem == null) {
+			dailyMirrorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Mirrors...");
+			dailyMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().getNumberOfMirrors();
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(Mirror.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap())
+						a.updateGraph();
+					a.show();
+				}
+			});
+		}
+		return dailyMirrorAnalysisMenuItem;
 	}
 
 	private JMenuItem getGroupDailyAnalysisMenuItem() {

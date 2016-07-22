@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -9,6 +10,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -261,6 +263,25 @@ public class Mirror extends HousePart {
 
 		drawLightBeams();
 
+	}
+
+	public void setNormalAtTime(Vector3 a, int minute) {
+		if (a == null) {
+			if (Util.isZero(zenith - 90)) {
+				a = getAbsPoint(0).addLocal(0, 0, baseHeight);
+			} else {
+				double h = mirrorHeight / Scene.getInstance().getAnnotationScale();
+				a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
+			}
+		}
+		Calendar calendar = Heliodon.getInstance().getCalender();
+		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+		calendar.set(Calendar.MINUTE, minute % 60);
+		// System.out.println("***" + minute + "=" + calendar.getTime());
+		ReadOnlyVector3 o = heliostatTarget.getTankCenter();
+		final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
+		final Vector3 q = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
+		normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
 	}
 
 	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation

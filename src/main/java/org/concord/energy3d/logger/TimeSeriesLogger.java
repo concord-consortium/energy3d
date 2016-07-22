@@ -39,8 +39,8 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
-import org.concord.energy3d.simulation.SolarAnnualAnalysis;
-import org.concord.energy3d.simulation.SolarDailyAnalysis;
+import org.concord.energy3d.simulation.PvAnnualAnalysis;
+import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.AdjustThermostatCommand;
@@ -636,10 +636,10 @@ public class TimeSeriesLogger {
 						}
 					}
 				}
-				if (analysisRequester instanceof SolarDailyAnalysis) {
-					line += ((SolarDailyAnalysis) analysisRequester).toJson();
-				} else if (analysisRequester instanceof SolarAnnualAnalysis) {
-					line += ((SolarAnnualAnalysis) analysisRequester).toJson();
+				if (analysisRequester instanceof PvDailyAnalysis) {
+					line += ((PvDailyAnalysis) analysisRequester).toJson();
+				} else if (analysisRequester instanceof PvAnnualAnalysis) {
+					line += ((PvAnnualAnalysis) analysisRequester).toJson();
 				}
 				if (analysisRequester instanceof GroupDailyAnalysis) {
 					line += ((GroupDailyAnalysis) analysisRequester).toJson();

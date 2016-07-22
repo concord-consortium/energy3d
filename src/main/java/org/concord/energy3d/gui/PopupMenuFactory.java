@@ -61,8 +61,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
-import org.concord.energy3d.simulation.SolarAnnualAnalysis;
-import org.concord.energy3d.simulation.SolarDailyAnalysis;
+import org.concord.energy3d.simulation.PvAnnualAnalysis;
+import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
@@ -1817,7 +1817,7 @@ public class PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					final SolarDailyAnalysis a = new SolarDailyAnalysis();
+					final PvDailyAnalysis a = new PvDailyAnalysis();
 					if (SceneManager.getInstance().getSolarHeatMap())
 						a.updateGraph();
 					a.show();
@@ -1837,7 +1837,7 @@ public class PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					SolarAnnualAnalysis a = new SolarAnnualAnalysis();
+					PvAnnualAnalysis a = new PvAnnualAnalysis();
 					if (foundation.getUtilityBill() != null)
 						a.setUtilityBill(foundation.getUtilityBill());
 					a.show();
@@ -2266,7 +2266,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
-					new SolarDailyAnalysis().show();
+					new PvDailyAnalysis().show();
 				}
 			});
 			popupMenuForSolarPanel.add(mi);
@@ -2278,7 +2278,7 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof SolarPanel))
 						return;
-					new SolarAnnualAnalysis().show();
+					new PvAnnualAnalysis().show();
 				}
 			});
 			popupMenuForSolarPanel.add(mi);

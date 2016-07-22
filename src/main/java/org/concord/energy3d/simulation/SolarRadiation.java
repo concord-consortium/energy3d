@@ -174,6 +174,9 @@ public class SolarRadiation {
 					if (part.isDrawCompleted()) {
 						if (part instanceof Window) {
 							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
+						} else if (part instanceof Wall) {
+							if (((Wall) part).getType() == Wall.SOLID_WALL)
+								computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						} else if (part instanceof Foundation) {
 							final Foundation foundation = (Foundation) part;
 							for (int i = 0; i < 5; i++) {
@@ -181,11 +184,6 @@ public class SolarRadiation {
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
-						} else if (part instanceof Wall) {
-							if (((Wall) part).getType() == Wall.SOLID_WALL)
-								computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
-						} else if (part instanceof SolarPanel || part instanceof Mirror || part instanceof Sensor) {
-							computeOnMeshPlate(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						} else if (part instanceof Roof) {
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
@@ -194,6 +192,8 @@ public class SolarRadiation {
 									computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
 								}
 							}
+						} else if (part instanceof SolarPanel || part instanceof Mirror || part instanceof Sensor) {
+							computeOnPlate(minute, dayLength, directionTowardSun, part);
 						}
 					}
 				}
@@ -314,11 +314,21 @@ public class SolarRadiation {
 
 	}
 
-	private void computeOnMeshPlate(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+	private void computeOnPlate(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart part) {
 
+		if (part instanceof Mirror) {
+			Mirror m = (Mirror) part;
+			if (m.getHeliostatTarget() != null) { // calculate the normal at this minute
+				m.setNormalAtTime(null, minute);
+			}
+		}
+
+		ReadOnlyVector3 normal = part.getNormal();
 		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent. This is a temporary fix.
 			return;
 
+		Mesh drawMesh = part.getRadiationMesh();
+		Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal);
@@ -335,8 +345,9 @@ public class SolarRadiation {
 
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
-		for (int col = 0; col < 2; col++) {
-			for (int row = 0; row < 2; row++) {
+		int n = 2;
+		for (int col = 0; col < n; col++) {
+			for (int row = 0; row < n; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				final int index;
@@ -367,16 +378,16 @@ public class SolarRadiation {
 
 				data.dailySolarIntensity[row][col] += radiation;
 				double area = 1;
-				if (housePart instanceof SolarPanel) {
-					final SolarPanel sp = (SolarPanel) housePart;
+				if (part instanceof SolarPanel) {
+					final SolarPanel sp = (SolarPanel) part;
 					area = sp.getPanelWidth() * sp.getPanelHeight();
-				} else if (housePart instanceof Mirror) {
-					final Mirror m = (Mirror) housePart;
+				} else if (part instanceof Mirror) {
+					final Mirror m = (Mirror) part;
 					area = m.getMirrorWidth() * m.getMirrorHeight();
-				} else if (housePart instanceof Sensor) {
+				} else if (part instanceof Sensor) {
 					area = Sensor.WIDTH * Sensor.HEIGHT;
 				}
-				housePart.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
+				part.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
 				// ABOVE: 4x60: 4 is to get the 1/4 area of the 2x2 grid; 60 is to convert the unit of timeStep from minute to kWh
 
 			}

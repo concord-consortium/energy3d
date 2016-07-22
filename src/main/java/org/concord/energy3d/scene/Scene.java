@@ -326,7 +326,7 @@ public class Scene implements Serializable {
 			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
 			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().changeSkyTexture();
-			// SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+			SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 		}
 
 		if (Util.isZero(instance.solarContrast)) // if the solar map color contrast has not been set, set it to 50
@@ -1839,6 +1839,15 @@ public class Scene implements Serializable {
 		int count = 0;
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel)
+				count++;
+		}
+		return count;
+	}
+
+	public int getNumberOfMirrors() {
+		int count = 0;
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror)
 				count++;
 		}
 		return count;

@@ -749,6 +749,7 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) selectedPart;
 				if (sp.isDrawable()) {
+					partPanelBorder.setTitle("Solar Panel (" + sp.getId() + ")");
 					Foundation f = (Foundation) sp.getTopContainer();
 					partProperty1Label.setText("  Size & Position:");
 					partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFeet) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
@@ -760,15 +761,12 @@ public class EnergyPanel extends JPanel {
 					partProperty2TextField.setText(flat ? "zenith: " + oneDecimal.format(sp.getZenith()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0" : " --- ");
 					partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
 					partProperty2TextField.setToolTipText("The angles of the solar panel");
-					String id = "Solar Panel (" + sp.getId() + ")";
 					String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
 					if (energyViewShown) {
-						partPanelBorder.setTitle(id + " - \u03B7 = " + eff);
-						partProperty3Label.setText("  Yield:");
-						partProperty3TextField.setText(twoDecimals.format(sp.getSolarPotentialToday() * sp.getCellEfficiency()) + " kWh");
-						partProperty3TextField.setToolTipText("The total yield of the solar panel of the day");
+						partProperty3Label.setText("  Efficiency & Yield:");
+						partProperty3TextField.setText(eff + ", " + twoDecimals.format(sp.getSolarPotentialToday() * sp.getCellEfficiency()) + " kWh");
+						partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel");
 					} else {
-						partPanelBorder.setTitle(id);
 						partProperty3Label.setText("  Efficiency:");
 						partProperty3TextField.setText(eff);
 						partProperty3TextField.setToolTipText("The solar cell efficiency of the solar panel");
@@ -777,6 +775,7 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Mirror) {
 				final Mirror m = (Mirror) selectedPart;
 				if (m.isDrawable()) {
+					partPanelBorder.setTitle("Mirror (" + m.getId() + ")");
 					Foundation f = (Foundation) m.getTopContainer();
 					partProperty1Label.setText("  Size & Position:");
 					partProperty1TextField.setText(twoDecimals.format(m.getMirrorWidth() * meterToFeet) + "\u00d7" + twoDecimals.format(m.getMirrorHeight() * meterToFeet) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
@@ -788,12 +787,16 @@ public class EnergyPanel extends JPanel {
 					partProperty2TextField.setText(flat ? "zenith: " + oneDecimal.format(m.getZenith()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0" : " --- ");
 					partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
 					partProperty2TextField.setToolTipText("The angles of the solar panel");
-					String id = "Mirror (" + m.getId() + ")";
 					String reflectivity = oneDecimal.format(m.getReflectivity() * 100) + "%";
-					partPanelBorder.setTitle(id);
-					partProperty3Label.setText("  Reflectivity:");
-					partProperty3TextField.setText(reflectivity);
-					partProperty3TextField.setToolTipText("The reflectivity of this mirror");
+					if (energyViewShown) {
+						partProperty3Label.setText("  Reflectivity & Yield:");
+						partProperty3TextField.setText(reflectivity + ", " + twoDecimals.format(m.getSolarPotentialToday() * m.getReflectivity()) + " kWh");
+						partProperty3TextField.setToolTipText("The reflectivity and yield of this mirror");
+					} else {
+						partProperty3Label.setText("  Reflectivity:");
+						partProperty3TextField.setText(reflectivity);
+						partProperty3TextField.setToolTipText("The reflectivity of this mirror");
+					}
 				}
 			} else if (selectedPart instanceof Sensor) {
 				final Sensor sensor = (Sensor) selectedPart;
