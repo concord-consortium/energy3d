@@ -492,10 +492,17 @@ public class Scene implements Serializable {
 
 		final ArrayList<HousePart> toBeRemoved = new ArrayList<HousePart>();
 
-		// remove all invalid parts or orphan parts without a top container
-		for (final HousePart p : parts)
+		for (final HousePart p : parts) {
+			// remove all invalid parts or orphan parts without a top container
 			if (!p.isValid() || ((p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Floor) && p.getContainer() == null))
 				toBeRemoved.add(p);
+			// remove walls that are at the same position
+			if (p instanceof Wall) {
+				if (((Wall) p).isAtSamePlaceAsAnotherPart()) {
+					toBeRemoved.add(p);
+				}
+			}
+		}
 		for (final HousePart p : toBeRemoved)
 			remove(p, false);
 
