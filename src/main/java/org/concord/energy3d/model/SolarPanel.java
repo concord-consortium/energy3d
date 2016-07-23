@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -8,6 +9,8 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -39,6 +42,8 @@ public class SolarPanel extends HousePart {
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
+	private boolean heliostat;
+	private double baseHeight = 5;
 	private transient double layoutGap = 0.01;
 
 	public SolarPanel(boolean rotated) {
@@ -95,6 +100,8 @@ public class SolarPanel extends HousePart {
 			efficiency = 0.15;
 		if (Util.isZero(inverterEfficiency))
 			inverterEfficiency = 0.95;
+		if (Util.isZero(baseHeight))
+			baseHeight = 5;
 
 		mesh = new Mesh("SolarPanel");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -158,7 +165,7 @@ public class SolarPanel extends HousePart {
 				}
 				if (!Util.isZero(zenith - 90)) {
 					double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-					p.setZ(p.getZ() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
+					p.setZ(p.getZ() + baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 				}
 				getEditPointShape(i).setTranslation(p);
 			}
@@ -222,18 +229,26 @@ public class SolarPanel extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
+		Vector3 a;
 		if (Util.isZero(zenith - 90)) {
-			mesh.setTranslation(getAbsPoint(0));
-			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
-				double a = Math.PI / 2 * 0.9999; // exactly 90 degrees will cause the solar panel to disappear
-				setNormal(a, Math.toRadians(relativeAzimuth));
-			}
+			a = getAbsPoint(0).addLocal(0, 0, baseHeight);
 		} else {
-			double t = Math.toRadians(zenith);
 			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-			mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, 0.5 * h * Math.cos(t)));
-			setNormal(t, Math.toRadians(relativeAzimuth));
+			a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 		}
+
+		if (heliostat) {
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		} else {
+			if (Util.isZero(zenith - 90)) {
+				if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+					setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+				}
+			} else {
+				setNormal(Math.toRadians(zenith), Math.toRadians(relativeAzimuth));
+			}
+		}
+		mesh.setTranslation(a);
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
@@ -244,6 +259,13 @@ public class SolarPanel extends HousePart {
 
 		drawSupporFrame();
 
+	}
+
+	public void setNormalAtTime(int minute) {
+		Calendar calendar = (Calendar) Heliodon.getInstance().getCalender().clone();
+		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+		calendar.set(Calendar.MINUTE, minute % 60);
+		normal = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -272,7 +294,7 @@ public class SolarPanel extends HousePart {
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		double t = Math.toRadians(zenith);
 		double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-		final Vector3 p = o.add(0, 0, 0.5 * h * Math.cos(t), null);
+		final Vector3 p = o.add(0, 0, baseHeight + 0.5 * h * Math.cos(t), null);
 		Vector3 dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
 		double w = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
@@ -486,6 +508,14 @@ public class SolarPanel extends HousePart {
 
 	public double getZenith() {
 		return zenith;
+	}
+
+	public void setHeliostat(boolean heliostat) {
+		this.heliostat = heliostat;
+	}
+
+	public boolean getHeliostat() {
+		return heliostat;
 	}
 
 }

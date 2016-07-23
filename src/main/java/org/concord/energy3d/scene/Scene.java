@@ -1607,6 +1607,26 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void enableHeliostatForSolarPanelsOfFoundation(final Foundation foundation, final boolean enabled) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setHeliostat(enabled);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void enableHeliostatForAllSolarPanels(final boolean enabled) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setHeliostat(enabled);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)

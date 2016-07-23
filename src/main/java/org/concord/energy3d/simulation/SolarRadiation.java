@@ -321,6 +321,11 @@ public class SolarRadiation {
 			if (m.getHeliostatTarget() != null) { // calculate the normal at this minute
 				m.setNormalAtTime(null, minute);
 			}
+		} else if (part instanceof SolarPanel) {
+			SolarPanel sp = (SolarPanel) part;
+			if (sp.getHeliostat()) { // calculate the normal at this minute
+				sp.setNormalAtTime(minute);
+			}
 		}
 
 		ReadOnlyVector3 normal = part.getNormal();

@@ -323,12 +323,12 @@ public class MirrorDailyAnalysis extends Analysis {
 			if (selectedPart instanceof Mirror) {
 				s += "\"Mirror\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart instanceof Foundation) {
-				s += "\"Mirror\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+				s += "\"Platform\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
-				s += "\"Mirror\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
+				s += "\"Platform\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
 			}
 		} else {
-			s += "\"Panel\": \"All\"";
+			s += "\"Mirror\": \"All\"";
 		}
 		String name = "Solar";
 		List<Double> data = graph.getData(name);

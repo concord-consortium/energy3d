@@ -323,9 +323,9 @@ public class PvDailyAnalysis extends Analysis {
 			if (selectedPart instanceof SolarPanel) {
 				s += "\"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart instanceof Foundation) {
-				s += "\"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+				s += "\"Platform\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
-				s += "\"Panel\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
+				s += "\"Platform\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
 			}
 		} else {
 			s += "\"Panel\": \"All\"";

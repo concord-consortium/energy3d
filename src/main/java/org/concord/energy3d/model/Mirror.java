@@ -274,10 +274,9 @@ public class Mirror extends HousePart {
 				a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 			}
 		}
-		Calendar calendar = Heliodon.getInstance().getCalender();
+		Calendar calendar = (Calendar) Heliodon.getInstance().getCalender().clone();
 		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 		calendar.set(Calendar.MINUTE, minute % 60);
-		// System.out.println("***" + minute + "=" + calendar.getTime());
 		ReadOnlyVector3 o = heliostatTarget.getTankCenter();
 		final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 		final Vector3 q = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);

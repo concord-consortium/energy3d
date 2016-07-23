@@ -95,6 +95,7 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
+import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
@@ -159,6 +160,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem groupAnnualAnalysisMenuItem;
 	private JMenuItem annualPvAnalysisMenuItem;
 	private JMenuItem dailyPvAnalysisMenuItem;
+	private JMenuItem annualMirrorAnalysisMenuItem;
 	private JMenuItem dailyMirrorAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
@@ -1127,6 +1129,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getAnnualPvAnalysisMenuItem());
 			analysisMenu.add(getDailyPvAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getAnnualMirrorAnalysisMenuItem());
 			analysisMenu.add(getDailyMirrorAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getGroupAnnualAnalysisMenuItem());
@@ -1700,6 +1703,46 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return dailyMirrorAnalysisMenuItem;
+	}
+
+	private JMenuItem getAnnualMirrorAnalysisMenuItem() {
+		if (annualMirrorAnalysisMenuItem == null) {
+			annualMirrorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Mirrors...");
+			annualMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().getNumberOfMirrors();
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final MirrorAnnualAnalysis a = new MirrorAnnualAnalysis();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(Mirror.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					a.show();
+				}
+			});
+		}
+		return annualMirrorAnalysisMenuItem;
 	}
 
 	private JMenuItem getGroupDailyAnalysisMenuItem() {
