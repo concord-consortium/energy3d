@@ -108,6 +108,9 @@ import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChangeZenithAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
+import org.concord.energy3d.undo.EnableFoundationSolarPanelHeliostatCommand;
+import org.concord.energy3d.undo.EnableHeliostatForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.EnableSolarPanelHeliostatCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.util.Config;
@@ -1935,19 +1938,19 @@ public class PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) {
-						// ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
+						EnableSolarPanelHeliostatCommand c = new EnableSolarPanelHeliostatCommand(sp);
 						sp.setHeliostat(true);
 						sp.draw();
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
-						// ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
+						EnableFoundationSolarPanelHeliostatCommand c = new EnableFoundationSolarPanelHeliostatCommand(foundation);
 						Scene.getInstance().enableHeliostatForSolarPanelsOfFoundation(foundation, true);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						// ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
+						EnableHeliostatForAllSolarPanelsCommand c = new EnableHeliostatForAllSolarPanelsCommand();
 						Scene.getInstance().enableHeliostatForAllSolarPanels(true);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true);
@@ -1982,10 +1985,10 @@ public class PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) {
-						// ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
+						EnableSolarPanelHeliostatCommand c = new EnableSolarPanelHeliostatCommand(sp);
 						sp.setHeliostat(false);
 						sp.draw();
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
 						// ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
@@ -2208,15 +2211,39 @@ public class PopupMenuFactory {
 						return;
 					SolarPanel sp = (SolarPanel) selectedPart;
 					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
-					miZenith.setEnabled(true);
+					boolean heliostat = sp.getHeliostat();
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
-						boolean flat = roof.getHeight() == 0;
-						miZenith.setEnabled(flat);
-						miAzimuth.setEnabled(flat);
+						if (Util.isZero(roof.getHeight())) {
+							miEnableHeliostat.setEnabled(!heliostat);
+							miDisableHeliostat.setEnabled(heliostat);
+						} else {
+							miEnableHeliostat.setEnabled(false);
+							miDisableHeliostat.setEnabled(false);
+						}
 					} else if (sp.getContainer() instanceof Wall) {
+						miEnableHeliostat.setEnabled(false);
+						miDisableHeliostat.setEnabled(false);
+					} else if (sp.getContainer() instanceof Foundation) {
+						miEnableHeliostat.setEnabled(!heliostat);
+						miDisableHeliostat.setEnabled(heliostat);
+					}
+					if (sp.getHeliostat()) {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
+					} else {
+						miZenith.setEnabled(true);
+						miAzimuth.setEnabled(true);
+						if (sp.getContainer() instanceof Roof) {
+							Roof roof = (Roof) sp.getContainer();
+							if (roof.getHeight() > 0) {
+								miZenith.setEnabled(false);
+								miAzimuth.setEnabled(false);
+							}
+						} else if (sp.getContainer() instanceof Wall) {
+							miZenith.setEnabled(false);
+							miAzimuth.setEnabled(false);
+						}
 					}
 				}
 			});

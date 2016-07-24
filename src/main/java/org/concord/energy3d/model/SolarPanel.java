@@ -43,7 +43,7 @@ public class SolarPanel extends HousePart {
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
 	private boolean heliostat;
-	private double baseHeight = 5;
+	private double baseHeight = 2.5;
 	private transient double layoutGap = 0.01;
 
 	public SolarPanel(boolean rotated) {
@@ -101,7 +101,7 @@ public class SolarPanel extends HousePart {
 		if (Util.isZero(inverterEfficiency))
 			inverterEfficiency = 0.95;
 		if (Util.isZero(baseHeight))
-			baseHeight = 5;
+			baseHeight = 2.5;
 
 		mesh = new Mesh("SolarPanel");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));

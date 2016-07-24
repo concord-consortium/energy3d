@@ -1906,6 +1906,20 @@ public class Scene implements Serializable {
 		});
 	}
 
+	public void updateSolarPanels() {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				for (final HousePart part : parts) {
+					if (part instanceof SolarPanel) {
+						part.draw();
+					}
+				}
+				return null;
+			}
+		});
+	}
+
 	public Ground getGround() {
 		return ground;
 	}
