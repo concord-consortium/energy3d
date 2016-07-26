@@ -722,8 +722,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		normalBuffer1.rewind();
 		normalBuffer2.rewind();
 		normalBuffer3.rewind();
-		final ReadOnlyVector3 n1 = p2.subtract(p0, null).normalizeLocal().crossLocal(Vector3.UNIT_Z);
-		final ReadOnlyVector3 n2 = p3.subtract(p2, null).normalizeLocal().crossLocal(Vector3.UNIT_Z);
+		final ReadOnlyVector3 n1 = p3.subtract(p0, null).normalizeLocal();
+		final ReadOnlyVector3 n2 = p2.subtract(p0, null).normalizeLocal();
 		ReadOnlyVector3 normal;
 		normal = n1;
 		((UserData) sideMesh[0].getUserData()).setNormal(normal);
