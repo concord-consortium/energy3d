@@ -1586,6 +1586,56 @@ public class PopupMenuFactory {
 
 			final JMenu layoutMenu = new JMenu("Layout");
 
+			final JMenuItem miSolarPanelArrays = new JMenuItem("Solar Panel Arrays");
+			layoutMenu.add(miSolarPanelArrays);
+			miSolarPanelArrays.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						double rowSpacing = 0.5;
+						double colSpacing = 1.0;
+						JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
+						panel.add(new JLabel("Row spacing: "));
+						JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(rowSpacing));
+						panel.add(rowSpacingField);
+						panel.add(new JLabel("Column spacing: "));
+						JTextField colSpacingField = new JTextField(twoDecimalsFormat.format(colSpacing));
+						panel.add(colSpacingField);
+						while (true) {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Spacings", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+								String rowValue = rowSpacingField.getText();
+								String colValue = colSpacingField.getText();
+								try {
+									rowSpacing = Double.parseDouble(rowValue);
+									colSpacing = Double.parseDouble(colValue);
+									if (rowSpacing <= 0 || colSpacing <= 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Row spacing must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else {
+										break;
+									}
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), rowValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								}
+							} else {
+								break;
+							}
+						}
+						final double rowSpacing1 = rowSpacing;
+						final double colSpacing1 = colSpacing;
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() {
+								f.addSolarPanelArrays(rowSpacing1, colSpacing1);
+								return null;
+							}
+						});
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+
 			final JMenuItem miMirrorCircularArrays = new JMenuItem("Circular Mirror Arrays");
 			layoutMenu.add(miMirrorCircularArrays);
 			miMirrorCircularArrays.addActionListener(new ActionListener() {
@@ -3002,9 +3052,7 @@ public class PopupMenuFactory {
 
 				}
 
-				while (true)
-
-				{
+				while (true) {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						String newValue = siField.getText();
 						try {
