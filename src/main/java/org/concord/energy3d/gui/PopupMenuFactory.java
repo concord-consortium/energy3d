@@ -1910,7 +1910,7 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			final JMenuItem miEnableHeliostat = new JMenuItem("Enable Heliostat...");
+			final JCheckBoxMenuItem miEnableHeliostat = new JCheckBoxMenuItem("Enable Heliostat...");
 			miEnableHeliostat.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1932,72 +1932,25 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final String title = "<html>Enable heliostat for " + partInfo + "</html>";
+					final String title = "<html>" + (sp.getHeliostat() ? "Disable" : "Enable") + " heliostat for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The heliostat will rotate the solar panel to face the sun.<hr></html>";
 					Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, (sp.getHeliostat() ? "Disable" : "Enable") + " heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) {
 						EnableSolarPanelHeliostatCommand c = new EnableSolarPanelHeliostatCommand(sp);
-						sp.setHeliostat(true);
+						sp.setHeliostat(!sp.getHeliostat());
 						sp.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
 						EnableFoundationSolarPanelHeliostatCommand c = new EnableFoundationSolarPanelHeliostatCommand(foundation);
-						Scene.getInstance().enableHeliostatForSolarPanelsOfFoundation(foundation, true);
+						Scene.getInstance().enableHeliostatForSolarPanelsOfFoundation(foundation, !sp.getHeliostat());
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						EnableHeliostatForAllSolarPanelsCommand c = new EnableHeliostatForAllSolarPanelsCommand();
-						Scene.getInstance().enableHeliostatForAllSolarPanels(true);
+						Scene.getInstance().enableHeliostatForAllSolarPanels(!sp.getHeliostat());
 						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setEdited(true);
-				}
-			});
-
-			final JMenuItem miDisableHeliostat = new JMenuItem("Disable Heliostat...");
-			miDisableHeliostat.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
-						return;
-					final SolarPanel sp = (SolarPanel) selectedPart;
-					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
-					JPanel panel = new JPanel();
-					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
-					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
-					panel.add(rb1);
-					panel.add(rb2);
-					panel.add(rb3);
-					ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					final String title = "<html>Disable heliostat for " + partInfo + "</html>";
-					final String footnote = "<html><hr></html>";
-					Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
-						return;
-					if (rb1.isSelected()) {
-						EnableSolarPanelHeliostatCommand c = new EnableSolarPanelHeliostatCommand(sp);
-						sp.setHeliostat(false);
-						sp.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb2.isSelected()) {
-						Foundation foundation = sp.getTopContainer();
-						// ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-						Scene.getInstance().enableHeliostatForSolarPanelsOfFoundation(foundation, false);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb3.isSelected()) {
-						// ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-						Scene.getInstance().enableHeliostatForAllSolarPanels(false);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					Scene.getInstance().setEdited(true);
@@ -2211,22 +2164,13 @@ public class PopupMenuFactory {
 						return;
 					SolarPanel sp = (SolarPanel) selectedPart;
 					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
-					boolean heliostat = sp.getHeliostat();
+					Util.selectSilently(miEnableHeliostat, sp.getHeliostat());
+					miEnableHeliostat.setEnabled(true);
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
-						if (Util.isZero(roof.getHeight())) {
-							miEnableHeliostat.setEnabled(!heliostat);
-							miDisableHeliostat.setEnabled(heliostat);
-						} else {
-							miEnableHeliostat.setEnabled(false);
-							miDisableHeliostat.setEnabled(false);
-						}
+						miEnableHeliostat.setEnabled(Util.isZero(roof.getHeight()));
 					} else if (sp.getContainer() instanceof Wall) {
 						miEnableHeliostat.setEnabled(false);
-						miDisableHeliostat.setEnabled(false);
-					} else if (sp.getContainer() instanceof Foundation) {
-						miEnableHeliostat.setEnabled(!heliostat);
-						miDisableHeliostat.setEnabled(heliostat);
 					}
 					if (sp.getHeliostat()) {
 						miZenith.setEnabled(false);
@@ -2372,7 +2316,6 @@ public class PopupMenuFactory {
 
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miEnableHeliostat);
-			popupMenuForSolarPanel.add(miDisableHeliostat);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miRotateAroundNormal);
 			popupMenuForSolarPanel.add(miZenith);
@@ -2439,8 +2382,8 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final String title = "<html>Set the ID of the target platform of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The light beams reflected by this mirror will focus on the highest point<br>of the structure on the target platform.<hr></html>";
+					final String title = "<html>Set the ID of the platform of the target tower for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will focus on the top of the target platform.<hr></html>";
 					Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getHeliostatTarget() == null ? "" : m.getHeliostatTarget().getId());

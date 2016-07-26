@@ -349,11 +349,15 @@ public class Util {
 	}
 
 	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
-		return isZero(a.distance(b));
+		return a.distance(b) < MathUtils.ZERO_TOLERANCE;
+	}
+
+	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b, double tolerance) {
+		return a.distance(b) < tolerance;
 	}
 
 	public static boolean isEqual(final ReadOnlyVector2 a, final ReadOnlyVector2 b) {
-		return isZero(a.distance(b));
+		return a.distance(b) < MathUtils.ZERO_TOLERANCE;
 	}
 
 	public static boolean isEqual(final double a, final double b) {

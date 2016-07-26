@@ -25,6 +25,7 @@ import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.geom.BufferUtils;
 
@@ -163,9 +164,11 @@ public class SolarPanel extends HousePart {
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
-				if (!Util.isZero(zenith - 90)) {
+				if (Util.isZero(zenith - 90)) {
+					p.setZ(p.getZ() + getBaseHeight());
+				} else {
 					double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-					p.setZ(p.getZ() + baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
+					p.setZ(p.getZ() + getBaseHeight() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 				}
 				getEditPointShape(i).setTranslation(p);
 			}
@@ -175,6 +178,21 @@ public class SolarPanel extends HousePart {
 		/* remove remaining edit shapes */
 		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
 			pointsRoot.detachChildAt(points.size());
+	}
+
+	private double getBaseHeight() {
+		return onFlatSurface() ? baseHeight : 0;
+	}
+
+	private boolean onFlatSurface() {
+		if (container instanceof Roof) {
+			if (Util.isZero(container.getHeight())) {
+				return true;
+			}
+		} else if (container instanceof Foundation) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -231,17 +249,17 @@ public class SolarPanel extends HousePart {
 
 		Vector3 a;
 		if (Util.isZero(zenith - 90)) {
-			a = getAbsPoint(0).addLocal(0, 0, baseHeight);
+			a = getAbsPoint(0).addLocal(0, 0, getBaseHeight());
 		} else {
 			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-			a = getAbsPoint(0).addLocal(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)));
+			a = getAbsPoint(0).addLocal(0, 0, getBaseHeight() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
 		}
 
 		if (heliostat) {
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 		} else {
 			if (Util.isZero(zenith - 90)) {
-				if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+				if (Util.isEqual(normal, Vector3.UNIT_Z, 0.1)) { // greater tolerance than default
 					setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 				}
 			} else {
@@ -257,7 +275,12 @@ public class SolarPanel extends HousePart {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
-		drawSupporFrame();
+		if (onFlatSurface()) {
+			supportFrame.getSceneHints().setCullHint(CullHint.Inherit);
+			drawSupporFrame();
+		} else {
+			supportFrame.getSceneHints().setCullHint(CullHint.Always);
+		}
 
 	}
 
@@ -292,10 +315,16 @@ public class SolarPanel extends HousePart {
 		vertexBuffer.limit(vertexBuffer.capacity());
 		normalBuffer.limit(normalBuffer.capacity());
 		final ReadOnlyVector3 o = getAbsPoint(0);
-		double t = Math.toRadians(zenith);
-		double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-		final Vector3 p = o.add(0, 0, baseHeight + 0.5 * h * Math.cos(t), null);
-		Vector3 dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
+		Vector3 dir;
+		Vector3 p;
+		if (Util.isZero(zenith - 90)) {
+			dir = new Vector3(0.5, 0, 0);
+			p = o.add(0, 0, getBaseHeight(), null);
+		} else {
+			dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
+			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
+			p = o.add(0, 0, getBaseHeight() + 0.5 * h * Math.cos(Math.toRadians(zenith)), null);
+		}
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
 		double w = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
 		dir.normalizeLocal().multiplyLocal(w * 0.5);
