@@ -15,6 +15,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -1432,9 +1433,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (final HousePart m : mirrors) {
 			Scene.getInstance().remove(m, false);
 		}
+		AddArrayCommand command = new AddArrayCommand(mirrors, this, Mirror.class);
+		Mirror m = new Mirror();
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
-		Mirror m = new Mirror();
 		final double w = 1.5 * m.getMirrorWidth() / Scene.getInstance().getAnnotationScale();
 		final double h = 1.5 * m.getMirrorHeight() / Scene.getInstance().getAnnotationScale();
 		final double rows = a / h;
@@ -1455,6 +1457,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				m.draw();
 			}
 		}
+		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 
 	public void addSolarPanelArrays(double panelWidth, double panelHeight, double rowSpacing, double colSpacing) {
@@ -1464,9 +1467,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (c instanceof SolarPanel)
 				panels.add(c);
 		}
-		for (final HousePart m : panels) {
-			Scene.getInstance().remove(m, false);
+		for (final HousePart p : panels) {
+			Scene.getInstance().remove(p, false);
 		}
+		AddArrayCommand command = new AddArrayCommand(panels, this, SolarPanel.class);
 		final Vector3 p0 = getAbsPoint(0);
 		final double a = p0.distance(getAbsPoint(2));
 		final double b = p0.distance(getAbsPoint(1));
@@ -1491,6 +1495,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				sp.draw();
 			}
 		}
+		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 
 }

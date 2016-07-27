@@ -41,6 +41,7 @@ import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
+import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.AdjustThermostatCommand;
@@ -225,6 +226,10 @@ public class TimeSeriesLogger {
 					if (c.getURL() != null) {
 						stateValue = "{\"Import\": \"" + c.getURL() + "\"}";
 					}
+				} else if (lastEdit instanceof AddArrayCommand) {
+					AddArrayCommand c = (AddArrayCommand) lastEdit;
+					Foundation f = c.getFoundation();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + f.countParts(c.getType()) + "}";
 				} else if (lastEdit instanceof PastePartCommand) {
 					actedPart = ((PastePartCommand) lastEdit).getPart();
 					if (actedPart instanceof Foundation) {
