@@ -1594,17 +1594,25 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
-						double rowSpacing = 0.5;
-						double colSpacing = 1.0;
-						JPanel panel = new JPanel(new GridLayout(2, 2, 5, 5));
-						panel.add(new JLabel("Row spacing: "));
+						int n = f.countParts(SolarPanel.class);
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+							return;
+						double rowSpacing = 1;
+						double colSpacing = 0.5;
+						JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+						panel.add(new JLabel("Panel size:"));
+						JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
+						sizeComboBox.setSelectedIndex(2);
+						panel.add(sizeComboBox);
+						panel.add(new JLabel("Row spacing:"));
 						JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(rowSpacing));
 						panel.add(rowSpacingField);
-						panel.add(new JLabel("Column spacing: "));
+						panel.add(new JLabel("Column spacing:"));
 						JTextField colSpacingField = new JTextField(twoDecimalsFormat.format(colSpacing));
 						panel.add(colSpacingField);
+						boolean ok = false;
 						while (true) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Spacings", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								String rowValue = rowSpacingField.getText();
 								String colValue = colSpacingField.getText();
 								try {
@@ -1613,25 +1621,43 @@ public class PopupMenuFactory {
 									if (rowSpacing <= 0 || colSpacing <= 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Row spacing must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
+										ok = true;
 										break;
 									}
 								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), rowValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
 							} else {
 								break;
 							}
 						}
-						final double rowSpacing1 = rowSpacing;
-						final double colSpacing1 = colSpacing;
-						SceneManager.getTaskManager().update(new Callable<Object>() {
-							@Override
-							public Object call() {
-								f.addSolarPanelArrays(rowSpacing1, colSpacing1);
-								return null;
+						if (ok) {
+							final double panelWidth, panelHeight;
+							switch (sizeComboBox.getSelectedIndex()) {
+							case 0:
+								panelWidth = 0.99;
+								panelHeight = 1.65;
+								break;
+							case 1:
+								panelWidth = 1.04;
+								panelHeight = 1.55;
+								break;
+							default:
+								panelWidth = 0.99;
+								panelHeight = 1.96;
+								break;
 							}
-						});
-						Scene.getInstance().setEdited(true);
+							final double rowSpacing1 = rowSpacing;
+							final double colSpacing1 = colSpacing;
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() {
+									f.addSolarPanelArrays(panelWidth, panelHeight, rowSpacing1, colSpacing1);
+									return null;
+								}
+							});
+							Scene.getInstance().setEdited(true);
+						}
 					}
 				}
 			});
@@ -1644,6 +1670,9 @@ public class PopupMenuFactory {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
+						int n = f.countParts(Mirror.class);
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+							return;
 						SceneManager.getTaskManager().update(new Callable<Object>() {
 							@Override
 							public Object call() {

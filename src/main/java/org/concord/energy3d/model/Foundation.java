@@ -1457,7 +1457,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	public void addSolarPanelArrays(double rowSpacing, double colSpacing) {
+	public void addSolarPanelArrays(double panelWidth, double panelHeight, double rowSpacing, double colSpacing) {
 		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
@@ -1471,8 +1471,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double a = p0.distance(getAbsPoint(2));
 		final double b = p0.distance(getAbsPoint(1));
 		SolarPanel sp = new SolarPanel(false);
-		final double w = sp.getPanelWidth() * (1 + rowSpacing) / Scene.getInstance().getAnnotationScale();
-		final double h = sp.getPanelHeight() * (1 + colSpacing) / Scene.getInstance().getAnnotationScale();
+		final double w = (sp.getPanelWidth() + colSpacing) / Scene.getInstance().getAnnotationScale();
+		final double h = (sp.getPanelHeight() + rowSpacing) / Scene.getInstance().getAnnotationScale();
 		final int rows = (int) Math.round(a / w);
 		final int cols = (int) Math.round(b / h);
 		final double x0 = Math.min(p0.getX(), getAbsPoint(2).getX());
@@ -1480,6 +1480,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (int c = 1; c < cols; c++) {
 			for (int r = 1; r < rows; r++) {
 				sp = new SolarPanel(false);
+				sp.setPanelWidth(panelWidth);
+				sp.setPanelHeight(panelHeight);
 				sp.setContainer(this);
 				Scene.getInstance().add(sp, false);
 				sp.complete();

@@ -68,7 +68,7 @@ public abstract class Graph extends JPanel {
 	double xmin = 0;
 	double xmax = 11;
 	double ymin = 0;
-	double ymax = 1;
+	double ymax = 0.001;
 	double dx;
 	double dy;
 	String info = "No new data";
@@ -386,7 +386,7 @@ public abstract class Graph extends JPanel {
 			drawRecords(g2);
 		} else {
 			ymin = 0;
-			ymax = 1;
+			ymax = 0.001;
 		}
 
 		if (data.isEmpty()) {
