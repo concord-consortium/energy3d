@@ -79,6 +79,7 @@ public class MirrorAnnualAnalysis extends Analysis {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalender();
 						c.set(Calendar.MONTH, m);
+						Scene.getInstance().updateMirrors();
 						final Throwable t = compute();
 						if (t != null) {
 							stopAnalysis();

@@ -1475,13 +1475,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double h = sp.getPanelHeight() * (1 + colSpacing) / Scene.getInstance().getAnnotationScale();
 		final int rows = (int) Math.round(a / w);
 		final int cols = (int) Math.round(b / h);
+		final double x0 = Math.min(p0.getX(), getAbsPoint(2).getX());
+		final double y0 = Math.min(p0.getY(), getAbsPoint(1).getY());
 		for (int c = 1; c < cols; c++) {
 			for (int r = 1; r < rows; r++) {
 				sp = new SolarPanel(false);
 				sp.setContainer(this);
 				Scene.getInstance().add(sp, false);
 				sp.complete();
-				final Vector3 v = sp.toRelative(new Vector3(p0.getX() + w * r, p0.getY() + h * c, 0));
+				final Vector3 v = sp.toRelative(new Vector3(x0 + w * r, y0 + h * c, 0));
 				sp.points.get(0).setX(v.getX());
 				sp.points.get(0).setY(v.getY());
 				sp.draw();

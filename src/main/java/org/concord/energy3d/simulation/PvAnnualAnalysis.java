@@ -80,6 +80,7 @@ public class PvAnnualAnalysis extends Analysis {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalender();
 						c.set(Calendar.MONTH, m);
+						Scene.getInstance().updateSolarPanels();
 						final Throwable t = compute();
 						if (t != null) {
 							stopAnalysis();

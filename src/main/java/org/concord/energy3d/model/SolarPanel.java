@@ -44,7 +44,7 @@ public class SolarPanel extends HousePart {
 	private double relativeAzimuth;
 	private double zenith = 90; // the zenith angle relative to the surface of the parent
 	private boolean heliostat;
-	private double baseHeight = 2.5;
+	private double baseHeight = 5;
 	private transient double layoutGap = 0.01;
 
 	public SolarPanel(boolean rotated) {
@@ -102,7 +102,7 @@ public class SolarPanel extends HousePart {
 		if (Util.isZero(inverterEfficiency))
 			inverterEfficiency = 0.95;
 		if (Util.isZero(baseHeight))
-			baseHeight = 2.5;
+			baseHeight = 5;
 
 		mesh = new Mesh("SolarPanel");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -181,7 +181,14 @@ public class SolarPanel extends HousePart {
 	}
 
 	private double getBaseHeight() {
-		return onFlatSurface() ? baseHeight : 0;
+		if (onFlatSurface()) {
+			if (container instanceof Foundation) {
+				return baseHeight + ((Foundation) container).getHeight();
+			} else {
+				return baseHeight;
+			}
+		}
+		return 0;
 	}
 
 	private boolean onFlatSurface() {
@@ -314,16 +321,17 @@ public class SolarPanel extends HousePart {
 		normalBuffer.rewind();
 		vertexBuffer.limit(vertexBuffer.capacity());
 		normalBuffer.limit(normalBuffer.capacity());
-		final ReadOnlyVector3 o = getAbsPoint(0);
+		double h0 = container instanceof Foundation ? ((Foundation) container).getHeight() : 0;
+		final ReadOnlyVector3 o = getAbsPoint(0).addLocal(0, 0, h0);
 		Vector3 dir;
 		Vector3 p;
-		if (Util.isZero(zenith - 90)) {
+		if (!heliostat && Util.isZero(zenith - 90)) {
 			dir = new Vector3(0.5, 0, 0);
-			p = o.add(0, 0, getBaseHeight(), null);
+			p = o.add(0, 0, baseHeight, null);
 		} else {
 			dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
 			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-			p = o.add(0, 0, getBaseHeight() + 0.5 * h * Math.cos(Math.toRadians(zenith)), null);
+			p = o.add(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)), null);
 		}
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
 		double w = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
