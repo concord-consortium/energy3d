@@ -1570,7 +1570,7 @@ public class Scene implements Serializable {
 	public void setZenithAngleForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setZenith(angle);
+				((SolarPanel) p).setZenithAngle(angle);
 				p.draw();
 			}
 		}
@@ -1580,7 +1580,7 @@ public class Scene implements Serializable {
 	public void setZenithAngleForAllSolarPanels(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
-				((SolarPanel) p).setZenith(angle);
+				((SolarPanel) p).setZenithAngle(angle);
 				p.draw();
 			}
 		}
