@@ -163,7 +163,8 @@ public class SolarPanel extends HousePart {
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
-				p.setZ(p.getZ() + getBaseHeight());
+				if (onFlatSurface())
+					p.setZ(p.getZ() + baseHeight);
 				getEditPointShape(i).setTranslation(p);
 			}
 		} finally {
@@ -172,17 +173,6 @@ public class SolarPanel extends HousePart {
 		/* remove remaining edit shapes */
 		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
 			pointsRoot.detachChildAt(points.size());
-	}
-
-	private double getBaseHeight() {
-		if (onFlatSurface()) {
-			if (container instanceof Foundation) {
-				return baseHeight + ((Foundation) container).getHeight();
-			} else {
-				return baseHeight;
-			}
-		}
-		return 0;
 	}
 
 	private boolean onFlatSurface() {
@@ -248,13 +238,15 @@ public class SolarPanel extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
+		boolean onFlatSurface = onFlatSurface();
 		if (heliostat) {
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 		} else {
-			setNormal(Util.isZero(zenithAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - zenithAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+			if (onFlatSurface)
+				setNormal(Util.isZero(zenithAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - zenithAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
-		mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, getBaseHeight()));
+		mesh.setTranslation(onFlatSurface ? getAbsPoint(0).addLocal(0, 0, baseHeight) : getAbsPoint(0));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -262,7 +254,7 @@ public class SolarPanel extends HousePart {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
-		if (onFlatSurface()) {
+		if (onFlatSurface) {
 			supportFrame.getSceneHints().setCullHint(CullHint.Inherit);
 			drawSupporFrame();
 		} else {
@@ -301,8 +293,7 @@ public class SolarPanel extends HousePart {
 		normalBuffer.rewind();
 		vertexBuffer.limit(vertexBuffer.capacity());
 		normalBuffer.limit(normalBuffer.capacity());
-		double h0 = container instanceof Foundation ? ((Foundation) container).getHeight() : 0;
-		final ReadOnlyVector3 o = getAbsPoint(0).addLocal(0, 0, h0);
+		final ReadOnlyVector3 o = getAbsPoint(0);
 		Vector3 dir;
 		Vector3 p;
 		if (!heliostat && Util.isZero(zenithAngle)) {
