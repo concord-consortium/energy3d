@@ -2060,7 +2060,7 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String title = "<html>Zenith Angle (&deg;) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The zenith angle is measured from the direction perpendicular to the base surface.<hr></html>";
 					JPanel panel = new JPanel();
@@ -2078,7 +2078,7 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getZenith());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getZenith());
 						if (newValue == null)
 							break;
 						else {
@@ -2090,11 +2090,12 @@ public class PopupMenuFactory {
 									if (Util.isZero(val - 90))
 										val = 89.999;
 									if (rb1.isSelected()) {
-										ChangeZenithCommand c = new ChangeZenithCommand(solarPanel);
-										solarPanel.setZenith(val);
+										ChangeZenithCommand c = new ChangeZenithCommand(sp);
+										sp.setZenith(val);
+										sp.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
-										Foundation foundation = solarPanel.getTopContainer();
+										Foundation foundation = sp.getTopContainer();
 										ChangeBuildingSolarPanelZenithAngleCommand c = new ChangeBuildingSolarPanelZenithAngleCommand(foundation);
 										Scene.getInstance().setZenithAngleForSolarPanelsOfBuilding(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -2105,7 +2106,7 @@ public class PopupMenuFactory {
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									Scene.getInstance().setEdited(true);
-									solarPanel.draw();
+									sp.draw();
 									break;
 								}
 							} catch (final NumberFormatException exception) {

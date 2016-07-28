@@ -32,7 +32,7 @@ public class ChangeAzimuthForAllSolarPanelsCommand extends AbstractUndoableEdit 
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			SolarPanel p = panels.get(i);
-			newValues[i] = p.getZenith();
+			newValues[i] = p.getRelativeAzimuth();
 			p.setRelativeAzimuth(oldValues[i]);
 			p.draw();
 		}
