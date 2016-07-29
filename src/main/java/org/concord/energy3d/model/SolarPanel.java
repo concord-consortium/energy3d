@@ -237,7 +237,7 @@ public class SolarPanel extends HousePart {
 		} else {
 			supportFrame.getSceneHints().setCullHint(CullHint.Always);
 		}
-
+		
 		if (drawSunBeam)
 			drawSunBeam();
 
