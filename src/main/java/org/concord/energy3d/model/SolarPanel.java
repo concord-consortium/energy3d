@@ -15,6 +15,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -36,6 +37,7 @@ public class SolarPanel extends HousePart {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Mesh supportFrame;
+	private transient Line sunBeam;
 	private double efficiency = 0.15; // a number in (0, 1)
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 0.99; // 39"
@@ -45,7 +47,9 @@ public class SolarPanel extends HousePart {
 	private double tiltAngle;
 	private boolean heliostat;
 	private double baseHeight = 6;
+	private boolean drawSunBeam;
 	private transient double layoutGap = 0.01;
+	private static transient BloomRenderPass bloomRenderPass;
 
 	public SolarPanel(boolean rotated) {
 		super(1, 1, 0);
@@ -94,6 +98,15 @@ public class SolarPanel extends HousePart {
 		supportFrame.setRenderState(offsetState);
 		supportFrame.setModelBound(new BoundingBox());
 		root.attachChild(supportFrame);
+
+		sunBeam = new Line("Sun Beam");
+		sunBeam.setLineWidth(0.01f);
+		sunBeam.setStipplePattern((short) 0xffff);
+		sunBeam.setModelBound(null);
+		Util.disablePickShadowLight(sunBeam);
+		sunBeam.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		sunBeam.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
+		root.attachChild(sunBeam);
 
 		updateTextureAndColor();
 
@@ -225,6 +238,9 @@ public class SolarPanel extends HousePart {
 			supportFrame.getSceneHints().setCullHint(CullHint.Always);
 		}
 
+		if (drawSunBeam)
+			drawSunBeam();
+
 	}
 
 	public void setNormalAtTime(int minute) {
@@ -280,6 +296,32 @@ public class SolarPanel extends HousePart {
 		normalBuffer.limit(normalBuffer.position());
 		supportFrame.getMeshData().updateVertexCount();
 		supportFrame.updateModelBound();
+	}
+
+	public void drawSunBeam() {
+		if (Heliodon.getInstance().isNightTime()) {
+			sunBeam.setVisible(false);
+			return;
+		}
+		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
+		beamsVertices.rewind();
+		Vector3 r = new Vector3(o);
+		r.addLocal(sunLocation.multiply(5000, null));
+		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		sunBeam.updateModelBound();
+		sunBeam.setVisible(true);
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
+			bloomRenderPass.setNrBlurPasses(2);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+		}
+		if (!bloomRenderPass.contains(sunBeam)) {
+			bloomRenderPass.add(sunBeam);
+		}
 	}
 
 	@Override
@@ -523,6 +565,23 @@ public class SolarPanel extends HousePart {
 
 	public boolean getHeliostat() {
 		return heliostat;
+	}
+
+	public void setDrawSunBeam(boolean drawSunBeam) {
+		this.drawSunBeam = drawSunBeam;
+	}
+
+	public boolean getDrawSunBeam() {
+		return drawSunBeam;
+	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		if (bloomRenderPass != null) {
+			if (bloomRenderPass.contains(sunBeam))
+				bloomRenderPass.remove(sunBeam);
+		}
 	}
 
 }

@@ -1895,7 +1895,7 @@ public class Scene implements Serializable {
 					if (part instanceof Mirror) {
 						Mirror m = (Mirror) part;
 						if (night) {
-							m.drawLightBeams();
+							m.drawLightBeams(); // call this so that the light beams can be set invisible
 						} else {
 							m.draw();
 						}
@@ -1910,9 +1910,15 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
+				boolean night = Heliodon.getInstance().isNightTime();
 				for (final HousePart part : parts) {
 					if (part instanceof SolarPanel) {
-						part.draw();
+						SolarPanel sp = (SolarPanel) part;
+						if (night) {
+							sp.drawSunBeam();
+						} else {
+							sp.draw();
+						}
 					}
 				}
 				return null;

@@ -1989,6 +1989,19 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
+			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
+			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					sp.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
+					sp.draw();
+				}
+			});
+
 			final JCheckBoxMenuItem miEnableHeliostat = new JCheckBoxMenuItem("Enable Heliostat...");
 			miEnableHeliostat.addActionListener(new ActionListener() {
 				@Override
@@ -2245,6 +2258,7 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					SolarPanel sp = (SolarPanel) selectedPart;
+					Util.selectSilently(cbmiDrawSunBeam, sp.getDrawSunBeam());
 					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
 					Util.selectSilently(miEnableHeliostat, sp.getHeliostat());
 					miEnableHeliostat.setEnabled(true);
@@ -2404,6 +2418,8 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.addSeparator();
+			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
+			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miEff);
 			popupMenuForSolarPanel.add(miInverterEff);
 			popupMenuForSolarPanel.addSeparator();
@@ -2441,6 +2457,19 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForMirror() {
 
 		if (popupMenuForMirror == null) {
+
+			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
+			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final Mirror m = (Mirror) selectedPart;
+					m.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
+					m.draw();
+				}
+			});
 
 			final JMenuItem miSetHeliostat = new JMenuItem("Set Heliostat...");
 			miSetHeliostat.addActionListener(new ActionListener() {
@@ -2752,6 +2781,7 @@ public class PopupMenuFactory {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
 					}
+					Util.selectSilently(cbmiDrawSunBeam, m.getDrawSunBeam());
 				}
 			});
 
@@ -2822,6 +2852,8 @@ public class PopupMenuFactory {
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miZenith);
 			popupMenuForMirror.add(miAzimuth);
+			popupMenuForMirror.addSeparator();
+			popupMenuForMirror.add(cbmiDrawSunBeam);
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSize);
 			popupMenuForMirror.add(miReflectivity);

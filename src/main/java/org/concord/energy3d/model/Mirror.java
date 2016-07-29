@@ -45,6 +45,7 @@ public class Mirror extends HousePart {
 	private transient double layoutGap = 0.01;
 	private Foundation heliostatTarget;
 	private double baseHeight = 10;
+	private boolean drawSunBeam;
 	private static transient BloomRenderPass bloomRenderPass;
 
 	public Mirror() {
@@ -262,11 +263,12 @@ public class Mirror extends HousePart {
 		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 
-		// draw sun beam
-		// Vector3 r = new Vector3(o);
-		// r.addLocal(sunLocation.multiply(5000, null));
-		// beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		// beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		if (drawSunBeam) {
+			Vector3 r = new Vector3(o);
+			r.addLocal(sunLocation.multiply(5000, null));
+			beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+			beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		}
 
 		Vector3 s = sunLocation.multiplyLocal(length);
 		Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
@@ -455,6 +457,14 @@ public class Mirror extends HousePart {
 
 	public Foundation getHeliostatTarget() {
 		return heliostatTarget;
+	}
+
+	public void setDrawSunBeam(boolean drawSunBeam) {
+		this.drawSunBeam = drawSunBeam;
+	}
+
+	public boolean getDrawSunBeam() {
+		return drawSunBeam;
 	}
 
 	@Override

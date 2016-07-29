@@ -431,15 +431,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (part instanceof Mirror) {
 						Mirror m = (Mirror) part;
 						if (night) {
-							m.drawLightBeams();
+							m.drawLightBeams(); // call this so that the light beams can be set invisible
 						} else {
 							if (m.getHeliostatTarget() != null)
 								m.draw();
 						}
 					} else if (part instanceof SolarPanel) {
 						SolarPanel m = (SolarPanel) part;
-						if (!night && m.getHeliostat())
-							m.draw();
+						if (night) {
+							m.drawSunBeam(); // call this so that the sun beam can be set invisible
+						} else {
+							if (m.getHeliostat())
+								m.draw();
+						}
 					}
 				}
 			}
