@@ -65,11 +65,15 @@ import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeFoundationMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
@@ -88,6 +92,7 @@ import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
@@ -2037,7 +2042,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
 						EnableFoundationSolarPanelHeliostatCommand c = new EnableFoundationSolarPanelHeliostatCommand(foundation);
-						Scene.getInstance().enableHeliostatForSolarPanelsOfFoundation(foundation, !sp.getHeliostat());
+						Scene.getInstance().enableHeliostatForSolarPanelsOnFoundation(foundation, !sp.getHeliostat());
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						EnableHeliostatForAllSolarPanelsCommand c = new EnableHeliostatForAllSolarPanelsCommand();
@@ -2112,11 +2117,11 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										Foundation foundation = sp.getTopContainer();
 										ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
-										Scene.getInstance().setZenithAngleForSolarPanelsOfBuilding(foundation, val);
+										Scene.getInstance().setTiltAngleForSolarPanelsOnFoundation(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
-										Scene.getInstance().setZenithAngleForAllSolarPanels(val);
+										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2140,15 +2145,15 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final Foundation foundation = solarPanel.getTopContainer();
-					final String title = "<html>Azimuth Angle (&deg;) of " + partInfo + "</html>";
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final Foundation foundation = sp.getTopContainer();
+					final String title = "<html>Azimuth Angle of " + partInfo + " (&deg;)</html>";
 					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -2159,7 +2164,7 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						double a = solarPanel.getRelativeAzimuth() + foundation.getAzimuth();
+						double a = sp.getRelativeAzimuth() + foundation.getAzimuth();
 						if (a > 360)
 							a -= 360;
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
@@ -2172,21 +2177,22 @@ public class PopupMenuFactory {
 								if (a < 0)
 									a += 360;
 								if (rb1.isSelected()) {
-									ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
-									solarPanel.setRelativeAzimuth(a);
+									ChangeAzimuthCommand c = new ChangeAzimuthCommand(sp);
+									sp.setRelativeAzimuth(a);
+									sp.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									ChangeFoundationSolarPanelAzimuthCommand c = new ChangeFoundationSolarPanelAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForSolarPanelsOfBuilding(foundation, val);
+									Scene.getInstance().setAzimuthForSolarPanelsOnFoundation(foundation, a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									ChangeAzimuthForAllSolarPanelsCommand c = new ChangeAzimuthForAllSolarPanelsCommand();
-									Scene.getInstance().setAzimuthForAllSolarPanels(val);
+									Scene.getInstance().setAzimuthForAllSolarPanels(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 								Scene.getInstance().setEdited(true);
-								solarPanel.draw();
+								sp.draw();
 								break;
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -2248,6 +2254,65 @@ public class PopupMenuFactory {
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					s.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+
+			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
+			miBaseHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final Foundation foundation = sp.getTopContainer();
+					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getBaseHeight() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
+								if (rb1.isSelected()) {
+									ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
+									sp.setBaseHeight(val);
+									sp.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb2.isSelected()) {
+									ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
+									Scene.getInstance().setBaseHeightForSolarPanelsOnFoundation(foundation, val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
+									ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
+									Scene.getInstance().setBaseHeightForAllSolarPanels(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								Scene.getInstance().setEdited(true);
+								sp.draw();
+								break;
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
 				}
 			});
 
@@ -2330,7 +2395,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
 										ChangeFoundationSolarCellEfficiencyCommand c = new ChangeFoundationSolarCellEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
+										Scene.getInstance().setSolarCellEfficiencyOnFoundation(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
@@ -2391,7 +2456,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
 										ChangeFoundationMicroInverterEfficiencyCommand c = new ChangeFoundationMicroInverterEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarPanelInverterEfficiencyOfBuilding(foundation, val * 0.01);
+										Scene.getInstance().setSolarPanelInverterEfficiencyOnFoundation(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										ChangeMicroInverterEfficiencyForAllCommand c = new ChangeMicroInverterEfficiencyForAllCommand();
@@ -2417,6 +2482,7 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miZenith);
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miSize);
+			popupMenuForSolarPanel.add(miBaseHeight);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
 			popupMenuForSolarPanel.addSeparator();
@@ -2517,7 +2583,7 @@ public class PopupMenuFactory {
 										} else if (rb2.isSelected()) {
 											Foundation foundation = m.getTopContainer();
 											ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-											Scene.getInstance().setTargetForMirrorsOfFoundation(foundation, f);
+											Scene.getInstance().setTargetForMirrorsOnFoundation(foundation, f);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else if (rb3.isSelected()) {
 											ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
@@ -2574,7 +2640,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						Foundation foundation = m.getTopContainer();
 						ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-						Scene.getInstance().setTargetForMirrorsOfFoundation(foundation, null);
+						Scene.getInstance().setTargetForMirrorsOnFoundation(foundation, null);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
@@ -2637,7 +2703,7 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										ChangeTiltAngleForAllMirrorsCommand c = new ChangeTiltAngleForAllMirrorsCommand();
-										Scene.getInstance().setZenithAngleForAllMirrors(val);
+										Scene.getInstance().setTiltAngleForAllMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2695,14 +2761,15 @@ public class PopupMenuFactory {
 								if (rb1.isSelected()) {
 									ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 									mirror.setRelativeAzimuth(a);
+									mirror.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForMirrorsOfFoundation(foundation, val);
+									Scene.getInstance().setAzimuthForMirrorsOnFoundation(foundation, a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
-									Scene.getInstance().setAzimuthForAllMirrors(val);
+									Scene.getInstance().setAzimuthForAllMirrors(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2764,6 +2831,65 @@ public class PopupMenuFactory {
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 					m.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+
+			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
+			miBaseHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Mirror m = (Mirror) selectedPart;
+					final Foundation foundation = m.getTopContainer();
+					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Mirrors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getBaseHeight() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
+								if (rb1.isSelected()) {
+									ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(m);
+									m.setBaseHeight(val);
+									m.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb2.isSelected()) {
+									ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
+									Scene.getInstance().setBaseHeightForMirrorsOnFoundation(foundation, val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
+									ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
+									Scene.getInstance().setBaseHeightForAllMirrors(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								Scene.getInstance().setEdited(true);
+								m.draw();
+								break;
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
 				}
 			});
 
@@ -2856,6 +2982,7 @@ public class PopupMenuFactory {
 			popupMenuForMirror.add(cbmiDrawSunBeam);
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSize);
+			popupMenuForMirror.add(miBaseHeight);
 			popupMenuForMirror.add(miReflectivity);
 
 		}

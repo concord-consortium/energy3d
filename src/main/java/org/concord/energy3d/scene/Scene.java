@@ -1549,7 +1549,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public List<SolarPanel> getSolarPanelsOfBuilding(final Foundation foundation) {
+	public List<SolarPanel> getSolarPanelsOnFoundation(final Foundation foundation) {
 		final List<SolarPanel> list = new ArrayList<SolarPanel>();
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
@@ -1567,7 +1567,7 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setZenithAngleForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
+	public void setTiltAngleForSolarPanelsOnFoundation(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
 				((SolarPanel) p).setTiltAngle(angle);
@@ -1577,7 +1577,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setZenithAngleForAllSolarPanels(final double angle) {
+	public void setTiltAngleForAllSolarPanels(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setTiltAngle(angle);
@@ -1587,7 +1587,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setAzimuthForSolarPanelsOfBuilding(final Foundation foundation, final double angle) {
+	public void setAzimuthForSolarPanelsOnFoundation(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
 				((SolarPanel) p).setRelativeAzimuth(angle);
@@ -1607,7 +1607,27 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void enableHeliostatForSolarPanelsOfFoundation(final Foundation foundation, final boolean enabled) {
+	public void setBaseHeightForSolarPanelsOnFoundation(final Foundation foundation, final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForAllSolarPanels(final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void enableHeliostatForSolarPanelsOnFoundation(final Foundation foundation, final boolean enabled) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
 				((SolarPanel) p).setHeliostat(enabled);
@@ -1627,7 +1647,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSolarCellEfficiencyOfBuilding(final Foundation foundation, final double eff) {
+	public void setSolarCellEfficiencyOnFoundation(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
 				((SolarPanel) p).setCellEfficiency(eff);
@@ -1641,7 +1661,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setSolarPanelInverterEfficiencyOfBuilding(final Foundation foundation, final double eff) {
+	public void setSolarPanelInverterEfficiencyOnFoundation(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
 				((SolarPanel) p).setInverterEfficiency(eff);
@@ -1655,7 +1675,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public List<Mirror> getMirrorsOfFoundation(final Foundation foundation) {
+	public List<Mirror> getMirrorsOnFoundation(final Foundation foundation) {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror && p.getTopContainer() == foundation)
@@ -1683,7 +1703,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setZenithAngleForAllMirrors(final double angle) {
+	public void setTiltAngleForAllMirrors(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setTiltAngle(angle);
@@ -1693,7 +1713,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setAzimuthForMirrorsOfFoundation(final Foundation foundation, final double angle) {
+	public void setAzimuthForMirrorsOnFoundation(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror && p.getTopContainer() == foundation) {
 				((Mirror) p).setRelativeAzimuth(angle);
@@ -1727,7 +1747,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setTargetForMirrorsOfFoundation(final Foundation foundation, final Foundation target) {
+	public void setTargetForMirrorsOnFoundation(final Foundation foundation, final Foundation target) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror && p.getTopContainer() == foundation) {
 				((Mirror) p).setHeliostatTarget(target);
@@ -1741,6 +1761,26 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setHeliostatTarget(target);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForMirrorsOnFoundation(final Foundation foundation, final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
+				((Mirror) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForAllMirrors(final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror) {
+				((Mirror) p).setBaseHeight(baseHeight);
 				p.draw();
 			}
 		}

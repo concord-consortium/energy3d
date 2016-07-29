@@ -431,6 +431,14 @@ public class Mirror extends HousePart {
 		return mirrorHeight;
 	}
 
+	public void setBaseHeight(double baseHeight) {
+		this.baseHeight = baseHeight;
+	}
+
+	public double getBaseHeight() {
+		return baseHeight;
+	}
+
 	public void setRelativeAzimuth(double relativeAzimuth) {
 		if (relativeAzimuth < 0)
 			relativeAzimuth += 360;

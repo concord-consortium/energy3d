@@ -20,7 +20,7 @@ public class EnableFoundationSolarPanelHeliostatCommand extends AbstractUndoable
 
 	public EnableFoundationSolarPanelHeliostatCommand(Foundation foundation) {
 		this.foundation = foundation;
-		solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+		solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 		int n = solarPanels.size();
 		oldValues = new boolean[n];
 		for (int i = 0; i < n; i++) {
@@ -60,7 +60,7 @@ public class EnableFoundationSolarPanelHeliostatCommand extends AbstractUndoable
 
 	@Override
 	public String getPresentationName() {
-		return (solarPanels.get(0).getHeliostat() ? "Enable" : "Disable") + " Heliostat for All Solar Panels on Selected Platform";
+		return (solarPanels.get(0).getHeliostat() ? "Enable" : "Disable") + " Heliostat for All Solar Panels on Selected Foundation";
 	}
 
 }

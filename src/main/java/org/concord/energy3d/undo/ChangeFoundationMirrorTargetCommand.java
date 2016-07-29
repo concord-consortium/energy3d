@@ -20,7 +20,7 @@ public class ChangeFoundationMirrorTargetCommand extends AbstractUndoableEdit {
 
 	public ChangeFoundationMirrorTargetCommand(Foundation foundation) {
 		this.foundation = foundation;
-		mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+		mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
 		int n = mirrors.size();
 		oldValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {

@@ -19,7 +19,7 @@ public class ChangeFoundationMicroInverterEfficiencyCommand extends AbstractUndo
 
 	public ChangeFoundationMicroInverterEfficiencyCommand(Foundation foundation) {
 		this.foundation = foundation;
-		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+		panels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
@@ -53,7 +53,7 @@ public class ChangeFoundationMicroInverterEfficiencyCommand extends AbstractUndo
 
 	@Override
 	public String getPresentationName() {
-		return "Micro Inverter Efficiency Change for All Solar Panels of Selected Building";
+		return "Micro Inverter Efficiency Change for All Solar Panels on Selected Foundation";
 	}
 
 }

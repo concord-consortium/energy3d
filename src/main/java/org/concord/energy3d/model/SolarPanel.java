@@ -237,7 +237,7 @@ public class SolarPanel extends HousePart {
 		} else {
 			supportFrame.getSceneHints().setCullHint(CullHint.Always);
 		}
-		
+
 		if (drawSunBeam)
 			drawSunBeam();
 
@@ -529,6 +529,14 @@ public class SolarPanel extends HousePart {
 
 	public double getPanelHeight() {
 		return panelHeight;
+	}
+
+	public void setBaseHeight(double baseHeight) {
+		this.baseHeight = baseHeight;
+	}
+
+	public double getBaseHeight() {
+		return baseHeight;
 	}
 
 	public void setRotated(boolean b) {

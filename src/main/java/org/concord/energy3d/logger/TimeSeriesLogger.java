@@ -50,10 +50,14 @@ import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeFoundationMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
@@ -62,6 +66,7 @@ import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
@@ -432,45 +437,64 @@ public class TimeSeriesLogger {
 					}
 				}
 
-				// zenith and azimuth
+				// tilt, azimuth, and base
 				else if (lastEdit instanceof ChangeTiltAngleCommand) {
 					ChangeTiltAngleCommand c = (ChangeTiltAngleCommand) lastEdit;
 					HousePart p = c.getPart();
-					stateValue = "{\"Building\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId();
+					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId();
 					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
 				} else if (lastEdit instanceof ChangeAzimuthCommand) {
 					ChangeAzimuthCommand c = (ChangeAzimuthCommand) lastEdit;
 					HousePart p = c.getPart();
-					stateValue = "{\"Building\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId();
+					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
+				} else if (lastEdit instanceof ChangeBaseHeightCommand) {
+					ChangeBaseHeightCommand c = (ChangeBaseHeightCommand) lastEdit;
+					HousePart p = c.getPart();
+					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId();
 					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
 				} else if (lastEdit instanceof ChangeFoundationSolarPanelTiltAngleCommand) {
 					Foundation foundation = ((ChangeFoundationSolarPanelTiltAngleCommand) lastEdit).getFoundation();
-					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
-					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTiltAngle()) + "}";
+					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTiltAngle()) + "}";
 				} else if (lastEdit instanceof ChangeTiltAngleForAllSolarPanelsCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTiltAngle()) + "}";
 				} else if (lastEdit instanceof ChangeFoundationSolarPanelAzimuthCommand) {
 					Foundation foundation = ((ChangeFoundationSolarPanelAzimuthCommand) lastEdit).getFoundation();
-					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
-					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getRelativeAzimuth()) + "}";
+					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getRelativeAzimuth()) + "}";
 				} else if (lastEdit instanceof ChangeAzimuthForAllSolarPanelsCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getRelativeAzimuth()) + "}";
+				} else if (lastEdit instanceof ChangeFoundationSolarPanelBaseHeightCommand) {
+					Foundation foundation = ((ChangeFoundationSolarPanelBaseHeightCommand) lastEdit).getFoundation();
+					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getBaseHeight()) + "}";
+				} else if (lastEdit instanceof ChangeBaseHeightForAllSolarPanelsCommand) {
+					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
+					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getBaseHeight()) + "}";
 				} else if (lastEdit instanceof ChangeFoundationMirrorTiltAngleCommand) {
 					Foundation foundation = ((ChangeFoundationMirrorTiltAngleCommand) lastEdit).getFoundation();
-					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
 					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTiltAngle()) + "}";
 				} else if (lastEdit instanceof ChangeTiltAngleForAllMirrorsCommand) {
 					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
 					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTiltAngle()) + "}";
 				} else if (lastEdit instanceof ChangeFoundationMirrorAzimuthCommand) {
 					Foundation foundation = ((ChangeFoundationMirrorAzimuthCommand) lastEdit).getFoundation();
-					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
 					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getRelativeAzimuth()) + "}";
 				} else if (lastEdit instanceof ChangeAzimuthForAllMirrorsCommand) {
 					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
 					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getRelativeAzimuth()) + "}";
+				} else if (lastEdit instanceof ChangeFoundationMirrorBaseHeightCommand) {
+					Foundation foundation = ((ChangeFoundationMirrorBaseHeightCommand) lastEdit).getFoundation();
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
+					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getBaseHeight()) + "}";
+				} else if (lastEdit instanceof ChangeBaseHeightForAllMirrorsCommand) {
+					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getBaseHeight()) + "}";
 				}
 
 				// solar panel properties
@@ -487,7 +511,7 @@ public class TimeSeriesLogger {
 					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getCellEfficiency() + "}";
 				} else if (lastEdit instanceof ChangeFoundationSolarCellEfficiencyCommand) {
 					Foundation foundation = ((ChangeFoundationSolarCellEfficiencyCommand) lastEdit).getFoundation();
-					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getCellEfficiency()) + "}";
 				} else if (lastEdit instanceof ChangeSolarCellEfficiencyForAllCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
@@ -499,7 +523,7 @@ public class TimeSeriesLogger {
 					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getInverterEfficiency() + "}";
 				} else if (lastEdit instanceof ChangeFoundationMicroInverterEfficiencyCommand) {
 					Foundation foundation = ((ChangeFoundationMicroInverterEfficiencyCommand) lastEdit).getFoundation();
-					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
 				} else if (lastEdit instanceof ChangeMicroInverterEfficiencyForAllCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
@@ -533,7 +557,7 @@ public class TimeSeriesLogger {
 					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + m.getReflectivity() + "}";
 				} else if (lastEdit instanceof ChangeFoundationMirrorReflectivityCommand) {
 					Foundation foundation = ((ChangeFoundationMirrorReflectivityCommand) lastEdit).getFoundation();
-					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
 					stateValue = "{\"Foundation\": " + foundation.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectivity()) + "}";
 				} else if (lastEdit instanceof ChangeReflectivityForAllMirrorsCommand) {
 					List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
@@ -545,7 +569,7 @@ public class TimeSeriesLogger {
 					stateValue += ", \"Old Value\": " + (c.getOldValue() == null ? -1 : c.getOldValue().getId()) + ", \"New Value\": " + (c.getNewValue() == null ? -1 : c.getNewValue().getId()) + "}";
 				} else if (lastEdit instanceof ChangeFoundationMirrorTargetCommand) {
 					Foundation foundation = ((ChangeFoundationMirrorTargetCommand) lastEdit).getFoundation();
-					List<Mirror> mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+					List<Mirror> mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
 					long newValue = -1;
 					if (!mirrors.isEmpty()) {
 						Foundation t = mirrors.get(0).getHeliostatTarget();

@@ -20,7 +20,7 @@ public class ChangeFoundationSolarPanelTiltAngleCommand extends AbstractUndoable
 
 	public ChangeFoundationSolarPanelTiltAngleCommand(Foundation foundation) {
 		this.foundation = foundation;
-		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+		panels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
@@ -60,7 +60,7 @@ public class ChangeFoundationSolarPanelTiltAngleCommand extends AbstractUndoable
 
 	@Override
 	public String getPresentationName() {
-		return "Change Tilt Angle for All Solar Panels of Selected Building";
+		return "Change Tilt Angle for All Solar Panels on Selected Foundation";
 	}
 
 }

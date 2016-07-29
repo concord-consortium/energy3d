@@ -20,7 +20,7 @@ public class ChangeFoundationSolarPanelAzimuthCommand extends AbstractUndoableEd
 
 	public ChangeFoundationSolarPanelAzimuthCommand(Foundation foundation) {
 		this.foundation = foundation;
-		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+		panels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
@@ -60,7 +60,7 @@ public class ChangeFoundationSolarPanelAzimuthCommand extends AbstractUndoableEd
 
 	@Override
 	public String getPresentationName() {
-		return "Change Azimuth for All Solar Panels of Selected Building";
+		return "Change Azimuth for All Solar Panels on Selected Foundation";
 	}
 
 }

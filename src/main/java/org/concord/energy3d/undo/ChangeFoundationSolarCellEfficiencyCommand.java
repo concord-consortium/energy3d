@@ -19,7 +19,7 @@ public class ChangeFoundationSolarCellEfficiencyCommand extends AbstractUndoable
 
 	public ChangeFoundationSolarCellEfficiencyCommand(Foundation foundation) {
 		this.foundation = foundation;
-		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
+		panels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
@@ -53,7 +53,7 @@ public class ChangeFoundationSolarCellEfficiencyCommand extends AbstractUndoable
 
 	@Override
 	public String getPresentationName() {
-		return "Solar Cell Efficiency Change for All Solar Panels of Selected Building";
+		return "Solar Cell Efficiency Change for All Solar Panels on Selected Foundation";
 	}
 
 }

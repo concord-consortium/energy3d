@@ -20,7 +20,7 @@ public class ChangeFoundationMirrorTiltAngleCommand extends AbstractUndoableEdit
 
 	public ChangeFoundationMirrorTiltAngleCommand(Foundation foundation) {
 		this.foundation = foundation;
-		mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+		mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
 		int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
