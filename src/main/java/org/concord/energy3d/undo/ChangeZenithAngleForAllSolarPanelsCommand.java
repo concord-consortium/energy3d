@@ -21,7 +21,7 @@ public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableE
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getZenithAngle();
+			oldValues[i] = panels.get(i).getTiltAngle();
 		}
 	}
 
@@ -32,8 +32,8 @@ public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableE
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			SolarPanel p = panels.get(i);
-			newValues[i] = p.getZenithAngle();
-			p.setZenithAngle(oldValues[i]);
+			newValues[i] = p.getTiltAngle();
+			p.setTiltAngle(oldValues[i]);
 			p.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -45,7 +45,7 @@ public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableE
 		int n = panels.size();
 		for (int i = 0; i < n; i++) {
 			SolarPanel p = panels.get(i);
-			p.setZenithAngle(newValues[i]);
+			p.setTiltAngle(newValues[i]);
 			p.draw();
 		}
 		SceneManager.getInstance().refresh();

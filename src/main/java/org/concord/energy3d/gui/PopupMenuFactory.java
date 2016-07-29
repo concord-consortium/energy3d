@@ -2052,7 +2052,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miZenith = new JMenuItem("Zenith Angle...");
+			final JMenuItem miZenith = new JMenuItem("Tilt Angle...");
 			miZenith.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2061,8 +2061,8 @@ public class PopupMenuFactory {
 						return;
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel sp = (SolarPanel) selectedPart;
-					final String title = "<html>Zenith Angle of " + partInfo + " (&deg;)</html>";
-					final String footnote = "<html><hr><font size=2>The zenith angle of a solar panel is the angle between its surface normal and the zenith.<br>The zenith angle must be between -90&deg; and 90&deg;. It is complementary to the tilt angle.<hr></html>";
+					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>The tilt angle of a solar panel is the angle between its surface and the surface of the supporting part.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -2078,14 +2078,14 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getZenithAngle());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getTiltAngle());
 						if (newValue == null)
 							break;
 						else {
 							try {
 								double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The zenith angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (Util.isZero(val - 90))
 										val = 89.999;
@@ -2093,7 +2093,7 @@ public class PopupMenuFactory {
 										val = -89.999;
 									if (rb1.isSelected()) {
 										ChangeZenithCommand c = new ChangeZenithCommand(sp);
-										sp.setZenithAngle(val);
+										sp.setTiltAngle(val);
 										sp.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {

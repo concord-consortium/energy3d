@@ -42,49 +42,13 @@ public class SolarPanel extends HousePart {
 	private double panelHeight = 1.65; // 65"
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
-	private double zenithAngle;
+	private double tiltAngle;
 	private boolean heliostat;
 	private double baseHeight = 6;
 	private transient double layoutGap = 0.01;
 
 	public SolarPanel(boolean rotated) {
 		super(1, 1, 0);
-	}
-
-	/** a number between 0 and 1 */
-	public void setCellEfficiency(final double efficiency) {
-		this.efficiency = efficiency;
-	}
-
-	/** a number between 0 and 1 */
-	public double getCellEfficiency() {
-		return efficiency;
-	}
-
-	/** a number between 0 and 1, typically 0.95 */
-	public void setInverterEfficiency(final double inverterEfficiency) {
-		this.inverterEfficiency = inverterEfficiency;
-	}
-
-	/** a number between 0 and 1, typically 0.95 */
-	public double getInverterEfficiency() {
-		return inverterEfficiency;
-	}
-
-	public void setPanelWidth(double panelWidth) {
-		this.panelWidth = panelWidth;
-	}
-
-	public double getPanelWidth() {
-		return panelWidth;
-	}
-
-	public void setPanelHeight(double panelHeight) {
-		this.panelHeight = panelHeight;
-	}
-
-	public double getPanelHeight() {
-		return panelHeight;
 	}
 
 	@Override
@@ -243,7 +207,7 @@ public class SolarPanel extends HousePart {
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 		} else {
 			if (onFlatSurface)
-				setNormal(Util.isZero(zenithAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - zenithAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 		mesh.setTranslation(onFlatSurface ? getAbsPoint(0).addLocal(0, 0, baseHeight) : getAbsPoint(0));
@@ -271,7 +235,7 @@ public class SolarPanel extends HousePart {
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
-	private void setNormal(double tilt, double azimuth) {
+	private void setNormal(double angle, double azimuth) {
 		Foundation foundation = getTopContainer();
 		Vector3 v = foundation.getAbsPoint(0);
 		Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
@@ -279,7 +243,7 @@ public class SolarPanel extends HousePart {
 		Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
 		Vector3 v1 = m.applyPost(vx, null);
 		Vector3 v2 = m.applyPost(vy, null);
-		v = new Matrix3().fromAngleAxis(tilt, v1).applyPost(v2, null);
+		v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
 		if (v.getZ() < 0)
 			v.negateLocal();
 		normal = v.normalizeLocal();
@@ -296,7 +260,7 @@ public class SolarPanel extends HousePart {
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		Vector3 dir;
 		Vector3 p;
-		if (!heliostat && Util.isZero(zenithAngle)) {
+		if (!heliostat && Util.isZero(tiltAngle)) {
 			dir = new Vector3(0.5, 0, 0);
 			p = o.add(0, 0, baseHeight, null);
 		} else {
@@ -489,6 +453,42 @@ public class SolarPanel extends HousePart {
 		return c;
 	}
 
+	/** a number between 0 and 1 */
+	public void setCellEfficiency(final double efficiency) {
+		this.efficiency = efficiency;
+	}
+
+	/** a number between 0 and 1 */
+	public double getCellEfficiency() {
+		return efficiency;
+	}
+
+	/** a number between 0 and 1, typically 0.95 */
+	public void setInverterEfficiency(final double inverterEfficiency) {
+		this.inverterEfficiency = inverterEfficiency;
+	}
+
+	/** a number between 0 and 1, typically 0.95 */
+	public double getInverterEfficiency() {
+		return inverterEfficiency;
+	}
+
+	public void setPanelWidth(double panelWidth) {
+		this.panelWidth = panelWidth;
+	}
+
+	public double getPanelWidth() {
+		return panelWidth;
+	}
+
+	public void setPanelHeight(double panelHeight) {
+		this.panelHeight = panelHeight;
+	}
+
+	public double getPanelHeight() {
+		return panelHeight;
+	}
+
 	public void setRotated(boolean b) {
 		rotated = b;
 	}
@@ -509,12 +509,12 @@ public class SolarPanel extends HousePart {
 		return relativeAzimuth;
 	}
 
-	public void setZenithAngle(double zenithAngle) {
-		this.zenithAngle = zenithAngle;
+	public void setTiltAngle(double tiltAngle) {
+		this.tiltAngle = tiltAngle;
 	}
 
-	public double getZenithAngle() {
-		return zenithAngle;
+	public double getTiltAngle() {
+		return tiltAngle;
 	}
 
 	public void setHeliostat(boolean heliostat) {

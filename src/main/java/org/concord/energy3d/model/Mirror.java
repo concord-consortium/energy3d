@@ -41,7 +41,7 @@ public class Mirror extends HousePart {
 	private double mirrorWidth = 2;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
-	private double zenith = 90; // the zenith angle relative to the surface of the parent
+	private double zenith = 90;
 	private transient double layoutGap = 0.01;
 	private Foundation heliostatTarget;
 	private double baseHeight = 10;

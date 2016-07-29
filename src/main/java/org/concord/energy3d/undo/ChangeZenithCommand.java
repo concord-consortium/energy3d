@@ -17,7 +17,7 @@ public class ChangeZenithCommand extends AbstractUndoableEdit {
 	public ChangeZenithCommand(HousePart part) {
 		this.part = part;
 		if (part instanceof SolarPanel)
-			oldValue = ((SolarPanel) part).getZenithAngle();
+			oldValue = ((SolarPanel) part).getTiltAngle();
 		else if (part instanceof Mirror)
 			oldValue = ((Mirror) part).getZenith();
 	}
@@ -32,7 +32,7 @@ public class ChangeZenithCommand extends AbstractUndoableEdit {
 
 	public double getNewValue() {
 		if (part instanceof SolarPanel) {
-			newValue = ((SolarPanel) part).getZenithAngle();
+			newValue = ((SolarPanel) part).getTiltAngle();
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getZenith();
 		}
@@ -43,8 +43,8 @@ public class ChangeZenithCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		if (part instanceof SolarPanel) {
-			newValue = ((SolarPanel) part).getZenithAngle();
-			((SolarPanel) part).setZenithAngle(oldValue);
+			newValue = ((SolarPanel) part).getTiltAngle();
+			((SolarPanel) part).setTiltAngle(oldValue);
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getZenith();
 			((Mirror) part).setZenith(oldValue);
@@ -56,7 +56,7 @@ public class ChangeZenithCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		if (part instanceof SolarPanel) {
-			((SolarPanel) part).setZenithAngle(newValue);
+			((SolarPanel) part).setTiltAngle(newValue);
 		} else if (part instanceof Mirror) {
 			((Mirror) part).setZenith(newValue);
 		}

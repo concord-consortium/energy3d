@@ -446,10 +446,10 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeBuildingSolarPanelZenithAngleCommand) {
 					Foundation foundation = ((ChangeBuildingSolarPanelZenithAngleCommand) lastEdit).getFoundation();
 					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
-					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getZenithAngle()) + "}";
+					stateValue = "{\"Building\": " + foundation.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTiltAngle()) + "}";
 				} else if (lastEdit instanceof ChangeZenithAngleForAllSolarPanelsCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
-					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getZenithAngle()) + "}";
+					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTiltAngle()) + "}";
 				} else if (lastEdit instanceof ChangeBuildingSolarPanelAzimuthCommand) {
 					Foundation foundation = ((ChangeBuildingSolarPanelAzimuthCommand) lastEdit).getFoundation();
 					List<SolarPanel> solarPanels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
