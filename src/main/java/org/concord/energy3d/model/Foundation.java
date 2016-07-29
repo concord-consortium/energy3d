@@ -1454,6 +1454,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
 				m.points.get(0).setX(v.getX());
 				m.points.get(0).setY(v.getY());
+				m.points.get(0).setZ(height);
 				m.draw();
 			}
 		}

@@ -1676,7 +1676,7 @@ public class Scene implements Serializable {
 	public void setZenithAngleForMirrorsOfFoundation(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setZenith(angle);
+				((Mirror) p).setTiltAngle(angle);
 				p.draw();
 			}
 		}
@@ -1686,7 +1686,7 @@ public class Scene implements Serializable {
 	public void setZenithAngleForAllMirrors(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
-				((Mirror) p).setZenith(angle);
+				((Mirror) p).setTiltAngle(angle);
 				p.draw();
 			}
 		}

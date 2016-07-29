@@ -8,18 +8,18 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeZenithCommand extends AbstractUndoableEdit {
+public class ChangeTiltAngleCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldValue, newValue;
 	private HousePart part;
 
-	public ChangeZenithCommand(HousePart part) {
+	public ChangeTiltAngleCommand(HousePart part) {
 		this.part = part;
 		if (part instanceof SolarPanel)
 			oldValue = ((SolarPanel) part).getTiltAngle();
 		else if (part instanceof Mirror)
-			oldValue = ((Mirror) part).getZenith();
+			oldValue = ((Mirror) part).getTiltAngle();
 	}
 
 	public HousePart getPart() {
@@ -34,7 +34,7 @@ public class ChangeZenithCommand extends AbstractUndoableEdit {
 		if (part instanceof SolarPanel) {
 			newValue = ((SolarPanel) part).getTiltAngle();
 		} else if (part instanceof Mirror) {
-			newValue = ((Mirror) part).getZenith();
+			newValue = ((Mirror) part).getTiltAngle();
 		}
 		return newValue;
 	}
@@ -46,8 +46,8 @@ public class ChangeZenithCommand extends AbstractUndoableEdit {
 			newValue = ((SolarPanel) part).getTiltAngle();
 			((SolarPanel) part).setTiltAngle(oldValue);
 		} else if (part instanceof Mirror) {
-			newValue = ((Mirror) part).getZenith();
-			((Mirror) part).setZenith(oldValue);
+			newValue = ((Mirror) part).getTiltAngle();
+			((Mirror) part).setTiltAngle(oldValue);
 		}
 		part.draw();
 	}
@@ -58,14 +58,14 @@ public class ChangeZenithCommand extends AbstractUndoableEdit {
 		if (part instanceof SolarPanel) {
 			((SolarPanel) part).setTiltAngle(newValue);
 		} else if (part instanceof Mirror) {
-			((Mirror) part).setZenith(newValue);
+			((Mirror) part).setTiltAngle(newValue);
 		}
 		part.draw();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Change Zenith Angle";
+		return "Change Tilt Angle";
 	}
 
 }

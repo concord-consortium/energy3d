@@ -788,7 +788,7 @@ public class EnergyPanel extends JPanel {
 					if (a >= 360)
 						a -= 360;
 					boolean flat = m.getContainer() instanceof Foundation;
-					partProperty2TextField.setText(flat ? "zenith: " + oneDecimal.format(m.getZenith()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0" : " --- ");
+					partProperty2TextField.setText(flat ? "zenith: " + oneDecimal.format(m.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(a) + "\u00B0" : " --- ");
 					partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
 					partProperty2TextField.setToolTipText("The angles of the solar panel");
 					String reflectivity = oneDecimal.format(m.getReflectivity() * 100) + "%";

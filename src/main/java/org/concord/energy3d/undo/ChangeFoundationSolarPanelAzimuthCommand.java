@@ -11,14 +11,14 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeBuildingSolarPanelAzimuthCommand extends AbstractUndoableEdit {
+public class ChangeFoundationSolarPanelAzimuthCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
 	private Foundation foundation;
 	private List<SolarPanel> panels;
 
-	public ChangeBuildingSolarPanelAzimuthCommand(Foundation foundation) {
+	public ChangeFoundationSolarPanelAzimuthCommand(Foundation foundation) {
 		this.foundation = foundation;
 		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
 		int n = panels.size();

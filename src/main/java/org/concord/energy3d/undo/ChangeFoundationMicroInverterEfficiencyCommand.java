@@ -10,14 +10,14 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeBuildingMicroInverterEfficiencyCommand extends AbstractUndoableEdit {
+public class ChangeFoundationMicroInverterEfficiencyCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
 	private Foundation foundation;
 	private List<SolarPanel> panels;
 
-	public ChangeBuildingMicroInverterEfficiencyCommand(Foundation foundation) {
+	public ChangeFoundationMicroInverterEfficiencyCommand(Foundation foundation) {
 		this.foundation = foundation;
 		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
 		int n = panels.size();

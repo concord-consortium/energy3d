@@ -11,20 +11,20 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationMirrorZenithAngleCommand extends AbstractUndoableEdit {
+public class ChangeFoundationMirrorTiltAngleCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
 	private Foundation foundation;
 	private List<Mirror> mirrors;
 
-	public ChangeFoundationMirrorZenithAngleCommand(Foundation foundation) {
+	public ChangeFoundationMirrorTiltAngleCommand(Foundation foundation) {
 		this.foundation = foundation;
 		mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
 		int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = mirrors.get(i).getZenith();
+			oldValues[i] = mirrors.get(i).getTiltAngle();
 		}
 	}
 
@@ -39,8 +39,8 @@ public class ChangeFoundationMirrorZenithAngleCommand extends AbstractUndoableEd
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			Mirror m = mirrors.get(i);
-			newValues[i] = m.getZenith();
-			m.setZenith(oldValues[i]);
+			newValues[i] = m.getTiltAngle();
+			m.setTiltAngle(oldValues[i]);
 			m.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -52,7 +52,7 @@ public class ChangeFoundationMirrorZenithAngleCommand extends AbstractUndoableEd
 		int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
 			Mirror m = mirrors.get(i);
-			m.setZenith(newValues[i]);
+			m.setTiltAngle(newValues[i]);
 			m.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -60,7 +60,7 @@ public class ChangeFoundationMirrorZenithAngleCommand extends AbstractUndoableEd
 
 	@Override
 	public String getPresentationName() {
-		return "Change Zenith Angle for All Mirrors on Selected Foundation";
+		return "Change Tilt Angle for All Mirrors on Selected Foundation";
 	}
 
 }

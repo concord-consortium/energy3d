@@ -66,11 +66,11 @@ import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelAzimuthCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelZenithAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
@@ -90,7 +90,7 @@ import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorZenithAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
@@ -100,12 +100,12 @@ import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeZenithCommand;
-import org.concord.energy3d.undo.ChangeZenithAngleForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetMirrorSizeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
-import org.concord.energy3d.undo.ChangeZenithAngleForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.EnableFoundationSolarPanelHeliostatCommand;
@@ -2062,7 +2062,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
-					final String footnote = "<html><hr><font size=2>The tilt angle of a solar panel is the angle between its surface and the surface of the supporting part.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
+					final String footnote = "<html><hr><font size=2>The tilt angle of a solar panel is the angle between its surface and the base surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -2092,17 +2092,17 @@ public class PopupMenuFactory {
 									else if (Util.isZero(val + 90))
 										val = -89.999;
 									if (rb1.isSelected()) {
-										ChangeZenithCommand c = new ChangeZenithCommand(sp);
+										ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(sp);
 										sp.setTiltAngle(val);
 										sp.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = sp.getTopContainer();
-										ChangeBuildingSolarPanelZenithAngleCommand c = new ChangeBuildingSolarPanelZenithAngleCommand(foundation);
+										ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
 										Scene.getInstance().setZenithAngleForSolarPanelsOfBuilding(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										ChangeZenithAngleForAllSolarPanelsCommand c = new ChangeZenithAngleForAllSolarPanelsCommand();
+										ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
 										Scene.getInstance().setZenithAngleForAllSolarPanels(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
@@ -2163,7 +2163,7 @@ public class PopupMenuFactory {
 									solarPanel.setRelativeAzimuth(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
-									ChangeBuildingSolarPanelAzimuthCommand c = new ChangeBuildingSolarPanelAzimuthCommand(foundation);
+									ChangeFoundationSolarPanelAzimuthCommand c = new ChangeFoundationSolarPanelAzimuthCommand(foundation);
 									Scene.getInstance().setAzimuthForSolarPanelsOfBuilding(foundation, val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
@@ -2315,7 +2315,7 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
-										ChangeBuildingSolarCellEfficiencyCommand c = new ChangeBuildingSolarCellEfficiencyCommand(foundation);
+										ChangeFoundationSolarCellEfficiencyCommand c = new ChangeFoundationSolarCellEfficiencyCommand(foundation);
 										Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
@@ -2376,7 +2376,7 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
-										ChangeBuildingMicroInverterEfficiencyCommand c = new ChangeBuildingMicroInverterEfficiencyCommand(foundation);
+										ChangeFoundationMicroInverterEfficiencyCommand c = new ChangeFoundationMicroInverterEfficiencyCommand(foundation);
 										Scene.getInstance().setSolarPanelInverterEfficiencyOfBuilding(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
@@ -2557,7 +2557,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miZenith = new JMenuItem("Zenith Angle...");
+			final JMenuItem miZenith = new JMenuItem("Tilt Angle...");
 			miZenith.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2566,8 +2566,8 @@ public class PopupMenuFactory {
 						return;
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
-					final String title = "<html>Zenith Angle (&deg;) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The zenith angle is measured from the direction perpendicular to the base surface.<hr></html>";
+					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>The tilt angle of a mirror is the angle between its surface and the base surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -2583,28 +2583,31 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getZenith());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getTiltAngle());
 						if (newValue == null)
 							break;
 						else {
 							try {
 								double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The zenith angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (Util.isZero(val - 90))
 										val = 89.999;
+									else if (Util.isZero(val + 90))
+										val = -89.999;
 									if (rb1.isSelected()) {
-										ChangeZenithCommand c = new ChangeZenithCommand(m);
-										m.setZenith(val);
+										ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(m);
+										m.setTiltAngle(val);
+										m.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = m.getTopContainer();
-										ChangeFoundationMirrorZenithAngleCommand c = new ChangeFoundationMirrorZenithAngleCommand(foundation);
+										ChangeFoundationMirrorTiltAngleCommand c = new ChangeFoundationMirrorTiltAngleCommand(foundation);
 										Scene.getInstance().setZenithAngleForMirrorsOfFoundation(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										ChangeZenithAngleForAllMirrorsCommand c = new ChangeZenithAngleForAllMirrorsCommand();
+										ChangeTiltAngleForAllMirrorsCommand c = new ChangeTiltAngleForAllMirrorsCommand();
 										Scene.getInstance().setZenithAngleForAllMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}

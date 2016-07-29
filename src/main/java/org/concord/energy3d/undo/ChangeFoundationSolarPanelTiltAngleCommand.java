@@ -11,14 +11,14 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeBuildingSolarPanelZenithAngleCommand extends AbstractUndoableEdit {
+public class ChangeFoundationSolarPanelTiltAngleCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
 	private Foundation foundation;
 	private List<SolarPanel> panels;
 
-	public ChangeBuildingSolarPanelZenithAngleCommand(Foundation foundation) {
+	public ChangeFoundationSolarPanelTiltAngleCommand(Foundation foundation) {
 		this.foundation = foundation;
 		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
 		int n = panels.size();
@@ -60,7 +60,7 @@ public class ChangeBuildingSolarPanelZenithAngleCommand extends AbstractUndoable
 
 	@Override
 	public String getPresentationName() {
-		return "Change Zenith Angle for All Solar Panels of Selected Building";
+		return "Change Tilt Angle for All Solar Panels of Selected Building";
 	}
 
 }

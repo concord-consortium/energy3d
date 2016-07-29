@@ -6,23 +6,29 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableEdit {
+public class ChangeFoundationSolarCellEfficiencyCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double[] oldValues, newValues;
+	private Foundation foundation;
 	private List<SolarPanel> panels;
 
-	public ChangeZenithAngleForAllSolarPanelsCommand() {
-		panels = Scene.getInstance().getAllSolarPanels();
+	public ChangeFoundationSolarCellEfficiencyCommand(Foundation foundation) {
+		this.foundation = foundation;
+		panels = Scene.getInstance().getSolarPanelsOfBuilding(foundation);
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getTiltAngle();
+			oldValues[i] = panels.get(i).getCellEfficiency();
 		}
+	}
+
+	public Foundation getFoundation() {
+		return foundation;
 	}
 
 	@Override
@@ -31,12 +37,9 @@ public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableE
 		int n = panels.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			SolarPanel p = panels.get(i);
-			newValues[i] = p.getTiltAngle();
-			p.setTiltAngle(oldValues[i]);
-			p.draw();
+			newValues[i] = panels.get(i).getCellEfficiency();
+			panels.get(i).setCellEfficiency(oldValues[i]);
 		}
-		SceneManager.getInstance().refresh();
 	}
 
 	@Override
@@ -44,16 +47,13 @@ public class ChangeZenithAngleForAllSolarPanelsCommand extends AbstractUndoableE
 		super.redo();
 		int n = panels.size();
 		for (int i = 0; i < n; i++) {
-			SolarPanel p = panels.get(i);
-			p.setTiltAngle(newValues[i]);
-			p.draw();
+			panels.get(i).setCellEfficiency(newValues[i]);
 		}
-		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Change Zenith Angle for All Solar Panels";
+		return "Solar Cell Efficiency Change for All Solar Panels of Selected Building";
 	}
 
 }
