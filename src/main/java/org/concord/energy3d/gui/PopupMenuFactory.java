@@ -113,9 +113,9 @@ import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
-import org.concord.energy3d.undo.EnableFoundationSolarPanelHeliostatCommand;
-import org.concord.energy3d.undo.EnableHeliostatForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.EnableSolarPanelHeliostatCommand;
+import org.concord.energy3d.undo.EnableFoundationSolarTrackerCommand;
+import org.concord.energy3d.undo.EnableTrackerForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.EnableSolarTrackerCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.util.Config;
@@ -2002,12 +2002,13 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					final SolarPanel sp = (SolarPanel) selectedPart;
-					sp.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
+					sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+					sp.drawSunBeam();
 					sp.draw();
 				}
 			});
 
-			final JCheckBoxMenuItem miEnableHeliostat = new JCheckBoxMenuItem("Enable Heliostat...");
+			final JCheckBoxMenuItem miEnableHeliostat = new JCheckBoxMenuItem("Enable Tracker...");
 			miEnableHeliostat.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2029,24 +2030,24 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final String title = "<html>" + (sp.getHeliostat() ? "Disable" : "Enable") + " heliostat for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The heliostat will rotate the solar panel to face the sun.<hr></html>";
+					final String title = "<html>" + (sp.isTrackerEnabled() ? "Disable" : "Enable") + " tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The solar tracker will rotate the solar panel to face the sun.<hr></html>";
 					Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, (sp.getHeliostat() ? "Disable" : "Enable") + " heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, (sp.isTrackerEnabled() ? "Disable" : "Enable") + " solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) {
-						EnableSolarPanelHeliostatCommand c = new EnableSolarPanelHeliostatCommand(sp);
-						sp.setHeliostat(!sp.getHeliostat());
+						EnableSolarTrackerCommand c = new EnableSolarTrackerCommand(sp);
+						sp.setTrackerEnabled(!sp.isTrackerEnabled());
 						sp.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
-						EnableFoundationSolarPanelHeliostatCommand c = new EnableFoundationSolarPanelHeliostatCommand(foundation);
-						Scene.getInstance().enableHeliostatForSolarPanelsOnFoundation(foundation, !sp.getHeliostat());
+						EnableFoundationSolarTrackerCommand c = new EnableFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().enableTrackerForSolarPanelsOnFoundation(foundation, !sp.isTrackerEnabled());
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						EnableHeliostatForAllSolarPanelsCommand c = new EnableHeliostatForAllSolarPanelsCommand();
-						Scene.getInstance().enableHeliostatForAllSolarPanels(!sp.getHeliostat());
+						EnableTrackerForAllSolarPanelsCommand c = new EnableTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().enableTrackerForAllSolarPanels(!sp.isTrackerEnabled());
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2323,9 +2324,9 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					SolarPanel sp = (SolarPanel) selectedPart;
-					Util.selectSilently(cbmiDrawSunBeam, sp.getDrawSunBeam());
+					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
 					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
-					Util.selectSilently(miEnableHeliostat, sp.getHeliostat());
+					Util.selectSilently(miEnableHeliostat, sp.isTrackerEnabled());
 					miEnableHeliostat.setEnabled(true);
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
@@ -2333,7 +2334,7 @@ public class PopupMenuFactory {
 					} else if (sp.getContainer() instanceof Wall) {
 						miEnableHeliostat.setEnabled(false);
 					}
-					if (sp.getHeliostat()) {
+					if (sp.isTrackerEnabled()) {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
 					} else {

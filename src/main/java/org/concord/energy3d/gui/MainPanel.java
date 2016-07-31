@@ -617,6 +617,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
+					energyViewButton.setSelected(false);
 					final AnimateSunCommand c = new AnimateSunCommand();
 					SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
 					if (shadowButton.isSelected())

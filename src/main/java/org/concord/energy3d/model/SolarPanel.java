@@ -45,7 +45,7 @@ public class SolarPanel extends HousePart {
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double tiltAngle;
-	private boolean heliostat;
+	private boolean tracker;
 	private double baseHeight = 6;
 	private boolean drawSunBeam;
 	private transient double layoutGap = 0.01;
@@ -216,7 +216,7 @@ public class SolarPanel extends HousePart {
 		outlineMesh.updateModelBound();
 
 		boolean onFlatSurface = onFlatSurface();
-		if (heliostat) {
+		if (tracker) {
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 		} else {
 			if (onFlatSurface)
@@ -276,7 +276,7 @@ public class SolarPanel extends HousePart {
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		Vector3 dir;
 		Vector3 p;
-		if (!heliostat && Util.isZero(tiltAngle)) {
+		if (!tracker && Util.isZero(tiltAngle)) {
 			dir = new Vector3(0.5, 0, 0);
 			p = o.add(0, 0, baseHeight, null);
 		} else {
@@ -299,7 +299,7 @@ public class SolarPanel extends HousePart {
 	}
 
 	public void drawSunBeam() {
-		if (Heliodon.getInstance().isNightTime()) {
+		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
 			sunBeam.setVisible(false);
 			return;
 		}
@@ -567,19 +567,19 @@ public class SolarPanel extends HousePart {
 		return tiltAngle;
 	}
 
-	public void setHeliostat(boolean heliostat) {
-		this.heliostat = heliostat;
+	public void setTrackerEnabled(boolean tracker) {
+		this.tracker = tracker;
 	}
 
-	public boolean getHeliostat() {
-		return heliostat;
+	public boolean isTrackerEnabled() {
+		return tracker;
 	}
 
-	public void setDrawSunBeam(boolean drawSunBeam) {
+	public void setSunBeamVisible(boolean drawSunBeam) {
 		this.drawSunBeam = drawSunBeam;
 	}
 
-	public boolean getDrawSunBeam() {
+	public boolean isDrawSunBeamVisible() {
 		return drawSunBeam;
 	}
 

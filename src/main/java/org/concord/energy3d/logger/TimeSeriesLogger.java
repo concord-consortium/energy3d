@@ -98,8 +98,8 @@ import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.EditPartCommand;
-import org.concord.energy3d.undo.EnableFoundationSolarPanelHeliostatCommand;
-import org.concord.energy3d.undo.EnableSolarPanelHeliostatCommand;
+import org.concord.energy3d.undo.EnableFoundationSolarTrackerCommand;
+import org.concord.energy3d.undo.EnableSolarTrackerCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
@@ -528,12 +528,12 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeMicroInverterEfficiencyForAllCommand) {
 					List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
-				} else if (lastEdit instanceof EnableSolarPanelHeliostatCommand) {
-					EnableSolarPanelHeliostatCommand c = (EnableSolarPanelHeliostatCommand) lastEdit;
+				} else if (lastEdit instanceof EnableSolarTrackerCommand) {
+					EnableSolarTrackerCommand c = (EnableSolarTrackerCommand) lastEdit;
 					SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + "}";
-				} else if (lastEdit instanceof EnableFoundationSolarPanelHeliostatCommand) {
-					EnableFoundationSolarPanelHeliostatCommand c = (EnableFoundationSolarPanelHeliostatCommand) lastEdit;
+				} else if (lastEdit instanceof EnableFoundationSolarTrackerCommand) {
+					EnableFoundationSolarTrackerCommand c = (EnableFoundationSolarTrackerCommand) lastEdit;
 					Foundation f = c.getFoundation();
 					stateValue = "{\"Building\": " + f.getId() + "}";
 				} else if (lastEdit instanceof RotateSolarPanelCommand) {

@@ -438,9 +438,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 					} else if (part instanceof SolarPanel) {
 						SolarPanel sp = (SolarPanel) part;
-						if (!night && sp.getHeliostat())
+						if (!night && sp.isTrackerEnabled())
 							sp.draw();
-						if (sp.getDrawSunBeam())
+						if (sp.isDrawSunBeamVisible())
 							sp.drawSunBeam();
 					}
 				}

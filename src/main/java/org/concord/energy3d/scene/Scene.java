@@ -1627,20 +1627,20 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void enableHeliostatForSolarPanelsOnFoundation(final Foundation foundation, final boolean enabled) {
+	public void enableTrackerForSolarPanelsOnFoundation(final Foundation foundation, final boolean enabled) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setHeliostat(enabled);
+				((SolarPanel) p).setTrackerEnabled(enabled);
 				p.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
 	}
 
-	public void enableHeliostatForAllSolarPanels(final boolean enabled) {
+	public void enableTrackerForAllSolarPanels(final boolean enabled) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
-				((SolarPanel) p).setHeliostat(enabled);
+				((SolarPanel) p).setTrackerEnabled(enabled);
 				p.draw();
 			}
 		}

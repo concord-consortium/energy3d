@@ -6,15 +6,15 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class EnableSolarPanelHeliostatCommand extends AbstractUndoableEdit {
+public class EnableSolarTrackerCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private boolean oldValue, newValue;
 	private SolarPanel sp;
 
-	public EnableSolarPanelHeliostatCommand(SolarPanel sp) {
+	public EnableSolarTrackerCommand(SolarPanel sp) {
 		this.sp = sp;
-		oldValue = sp.getHeliostat();
+		oldValue = sp.isTrackerEnabled();
 	}
 
 	public SolarPanel getSolarPanel() {
@@ -24,21 +24,21 @@ public class EnableSolarPanelHeliostatCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = sp.getHeliostat();
-		sp.setHeliostat(oldValue);
+		newValue = sp.isTrackerEnabled();
+		sp.setTrackerEnabled(oldValue);
 		sp.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		sp.setHeliostat(newValue);
+		sp.setTrackerEnabled(newValue);
 		sp.draw();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return oldValue ? "Disable Heliostat" : "Enable Heliostat";
+		return oldValue ? "Disable Solar Tracker" : "Enable Solar Tracker";
 	}
 
 }
