@@ -11,20 +11,20 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class EnableFoundationSolarTrackerCommand extends AbstractUndoableEdit {
+public class SetFoundationSolarTrackerCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private boolean[] oldValues, newValues;
+	private int[] oldValues, newValues;
 	private Foundation foundation;
 	private List<SolarPanel> solarPanels;
 
-	public EnableFoundationSolarTrackerCommand(Foundation foundation) {
+	public SetFoundationSolarTrackerCommand(Foundation foundation) {
 		this.foundation = foundation;
 		solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
 		int n = solarPanels.size();
-		oldValues = new boolean[n];
+		oldValues = new int[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = solarPanels.get(i).isTrackerEnabled();
+			oldValues[i] = solarPanels.get(i).getTracker();
 		}
 	}
 
@@ -36,11 +36,11 @@ public class EnableFoundationSolarTrackerCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		int n = solarPanels.size();
-		newValues = new boolean[n];
+		newValues = new int[n];
 		for (int i = 0; i < n; i++) {
 			SolarPanel s = solarPanels.get(i);
-			newValues[i] = s.isTrackerEnabled();
-			s.setTrackerEnabled(oldValues[i]);
+			newValues[i] = s.getTracker();
+			s.setTracker(oldValues[i]);
 			s.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -52,7 +52,7 @@ public class EnableFoundationSolarTrackerCommand extends AbstractUndoableEdit {
 		int n = solarPanels.size();
 		for (int i = 0; i < n; i++) {
 			SolarPanel s = solarPanels.get(i);
-			s.setTrackerEnabled(newValues[i]);
+			s.setTracker(newValues[i]);
 			s.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -60,7 +60,14 @@ public class EnableFoundationSolarTrackerCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return (solarPanels.get(0).isTrackerEnabled() ? "Enable" : "Disable") + " Tracker for All Solar Panels on Selected Foundation";
+		switch (solarPanels.get(0).getTracker()) {
+		case SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
+			return "Enable Dual-Axis Tracker for All Solar Panels on Selected Foundation";
+		case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
+			return "Enable Single-Axis Tracker for All Solar Panels on Selected Foundation";
+		default:
+			return "Disable Tracker for All Solar Panels on Selected Foundation";
+		}
 	}
 
 }

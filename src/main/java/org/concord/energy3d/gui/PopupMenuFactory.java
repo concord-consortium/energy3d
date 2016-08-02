@@ -113,9 +113,9 @@ import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
-import org.concord.energy3d.undo.EnableFoundationSolarTrackerCommand;
-import org.concord.energy3d.undo.EnableTrackerForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.EnableSolarTrackerCommand;
+import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
+import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.util.Config;
@@ -1994,22 +1994,13 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
-			cbmiDrawSunBeam.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
-						return;
-					final SolarPanel sp = (SolarPanel) selectedPart;
-					sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
-					sp.drawSunBeam();
-					sp.draw();
-				}
-			});
+			final JMenu trackerMenu = new JMenu("Tracker");
 
-			final JCheckBoxMenuItem miEnableHeliostat = new JCheckBoxMenuItem("Enable Tracker...");
-			miEnableHeliostat.addActionListener(new ActionListener() {
+			ButtonGroup trackerButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miNoTracker = new JRadioButtonMenuItem("No Tracker...", true);
+			trackerButtonGroup.add(miNoTracker);
+			miNoTracker.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2030,24 +2021,120 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final String title = "<html>" + (sp.isTrackerEnabled() ? "Disable" : "Enable") + " tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The solar tracker will rotate the solar panel to face the sun.<hr></html>";
+					final String title = "<html>Disable tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>No tracker will be used.<hr></html>";
 					Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, (sp.isTrackerEnabled() ? "Disable" : "Enable") + " solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) {
-						EnableSolarTrackerCommand c = new EnableSolarTrackerCommand(sp);
-						sp.setTrackerEnabled(!sp.isTrackerEnabled());
+						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+						sp.setTracker(SolarPanel.NO_TRACKER);
 						sp.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
-						EnableFoundationSolarTrackerCommand c = new EnableFoundationSolarTrackerCommand(foundation);
-						Scene.getInstance().enableTrackerForSolarPanelsOnFoundation(foundation, !sp.isTrackerEnabled());
+						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						EnableTrackerForAllSolarPanelsCommand c = new EnableTrackerForAllSolarPanelsCommand();
-						Scene.getInstance().enableTrackerForAllSolarPanels(!sp.isTrackerEnabled());
+						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.NO_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			final JRadioButtonMenuItem miHorizontalSingleAxisTracker = new JRadioButtonMenuItem("Horizontal Single-Axis Tracker...");
+			trackerButtonGroup.add(miHorizontalSingleAxisTracker);
+			miHorizontalSingleAxisTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final String title = "<html>Enable horizontal single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					Object[] params = { title, footnote, panel };
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable horizontal single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						return;
+					if (rb1.isSelected()) {
+						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+						sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						sp.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						Foundation foundation = sp.getTopContainer();
+						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			final JRadioButtonMenuItem miAzimuthAltitudeDualAxisTracker = new JRadioButtonMenuItem("Azimuth-Altitude Dual-Axis Tracker...");
+			trackerButtonGroup.add(miAzimuthAltitudeDualAxisTracker);
+			miAzimuthAltitudeDualAxisTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final String title = "<html>Enable azimuth-altitude dual-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
+					Object[] params = { title, footnote, panel };
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable azimuth-altitude dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						return;
+					if (rb1.isSelected()) {
+						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+						sp.setTracker(SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER);
+						sp.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						Foundation foundation = sp.getTopContainer();
+						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2317,6 +2404,20 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
+			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+					sp.drawSunBeam();
+					sp.draw();
+				}
+			});
+
 			popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
@@ -2326,15 +2427,25 @@ public class PopupMenuFactory {
 					SolarPanel sp = (SolarPanel) selectedPart;
 					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
 					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
-					Util.selectSilently(miEnableHeliostat, sp.isTrackerEnabled());
-					miEnableHeliostat.setEnabled(true);
+					switch (sp.getTracker()) {
+					case SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
+						Util.selectSilently(miAzimuthAltitudeDualAxisTracker, true);
+						break;
+					case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
+						Util.selectSilently(miHorizontalSingleAxisTracker, true);
+						break;
+					case SolarPanel.NO_TRACKER:
+						Util.selectSilently(miNoTracker, true);
+						break;
+					}
+					miAzimuthAltitudeDualAxisTracker.setEnabled(true);
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
-						miEnableHeliostat.setEnabled(Util.isZero(roof.getHeight()));
+						miAzimuthAltitudeDualAxisTracker.setEnabled(Util.isZero(roof.getHeight()));
 					} else if (sp.getContainer() instanceof Wall) {
-						miEnableHeliostat.setEnabled(false);
+						miAzimuthAltitudeDualAxisTracker.setEnabled(false);
 					}
-					if (sp.isTrackerEnabled()) {
+					if (sp.getTracker() != SolarPanel.NO_TRACKER) {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
 					} else {
@@ -2476,8 +2587,12 @@ public class PopupMenuFactory {
 				}
 			});
 
+			trackerMenu.add(miNoTracker);
+			trackerMenu.add(miHorizontalSingleAxisTracker);
+			trackerMenu.add(miAzimuthAltitudeDualAxisTracker);
+
 			popupMenuForSolarPanel.addSeparator();
-			popupMenuForSolarPanel.add(miEnableHeliostat);
+			popupMenuForSolarPanel.add(trackerMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miRotateAroundNormal);
 			popupMenuForSolarPanel.add(miZenith);

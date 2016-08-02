@@ -33,6 +33,10 @@ import com.ardor3d.util.geom.BufferUtils;
 public class SolarPanel extends HousePart {
 
 	private static final long serialVersionUID = 1L;
+	public static final int NO_TRACKER = 0;
+	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
+	public static final int AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER = 2;
+
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
@@ -45,7 +49,7 @@ public class SolarPanel extends HousePart {
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double tiltAngle;
-	private boolean tracker;
+	private int trackerType = NO_TRACKER;
 	private double baseHeight = 6;
 	private boolean drawSunBeam;
 	private transient double layoutGap = 0.01;
@@ -216,9 +220,12 @@ public class SolarPanel extends HousePart {
 		outlineMesh.updateModelBound();
 
 		boolean onFlatSurface = onFlatSurface();
-		if (tracker) {
+		switch (trackerType) {
+		case AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
-		} else {
+			break;
+		default:
 			if (onFlatSurface)
 				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
@@ -276,7 +283,7 @@ public class SolarPanel extends HousePart {
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		Vector3 dir;
 		Vector3 p;
-		if (!tracker && Util.isZero(tiltAngle)) {
+		if (trackerType == NO_TRACKER && Util.isZero(tiltAngle)) {
 			dir = new Vector3(0.5, 0, 0);
 			p = o.add(0, 0, baseHeight, null);
 		} else {
@@ -567,12 +574,12 @@ public class SolarPanel extends HousePart {
 		return tiltAngle;
 	}
 
-	public void setTrackerEnabled(boolean tracker) {
-		this.tracker = tracker;
+	public void setTracker(int tracker) {
+		this.trackerType = tracker;
 	}
 
-	public boolean isTrackerEnabled() {
-		return tracker;
+	public int getTracker() {
+		return trackerType;
 	}
 
 	public void setSunBeamVisible(boolean drawSunBeam) {

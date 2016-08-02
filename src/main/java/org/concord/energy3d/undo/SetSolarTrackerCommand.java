@@ -6,15 +6,15 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class EnableSolarTrackerCommand extends AbstractUndoableEdit {
+public class SetSolarTrackerCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private boolean oldValue, newValue;
+	private int oldValue, newValue;
 	private SolarPanel sp;
 
-	public EnableSolarTrackerCommand(SolarPanel sp) {
+	public SetSolarTrackerCommand(SolarPanel sp) {
 		this.sp = sp;
-		oldValue = sp.isTrackerEnabled();
+		oldValue = sp.getTracker();
 	}
 
 	public SolarPanel getSolarPanel() {
@@ -24,21 +24,28 @@ public class EnableSolarTrackerCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = sp.isTrackerEnabled();
-		sp.setTrackerEnabled(oldValue);
+		newValue = sp.getTracker();
+		sp.setTracker(oldValue);
 		sp.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		sp.setTrackerEnabled(newValue);
+		sp.setTracker(newValue);
 		sp.draw();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return oldValue ? "Disable Solar Tracker" : "Enable Solar Tracker";
+		switch (oldValue) {
+		case SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
+			return "Enable Dual-Axis Tracker";
+		case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
+			return "Enable Single-Axis Tracker";
+		default:
+			return "Disable Tracker";
+		}
 	}
 
 }
