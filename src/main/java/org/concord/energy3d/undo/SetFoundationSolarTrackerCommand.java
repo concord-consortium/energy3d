@@ -61,7 +61,7 @@ public class SetFoundationSolarTrackerCommand extends AbstractUndoableEdit {
 	@Override
 	public String getPresentationName() {
 		switch (solarPanels.get(0).getTracker()) {
-		case SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
+		case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			return "Enable Dual-Axis Tracker for All Solar Panels on Selected Foundation";
 		case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
 			return "Enable Single-Axis Tracker for All Solar Panels on Selected Foundation";

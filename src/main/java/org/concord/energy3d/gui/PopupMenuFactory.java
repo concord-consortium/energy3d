@@ -2094,9 +2094,9 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JRadioButtonMenuItem miAzimuthAltitudeDualAxisTracker = new JRadioButtonMenuItem("Azimuth-Altitude Dual-Axis Tracker...");
-			trackerButtonGroup.add(miAzimuthAltitudeDualAxisTracker);
-			miAzimuthAltitudeDualAxisTracker.addActionListener(new ActionListener() {
+			final JRadioButtonMenuItem miAltazimuthDualAxisTracker = new JRadioButtonMenuItem("Altazimuth Dual-Axis Tracker...");
+			trackerButtonGroup.add(miAltazimuthDualAxisTracker);
+			miAltazimuthDualAxisTracker.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2117,24 +2117,24 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final String title = "<html>Enable azimuth-altitude dual-axis tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
+					final String title = "<html>Enable altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
 					Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable azimuth-altitude dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable altitude-azimuth dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) {
 						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
-						sp.setTracker(SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER);
+						sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						sp.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
 						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
-						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
-						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER);
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2428,8 +2428,8 @@ public class PopupMenuFactory {
 					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
 					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
 					switch (sp.getTracker()) {
-					case SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
-						Util.selectSilently(miAzimuthAltitudeDualAxisTracker, true);
+					case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+						Util.selectSilently(miAltazimuthDualAxisTracker, true);
 						break;
 					case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
 						Util.selectSilently(miHorizontalSingleAxisTracker, true);
@@ -2438,12 +2438,12 @@ public class PopupMenuFactory {
 						Util.selectSilently(miNoTracker, true);
 						break;
 					}
-					miAzimuthAltitudeDualAxisTracker.setEnabled(true);
+					miAltazimuthDualAxisTracker.setEnabled(true);
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
-						miAzimuthAltitudeDualAxisTracker.setEnabled(Util.isZero(roof.getHeight()));
+						miAltazimuthDualAxisTracker.setEnabled(Util.isZero(roof.getHeight()));
 					} else if (sp.getContainer() instanceof Wall) {
-						miAzimuthAltitudeDualAxisTracker.setEnabled(false);
+						miAltazimuthDualAxisTracker.setEnabled(false);
 					}
 					if (sp.getTracker() != SolarPanel.NO_TRACKER) {
 						miZenith.setEnabled(false);
@@ -2589,7 +2589,7 @@ public class PopupMenuFactory {
 
 			trackerMenu.add(miNoTracker);
 			trackerMenu.add(miHorizontalSingleAxisTracker);
-			trackerMenu.add(miAzimuthAltitudeDualAxisTracker);
+			trackerMenu.add(miAltazimuthDualAxisTracker);
 
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(trackerMenu);

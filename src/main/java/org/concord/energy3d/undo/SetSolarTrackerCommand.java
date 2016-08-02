@@ -39,7 +39,7 @@ public class SetSolarTrackerCommand extends AbstractUndoableEdit {
 	@Override
 	public String getPresentationName() {
 		switch (oldValue) {
-		case SolarPanel.AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
+		case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			return "Enable Dual-Axis Tracker";
 		case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
 			return "Enable Single-Axis Tracker";

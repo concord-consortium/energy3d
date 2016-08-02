@@ -35,7 +35,7 @@ public class SolarPanel extends HousePart {
 	private static final long serialVersionUID = 1L;
 	public static final int NO_TRACKER = 0;
 	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
-	public static final int AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER = 2;
+	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -221,9 +221,13 @@ public class SolarPanel extends HousePart {
 
 		boolean onFlatSurface = onFlatSurface();
 		switch (trackerType) {
-		case AZIMUTH_ALTITUDE_DUAL_AXIS_TRACKER:
-		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+			break;
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).multiply(1, 0, 1, null).normalize(null);
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
+				normal = new Vector3(0, 0.001, 1).normalizeLocal();
 			break;
 		default:
 			if (onFlatSurface)
@@ -254,7 +258,16 @@ public class SolarPanel extends HousePart {
 		Calendar calendar = (Calendar) Heliodon.getInstance().getCalender().clone();
 		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 		calendar.set(Calendar.MINUTE, minute % 60);
-		normal = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
+		switch (trackerType) {
+		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			normal = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
+			break;
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+			normal = Heliodon.getInstance().computeSunLocation(calendar).multiply(1, 0, 1, null).normalize(null);
+			if (Util.isEqual(normal, Vector3.UNIT_Z))
+				normal = new Vector3(0, 0.001, 1).normalizeLocal();
+			break;
+		}
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -287,7 +300,8 @@ public class SolarPanel extends HousePart {
 			dir = new Vector3(0.5, 0, 0);
 			p = o.add(0, 0, baseHeight, null);
 		} else {
-			dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
+			dir = Util.isEqual(normal, Vector3.UNIT_Z, 0.001) ? new Vector3(0, 1, 0) : normal.cross(Vector3.UNIT_Z, null); // special case when normal is z-axis
+			dir = dir.multiplyLocal(0.5);
 			p = o.add(0, 0, baseHeight, null);
 		}
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
