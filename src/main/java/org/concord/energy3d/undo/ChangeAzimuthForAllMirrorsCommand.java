@@ -32,7 +32,7 @@ public class ChangeAzimuthForAllMirrorsCommand extends AbstractUndoableEdit {
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			Mirror m = mirrors.get(i);
-			newValues[i] = m.getZenith();
+			newValues[i] = m.getRelativeAzimuth();
 			m.setRelativeAzimuth(oldValues[i]);
 			m.draw();
 		}

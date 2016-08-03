@@ -323,7 +323,7 @@ public class SolarRadiation {
 			}
 		} else if (part instanceof SolarPanel) {
 			SolarPanel sp = (SolarPanel) part;
-			if (sp.getHeliostat()) { // calculate the normal at this minute
+			if (sp.getTracker() != SolarPanel.NO_TRACKER) { // calculate the normal at this minute
 				sp.setNormalAtTime(minute);
 			}
 		}

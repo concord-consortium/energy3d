@@ -15,6 +15,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -32,59 +33,30 @@ import com.ardor3d.util.geom.BufferUtils;
 public class SolarPanel extends HousePart {
 
 	private static final long serialVersionUID = 1L;
+	public static final int NO_TRACKER = 0;
+	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
+	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
+
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Mesh supportFrame;
+	private transient Line sunBeam;
 	private double efficiency = 0.15; // a number in (0, 1)
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
-	private double zenith = 90; // the zenith angle relative to the surface of the parent
-	private boolean heliostat;
-	private double baseHeight = 5;
+	private double tiltAngle;
+	private int trackerType = NO_TRACKER;
+	private double baseHeight = 6;
+	private boolean drawSunBeam;
 	private transient double layoutGap = 0.01;
+	private static transient BloomRenderPass bloomRenderPass;
 
 	public SolarPanel(boolean rotated) {
 		super(1, 1, 0);
-	}
-
-	/** a number between 0 and 1 */
-	public void setCellEfficiency(final double efficiency) {
-		this.efficiency = efficiency;
-	}
-
-	/** a number between 0 and 1 */
-	public double getCellEfficiency() {
-		return efficiency;
-	}
-
-	/** a number between 0 and 1, typically 0.95 */
-	public void setInverterEfficiency(final double inverterEfficiency) {
-		this.inverterEfficiency = inverterEfficiency;
-	}
-
-	/** a number between 0 and 1, typically 0.95 */
-	public double getInverterEfficiency() {
-		return inverterEfficiency;
-	}
-
-	public void setPanelWidth(double panelWidth) {
-		this.panelWidth = panelWidth;
-	}
-
-	public double getPanelWidth() {
-		return panelWidth;
-	}
-
-	public void setPanelHeight(double panelHeight) {
-		this.panelHeight = panelHeight;
-	}
-
-	public double getPanelHeight() {
-		return panelHeight;
 	}
 
 	@Override
@@ -95,14 +67,12 @@ public class SolarPanel extends HousePart {
 			panelWidth = 0.99;
 		if (Util.isZero(panelHeight))
 			panelHeight = 1.65;
-		if (Util.isZero(zenith))
-			zenith = 90;
 		if (Util.isZero(efficiency))
 			efficiency = 0.15;
 		if (Util.isZero(inverterEfficiency))
 			inverterEfficiency = 0.95;
 		if (Util.isZero(baseHeight))
-			baseHeight = 5;
+			baseHeight = 6;
 
 		mesh = new Mesh("SolarPanel");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -133,7 +103,17 @@ public class SolarPanel extends HousePart {
 		supportFrame.setModelBound(new BoundingBox());
 		root.attachChild(supportFrame);
 
+		sunBeam = new Line("Sun Beam");
+		sunBeam.setLineWidth(0.01f);
+		sunBeam.setStipplePattern((short) 0xffff);
+		sunBeam.setModelBound(null);
+		Util.disablePickShadowLight(sunBeam);
+		sunBeam.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		sunBeam.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
+		root.attachChild(sunBeam);
+
 		updateTextureAndColor();
+
 	}
 
 	@Override
@@ -164,12 +144,8 @@ public class SolarPanel extends HousePart {
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
-				if (Util.isZero(zenith - 90)) {
-					p.setZ(p.getZ() + getBaseHeight());
-				} else {
-					double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-					p.setZ(p.getZ() + getBaseHeight() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
-				}
+				if (onFlatSurface())
+					p.setZ(p.getZ() + baseHeight);
 				getEditPointShape(i).setTranslation(p);
 			}
 		} finally {
@@ -178,17 +154,6 @@ public class SolarPanel extends HousePart {
 		/* remove remaining edit shapes */
 		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
 			pointsRoot.detachChildAt(points.size());
-	}
-
-	private double getBaseHeight() {
-		if (onFlatSurface()) {
-			if (container instanceof Foundation) {
-				return baseHeight + ((Foundation) container).getHeight();
-			} else {
-				return baseHeight;
-			}
-		}
-		return 0;
 	}
 
 	private boolean onFlatSurface() {
@@ -204,17 +169,18 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	protected void drawMesh() {
+
 		if (container == null)
 			return;
 
 		normal = computeNormalAndKeepOnRoof();
 		updateEditShapes();
 
-		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double annotationScaleFactor = 0.5 / Scene.getInstance().getAnnotationScale();
 		if (rotated) {
-			surround.setData(new Vector3(0, 0, 0), panelHeight / 2.0 / annotationScale, panelWidth / 2.0 / annotationScale, 0.15);
+			surround.setData(new Vector3(), panelHeight * annotationScaleFactor, panelWidth * annotationScaleFactor, 0.15);
 		} else {
-			surround.setData(new Vector3(0, 0, 0), panelWidth / 2.0 / annotationScale, panelHeight / 2.0 / annotationScale, 0.15);
+			surround.setData(new Vector3(), panelWidth * annotationScaleFactor, panelHeight * annotationScaleFactor, 0.15);
 		}
 		surround.updateModelBound();
 
@@ -254,27 +220,22 @@ public class SolarPanel extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		Vector3 a;
-		if (Util.isZero(zenith - 90)) {
-			a = getAbsPoint(0).addLocal(0, 0, getBaseHeight());
-		} else {
-			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-			a = getAbsPoint(0).addLocal(0, 0, getBaseHeight() + 0.5 * h * Math.cos(Math.toRadians(zenith)));
-		}
-
-		if (heliostat) {
+		boolean onFlatSurface = onFlatSurface();
+		switch (trackerType) {
+		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
-		} else {
-			if (Util.isZero(zenith - 90)) {
-				if (Util.isEqual(normal, Vector3.UNIT_Z, 0.1)) { // greater tolerance than default
-					setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
-				}
-			} else {
-				setNormal(Math.toRadians(zenith), Math.toRadians(relativeAzimuth));
-			}
+			break;
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).multiply(1, 0, 1, null).normalize(null);
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
+				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
+			break;
+		default:
+			if (onFlatSurface)
+				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
-		mesh.setTranslation(a);
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		mesh.setTranslation(onFlatSurface ? getAbsPoint(0).addLocal(0, 0, baseHeight) : getAbsPoint(0));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -282,12 +243,15 @@ public class SolarPanel extends HousePart {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
-		if (onFlatSurface()) {
+		if (onFlatSurface) {
 			supportFrame.getSceneHints().setCullHint(CullHint.Inherit);
 			drawSupporFrame();
 		} else {
 			supportFrame.getSceneHints().setCullHint(CullHint.Always);
 		}
+
+		if (drawSunBeam)
+			drawSunBeam();
 
 	}
 
@@ -295,11 +259,20 @@ public class SolarPanel extends HousePart {
 		Calendar calendar = (Calendar) Heliodon.getInstance().getCalender().clone();
 		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 		calendar.set(Calendar.MINUTE, minute % 60);
-		normal = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
+		switch (trackerType) {
+		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			normal = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
+			break;
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+			normal = Heliodon.getInstance().computeSunLocation(calendar).multiply(1, 0, 1, null).normalize(null);
+			if (Util.isEqual(normal, Vector3.UNIT_Z))
+				normal = new Vector3(0, 0.001, 1).normalizeLocal();
+			break;
+		}
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
-	private void setNormal(double zenith, double azimuth) {
+	private void setNormal(double angle, double azimuth) {
 		Foundation foundation = getTopContainer();
 		Vector3 v = foundation.getAbsPoint(0);
 		Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
@@ -307,7 +280,7 @@ public class SolarPanel extends HousePart {
 		Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
 		Vector3 v1 = m.applyPost(vx, null);
 		Vector3 v2 = m.applyPost(vy, null);
-		v = new Matrix3().fromAngleAxis(zenith, v1).applyPost(v2, null);
+		v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
 		if (v.getZ() < 0)
 			v.negateLocal();
 		normal = v.normalizeLocal();
@@ -321,17 +294,16 @@ public class SolarPanel extends HousePart {
 		normalBuffer.rewind();
 		vertexBuffer.limit(vertexBuffer.capacity());
 		normalBuffer.limit(normalBuffer.capacity());
-		double h0 = container instanceof Foundation ? ((Foundation) container).getHeight() : 0;
-		final ReadOnlyVector3 o = getAbsPoint(0).addLocal(0, 0, h0);
+		final ReadOnlyVector3 o = getAbsPoint(0);
 		Vector3 dir;
 		Vector3 p;
-		if (!heliostat && Util.isZero(zenith - 90)) {
+		if (trackerType == NO_TRACKER && Util.isZero(tiltAngle)) {
 			dir = new Vector3(0.5, 0, 0);
 			p = o.add(0, 0, baseHeight, null);
 		} else {
-			dir = normal.cross(Vector3.UNIT_Z, null).multiplyLocal(0.5);
-			double h = (rotated ? panelWidth : panelHeight) / Scene.getInstance().getAnnotationScale();
-			p = o.add(0, 0, baseHeight + 0.5 * h * Math.cos(Math.toRadians(zenith)), null);
+			dir = Util.isEqual(normal, Vector3.UNIT_Z, 0.001) ? new Vector3(0, 1, 0) : normal.cross(Vector3.UNIT_Z, null); // special case when normal is z-axis
+			dir = dir.multiplyLocal(0.5);
+			p = o.add(0, 0, baseHeight, null);
 		}
 		Util.addPointToQuad(normal, o, p, dir, vertexBuffer, normalBuffer);
 		double w = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
@@ -346,6 +318,32 @@ public class SolarPanel extends HousePart {
 		normalBuffer.limit(normalBuffer.position());
 		supportFrame.getMeshData().updateVertexCount();
 		supportFrame.updateModelBound();
+	}
+
+	public void drawSunBeam() {
+		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
+			sunBeam.setVisible(false);
+			return;
+		}
+		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
+		beamsVertices.rewind();
+		Vector3 r = new Vector3(o);
+		r.addLocal(sunLocation.multiply(5000, null));
+		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		sunBeam.updateModelBound();
+		sunBeam.setVisible(true);
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
+			bloomRenderPass.setNrBlurPasses(2);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+		}
+		if (!bloomRenderPass.contains(sunBeam)) {
+			bloomRenderPass.add(sunBeam);
+		}
 	}
 
 	@Override
@@ -519,6 +517,50 @@ public class SolarPanel extends HousePart {
 		return c;
 	}
 
+	/** a number between 0 and 1 */
+	public void setCellEfficiency(final double efficiency) {
+		this.efficiency = efficiency;
+	}
+
+	/** a number between 0 and 1 */
+	public double getCellEfficiency() {
+		return efficiency;
+	}
+
+	/** a number between 0 and 1, typically 0.95 */
+	public void setInverterEfficiency(final double inverterEfficiency) {
+		this.inverterEfficiency = inverterEfficiency;
+	}
+
+	/** a number between 0 and 1, typically 0.95 */
+	public double getInverterEfficiency() {
+		return inverterEfficiency;
+	}
+
+	public void setPanelWidth(double panelWidth) {
+		this.panelWidth = panelWidth;
+	}
+
+	public double getPanelWidth() {
+		return panelWidth;
+	}
+
+	public void setPanelHeight(double panelHeight) {
+		this.panelHeight = panelHeight;
+	}
+
+	public double getPanelHeight() {
+		return panelHeight;
+	}
+
+	public void setBaseHeight(double baseHeight) {
+		this.baseHeight = baseHeight;
+	}
+
+	public double getBaseHeight() {
+		return baseHeight;
+	}
+
 	public void setRotated(boolean b) {
 		rotated = b;
 	}
@@ -539,20 +581,37 @@ public class SolarPanel extends HousePart {
 		return relativeAzimuth;
 	}
 
-	public void setZenith(double zenith) {
-		this.zenith = zenith;
+	public void setTiltAngle(double tiltAngle) {
+		this.tiltAngle = tiltAngle;
 	}
 
-	public double getZenith() {
-		return zenith;
+	public double getTiltAngle() {
+		return tiltAngle;
 	}
 
-	public void setHeliostat(boolean heliostat) {
-		this.heliostat = heliostat;
+	public void setTracker(int tracker) {
+		this.trackerType = tracker;
 	}
 
-	public boolean getHeliostat() {
-		return heliostat;
+	public int getTracker() {
+		return trackerType;
+	}
+
+	public void setSunBeamVisible(boolean drawSunBeam) {
+		this.drawSunBeam = drawSunBeam;
+	}
+
+	public boolean isDrawSunBeamVisible() {
+		return drawSunBeam;
+	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		if (bloomRenderPass != null) {
+			if (bloomRenderPass.contains(sunBeam))
+				bloomRenderPass.remove(sunBeam);
+		}
 	}
 
 }

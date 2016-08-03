@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 getdown.txt = b7421eacecb05c2a4b8f5731beb64306
 energy3d.jar = 2142b86b04666881d6214a17ecf5f33a
 lib/getdown.jar = 10c59456bdecda177e176821d5838c34
@@ -22,3 +23,10 @@ lib/jogl/native/mac-universal/libjogl_desktop.jnilib = 4f42ff05a0cebbf1b4478fb79
 lib/jogl/native/mac-universal/libnativewindow_awt.jnilib = 921c381a11a9b44eb7f16c10bd4a55fc
 lib/jogl/native/mac-universal/libnativewindow_macosx.jnilib = 52960d9e8e4e1f752a52b9f62e72fc60
 digest.txt = 1c405dccad7c68bf330456112b5c29b9
+=======
+getdown.txt = 23fc3f6ab314516adb5167832a5f945a
+energy3d.jar = 8d9f79e6f897259d44ffbb7797c2e32a
+lib/getdown.jar = 10c59456bdecda177e176821d5838c34
+lib/samskivert.jar = a3d63656031a4babc42561cf4b67b41d
+digest.txt = 5aa13e0a18aa4b1b7901448d8b5833cf
+>>>>>>> branch 'master' of https://github.com/concord-consortium/energy3d.git

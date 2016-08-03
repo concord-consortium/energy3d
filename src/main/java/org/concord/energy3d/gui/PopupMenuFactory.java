@@ -65,12 +65,16 @@ import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarCellEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelAzimuthCommand;
-import org.concord.energy3d.undo.ChangeBuildingSolarPanelZenithAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
@@ -88,9 +92,10 @@ import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorZenithAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
@@ -100,17 +105,17 @@ import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeZenithCommand;
-import org.concord.energy3d.undo.ChangeZenithAngleForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetMirrorSizeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
-import org.concord.energy3d.undo.ChangeZenithAngleForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
-import org.concord.energy3d.undo.EnableFoundationSolarPanelHeliostatCommand;
-import org.concord.energy3d.undo.EnableHeliostatForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.EnableSolarPanelHeliostatCommand;
+import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
+import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.util.Config;
@@ -1586,7 +1591,7 @@ public class PopupMenuFactory {
 
 			final JMenu layoutMenu = new JMenu("Layout");
 
-			final JMenuItem miSolarPanelArrays = new JMenuItem("Solar Panel Arrays");
+			final JMenuItem miSolarPanelArrays = new JMenuItem("Solar Panel Arrays...");
 			layoutMenu.add(miSolarPanelArrays);
 			miSolarPanelArrays.addActionListener(new ActionListener() {
 				@Override
@@ -1599,11 +1604,14 @@ public class PopupMenuFactory {
 							return;
 						double rowSpacing = 1;
 						double colSpacing = 0.5;
-						JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+						JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
 						panel.add(new JLabel("Panel size:"));
 						JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 						sizeComboBox.setSelectedIndex(2);
 						panel.add(sizeComboBox);
+						panel.add(new JLabel("Row alignment:"));
+						JComboBox<String> alignmentComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
+						panel.add(alignmentComboBox);
 						panel.add(new JLabel("Row spacing:"));
 						JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(rowSpacing));
 						panel.add(rowSpacingField);
@@ -1618,8 +1626,8 @@ public class PopupMenuFactory {
 								try {
 									rowSpacing = Double.parseDouble(rowValue);
 									colSpacing = Double.parseDouble(colValue);
-									if (rowSpacing <= 0 || colSpacing <= 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Row spacing must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									if (rowSpacing < 0 || colSpacing < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;
@@ -1647,12 +1655,13 @@ public class PopupMenuFactory {
 								panelHeight = 1.96;
 								break;
 							}
+							final int alignment = alignmentComboBox.getSelectedIndex();
 							final double rowSpacing1 = rowSpacing;
 							final double colSpacing1 = colSpacing;
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									f.addSolarPanelArrays(panelWidth, panelHeight, rowSpacing1, colSpacing1);
+									f.addSolarPanelArrays(panelWidth, panelHeight, rowSpacing1, colSpacing1, alignment);
 									return null;
 								}
 							});
@@ -1989,8 +1998,13 @@ public class PopupMenuFactory {
 
 		if (popupMenuForSolarPanel == null) {
 
-			final JCheckBoxMenuItem miEnableHeliostat = new JCheckBoxMenuItem("Enable Heliostat...");
-			miEnableHeliostat.addActionListener(new ActionListener() {
+			final JMenu trackerMenu = new JMenu("Tracker");
+
+			ButtonGroup trackerButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miNoTracker = new JRadioButtonMenuItem("No Tracker...", true);
+			trackerButtonGroup.add(miNoTracker);
+			miNoTracker.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2011,24 +2025,120 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final String title = "<html>" + (sp.getHeliostat() ? "Disable" : "Enable") + " heliostat for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The heliostat will rotate the solar panel to face the sun.<hr></html>";
+					final String title = "<html>Disable tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>No tracker will be used.<hr></html>";
 					Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, (sp.getHeliostat() ? "Disable" : "Enable") + " heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
 						return;
 					if (rb1.isSelected()) {
-						EnableSolarPanelHeliostatCommand c = new EnableSolarPanelHeliostatCommand(sp);
-						sp.setHeliostat(!sp.getHeliostat());
+						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+						sp.setTracker(SolarPanel.NO_TRACKER);
 						sp.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						Foundation foundation = sp.getTopContainer();
-						EnableFoundationSolarPanelHeliostatCommand c = new EnableFoundationSolarPanelHeliostatCommand(foundation);
-						Scene.getInstance().enableHeliostatForSolarPanelsOfFoundation(foundation, !sp.getHeliostat());
+						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						EnableHeliostatForAllSolarPanelsCommand c = new EnableHeliostatForAllSolarPanelsCommand();
-						Scene.getInstance().enableHeliostatForAllSolarPanels(!sp.getHeliostat());
+						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.NO_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			final JRadioButtonMenuItem miHorizontalSingleAxisTracker = new JRadioButtonMenuItem("Horizontal Single-Axis Tracker...");
+			trackerButtonGroup.add(miHorizontalSingleAxisTracker);
+			miHorizontalSingleAxisTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final String title = "<html>Enable horizontal single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					Object[] params = { title, footnote, panel };
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable horizontal single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						return;
+					if (rb1.isSelected()) {
+						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+						sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						sp.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						Foundation foundation = sp.getTopContainer();
+						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			final JRadioButtonMenuItem miAltazimuthDualAxisTracker = new JRadioButtonMenuItem("Altazimuth Dual-Axis Tracker...");
+			trackerButtonGroup.add(miAltazimuthDualAxisTracker);
+			miAltazimuthDualAxisTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final String title = "<html>Enable altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
+					Object[] params = { title, footnote, panel };
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable altitude-azimuth dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						return;
+					if (rb1.isSelected()) {
+						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+						sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+						sp.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						Foundation foundation = sp.getTopContainer();
+						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2052,7 +2162,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miZenith = new JMenuItem("Zenith Angle...");
+			final JMenuItem miZenith = new JMenuItem("Tilt Angle...");
 			miZenith.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2060,14 +2170,14 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Zenith Angle (&deg;) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The zenith angle is measured from the direction perpendicular to the base surface.<hr></html>";
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>The tilt angle of a solar panel is the angle between its surface and the base surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on This Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -2078,34 +2188,37 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getZenith());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getTiltAngle());
 						if (newValue == null)
 							break;
 						else {
 							try {
 								double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The zenith angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (Util.isZero(val - 90))
 										val = 89.999;
+									else if (Util.isZero(val + 90))
+										val = -89.999;
 									if (rb1.isSelected()) {
-										ChangeZenithCommand c = new ChangeZenithCommand(solarPanel);
-										solarPanel.setZenith(val);
+										ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(sp);
+										sp.setTiltAngle(val);
+										sp.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
-										Foundation foundation = solarPanel.getTopContainer();
-										ChangeBuildingSolarPanelZenithAngleCommand c = new ChangeBuildingSolarPanelZenithAngleCommand(foundation);
-										Scene.getInstance().setZenithAngleForSolarPanelsOfBuilding(foundation, val);
+										Foundation foundation = sp.getTopContainer();
+										ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
+										Scene.getInstance().setTiltAngleForSolarPanelsOnFoundation(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										ChangeZenithAngleForAllSolarPanelsCommand c = new ChangeZenithAngleForAllSolarPanelsCommand();
-										Scene.getInstance().setZenithAngleForAllSolarPanels(val);
+										ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
+										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 									Scene.getInstance().setEdited(true);
-									solarPanel.draw();
+									sp.draw();
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -2124,15 +2237,15 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final Foundation foundation = solarPanel.getTopContainer();
-					final String title = "<html>Azimuth Angle (&deg;) of " + partInfo + "</html>";
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final Foundation foundation = sp.getTopContainer();
+					final String title = "<html>Azimuth Angle of " + partInfo + " (&deg;)</html>";
 					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -2143,7 +2256,7 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						double a = solarPanel.getRelativeAzimuth() + foundation.getAzimuth();
+						double a = sp.getRelativeAzimuth() + foundation.getAzimuth();
 						if (a > 360)
 							a -= 360;
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
@@ -2156,21 +2269,22 @@ public class PopupMenuFactory {
 								if (a < 0)
 									a += 360;
 								if (rb1.isSelected()) {
-									ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
-									solarPanel.setRelativeAzimuth(a);
+									ChangeAzimuthCommand c = new ChangeAzimuthCommand(sp);
+									sp.setRelativeAzimuth(a);
+									sp.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
-									ChangeBuildingSolarPanelAzimuthCommand c = new ChangeBuildingSolarPanelAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForSolarPanelsOfBuilding(foundation, val);
+									ChangeFoundationSolarPanelAzimuthCommand c = new ChangeFoundationSolarPanelAzimuthCommand(foundation);
+									Scene.getInstance().setAzimuthForSolarPanelsOnFoundation(foundation, a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									ChangeAzimuthForAllSolarPanelsCommand c = new ChangeAzimuthForAllSolarPanelsCommand();
-									Scene.getInstance().setAzimuthForAllSolarPanels(val);
+									Scene.getInstance().setAzimuthForAllSolarPanels(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 								Scene.getInstance().setEdited(true);
-								solarPanel.draw();
+								sp.draw();
 								break;
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -2235,6 +2349,79 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
+			miBaseHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final Foundation foundation = sp.getTopContainer();
+					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getBaseHeight() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
+								if (rb1.isSelected()) {
+									ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
+									sp.setBaseHeight(val);
+									sp.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb2.isSelected()) {
+									ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
+									Scene.getInstance().setBaseHeightForSolarPanelsOnFoundation(foundation, val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
+									ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
+									Scene.getInstance().setBaseHeightForAllSolarPanels(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								Scene.getInstance().setEdited(true);
+								sp.draw();
+								break;
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
+			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+					sp.drawSunBeam();
+					sp.draw();
+				}
+			});
+
 			popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
@@ -2242,16 +2429,27 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel))
 						return;
 					SolarPanel sp = (SolarPanel) selectedPart;
+					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
 					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
-					Util.selectSilently(miEnableHeliostat, sp.getHeliostat());
-					miEnableHeliostat.setEnabled(true);
+					switch (sp.getTracker()) {
+					case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+						Util.selectSilently(miAltazimuthDualAxisTracker, true);
+						break;
+					case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
+						Util.selectSilently(miHorizontalSingleAxisTracker, true);
+						break;
+					case SolarPanel.NO_TRACKER:
+						Util.selectSilently(miNoTracker, true);
+						break;
+					}
+					miAltazimuthDualAxisTracker.setEnabled(true);
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
-						miEnableHeliostat.setEnabled(Util.isZero(roof.getHeight()));
+						miAltazimuthDualAxisTracker.setEnabled(Util.isZero(roof.getHeight()));
 					} else if (sp.getContainer() instanceof Wall) {
-						miEnableHeliostat.setEnabled(false);
+						miAltazimuthDualAxisTracker.setEnabled(false);
 					}
-					if (sp.getHeliostat()) {
+					if (sp.getTracker() != SolarPanel.NO_TRACKER) {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
 					} else {
@@ -2312,8 +2510,8 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
-										ChangeBuildingSolarCellEfficiencyCommand c = new ChangeBuildingSolarCellEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarCellEfficiencyOfBuilding(foundation, val * 0.01);
+										ChangeFoundationSolarCellEfficiencyCommand c = new ChangeFoundationSolarCellEfficiencyCommand(foundation);
+										Scene.getInstance().setSolarCellEfficiencyOnFoundation(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
@@ -2373,8 +2571,8 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = solarPanel.getTopContainer();
-										ChangeBuildingMicroInverterEfficiencyCommand c = new ChangeBuildingMicroInverterEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarPanelInverterEfficiencyOfBuilding(foundation, val * 0.01);
+										ChangeFoundationMicroInverterEfficiencyCommand c = new ChangeFoundationMicroInverterEfficiencyCommand(foundation);
+										Scene.getInstance().setSolarPanelInverterEfficiencyOnFoundation(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										ChangeMicroInverterEfficiencyForAllCommand c = new ChangeMicroInverterEfficiencyForAllCommand();
@@ -2393,13 +2591,20 @@ public class PopupMenuFactory {
 				}
 			});
 
+			trackerMenu.add(miNoTracker);
+			trackerMenu.add(miHorizontalSingleAxisTracker);
+			trackerMenu.add(miAltazimuthDualAxisTracker);
+
 			popupMenuForSolarPanel.addSeparator();
-			popupMenuForSolarPanel.add(miEnableHeliostat);
+			popupMenuForSolarPanel.add(trackerMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miRotateAroundNormal);
 			popupMenuForSolarPanel.add(miZenith);
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miSize);
+			popupMenuForSolarPanel.add(miBaseHeight);
+			popupMenuForSolarPanel.addSeparator();
+			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miEff);
 			popupMenuForSolarPanel.add(miInverterEff);
@@ -2438,6 +2643,19 @@ public class PopupMenuFactory {
 	private static JPopupMenu getPopupMenuForMirror() {
 
 		if (popupMenuForMirror == null) {
+
+			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
+			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final Mirror m = (Mirror) selectedPart;
+					m.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
+					m.draw();
+				}
+			});
 
 			final JMenuItem miSetHeliostat = new JMenuItem("Set Heliostat...");
 			miSetHeliostat.addActionListener(new ActionListener() {
@@ -2485,7 +2703,7 @@ public class PopupMenuFactory {
 										} else if (rb2.isSelected()) {
 											Foundation foundation = m.getTopContainer();
 											ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-											Scene.getInstance().setTargetForMirrorsOfFoundation(foundation, f);
+											Scene.getInstance().setTargetForMirrorsOnFoundation(foundation, f);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else if (rb3.isSelected()) {
 											ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
@@ -2542,7 +2760,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						Foundation foundation = m.getTopContainer();
 						ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-						Scene.getInstance().setTargetForMirrorsOfFoundation(foundation, null);
+						Scene.getInstance().setTargetForMirrorsOnFoundation(foundation, null);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
@@ -2554,7 +2772,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miZenith = new JMenuItem("Zenith Angle...");
+			final JMenuItem miZenith = new JMenuItem("Tilt Angle...");
 			miZenith.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2563,8 +2781,8 @@ public class PopupMenuFactory {
 						return;
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
-					final String title = "<html>Zenith Angle (&deg;) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The zenith angle is measured from the direction perpendicular to the base surface.<hr></html>";
+					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>The tilt angle of a mirror is the angle between its surface and the base surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
 					JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -2580,29 +2798,32 @@ public class PopupMenuFactory {
 					bg.add(rb3);
 					Object[] params = { title, footnote, panel };
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getZenith());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getTiltAngle());
 						if (newValue == null)
 							break;
 						else {
 							try {
 								double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The zenith angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (Util.isZero(val - 90))
 										val = 89.999;
+									else if (Util.isZero(val + 90))
+										val = -89.999;
 									if (rb1.isSelected()) {
-										ChangeZenithCommand c = new ChangeZenithCommand(m);
-										m.setZenith(val);
+										ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(m);
+										m.setTiltAngle(val);
+										m.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										Foundation foundation = m.getTopContainer();
-										ChangeFoundationMirrorZenithAngleCommand c = new ChangeFoundationMirrorZenithAngleCommand(foundation);
+										ChangeFoundationMirrorTiltAngleCommand c = new ChangeFoundationMirrorTiltAngleCommand(foundation);
 										Scene.getInstance().setZenithAngleForMirrorsOfFoundation(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										ChangeZenithAngleForAllMirrorsCommand c = new ChangeZenithAngleForAllMirrorsCommand();
-										Scene.getInstance().setZenithAngleForAllMirrors(val);
+										ChangeTiltAngleForAllMirrorsCommand c = new ChangeTiltAngleForAllMirrorsCommand();
+										Scene.getInstance().setTiltAngleForAllMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2660,14 +2881,15 @@ public class PopupMenuFactory {
 								if (rb1.isSelected()) {
 									ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 									mirror.setRelativeAzimuth(a);
+									mirror.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForMirrorsOfFoundation(foundation, val);
+									Scene.getInstance().setAzimuthForMirrorsOnFoundation(foundation, a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
-									Scene.getInstance().setAzimuthForAllMirrors(val);
+									Scene.getInstance().setAzimuthForAllMirrors(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
@@ -2732,6 +2954,65 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
+			miBaseHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror))
+						return;
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Mirror m = (Mirror) selectedPart;
+					final Foundation foundation = m.getTopContainer();
+					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Mirrors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getBaseHeight() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null)
+							break;
+						else {
+							try {
+								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
+								if (rb1.isSelected()) {
+									ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(m);
+									m.setBaseHeight(val);
+									m.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb2.isSelected()) {
+									ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
+									Scene.getInstance().setBaseHeightForMirrorsOnFoundation(foundation, val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
+									ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
+									Scene.getInstance().setBaseHeightForAllMirrors(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								Scene.getInstance().setEdited(true);
+								m.draw();
+								break;
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForMirror = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
@@ -2746,6 +3027,7 @@ public class PopupMenuFactory {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
 					}
+					Util.selectSilently(cbmiDrawSunBeam, m.getDrawSunBeam());
 				}
 			});
 
@@ -2817,7 +3099,10 @@ public class PopupMenuFactory {
 			popupMenuForMirror.add(miZenith);
 			popupMenuForMirror.add(miAzimuth);
 			popupMenuForMirror.addSeparator();
+			popupMenuForMirror.add(cbmiDrawSunBeam);
+			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSize);
+			popupMenuForMirror.add(miBaseHeight);
 			popupMenuForMirror.add(miReflectivity);
 
 		}

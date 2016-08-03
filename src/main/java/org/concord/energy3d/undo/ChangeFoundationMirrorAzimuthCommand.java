@@ -20,7 +20,7 @@ public class ChangeFoundationMirrorAzimuthCommand extends AbstractUndoableEdit {
 
 	public ChangeFoundationMirrorAzimuthCommand(Foundation foundation) {
 		this.foundation = foundation;
-		mirrors = Scene.getInstance().getMirrorsOfFoundation(foundation);
+		mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
 		int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
@@ -60,7 +60,7 @@ public class ChangeFoundationMirrorAzimuthCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Change Azimuth for All Mirrors of Selected Foundation";
+		return "Change Azimuth for All Mirrors on Selected Foundation";
 	}
 
 }
