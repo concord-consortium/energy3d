@@ -2,8 +2,6 @@ package org.concord.energy3d.util;
 
 import java.io.IOException;
 
-import org.concord.energy3d.MainApplication;
-
 import com.threerings.getdown.launcher.Getdown;
 import com.threerings.getdown.launcher.GetdownApp;
 
@@ -11,7 +9,7 @@ public class Updater {
 
 	public static void download() {
 		System.out.println("Updater.download()");
-		if (!Config.isWebStart() && !Config.isEclipse() && MainApplication.appDirectoryWritable)
+		if (!Config.isWebStart() && !Config.isEclipse())
 			new Thread() {
 				@Override
 				public void run() {
