@@ -177,9 +177,9 @@ public class SolarPanel extends HousePart {
 
 		final double annotationScaleFactor = 0.5 / Scene.getInstance().getAnnotationScale();
 		if (rotated) {
-			surround.setData(new Vector3(0, 0, 0), panelHeight * annotationScaleFactor, panelWidth * annotationScaleFactor, 0.15);
+			surround.setData(new Vector3(), panelHeight * annotationScaleFactor, panelWidth * annotationScaleFactor, 0.15);
 		} else {
-			surround.setData(new Vector3(0, 0, 0), panelWidth * annotationScaleFactor, panelHeight * annotationScaleFactor, 0.15);
+			surround.setData(new Vector3(), panelWidth * annotationScaleFactor, panelHeight * annotationScaleFactor, 0.15);
 		}
 		surround.updateModelBound();
 

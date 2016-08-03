@@ -1807,7 +1807,7 @@ public class MainFrame extends JFrame {
 		JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Wall", "Window", "Roof", "Solar Panel" });
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Mirror", "Window", "Wall", "Roof" });
 		typeComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -1822,6 +1822,8 @@ public class MainFrame extends JFrame {
 					c = Roof.class;
 				} else if ("Solar Panel".equals(type)) {
 					c = SolarPanel.class;
+				} else if ("Mirror".equals(type)) {
+					c = Mirror.class;
 				}
 				if (c != null) {
 					ArrayList<Long> idArray = getIdArray(c);
@@ -1831,7 +1833,7 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		final ArrayList<Long> idArray = getIdArray(Wall.class);
+		final ArrayList<Long> idArray = getIdArray(SolarPanel.class);
 		for (Long id : idArray) {
 			idListModel.addElement(id);
 		}

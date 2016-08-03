@@ -1461,7 +1461,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 
-	public void addSolarPanelArrays(double panelWidth, double panelHeight, double rowSpacing, double colSpacing) {
+	public void addSolarPanelArrays(double panelWidth, double panelHeight, double rowSpacing, double colSpacing, int alignment) {
 		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
@@ -1472,31 +1472,60 @@ public class Foundation extends HousePart implements Thermalizable {
 			Scene.getInstance().remove(p, false);
 		}
 		AddArrayCommand command = new AddArrayCommand(panels, this, SolarPanel.class);
+		final double az = Math.toRadians(getAzimuth());
+		if (!Util.isZero(az))
+			rotate(az, null);
 		final Vector3 p0 = getAbsPoint(0);
 		final double a = p0.distance(getAbsPoint(2));
 		final double b = p0.distance(getAbsPoint(1));
-		SolarPanel sp = new SolarPanel(false);
-		final double w = (sp.getPanelWidth() + colSpacing) / Scene.getInstance().getAnnotationScale();
-		final double h = (sp.getPanelHeight() + rowSpacing) / Scene.getInstance().getAnnotationScale();
-		final int rows = (int) Math.round(a / w);
-		final int cols = (int) Math.round(b / h);
-		final double x0 = Math.min(p0.getX(), getAbsPoint(2).getX());
-		final double y0 = Math.min(p0.getY(), getAbsPoint(1).getY());
-		for (int c = 1; c < cols; c++) {
-			for (int r = 1; r < rows; r++) {
-				sp = new SolarPanel(false);
-				sp.setPanelWidth(panelWidth);
-				sp.setPanelHeight(panelHeight);
-				sp.setContainer(this);
-				Scene.getInstance().add(sp, false);
-				sp.complete();
-				final Vector3 v = sp.toRelative(new Vector3(x0 + w * r, y0 + h * c, 0));
-				sp.points.get(0).setX(v.getX());
-				sp.points.get(0).setY(v.getY());
-				sp.points.get(0).setZ(height);
-				sp.draw();
+		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
+		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
+		double w = (panelWidth + colSpacing) / Scene.getInstance().getAnnotationScale();
+		double h = (panelHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
+		switch (alignment) {
+		case 0:
+			int rows = (int) Math.floor(a / w);
+			int cols = (int) Math.floor(b / h);
+			for (int c = 0; c < cols; c++) {
+				for (int r = 0; r < rows; r++) {
+					SolarPanel sp = new SolarPanel(false);
+					sp.setPanelWidth(panelWidth);
+					sp.setPanelHeight(panelHeight);
+					sp.setContainer(this);
+					Scene.getInstance().add(sp, false);
+					sp.complete();
+					final Vector3 v = sp.toRelative(new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0));
+					sp.points.get(0).setX(v.getX());
+					sp.points.get(0).setY(v.getY());
+					sp.points.get(0).setZ(height);
+					sp.draw();
+				}
 			}
+			break;
+		case 1:
+			rows = (int) Math.floor(b / w);
+			cols = (int) Math.floor(a / h);
+			for (int c = 0; c < cols; c++) {
+				for (int r = 0; r < rows; r++) {
+					SolarPanel sp = new SolarPanel(false);
+					sp.setPanelWidth(panelWidth);
+					sp.setPanelHeight(panelHeight);
+					sp.setContainer(this);
+					Scene.getInstance().add(sp, false);
+					sp.complete();
+					sp.setRelativeAzimuth(90);
+					final Vector3 v = sp.toRelative(new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0));
+					sp.points.get(0).setX(v.getX());
+					sp.points.get(0).setY(v.getY());
+					sp.points.get(0).setZ(height);
+					sp.draw();
+				}
+			}
+			break;
 		}
+		if (!Util.isZero(az))
+			rotate(-az, null);
+		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 

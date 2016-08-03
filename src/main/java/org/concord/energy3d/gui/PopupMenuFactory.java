@@ -1591,7 +1591,7 @@ public class PopupMenuFactory {
 
 			final JMenu layoutMenu = new JMenu("Layout");
 
-			final JMenuItem miSolarPanelArrays = new JMenuItem("Solar Panel Arrays");
+			final JMenuItem miSolarPanelArrays = new JMenuItem("Solar Panel Arrays...");
 			layoutMenu.add(miSolarPanelArrays);
 			miSolarPanelArrays.addActionListener(new ActionListener() {
 				@Override
@@ -1604,11 +1604,14 @@ public class PopupMenuFactory {
 							return;
 						double rowSpacing = 1;
 						double colSpacing = 0.5;
-						JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+						JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
 						panel.add(new JLabel("Panel size:"));
 						JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 						sizeComboBox.setSelectedIndex(2);
 						panel.add(sizeComboBox);
+						panel.add(new JLabel("Row alignment:"));
+						JComboBox<String> alignmentComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
+						panel.add(alignmentComboBox);
 						panel.add(new JLabel("Row spacing:"));
 						JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(rowSpacing));
 						panel.add(rowSpacingField);
@@ -1623,8 +1626,8 @@ public class PopupMenuFactory {
 								try {
 									rowSpacing = Double.parseDouble(rowValue);
 									colSpacing = Double.parseDouble(colValue);
-									if (rowSpacing <= 0 || colSpacing <= 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Row spacing must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									if (rowSpacing < 0 || colSpacing < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;
@@ -1652,12 +1655,13 @@ public class PopupMenuFactory {
 								panelHeight = 1.96;
 								break;
 							}
+							final int alignment = alignmentComboBox.getSelectedIndex();
 							final double rowSpacing1 = rowSpacing;
 							final double colSpacing1 = colSpacing;
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									f.addSolarPanelArrays(panelWidth, panelHeight, rowSpacing1, colSpacing1);
+									f.addSolarPanelArrays(panelWidth, panelHeight, rowSpacing1, colSpacing1, alignment);
 									return null;
 								}
 							});
