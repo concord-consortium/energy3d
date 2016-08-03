@@ -169,6 +169,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	protected void drawMesh() {
+
 		if (container == null)
 			return;
 
@@ -227,7 +228,7 @@ public class SolarPanel extends HousePart {
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).multiply(1, 0, 1, null).normalize(null);
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
-				normal = new Vector3(0, 0.001, 1).normalizeLocal();
+				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 			break;
 		default:
 			if (onFlatSurface)
