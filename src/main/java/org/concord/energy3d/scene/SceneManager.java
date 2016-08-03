@@ -82,7 +82,6 @@ import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
-import com.ardor3d.framework.jogl.JoglSwingCanvas;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
 import com.ardor3d.image.util.awt.AWTImageLoader;
@@ -244,7 +243,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		else if (Config.RENDER_MODE == RenderMode.JOGL)
 			rendererFactory = new JoglFactory(settings, this);
 		else
-			rendererFactory = new LwjglFactory(settings, this);
+			rendererFactory = null;
 
 		final MouseWrapper mouseWrapper = rendererFactory.getMouseWrapper();
 		final KeyboardWrapper keyboardWrapper = rendererFactory.getKeyboardWrapper();
@@ -426,10 +425,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				heliodon.setHourAngle(heliodon.getHourAngle() + tpf * 0.5, true, true, false);
 				SceneManager.getInstance().changeSkyTexture();
 				SceneManager.getInstance().setShading(heliodon.isNightTime());
-				boolean night = Heliodon.getInstance().isNightTime();
+				final boolean night = Heliodon.getInstance().isNightTime();
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part instanceof Mirror) {
-						Mirror m = (Mirror) part;
+						final Mirror m = (Mirror) part;
 						if (night) {
 							m.drawLightBeams();
 						} else {
@@ -437,7 +436,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								m.draw();
 						}
 					} else if (part instanceof SolarPanel) {
-						SolarPanel m = (SolarPanel) part;
+						final SolarPanel m = (SolarPanel) part;
 						if (!night && m.getHeliostat())
 							m.draw();
 					}
@@ -459,8 +458,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			initCamera();
 			return false;
 		}
-		final float[] f = new float[2];
-		((JoglSwingCanvas) canvas).getRequestedSurfaceScale(f);
 		setWindowsVisible(false);
 		passManager.renderPasses(renderer);
 		try {
@@ -617,7 +614,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void changeSkyTexture() {
 		if (sky != null) {
-			boolean isNightTime = Heliodon.getInstance().isNightTime();
+			final boolean isNightTime = Heliodon.getInstance().isNightTime();
 			TextureState ts;
 			switch (Scene.getInstance().getTheme()) {
 			case Scene.DESERT:
@@ -997,13 +994,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Scene.getInstance().redrawAll();
 		} else if (selectedPart instanceof Foundation) {
 			c = new MoveBuildingCommand((Foundation) selectedPart, v);
-			Foundation f = (Foundation) selectedPart;
+			final Foundation f = (Foundation) selectedPart;
 			f.move(v, selectedPart.getGridSize());
 			f.draw();
 			f.drawChildren();
 			SceneManager.getInstance().refresh();
 		} else if (selectedPart instanceof Window) {
-			Window w = (Window) selectedPart;
+			final Window w = (Window) selectedPart;
 			w.move(v);
 			w.draw();
 		}
@@ -1467,7 +1464,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					hoveredPart = null;
 			}
 			mouseState = null;
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 			t.printStackTrace();
 			Util.reportError(t);
 		}
@@ -1587,7 +1584,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
 						PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 					}
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					t.printStackTrace();
 					Util.reportError(t);
 				}
@@ -1629,7 +1626,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									((Foundation) selectedPart).drawAzimuthArrow();
 								}
 								if (selectedPart != null) {
-									Foundation foundationOfSelectedPart = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+									final Foundation foundationOfSelectedPart = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 									if (foundationOfSelectedPart != null) {
 										foundationOfSelectedPart.setMovePointsVisible(true);
 									}
@@ -1655,7 +1652,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								previousSelectedPart.setEditPointsVisible(false);
 								previousSelectedPart.setGridsVisible(false);
 								if (previousSelectedPart != null) {
-									Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
+									final Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
 									if (foundationOfPreviousSelectedPart != null) {
 										if (selectedPart == null) {
 											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
@@ -1688,7 +1685,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					} else {
 						selectedPart.addPoint(mouseState.getX(), mouseState.getY());
 					}
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					t.printStackTrace();
 					Util.reportError(t);
 				}
@@ -1765,7 +1762,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedPart instanceof Foundation)
 						Scene.getInstance().updateMirrors();
 					EnergyPanel.getInstance().update();
-				} catch (Throwable t) {
+				} catch (final Throwable t) {
 					t.printStackTrace();
 					Util.reportError(t);
 				}
@@ -1929,20 +1926,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
 					final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, angle);
 					SceneManager.getInstance().rotateBuilding(angle, true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				} else if (selectedPart instanceof SolarPanel) {
-					SolarPanel solarPanel = (SolarPanel) selectedPart;
-					ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
+					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 					solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(angle));
 					solarPanel.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				} else if (selectedPart instanceof Mirror) {
-					Mirror mirror = (Mirror) selectedPart;
-					ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
+					final Mirror mirror = (Mirror) selectedPart;
+					final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 					mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(angle));
 					mirror.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);

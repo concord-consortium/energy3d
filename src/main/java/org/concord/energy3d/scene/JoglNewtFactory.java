@@ -2,7 +2,7 @@ package org.concord.energy3d.scene;
 
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.jogl.JoglCanvasRenderer;
-import com.ardor3d.framework.jogl.JoglNewtAwtCanvas;
+import com.ardor3d.framework.jogl.awt.JoglNewtAwtCanvas;
 import com.ardor3d.input.jogl.JoglNewtFocusWrapper;
 import com.ardor3d.input.jogl.JoglNewtKeyboardWrapper;
 import com.ardor3d.input.jogl.JoglNewtMouseManager;

@@ -2,15 +2,16 @@
 <!DOCTYPE xml>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<property name="app.name" value="Energy3D"/>
-	<property name="app.version" value="5.0"/>
+	<property name="app.version" value="5.6"/>
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
-	<property name="build.dist.dir" value="dist" />
+	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
+	<property name="jdk" value="jdk1.8.0_101" />
 	
-	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\jdk1.8.0_92\">
+	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\${jdk}\">
 		<os family="windows" />
 	</condition>
-	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_51.jdk/Contents/Home">
+	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/${jdk}.jdk/Contents/Home">
 		<os family="mac" />
 	</condition>
 	<condition property="JAVA_HOME" value="">
@@ -47,9 +48,10 @@
 		<os family="unix" />
 	</condition>
 
-	<echo message="OS Name is:         ${os}" />
-	<echo message="OS Architecture is: ${os.arch}" />
-	<echo message="OS Version is:      ${os.version}" />
+	<echo message="OS Name:    	${os}" />
+	<echo message="OS Arch: 	${os.arch}" />
+	<echo message="OS Version: 	${os.version}" />
+	<echo message="Dist dir:	${build.dist.dir}" />
 
 	<path id="CLASSPATH">
 		<fileset dir="exe">
@@ -128,7 +130,7 @@
 	</target>
 
 	<target name="compile" depends="clean">
-		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" source="1.6" target="1.6" debug="on" classpathref="CLASSPATH">
+		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" debug="on" classpathref="CLASSPATH">
 		</javac>
 
 		<!-- Copy resources to build.classes.dir -->

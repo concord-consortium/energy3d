@@ -10,6 +10,25 @@ ui.progress = 2, 2, 500, 22
 code = energy3d.jar
 code = lib/getdown.jar
 code = lib/samskivert.jar
+code = lib/ardor3d/ardor3d-animation.jar
+code = lib/ardor3d/ardor3d-awt.jar
+code = lib/ardor3d/ardor3d-collada.jar
+code = lib/ardor3d/ardor3d-core.jar
+code = lib/ardor3d/ardor3d-effects.jar
+code = lib/ardor3d/ardor3d-jogl-awt.jar
+code = lib/ardor3d/ardor3d-jogl.jar
+code = lib/ardor3d/ardor3d-math.jar
+code = lib/ardor3d/ardor3d-savable.jar
+code = lib/jogl/gluegen-rt.jar
+code = lib/jogl/jogl-all.jar
+resource = [windows] lib/jogl/native/windows-32/gluegen-rt.dll
+resource = [windows] lib/jogl/native/windows-32/jogl_desktop.dll
+resource = [windows] lib/jogl/native/windows-32/nativewindow_awt.dll
+resource = [windows] lib/jogl/native/windows-32/nativewindow_win32.dll
+resource = [mac os x] lib/jogl/native/mac-universal/libgluegen-rt.jnilib
+resource = [mac os x] lib/jogl/native/mac-universal/libjogl_desktop.jnilib
+resource = [mac os x] lib/jogl/native/mac-universal/libnativewindow_awt.jnilib
+resource = [mac os x] lib/jogl/native/mac-universal/libnativewindow_macosx.jnilib
 
 # The main entry point for the application
 class = org.concord.energy3d.util.UpdateStub

@@ -13,22 +13,23 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="exe/lib/jogl/gluegen-rt.jar" sourcepath="exe/lib/jogl/jogamp-fat-java-src.zip"/>
-	<classpathentry kind="lib" path="exe/lib/jogl/jogl-all.jar" sourcepath="exe/lib/jogl/jogamp-fat-java-src.zip"/>
+	<classpathentry kind="lib" path="exe/lib/jogl/gluegen-rt.jar" sourcepath="exe/lib/jogl/gluegen-java-src.zip"/>
+	<classpathentry kind="lib" path="exe/lib/jogl/jogl-all.jar" sourcepath="exe/lib/jogl/jogl-java-src.zip"/>
 	<classpathentry kind="lib" path="exe/lib/getdown.jar"/>
 	<classpathentry kind="lib" path="exe/lib/google-collections.jar"/>
 	<classpathentry kind="lib" path="exe/lib/jdom2.jar"/>
 	<classpathentry kind="lib" path="exe/lib/orange-extensions.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-animation.jar" sourcepath="exe/lib/ardor3d/ardor3d-animation-1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-awt.jar" sourcepath="exe/lib/ardor3d/ardor3d-awt-1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-collada.jar" sourcepath="exe/lib/ardor3d/ardor3d-collada-1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-core.jar" sourcepath="exe/lib/ardor3d/ardor3d-core-1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-effects.jar" sourcepath="exe/lib/ardor3d/ardor3d-effects-1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-jogl.jar" sourcepath="exe/lib/ardor3d/ardor3d-jogl-1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-math.jar" sourcepath="exe/lib/ardor3d/ardor3d-math-1.0-SNAPSHOT-sources.jar"/>
-	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-savable.jar" sourcepath="exe/lib/ardor3d/ardor3d-savable-1.0-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-animation.jar" sourcepath="exe/lib/ardor3d/ardor3d-animation-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-awt.jar" sourcepath="exe/lib/ardor3d/ardor3d-awt-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-collada.jar" sourcepath="exe/lib/ardor3d/ardor3d-collada-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-core.jar" sourcepath="exe/lib/ardor3d/ardor3d-core-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-effects.jar" sourcepath="exe/lib/ardor3d/ardor3d-effects-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-jogl.jar" sourcepath="exe/lib/ardor3d/ardor3d-jogl-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-math.jar" sourcepath="exe/lib/ardor3d/ardor3d-math-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-savable.jar" sourcepath="exe/lib/ardor3d/ardor3d-savable-sources.jar"/>
 	<classpathentry kind="lib" path="exe/lib/poly2tri/poly2tri-ardor3d.jar"/>
 	<classpathentry kind="lib" path="exe/lib/poly2tri/poly2tri-core.jar"/>
 	<classpathentry kind="lib" path="exe/lib/samskivert.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-jogl-awt.jar" sourcepath="exe/lib/ardor3d/ardor3d-jogl-awt-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
