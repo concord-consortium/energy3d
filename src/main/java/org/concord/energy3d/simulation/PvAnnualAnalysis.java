@@ -76,10 +76,13 @@ public class PvAnnualAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
+				final EnergyPanel e = EnergyPanel.getInstance();
+				Calendar today;
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalender();
 						c.set(Calendar.MONTH, m);
+						today = (Calendar) c.clone();
 						Scene.getInstance().updateSolarPanels();
 						final Throwable t = compute();
 						if (t != null) {
@@ -91,10 +94,25 @@ public class PvAnnualAnalysis extends Analysis {
 							});
 							break;
 						}
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) { // synchronize with daily graph
+							if (e.getPvStationDailyEnergyGraph().hasGraph()) {
+								e.getPvStationDailyEnergyGraph().setCalendar(today);
+								e.getPvStationDailyEnergyGraph().updateGraph();
+							}
+						}
+						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
+								e.getDateSpinner().setValue(c.getTime());
+								if (selectedPart instanceof Foundation) {
+									e.getPvStationTabbedPane().setSelectedComponent(e.getPvStationDailyEnergyGraph());
+									if (!e.getPvStationDailyEnergyGraph().hasGraph()) {
+										e.getPvStationDailyEnergyGraph().setCalendar(today2);
+										e.getPvStationDailyEnergyGraph().addGraph((Foundation) selectedPart);
+									}
+								}
 							}
 						});
 					}
@@ -196,7 +214,7 @@ public class PvAnnualAnalysis extends Analysis {
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield";
 			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
-				title = "Annual Yield of Selected Building";
+				title = "Annual Yield on Selected Foundation";
 			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);

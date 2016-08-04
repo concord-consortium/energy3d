@@ -173,8 +173,9 @@ public class Scene implements Serializable {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					EnergyPanel.getInstance().update();
-					EnergyPanel.getInstance().clearAllGraphs();
+					final EnergyPanel e = EnergyPanel.getInstance();
+					e.update();
+					e.clearAllGraphs();
 					if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
 						MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
 						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
@@ -182,10 +183,22 @@ public class Scene implements Serializable {
 					}
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
-						EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
-						EnergyPanel.getInstance().getDailyEnergyGraph().clearData();
-						EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) p);
-						EnergyPanel.getInstance().validate();
+						Foundation f = (Foundation) p;
+						switch (f.getSupportingType()) {
+						case Foundation.BUILDING:
+							e.getConstructionCostGraph().addGraph(f);
+							e.getBuildingDailyEnergyGraph().clearData();
+							e.getBuildingDailyEnergyGraph().addGraph(f);
+							e.validate();
+							break;
+						case Foundation.PV_STATION:
+							e.getPvStationDailyEnergyGraph().clearData();
+							e.getPvStationDailyEnergyGraph().addGraph(f);
+							e.validate();
+							break;
+						case Foundation.CSP_STATION:
+							break;
+						}
 					}
 				}
 			});

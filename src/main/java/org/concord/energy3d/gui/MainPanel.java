@@ -776,8 +776,10 @@ public class MainPanel extends JPanel {
 						defaultTool();
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {
-						EnergyPanel.getInstance().getDailyEnergyGraph().clearData();
-						EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
+						EnergyPanel.getInstance().getBuildingDailyEnergyGraph().clearData();
+						EnergyPanel.getInstance().getBuildingDailyEnergyGraph().removeGraph();
+						EnergyPanel.getInstance().getPvStationDailyEnergyGraph().clearData();
+						EnergyPanel.getInstance().getPvStationDailyEnergyGraph().removeGraph();
 					}
 					SceneManager.getInstance().computeEnergyView(energyViewButton.isSelected());
 				}

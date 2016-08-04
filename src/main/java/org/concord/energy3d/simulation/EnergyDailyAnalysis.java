@@ -87,7 +87,7 @@ public class EnergyDailyAnalysis extends Analysis {
 							}
 							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 							if (selectedPart instanceof Foundation)
-								EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
+								EnergyPanel.getInstance().getBuildingDailyEnergyGraph().addGraph((Foundation) selectedPart);
 							JOptionPane.showMessageDialog(parent, "<html>The calculated daily net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}

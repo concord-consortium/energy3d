@@ -22,8 +22,8 @@ public class PvStationInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private JPanel countPanel, costPanel;
-	private ColorBar countBar, costBar;
+	private JPanel countPanel, costPanel, landAreaPanel, panelAreaPanel;
+	private ColorBar countBar, costBar, landAreaBar, panelAreaBar;
 
 	public PvStationInfoPanel() {
 
@@ -35,7 +35,7 @@ public class PvStationInfoPanel extends JPanel {
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		add(container, BorderLayout.NORTH);
 
-		// solar panel count for the selected base
+		// solar panel count on the selected base
 
 		countPanel = new JPanel(new BorderLayout());
 		countPanel.setBorder(EnergyPanel.createTitledBorder("Number of solar panels", true));
@@ -49,7 +49,33 @@ public class PvStationInfoPanel extends JPanel {
 		countBar.setPreferredSize(new Dimension(100, 16));
 		countPanel.add(countBar, BorderLayout.CENTER);
 
-		// solar panel cost for the selected base
+		// average area of a solar panel on the selected base
+
+		landAreaPanel = new JPanel(new BorderLayout());
+		landAreaPanel.setBorder(EnergyPanel.createTitledBorder("<html>Average land area occupied by a panel (m<sup>2</sup>)</html>", true));
+		container.add(landAreaPanel);
+		landAreaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		landAreaBar.setUnit("");
+		landAreaBar.setVerticalLineRepresentation(false);
+		landAreaBar.setDecimalDigits(2);
+		landAreaBar.setToolTipText(landAreaPanel.getToolTipText());
+		landAreaBar.setPreferredSize(new Dimension(100, 16));
+		landAreaPanel.add(landAreaBar, BorderLayout.CENTER);
+
+		// total solar panel area on the selected base
+
+		panelAreaPanel = new JPanel(new BorderLayout());
+		panelAreaPanel.setBorder(EnergyPanel.createTitledBorder("<html>Total surface area of panels (m<sup>2</sup>)</html>", true));
+		container.add(panelAreaPanel);
+		panelAreaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		panelAreaBar.setUnit("");
+		panelAreaBar.setVerticalLineRepresentation(false);
+		panelAreaBar.setDecimalDigits(2);
+		panelAreaBar.setToolTipText(panelAreaPanel.getToolTipText());
+		panelAreaBar.setPreferredSize(new Dimension(100, 16));
+		panelAreaPanel.add(panelAreaBar, BorderLayout.CENTER);
+
+		// solar panel cost on the selected base
 
 		costPanel = new JPanel(new BorderLayout());
 		costPanel.setBorder(EnergyPanel.createTitledBorder("Cost of solar panels", true));
@@ -68,11 +94,15 @@ public class PvStationInfoPanel extends JPanel {
 	void update(Foundation foundation) {
 		List<SolarPanel> panels = foundation.getSolarPanels();
 		countBar.setValue(panels.size());
+		landAreaBar.setValue((float) foundation.getArea() / panels.size());
 		double cost = 0;
+		double panelArea = 0;
 		for (SolarPanel s : panels) {
 			cost += Cost.getInstance().getPartCost(s);
+			panelArea += s.getPanelWidth() * s.getPanelHeight();
 		}
 		costBar.setValue(Math.round(cost));
+		panelAreaBar.setValue((float) panelArea);
 	}
 
 }

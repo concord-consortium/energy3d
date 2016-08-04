@@ -120,11 +120,12 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty2TextField;
 	private JTextField partProperty3TextField;
 	private ChangeListener latitudeChangeListener;
+	private ConstructionCostGraph constructionCostGraph;
+	private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
+	private PvStationDailyEnergyGraph pvStationDailyEnergyGraph;
 	private BuildingInfoPanel buildingInfoPanel;
 	private PvStationInfoPanel pvStationInfoPanel;
 	private CspStationInfoPanel cspStationInfoPanel;
-	private ConstructionCostGraph constructionCostGraph;
-	private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
 	private JTabbedPane buildingTabbedPane, pvStationTabbedPane, cspStationTabbedPane;
 	private JPanel buildingPanel, pvStationPanel, cspStationPanel;
 	private boolean disableDateSpinner;
@@ -414,6 +415,27 @@ public class EnergyPanel extends JPanel {
 		pvStationInfoPanel = new PvStationInfoPanel();
 		pvStationTabbedPane.add("Info", pvStationInfoPanel);
 
+		pvStationDailyEnergyGraph = new PvStationDailyEnergyGraph();
+		pvStationTabbedPane.add("Output", pvStationDailyEnergyGraph);
+
+		pvStationTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (pvStationTabbedPane.getSelectedComponent() == pvStationDailyEnergyGraph) {
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							pvStationDailyEnergyGraph.addGraph((Foundation) selectedPart);
+						} else {
+							pvStationDailyEnergyGraph.removeGraph();
+						}
+					}
+				}
+				TimeSeriesLogger.getInstance().logGraphTab(pvStationTabbedPane.getTitleAt(pvStationTabbedPane.getSelectedIndex()));
+			}
+		});
+		pvStationPanel.setMaximumSize(new Dimension(pvStationPanel.getMaximumSize().width, pvStationPanel.getPreferredSize().height));
+
 		// csp station panel
 		cspStationPanel = new JPanel();
 		cspStationPanel.setBorder(createTitledBorder("Concentrated Solar Power Station", true));
@@ -482,9 +504,9 @@ public class EnergyPanel extends JPanel {
 					if (SceneManager.getInstance().getSolarHeatMap()) {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) {
-							EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
+							buildingDailyEnergyGraph.addGraph((Foundation) selectedPart);
 						} else {
-							EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
+							buildingDailyEnergyGraph.removeGraph();
 						}
 					}
 				}
@@ -537,7 +559,7 @@ public class EnergyPanel extends JPanel {
 			computeRequest = true;
 		else {
 			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			thread = new Thread("Energy Computer") {
+			thread = new Thread("Energy Computation") {
 				@Override
 				public void run() {
 					do {
@@ -568,11 +590,23 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								progress(0);
 								if (SceneManager.getInstance().getSolarHeatMap()) {
-									Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
-										buildingDailyEnergyGraph.addGraph((Foundation) p);
-										TimeSeriesLogger.getInstance().logAnalysis(buildingDailyEnergyGraph);
+										Foundation f = (Foundation) p;
+										switch (f.getSupportingType()) {
+										case Foundation.BUILDING:
+											Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
+											buildingDailyEnergyGraph.addGraph(f);
+											TimeSeriesLogger.getInstance().logAnalysis(buildingDailyEnergyGraph);
+											break;
+										case Foundation.PV_STATION:
+											Util.setSilently(pvStationTabbedPane, pvStationDailyEnergyGraph);
+											pvStationDailyEnergyGraph.addGraph(f);
+											TimeSeriesLogger.getInstance().logAnalysis(pvStationDailyEnergyGraph);
+											break;
+										case Foundation.CSP_STATION:
+											break;
+										}
 									}
 								}
 							}
@@ -654,8 +688,16 @@ public class EnergyPanel extends JPanel {
 		}
 	}
 
-	public JTabbedPane getGraphTabbedPane() {
+	public JTabbedPane getBuildingTabbedPane() {
 		return buildingTabbedPane;
+	}
+
+	public JTabbedPane getPvStationTabbedPane() {
+		return pvStationTabbedPane;
+	}
+
+	public JTabbedPane getCspStationTabbedPane() {
+		return cspStationTabbedPane;
 	}
 
 	public JSpinner getDateSpinner() {
@@ -678,14 +720,19 @@ public class EnergyPanel extends JPanel {
 		return constructionCostGraph;
 	}
 
-	public BuildingDailyEnergyGraph getDailyEnergyGraph() {
+	public BuildingDailyEnergyGraph getBuildingDailyEnergyGraph() {
 		return buildingDailyEnergyGraph;
+	}
+
+	public PvStationDailyEnergyGraph getPvStationDailyEnergyGraph() {
+		return pvStationDailyEnergyGraph;
 	}
 
 	/** call when loading a new file */
 	public void clearAllGraphs() {
 		constructionCostGraph.removeGraph();
 		buildingDailyEnergyGraph.removeGraph();
+		pvStationDailyEnergyGraph.removeGraph();
 	}
 
 	public void progress(final int percentage) {
@@ -1158,12 +1205,22 @@ public class EnergyPanel extends JPanel {
 			public void run() {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
-					final Foundation foundation = (Foundation) selectedPart;
-					constructionCostGraph.addGraph(foundation);
-					buildingDailyEnergyGraph.addGraph(foundation);
+					final Foundation f = (Foundation) selectedPart;
+					switch (f.getSupportingType()) {
+					case Foundation.BUILDING:
+						constructionCostGraph.addGraph(f);
+						buildingDailyEnergyGraph.addGraph(f);
+						break;
+					case Foundation.PV_STATION:
+						pvStationDailyEnergyGraph.addGraph(f);
+						break;
+					case Foundation.CSP_STATION:
+						break;
+					}
 				} else {
 					constructionCostGraph.removeGraph();
 					buildingDailyEnergyGraph.removeGraph();
+					pvStationDailyEnergyGraph.removeGraph();
 				}
 			}
 		});
