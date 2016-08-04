@@ -8,7 +8,6 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.scene.Scene;
 
 public class ChangeFoundationMirrorReflectivityCommand extends AbstractUndoableEdit {
 
@@ -19,7 +18,7 @@ public class ChangeFoundationMirrorReflectivityCommand extends AbstractUndoableE
 
 	public ChangeFoundationMirrorReflectivityCommand(Foundation foundation) {
 		this.foundation = foundation;
-		mirrors = Scene.getInstance().getMirrorsOnFoundation(foundation);
+		mirrors = foundation.getMirrors();
 		int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {

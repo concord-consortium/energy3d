@@ -1549,15 +1549,6 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public List<SolarPanel> getSolarPanelsOnFoundation(final Foundation foundation) {
-		final List<SolarPanel> list = new ArrayList<SolarPanel>();
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-				list.add((SolarPanel) p);
-		}
-		return list;
-	}
-
 	public List<SolarPanel> getAllSolarPanels() {
 		final List<SolarPanel> list = new ArrayList<SolarPanel>();
 		for (final HousePart p : parts) {
@@ -1673,15 +1664,6 @@ public class Scene implements Serializable {
 			if (p instanceof SolarPanel)
 				((SolarPanel) p).setInverterEfficiency(eff);
 		}
-	}
-
-	public List<Mirror> getMirrorsOnFoundation(final Foundation foundation) {
-		final List<Mirror> list = new ArrayList<Mirror>();
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation)
-				list.add((Mirror) p);
-		}
-		return list;
 	}
 
 	public List<Mirror> getAllMirrors() {

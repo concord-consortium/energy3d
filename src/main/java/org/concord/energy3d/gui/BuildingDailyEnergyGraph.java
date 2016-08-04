@@ -29,7 +29,7 @@ import org.concord.energy3d.simulation.SolarRadiation;
  * @author Charles Xie
  *
  */
-public class DailyEnergyGraph extends JPanel {
+public class BuildingDailyEnergyGraph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -37,7 +37,7 @@ public class DailyEnergyGraph extends JPanel {
 	private Foundation building;
 	private Box buttonPanel;
 
-	public DailyEnergyGraph() {
+	public BuildingDailyEnergyGraph() {
 		super(new BorderLayout());
 
 		buttonPanel = new Box(BoxLayout.Y_AXIS);

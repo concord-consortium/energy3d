@@ -1318,6 +1318,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		return count;
 	}
 
+	public List<SolarPanel> getSolarPanels() {
+		final List<SolarPanel> list = new ArrayList<SolarPanel>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this)
+				list.add((SolarPanel) p);
+		}
+		return list;
+	}
+
+	public List<Mirror> getMirrors() {
+		final List<Mirror> list = new ArrayList<Mirror>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this)
+				list.add((Mirror) p);
+		}
+		return list;
+	}
+
 	public void updateHandlesOfAllFoudations() {
 		for (final HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation)

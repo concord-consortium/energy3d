@@ -121,8 +121,10 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty3TextField;
 	private ChangeListener latitudeChangeListener;
 	private BuildingInfoPanel buildingInfoPanel;
+	private PvStationInfoPanel pvStationInfoPanel;
+	private CspStationInfoPanel cspStationInfoPanel;
 	private ConstructionCostGraph constructionCostGraph;
-	private DailyEnergyGraph dailyEnergyGraph;
+	private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
 	private JTabbedPane buildingTabbedPane, pvStationTabbedPane, cspStationTabbedPane;
 	private JPanel buildingPanel, pvStationPanel, cspStationPanel;
 	private boolean disableDateSpinner;
@@ -409,6 +411,9 @@ public class EnergyPanel extends JPanel {
 		pvStationTabbedPane.setFont(new Font(pvStationTabbedPane.getFont().getName(), Font.PLAIN, pvStationTabbedPane.getFont().getSize() - 1));
 		pvStationPanel.add(pvStationTabbedPane);
 
+		pvStationInfoPanel = new PvStationInfoPanel();
+		pvStationTabbedPane.add("Info", pvStationInfoPanel);
+
 		// csp station panel
 		cspStationPanel = new JPanel();
 		cspStationPanel.setBorder(createTitledBorder("Concentrated Solar Power Station", true));
@@ -417,6 +422,9 @@ public class EnergyPanel extends JPanel {
 		cspStationTabbedPane = new JTabbedPane();
 		cspStationTabbedPane.setFont(new Font(cspStationTabbedPane.getFont().getName(), Font.PLAIN, cspStationTabbedPane.getFont().getSize() - 1));
 		cspStationPanel.add(cspStationTabbedPane);
+
+		cspStationInfoPanel = new CspStationInfoPanel();
+		cspStationTabbedPane.add("Info", cspStationInfoPanel);
 
 		// building panel
 
@@ -464,13 +472,13 @@ public class EnergyPanel extends JPanel {
 		constructionCostGraph = new ConstructionCostGraph(); // construction cost graph
 		buildingTabbedPane.add("Cost", constructionCostGraph);
 
-		dailyEnergyGraph = new DailyEnergyGraph(); // hourly energy graph
-		buildingTabbedPane.add("Energy", dailyEnergyGraph);
+		buildingDailyEnergyGraph = new BuildingDailyEnergyGraph(); // hourly energy graph
+		buildingTabbedPane.add("Energy", buildingDailyEnergyGraph);
 
 		buildingTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				if (buildingTabbedPane.getSelectedComponent() == dailyEnergyGraph) {
+				if (buildingTabbedPane.getSelectedComponent() == buildingDailyEnergyGraph) {
 					if (SceneManager.getInstance().getSolarHeatMap()) {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) {
@@ -560,11 +568,11 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								progress(0);
 								if (SceneManager.getInstance().getSolarHeatMap()) {
-									Util.setSilently(buildingTabbedPane, dailyEnergyGraph);
+									Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
-										dailyEnergyGraph.addGraph((Foundation) p);
-										TimeSeriesLogger.getInstance().logAnalysis(dailyEnergyGraph);
+										buildingDailyEnergyGraph.addGraph((Foundation) p);
+										TimeSeriesLogger.getInstance().logAnalysis(buildingDailyEnergyGraph);
 									}
 								}
 							}
@@ -670,14 +678,14 @@ public class EnergyPanel extends JPanel {
 		return constructionCostGraph;
 	}
 
-	public DailyEnergyGraph getDailyEnergyGraph() {
-		return dailyEnergyGraph;
+	public BuildingDailyEnergyGraph getDailyEnergyGraph() {
+		return buildingDailyEnergyGraph;
 	}
 
 	/** call when loading a new file */
 	public void clearAllGraphs() {
 		constructionCostGraph.removeGraph();
-		dailyEnergyGraph.removeGraph();
+		buildingDailyEnergyGraph.removeGraph();
 	}
 
 	public void progress(final int percentage) {
@@ -1002,12 +1010,12 @@ public class EnergyPanel extends JPanel {
 			selectedFoundation = selectedPart.getTopContainer();
 		}
 		if (selectedFoundation != null) {
-			buildingInfoPanel.update(selectedFoundation);
 			switch (selectedFoundation.getSupportingType()) {
 			case Foundation.BUILDING:
 				dataPanel.remove(pvStationPanel);
 				dataPanel.remove(cspStationPanel);
 				dataPanel.add(buildingPanel, 2);
+				buildingInfoPanel.update(selectedFoundation);
 				final Calendar c = Heliodon.getInstance().getCalender();
 				final int temp = selectedFoundation.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 				switch (Scene.getInstance().getUnit()) {
@@ -1029,11 +1037,13 @@ public class EnergyPanel extends JPanel {
 				dataPanel.remove(buildingPanel);
 				dataPanel.remove(cspStationPanel);
 				dataPanel.add(pvStationPanel, 2);
+				pvStationInfoPanel.update(selectedFoundation);
 				break;
 			case Foundation.CSP_STATION:
 				dataPanel.remove(buildingPanel);
 				dataPanel.remove(pvStationPanel);
 				dataPanel.add(cspStationPanel, 2);
+				cspStationInfoPanel.update(selectedFoundation);
 				break;
 			}
 		} else {
@@ -1043,6 +1053,7 @@ public class EnergyPanel extends JPanel {
 		}
 		buildingInfoPanel.repaint();
 		buildingPanel.repaint();
+		dataPanel.validate();
 		dataPanel.repaint();
 
 	}
@@ -1149,10 +1160,10 @@ public class EnergyPanel extends JPanel {
 				if (selectedPart instanceof Foundation) {
 					final Foundation foundation = (Foundation) selectedPart;
 					constructionCostGraph.addGraph(foundation);
-					dailyEnergyGraph.addGraph(foundation);
+					buildingDailyEnergyGraph.addGraph(foundation);
 				} else {
 					constructionCostGraph.removeGraph();
-					dailyEnergyGraph.removeGraph();
+					buildingDailyEnergyGraph.removeGraph();
 				}
 			}
 		});
