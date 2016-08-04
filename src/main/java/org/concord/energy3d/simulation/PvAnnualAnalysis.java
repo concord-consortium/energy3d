@@ -42,6 +42,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.PvStationDailyEnergyGraph;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -96,9 +97,10 @@ public class PvAnnualAnalysis extends Analysis {
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) { // synchronize with daily graph
-							if (e.getPvStationDailyEnergyGraph().hasGraph()) {
-								e.getPvStationDailyEnergyGraph().setCalendar(today);
-								e.getPvStationDailyEnergyGraph().updateGraph();
+							PvStationDailyEnergyGraph g = e.getPvStationDailyEnergyGraph();
+							if (g.hasGraph()) {
+								g.setCalendar(today);
+								g.updateGraph();
 							}
 						}
 						final Calendar today2 = today;
@@ -107,10 +109,11 @@ public class PvAnnualAnalysis extends Analysis {
 							public void run() {
 								e.getDateSpinner().setValue(c.getTime());
 								if (selectedPart instanceof Foundation) {
-									e.getPvStationTabbedPane().setSelectedComponent(e.getPvStationDailyEnergyGraph());
-									if (!e.getPvStationDailyEnergyGraph().hasGraph()) {
-										e.getPvStationDailyEnergyGraph().setCalendar(today2);
-										e.getPvStationDailyEnergyGraph().addGraph((Foundation) selectedPart);
+									PvStationDailyEnergyGraph g = e.getPvStationDailyEnergyGraph();
+									e.getPvStationTabbedPane().setSelectedComponent(g);
+									if (!g.hasGraph()) {
+										g.setCalendar(today2);
+										g.addGraph((Foundation) selectedPart);
 									}
 								}
 							}

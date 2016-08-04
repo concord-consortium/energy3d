@@ -123,6 +123,7 @@ public class EnergyPanel extends JPanel {
 	private ConstructionCostGraph constructionCostGraph;
 	private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
 	private PvStationDailyEnergyGraph pvStationDailyEnergyGraph;
+	private CspStationDailyEnergyGraph cspStationDailyEnergyGraph;
 	private BuildingInfoPanel buildingInfoPanel;
 	private PvStationInfoPanel pvStationInfoPanel;
 	private CspStationInfoPanel cspStationInfoPanel;
@@ -448,6 +449,27 @@ public class EnergyPanel extends JPanel {
 		cspStationInfoPanel = new CspStationInfoPanel();
 		cspStationTabbedPane.add("Info", cspStationInfoPanel);
 
+		cspStationDailyEnergyGraph = new CspStationDailyEnergyGraph();
+		cspStationTabbedPane.add("Output", cspStationDailyEnergyGraph);
+
+		cspStationTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (cspStationTabbedPane.getSelectedComponent() == cspStationDailyEnergyGraph) {
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							cspStationDailyEnergyGraph.addGraph((Foundation) selectedPart);
+						} else {
+							cspStationDailyEnergyGraph.removeGraph();
+						}
+					}
+				}
+				TimeSeriesLogger.getInstance().logGraphTab(cspStationTabbedPane.getTitleAt(cspStationTabbedPane.getSelectedIndex()));
+			}
+		});
+		cspStationPanel.setMaximumSize(new Dimension(cspStationPanel.getMaximumSize().width, cspStationPanel.getPreferredSize().height));
+
 		// building panel
 
 		buildingPanel = new JPanel();
@@ -605,6 +627,9 @@ public class EnergyPanel extends JPanel {
 											TimeSeriesLogger.getInstance().logAnalysis(pvStationDailyEnergyGraph);
 											break;
 										case Foundation.CSP_STATION:
+											Util.setSilently(cspStationTabbedPane, cspStationDailyEnergyGraph);
+											cspStationDailyEnergyGraph.addGraph(f);
+											TimeSeriesLogger.getInstance().logAnalysis(cspStationDailyEnergyGraph);
 											break;
 										}
 									}
@@ -728,11 +753,16 @@ public class EnergyPanel extends JPanel {
 		return pvStationDailyEnergyGraph;
 	}
 
+	public CspStationDailyEnergyGraph getCspStationDailyEnergyGraph() {
+		return cspStationDailyEnergyGraph;
+	}
+
 	/** call when loading a new file */
 	public void clearAllGraphs() {
 		constructionCostGraph.removeGraph();
 		buildingDailyEnergyGraph.removeGraph();
 		pvStationDailyEnergyGraph.removeGraph();
+		cspStationDailyEnergyGraph.removeGraph();
 	}
 
 	public void progress(final int percentage) {
@@ -1215,12 +1245,14 @@ public class EnergyPanel extends JPanel {
 						pvStationDailyEnergyGraph.addGraph(f);
 						break;
 					case Foundation.CSP_STATION:
+						cspStationDailyEnergyGraph.addGraph(f);
 						break;
 					}
 				} else {
 					constructionCostGraph.removeGraph();
 					buildingDailyEnergyGraph.removeGraph();
 					pvStationDailyEnergyGraph.removeGraph();
+					cspStationDailyEnergyGraph.removeGraph();
 				}
 			}
 		});
