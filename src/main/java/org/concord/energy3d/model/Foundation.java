@@ -44,6 +44,10 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Foundation extends HousePart implements Thermalizable {
 
 	private static final long serialVersionUID = 1L;
+	public static final int BUILDING = 0;
+	public static final int PV_STATION = 1;
+	public static final int CSP_STATION = 2;
+
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
@@ -1527,6 +1531,18 @@ public class Foundation extends HousePart implements Thermalizable {
 			rotate(-az, null);
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
+	}
+
+	public int getSupportingType() {
+		for (HousePart p : children) {
+			if (p instanceof Wall)
+				return BUILDING;
+			if (p instanceof SolarPanel)
+				return PV_STATION;
+			if (p instanceof Mirror)
+				return CSP_STATION;
+		}
+		return -1;
 	}
 
 }

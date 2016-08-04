@@ -20,7 +20,7 @@ import org.concord.energy3d.simulation.DesignSpecs;
  * @author Charles Xie
  *
  */
-public class BasicsPanel extends JPanel {
+public class BuildingInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,7 +31,7 @@ public class BasicsPanel extends JPanel {
 	private JPanel solarPanelCountPanel, windowCountPanel, wallCountPanel;
 	private ColorBar solarPanelCountBar, windowCountBar, wallCountBar;
 
-	public BasicsPanel() {
+	public BuildingInfoPanel() {
 
 		super(new BorderLayout());
 
