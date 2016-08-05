@@ -328,13 +328,14 @@ public class SolarRadiation {
 		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent
 			throw new RuntimeException("Normal is null");
 
+		int n = 8;
 		Mesh drawMesh = part.getRadiationMesh();
 		Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
-			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal);
+			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, n, n);
 
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(2, null);
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(3, null);
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
@@ -343,24 +344,39 @@ public class SolarRadiation {
 			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
+		double a = 1;
+		if (part instanceof SolarPanel) {
+			final SolarPanel sp = (SolarPanel) part;
+			a = sp.getPanelWidth() * sp.getPanelHeight();
+		} else if (part instanceof Mirror) {
+			final Mirror m = (Mirror) part;
+			a = m.getMirrorWidth() * m.getMirrorHeight();
+		} else if (part instanceof Sensor) {
+			a = Sensor.WIDTH * Sensor.HEIGHT;
+		}
+
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
-		int n = 2;
+		final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // row 0, col 0
+		final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // row 1, col 0
+		final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // row 0, col 1
+		final Vector3 u = p1.subtractLocal(p0).normalizeLocal();
+		final Vector3 v = p2.subtractLocal(p0).normalizeLocal();
+
+		final double rowSpacing = p0.distance(p1) / (n - 1);
+		final double colSpacing = p0.distance(p2) / (n - 1);
+		a *= timeStep / (n * n * 60.0); // nxnx60: nxn is to get the unit cell area of the nxn grid; 60 is to convert the unit of timeStep from minute to kWh
+
+		final int iMinute = minute / timeStep;
 		for (int col = 0; col < n; col++) {
 			for (int row = 0; row < n; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
-				final int index;
-				if (row == 0 && col == 0)
-					index = 3;
-				else if (row == 0 && col == 1)
-					index = 0;
-				else if (row == 1 && col == 0)
-					index = 6;
-				else
-					index = 12;
-				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
+				Vector3 u1 = u.multiply(rowSpacing * row, null);
+				Vector3 v1 = v.multiply(colSpacing * col, null);
+				final Vector3 point = p0.add(u1, null).add(v1, null);
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
+				// System.out.println("***"+p);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
@@ -375,23 +391,9 @@ public class SolarRadiation {
 					if (pickResults.getNumber() == 0)
 						radiation += directRadiation;
 				}
-
 				data.dailySolarIntensity[row][col] += radiation;
-				double area = 1;
-				if (part instanceof SolarPanel) {
-					final SolarPanel sp = (SolarPanel) part;
-					area = sp.getPanelWidth() * sp.getPanelHeight();
-				} else if (part instanceof Mirror) {
-					final Mirror m = (Mirror) part;
-					area = m.getMirrorWidth() * m.getMirrorHeight();
-				} else if (part instanceof Sensor) {
-					area = Sensor.WIDTH * Sensor.HEIGHT;
-				}
-				part.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
-				// ABOVE: 4x60: 4 is to get the 1/4 area of the 2x2 grid; 60 is to convert the unit of timeStep from minute to kWh
-
+				part.getSolarPotential()[iMinute] += radiation * a;
 			}
-
 		}
 
 	}
@@ -483,10 +485,10 @@ public class SolarRadiation {
 		return data;
 	}
 
-	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, int rows, int cols) {
 		final MeshData data = new MeshData();
-		data.rows = 4;
-		data.cols = 4;
+		data.rows = rows;
+		data.cols = cols;
 		if (data.dailySolarIntensity == null)
 			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
 		onMesh.put(drawMesh, data);
@@ -759,26 +761,8 @@ public class SolarRadiation {
 			mesh.clearRenderState(StateType.Texture);
 			return;
 		}
-
 		final double[][] solarData = onMesh.get(mesh).dailySolarIntensity;
-		final Object userData = mesh.getUserData();
-		if (userData instanceof UserData) {
-			final UserData ud = (UserData) userData;
-			if (ud.getHousePart() instanceof SolarPanel || ud.getHousePart() instanceof Mirror) {
-				solarData[3][0] = solarData[2][0] = solarData[1][0];
-				solarData[3][1] = solarData[2][1] = solarData[1][0];
-				solarData[3][2] = solarData[2][2] = solarData[1][1];
-				solarData[3][3] = solarData[2][3] = solarData[1][1];
-
-				solarData[0][2] = solarData[1][2] = solarData[0][1];
-				solarData[0][3] = solarData[1][3] = solarData[0][1];
-				solarData[0][0] = solarData[1][0] = solarData[0][0];
-				solarData[0][1] = solarData[1][1] = solarData[0][0];
-			}
-		}
-
 		fillBlanksWithNeighboringValues(solarData);
-
 		final int rows = solarData.length;
 		final int cols = solarData[0].length;
 		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
@@ -788,7 +772,6 @@ public class SolarRadiation {
 				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
 			}
 		}
-
 		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
 		final Texture2D texture = new Texture2D();
 		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
