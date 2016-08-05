@@ -271,19 +271,15 @@ public class SolarRadiation {
 		}
 
 		for (int col = 0; col < data.cols; col++) {
-			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
-			final double w = (col == data.cols - 1) ? data.p2.distance(pU) : solarStep;
+			final ReadOnlyVector3 pU = data.u.multiply((col + 0.5) * solarStep, null).addLocal(data.p0);
+			final double w = (col == data.cols - 1) ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
 			for (int row = 0; row < data.rows; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				if (data.dailySolarIntensity[row][col] == -1)
 					continue;
-				final ReadOnlyVector3 p = data.v.multiply(solarStep / 2.0 + row * solarStep, null).addLocal(pU).add(offset, null);
-				final double h;
-				if (row == data.rows - 1)
-					h = data.p1.subtract(data.p0, null).length() - row * solarStep;
-				else
-					h = solarStep;
+				final ReadOnlyVector3 p = data.v.multiply((row + 0.5) * solarStep, null).addLocal(pU).add(offset, null);
+				final double h = (row == data.rows - 1) ? data.p1.distance(data.p0) - row * solarStep : solarStep;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
@@ -330,7 +326,7 @@ public class SolarRadiation {
 
 		ReadOnlyVector3 normal = part.getNormal();
 		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent
-			throw new RuntimeException("Normal of solar panel is null");
+			throw new RuntimeException("Normal is null");
 
 		Mesh drawMesh = part.getRadiationMesh();
 		Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
