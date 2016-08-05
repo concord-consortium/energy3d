@@ -329,8 +329,8 @@ public class SolarRadiation {
 		}
 
 		ReadOnlyVector3 normal = part.getNormal();
-		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent. This is a temporary fix.
-			return;
+		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent
+			throw new RuntimeException("Normal of solar panel is null");
 
 		Mesh drawMesh = part.getRadiationMesh();
 		Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
@@ -338,8 +338,7 @@ public class SolarRadiation {
 		if (data == null)
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal);
 
-		final double OFFSET = 3;
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(2, null);
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
