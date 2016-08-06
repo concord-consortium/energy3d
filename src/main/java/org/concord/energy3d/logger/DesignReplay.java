@@ -8,7 +8,6 @@ import java.util.concurrent.Callable;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Foundation;
@@ -76,7 +75,7 @@ public class DesignReplay extends PlayControl {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().clearRadiationHeatMap();
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {

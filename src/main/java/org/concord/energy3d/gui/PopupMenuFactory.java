@@ -41,7 +41,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.MainApplication;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -348,7 +347,7 @@ public class PopupMenuFactory {
 									ChangeBackgroundAlbedoCommand c = new ChangeBackgroundAlbedoCommand();
 									Scene.getInstance().getGround().setAlbedo(val);
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
@@ -802,7 +801,7 @@ public class PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										Scene.getInstance().setShutterLengthOfBuilding(window, val);
 									}
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									Scene.getInstance().setEdited(true);
 									break;
 								}
@@ -890,7 +889,7 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -1312,7 +1311,7 @@ public class PopupMenuFactory {
 									f.drawChildren();
 									SceneManager.getInstance().refresh();
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
@@ -1808,7 +1807,7 @@ public class PopupMenuFactory {
 									f.drawChildren();
 									SceneManager.getInstance().refresh();
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									break;
 								}
@@ -2045,7 +2044,7 @@ public class PopupMenuFactory {
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					EnergyPanel.getInstance().clearRadiationHeatMap();
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -2093,7 +2092,7 @@ public class PopupMenuFactory {
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					EnergyPanel.getInstance().clearRadiationHeatMap();
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -2141,7 +2140,7 @@ public class PopupMenuFactory {
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					EnergyPanel.getInstance().clearRadiationHeatMap();
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -2216,7 +2215,7 @@ public class PopupMenuFactory {
 										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									Scene.getInstance().setEdited(true);
 									sp.draw();
 									break;
@@ -2282,7 +2281,7 @@ public class PopupMenuFactory {
 									Scene.getInstance().setAzimuthForAllSolarPanels(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().clearRadiationHeatMap();
 								Scene.getInstance().setEdited(true);
 								sp.draw();
 								break;
@@ -2343,7 +2342,7 @@ public class PopupMenuFactory {
 					s.setPanelWidth(w);
 					s.setPanelHeight(h);
 					Scene.getInstance().setEdited(true);
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					EnergyPanel.getInstance().clearRadiationHeatMap();
 					s.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -2396,7 +2395,7 @@ public class PopupMenuFactory {
 									Scene.getInstance().setBaseHeightForAllSolarPanels(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().clearRadiationHeatMap();
 								Scene.getInstance().setEdited(true);
 								sp.draw();
 								break;
@@ -2519,7 +2518,7 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -2580,7 +2579,7 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -2710,7 +2709,7 @@ public class PopupMenuFactory {
 											Scene.getInstance().setTargetForAllMirrors(f);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
-										EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+										EnergyPanel.getInstance().clearRadiationHeatMap();
 										Scene.getInstance().setEdited(true);
 									} else {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -2767,7 +2766,7 @@ public class PopupMenuFactory {
 						Scene.getInstance().setTargetForAllMirrors(null);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					EnergyPanel.getInstance().clearRadiationHeatMap();
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -2826,7 +2825,7 @@ public class PopupMenuFactory {
 										Scene.getInstance().setTiltAngleForAllMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									Scene.getInstance().setEdited(true);
 									m.draw();
 									break;
@@ -2892,7 +2891,7 @@ public class PopupMenuFactory {
 									Scene.getInstance().setAzimuthForAllMirrors(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().clearRadiationHeatMap();
 								Scene.getInstance().setEdited(true);
 								mirror.draw();
 								break;
@@ -2948,7 +2947,7 @@ public class PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 					}
 					Scene.getInstance().setEdited(true);
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					EnergyPanel.getInstance().clearRadiationHeatMap();
 					m.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -3001,7 +3000,7 @@ public class PopupMenuFactory {
 									Scene.getInstance().setBaseHeightForAllMirrors(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().clearRadiationHeatMap();
 								Scene.getInstance().setEdited(true);
 								m.draw();
 								break;
@@ -3081,7 +3080,7 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									Scene.getInstance().setEdited(true);
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -3384,7 +3383,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								Scene.getInstance().setEdited(true);
-								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().clearRadiationHeatMap();
 								EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
 								break;
 							}
@@ -3427,7 +3426,7 @@ public class PopupMenuFactory {
 								ChangeVolumetricHeatCapacityCommand c = new ChangeVolumetricHeatCapacityCommand(selectedPart);
 								t.setVolumetricHeatCapacity(val);
 								Scene.getInstance().setEdited(true);
-								EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+								EnergyPanel.getInstance().clearRadiationHeatMap();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								break;
 							}

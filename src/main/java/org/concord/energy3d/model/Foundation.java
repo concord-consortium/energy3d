@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -1446,7 +1445,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void addCircularMirrorArrays() {
-		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
 			if (c instanceof Mirror)
@@ -1484,7 +1483,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void addSolarPanelArrays(double panelWidth, double panelHeight, double rowSpacing, double colSpacing, int alignment) {
-		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
 			if (c instanceof SolarPanel)

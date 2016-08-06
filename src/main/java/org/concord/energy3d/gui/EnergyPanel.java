@@ -186,7 +186,7 @@ public class EnergyPanel extends JPanel {
 					}
 					Scene.getInstance().setDate(d);
 					Heliodon.getInstance().setDate(d);
-					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					clearRadiationHeatMap();
 					Scene.getInstance().setTreeLeaves();
 					Scene.getInstance().updateMirrors();
 					Scene.getInstance().updateSolarPanels();
@@ -222,13 +222,13 @@ public class EnergyPanel extends JPanel {
 			public void actionPerformed(final ActionEvent e) {
 				final String city = (String) cityComboBox.getSelectedItem();
 				if (city.equals("")) {
-					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					clearRadiationHeatMap();
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
 					Scene.getInstance().setCity(city);
 				} else {
 					final ChangeCityCommand c = new ChangeCityCommand();
 					setLatitude((int) LocationData.getInstance().getLatitutes().get(cityComboBox.getSelectedItem()).floatValue());
-					compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					clearRadiationHeatMap();
 					Scene.getInstance().setCity(city);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -322,7 +322,7 @@ public class EnergyPanel extends JPanel {
 			public void stateChanged(final ChangeEvent e) {
 				final ChangeLatitudeCommand c = new ChangeLatitudeCommand();
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
-				compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				clearRadiationHeatMap();
 				Scene.getInstance().updateMirrors();
 				Scene.getInstance().updateSolarPanels();
 				Scene.getInstance().setEdited(true);

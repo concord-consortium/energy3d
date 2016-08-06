@@ -17,7 +17,6 @@ import java.util.concurrent.Callable;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.logger.SnapshotLogger;
@@ -169,7 +168,7 @@ public class Scene implements Serializable {
 	public static void open(final URL file) throws Exception {
 		openNow(file);
 		synchronized (SceneManager.getInstance()) {
-			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+			EnergyPanel.getInstance().clearRadiationHeatMap();
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {

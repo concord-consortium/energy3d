@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.SolarRadiation;
 
@@ -79,7 +78,7 @@ class SimulationSettingsDialog extends JDialog {
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
 				Scene.getInstance().setHeatVectorLength(heatVectorLength);
 				Scene.getInstance().setEdited(true);
-				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				EnergyPanel.getInstance().clearRadiationHeatMap();
 				SimulationSettingsDialog.this.dispose();
 			}
 		};

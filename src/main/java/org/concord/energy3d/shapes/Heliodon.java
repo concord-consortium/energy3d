@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.FontManager;
@@ -422,7 +421,7 @@ public class Heliodon {
 					setHourAngle(newHourAngle, false, true, true);
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
-					EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					EnergyPanel.getInstance().clearRadiationHeatMap();
 				}
 			}
 		}));

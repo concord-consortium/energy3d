@@ -100,7 +100,7 @@ public class SolarRadiation {
 		for (final HousePart part : Scene.getInstance().getParts())
 			part.setSolarPotential(new double[MINUTES_OF_DAY / timeStep]);
 		maxValue = 1;
-		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
+		computeToday();
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part.isDrawCompleted())
 				part.drawHeatFlux();
@@ -150,10 +150,16 @@ public class SolarRadiation {
 		}
 	}
 
-	private void computeToday(final Calendar today) {
+	private void computeToday() {
+
+		// save current calendar for restoring at the end of this calculation
+		final Calendar today = (Calendar) Heliodon.getInstance().getCalender().clone();
+		final int hourOfDay = today.get(Calendar.HOUR_OF_DAY);
+		final int minuteOfHour = today.get(Calendar.MINUTE);
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
+
 		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[SolarRadiation.MINUTES_OF_DAY / timeStep];
 		int totalSteps = 0;
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
@@ -204,6 +210,24 @@ public class SolarRadiation {
 			maxValue++;
 		}
 		maxValue *= 1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast();
+
+		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
+		Heliodon.getInstance().getCalender().set(Calendar.HOUR_OF_DAY, hourOfDay);
+		Heliodon.getInstance().getCalender().set(Calendar.MINUTE, minuteOfHour);
+		for (HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Mirror) {
+				Mirror m = (Mirror) part;
+				if (m.getHeliostatTarget() != null) {
+					m.draw();
+				}
+			} else if (part instanceof SolarPanel) {
+				SolarPanel sp = (SolarPanel) part;
+				if (sp.getTracker() != SolarPanel.NO_TRACKER) {
+					sp.draw();
+				}
+			}
+		}
+
 	}
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
@@ -314,13 +338,19 @@ public class SolarRadiation {
 
 		if (part instanceof Mirror) {
 			Mirror m = (Mirror) part;
-			if (m.getHeliostatTarget() != null) { // calculate the normal at this minute
-				m.setNormalAtTime(null, minute);
+			if (m.getHeliostatTarget() != null) {
+				Calendar calendar = (Calendar) Heliodon.getInstance().getCalender();
+				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+				calendar.set(Calendar.MINUTE, minute % 60);
+				m.draw();
 			}
 		} else if (part instanceof SolarPanel) {
 			SolarPanel sp = (SolarPanel) part;
-			if (sp.getTracker() != SolarPanel.NO_TRACKER) { // calculate the normal at this minute
-				sp.setNormalAtTime(minute);
+			if (sp.getTracker() != SolarPanel.NO_TRACKER) {
+				Calendar calendar = (Calendar) Heliodon.getInstance().getCalender();
+				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+				calendar.set(Calendar.MINUTE, minute % 60);
+				sp.draw();
 			}
 		}
 
@@ -335,7 +365,7 @@ public class SolarRadiation {
 		if (data == null)
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, n, n);
 
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(3, null);
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
@@ -360,11 +390,15 @@ public class SolarRadiation {
 		final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // row 0, col 0
 		final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // row 1, col 0
 		final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // row 0, col 1
-		final Vector3 u = p1.subtractLocal(p0).normalizeLocal();
-		final Vector3 v = p2.subtractLocal(p0).normalizeLocal();
+		// Vector3 q0 = drawMesh.localToWorld(p0, null);
+		// Vector3 q1 = drawMesh.localToWorld(p1, null);
+		// Vector3 q2 = drawMesh.localToWorld(p2, null);
+		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
+		final Vector3 u = p1.subtract(p0, null).normalizeLocal();
+		final Vector3 v = p2.subtract(p0, null).normalizeLocal();
 
-		final double rowSpacing = p0.distance(p1) / (n - 1);
-		final double colSpacing = p0.distance(p2) / (n - 1);
+		final double rowSpacing = p0.distance(p1) / n;
+		final double colSpacing = p0.distance(p2) / n;
 		a *= timeStep / (n * n * 60.0); // nxnx60: nxn is to get the unit cell area of the nxn grid; 60 is to convert the unit of timeStep from minute to kWh
 
 		final int iMinute = minute / timeStep;
@@ -374,9 +408,7 @@ public class SolarRadiation {
 					throw new CancellationException();
 				Vector3 u1 = u.multiply(rowSpacing * row, null);
 				Vector3 v1 = v.multiply(colSpacing * col, null);
-				final Vector3 point = p0.add(u1, null).add(v1, null);
-				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
-				// System.out.println("***"+p);
+				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(u1, null).addLocal(v1)).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {

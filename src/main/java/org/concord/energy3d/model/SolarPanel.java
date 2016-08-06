@@ -1,7 +1,6 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
-import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -10,7 +9,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -253,22 +251,6 @@ public class SolarPanel extends HousePart {
 		if (drawSunBeam)
 			drawSunBeam();
 
-	}
-
-	public void setNormalAtTime(int minute) {
-		Calendar calendar = (Calendar) Heliodon.getInstance().getCalender().clone();
-		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
-		calendar.set(Calendar.MINUTE, minute % 60);
-		switch (trackerType) {
-		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
-			break;
-		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(calendar).multiply(1, 0, 1, null).normalize(null);
-			if (Util.isEqual(normal, Vector3.UNIT_Z))
-				normal = new Vector3(0, 0.001, 1).normalizeLocal();
-			break;
-		}
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
