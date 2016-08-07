@@ -1608,9 +1608,9 @@ public class PopupMenuFactory {
 						JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 						sizeComboBox.setSelectedIndex(2);
 						panel.add(sizeComboBox);
-						panel.add(new JLabel("Row alignment:"));
-						JComboBox<String> alignmentComboBox = new JComboBox<String>(new String[] { "East-West", "North-South" });
-						panel.add(alignmentComboBox);
+						panel.add(new JLabel("Row axis:"));
+						JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						panel.add(rowAxisComboBox);
 						panel.add(new JLabel("Row spacing:"));
 						JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(rowSpacing));
 						panel.add(rowSpacingField);
@@ -1654,13 +1654,13 @@ public class PopupMenuFactory {
 								panelHeight = 1.96;
 								break;
 							}
-							final int alignment = alignmentComboBox.getSelectedIndex();
+							final int rowAxis = rowAxisComboBox.getSelectedIndex();
 							final double rowSpacing1 = rowSpacing;
 							final double colSpacing1 = colSpacing;
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									f.addSolarPanelArrays(panelWidth, panelHeight, rowSpacing1, colSpacing1, alignment);
+									f.addSolarPanelArrays(panelWidth, panelHeight, rowSpacing1, colSpacing1, rowAxis);
 									return null;
 								}
 							});
