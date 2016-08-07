@@ -50,6 +50,7 @@ public class SolarPanel extends HousePart {
 	private int trackerType = NO_TRACKER;
 	private double baseHeight = 6;
 	private boolean drawSunBeam;
+	private int rotationAxis;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
 
@@ -224,7 +225,15 @@ public class SolarPanel extends HousePart {
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).multiply(1, 0, 1, null).normalize(null);
+			int xRotationAxis = 1;
+			int yRotationAxis = 0;
+			switch (rotationAxis) {
+			case 1:
+				xRotationAxis = 0;
+				yRotationAxis = 1;
+				break;
+			}
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
 				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 			break;
@@ -577,6 +586,14 @@ public class SolarPanel extends HousePart {
 
 	public int getTracker() {
 		return trackerType;
+	}
+
+	public void setRotationAxis(int rotationAxis) {
+		this.rotationAxis = rotationAxis;
+	}
+
+	public int getRotationAxis() {
+		return rotationAxis;
 	}
 
 	public void setSunBeamVisible(boolean drawSunBeam) {
