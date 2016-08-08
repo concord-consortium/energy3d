@@ -279,7 +279,7 @@ public class Tree extends HousePart {
 	private boolean isShedded() {
 		if (treeType == PINE)
 			return false;
-		Calendar c = Heliodon.getInstance().getCalender();
+		Calendar c = Heliodon.getInstance().getCalendar();
 		int year = c.get(Calendar.YEAR);
 		if (Heliodon.getInstance().getLatitude() > 0) {
 			leaf_grow_northern_hemisphere.set(Calendar.YEAR, year); // make sure that the year is the same

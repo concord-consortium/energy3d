@@ -19,7 +19,7 @@ public class ChangeInsideTemperatureCommand extends AbstractUndoableEdit {
 	private Foundation foundation;
 
 	public ChangeInsideTemperatureCommand(Foundation foundation) {
-		Calendar c = Heliodon.getInstance().getCalender();
+		Calendar c = Heliodon.getInstance().getCalendar();
 		monthOfYear = c.get(Calendar.MONTH);
 		dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY;
 		hourOfDay = c.get(Calendar.HOUR_OF_DAY);

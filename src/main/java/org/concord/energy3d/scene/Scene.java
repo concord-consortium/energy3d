@@ -600,7 +600,7 @@ public class Scene implements Serializable {
 
 				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
-				instance.calendar.setTime(Heliodon.getInstance().getCalender().getTime());
+				instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
 				instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
@@ -1847,7 +1847,7 @@ public class Scene implements Serializable {
 	public Date getDate() {
 		if (calendar != null)
 			return calendar.getTime();
-		return Heliodon.getInstance().getCalender().getTime();
+		return Heliodon.getInstance().getCalendar().getTime();
 	}
 
 	public void setHeatVectorLength(final double heatVectorLength) {

@@ -419,7 +419,7 @@ public abstract class Graph extends JPanel {
 			g2.setFont(new Font("Arial", Font.BOLD, popup ? 14 : 8));
 			FontMetrics fm = g2.getFontMetrics();
 			if (today == null)
-				today = Heliodon.getInstance().getCalender();
+				today = Heliodon.getInstance().getCalendar();
 			String cityAndDate = city + (this instanceof DailyGraph ? " - " + new SimpleDateFormat("MMM").format(today.getTime()) + " " + today.get(Calendar.DAY_OF_MONTH) : "");
 			g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, popup ? 20 : 10);
 		}

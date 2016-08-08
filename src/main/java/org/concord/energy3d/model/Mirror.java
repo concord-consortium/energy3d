@@ -202,7 +202,7 @@ public class Mirror extends HousePart {
 		} else {
 			ReadOnlyVector3 o = heliostatTarget.getTankCenter();
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
-			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
 		}
 		mesh.setTranslation(a);
@@ -245,7 +245,7 @@ public class Mirror extends HousePart {
 		double length = 100;
 		if (heliostatTarget != null)
 			length = heliostatTarget.getTankCenter().distance(o);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 

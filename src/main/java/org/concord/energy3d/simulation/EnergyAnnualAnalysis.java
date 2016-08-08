@@ -87,7 +87,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 				Calendar today;
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
-						final Calendar c = Heliodon.getInstance().getCalender();
+						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
 						today = (Calendar) c.clone();
 						final Throwable t = compute();
@@ -128,7 +128,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 					public void run() {
 						onCompletion();
 						if (graph instanceof BuildingEnergyAnnualGraph) {
-							if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
+							if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER)
 								return; // annual calculation aborted
 							int net = (int) Math.round(getResult("Net"));
 							String previousRuns = "";

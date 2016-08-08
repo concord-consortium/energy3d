@@ -222,7 +222,7 @@ public class SolarPanel extends HousePart {
 		boolean onFlatSurface = onFlatSurface();
 		switch (trackerType) {
 		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			int xRotationAxis = 1;
@@ -233,7 +233,7 @@ public class SolarPanel extends HousePart {
 				yRotationAxis = 1;
 				break;
 			}
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
 				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 			break;
@@ -317,7 +317,7 @@ public class SolarPanel extends HousePart {
 			return;
 		}
 		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 		Vector3 r = new Vector3(o);

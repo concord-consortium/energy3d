@@ -81,7 +81,7 @@ public class PvAnnualAnalysis extends Analysis {
 				Calendar today;
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
-						final Calendar c = Heliodon.getInstance().getCalender();
+						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
 						today = (Calendar) c.clone();
 						Scene.getInstance().updateSolarPanels();
@@ -125,7 +125,7 @@ public class PvAnnualAnalysis extends Analysis {
 					@Override
 					public void run() {
 						onCompletion();
-						if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
+						if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER)
 							return; // annual calculation aborted
 						String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
 						String previousRuns = "";

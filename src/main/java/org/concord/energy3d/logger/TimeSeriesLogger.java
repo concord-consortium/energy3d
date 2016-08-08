@@ -335,7 +335,7 @@ public class TimeSeriesLogger {
 					Calendar cal0 = new GregorianCalendar();
 					cal0.setTime(c.getOldTime());
 					stateValue = "{\"Old Time\": \"" + (cal0.get(Calendar.HOUR_OF_DAY)) + ":" + cal0.get(Calendar.MINUTE) + "\"";
-					Calendar cal1 = Heliodon.getInstance().getCalender();
+					Calendar cal1 = Heliodon.getInstance().getCalendar();
 					stateValue += ", \"New Time\": \"" + (cal1.get(Calendar.HOUR_OF_DAY)) + ":" + cal1.get(Calendar.MINUTE) + "\"}";
 				} else if (lastEdit instanceof ChangeTextureCommand) {
 					stateValue = "{\"Old Value\": ";

@@ -1204,7 +1204,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				heat /= getAreaWithoutOverhang(mesh) * heatLossArray.length;
 				heatFlux.setDefaultColor(ColorRGBA.YELLOW);
 			} else {
-				final int hourOfDay = Heliodon.getInstance().getCalender().get(Calendar.HOUR_OF_DAY);
+				final int hourOfDay = Heliodon.getInstance().getCalendar().get(Calendar.HOUR_OF_DAY);
 				heat = heatLossArray[hourOfDay * 4] + heatLossArray[hourOfDay * 4 + 1] + heatLossArray[hourOfDay * 4 + 2] + heatLossArray[hourOfDay * 4 + 3];
 				heat /= 4 * getAreaWithoutOverhang(mesh);
 				heatFlux.setDefaultColor(ColorRGBA.WHITE);

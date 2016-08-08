@@ -660,7 +660,7 @@ public class EnergyPanel extends JPanel {
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 				SolarRadiation.getInstance().compute();
-				final Calendar c = (Calendar) Heliodon.getInstance().getCalender().clone();
+				final Calendar c = (Calendar) Heliodon.getInstance().getCalendar().clone();
 				HeatLoad.getInstance().computeEnergyToday(c);
 				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 			}
@@ -708,7 +708,7 @@ public class EnergyPanel extends JPanel {
 				break;
 			}
 			final Map<String, int[]> sunshineHours = LocationData.getInstance().getSunshineHours();
-			final int month = Heliodon.getInstance().getCalender().get(Calendar.MONTH);
+			final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
 			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + " hours");
 		}
 	}
@@ -1152,7 +1152,7 @@ public class EnergyPanel extends JPanel {
 						dataPanel.remove(cspStationPanel);
 						dataPanel.add(buildingPanel, 2);
 						buildingInfoPanel.update(selectedFoundation);
-						final Calendar c = Heliodon.getInstance().getCalender();
+						final Calendar c = Heliodon.getInstance().getCalendar();
 						final int temp = selectedFoundation.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 						switch (Scene.getInstance().getUnit()) {
 						case InternationalSystemOfUnits:
@@ -1202,7 +1202,7 @@ public class EnergyPanel extends JPanel {
 			return;
 		final Foundation selectedBuilding = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 		if (selectedBuilding != null) {
-			final Calendar c = Heliodon.getInstance().getCalender();
+			final Calendar c = Heliodon.getInstance().getCalendar();
 			final double temp = selectedBuilding.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:

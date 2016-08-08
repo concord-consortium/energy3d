@@ -93,7 +93,7 @@ public class GroupAnnualAnalysis extends Analysis {
 			public void run() {
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
-						final Calendar c = Heliodon.getInstance().getCalender();
+						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
 						final Throwable t = compute();
 						if (t != null) {

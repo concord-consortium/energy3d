@@ -153,7 +153,7 @@ public class SolarRadiation {
 	private void computeToday() {
 
 		// save current calendar for restoring at the end of this calculation
-		final Calendar today = (Calendar) Heliodon.getInstance().getCalender().clone();
+		final Calendar today = (Calendar) Heliodon.getInstance().getCalendar().clone();
 		final int hourOfDay = today.get(Calendar.HOUR_OF_DAY);
 		final int minuteOfHour = today.get(Calendar.MINUTE);
 		today.set(Calendar.SECOND, 0);
@@ -212,8 +212,8 @@ public class SolarRadiation {
 		maxValue *= 1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast();
 
 		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
-		Heliodon.getInstance().getCalender().set(Calendar.HOUR_OF_DAY, hourOfDay);
-		Heliodon.getInstance().getCalender().set(Calendar.MINUTE, minuteOfHour);
+		Heliodon.getInstance().getCalendar().set(Calendar.HOUR_OF_DAY, hourOfDay);
+		Heliodon.getInstance().getCalendar().set(Calendar.MINUTE, minuteOfHour);
 		for (HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Mirror) {
 				Mirror m = (Mirror) part;
@@ -339,7 +339,7 @@ public class SolarRadiation {
 		if (part instanceof Mirror) {
 			Mirror m = (Mirror) part;
 			if (m.getHeliostatTarget() != null) {
-				Calendar calendar = (Calendar) Heliodon.getInstance().getCalender();
+				Calendar calendar = (Calendar) Heliodon.getInstance().getCalendar();
 				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 				calendar.set(Calendar.MINUTE, minute % 60);
 				m.draw();
@@ -347,7 +347,7 @@ public class SolarRadiation {
 		} else if (part instanceof SolarPanel) {
 			SolarPanel sp = (SolarPanel) part;
 			if (sp.getTracker() != SolarPanel.NO_TRACKER) {
-				Calendar calendar = (Calendar) Heliodon.getInstance().getCalender();
+				Calendar calendar = (Calendar) Heliodon.getInstance().getCalendar();
 				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 				calendar.set(Calendar.MINUTE, minute % 60);
 				sp.draw();
@@ -573,7 +573,7 @@ public class SolarRadiation {
 	// Solar radiation incident outside the earth's atmosphere is called extraterrestrial radiation.
 	// https://pvpmc.sandia.gov/modeling-steps/1-weather-design-inputs/irradiance-and-insolation-2/extraterrestrial-radiation/
 	private static double getExtraterrestrialRadiation() {
-		final double b = Math.PI * 2.0 * Heliodon.getInstance().getCalender().get(Calendar.DAY_OF_YEAR) / 365.0;
+		final double b = Math.PI * 2.0 * Heliodon.getInstance().getCalendar().get(Calendar.DAY_OF_YEAR) / 365.0;
 		final double er = 1.00011 + 0.034221 * Math.cos(b) + 0.00128 * Math.sin(b) + 0.000719 * Math.cos(2 * b) + 0.000077 * Math.sin(2 * b);
 		return SOLAR_CONSTANT * er;
 	}
@@ -585,7 +585,7 @@ public class SolarRadiation {
 		if (!city.equals("")) {
 			final int[] sunshineHours = LocationData.getInstance().getSunshineHours().get(city);
 			if (sunshineHours != null)
-				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
+				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)] / (dayLength * 30);
 		}
 		// don't use the 1.1 prefactor as we consider diffuse radiation in the ASHRAE model
 		peakRadiation = getExtraterrestrialRadiation() * Math.pow(0.7, Math.pow(computeAirMass(directionTowardSun), 0.678)) * sunshinePercentage;
@@ -604,7 +604,7 @@ public class SolarRadiation {
 		final double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
 			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
-				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
+				result += ASHRAE_C[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
 			}
 			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
 				result += Scene.getInstance().getGround().getAlbedo() * viewFactorWithGround * peakRadiation;
@@ -631,7 +631,7 @@ public class SolarRadiation {
 			part.drawHeatFlux();
 		}
 
-		final Calendar today = Heliodon.getInstance().getCalender();
+		final Calendar today = Heliodon.getInstance().getCalendar();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
 
@@ -709,7 +709,7 @@ public class SolarRadiation {
 	}
 
 	public void computeEnergyAtHour(final int hour) {
-		final Calendar today = Heliodon.getInstance().getCalender();
+		final Calendar today = Heliodon.getInstance().getCalendar();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
 		final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], hour * 60);
