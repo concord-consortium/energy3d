@@ -406,8 +406,8 @@ public class SolarRadiation {
 			for (int row = 0; row < n; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
-				Vector3 u1 = u.multiply(rowSpacing * row, null);
-				Vector3 v1 = v.multiply(colSpacing * col, null);
+				Vector3 u1 = u.multiply(rowSpacing * (row + 0.5), null);
+				Vector3 v1 = v.multiply(colSpacing * (col + 0.5), null);
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(u1, null).addLocal(v1)).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
