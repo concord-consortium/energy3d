@@ -74,7 +74,7 @@ public class HeatLoad {
 		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
 			return;
 
-		final int timeStep = SolarRadiation.getInstance().getTimeStep();
+		final int timeStep = Scene.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		// System.out.println(today.get(Calendar.DAY_OF_YEAR) + ", " + outsideTemperatureRange[0] + ", " + outsideTemperatureRange[1]);
 		int iMinute = 0;

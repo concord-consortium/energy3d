@@ -656,7 +656,7 @@ public class EnergyPanel extends JPanel {
 			});
 
 			synchronized (SceneManager.getInstance()) {
-				final int timeStep = SolarRadiation.getInstance().getTimeStep();
+				final int timeStep = Scene.getInstance().getTimeStep();
 				for (final HousePart part : Scene.getInstance().getParts())
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 				SolarRadiation.getInstance().compute();

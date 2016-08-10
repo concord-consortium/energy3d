@@ -94,7 +94,7 @@ public class GroupDailyAnalysis extends Analysis {
 
 	@Override
 	public void updateGraph() {
-		int n = (int) Math.round(60.0 / SolarRadiation.getInstance().getTimeStep());
+		int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
 			for (HousePart p : selectedParts) {
