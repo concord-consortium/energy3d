@@ -38,7 +38,6 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
@@ -99,7 +98,7 @@ public class EnergyDailyAnalysis extends Analysis {
 
 	@Override
 	public void updateGraph() {
-		int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
+		int n = (int) Math.round(60.0 / SolarRadiation.getInstance().getTimeStep());
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

@@ -29,7 +29,7 @@ class MySlider extends JSlider {
 		final Dimension size = getSize();
 		final int y1 = 2 * size.height / 3;
 		for (int x = 0; x < size.width - STEP; x += STEP) {
-			final ColorRGBA color = SolarRadiation.computeColor(x, size.width);
+			final ColorRGBA color = SolarRadiation.getInstance().computeColor(x, size.width);
 			g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 			g.fillRect(x, 0, x + STEP, y1);
 		}
@@ -39,5 +39,4 @@ class MySlider extends JSlider {
 		g.drawRect(0, y1, size.width - 1, size.height - y1 - 1);
 		super.paintComponent(g);
 	}
-
 }

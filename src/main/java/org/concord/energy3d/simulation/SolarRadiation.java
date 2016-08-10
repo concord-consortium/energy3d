@@ -358,14 +358,12 @@ public class SolarRadiation {
 		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent
 			throw new RuntimeException("Normal is null");
 
-		final int plateNx = Scene.getInstance().getPlateNx();
-		final int plateNy = Scene.getInstance().getPlateNy();
-
+		int n = 8;
 		Mesh drawMesh = part.getRadiationMesh();
 		Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
-			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, plateNx, plateNy);
+			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, n, n);
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
 
@@ -399,13 +397,13 @@ public class SolarRadiation {
 		final Vector3 u = p1.subtract(p0, null).normalizeLocal();
 		final Vector3 v = p2.subtract(p0, null).normalizeLocal();
 
-		final double rowSpacing = p0.distance(p1) / plateNx;
-		final double colSpacing = p0.distance(p2) / plateNy;
-		a *= timeStep / (plateNx * plateNy * 60.0); // nxnx60: nxn is to get the unit cell area of the nxn grid; 60 is to convert the unit of timeStep from minute to kWh
+		final double rowSpacing = p0.distance(p1) / n;
+		final double colSpacing = p0.distance(p2) / n;
+		a *= timeStep / (n * n * 60.0); // nxnx60: nxn is to get the unit cell area of the nxn grid; 60 is to convert the unit of timeStep from minute to kWh
 
 		final int iMinute = minute / timeStep;
-		for (int col = 0; col < plateNx; col++) {
-			for (int row = 0; row < plateNy; row++) {
+		for (int col = 0; col < n; col++) {
+			for (int row = 0; row < n; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				Vector3 u1 = u.multiply(rowSpacing * row, null);
@@ -532,8 +530,8 @@ public class SolarRadiation {
 	private void updateTextureCoords(final Mesh drawMesh) {
 		final MeshData data = onMesh.get(drawMesh);
 		final ReadOnlyVector3 o = data.p0;
-		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * Scene.getInstance().getSolarStep(), null);
-		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);
+		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * getSolarStep(), null);
+		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
@@ -838,7 +836,7 @@ public class SolarRadiation {
 							solarData[row][col] = solarData[rows - 1][col];
 	}
 
-	public static ColorRGBA computeColor(final double value, final long maxValue) {
+	public ColorRGBA computeColor(final double value, final long maxValue) {
 		final ReadOnlyColorRGBA[] colors = EnergyPanel.solarColors;
 		long valuePerColorRange = maxValue / (colors.length - 1);
 		final int colorIndex;
@@ -852,8 +850,24 @@ public class SolarRadiation {
 		return color;
 	}
 
-	private static int roundToPowerOfTwo(final int n) {
+	private int roundToPowerOfTwo(final int n) {
 		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
+	}
+
+	public void setSolarStep(final double solarStep) {
+		this.solarStep = solarStep;
+	}
+
+	public double getSolarStep() {
+		return solarStep;
+	}
+
+	public void setTimeStep(final int timeStep) {
+		this.timeStep = timeStep;
+	}
+
+	public int getTimeStep() {
+		return timeStep;
 	}
 
 	public void setAirMassSelection(final int selection) {
