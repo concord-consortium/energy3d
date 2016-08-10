@@ -241,7 +241,7 @@ public class SolarPanel extends HousePart {
 			if (onFlatSurface)
 				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
-		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
 		mesh.setTranslation(onFlatSurface ? getAbsPoint(0).addLocal(0, 0, baseHeight) : getAbsPoint(0));
 
 		surround.setTranslation(mesh.getTranslation());
