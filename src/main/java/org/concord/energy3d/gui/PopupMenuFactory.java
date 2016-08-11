@@ -2097,6 +2097,54 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JRadioButtonMenuItem miVerticalSingleAxisTracker = new JRadioButtonMenuItem("Vertical Single-Axis Tracker...");
+			trackerButtonGroup.add(miVerticalSingleAxisTracker);
+			miVerticalSingleAxisTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel))
+						return;
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
+					JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final String title = "<html>Enable vertical single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					Object[] params = { title, footnote, panel };
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable vertical single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						return;
+					if (rb1.isSelected()) {
+						SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+						sp.setTracker(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+						sp.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						Foundation foundation = sp.getTopContainer();
+						SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					EnergyPanel.getInstance().clearRadiationHeatMap();
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
 			final JRadioButtonMenuItem miAltazimuthDualAxisTracker = new JRadioButtonMenuItem("Altazimuth Dual-Axis Tracker...");
 			trackerButtonGroup.add(miAltazimuthDualAxisTracker);
 			miAltazimuthDualAxisTracker.addActionListener(new ActionListener() {
@@ -2161,8 +2209,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miZenith = new JMenuItem("Tilt Angle...");
-			miZenith.addActionListener(new ActionListener() {
+			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
+			miTiltAngle.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2437,31 +2485,41 @@ public class PopupMenuFactory {
 					case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
 						Util.selectSilently(miHorizontalSingleAxisTracker, true);
 						break;
+					case SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER:
+						Util.selectSilently(miVerticalSingleAxisTracker, true);
+						break;
 					case SolarPanel.NO_TRACKER:
 						Util.selectSilently(miNoTracker, true);
 						break;
 					}
 					miAltazimuthDualAxisTracker.setEnabled(true);
+					miHorizontalSingleAxisTracker.setEnabled(true);
+					miVerticalSingleAxisTracker.setEnabled(true);
 					if (sp.getContainer() instanceof Roof) {
 						Roof roof = (Roof) sp.getContainer();
-						miAltazimuthDualAxisTracker.setEnabled(Util.isZero(roof.getHeight()));
+						boolean flat = Util.isZero(roof.getHeight());
+						miAltazimuthDualAxisTracker.setEnabled(flat);
+						miHorizontalSingleAxisTracker.setEnabled(flat);
+						miVerticalSingleAxisTracker.setEnabled(flat);
 					} else if (sp.getContainer() instanceof Wall) {
 						miAltazimuthDualAxisTracker.setEnabled(false);
+						miHorizontalSingleAxisTracker.setEnabled(false);
+						miVerticalSingleAxisTracker.setEnabled(false);
 					}
 					if (sp.getTracker() != SolarPanel.NO_TRACKER) {
-						miZenith.setEnabled(false);
+						miTiltAngle.setEnabled(sp.getTracker() == SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 						miAzimuth.setEnabled(false);
 					} else {
-						miZenith.setEnabled(true);
+						miTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);
 						if (sp.getContainer() instanceof Roof) {
 							Roof roof = (Roof) sp.getContainer();
 							if (roof.getHeight() > 0) {
-								miZenith.setEnabled(false);
+								miTiltAngle.setEnabled(false);
 								miAzimuth.setEnabled(false);
 							}
 						} else if (sp.getContainer() instanceof Wall) {
-							miZenith.setEnabled(false);
+							miTiltAngle.setEnabled(false);
 							miAzimuth.setEnabled(false);
 						}
 					}
@@ -2592,13 +2650,14 @@ public class PopupMenuFactory {
 
 			trackerMenu.add(miNoTracker);
 			trackerMenu.add(miHorizontalSingleAxisTracker);
+			trackerMenu.add(miVerticalSingleAxisTracker);
 			trackerMenu.add(miAltazimuthDualAxisTracker);
 
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(trackerMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miRotateAroundNormal);
-			popupMenuForSolarPanel.add(miZenith);
+			popupMenuForSolarPanel.add(miTiltAngle);
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miBaseHeight);
