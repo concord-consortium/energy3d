@@ -397,21 +397,21 @@ public class SolarRadiation {
 		// Vector3 q1 = drawMesh.localToWorld(p1, null);
 		// Vector3 q2 = drawMesh.localToWorld(p2, null);
 		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
-		final Vector3 u = p1.subtract(p0, null).normalizeLocal();
-		final Vector3 v = p2.subtract(p0, null).normalizeLocal();
+		final Vector3 u = p2.subtract(p0, null).normalizeLocal();
+		final Vector3 v = p1.subtract(p0, null).normalizeLocal();
 
-		final double rowSpacing = p0.distance(p1) / plateNx;
-		final double colSpacing = p0.distance(p2) / plateNy;
+		final double xSpacing = p0.distance(p2) / plateNx;
+		final double ySpacing = p0.distance(p1) / plateNy;
 		a *= Scene.getInstance().getTimeStep() / (plateNx * plateNy * 60.0); // nxnx60: nxn is to get the unit cell area of the nxn grid; 60 is to convert the unit of timeStep from minute to kWh
 
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
-		for (int col = 0; col < plateNx; col++) {
-			for (int row = 0; row < plateNy; row++) {
+		for (int x = 0; x < plateNx; x++) {
+			for (int y = 0; y < plateNy; y++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
-				Vector3 u1 = u.multiply(rowSpacing * (row + 0.5), null);
-				Vector3 v1 = v.multiply(colSpacing * (col + 0.5), null);
-				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(u1, null).addLocal(v1)).addLocal(offset);
+				Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
+				Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
+				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
@@ -426,7 +426,7 @@ public class SolarRadiation {
 					if (pickResults.getNumber() == 0)
 						radiation += directRadiation;
 				}
-				data.dailySolarIntensity[row][col] += radiation;
+				data.dailySolarIntensity[x][y] += radiation;
 				part.getSolarPotential()[iMinute] += radiation * a;
 			}
 		}

@@ -84,6 +84,10 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if ((plateNx & (plateNx - 1)) != 0 || (plateNy & (plateNy - 1)) != 0) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				s.setSolarStep(cellSize);
 				s.setTimeStep(timeStep);
 				s.setPlateNx(plateNx);
@@ -97,20 +101,20 @@ class SimulationSettingsDialog extends JDialog {
 		};
 
 		// set number of grid cells for a plate
-		panel.add(new JLabel("Number of Grid Cells in X-Direction: "));
+		panel.add(new JLabel("# Grid Cells in X-Direction: "));
 		panel.add(plateNxTextField);
 		plateNxTextField.setColumns(6);
-		panel.add(new JLabel("For solar panels and mirrors"));
+		panel.add(new JLabel("For panels (must be power of 2)"));
 
 		// set number of grid cells for a plate
-		panel.add(new JLabel("Number of Grid Cells in Y-Direction: "));
+		panel.add(new JLabel("# Grid Cells in Y-Direction: "));
 		panel.add(plateNyTextField);
-		panel.add(new JLabel("For solar panels and mirrors"));
+		panel.add(new JLabel("For panels (must be power of 2)"));
 
 		// set the grid size ("solar step")
 		panel.add(new JLabel("Radiation Grid Cell Size: "));
 		panel.add(cellSizeTextField);
-		panel.add(new JLabel("For others (internal unit)"));
+		panel.add(new JLabel("For non-panels (internal unit)"));
 
 		// set the heat arrow length
 		panel.add(new JLabel("Heat Arrow Length: "));
