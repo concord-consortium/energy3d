@@ -33,8 +33,7 @@ public class SolarPanel extends HousePart {
 	private static final long serialVersionUID = 1L;
 	public static final int NO_TRACKER = 0;
 	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
-	public static final int VERTICAL_SINGLE_AXIS_TRACKER = 2;
-	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 11;
+	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -235,21 +234,13 @@ public class SolarPanel extends HousePart {
 				break;
 			}
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
-			break;
-		case VERTICAL_SINGLE_AXIS_TRACKER:
-			Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
-			Vector3 b = Vector3.UNIT_Z.cross(a, null);
-			Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
-			normal = m.applyPost(a, null);
-			if (normal.getZ() < 0)
-				normal = normal.negate(null);
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
+				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 			break;
 		default:
 			if (onFlatSurface)
 				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
-		if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
-			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
 		mesh.setTranslation(onFlatSurface ? getAbsPoint(0).addLocal(0, 0, baseHeight) : getAbsPoint(0));
 
