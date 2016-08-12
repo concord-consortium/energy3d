@@ -871,7 +871,19 @@ public class EnergyPanel extends JPanel {
 					final boolean flat = (sp.getContainer() instanceof Roof && Util.isZero(sp.getContainer().getHeight())) || (sp.getContainer() instanceof Foundation);
 					EventQueue.invokeLater(new Runnable() {
 						public void run() {
-							partPanelBorder.setTitle("Solar Panel (" + sp.getId() + ")");
+							String title = "Solar Panel (" + sp.getId() + ")";
+							switch (sp.getTracker()) {
+							case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
+								title += ", Tracker: HSAT";
+								break;
+							case SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER:
+								title += ", Tracker: VSAT";
+								break;
+							case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+								title += ", Tracker: AADAT";
+								break;
+							}
+							partPanelBorder.setTitle(title);
 							partProperty1Label.setText("  Size & Position:");
 							partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
 							partProperty2Label.setText("  Angles:");
