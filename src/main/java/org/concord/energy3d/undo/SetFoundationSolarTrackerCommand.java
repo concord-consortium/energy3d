@@ -8,7 +8,6 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 public class SetFoundationSolarTrackerCommand extends AbstractUndoableEdit {
@@ -20,7 +19,7 @@ public class SetFoundationSolarTrackerCommand extends AbstractUndoableEdit {
 
 	public SetFoundationSolarTrackerCommand(Foundation foundation) {
 		this.foundation = foundation;
-		solarPanels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
+		solarPanels = foundation.getSolarPanels();
 		int n = solarPanels.size();
 		oldValues = new int[n];
 		for (int i = 0; i < n; i++) {

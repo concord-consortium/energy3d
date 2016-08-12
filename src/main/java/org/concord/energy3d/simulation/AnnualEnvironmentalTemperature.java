@@ -114,7 +114,7 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 			hideData.put(lowestGroundTemperature[i], false);
 
 		city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		Calendar today = (Calendar) Heliodon.getInstance().getCalender().clone();
+		Calendar today = (Calendar) Heliodon.getInstance().getCalendar().clone();
 		xToday = today.get(Calendar.MONTH) + ((double) (today.get(Calendar.DAY_OF_MONTH) - 1) / (double) today.getActualMaximum(Calendar.DAY_OF_MONTH));
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);

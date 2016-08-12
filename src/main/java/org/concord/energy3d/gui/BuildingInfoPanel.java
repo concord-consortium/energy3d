@@ -20,7 +20,7 @@ import org.concord.energy3d.simulation.DesignSpecs;
  * @author Charles Xie
  *
  */
-public class BasicsPanel extends JPanel {
+public class BuildingInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,7 +31,7 @@ public class BasicsPanel extends JPanel {
 	private JPanel solarPanelCountPanel, windowCountPanel, wallCountPanel;
 	private ColorBar solarPanelCountBar, windowCountBar, wallCountBar;
 
-	public BasicsPanel() {
+	public BuildingInfoPanel() {
 
 		super(new BorderLayout());
 
@@ -164,15 +164,6 @@ public class BasicsPanel extends JPanel {
 			heightBar.setValue((float) (height * 3.28084));
 			break;
 		}
-	}
-
-	void clear() {
-		heightBar.setValue(0);
-		areaBar.setValue(0);
-		windowToFloorBar.setValue(0);
-		solarPanelCountBar.setValue(Scene.getInstance().getNumberOfSolarPanels());
-		windowCountBar.setValue(0);
-		wallCountBar.setValue(0);
 	}
 
 	public void updateArea() {

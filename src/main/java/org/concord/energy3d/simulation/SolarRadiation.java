@@ -70,8 +70,6 @@ public class SolarRadiation {
 	private final Map<Mesh, MeshData> onMesh = new HashMap<Mesh, MeshData>();
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
 	private final Map<Spatial, HousePart> collidablesToParts = new HashMap<Spatial, HousePart>();
-	private int timeStep = 15;
-	private double solarStep = 2.0;
 	private long maxValue;
 	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
 	private double peakRadiation;
@@ -98,9 +96,9 @@ public class SolarRadiation {
 		initCollidables();
 		onMesh.clear();
 		for (final HousePart part : Scene.getInstance().getParts())
-			part.setSolarPotential(new double[MINUTES_OF_DAY / timeStep]);
+			part.setSolarPotential(new double[MINUTES_OF_DAY / Scene.getInstance().getTimeStep()]);
 		maxValue = 1;
-		computeToday((Calendar) Heliodon.getInstance().getCalender().clone());
+		computeToday();
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part.isDrawCompleted())
 				part.drawHeatFlux();
@@ -150,10 +148,17 @@ public class SolarRadiation {
 		}
 	}
 
-	private void computeToday(final Calendar today) {
+	private void computeToday() {
+
+		// save current calendar for restoring at the end of this calculation
+		final Calendar today = (Calendar) Heliodon.getInstance().getCalendar().clone();
+		final int hourOfDay = today.get(Calendar.HOUR_OF_DAY);
+		final int minuteOfHour = today.get(Calendar.MINUTE);
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
+
+		final int timeStep = Scene.getInstance().getTimeStep();
 		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[SolarRadiation.MINUTES_OF_DAY / timeStep];
 		int totalSteps = 0;
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
@@ -204,13 +209,31 @@ public class SolarRadiation {
 			maxValue++;
 		}
 		maxValue *= 1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast();
+
+		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
+		Heliodon.getInstance().getCalendar().set(Calendar.HOUR_OF_DAY, hourOfDay);
+		Heliodon.getInstance().getCalendar().set(Calendar.MINUTE, minuteOfHour);
+		for (HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Mirror) {
+				Mirror m = (Mirror) part;
+				if (m.getHeliostatTarget() != null) {
+					m.draw();
+				}
+			} else if (part instanceof SolarPanel) {
+				SolarPanel sp = (SolarPanel) part;
+				if (sp.getTracker() != SolarPanel.NO_TRACKER) {
+					sp.draw();
+				}
+			}
+		}
+
 	}
 
 	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
 		final double totalRadiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + indirectRadiation;
-		final double step = solarStep * 4;
+		final double step = Scene.getInstance().getSolarStep() * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
 		MeshData data = onMesh.get(SceneManager.getInstance().getSolarLand());
@@ -259,6 +282,8 @@ public class SolarRadiation {
 		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
+		final int timeStep = Scene.getInstance().getTimeStep();
+		final double solarStep = Scene.getInstance().getSolarStep();
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		final float absorption = housePart instanceof Window ? 1 : 1 - housePart.getAlbedo(); // a window itself doesn't really absorb solar energy, but it passes the energy into the house to be absorbed
@@ -271,19 +296,15 @@ public class SolarRadiation {
 		}
 
 		for (int col = 0; col < data.cols; col++) {
-			final ReadOnlyVector3 pU = data.u.multiply(solarStep / 2.0 + col * solarStep, null).addLocal(data.p0);
-			final double w = (col == data.cols - 1) ? data.p2.distance(pU) : solarStep;
+			final ReadOnlyVector3 pU = data.u.multiply((col + 0.5) * solarStep, null).addLocal(data.p0);
+			final double w = (col == data.cols - 1) ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
 			for (int row = 0; row < data.rows; row++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
 				if (data.dailySolarIntensity[row][col] == -1)
 					continue;
-				final ReadOnlyVector3 p = data.v.multiply(solarStep / 2.0 + row * solarStep, null).addLocal(pU).add(offset, null);
-				final double h;
-				if (row == data.rows - 1)
-					h = data.p1.subtract(data.p0, null).length() - row * solarStep;
-				else
-					h = solarStep;
+				final ReadOnlyVector3 p = data.v.multiply((row + 0.5) * solarStep, null).addLocal(pU).add(offset, null);
+				final double h = (row == data.rows - 1) ? data.p1.distance(data.p0) - row * solarStep : solarStep;
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
@@ -318,28 +339,36 @@ public class SolarRadiation {
 
 		if (part instanceof Mirror) {
 			Mirror m = (Mirror) part;
-			if (m.getHeliostatTarget() != null) { // calculate the normal at this minute
-				m.setNormalAtTime(null, minute);
+			if (m.getHeliostatTarget() != null) {
+				Calendar calendar = (Calendar) Heliodon.getInstance().getCalendar();
+				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+				calendar.set(Calendar.MINUTE, minute % 60);
+				m.draw();
 			}
 		} else if (part instanceof SolarPanel) {
 			SolarPanel sp = (SolarPanel) part;
-			if (sp.getTracker() != SolarPanel.NO_TRACKER) { // calculate the normal at this minute
-				sp.setNormalAtTime(minute);
+			if (sp.getTracker() != SolarPanel.NO_TRACKER) {
+				Calendar calendar = (Calendar) Heliodon.getInstance().getCalendar();
+				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+				calendar.set(Calendar.MINUTE, minute % 60);
+				sp.draw();
 			}
 		}
 
+		int plateNx = Scene.getInstance().getPlateNx();
+		int plateNy = Scene.getInstance().getPlateNy();
+
 		ReadOnlyVector3 normal = part.getNormal();
-		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent. This is a temporary fix.
-			return;
+		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent
+			throw new RuntimeException("Normal is null");
 
 		Mesh drawMesh = part.getRadiationMesh();
 		Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
-			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal);
+			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, plateNx, plateNy);
 
-		final double OFFSET = 3;
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
@@ -348,24 +377,41 @@ public class SolarRadiation {
 			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
+		double a = 1;
+		if (part instanceof SolarPanel) {
+			final SolarPanel sp = (SolarPanel) part;
+			a = sp.getPanelWidth() * sp.getPanelHeight();
+		} else if (part instanceof Mirror) {
+			final Mirror m = (Mirror) part;
+			a = m.getMirrorWidth() * m.getMirrorHeight();
+		} else if (part instanceof Sensor) {
+			a = Sensor.WIDTH * Sensor.HEIGHT;
+		}
+
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 
-		int n = 2;
-		for (int col = 0; col < n; col++) {
-			for (int row = 0; row < n; row++) {
+		final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // row 0, col 0
+		final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // row 1, col 0
+		final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // row 0, col 1
+		// Vector3 q0 = drawMesh.localToWorld(p0, null);
+		// Vector3 q1 = drawMesh.localToWorld(p1, null);
+		// Vector3 q2 = drawMesh.localToWorld(p2, null);
+		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
+		final Vector3 u = p2.subtract(p0, null).normalizeLocal();
+		final Vector3 v = p1.subtract(p0, null).normalizeLocal();
+
+		final double xSpacing = p0.distance(p2) / plateNx;
+		final double ySpacing = p0.distance(p1) / plateNy;
+		a *= Scene.getInstance().getTimeStep() / (plateNx * plateNy * 60.0); // nxnx60: nxn is to get the unit cell area of the nxn grid; 60 is to convert the unit of timeStep from minute to kWh
+
+		final int iMinute = minute / Scene.getInstance().getTimeStep();
+		for (int x = 0; x < plateNx; x++) {
+			for (int y = 0; y < plateNy; y++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
-				final int index;
-				if (row == 0 && col == 0)
-					index = 3;
-				else if (row == 0 && col == 1)
-					index = 0;
-				else if (row == 1 && col == 0)
-					index = 6;
-				else
-					index = 12;
-				final Vector3 point = new Vector3(vertexBuffer.get(index), vertexBuffer.get(index + 1), vertexBuffer.get(index + 2));
-				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(point).addLocal(offset);
+				Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
+				Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
+				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
 				if (dot > 0) {
@@ -380,23 +426,9 @@ public class SolarRadiation {
 					if (pickResults.getNumber() == 0)
 						radiation += directRadiation;
 				}
-
-				data.dailySolarIntensity[row][col] += radiation;
-				double area = 1;
-				if (part instanceof SolarPanel) {
-					final SolarPanel sp = (SolarPanel) part;
-					area = sp.getPanelWidth() * sp.getPanelHeight();
-				} else if (part instanceof Mirror) {
-					final Mirror m = (Mirror) part;
-					area = m.getMirrorWidth() * m.getMirrorHeight();
-				} else if (part instanceof Sensor) {
-					area = Sensor.WIDTH * Sensor.HEIGHT;
-				}
-				part.getSolarPotential()[minute / timeStep] += radiation * area / 240.0 * timeStep;
-				// ABOVE: 4x60: 4 is to get the 1/4 area of the 2x2 grid; 60 is to convert the unit of timeStep from minute to kWh
-
+				data.dailySolarIntensity[x][y] += radiation;
+				part.getSolarPotential()[iMinute] += radiation * a;
 			}
-
 		}
 
 	}
@@ -450,6 +482,7 @@ public class SolarRadiation {
 		fromXY.transform(tmp);
 		data.p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
+		final double solarStep = Scene.getInstance().getSolarStep();
 		data.rows = Math.max(1, (int) Math.ceil(data.p1.subtract(data.p0, null).length() / solarStep));
 		data.cols = Math.max(1, (int) Math.ceil(data.p2.subtract(data.p0, null).length() / solarStep));
 		if (data.dailySolarIntensity == null)
@@ -488,10 +521,10 @@ public class SolarRadiation {
 		return data;
 	}
 
-	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, int rows, int cols) {
 		final MeshData data = new MeshData();
-		data.rows = 4;
-		data.cols = 4;
+		data.rows = rows;
+		data.cols = cols;
 		if (data.dailySolarIntensity == null)
 			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
 		onMesh.put(drawMesh, data);
@@ -501,8 +534,8 @@ public class SolarRadiation {
 	private void updateTextureCoords(final Mesh drawMesh) {
 		final MeshData data = onMesh.get(drawMesh);
 		final ReadOnlyVector3 o = data.p0;
-		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * getSolarStep(), null);
-		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * getSolarStep(), null);
+		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * Scene.getInstance().getSolarStep(), null);
+		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
@@ -544,7 +577,7 @@ public class SolarRadiation {
 	// Solar radiation incident outside the earth's atmosphere is called extraterrestrial radiation.
 	// https://pvpmc.sandia.gov/modeling-steps/1-weather-design-inputs/irradiance-and-insolation-2/extraterrestrial-radiation/
 	private static double getExtraterrestrialRadiation() {
-		final double b = Math.PI * 2.0 * Heliodon.getInstance().getCalender().get(Calendar.DAY_OF_YEAR) / 365.0;
+		final double b = Math.PI * 2.0 * Heliodon.getInstance().getCalendar().get(Calendar.DAY_OF_YEAR) / 365.0;
 		final double er = 1.00011 + 0.034221 * Math.cos(b) + 0.00128 * Math.sin(b) + 0.000719 * Math.cos(2 * b) + 0.000077 * Math.sin(2 * b);
 		return SOLAR_CONSTANT * er;
 	}
@@ -556,7 +589,7 @@ public class SolarRadiation {
 		if (!city.equals("")) {
 			final int[] sunshineHours = LocationData.getInstance().getSunshineHours().get(city);
 			if (sunshineHours != null)
-				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] / (dayLength * 30);
+				sunshinePercentage = sunshineHours[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)] / (dayLength * 30);
 		}
 		// don't use the 1.1 prefactor as we consider diffuse radiation in the ASHRAE model
 		peakRadiation = getExtraterrestrialRadiation() * Math.pow(0.7, Math.pow(computeAirMass(directionTowardSun), 0.678)) * sunshinePercentage;
@@ -575,7 +608,7 @@ public class SolarRadiation {
 		final double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
 			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
-				result += ASHRAE_C[Heliodon.getInstance().getCalender().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
+				result += ASHRAE_C[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
 			}
 			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
 				result += Scene.getInstance().getGround().getAlbedo() * viewFactorWithGround * peakRadiation;
@@ -602,7 +635,7 @@ public class SolarRadiation {
 			part.drawHeatFlux();
 		}
 
-		final Calendar today = Heliodon.getInstance().getCalender();
+		final Calendar today = Heliodon.getInstance().getCalendar();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
 
@@ -618,7 +651,7 @@ public class SolarRadiation {
 					// In most cases, the inside temperature is always higher than the ground temperature. In this winter, this adds to heating load, but in the summer, this reduces cooling load.
 					// In other words, geothermal energy is good in hot conditions. This is similar to passive solar energy, which is good in the winter but bad in the summer.
 					if (groundHeatLoss > 0) {
-						final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * timeStep);
+						final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * Scene.getInstance().getTimeStep());
 						if (outsideTemperature >= foundation.getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY))) {
 							heatLoss[i] -= groundHeatLoss;
 						}
@@ -680,7 +713,7 @@ public class SolarRadiation {
 	}
 
 	public void computeEnergyAtHour(final int hour) {
-		final Calendar today = Heliodon.getInstance().getCalender();
+		final Calendar today = Heliodon.getInstance().getCalendar();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
 		final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], hour * 60);
@@ -690,7 +723,7 @@ public class SolarRadiation {
 				final Foundation foundation = (Foundation) part;
 				if (foundation.getHeatLoss() == null)
 					continue;
-				final int n = (int) Math.round(60.0 / timeStep);
+				final int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
 				final double[] heatLoss = new double[n];
 				final double[] passiveSolar = new double[n];
 				final double[] photovoltaic = new double[n];
@@ -764,26 +797,8 @@ public class SolarRadiation {
 			mesh.clearRenderState(StateType.Texture);
 			return;
 		}
-
 		final double[][] solarData = onMesh.get(mesh).dailySolarIntensity;
-		final Object userData = mesh.getUserData();
-		if (userData instanceof UserData) {
-			final UserData ud = (UserData) userData;
-			if (ud.getHousePart() instanceof SolarPanel || ud.getHousePart() instanceof Mirror) {
-				solarData[3][0] = solarData[2][0] = solarData[1][0];
-				solarData[3][1] = solarData[2][1] = solarData[1][0];
-				solarData[3][2] = solarData[2][2] = solarData[1][1];
-				solarData[3][3] = solarData[2][3] = solarData[1][1];
-
-				solarData[0][2] = solarData[1][2] = solarData[0][1];
-				solarData[0][3] = solarData[1][3] = solarData[0][1];
-				solarData[0][0] = solarData[1][0] = solarData[0][0];
-				solarData[0][1] = solarData[1][1] = solarData[0][0];
-			}
-		}
-
 		fillBlanksWithNeighboringValues(solarData);
-
 		final int rows = solarData.length;
 		final int cols = solarData[0].length;
 		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
@@ -793,7 +808,6 @@ public class SolarRadiation {
 				data.put((byte) (color.getRed() * 255)).put((byte) (color.getGreen() * 255)).put((byte) (color.getBlue() * 255));
 			}
 		}
-
 		final Image image = new Image(ImageDataFormat.RGB, PixelDataType.UnsignedByte, cols, rows, data, null);
 		final Texture2D texture = new Texture2D();
 		texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
@@ -826,7 +840,7 @@ public class SolarRadiation {
 							solarData[row][col] = solarData[rows - 1][col];
 	}
 
-	public ColorRGBA computeColor(final double value, final long maxValue) {
+	public static ColorRGBA computeColor(final double value, final long maxValue) {
 		final ReadOnlyColorRGBA[] colors = EnergyPanel.solarColors;
 		long valuePerColorRange = maxValue / (colors.length - 1);
 		final int colorIndex;
@@ -840,24 +854,8 @@ public class SolarRadiation {
 		return color;
 	}
 
-	private int roundToPowerOfTwo(final int n) {
+	private static int roundToPowerOfTwo(final int n) {
 		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
-	}
-
-	public void setSolarStep(final double solarStep) {
-		this.solarStep = solarStep;
-	}
-
-	public double getSolarStep() {
-		return solarStep;
-	}
-
-	public void setTimeStep(final int timeStep) {
-		this.timeStep = timeStep;
-	}
-
-	public int getTimeStep() {
-		return timeStep;
 	}
 
 	public void setAirMassSelection(final int selection) {

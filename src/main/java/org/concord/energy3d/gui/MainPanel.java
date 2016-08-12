@@ -771,13 +771,18 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					EnergyPanel.getInstance().showHeatMapContrastSlider(energyViewButton.isSelected());
+					EnergyPanel p = EnergyPanel.getInstance();
+					p.showHeatMapContrastSlider(energyViewButton.isSelected());
 					if (energyViewButton.isSelected()) {
 						defaultTool();
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {
-						EnergyPanel.getInstance().getDailyEnergyGraph().clearData();
-						EnergyPanel.getInstance().getDailyEnergyGraph().removeGraph();
+						p.getBuildingDailyEnergyGraph().clearData();
+						p.getBuildingDailyEnergyGraph().removeGraph();
+						p.getPvStationDailyEnergyGraph().clearData();
+						p.getPvStationDailyEnergyGraph().removeGraph();
+						p.getCspStationDailyEnergyGraph().clearData();
+						p.getCspStationDailyEnergyGraph().removeGraph();
 					}
 					SceneManager.getInstance().computeEnergyView(energyViewButton.isSelected());
 				}

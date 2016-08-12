@@ -8,7 +8,6 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.scene.Scene;
 
 public class ChangeFoundationMicroInverterEfficiencyCommand extends AbstractUndoableEdit {
 
@@ -19,7 +18,7 @@ public class ChangeFoundationMicroInverterEfficiencyCommand extends AbstractUndo
 
 	public ChangeFoundationMicroInverterEfficiencyCommand(Foundation foundation) {
 		this.foundation = foundation;
-		panels = Scene.getInstance().getSolarPanelsOnFoundation(foundation);
+		panels = foundation.getSolarPanels();
 		int n = panels.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {

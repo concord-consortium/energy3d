@@ -42,6 +42,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.PvStationDailyEnergyGraph;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -76,10 +77,13 @@ public class PvAnnualAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
+				final EnergyPanel e = EnergyPanel.getInstance();
+				Calendar today;
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
-						final Calendar c = Heliodon.getInstance().getCalender();
+						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
+						today = (Calendar) c.clone();
 						Scene.getInstance().updateSolarPanels();
 						final Throwable t = compute();
 						if (t != null) {
@@ -91,10 +95,27 @@ public class PvAnnualAnalysis extends Analysis {
 							});
 							break;
 						}
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) { // synchronize with daily graph
+							PvStationDailyEnergyGraph g = e.getPvStationDailyEnergyGraph();
+							if (g.hasGraph()) {
+								g.setCalendar(today);
+								g.updateGraph();
+							}
+						}
+						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
+								e.getDateSpinner().setValue(c.getTime());
+								if (selectedPart instanceof Foundation) {
+									PvStationDailyEnergyGraph g = e.getPvStationDailyEnergyGraph();
+									e.getPvStationTabbedPane().setSelectedComponent(g);
+									if (!g.hasGraph()) {
+										g.setCalendar(today2);
+										g.addGraph((Foundation) selectedPart);
+									}
+								}
 							}
 						});
 					}
@@ -104,7 +125,7 @@ public class PvAnnualAnalysis extends Analysis {
 					@Override
 					public void run() {
 						onCompletion();
-						if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
+						if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER)
 							return; // annual calculation aborted
 						String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
 						String previousRuns = "";
@@ -196,7 +217,7 @@ public class PvAnnualAnalysis extends Analysis {
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield";
 			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
-				title = "Annual Yield of Selected Building";
+				title = "Annual Yield on Selected Foundation";
 			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);

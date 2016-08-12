@@ -21,8 +21,6 @@ public class Updater {
 					System.setProperty("direct", "true");
 					System.setProperty("no_install", "true");
 					System.setProperty("silent", "true");
-					if (Config.isEclipse())
-						System.setProperty("no_log_redir", "true");
 					GetdownApp.main(new String[] { "." });
 				};
 			}.start();

@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.DesignSpecs;
 
@@ -391,7 +390,7 @@ class SpecsDialog extends JDialog {
 				specs.setMaximumWindowToFloorRatio(maximumWindowToFloorRatio);
 
 				Scene.getInstance().setEdited(true);
-				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				EnergyPanel.getInstance().clearRadiationHeatMap();
 
 				SpecsDialog.this.dispose();
 

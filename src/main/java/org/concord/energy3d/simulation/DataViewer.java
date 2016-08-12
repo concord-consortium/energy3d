@@ -16,7 +16,9 @@ import javax.swing.table.DefaultTableModel;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -81,7 +83,7 @@ class DataViewer {
 			header = new String[] { "Month", "Windows", "Solar Panels", "Heater", "AC", "Net" };
 		} else if (graph instanceof PartEnergyDailyGraph) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectAll || selectedPart instanceof SolarPanel) {
+			if (selectAll || selectedPart instanceof SolarPanel || selectedPart instanceof Mirror || selectedPart instanceof Foundation) {
 				header = new String[] { "Hour", "Solar" };
 			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
 				header = new String[] { "Hour", "Heat Gain" };
@@ -107,7 +109,7 @@ class DataViewer {
 			}
 		} else if (graph instanceof PartEnergyAnnualGraph) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectAll || selectedPart instanceof SolarPanel) {
+			if (selectAll || selectedPart instanceof SolarPanel || selectedPart instanceof Mirror || selectedPart instanceof Foundation) {
 				header = new String[] { "Month", "Solar" };
 			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
 				header = new String[] { "Month", "Heat Gain" };
@@ -135,7 +137,7 @@ class DataViewer {
 			header = new String[] { "Degree", "Windows", "Solar Panels", "Heater", "AC", "Net" };
 		} else if (graph instanceof PartEnergyAngularGraph) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof SolarPanel) {
+			if (selectedPart instanceof SolarPanel || selectedPart instanceof Mirror || selectedPart instanceof Foundation) {
 				header = new String[] { "Degree", "Solar" };
 			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
 				header = new String[] { "Degree", "Heat Gain" };
@@ -151,7 +153,7 @@ class DataViewer {
 		final int n = graph.getLength();
 		final Object[][] column = new Object[n][m + 1];
 		for (int i = 0; i < n; i++)
-			column[i][0] = (i + 1);
+			column[i][0] = header[0].equals("Hour") ? i : (i + 1);
 		for (int j = 1; j < m; j++) {
 			final List<Double> list = graph.getData(header[j]);
 			for (int i = 0; i < n; i++) {
@@ -173,7 +175,7 @@ class DataViewer {
 			headers.add("Month");
 		}
 		for (HousePart p : selectedParts) {
-			if (p instanceof SolarPanel) {
+			if (p instanceof SolarPanel || p instanceof Mirror) {
 				headers.add("Solar " + p.getId());
 			} else if (p instanceof Wall || p instanceof Roof || p instanceof Door) {
 				headers.add("Heat Gain " + p.getId());

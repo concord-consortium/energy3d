@@ -73,7 +73,7 @@ public class Weather {
 	}
 
 	public double getCurrentOutsideTemperature() {
-		Calendar now = Heliodon.getInstance().getCalender();
+		Calendar now = Heliodon.getInstance().getCalendar();
 		final double[] t = computeOutsideTemperature(now, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		return getOutsideTemperatureAtMinute(t[1], t[0], now.get(Calendar.MINUTE) + now.get(Calendar.HOUR_OF_DAY) * 60);
 	}

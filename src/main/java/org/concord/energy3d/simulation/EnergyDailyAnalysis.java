@@ -38,6 +38,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
@@ -87,7 +88,7 @@ public class EnergyDailyAnalysis extends Analysis {
 							}
 							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 							if (selectedPart instanceof Foundation)
-								EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) selectedPart);
+								EnergyPanel.getInstance().getBuildingDailyEnergyGraph().addGraph((Foundation) selectedPart);
 							JOptionPane.showMessageDialog(parent, "<html>The calculated daily net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
@@ -98,7 +99,7 @@ public class EnergyDailyAnalysis extends Analysis {
 
 	@Override
 	public void updateGraph() {
-		int n = (int) Math.round(60.0 / SolarRadiation.getInstance().getTimeStep());
+		int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

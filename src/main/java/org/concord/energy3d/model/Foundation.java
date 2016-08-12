@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -44,6 +43,10 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Foundation extends HousePart implements Thermalizable {
 
 	private static final long serialVersionUID = 1L;
+	public static final int BUILDING = 0;
+	public static final int PV_STATION = 1;
+	public static final int CSP_STATION = 2;
+
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
@@ -1314,6 +1317,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		return count;
 	}
 
+	public List<SolarPanel> getSolarPanels() {
+		final List<SolarPanel> list = new ArrayList<SolarPanel>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this)
+				list.add((SolarPanel) p);
+		}
+		return list;
+	}
+
+	public List<Mirror> getMirrors() {
+		final List<Mirror> list = new ArrayList<Mirror>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this)
+				list.add((Mirror) p);
+		}
+		return list;
+	}
+
 	public void updateHandlesOfAllFoudations() {
 		for (final HousePart part : Scene.getInstance().getParts())
 			if (part instanceof Foundation)
@@ -1424,7 +1445,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void addCircularMirrorArrays() {
-		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
 			if (c instanceof Mirror)
@@ -1461,8 +1482,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 
-	public void addSolarPanelArrays(final double panelWidth, final double panelHeight, final double rowSpacing, final double colSpacing, final int alignment) {
-		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+	public void addSolarPanelArrays(final double panelWidth, final double panelHeight, final double rowSpacing, final double colSpacing, final int rowAxis) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
 			if (c instanceof SolarPanel)
@@ -1482,19 +1503,21 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
 		final double w = (panelWidth + colSpacing) / Scene.getInstance().getAnnotationScale();
 		final double h = (panelHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
-		switch (alignment) {
-		case 0:
-			int rows = (int) Math.floor(a / w);
-			int cols = (int) Math.floor(b / h);
+		switch (rowAxis) {
+		case 0: // north-south axis
+			int rows = (int) Math.floor(b / w);
+			int cols = (int) Math.floor(a / h);
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final SolarPanel sp = new SolarPanel(false);
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
 					sp.setContainer(this);
+					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
-					final Vector3 v = sp.toRelative(new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0));
+					sp.setRelativeAzimuth(90);
+					final Vector3 v = sp.toRelative(new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0));
 					sp.points.get(0).setX(v.getX());
 					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
@@ -1502,19 +1525,19 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 			break;
-		case 1:
-			rows = (int) Math.floor(b / w);
-			cols = (int) Math.floor(a / h);
+		case 1: // east-west axis
+			rows = (int) Math.floor(a / w);
+			cols = (int) Math.floor(b / h);
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final SolarPanel sp = new SolarPanel(false);
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
 					sp.setContainer(this);
+					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
-					sp.setRelativeAzimuth(90);
-					final Vector3 v = sp.toRelative(new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0));
+					final Vector3 v = sp.toRelative(new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0));
 					sp.points.get(0).setX(v.getX());
 					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
@@ -1527,6 +1550,18 @@ public class Foundation extends HousePart implements Thermalizable {
 			rotate(-az, null);
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
+	}
+
+	public int getSupportingType() {
+		for (final HousePart p : children) {
+			if (p instanceof Wall)
+				return BUILDING;
+			if (p instanceof SolarPanel)
+				return PV_STATION;
+			if (p instanceof Mirror)
+				return CSP_STATION;
+		}
+		return -1;
 	}
 
 }

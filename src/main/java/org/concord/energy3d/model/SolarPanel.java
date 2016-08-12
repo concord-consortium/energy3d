@@ -1,7 +1,6 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
-import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -10,7 +9,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -36,6 +34,7 @@ public class SolarPanel extends HousePart {
 	public static final int NO_TRACKER = 0;
 	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
 	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
+	public static final int VERTICAL_SINGLE_AXIS_TRACKER = 3;
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -52,6 +51,7 @@ public class SolarPanel extends HousePart {
 	private int trackerType = NO_TRACKER;
 	private double baseHeight = 6;
 	private boolean drawSunBeam;
+	private int rotationAxis;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
 
@@ -223,18 +223,34 @@ public class SolarPanel extends HousePart {
 		boolean onFlatSurface = onFlatSurface();
 		switch (trackerType) {
 		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).multiply(1, 0, 1, null).normalize(null);
-			if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
-				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
+			int xRotationAxis = 1;
+			int yRotationAxis = 0;
+			switch (rotationAxis) {
+			case 1:
+				xRotationAxis = 0;
+				yRotationAxis = 1;
+				break;
+			}
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
+			break;
+		case VERTICAL_SINGLE_AXIS_TRACKER:
+			Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
+			Vector3 b = Vector3.UNIT_Z.cross(a, null);
+			Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
+			normal = m.applyPost(a, null);
+			if (normal.getZ() < 0)
+				normal = normal.negate(null);
 			break;
 		default:
 			if (onFlatSurface)
 				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
-		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		if (Util.isEqual(normal, Vector3.UNIT_Z)) // special case when normal is z-axis
+			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
+		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
 		mesh.setTranslation(onFlatSurface ? getAbsPoint(0).addLocal(0, 0, baseHeight) : getAbsPoint(0));
 
 		surround.setTranslation(mesh.getTranslation());
@@ -253,22 +269,6 @@ public class SolarPanel extends HousePart {
 		if (drawSunBeam)
 			drawSunBeam();
 
-	}
-
-	public void setNormalAtTime(int minute) {
-		Calendar calendar = (Calendar) Heliodon.getInstance().getCalender().clone();
-		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
-		calendar.set(Calendar.MINUTE, minute % 60);
-		switch (trackerType) {
-		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
-			break;
-		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(calendar).multiply(1, 0, 1, null).normalize(null);
-			if (Util.isEqual(normal, Vector3.UNIT_Z))
-				normal = new Vector3(0, 0.001, 1).normalizeLocal();
-			break;
-		}
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -326,7 +326,7 @@ public class SolarPanel extends HousePart {
 			return;
 		}
 		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 		Vector3 r = new Vector3(o);
@@ -595,6 +595,14 @@ public class SolarPanel extends HousePart {
 
 	public int getTracker() {
 		return trackerType;
+	}
+
+	public void setRotationAxis(int rotationAxis) {
+		this.rotationAxis = rotationAxis;
+	}
+
+	public int getRotationAxis() {
+		return rotationAxis;
 	}
 
 	public void setSunBeamVisible(boolean drawSunBeam) {

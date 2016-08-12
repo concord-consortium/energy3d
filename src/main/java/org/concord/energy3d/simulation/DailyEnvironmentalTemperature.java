@@ -102,7 +102,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 			hideData.put(groundTemperature[i], false);
 
 		city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		today = Heliodon.getInstance().getCalender();
+		today = Heliodon.getInstance().getCalendar();
 		xNow = today.get(Calendar.HOUR_OF_DAY) + (double) today.get(Calendar.MINUTE) / 60.0;
 		int day = today.get(Calendar.DAY_OF_YEAR);
 		double[] r = Weather.computeOutsideTemperature(today, city);

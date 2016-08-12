@@ -45,7 +45,7 @@ class ThermostatDialog extends JDialog {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		Calendar calendar = Heliodon.getInstance().getCalender();
+		Calendar calendar = Heliodon.getInstance().getCalendar();
 		int month = calendar.get(Calendar.MONTH);
 		setTitle("Thermostat Schedule: " + new DateFormatSymbols().getMonths()[month]);
 		getContentPane().setLayout(new BorderLayout());

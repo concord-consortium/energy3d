@@ -162,7 +162,7 @@ public class PostProcessor extends PlayControl {
 							floorCount0 = floorCount;
 						if (doorCount0 == -1)
 							doorCount0 = doorCount;
-						final Calendar heliodonCalendar = Heliodon.getInstance().getCalender();
+						final Calendar heliodonCalendar = Heliodon.getInstance().getCalendar();
 						String heliodonTime = FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.MONTH) + 1);
 						heliodonTime += "/" + FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.DAY_OF_MONTH));
 						heliodonTime += ":" + FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.HOUR_OF_DAY));

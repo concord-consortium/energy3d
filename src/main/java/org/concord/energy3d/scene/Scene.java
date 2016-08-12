@@ -17,7 +17,6 @@ import java.util.concurrent.Callable;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.logger.SnapshotLogger;
@@ -39,7 +38,6 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
-import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.LockAllCommand;
@@ -115,6 +113,8 @@ public class Scene implements Serializable {
 	private boolean showBuildingLabels;
 	private double solarStep = 2.0;
 	private int timeStep = 15; // in minutes
+	private int plateNx = 2; // number of grid cells in x direction for a plate
+	private int plateNy = 2; // number of grid cells in y direction for a plate
 	private boolean cleanup = false;
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
@@ -169,12 +169,13 @@ public class Scene implements Serializable {
 	public static void open(final URL file) throws Exception {
 		openNow(file);
 		synchronized (SceneManager.getInstance()) {
-			EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+			EnergyPanel.getInstance().clearRadiationHeatMap();
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					EnergyPanel.getInstance().update();
-					EnergyPanel.getInstance().clearAllGraphs();
+					final EnergyPanel e = EnergyPanel.getInstance();
+					e.update();
+					e.clearAllGraphs();
 					if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
 						MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
 						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
@@ -182,10 +183,25 @@ public class Scene implements Serializable {
 					}
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
-						EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
-						EnergyPanel.getInstance().getDailyEnergyGraph().clearData();
-						EnergyPanel.getInstance().getDailyEnergyGraph().addGraph((Foundation) p);
-						EnergyPanel.getInstance().validate();
+						Foundation f = (Foundation) p;
+						switch (f.getSupportingType()) {
+						case Foundation.BUILDING:
+							e.getConstructionCostGraph().addGraph(f);
+							e.getBuildingDailyEnergyGraph().clearData();
+							e.getBuildingDailyEnergyGraph().addGraph(f);
+							e.validate();
+							break;
+						case Foundation.PV_STATION:
+							e.getPvStationDailyEnergyGraph().clearData();
+							e.getPvStationDailyEnergyGraph().addGraph(f);
+							e.validate();
+							break;
+						case Foundation.CSP_STATION:
+							e.getCspStationDailyEnergyGraph().clearData();
+							e.getCspStationDailyEnergyGraph().addGraph(f);
+							e.validate();
+							break;
+						}
 					}
 				}
 			});
@@ -246,8 +262,7 @@ public class Scene implements Serializable {
 			if (count == 1)
 				SceneManager.getInstance().setSelectedPart(first);
 
-			initSceneNow();
-			initEnergy();
+			instance.init();
 			instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
 			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 
@@ -271,7 +286,8 @@ public class Scene implements Serializable {
 
 	}
 
-	public static void initSceneNow() {
+	private void init() {
+
 		root.detachAllChildren();
 		originalHouseRoot.detachAllChildren();
 		notReceivingShadowRoot.detachAllChildren();
@@ -279,82 +295,80 @@ public class Scene implements Serializable {
 		root.attachChild(notReceivingShadowRoot);
 
 		if (url != null) {
-			for (final HousePart housePart : instance.getParts()) {
-				final boolean b = housePart instanceof Tree || housePart instanceof Human;
-				(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(housePart.getRoot());
+			for (final HousePart p : parts) {
+				final boolean b = p instanceof Tree || p instanceof Human;
+				(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(p.getRoot());
 			}
 			System.out.println("initSceneNow done");
 			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
-			// instance.redrawAllNow();
+			// redrawAllNow();
 		}
 
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-		SceneManager.getInstance().setAxesVisible(!instance.hideAxes);
-		SceneManager.getInstance().setBuildingLabelsVisible(instance.showBuildingLabels);
-		Util.setSilently(MainPanel.getInstance().getNoteTextArea(), instance.note == null ? "" : instance.note); // need to do this to avoid logging
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
-				SceneManager.getInstance().getUndoManager().die();
-			}
-		});
-		instance.setEdited(false);
-		instance.setCopyBuffer(null);
+		SceneManager.getInstance().setAxesVisible(!hideAxes);
+		SceneManager.getInstance().setBuildingLabelsVisible(showBuildingLabels);
 
-		instance.setTheme(instance.theme);
-		SceneManager.getInstance().getLand().setDefaultColor(instance.landColor != null ? instance.landColor : new ColorRGBA(0, 1, 0, 0.5f));
+		setTheme(theme);
+		SceneManager.getInstance().getLand().setDefaultColor(landColor != null ? landColor : new ColorRGBA(0, 1, 0, 0.5f));
 
-	}
-
-	public static void initEnergy() {
 		final EnergyPanel energyPanel = EnergyPanel.getInstance();
-		if (instance.calendar != null) {
-			Heliodon.getInstance().setDate(instance.calendar.getTime());
-			Heliodon.getInstance().setTime(instance.calendar.getTime());
-			Util.setSilently(energyPanel.getDateSpinner(), instance.calendar.getTime());
-			Util.setSilently(energyPanel.getTimeSpinner(), instance.calendar.getTime());
-			if ("Boston".equals(instance.city) || instance.city == null || "".equals(instance.city)) {
-				instance.city = "Boston, MA";
-				instance.latitude = 42;
+		if (calendar != null) {
+			final Date time = calendar.getTime();
+			Heliodon.getInstance().setDate(time);
+			Heliodon.getInstance().setTime(time);
+			Util.setSilently(energyPanel.getDateSpinner(), time);
+			Util.setSilently(energyPanel.getTimeSpinner(), time);
+			if ("Boston".equals(city) || city == null || "".equals(city)) {
+				city = "Boston, MA";
+				latitude = 42;
 			}
-			energyPanel.setLatitude(instance.latitude); // already silent
-			Util.selectSilently(energyPanel.getCityComboBox(), instance.city);
+			energyPanel.setLatitude(latitude); // already silent
+			Util.selectSilently(energyPanel.getCityComboBox(), city);
 			Scene.getInstance().setTreeLeaves();
-			MainPanel.getInstance().getHeliodonButton().setSelected(instance.isHeliodonVisible);
+			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().changeSkyTexture();
 			SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 		}
 
-		if (Util.isZero(instance.solarContrast)) // if the solar map color contrast has not been set, set it to 50
-			instance.solarContrast = 50;
-		Util.setSilently(energyPanel.getColorMapSlider(), instance.solarContrast);
-
 		// previous versions do not have the following classes
-
-		if (instance.designSpecs == null)
-			instance.designSpecs = new DesignSpecs();
+		if (designSpecs == null)
+			designSpecs = new DesignSpecs();
 		else
-			instance.designSpecs.setDefaultValues();
-		if (instance.ground == null)
-			instance.ground = new Ground();
+			designSpecs.setDefaultValues();
+		if (ground == null)
+			ground = new Ground();
+		if (unit == null)
+			unit = Unit.InternationalSystemOfUnits;
 
-		if (instance.unit == null)
-			instance.unit = Unit.InternationalSystemOfUnits;
+		// restore the default values
+		if (Util.isZero(heatVectorLength))
+			heatVectorLength = 5000;
+		if (Util.isZero(solarStep))
+			solarStep = 2;
+		if (Util.isZero(timeStep))
+			timeStep = 15;
+		if (Util.isZero(plateNx))
+			plateNx = 2;
+		if (Util.isZero(plateNy))
+			plateNy = 2;
+		if (Util.isZero(solarContrast)) 
+			solarContrast = 50;
 
-		if (Util.isZero(instance.heatVectorLength))
-			instance.heatVectorLength = 5000;
-		SolarRadiation.getInstance().setSolarStep(Util.isZero(instance.solarStep) ? 2 : instance.solarStep);
-		SolarRadiation.getInstance().setTimeStep(Util.isZero(instance.timeStep) ? 15 : instance.timeStep);
-		instance.setEdited(false);
+		setEdited(false);
+		setCopyBuffer(null);
+
+		Util.setSilently(energyPanel.getColorMapSlider(), solarContrast);
+		Util.setSilently(MainPanel.getInstance().getNoteTextArea(), note == null ? "" : note); // need to do this to avoid logging
 
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().updateThermostat();
+				energyPanel.updateThermostat();
+				MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
+				MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
+				SceneManager.getInstance().getUndoManager().die();
 			}
 		});
 
@@ -585,14 +599,14 @@ public class Scene implements Serializable {
 
 				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
-				instance.calendar.setTime(Heliodon.getInstance().getCalender().getTime());
+				instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
 				instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
 				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
-				instance.solarStep = SolarRadiation.getInstance().getSolarStep();
-				instance.timeStep = SolarRadiation.getInstance().getTimeStep();
+				// instance.solarStep = SolarRadiation.getInstance().getSolarStep();
+				// instance.timeStep = SolarRadiation.getInstance().getTimeStep();
 
 				if (setAsCurrentFile)
 					Scene.url = url;
@@ -1549,15 +1563,6 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public List<SolarPanel> getSolarPanelsOnFoundation(final Foundation foundation) {
-		final List<SolarPanel> list = new ArrayList<SolarPanel>();
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
-				list.add((SolarPanel) p);
-		}
-		return list;
-	}
-
 	public List<SolarPanel> getAllSolarPanels() {
 		final List<SolarPanel> list = new ArrayList<SolarPanel>();
 		for (final HousePart p : parts) {
@@ -1673,15 +1678,6 @@ public class Scene implements Serializable {
 			if (p instanceof SolarPanel)
 				((SolarPanel) p).setInverterEfficiency(eff);
 		}
-	}
-
-	public List<Mirror> getMirrorsOnFoundation(final Foundation foundation) {
-		final List<Mirror> list = new ArrayList<Mirror>();
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation)
-				list.add((Mirror) p);
-		}
-		return list;
 	}
 
 	public List<Mirror> getAllMirrors() {
@@ -1850,7 +1846,7 @@ public class Scene implements Serializable {
 	public Date getDate() {
 		if (calendar != null)
 			return calendar.getTime();
-		return Heliodon.getInstance().getCalender().getTime();
+		return Heliodon.getInstance().getCalendar().getTime();
 	}
 
 	public void setHeatVectorLength(final double heatVectorLength) {
@@ -2036,6 +2032,38 @@ public class Scene implements Serializable {
 
 	public boolean areSunAnglesVisible() {
 		return showSunAngles;
+	}
+
+	public void setPlateNx(int plateNx) {
+		this.plateNx = plateNx;
+	}
+
+	public int getPlateNx() {
+		return plateNx;
+	}
+
+	public void setPlateNy(int plateNy) {
+		this.plateNy = plateNy;
+	}
+
+	public int getPlateNy() {
+		return plateNy;
+	}
+
+	public void setSolarStep(final double solarStep) {
+		this.solarStep = solarStep;
+	}
+
+	public double getSolarStep() {
+		return solarStep;
+	}
+
+	public void setTimeStep(final int timeStep) {
+		this.timeStep = timeStep;
+	}
+
+	public int getTimeStep() {
+		return timeStep;
 	}
 
 }

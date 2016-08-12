@@ -19,25 +19,26 @@ import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.BuildingEnergyDailyGraph;
-import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.Graph;
+import org.concord.energy3d.simulation.PartEnergyDailyGraph;
+import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.SolarRadiation;
 
 /**
  * @author Charles Xie
  *
  */
-public class DailyEnergyGraph extends JPanel {
+public class PvStationDailyEnergyGraph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private BuildingEnergyDailyGraph graph;
-	private Foundation building;
+	private PartEnergyDailyGraph graph;
+	private Foundation base;
 	private Box buttonPanel;
 
-	public DailyEnergyGraph() {
+	public PvStationDailyEnergyGraph() {
 		super(new BorderLayout());
 
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
@@ -59,7 +60,7 @@ public class DailyEnergyGraph extends JPanel {
 		buttonPanel.add(button);
 		buttonPanel.add(Box.createVerticalGlue());
 
-		graph = new BuildingEnergyDailyGraph();
+		graph = new PartEnergyDailyGraph();
 		graph.setPopup(false);
 		graph.setBackground(Color.WHITE);
 		graph.setBorder(BorderFactory.createEtchedBorder());
@@ -72,9 +73,9 @@ public class DailyEnergyGraph extends JPanel {
 						return;
 					}
 					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
-						EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+						PvDailyAnalysis analysis = new PvDailyAnalysis();
 						analysis.updateGraph();
-						analysis.show("Daily Energy");
+						analysis.show();
 					}
 				}
 			}
@@ -86,7 +87,7 @@ public class DailyEnergyGraph extends JPanel {
 	}
 
 	public Foundation getBuilding() {
-		return building;
+		return base;
 	}
 
 	public double getResult(final String name) {
@@ -111,25 +112,28 @@ public class DailyEnergyGraph extends JPanel {
 	}
 
 	public void updateGraph() {
-		if (building == null)
+		if (base == null)
 			return;
 		graph.clearData();
-		for (int i = 0; i < 24; i++) {
-			SolarRadiation.getInstance().computeEnergyAtHour(i);
-			graph.addData("Windows", building.getPassiveSolarNow());
-			graph.addData("Solar Panels", building.getPhotovoltaicNow());
-			graph.addData("Heater", building.getHeatingNow());
-			graph.addData("AC", building.getCoolingNow());
-			graph.addData("Net", building.getTotalEnergyNow());
+		List<SolarPanel> panels = base.getSolarPanels();
+		if (!panels.isEmpty()) {
+			for (int i = 0; i < 24; i++) {
+				SolarRadiation.getInstance().computeEnergyAtHour(i);
+				double output = 0;
+				for (SolarPanel sp : panels) {
+					output += sp.getSolarPotentialNow() * sp.getCellEfficiency() * sp.getInverterEfficiency();
+				}
+				graph.addData("Solar", output);
+			}
 		}
 		repaint();
 	}
 
-	public void addGraph(Foundation building) {
+	public void addGraph(Foundation base) {
 
 		removeAll();
 
-		this.building = building;
+		this.base = base;
 		graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			updateGraph();
@@ -141,21 +145,18 @@ public class DailyEnergyGraph extends JPanel {
 
 	public String toJson() {
 		String s = "{";
-		if (building != null) {
-			s += "\"Building\": " + building.getId();
-			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-			for (String name : names) {
-				List<Double> data = graph.getData(name);
-				if (data == null)
-					continue;
-				s += ", \"" + name + "\": {";
+		if (base != null) {
+			s += "\"Foundation\": " + base.getId();
+			List<Double> data = graph.getData("Solar");
+			if (data != null) {
+				s += ", \"Solar\": {";
 				s += "\"Hourly\": [";
 				for (Double x : data) {
 					s += Graph.FIVE_DECIMALS.format(x) + ",";
 				}
 				s = s.substring(0, s.length() - 1);
 				s += "]\n";
-				s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
+				s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult("Solar"));
 				s += "}";
 			}
 		} else {

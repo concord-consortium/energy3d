@@ -29,7 +29,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.EnergyPanel;
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.gui.PopupMenuFactory;
@@ -1277,7 +1276,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
-		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 
 	}
 
@@ -1722,7 +1721,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (selectedPart.isDrawable()) {
 								selectedPart.complete();
 								if (editPartCommand != null && editPartCommand.isReallyEdited())
-									EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+									EnergyPanel.getInstance().clearRadiationHeatMap();
 							} else {
 								if (editPartCommand != null)
 									editPartCommand.undo();
@@ -1765,7 +1764,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							selectedPart = null;
 							if (operationStick)
 								operationFlag = true;
-							EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							EnergyPanel.getInstance().clearRadiationHeatMap();
 						}
 						if (!operationFlag) {
 							MainPanel.getInstance().defaultTool();
@@ -1866,7 +1865,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setSolarHeatMap(final boolean solarHeatMap) {
 		setSolarHeatMapWithoutUpdate(solarHeatMap);
 		EnergyPanel.getInstance().clearAlreadyRendered();
-		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	public boolean isHeatFluxDaily() {

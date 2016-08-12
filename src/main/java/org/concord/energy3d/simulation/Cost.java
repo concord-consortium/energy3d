@@ -26,6 +26,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
@@ -150,6 +151,9 @@ public class Cost {
 		if (part instanceof SolarPanel) {
 			// According to http://www.solartown.com/learning/solar-panels/solar-module-comparison
 			return 350 + (int) (((SolarPanel) part).getCellEfficiency() * 2000);
+		}
+		if (part instanceof Mirror) {
+			return (int) (((Mirror) part).getArea() * 100);
 		}
 		if (part instanceof Tree) {
 			Tree tree = (Tree) part;

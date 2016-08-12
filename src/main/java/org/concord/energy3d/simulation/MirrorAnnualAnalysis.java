@@ -40,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.gui.CspStationDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
@@ -75,10 +76,13 @@ public class MirrorAnnualAnalysis extends Analysis {
 		super.runAnalysis(new Runnable() {
 			@Override
 			public void run() {
+				final EnergyPanel e = EnergyPanel.getInstance();
+				Calendar today;
 				for (final int m : MONTHS) {
 					if (!analysisStopped) {
-						final Calendar c = Heliodon.getInstance().getCalender();
+						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
+						today = (Calendar) c.clone();
 						Scene.getInstance().updateMirrors();
 						final Throwable t = compute();
 						if (t != null) {
@@ -90,10 +94,27 @@ public class MirrorAnnualAnalysis extends Analysis {
 							});
 							break;
 						}
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) { // synchronize with daily graph
+							CspStationDailyEnergyGraph g = e.getCspStationDailyEnergyGraph();
+							if (g.hasGraph()) {
+								g.setCalendar(today);
+								g.updateGraph();
+							}
+						}
+						final Calendar today2 = today;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
+								e.getDateSpinner().setValue(c.getTime());
+								if (selectedPart instanceof Foundation) {
+									CspStationDailyEnergyGraph g = e.getCspStationDailyEnergyGraph();
+									e.getCspStationTabbedPane().setSelectedComponent(g);
+									if (!g.hasGraph()) {
+										g.setCalendar(today2);
+										g.addGraph((Foundation) selectedPart);
+									}
+								}
 							}
 						});
 					}
@@ -103,7 +124,7 @@ public class MirrorAnnualAnalysis extends Analysis {
 					@Override
 					public void run() {
 						onCompletion();
-						if (Heliodon.getInstance().getCalender().get(Calendar.MONTH) != Calendar.DECEMBER)
+						if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER)
 							return; // annual calculation aborted
 						String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
 						String previousRuns = "";

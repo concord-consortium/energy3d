@@ -1,7 +1,6 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
-import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -10,7 +9,6 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -204,7 +202,7 @@ public class Mirror extends HousePart {
 		} else {
 			ReadOnlyVector3 o = heliostatTarget.getTankCenter();
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
-			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
 		}
 		mesh.setTranslation(a);
@@ -221,18 +219,6 @@ public class Mirror extends HousePart {
 
 		drawLightBeams();
 
-	}
-
-	public void setNormalAtTime(Vector3 a, int minute) {
-		if (a == null)
-			a = getAbsPoint(0).addLocal(0, 0, baseHeight);
-		Calendar calendar = (Calendar) Heliodon.getInstance().getCalender().clone();
-		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
-		calendar.set(Calendar.MINUTE, minute % 60);
-		ReadOnlyVector3 o = heliostatTarget.getTankCenter();
-		final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
-		final Vector3 q = Heliodon.getInstance().computeSunLocation(calendar).normalize(null);
-		normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
 	}
 
 	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -259,7 +245,7 @@ public class Mirror extends HousePart {
 		double length = 100;
 		if (heliostatTarget != null)
 			length = heliostatTarget.getTankCenter().distance(o);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalender()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 

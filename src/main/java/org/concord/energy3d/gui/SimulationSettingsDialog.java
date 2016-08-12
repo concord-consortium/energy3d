@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import org.concord.energy3d.gui.EnergyPanel.UpdateRadiation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.SolarRadiation;
 
@@ -37,13 +36,16 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(4, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(6, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
-		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(SolarRadiation.getInstance().getSolarStep()));
+		final Scene s = Scene.getInstance();
+		final JTextField plateNxTextField = new JTextField(s.getPlateNx() + "");
+		final JTextField plateNyTextField = new JTextField(s.getPlateNy() + "");
+		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
-		final JTextField timeStepTextField = new JTextField(FORMAT2.format(SolarRadiation.getInstance().getTimeStep()));
+		final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
 		ActionListener okListener = new ActionListener() {
@@ -52,10 +54,14 @@ class SimulationSettingsDialog extends JDialog {
 				double cellSize;
 				int timeStep;
 				double heatVectorLength;
+				int plateNx;
+				int plateNy;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
+					plateNx = Integer.parseInt(plateNxTextField.getText());
+					plateNy = Integer.parseInt(plateNyTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -74,21 +80,41 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-60 seconds.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				SolarRadiation.getInstance().setSolarStep(cellSize);
-				SolarRadiation.getInstance().setTimeStep(timeStep);
+				if (plateNx < 2 || plateNy < 2) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if ((plateNx & (plateNx - 1)) != 0 || (plateNy & (plateNy - 1)) != 0) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				s.setSolarStep(cellSize);
+				s.setTimeStep(timeStep);
+				s.setPlateNx(plateNx);
+				s.setPlateNy(plateNy);
+				s.setHeatVectorLength(heatVectorLength);
+				s.setEdited(true);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
-				Scene.getInstance().setHeatVectorLength(heatVectorLength);
-				Scene.getInstance().setEdited(true);
-				EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+				EnergyPanel.getInstance().clearRadiationHeatMap();
 				SimulationSettingsDialog.this.dispose();
 			}
 		};
 
+		// set number of grid cells for a plate
+		panel.add(new JLabel("# Grid Cells in X-Direction: "));
+		panel.add(plateNxTextField);
+		plateNxTextField.setColumns(6);
+		panel.add(new JLabel("For panels (must be power of 2)"));
+
+		// set number of grid cells for a plate
+		panel.add(new JLabel("# Grid Cells in Y-Direction: "));
+		panel.add(plateNyTextField);
+		panel.add(new JLabel("For panels (must be power of 2)"));
+
 		// set the grid size ("solar step")
 		panel.add(new JLabel("Radiation Grid Cell Size: "));
 		panel.add(cellSizeTextField);
-		cellSizeTextField.setColumns(6);
-		panel.add(new JLabel("Internal unit"));
+		panel.add(new JLabel("For non-panels (internal unit)"));
 
 		// set the heat arrow length
 		panel.add(new JLabel("Heat Arrow Length: "));
