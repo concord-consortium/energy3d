@@ -177,6 +177,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final BasicPassManager passManager = new BasicPassManager();
 	private final Mesh land = new Quad("Land", 2000, 2000);
 	private final Mesh solarLand = new Quad("Solar Land", 256, 256);
+	private final Quad mapLand = new Quad("Map Land", 68.75 / 0.2, 68.75 / 0.2);
 	private final Mesh collisionLand = new Quad("Collision Land", 2000, 2000);
 	private final Mesh gridsMesh = new Line("Floor Grids");
 	private final LightState lightState = new LightState();
@@ -307,7 +308,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		backgroundRoot.attachChild(sky);
 		backgroundRoot.attachChild(createLand());
 		solarLand.setVisible(false);
+		mapLand.setVisible(false);
 		backgroundRoot.attachChild(solarLand);
+		backgroundRoot.attachChild(mapLand);
 		collisionLand.setModelBound(new BoundingBox());
 		collisionLand.getSceneHints().setCullHint(CullHint.Always);
 		root.attachChild(collisionLand);
@@ -1548,6 +1551,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public Mesh getSolarLand() {
 		return solarLand;
+	}
+
+	public Mesh getMapLand() {
+		return mapLand;
+	}
+
+	public void resizeMapLand(final double scale) {
+		final double d = 68.75 / 0.2 * scale;
+		mapLand.resize(d, d);
 	}
 
 	public boolean isHeliodonVisible() {

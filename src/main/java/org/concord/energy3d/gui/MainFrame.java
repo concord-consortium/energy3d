@@ -126,10 +126,17 @@ public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
+	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
+	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
+	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
+	private final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
+	private final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
+	private final FileChooser fileChooser;
+	private final JColorChooser colorChooser;
+	private int fileMenuItemCount;
+
 	private JMenuBar appMenuBar;
 	private JMenu fileMenu;
-	private int fileMenuItemCount;
-	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
 	private JMenuItem newMenuItem;
 	private JMenuItem openMenuItem;
 	private JMenuItem replayFolderMenuItem;
@@ -222,13 +229,6 @@ public class MainFrame extends JFrame {
 	private JMenu templatesMenu;
 	private JMenu otherTemplatesMenu;
 	private JMenu tutorialsMenu;
-
-	private final FileChooser fileChooser;
-	private final JColorChooser colorChooser;
-	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
-	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
-	private final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
-	private final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
 	private JMenuItem removeAllFloorsMenuItem;
@@ -248,6 +248,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rotate180MenuItem;
 	private JMenuItem rotate90CwMenuItem;
 	private JMenuItem rotate90CcwMenuItem;
+	private JMenuItem googleMapMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -852,7 +853,7 @@ public class MainFrame extends JFrame {
 			setTitle("Energy3D V" + MainApplication.VERSION + star);
 		} else {
 			if (Scene.isTemplate()) {
-				String s = Scene.getURL().toString();
+				final String s = Scene.getURL().toString();
 				setTitle("Energy3D V" + MainApplication.VERSION + " - TEMPLATE: " + s.substring(s.lastIndexOf("/") + 1).replaceAll("%20", " ") + star);
 			} else {
 				setTitle("Energy3D V" + MainApplication.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
@@ -1093,7 +1094,7 @@ public class MainFrame extends JFrame {
 			analysisMenu = new JMenu("Analysis");
 			analysisMenu.addMenuListener(new MenuListener() {
 
-				private void enableEnergyAnalysis(boolean b) {
+				private void enableEnergyAnalysis(final boolean b) {
 					annualEnergyAnalysisMenuItem.setEnabled(b);
 					annualEnergyAnalysisForSelectionMenuItem.setEnabled(b);
 					dailyEnergyAnalysisMenuItem.setEnabled(b);
@@ -1198,10 +1199,10 @@ public class MainFrame extends JFrame {
 	}
 
 	private void addModel(final JMenu menu, final String type, final String url) {
-		JMenuItem mi = new JMenuItem(type);
+		final JMenuItem mi = new JMenuItem(type);
 		mi.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				openModel(MainApplication.class.getResource(url));
 			}
 		});
@@ -1276,6 +1277,7 @@ public class MainFrame extends JFrame {
 			viewMenu.addSeparator();
 			viewMenu.add(getTextureMenu());
 			viewMenu.add(getThemeMenu());
+			viewMenu.add(getGoogleMapMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(getSolarAbsorptionHeatMapMenuItem());
@@ -1359,6 +1361,19 @@ public class MainFrame extends JFrame {
 		}
 		return themeMenu;
 
+	}
+
+	public JMenuItem getGoogleMapMenuItem() {
+		if (googleMapMenuItem == null) {
+			googleMapMenuItem = new JMenuItem("Google Map");
+			googleMapMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MapDialog.getInstance().setVisible(true);
+				}
+			});
+		}
+		return googleMapMenuItem;
 	}
 
 	public JCheckBoxMenuItem getAxesMenuItem() {
@@ -1462,7 +1477,7 @@ public class MainFrame extends JFrame {
 			rescaleMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						new RescaleBuildingDialog((Foundation) selectedPart).setVisible(true);
 						return;
@@ -1757,9 +1772,9 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					PartGroup g = selectGroup();
+					final PartGroup g = selectGroup();
 					if (g != null) {
-						GroupDailyAnalysis a = new GroupDailyAnalysis(g.getIds());
+						final GroupDailyAnalysis a = new GroupDailyAnalysis(g.getIds());
 						a.show(g.getType() + " " + g.getIds());
 					}
 					SceneManager.getInstance().hideAllEditPoints();
@@ -1780,9 +1795,9 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					PartGroup g = selectGroup();
+					final PartGroup g = selectGroup();
 					if (g != null) {
-						GroupAnnualAnalysis a = new GroupAnnualAnalysis(g.getIds());
+						final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g.getIds());
 						a.show(g.getType() + " " + g.getIds());
 					}
 					SceneManager.getInstance().hideAllEditPoints();
@@ -1792,9 +1807,9 @@ public class MainFrame extends JFrame {
 		return groupAnnualAnalysisMenuItem;
 	}
 
-	private ArrayList<Long> getIdArray(Class<?> c) {
-		ArrayList<Long> idArray = new ArrayList<Long>();
-		for (HousePart p : Scene.getInstance().getParts()) {
+	private ArrayList<Long> getIdArray(final Class<?> c) {
+		final ArrayList<Long> idArray = new ArrayList<Long>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (c.isInstance(p)) {
 				idArray.add(p.getId());
 			}
@@ -1804,15 +1819,15 @@ public class MainFrame extends JFrame {
 	}
 
 	private PartGroup selectGroup() {
-		JPanel gui = new JPanel(new BorderLayout(5, 5));
+		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
 		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Mirror", "Window", "Wall", "Roof" });
 		typeComboBox.addItemListener(new ItemListener() {
 			@Override
-			public void itemStateChanged(ItemEvent e) {
+			public void itemStateChanged(final ItemEvent e) {
 				idListModel.clear();
-				String type = (String) typeComboBox.getSelectedItem();
+				final String type = (String) typeComboBox.getSelectedItem();
 				Class<?> c = null;
 				if ("Wall".equals(type)) {
 					c = Wall.class;
@@ -1826,25 +1841,25 @@ public class MainFrame extends JFrame {
 					c = Mirror.class;
 				}
 				if (c != null) {
-					ArrayList<Long> idArray = getIdArray(c);
-					for (Long id : idArray) {
+					final ArrayList<Long> idArray = getIdArray(c);
+					for (final Long id : idArray) {
 						idListModel.addElement(id);
 					}
 				}
 			}
 		});
 		final ArrayList<Long> idArray = getIdArray(SolarPanel.class);
-		for (Long id : idArray) {
+		for (final Long id : idArray) {
 			idListModel.addElement(id);
 		}
 		final JList<Long> idList = new JList<Long>(idListModel);
 		idList.addListSelectionListener(new ListSelectionListener() {
 			@Override
-			public void valueChanged(ListSelectionEvent e) {
+			public void valueChanged(final ListSelectionEvent e) {
 				SceneManager.getInstance().hideAllEditPoints();
-				List<Long> selectedValues = idList.getSelectedValuesList();
-				for (Long i : selectedValues) {
-					HousePart p = Scene.getInstance().getPart(i);
+				final List<Long> selectedValues = idList.getSelectedValuesList();
+				for (final Long i : selectedValues) {
+					final HousePart p = Scene.getInstance().getPart(i);
 					p.setEditPointsVisible(true);
 					p.draw();
 				}
@@ -1854,7 +1869,7 @@ public class MainFrame extends JFrame {
 		gui.add(new JScrollPane(idList), BorderLayout.CENTER);
 		if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
 			return null;
-		List<Long> selectedIds = idList.getSelectedValuesList();
+		final List<Long> selectedIds = idList.getSelectedValuesList();
 		if (selectedIds.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.this, "You must select a group of parts first.", "Error", JOptionPane.ERROR_MESSAGE);
 			return null;
@@ -2438,7 +2453,7 @@ public class MainFrame extends JFrame {
 			zoomInMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ZoomCommand c = new ZoomCommand(true);
+					final ZoomCommand c = new ZoomCommand(true);
 					SceneManager.getInstance().zoom(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -2454,7 +2469,7 @@ public class MainFrame extends JFrame {
 			zoomOutMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ZoomCommand c = new ZoomCommand(false);
+					final ZoomCommand c = new ZoomCommand(false);
 					SceneManager.getInstance().zoom(false);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -3208,8 +3223,8 @@ public class MainFrame extends JFrame {
 			removeAllUtilityBillsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					ArrayList<Foundation> list = new ArrayList<Foundation>();
-					for (HousePart p : Scene.getInstance().getParts()) {
+					final ArrayList<Foundation> list = new ArrayList<Foundation>();
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Foundation && ((Foundation) p).getUtilityBill() != null) {
 							list.add((Foundation) p);
 						}
@@ -3219,7 +3234,7 @@ public class MainFrame extends JFrame {
 						return;
 					}
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + list.size() + " utility bills associated with buildings in this scene?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-						for (Foundation f : list)
+						for (final Foundation f : list)
 							f.setUtilityBill(null);
 					}
 					Scene.getInstance().setEdited(true);
@@ -3234,7 +3249,7 @@ public class MainFrame extends JFrame {
 			rotate180MenuItem = new JMenuItem("180\u00B0");
 			rotate180MenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().rotate(Math.PI);
 				}
 			});
@@ -3247,7 +3262,7 @@ public class MainFrame extends JFrame {
 			rotate90CwMenuItem = new JMenuItem("90\u00B0 Clockwise");
 			rotate90CwMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().rotate(-Math.PI / 2);
 				}
 			});
@@ -3260,7 +3275,7 @@ public class MainFrame extends JFrame {
 			rotate90CcwMenuItem = new JMenuItem("90\u00B0 Counter Clockwise");
 			rotate90CcwMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().rotate(Math.PI / 2);
 				}
 			});
@@ -3274,7 +3289,7 @@ public class MainFrame extends JFrame {
 			moveEastMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)); // use 0 to specify no modifier
 			moveEastMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
 						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3296,7 +3311,7 @@ public class MainFrame extends JFrame {
 			moveWestMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0)); // use 0 to specify no modifier
 			moveWestMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
 						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3318,7 +3333,7 @@ public class MainFrame extends JFrame {
 			moveSouthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)); // use 0 to specify no modifier
 			moveSouthMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
 						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3340,7 +3355,7 @@ public class MainFrame extends JFrame {
 			moveNorthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)); // use 0 to specify no modifier
 			moveNorthMenuItem.addActionListener(new ActionListener() {
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(final ActionEvent e) {
 					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
 						return;
 					SceneManager.getTaskManager().update(new Callable<Object>() {

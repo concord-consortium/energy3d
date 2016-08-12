@@ -1066,14 +1066,14 @@ public class MainPanel extends JPanel {
 												SceneManager.getInstance().rotateBuilding(rotationAngle, true);
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											} else if (hp instanceof SolarPanel) {
-												SolarPanel solarPanel = (SolarPanel) hp;
-												ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
+												final SolarPanel solarPanel = (SolarPanel) hp;
+												final ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												solarPanel.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											} else if (hp instanceof Mirror) {
-												Mirror mirror = (Mirror) hp;
-												ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
+												final Mirror mirror = (Mirror) hp;
+												final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 												mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												mirror.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);

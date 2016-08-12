@@ -1433,7 +1433,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (final HousePart m : mirrors) {
 			Scene.getInstance().remove(m, false);
 		}
-		AddArrayCommand command = new AddArrayCommand(mirrors, this, Mirror.class);
+		final AddArrayCommand command = new AddArrayCommand(mirrors, this, Mirror.class);
 		Mirror m = new Mirror();
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
@@ -1461,7 +1461,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 
-	public void addSolarPanelArrays(double panelWidth, double panelHeight, double rowSpacing, double colSpacing, int alignment) {
+	public void addSolarPanelArrays(final double panelWidth, final double panelHeight, final double rowSpacing, final double colSpacing, final int alignment) {
 		EnergyPanel.getInstance().compute(UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
@@ -1471,7 +1471,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (final HousePart p : panels) {
 			Scene.getInstance().remove(p, false);
 		}
-		AddArrayCommand command = new AddArrayCommand(panels, this, SolarPanel.class);
+		final AddArrayCommand command = new AddArrayCommand(panels, this, SolarPanel.class);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az))
 			rotate(az, null);
@@ -1480,15 +1480,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double b = p0.distance(getAbsPoint(1));
 		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
-		double w = (panelWidth + colSpacing) / Scene.getInstance().getAnnotationScale();
-		double h = (panelHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
+		final double w = (panelWidth + colSpacing) / Scene.getInstance().getAnnotationScale();
+		final double h = (panelHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
 		switch (alignment) {
 		case 0:
 			int rows = (int) Math.floor(a / w);
 			int cols = (int) Math.floor(b / h);
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
-					SolarPanel sp = new SolarPanel(false);
+					final SolarPanel sp = new SolarPanel(false);
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
 					sp.setContainer(this);
@@ -1507,7 +1507,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			cols = (int) Math.floor(a / h);
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
-					SolarPanel sp = new SolarPanel(false);
+					final SolarPanel sp = new SolarPanel(false);
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
 					sp.setContainer(this);

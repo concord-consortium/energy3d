@@ -472,7 +472,7 @@ public class Scene implements Serializable {
 	}
 
 	private void deleteAll() {
-		for (HousePart p : parts) {
+		for (final HousePart p : parts) {
 			p.delete();
 		}
 	}
@@ -482,8 +482,8 @@ public class Scene implements Serializable {
 		// fix if roof and wall are not linked from each other
 		for (final HousePart p : parts) {
 			if (p instanceof Roof) {
-				Roof r = (Roof) p;
-				HousePart c = r.getContainer();
+				final Roof r = (Roof) p;
+				final HousePart c = r.getContainer();
 				if (c != null && !c.getChildren().contains(r)) {
 					c.getChildren().add(r);
 				}
@@ -1215,7 +1215,7 @@ public class Scene implements Serializable {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
 				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation) {
-					Window w = (Window) part;
+					final Window w = (Window) part;
 					if (w.getLeftShutter() || w.getRightShutter())
 						windows.add(w);
 				}
@@ -1223,7 +1223,7 @@ public class Scene implements Serializable {
 		} else {
 			for (final HousePart part : parts) {
 				if (part instanceof Window && !part.isFrozen()) {
-					Window w = (Window) part;
+					final Window w = (Window) part;
 					if (w.getLeftShutter() || w.getRightShutter())
 						windows.add(w);
 				}
@@ -1237,7 +1237,7 @@ public class Scene implements Serializable {
 			return;
 		final RemoveMultipleShuttersCommand c = new RemoveMultipleShuttersCommand(windows);
 		for (final HousePart part : windows) {
-			Window w = (Window) part;
+			final Window w = (Window) part;
 			w.setLeftShutter(false);
 			w.setRightShutter(false);
 		}
@@ -1416,10 +1416,10 @@ public class Scene implements Serializable {
 		this.roofColor = roofColor;
 	}
 
-	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c, boolean shutter) {
+	public void setWindowColorInContainer(final HousePart container, final ColorRGBA c, final boolean shutter) {
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getContainer() == container) {
-				Window w = (Window) p;
+				final Window w = (Window) p;
 				if (shutter) {
 					w.setShutterColor(c);
 				} else {
@@ -1433,7 +1433,7 @@ public class Scene implements Serializable {
 	public void setShutterLengthInContainer(final HousePart container, final double length) {
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getContainer() == container) {
-				Window w = (Window) p;
+				final Window w = (Window) p;
 				w.setShutterLength(length);
 				w.draw();
 			}
@@ -1445,7 +1445,7 @@ public class Scene implements Serializable {
 			return;
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
-				Window w = (Window) p;
+				final Window w = (Window) p;
 				w.setShutterColor(color);
 				w.draw();
 			}
@@ -1457,7 +1457,7 @@ public class Scene implements Serializable {
 			return;
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
-				Window w = (Window) p;
+				final Window w = (Window) p;
 				w.setShutterLength(length);
 				w.draw();
 			}
@@ -1930,10 +1930,10 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				boolean night = Heliodon.getInstance().isNightTime();
+				final boolean night = Heliodon.getInstance().isNightTime();
 				for (final HousePart part : parts) {
 					if (part instanceof Mirror) {
-						Mirror m = (Mirror) part;
+						final Mirror m = (Mirror) part;
 						if (night) {
 							m.drawLightBeams(); // call this so that the light beams can be set invisible
 						} else {
@@ -1950,10 +1950,10 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				boolean night = Heliodon.getInstance().isNightTime();
+				final boolean night = Heliodon.getInstance().isNightTime();
 				for (final HousePart part : parts) {
 					if (part instanceof SolarPanel) {
-						SolarPanel sp = (SolarPanel) part;
+						final SolarPanel sp = (SolarPanel) part;
 						if (night) {
 							sp.drawSunBeam();
 						} else {
@@ -1998,7 +1998,7 @@ public class Scene implements Serializable {
 		return utilityBill;
 	}
 
-	public void setTheme(int theme) {
+	public void setTheme(final int theme) {
 		this.theme = theme;
 		ReadOnlyColorRGBA c;
 		switch (theme) {
@@ -2022,7 +2022,7 @@ public class Scene implements Serializable {
 		return theme;
 	}
 
-	public void setLightBeamsVisible(boolean showLightBeams) {
+	public void setLightBeamsVisible(final boolean showLightBeams) {
 		hideLightBeams = !showLightBeams;
 	}
 
@@ -2030,7 +2030,7 @@ public class Scene implements Serializable {
 		return !hideLightBeams;
 	}
 
-	public void setSunAnglesVisible(boolean showSunAngles) {
+	public void setSunAnglesVisible(final boolean showSunAngles) {
 		this.showSunAngles = showSunAngles;
 	}
 
