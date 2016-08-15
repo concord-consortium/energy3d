@@ -160,7 +160,7 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(createLabel("Date: "), gbc_dateLabel);
 
 		dateSpinner = createSpinner(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
-		JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "MMMM dd");
+		final JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "MMMM dd");
 		dateSpinner.setEditor(dateEditor);
 		dateEditor.getTextField().setColumns((int) ("September 30".length() * 0.7));
 		dateSpinner.addChangeListener(new ChangeListener() {
@@ -614,7 +614,7 @@ public class EnergyPanel extends JPanel {
 								if (SceneManager.getInstance().getSolarHeatMap()) {
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
-										Foundation f = (Foundation) p;
+										final Foundation f = (Foundation) p;
 										switch (f.getSupportingType()) {
 										case Foundation.BUILDING:
 											Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
@@ -825,6 +825,7 @@ public class EnergyPanel extends JPanel {
 				final Tree tree = (Tree) selectedPart;
 				if (tree.isDrawable()) {
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partPanelBorder.setTitle("Tree (" + tree.getId() + "): " + tree.getTreeName());
 							partProperty1Label.setText("  Spread:");
@@ -849,6 +850,7 @@ public class EnergyPanel extends JPanel {
 				final Human human = (Human) selectedPart;
 				if (human.isDrawable()) {
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partPanelBorder.setTitle("Human (" + human.getId() + "): " + human.getHumanName());
 							partProperty1Label.setText("  X:");
@@ -863,13 +865,14 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) selectedPart;
 				if (sp.isDrawable()) {
-					final Foundation f = (Foundation) sp.getTopContainer();
+					final Foundation f = sp.getTopContainer();
 					double a = sp.getRelativeAzimuth() + f.getAzimuth();
 					if (a >= 360)
 						a -= 360;
 					final double az = a;
 					final boolean flat = (sp.getContainer() instanceof Roof && Util.isZero(sp.getContainer().getHeight())) || (sp.getContainer() instanceof Foundation);
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							String title = "Solar Panel (" + sp.getId() + ")";
 							switch (sp.getTracker()) {
@@ -890,7 +893,7 @@ public class EnergyPanel extends JPanel {
 							partProperty2TextField.setText(flat ? "tilt: " + oneDecimal.format(sp.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0" : " --- ");
 							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
 							partProperty2TextField.setToolTipText("The angles of the solar panel");
-							String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
+							final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
 							if (energyViewShown) {
 								partProperty3Label.setText("  Efficiency & Yield:");
 								partProperty3TextField.setText(eff + ", " + twoDecimals.format(sp.getSolarPotentialToday() * sp.getCellEfficiency()) + " kWh");
@@ -906,13 +909,14 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Mirror) {
 				final Mirror m = (Mirror) selectedPart;
 				if (m.isDrawable()) {
-					Foundation f = (Foundation) m.getTopContainer();
+					final Foundation f = m.getTopContainer();
 					double a = m.getRelativeAzimuth() + f.getAzimuth();
 					if (a >= 360)
 						a -= 360;
 					final double az = a;
 					final boolean flat = m.getContainer() instanceof Foundation;
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partPanelBorder.setTitle("Mirror (" + m.getId() + ")");
 							partProperty1Label.setText("  Size & Position:");
@@ -921,7 +925,7 @@ public class EnergyPanel extends JPanel {
 							partProperty2TextField.setText(flat ? "tilt: " + oneDecimal.format(m.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0" : " --- ");
 							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
 							partProperty2TextField.setToolTipText("The angles of the solar panel");
-							String reflectivity = oneDecimal.format(m.getReflectivity() * 100) + "%";
+							final String reflectivity = oneDecimal.format(m.getReflectivity() * 100) + "%";
 							if (energyViewShown) {
 								partProperty3Label.setText("  Reflectivity & Yield:");
 								partProperty3TextField.setText(reflectivity + ", " + twoDecimals.format(m.getSolarPotentialToday() * m.getReflectivity()) + " kWh");
@@ -938,6 +942,7 @@ public class EnergyPanel extends JPanel {
 				final Sensor sensor = (Sensor) selectedPart;
 				if (sensor.isDrawable()) {
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partPanelBorder.setTitle("Sensor (" + sensor.getId() + ")");
 							partProperty1Label.setText("  Position:");
@@ -965,6 +970,7 @@ public class EnergyPanel extends JPanel {
 					final double lz = foundation.getHeight();
 					final double az = foundation.getAzimuth();
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 							partProperty1Label.setText("  Size:");
@@ -984,6 +990,7 @@ public class EnergyPanel extends JPanel {
 				if (roof.isDrawable()) {
 					final double area = roof.getArea();
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partProperty1Label.setText("  Area:");
 							partProperty1TextField.setText(twoDecimals.format(area) + " m\u00B2");
@@ -1013,6 +1020,7 @@ public class EnergyPanel extends JPanel {
 					final double lx = v.distance(window.getAbsPoint(2));
 					final double ly = v.distance(window.getAbsPoint(1));
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partProperty1Label.setText("  Size:");
 							partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
@@ -1047,6 +1055,7 @@ public class EnergyPanel extends JPanel {
 					final double lx = v.distance(v2);
 					final double ly = v.distance(v1);
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partProperty1Label.setText("  Size:");
 							partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
@@ -1081,6 +1090,7 @@ public class EnergyPanel extends JPanel {
 					final double lx = v.distance(v2);
 					final double ly = v.distance(v1);
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partPanelBorder.setTitle("Door (" + door.getId() + ")");
 							partProperty1Label.setText("  Size:");
@@ -1111,6 +1121,7 @@ public class EnergyPanel extends JPanel {
 					}
 					final double cz = v.getZ();
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							partPanelBorder.setTitle("Floor (" + floor.getId() + ")");
 							partProperty1Label.setText("  Area:");
@@ -1129,6 +1140,7 @@ public class EnergyPanel extends JPanel {
 			}
 		} else {
 			EventQueue.invokeLater(new Runnable() {
+				@Override
 				public void run() {
 					partPanelBorder.setTitle("Part");
 					partProperty1Label.setText("  -");
@@ -1155,7 +1167,10 @@ public class EnergyPanel extends JPanel {
 		} else {
 			selectedFoundation = selectedPart.getTopContainer();
 		}
+		if (selectedFoundation != null)
+			buildingInfoPanel.update(selectedFoundation);
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				if (selectedFoundation != null) {
 					switch (selectedFoundation.getSupportingType()) {
@@ -1163,7 +1178,6 @@ public class EnergyPanel extends JPanel {
 						dataPanel.remove(pvStationPanel);
 						dataPanel.remove(cspStationPanel);
 						dataPanel.add(buildingPanel, 2);
-						buildingInfoPanel.update(selectedFoundation);
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						final int temp = selectedFoundation.getThermostat().getTemperature(c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, c.get(Calendar.HOUR_OF_DAY));
 						switch (Scene.getInstance().getUnit()) {

@@ -248,7 +248,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem rotate180MenuItem;
 	private JMenuItem rotate90CwMenuItem;
 	private JMenuItem rotate90CcwMenuItem;
-	private JMenuItem googleMapMenuItem;
+	private JMenu geoLocationMenu;
+	private JMenuItem addGeoLocationMenuItem;
+	private JMenuItem clearGeoLocationMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -1230,7 +1232,8 @@ public class MainFrame extends JFrame {
 			addModel(tutorialsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
 			addModel(tutorialsMenu, "Solar Box", "tutorials/solar-box.ng3");
 			addModel(tutorialsMenu, "Solar Heat Map", "tutorials/solar-heat-map.ng3");
-			addModel(tutorialsMenu, "Solar Panel Tilt Angle", "tutorials/solar-tilt-angle.ng3");
+			addModel(tutorialsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
+			addModel(tutorialsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 		}
 		return tutorialsMenu;
 	}
@@ -1277,7 +1280,7 @@ public class MainFrame extends JFrame {
 			viewMenu.addSeparator();
 			viewMenu.add(getTextureMenu());
 			viewMenu.add(getThemeMenu());
-			viewMenu.add(getGoogleMapMenuItem());
+			viewMenu.add(getGeoLocationMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(getSolarAbsorptionHeatMapMenuItem());
@@ -1363,17 +1366,58 @@ public class MainFrame extends JFrame {
 
 	}
 
-	public JMenuItem getGoogleMapMenuItem() {
-		if (googleMapMenuItem == null) {
-			googleMapMenuItem = new JMenuItem("Google Map");
-			googleMapMenuItem.addActionListener(new ActionListener() {
+	public JMenu getGeoLocationMenu() {
+
+		if (geoLocationMenu == null) {
+			geoLocationMenu = new JMenu("Geo-Location");
+			geoLocationMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+				}
+			});
+
+			geoLocationMenu.add(getAddGeoLocationMenuItem());
+			geoLocationMenu.add(getClearGeoLocationMenuItem());
+
+		}
+		return geoLocationMenu;
+
+	}
+
+	public JMenuItem getAddGeoLocationMenuItem() {
+		if (addGeoLocationMenuItem == null) {
+			addGeoLocationMenuItem = new JMenuItem("Add Location");
+			addGeoLocationMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					MapDialog.getInstance().setVisible(true);
 				}
 			});
 		}
-		return googleMapMenuItem;
+		return addGeoLocationMenuItem;
+	}
+
+	public JMenuItem getClearGeoLocationMenuItem() {
+		if (clearGeoLocationMenuItem == null) {
+			clearGeoLocationMenuItem = new JMenuItem("Clear Location");
+			clearGeoLocationMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getInstance().getMapLand().setVisible(false);
+					MapDialog.getInstance().setFoundationsVisible(true);
+				}
+			});
+		}
+		return clearGeoLocationMenuItem;
 	}
 
 	public JCheckBoxMenuItem getAxesMenuItem() {

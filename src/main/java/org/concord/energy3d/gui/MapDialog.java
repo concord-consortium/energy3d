@@ -198,7 +198,7 @@ public class MapDialog extends JDialog {
 		return null;
 	}
 
-	private void setFoundationsVisible(final boolean visible) {
+	void setFoundationsVisible(final boolean visible) {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				part.getMesh().setVisible(visible);
