@@ -317,8 +317,9 @@ public class MainFrame extends JFrame {
 		final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
 		final String directoryPath = pref.get("dir", null);
 		fileChooser = new FileChooser(directoryPath);
-		if (!Config.isWebStart() && directoryPath == null)
+		if (!Config.isWebStart() && directoryPath == null) {
 			fileChooser.setCurrentDirectory(new File(System.getProperties().getProperty("user.dir")));
+		}
 		fileChooser.addRecentFile(pref.get("Recent File 0", null));
 		fileChooser.addRecentFile(pref.get("Recent File 1", null));
 		fileChooser.addRecentFile(pref.get("Recent File 2", null));
@@ -370,11 +371,13 @@ public class MainFrame extends JFrame {
 		setLocation(pref.getInt("window_location_x", (int) (screenSize.getWidth() - getSize().getWidth()) / 2), pref.getInt("window_location_y", (int) (screenSize.getHeight() - getSize().getHeight()) / 2));
 		setLocation(MathUtils.clamp(getLocation().x, 0, screenSize.width - getSize().width), MathUtils.clamp(getLocation().y, 0, screenSize.height - getSize().height));
 		final int windowState = pref.getInt("window_state", JFrame.NORMAL);
-		if ((windowState & JFrame.ICONIFIED) == 0)
+		if ((windowState & JFrame.ICONIFIED) == 0) {
 			setExtendedState(windowState);
+		}
 
-		if (Config.isMac())
+		if (Config.isMac()) {
 			Mac.init();
+		}
 
 		addComponentListener(new ComponentAdapter() {
 			@Override
@@ -438,9 +441,11 @@ public class MainFrame extends JFrame {
 	}
 
 	private void addCommonActionListeners(final JMenuBar menuBar) {
-		for (final Component c : menuBar.getComponents())
-			if (c instanceof JMenu)
+		for (final Component c : menuBar.getComponents()) {
+			if (c instanceof JMenu) {
 				addCommonActionListeners((JMenu) c);
+			}
+		}
 	}
 
 	private void addCommonActionListeners(final JMenu menu) {
@@ -501,8 +506,9 @@ public class MainFrame extends JFrame {
 
 					// recent files
 					if (!recentFileMenuItems.isEmpty()) {
-						for (final JComponent x : recentFileMenuItems)
+						for (final JComponent x : recentFileMenuItems) {
 							fileMenu.remove(x);
+						}
 					}
 					final String[] recentFiles = fileChooser.getRecentFiles();
 					if (recentFiles != null) {
@@ -520,13 +526,16 @@ public class MainFrame extends JFrame {
 											final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 											if (save == JOptionPane.YES_OPTION) {
 												save();
-												if (!Scene.getInstance().isEdited())
+												if (!Scene.getInstance().isEdited()) {
 													ok = true;
-											} else if (save != JOptionPane.CANCEL_OPTION)
+												}
+											} else if (save != JOptionPane.CANCEL_OPTION) {
 												ok = true;
-										} else
+											}
+										} else {
 											ok = true;
-										if (ok)
+										}
+										if (ok) {
 											SceneManager.getTaskManager().update(new Callable<Object>() {
 												@Override
 												public Object call() {
@@ -540,6 +549,7 @@ public class MainFrame extends JFrame {
 													return null;
 												}
 											});
+										}
 									}
 								});
 								fileMenu.insert(x, fileMenuItemCount + i);
@@ -634,12 +644,15 @@ public class MainFrame extends JFrame {
 						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if (save == JOptionPane.YES_OPTION) {
 							save();
-							if (!Scene.getInstance().isEdited())
+							if (!Scene.getInstance().isEdited()) {
 								ok = true;
-						} else if (save != JOptionPane.CANCEL_OPTION)
+							}
+						} else if (save != JOptionPane.CANCEL_OPTION) {
 							ok = true;
-					} else
+						}
+					} else {
 						ok = true;
+					}
 					if (ok) {
 						new Thread() {
 							@Override
@@ -672,12 +685,15 @@ public class MainFrame extends JFrame {
 						final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						if (save == JOptionPane.YES_OPTION) {
 							save();
-							if (!Scene.getInstance().isEdited())
+							if (!Scene.getInstance().isEdited()) {
 								open();
-						} else if (save != JOptionPane.CANCEL_OPTION)
+							}
+						} else if (save != JOptionPane.CANCEL_OPTION) {
 							open();
-					} else
+						}
+					} else {
 						open();
+					}
 				}
 			});
 		}
@@ -696,10 +712,11 @@ public class MainFrame extends JFrame {
 			SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			final File file;
-			if (!fileChooser.getSelectedFile().getName().toLowerCase().endsWith(".ng3"))
+			if (!fileChooser.getSelectedFile().getName().toLowerCase().endsWith(".ng3")) {
 				file = new File(fileChooser.getSelectedFile().toString() + ".ng3");
-			else
+			} else {
 				file = fileChooser.getSelectedFile();
+			}
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() {
@@ -722,8 +739,9 @@ public class MainFrame extends JFrame {
 			analyzeFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE))
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
 						return;
+					}
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fileChooser.removeChoosableFileFilter(ng3Filter);
@@ -754,8 +772,9 @@ public class MainFrame extends JFrame {
 			replayFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE))
+					if (JOptionPane.NO_OPTION == JOptionPane.showConfirmDialog(MainFrame.this, "This feature is for researchers only. Are you sure you want to continue?", "Research Mode", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE)) {
 						return;
+					}
 					SceneManager.getInstance().refresh(1);
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fileChooser.removeChoosableFileFilter(ng3Filter);
@@ -781,8 +800,9 @@ public class MainFrame extends JFrame {
 			replayLastFolderMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (DesignReplay.getInstance().getLastFolder() != null)
+					if (DesignReplay.getInstance().getLastFolder() != null) {
 						DesignReplay.getInstance().play(DesignReplay.getInstance().getLastFolder().listFiles(ng3NameFilter));
+					}
 				}
 			});
 		}
@@ -900,8 +920,9 @@ public class MainFrame extends JFrame {
 								PrintController.getInstance().print();
 							}
 						}.start();
-					} else
+					} else {
 						PrintController.getInstance().print();
+					}
 				}
 			});
 		}
@@ -1025,8 +1046,9 @@ public class MainFrame extends JFrame {
 				}
 			});
 			helpMenu.add(mi);
-			if (!Config.isMac())
+			if (!Config.isMac()) {
 				helpMenu.add(getAboutMenuItem());
+			}
 		}
 		return helpMenu;
 	}
@@ -1412,8 +1434,7 @@ public class MainFrame extends JFrame {
 			clearGeoLocationMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().getMapLand().setVisible(false);
-					MapDialog.getInstance().setFoundationsVisible(true);
+					Scene.getInstance().setMap(null, 1);
 				}
 			});
 		}
@@ -1560,8 +1581,9 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation)
+					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
 						new EnergyAnnualAnalysis().show("Annual Energy");
+					}
 				}
 			});
 		}
@@ -1604,8 +1626,9 @@ public class MainFrame extends JFrame {
 					}
 					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
 						final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
-						if (SceneManager.getInstance().getSolarHeatMap())
+						if (SceneManager.getInstance().getSolarHeatMap()) {
 							analysis.updateGraph();
+						}
 						analysis.show("Daily Energy");
 					}
 				}
@@ -1714,8 +1737,9 @@ public class MainFrame extends JFrame {
 						}
 					}
 					final PvDailyAnalysis a = new PvDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap())
+					if (SceneManager.getInstance().getSolarHeatMap()) {
 						a.updateGraph();
+					}
 					a.show();
 				}
 			});
@@ -1756,8 +1780,9 @@ public class MainFrame extends JFrame {
 						}
 					}
 					final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap())
+					if (SceneManager.getInstance().getSolarHeatMap()) {
 						a.updateGraph();
+					}
 					a.show();
 				}
 			});
@@ -1911,8 +1936,9 @@ public class MainFrame extends JFrame {
 		});
 		gui.add(typeComboBox, BorderLayout.NORTH);
 		gui.add(new JScrollPane(idList), BorderLayout.CENTER);
-		if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 			return null;
+		}
 		final List<Long> selectedIds = idList.getSelectedValuesList();
 		if (selectedIds.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.this, "You must select a group of parts first.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1927,10 +1953,11 @@ public class MainFrame extends JFrame {
 			annualSensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (Scene.getInstance().hasSensor())
+					if (Scene.getInstance().hasSensor()) {
 						new AnnualSensorData().show("Annual Sensor Data");
-					else
+					} else {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
+					}
 				}
 			});
 		}
@@ -1943,10 +1970,11 @@ public class MainFrame extends JFrame {
 			dailySensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (Scene.getInstance().hasSensor())
+					if (Scene.getInstance().hasSensor()) {
 						new DailySensorData().show("Daily Sensor Data");
-					else
+					} else {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
+					}
 				}
 			});
 		}
@@ -1974,8 +2002,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setOnlyAbsorptionInSolarMap(solarAbsorptionHeatMapMenuItem.isSelected());
-					if (SceneManager.getInstance().getSolarHeatMap())
+					if (SceneManager.getInstance().getSolarHeatMap()) {
 						SceneManager.getInstance().setSolarHeatMap(true);
+					}
 				}
 			});
 		}
@@ -2281,8 +2310,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null)
+					if (selectedPart != null) {
 						Scene.getInstance().setCopyBuffer(selectedPart);
+					}
 				}
 			});
 		}
@@ -2321,8 +2351,9 @@ public class MainFrame extends JFrame {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
 				File file = fileChooser.getSelectedFile();
-				if (!file.getName().toLowerCase().endsWith(".ng3"))
+				if (!file.getName().toLowerCase().endsWith(".ng3")) {
 					file = new File(file.toString() + ".ng3");
+				}
 				boolean doIt = true;
 				if (file.exists()) {
 					if (JOptionPane.showConfirmDialog(this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
@@ -2531,8 +2562,9 @@ public class MainFrame extends JFrame {
 					final ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.None);
 					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
+					if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					}
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
@@ -2550,8 +2582,9 @@ public class MainFrame extends JFrame {
 					final ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.Simple);
 					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
+					if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					}
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
@@ -2569,8 +2602,9 @@ public class MainFrame extends JFrame {
 					final ChangeTextureCommand c = new ChangeTextureCommand();
 					Scene.getInstance().setTextureMode(TextureMode.Full);
 					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyViewButton().isSelected())
+					if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
 						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					}
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
@@ -2653,8 +2687,9 @@ public class MainFrame extends JFrame {
 		ActionListener actionListener;
 		if (selectedPart == null) {
 			final ReadOnlyColorRGBA color = Scene.getInstance().getLandColor();
-			if (color != null)
+			if (color != null) {
 				colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+			}
 			actionListener = new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2668,20 +2703,23 @@ public class MainFrame extends JFrame {
 			};
 		} else {
 			if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
-				if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+				if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
 					return;
+				}
 				noTextureMenuItem.setSelected(true);
 				Scene.getInstance().setTextureMode(TextureMode.None);
 			}
 			final ReadOnlyColorRGBA color = selectedPart.getColor();
-			if (color != null)
+			if (color != null) {
 				colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+			}
 			actionListener = new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
+					if (selectedPart == null) {
 						return;
+					}
 					final Color c = colorChooser.getColor();
 					final float[] newColor = c.getComponents(null);
 					final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
@@ -2700,8 +2738,9 @@ public class MainFrame extends JFrame {
 						bg.add(rb1);
 						bg.add(rb2);
 						bg.add(rb3);
-						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
+						}
 						if (rb1.isSelected()) { // apply to only this part
 							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 							selectedPart.setColor(color);
@@ -2727,8 +2766,9 @@ public class MainFrame extends JFrame {
 						final ButtonGroup bg = new ButtonGroup();
 						bg.add(rb1);
 						bg.add(rb2);
-						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
+						}
 						if (rb1.isSelected()) { // apply to only this part
 							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 							selectedPart.setColor(color);
@@ -2750,8 +2790,9 @@ public class MainFrame extends JFrame {
 						final ButtonGroup bg = new ButtonGroup();
 						bg.add(rb1);
 						bg.add(rb2);
-						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
+						}
 						if (rb1.isSelected()) { // apply to only this part
 							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 							selectedPart.setColor(color);
@@ -2775,8 +2816,9 @@ public class MainFrame extends JFrame {
 						}
 					}
 					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
-					if (restartPrintPreview && PrintController.getInstance().isPrintPreview())
+					if (restartPrintPreview && PrintController.getInstance().isPrintPreview()) {
 						PrintController.getInstance().restartAnimation();
+					}
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 					Scene.getInstance().setEdited(true);
 				}
@@ -2806,12 +2848,15 @@ public class MainFrame extends JFrame {
 			final int save = JOptionPane.showConfirmDialog(MainFrame.this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (save == JOptionPane.YES_OPTION) {
 				save();
-				if (!Scene.getInstance().isEdited())
+				if (!Scene.getInstance().isEdited()) {
 					ok = true;
-			} else if (save != JOptionPane.CANCEL_OPTION)
+				}
+			} else if (save != JOptionPane.CANCEL_OPTION) {
 				ok = true;
-		} else
+			}
+		} else {
 			ok = true;
+		}
 		if (ok) {
 			try {
 				SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -2833,16 +2878,18 @@ public class MainFrame extends JFrame {
 			final int n = recentFiles.length;
 			if (n > 0) {
 				final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
-				for (int i = 0; i < n; i++)
+				for (int i = 0; i < n; i++) {
 					pref.put("Recent File " + i, recentFiles[n - i - 1]);
+				}
 			}
 		}
 		if (Scene.getInstance().isEdited()) {
 			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (save == JOptionPane.YES_OPTION) {
 				save();
-				if (!Scene.getInstance().isEdited())
+				if (!Scene.getInstance().isEdited()) {
 					MainApplication.exit();
+				}
 			} else if (save != JOptionPane.CANCEL_OPTION) {
 				MainApplication.exit();
 			}
@@ -2898,16 +2945,18 @@ public class MainFrame extends JFrame {
 					if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION) {
 						try {
 							File file = fileChooser.getSelectedFile();
-							if (!file.getName().toLowerCase().endsWith(".zip"))
+							if (!file.getName().toLowerCase().endsWith(".zip")) {
 								file = new File(file.toString() + ".zip");
+							}
 							boolean doIt = true;
 							if (file.exists()) {
 								if (JOptionPane.showConfirmDialog(MainFrame.this, "File " + file + " exists. Do you want to overwrite it?", "Overwrite", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 									doIt = false;
 								}
 							}
-							if (doIt)
+							if (doIt) {
 								new LogZipper(file).createDialog();
+							}
 						} catch (final Throwable err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(MainFrame.this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -2958,8 +3007,9 @@ public class MainFrame extends JFrame {
 			Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getSelectedFile().getParent());
 			try {
 				File file = fileChooser.getSelectedFile();
-				if (!file.getName().toLowerCase().endsWith(".png"))
+				if (!file.getName().toLowerCase().endsWith(".png")) {
 					file = new File(file.toString() + ".png");
+				}
 				System.out.print(file + "...");
 				boolean doIt = true;
 				if (file.exists()) {
@@ -3000,8 +3050,9 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(final ActionEvent e) {
 					UtilityBill b = Scene.getInstance().getUtilityBill();
 					if (b == null) {
-						if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+						if (JOptionPane.showConfirmDialog(MainFrame.this, "<html>No overall utility bill is found. Create one?<br>(This applies to all the structures in this scene.)</html>", "Overall Utility Bill", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
 							return;
+						}
 						b = new UtilityBill();
 						Scene.getInstance().setUtilityBill(b);
 					}
@@ -3278,8 +3329,9 @@ public class MainFrame extends JFrame {
 						return;
 					}
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + list.size() + " utility bills associated with buildings in this scene?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-						for (final Foundation f : list)
+						for (final Foundation f : list) {
 							f.setUtilityBill(null);
+						}
 					}
 					Scene.getInstance().setEdited(true);
 				}
@@ -3334,8 +3386,9 @@ public class MainFrame extends JFrame {
 			moveEastMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
 						return;
+					}
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -3356,8 +3409,9 @@ public class MainFrame extends JFrame {
 			moveWestMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
 						return;
+					}
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -3378,8 +3432,9 @@ public class MainFrame extends JFrame {
 			moveSouthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
 						return;
+					}
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -3400,8 +3455,9 @@ public class MainFrame extends JFrame {
 			moveNorthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					if (MainPanel.getInstance().getNoteTextArea().hasFocus())
+					if (MainPanel.getInstance().getNoteTextArea().hasFocus()) {
 						return;
+					}
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {

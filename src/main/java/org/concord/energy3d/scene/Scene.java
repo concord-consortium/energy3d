@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,26 +49,22 @@ import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.image.Image;
+import com.ardor3d.image.Texture.MinificationFilter;
+import com.ardor3d.image.Texture2D;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
+import com.ardor3d.renderer.state.TextureState;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.TextureKey;
 
 public class Scene implements Serializable {
-
-	public static enum Unit {
-		InternationalSystemOfUnits, USCustomaryUnits
-	};
-
-	public static enum TextureMode {
-		None, Simple, Full
-	};
-
 	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
 	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.LIGHT_GRAY;
-
 	public static final int CLOUDY_SKY = 0;
 	public static final int DESERT = 1;
 	public static final int GRASSLAND = 2;
@@ -127,6 +124,17 @@ public class Scene implements Serializable {
 	private boolean onlySolarAnalysis;
 	private UtilityBill utilityBill;
 	private int theme;
+	private Image mapImage;
+	private double mapScale;
+	private byte[] mapImageBytes;
+
+	public static enum Unit {
+		InternationalSystemOfUnits, USCustomaryUnits
+	};
+
+	public static enum TextureMode {
+		None, Simple, Full
+	};
 
 	public static Scene getInstance() {
 		if (instance == null) {
@@ -183,7 +191,7 @@ public class Scene implements Serializable {
 					}
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
-						Foundation f = (Foundation) p;
+						final Foundation f = (Foundation) p;
 						switch (f.getSupportingType()) {
 						case Foundation.BUILDING:
 							e.getConstructionCostGraph().addGraph(f);
@@ -211,8 +219,9 @@ public class Scene implements Serializable {
 	public static void openNow(final URL file) throws Exception {
 		if (PrintController.getInstance().isPrintPreview()) {
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
-			while (!PrintController.getInstance().isFinished())
+			while (!PrintController.getInstance().isFinished()) {
 				Thread.yield();
+			}
 		}
 
 		synchronized (SceneManager.getInstance()) {
@@ -228,8 +237,9 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 			Wall.resetDefaultWallHeight();
 
-			if (instance != null)
+			if (instance != null) {
 				instance.deleteAll();
+			}
 			if (url == null) {
 				instance = new Scene();
 				System.out.println("done");
@@ -245,22 +255,26 @@ public class Scene implements Serializable {
 				instance.cleanup();
 				loadCameraLocation();
 			}
+			instance.applyMap(true);
 			SceneManager.getInstance().hideAllEditPoints();
 			final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
-			if (cameraControl != null)
+			if (cameraControl != null) {
 				cameraControl.reset();
+			}
 
 			int count = 0;
 			Foundation first = null;
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation && !p.isFrozen()) {
-					if (count == 0)
+					if (count == 0) {
 						first = (Foundation) p;
+					}
 					count++;
 				}
 			}
-			if (count == 1)
+			if (count == 1) {
 				SceneManager.getInstance().setSelectedPart(first);
+			}
 
 			instance.init();
 			instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
@@ -272,12 +286,13 @@ public class Scene implements Serializable {
 
 			@Override
 			public void run() {
-				if (instance.textureMode == TextureMode.None)
+				if (instance.textureMode == TextureMode.None) {
 					MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
-				else if (instance.textureMode == TextureMode.Simple)
+				} else if (instance.textureMode == TextureMode.Simple) {
 					MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
-				else
+				} else {
 					MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
+				}
 				MainPanel.getInstance().getAnnotationButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 			}
@@ -333,28 +348,37 @@ public class Scene implements Serializable {
 		}
 
 		// previous versions do not have the following classes
-		if (designSpecs == null)
+		if (designSpecs == null) {
 			designSpecs = new DesignSpecs();
-		else
+		} else {
 			designSpecs.setDefaultValues();
-		if (ground == null)
+		}
+		if (ground == null) {
 			ground = new Ground();
-		if (unit == null)
+		}
+		if (unit == null) {
 			unit = Unit.InternationalSystemOfUnits;
+		}
 
 		// restore the default values
-		if (Util.isZero(heatVectorLength))
+		if (Util.isZero(heatVectorLength)) {
 			heatVectorLength = 5000;
-		if (Util.isZero(solarStep))
+		}
+		if (Util.isZero(solarStep)) {
 			solarStep = 2;
-		if (Util.isZero(timeStep))
+		}
+		if (Util.isZero(timeStep)) {
 			timeStep = 15;
-		if (Util.isZero(plateNx))
+		}
+		if (Util.isZero(plateNx)) {
 			plateNx = 2;
-		if (Util.isZero(plateNy))
+		}
+		if (Util.isZero(plateNy)) {
 			plateNy = 2;
-		if (Util.isZero(solarContrast)) 
+		}
+		if (Util.isZero(solarContrast)) {
 			solarContrast = 50;
+		}
 
 		setEdited(false);
 		setCopyBuffer(null);
@@ -392,19 +416,22 @@ public class Scene implements Serializable {
 	public static void importFile(final URL url) throws Exception {
 		if (PrintController.getInstance().isPrintPreview()) {
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
-			while (!PrintController.getInstance().isFinished())
+			while (!PrintController.getInstance().isFinished()) {
 				Thread.yield();
+			}
 		}
 
 		if (url != null) {
 
 			long max = -1;
 			for (final HousePart x : Scene.getInstance().parts) {
-				if (x.getId() > max)
+				if (x.getId() > max) {
 					max = x.getId();
+				}
 			}
-			if (max < 0)
+			if (max < 0) {
 				max = 0;
+			}
 
 			System.out.print("Opening..." + url + "...");
 			final ObjectInputStream in = new ObjectInputStream(url.openStream());
@@ -472,8 +499,9 @@ public class Scene implements Serializable {
 		// remove all undrawables
 		final ArrayList<HousePart> a = new ArrayList<HousePart>();
 		for (final HousePart p : parts) {
-			if (!p.isDrawable())
+			if (!p.isDrawable()) {
 				a.add(p);
+			}
 		}
 		for (final HousePart p : a) {
 			remove(p, false);
@@ -508,8 +536,9 @@ public class Scene implements Serializable {
 
 		for (final HousePart p : parts) {
 			// remove all invalid parts or orphan parts without a top container
-			if (!p.isValid() || ((p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Floor) && p.getContainer() == null))
+			if (!p.isValid() || ((p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Floor) && p.getContainer() == null)) {
 				toBeRemoved.add(p);
+			}
 			// remove walls that are at the same position
 			if (p instanceof Wall) {
 				if (((Wall) p).isAtSamePlaceAsAnotherPart()) {
@@ -517,35 +546,48 @@ public class Scene implements Serializable {
 				}
 			}
 		}
-		for (final HousePart p : toBeRemoved)
+		for (final HousePart p : toBeRemoved) {
 			remove(p, false);
+		}
 
 		// remove children with multiple parents
 		toBeRemoved.clear();
-		for (final HousePart p : parts)
-			for (final HousePart child : p.getChildren())
-				if (child.getContainer() != p && !toBeRemoved.contains(child))
+		for (final HousePart p : parts) {
+			for (final HousePart child : p.getChildren()) {
+				if (child.getContainer() != p && !toBeRemoved.contains(child)) {
 					toBeRemoved.add(child);
-		for (final HousePart p : toBeRemoved)
+				}
+			}
+		}
+		for (final HousePart p : toBeRemoved) {
 			remove(p, false);
+		}
 		// remove from remaining parents
-		for (final HousePart p : parts)
-			for (final HousePart r : toBeRemoved)
+		for (final HousePart p : parts) {
+			for (final HousePart r : toBeRemoved) {
 				p.getChildren().remove(r);
+			}
+		}
 
 		// remove all the children that are not in parts
 		toBeRemoved.clear();
-		for (final HousePart p : parts)
-			for (final HousePart child : p.getChildren())
-				if (!parts.contains(child) && !toBeRemoved.contains(child))
+		for (final HousePart p : parts) {
+			for (final HousePart child : p.getChildren()) {
+				if (!parts.contains(child) && !toBeRemoved.contains(child)) {
 					toBeRemoved.add(child);
-		for (final HousePart p : toBeRemoved)
+				}
+			}
+		}
+		for (final HousePart p : toBeRemoved) {
 			remove(p, false);
+		}
 
 		// complete all non-completed parts
-		for (final HousePart p : parts)
-			if (!p.isDrawCompleted())
+		for (final HousePart p : parts) {
+			if (!p.isDrawCompleted()) {
 				p.complete();
+			}
+		}
 
 	}
 
@@ -560,9 +602,11 @@ public class Scene implements Serializable {
 		}
 
 		if (version < 1) {
-			for (final HousePart part : parts)
-				if (part instanceof Foundation)
+			for (final HousePart part : parts) {
+				if (part instanceof Foundation) {
 					((Foundation) part).scaleHouseForNewVersion(10);
+				}
+			}
 			cameraLocation = cameraLocation.multiply(10, null);
 			setAnnotationScale(1.0);
 		}
@@ -571,17 +615,23 @@ public class Scene implements Serializable {
 	}
 
 	public void connectWalls() {
-		for (final HousePart part : parts)
-			if (part instanceof Wall)
+		for (final HousePart part : parts) {
+			if (part instanceof Wall) {
 				part.reset();
+			}
+		}
 
-		for (final HousePart part : parts)
-			if (part instanceof Wall)
+		for (final HousePart part : parts) {
+			if (part instanceof Wall) {
 				((Wall) part).connectedWalls();
+			}
+		}
 
-		for (final HousePart part : parts)
-			if (part instanceof Wall)
+		for (final HousePart part : parts) {
+			if (part instanceof Wall) {
 				((Wall) part).computeInsideDirectionOfAttachedWalls(false);
+			}
+		}
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile) throws Exception {
@@ -592,8 +642,9 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				if (notifyUndoManager)
+				if (notifyUndoManager) {
 					instance.cleanup();
+				}
 				// save camera to file
 				saveCameraLocation();
 
@@ -608,15 +659,20 @@ public class Scene implements Serializable {
 				// instance.solarStep = SolarRadiation.getInstance().getSolarStep();
 				// instance.timeStep = SolarRadiation.getInstance().getTimeStep();
 
-				if (setAsCurrentFile)
+				if (setAsCurrentFile) {
 					Scene.url = url;
+				}
+				if (instance.mapImage != null) {
+					instance.mapImage.setData((ByteBuffer) null);
+				}
 				System.out.print("Saving " + url + "...");
 				ObjectOutputStream out;
 				out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
 				out.writeObject(instance);
 				out.close();
-				if (notifyUndoManager)
+				if (notifyUndoManager) {
 					SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+				}
 				System.out.println("done");
 				return null;
 			}
@@ -638,11 +694,13 @@ public class Scene implements Serializable {
 
 	public void add(final HousePart housePart, final boolean redraw) {
 		final HousePart container = housePart.getContainer();
-		if (container != null)
+		if (container != null) {
 			container.getChildren().add(housePart);
+		}
 		add(housePart);
-		if (redraw)
+		if (redraw) {
 			redrawAll();
+		}
 	}
 
 	private void add(final HousePart housePart) {
@@ -653,27 +711,32 @@ public class Scene implements Serializable {
 			originalHouseRoot.attachChild(housePart.getRoot());
 		}
 		parts.add(housePart);
-		for (final HousePart child : housePart.getChildren())
+		for (final HousePart child : housePart.getChildren()) {
 			add(child);
+		}
 	}
 
 	public void remove(final HousePart housePart, final boolean redraw) {
-		if (housePart == null)
+		if (housePart == null) {
 			return;
+		}
 		housePart.setGridsVisible(false);
 		final HousePart container = housePart.getContainer();
-		if (container != null)
+		if (container != null) {
 			container.getChildren().remove(housePart);
+		}
 		removeChildren(housePart);
-		if (redraw)
+		if (redraw) {
 			redrawAll();
+		}
 	}
 
 	private void removeChildren(final HousePart housePart) {
 		System.out.println("Removing: " + housePart);
 		parts.remove(housePart); // this must happen before call to wall.delete()
-		for (final HousePart child : housePart.getChildren())
+		for (final HousePart child : housePart.getChildren()) {
 			removeChildren(child);
+		}
 		// originalHouseRoot.detachChild(housePart.getRoot());
 		housePart.getRoot().removeFromParent();
 		housePart.delete();
@@ -708,14 +771,17 @@ public class Scene implements Serializable {
 	}
 
 	public void paste() {
-		if (copyBuffer == null)
+		if (copyBuffer == null) {
 			return;
-		if (copyBuffer instanceof Foundation) // copying a foundation copies the entire building above it, which requires a different treatment elsewhere
+		}
+		if (copyBuffer instanceof Foundation) {
 			return;
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final HousePart c = copyBuffer.copy(true);
-		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
+		if (c == null) {
 			return;
+		}
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
@@ -725,14 +791,17 @@ public class Scene implements Serializable {
 
 	public void pasteToPickedLocationOnLand() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		if (copyBuffer == null)
+		if (copyBuffer == null) {
 			return;
+		}
 		final HousePart c = copyBuffer.copy(false);
-		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
+		if (c == null) {
 			return;
+		}
 		final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
-		if (position == null)
+		if (position == null) {
 			return;
+		}
 		if (c instanceof Tree || c instanceof Human) {
 			c.getPoints().set(0, position);
 			add(c, true);
@@ -753,8 +822,9 @@ public class Scene implements Serializable {
 			if (!oldRoofs.isEmpty() && !newRoofs.isEmpty()) {
 				for (int i = 0; i < newRoofs.size(); i++) {
 					final Map<Integer, List<Wall>> oldMap = oldRoofs.get(i).getGableEditPointToWallMap();
-					if (oldMap.isEmpty())
+					if (oldMap.isEmpty()) {
 						continue;
+					}
 					final Map<Integer, List<Wall>> newMap = new HashMap<Integer, List<Wall>>();
 					for (final Integer key : oldMap.keySet()) {
 						final List<Wall> oldWalls = oldMap.get(key);
@@ -777,26 +847,32 @@ public class Scene implements Serializable {
 		final ArrayList<HousePart> oldWalls = oldFoundation.getChildren();
 		final ArrayList<HousePart> newWalls = newFoundation.getChildren();
 		final int index = oldWalls.indexOf(oldWall);
-		if (index < 0)
+		if (index < 0) {
 			return null;
+		}
 		return (Wall) newWalls.get(index);
 	}
 
 	public void pasteToPickedLocationOnWall() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (!(selectedPart instanceof Wall))
+		if (!(selectedPart instanceof Wall)) {
 			return;
-		if (copyBuffer == null)
+		}
+		if (copyBuffer == null) {
 			return;
-		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a wall
+		}
+		if (copyBuffer instanceof Foundation) {
 			return;
+		}
 		final HousePart c = copyBuffer.copy(false);
-		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
+		if (c == null) {
 			return;
+		}
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnWall();
-		if (position == null)
+		if (position == null) {
 			return;
+		}
 		final Wall wall = (Wall) selectedPart;
 		if (c instanceof Window) { // windows can be pasted to a different wall
 			if (wall != c.getContainer()) {
@@ -828,8 +904,9 @@ public class Scene implements Serializable {
 		}
 		for (int i = 0; i < n; i++) {
 			final Vector3 v = c.getPoints().get(i);
-			if (!Util.insidePolygon(new Vector3(v.getX(), v.getZ(), v.getY()), relativePolygon)) // reject it if out of range
+			if (!Util.insidePolygon(new Vector3(v.getX(), v.getZ(), v.getY()), relativePolygon)) {
 				return;
+			}
 		}
 		add(c, true);
 		copyBuffer = c;
@@ -838,16 +915,20 @@ public class Scene implements Serializable {
 
 	public void pasteToPickedLocationOnRoof() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		if (copyBuffer == null)
+		if (copyBuffer == null) {
 			return;
-		if (copyBuffer instanceof Foundation) // cannot paste a foundation to a roof
+		}
+		if (copyBuffer instanceof Foundation) {
 			return;
+		}
 		final HousePart c = copyBuffer.copy(false);
-		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
+		if (c == null) {
 			return;
+		}
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnRoof();
-		if (position == null)
+		if (position == null) {
 			return;
+		}
 		if (c instanceof SolarPanel) { // solar panels can be pasted to a different parent
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Roof && selectedPart != c.getContainer()) {
@@ -870,16 +951,20 @@ public class Scene implements Serializable {
 	public void pasteToPickedLocationOnFoundation() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (!(selectedPart instanceof Foundation))
+		if (!(selectedPart instanceof Foundation)) {
 			return;
-		if (copyBuffer == null)
+		}
+		if (copyBuffer == null) {
 			return;
+		}
 		final HousePart c = copyBuffer.copy(false);
-		if (c == null) // the copy method returns null if something is wrong (like, out of range, overlap, etc.)
+		if (c == null) {
 			return;
+		}
 		Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
-		if (position == null)
+		if (position == null) {
 			return;
+		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
 		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
 		position = position.subtractLocal(center);
@@ -899,16 +984,18 @@ public class Scene implements Serializable {
 
 	public HousePart getPart(final long id) {
 		for (final HousePart p : parts) {
-			if (id == p.getId())
+			if (id == p.getId()) {
 				return p;
+			}
 		}
 		return null;
 	}
 
 	public void drawResizeBounds() {
 		for (final HousePart part : parts) {
-			if (part instanceof Foundation)
+			if (part instanceof Foundation) {
 				part.draw();
+			}
 		}
 	}
 
@@ -925,22 +1012,27 @@ public class Scene implements Serializable {
 	}
 
 	public static boolean isTemplate() {
-		if (Config.isEclipse())
+		if (Config.isEclipse()) {
 			return url != null && url.toString().indexOf("/energy3d/target/classes") != -1;
+		}
 		return url != null && url.toString().indexOf(".jar!") != -1;
 	}
 
 	public void setAnnotationsVisible(final boolean visible) {
 		isAnnotationsVisible = visible;
-		for (final HousePart part : parts)
+		for (final HousePart part : parts) {
 			part.setAnnotationsVisible(visible);
-		if (PrintController.getInstance().isPrintPreview())
-			for (final HousePart part : PrintController.getInstance().getPrintParts())
+		}
+		if (PrintController.getInstance().isPrintPreview()) {
+			for (final HousePart part : PrintController.getInstance().getPrintParts()) {
 				part.setAnnotationsVisible(visible);
+			}
+		}
 		if (PrintController.getInstance().isPrintPreview()) {
 			PrintController.getInstance().restartAnimation();
-		} else
+		} else {
 			SceneManager.getInstance().refresh();
+		}
 
 	}
 
@@ -970,12 +1062,15 @@ public class Scene implements Serializable {
 	public static void setDrawAnnotationsInside(final boolean drawAnnotationsInside) {
 		Scene.drawAnnotationsInside = drawAnnotationsInside;
 		synchronized (SceneManager.getInstance()) {
-			for (final HousePart part : instance.getParts())
+			for (final HousePart part : instance.getParts()) {
 				part.drawAnnotations();
+			}
 		}
-		if (PrintController.getInstance().getPrintParts() != null)
-			for (final HousePart part : PrintController.getInstance().getPrintParts())
+		if (PrintController.getInstance().getPrintParts() != null) {
+			for (final HousePart part : PrintController.getInstance().getPrintParts()) {
 				part.drawAnnotations();
+			}
+		}
 	}
 
 	public void redrawAll() {
@@ -984,10 +1079,11 @@ public class Scene implements Serializable {
 
 	public void redrawAll(final boolean cleanup) {
 		this.cleanup = cleanup;
-		if (PrintController.getInstance().isPrintPreview())
+		if (PrintController.getInstance().isPrintPreview()) {
 			PrintController.getInstance().restartAnimation();
-		else
+		} else {
 			redrawAll = true;
+		}
 	}
 
 	public void redrawAllNow() {
@@ -1000,18 +1096,23 @@ public class Scene implements Serializable {
 			}
 			connectWalls();
 			Snap.clearAnnotationDrawn();
-			for (final HousePart part : parts)
-				if (part instanceof Roof)
+			for (final HousePart part : parts) {
+				if (part instanceof Roof) {
 					part.draw();
-			for (final HousePart part : parts)
-				if (!(part instanceof Roof))
+				}
+			}
+			for (final HousePart part : parts) {
+				if (!(part instanceof Roof)) {
 					part.draw();
+				}
+			}
 			// need to draw roof again because roof holes depend on drawn windows
-			for (final HousePart part : parts)
+			for (final HousePart part : parts) {
 				if (part instanceof Roof) {
 					part.draw();
 					// System.out.println(((Roof) part).getIntersectionCache().size());
 				}
+			}
 			System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
 		}
 		// no need for redrawing print parts because they will be regenerated from original parts anyways
@@ -1020,8 +1121,9 @@ public class Scene implements Serializable {
 
 	public void updateAllTextures() {
 		System.out.println("updateAllTextures()");
-		for (final HousePart part : parts)
+		for (final HousePart part : parts) {
 			part.updateTextureAndColor();
+		}
 		SceneManager.getInstance().refresh();
 	}
 
@@ -1031,8 +1133,9 @@ public class Scene implements Serializable {
 	}
 
 	public Unit getUnit() {
-		if (unit == null)
+		if (unit == null) {
 			unit = Unit.InternationalSystemOfUnits;
+		}
 		return unit;
 	}
 
@@ -1041,35 +1144,45 @@ public class Scene implements Serializable {
 	}
 
 	public double getAnnotationScale() {
-		if (annotationScale == 0)
+		if (annotationScale == 0) {
 			annotationScale = 10;
+		}
 		return annotationScale;
 	}
 
 	public void updateRoofDashLinesColor() {
-		for (final HousePart part : parts)
-			if (part instanceof Roof)
+		for (final HousePart part : parts) {
+			if (part instanceof Roof) {
 				((Roof) part).updateDashLinesColor();
-		if (PrintController.getInstance().getPrintParts() != null)
-			for (final HousePart part : PrintController.getInstance().getPrintParts())
-				if (part instanceof Roof)
+			}
+		}
+		if (PrintController.getInstance().getPrintParts() != null) {
+			for (final HousePart part : PrintController.getInstance().getPrintParts()) {
+				if (part instanceof Roof) {
 					((Roof) part).updateDashLinesColor();
+				}
+			}
+		}
 	}
 
 	public void removeAllTrees() {
 		final ArrayList<HousePart> trees = new ArrayList<HousePart>();
-		for (final HousePart part : parts)
-			if (part instanceof Tree && !part.isFrozen())
+		for (final HousePart part : parts) {
+			if (part instanceof Tree && !part.isFrozen()) {
 				trees.add(part);
+			}
+		}
 		if (trees.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no tree to remove.", "No Tree", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + trees.size() + " trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + trees.size() + " trees?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(trees);
-		for (final HousePart part : trees)
+		for (final HousePart part : trees) {
 			remove(part, false);
+		}
 		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
@@ -1077,18 +1190,22 @@ public class Scene implements Serializable {
 
 	public void removeAllHumans() {
 		final ArrayList<HousePart> humans = new ArrayList<HousePart>();
-		for (final HousePart part : parts)
-			if (part instanceof Human)
+		for (final HousePart part : parts) {
+			if (part instanceof Human) {
 				humans.add(part);
+			}
+		}
 		if (humans.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no human to remove.", "No Human", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + humans.size() + " humans?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + humans.size() + " humans?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(humans);
-		for (final HousePart part : humans)
+		for (final HousePart part : humans) {
 			remove(part, false);
+		}
 		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
@@ -1096,18 +1213,22 @@ public class Scene implements Serializable {
 
 	public void removeAllRoofs() {
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
-		for (final HousePart part : parts)
-			if (part instanceof Roof && !part.isFrozen())
+		for (final HousePart part : parts) {
+			if (part instanceof Roof && !part.isFrozen()) {
 				roofs.add(part);
+			}
+		}
 		if (roofs.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no roof to remove.", "No Roof", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + roofs.size() + " roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + roofs.size() + " roofs?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(roofs);
-		for (final HousePart part : roofs)
+		for (final HousePart part : roofs) {
 			remove(part, false);
+		}
 		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
@@ -1115,18 +1236,22 @@ public class Scene implements Serializable {
 
 	public void removeAllFloors() {
 		final ArrayList<HousePart> floors = new ArrayList<HousePart>();
-		for (final HousePart part : parts)
-			if (part instanceof Floor && !part.isFrozen())
+		for (final HousePart part : parts) {
+			if (part instanceof Floor && !part.isFrozen()) {
 				floors.add(part);
+			}
+		}
 		if (floors.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no floor to remove.", "No Floor", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + floors.size() + " floors?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + floors.size() + " floors?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(floors);
-		for (final HousePart part : floors)
+		for (final HousePart part : floors) {
 			remove(part, false);
+		}
 		redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
@@ -1138,21 +1263,24 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation)
+				if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
 					panels.add(part);
+				}
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof SolarPanel && !part.isFrozen())
+				if (part instanceof SolarPanel && !part.isFrozen()) {
 					panels.add(part);
+				}
 			}
 		}
 		if (panels.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel to remove.", "No Solar Panel", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + panels.size() + " solar panels" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + panels.size() + " solar panels" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(panels);
 		for (final HousePart part : panels) {
 			remove(part, false);
@@ -1168,21 +1296,24 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof Mirror && !part.isFrozen() && part.getTopContainer() == foundation)
+				if (part instanceof Mirror && !part.isFrozen() && part.getTopContainer() == foundation) {
 					mirrors.add(part);
+				}
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof Mirror && !part.isFrozen())
+				if (part instanceof Mirror && !part.isFrozen()) {
 					mirrors.add(part);
+				}
 			}
 		}
 		if (mirrors.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + mirrors.size() + " mirrors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + mirrors.size() + " mirrors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(mirrors);
 		for (final HousePart part : mirrors) {
 			remove(part, false);
@@ -1198,21 +1329,24 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation)
+				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation) {
 					windows.add(part);
+				}
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof Window && !part.isFrozen())
+				if (part instanceof Window && !part.isFrozen()) {
 					windows.add(part);
+				}
 			}
 		}
 		if (windows.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no window to remove.", "No Window", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " windows" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " windows" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(windows);
 		for (final HousePart part : windows) {
 			remove(part, false);
@@ -1230,16 +1364,18 @@ public class Scene implements Serializable {
 			for (final HousePart part : parts) {
 				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation) {
 					final Window w = (Window) part;
-					if (w.getLeftShutter() || w.getRightShutter())
+					if (w.getLeftShutter() || w.getRightShutter()) {
 						windows.add(w);
+					}
 				}
 			}
 		} else {
 			for (final HousePart part : parts) {
 				if (part instanceof Window && !part.isFrozen()) {
 					final Window w = (Window) part;
-					if (w.getLeftShutter() || w.getRightShutter())
+					if (w.getLeftShutter() || w.getRightShutter()) {
 						windows.add(w);
+					}
 				}
 			}
 		}
@@ -1247,8 +1383,9 @@ public class Scene implements Serializable {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no window shutter to remove.", "No Shutter", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " window shutters" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + windows.size() + " window shutters" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultipleShuttersCommand c = new RemoveMultipleShuttersCommand(windows);
 		for (final HousePart part : windows) {
 			final Window w = (Window) part;
@@ -1263,15 +1400,17 @@ public class Scene implements Serializable {
 	public void removeAllFoundations() {
 		final ArrayList<HousePart> foundations = new ArrayList<HousePart>();
 		for (final HousePart part : parts) {
-			if (part instanceof Foundation && !part.isFrozen())
+			if (part instanceof Foundation && !part.isFrozen()) {
 				foundations.add(part);
+			}
 		}
 		if (foundations.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no activated foundation to remove.", "No Foundation", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + foundations.size() + " foundations?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + foundations.size() + " foundations?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(foundations);
 		for (final HousePart part : foundations) {
 			remove(part, false);
@@ -1286,16 +1425,18 @@ public class Scene implements Serializable {
 		final String s = parent.getClass().getSimpleName();
 		final List<HousePart> copy = new ArrayList<HousePart>(); // make a copy to avoid ConcurrentModificationException
 		for (final HousePart p : children) {
-			if (p instanceof Roof)
+			if (p instanceof Roof) {
 				continue; // make an exception of roof (it is a child of a wall)
+			}
 			copy.add(p);
 		}
 		if (copy.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no element to remove from " + s + ".", "No Element", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + copy.size() + " elements of " + s + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + copy.size() + " elements of " + s + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
 			return;
+		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(copy);
 		for (final HousePart p : copy) {
 			remove(p, false);
@@ -1306,27 +1447,32 @@ public class Scene implements Serializable {
 	}
 
 	public void lockAll(final boolean freeze) {
-		if (parts.isEmpty())
+		if (parts.isEmpty()) {
 			return;
+		}
 		int lockCount = 0;
 		for (final HousePart part : parts) {
-			if (part.isFrozen())
+			if (part.isFrozen()) {
 				lockCount++;
+			}
 		}
 		if (!freeze) {
 			if (lockCount > 0) {
-				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>A lock prevents a component from being edited.<br>Do you really want to remove all the existing " + lockCount + " locks?</html>", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>A lock prevents a component from being edited.<br>Do you really want to remove all the existing " + lockCount + " locks?</html>", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 					return;
+				}
 			} else {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>A lock prevents a component from being edited.<br>There is no lock to remove.</html>");
 				return;
 			}
 		}
 		SceneManager.getInstance().getUndoManager().addEdit(new LockAllCommand());
-		for (final HousePart part : parts)
+		for (final HousePart part : parts) {
 			part.setFreeze(freeze);
-		if (freeze)
+		}
+		if (freeze) {
 			SceneManager.getInstance().hideAllEditPoints();
+		}
 		redrawAll();
 		edited = true;
 	}
@@ -1356,9 +1502,11 @@ public class Scene implements Serializable {
 	}
 
 	public void removeAllGables() {
-		for (final HousePart part : parts)
-			if (part instanceof Roof)
+		for (final HousePart part : parts) {
+			if (part instanceof Roof) {
 				((Roof) part).removeAllGables();
+			}
+		}
 	}
 
 	public ReadOnlyColorRGBA getLandColor() {
@@ -1372,8 +1520,9 @@ public class Scene implements Serializable {
 
 	/** get the default color for foundations */
 	public ReadOnlyColorRGBA getFoundationColor() {
-		if (foundationColor == null)
+		if (foundationColor == null) {
 			return WHITE;
+		}
 		return foundationColor;
 	}
 
@@ -1384,8 +1533,9 @@ public class Scene implements Serializable {
 
 	/** get the default color for walls */
 	public ReadOnlyColorRGBA getWallColor() {
-		if (wallColor == null)
+		if (wallColor == null) {
 			return GRAY;
+		}
 		return wallColor;
 	}
 
@@ -1396,8 +1546,9 @@ public class Scene implements Serializable {
 
 	/** get the default color for doors */
 	public ReadOnlyColorRGBA getDoorColor() {
-		if (doorColor == null)
+		if (doorColor == null) {
 			return WHITE;
+		}
 		return doorColor;
 	}
 
@@ -1408,8 +1559,9 @@ public class Scene implements Serializable {
 
 	/** get the default color for floors */
 	public ReadOnlyColorRGBA getFloorColor() {
-		if (floorColor == null)
+		if (floorColor == null) {
 			return WHITE;
+		}
 		return floorColor;
 	}
 
@@ -1420,8 +1572,9 @@ public class Scene implements Serializable {
 
 	/** get the default color for roofs */
 	public ReadOnlyColorRGBA getRoofColor() {
-		if (roofColor == null)
+		if (roofColor == null) {
 			return WHITE;
+		}
 		return roofColor;
 	}
 
@@ -1455,8 +1608,9 @@ public class Scene implements Serializable {
 	}
 
 	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
-		if (part instanceof Foundation)
+		if (part instanceof Foundation) {
 			return;
+		}
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
 				final Window w = (Window) p;
@@ -1467,8 +1621,9 @@ public class Scene implements Serializable {
 	}
 
 	public void setShutterLengthOfBuilding(final HousePart part, final double length) {
-		if (part instanceof Foundation)
+		if (part instanceof Foundation) {
 			return;
+		}
 		for (final HousePart p : parts) {
 			if (p instanceof Window && p.getTopContainer() == part.getTopContainer()) {
 				final Window w = (Window) p;
@@ -1483,16 +1638,18 @@ public class Scene implements Serializable {
 			part.setColor(color);
 		} else {
 			for (final HousePart p : parts) {
-				if (p.getTopContainer() == part.getTopContainer() && p.getClass().equals(part.getClass()))
+				if (p.getTopContainer() == part.getTopContainer() && p.getClass().equals(part.getClass())) {
 					p.setColor(color);
+				}
 			}
 		}
 	}
 
 	public void setColorOfAllPartsOfSameType(final HousePart part, final ReadOnlyColorRGBA color) {
 		for (final HousePart p : parts) {
-			if (p.getClass().equals(part.getClass()))
+			if (p.getClass().equals(part.getClass())) {
 				p.setColor(color);
+			}
 		}
 	}
 
@@ -1502,8 +1659,9 @@ public class Scene implements Serializable {
 			list.add(x);
 		} else {
 			for (final HousePart p : parts) {
-				if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer())
+				if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer()) {
 					list.add(p);
+				}
 			}
 		}
 		return list;
@@ -1512,8 +1670,9 @@ public class Scene implements Serializable {
 	public List<HousePart> getAllPartsOfSameType(final HousePart x) {
 		final List<HousePart> list = new ArrayList<HousePart>();
 		for (final HousePart p : parts) {
-			if (p.getClass().equals(x.getClass()))
+			if (p.getClass().equals(x.getClass())) {
 				list.add(p);
+			}
 		}
 		return list;
 	}
@@ -1524,8 +1683,9 @@ public class Scene implements Serializable {
 				((Foundation) x).setUValue(uValue);
 			} else {
 				for (final HousePart p : parts) {
-					if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer())
+					if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer()) {
 						((Thermalizable) p).setUValue(uValue);
+					}
 				}
 			}
 		}
@@ -1534,40 +1694,45 @@ public class Scene implements Serializable {
 	public List<Window> getWindowsOnContainer(final HousePart container) {
 		final List<Window> list = new ArrayList<Window>();
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == container)
+			if (p instanceof Window && p.getContainer() == container) {
 				list.add((Window) p);
+			}
 		}
 		return list;
 	}
 
 	public void setWindowShgcInContainer(final HousePart container, final double shgc) {
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getContainer() == container)
+			if (p instanceof Window && p.getContainer() == container) {
 				((Window) p).setSolarHeatGainCoefficient(shgc);
+			}
 		}
 	}
 
 	public List<Window> getWindowsOfBuilding(final Foundation foundation) {
 		final List<Window> list = new ArrayList<Window>();
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == foundation)
+			if (p instanceof Window && p.getTopContainer() == foundation) {
 				list.add((Window) p);
+			}
 		}
 		return list;
 	}
 
 	public void setWindowShgcOfBuilding(final Foundation foundation, final double shgc) {
 		for (final HousePart p : parts) {
-			if (p instanceof Window && p.getTopContainer() == foundation)
+			if (p instanceof Window && p.getTopContainer() == foundation) {
 				((Window) p).setSolarHeatGainCoefficient(shgc);
+			}
 		}
 	}
 
 	public List<SolarPanel> getAllSolarPanels() {
 		final List<SolarPanel> list = new ArrayList<SolarPanel>();
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel)
+			if (p instanceof SolarPanel) {
 				list.add((SolarPanel) p);
+			}
 		}
 		return list;
 	}
@@ -1654,37 +1819,42 @@ public class Scene implements Serializable {
 
 	public void setSolarCellEfficiencyOnFoundation(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
 				((SolarPanel) p).setCellEfficiency(eff);
+			}
 		}
 	}
 
 	public void setSolarCellEfficiencyForAll(final double eff) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel)
+			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setCellEfficiency(eff);
+			}
 		}
 	}
 
 	public void setSolarPanelInverterEfficiencyOnFoundation(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
 				((SolarPanel) p).setInverterEfficiency(eff);
+			}
 		}
 	}
 
 	public void setSolarPanelInverterEfficiencyForAll(final double eff) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel)
+			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setInverterEfficiency(eff);
+			}
 		}
 	}
 
 	public List<Mirror> getAllMirrors() {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : parts) {
-			if (p instanceof Mirror)
+			if (p instanceof Mirror) {
 				list.add((Mirror) p);
+			}
 		}
 		return list;
 	}
@@ -1731,15 +1901,17 @@ public class Scene implements Serializable {
 
 	public void setReflectivityForMirrorsOnFoundation(final Foundation foundation, final double reflectivity) {
 		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation)
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
 				((Mirror) p).setReflectivity(reflectivity);
+			}
 		}
 	}
 
 	public void setReflectivityForAllMirrors(final double reflectivity) {
 		for (final HousePart p : parts) {
-			if (p instanceof Mirror)
+			if (p instanceof Mirror) {
 				((Mirror) p).setReflectivity(reflectivity);
+			}
 		}
 	}
 
@@ -1792,15 +1964,17 @@ public class Scene implements Serializable {
 	}
 
 	public void setEdited(final boolean edited, final boolean recomputeEnergy) {
-		if (edited)
+		if (edited) {
 			SnapshotLogger.getInstance().setSceneEdited(true);
+		}
 		this.edited = edited;
 		MainFrame.getInstance().updateTitleBar();
 	}
 
 	public void updateEditShapes() {
-		for (final HousePart part : parts)
+		for (final HousePart part : parts) {
 			part.updateEditShapes();
+		}
 	}
 
 	public long nextID() {
@@ -1808,9 +1982,11 @@ public class Scene implements Serializable {
 	}
 
 	public boolean hasSensor() {
-		for (final HousePart housePart : parts)
-			if (housePart instanceof Sensor)
+		for (final HousePart housePart : parts) {
+			if (housePart instanceof Sensor) {
 				return true;
+			}
+		}
 		return false;
 	}
 
@@ -1839,13 +2015,15 @@ public class Scene implements Serializable {
 	}
 
 	public void setDate(final Date date) {
-		if (calendar != null)
+		if (calendar != null) {
 			calendar.setTime(date);
+		}
 	}
 
 	public Date getDate() {
-		if (calendar != null)
+		if (calendar != null) {
 			return calendar.getTime();
+		}
 		return Heliodon.getInstance().getCalendar().getTime();
 	}
 
@@ -1863,8 +2041,9 @@ public class Scene implements Serializable {
 
 	public void setAlwaysComputeHeatFluxVectors(final boolean alwaysComputeHeatFluxVectors) {
 		this.alwaysComputeHeatFluxVectors = alwaysComputeHeatFluxVectors;
-		for (final HousePart part : Scene.getInstance().getParts())
+		for (final HousePart part : Scene.getInstance().getParts()) {
 			part.updateHeatFluxVisibility();
+		}
 	}
 
 	public boolean getOnlyAbsorptionInSolarMap() {
@@ -1894,8 +2073,9 @@ public class Scene implements Serializable {
 	public int getNumberOfSolarPanels() {
 		int count = 0;
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel)
+			if (p instanceof SolarPanel) {
 				count++;
+			}
 		}
 		return count;
 	}
@@ -1903,8 +2083,9 @@ public class Scene implements Serializable {
 	public int getNumberOfMirrors() {
 		int count = 0;
 		for (final HousePart p : parts) {
-			if (p instanceof Mirror)
+			if (p instanceof Mirror) {
 				count++;
+			}
 		}
 		return count;
 	}
@@ -1914,9 +2095,11 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				for (final HousePart p : parts)
-					if (p instanceof Tree)
+				for (final HousePart p : parts) {
+					if (p instanceof Tree) {
 						p.updateTextureAndColor();
+					}
+				}
 				return null;
 			}
 		});
@@ -2034,7 +2217,7 @@ public class Scene implements Serializable {
 		return showSunAngles;
 	}
 
-	public void setPlateNx(int plateNx) {
+	public void setPlateNx(final int plateNx) {
 		this.plateNx = plateNx;
 	}
 
@@ -2042,7 +2225,7 @@ public class Scene implements Serializable {
 		return plateNx;
 	}
 
-	public void setPlateNy(int plateNy) {
+	public void setPlateNy(final int plateNy) {
 		this.plateNy = plateNy;
 	}
 
@@ -2066,4 +2249,42 @@ public class Scene implements Serializable {
 		return timeStep;
 	}
 
+	public void setMap(final Image mapImage, final double mapScale) {
+		this.mapImage = mapImage;
+		this.mapScale = mapScale;
+		final ByteBuffer byteBuffer = mapImage.getData().get(0);
+		this.mapImageBytes = new byte[byteBuffer.limit()];
+		byteBuffer.get(this.mapImageBytes);
+		applyMap(false);
+	}
+
+	private void applyMap(final boolean init) {
+		if (mapImage == null) {
+			SceneManager.getInstance().getMapLand().setVisible(false);
+			setFoundationsVisible(true);
+		} else {
+			if (init) {
+				mapImage.setData(ByteBuffer.wrap(mapImageBytes));
+			}
+			SceneManager.getInstance().resizeMapLand(mapScale);
+			final Texture2D texture = new Texture2D();
+			texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
+			texture.setImage(mapImage);
+			final TextureState textureState = new TextureState();
+			textureState.setTexture(texture);
+			final Mesh mesh = SceneManager.getInstance().getMapLand();
+			mesh.setRenderState(textureState);
+			mesh.setVisible(true);
+			setFoundationsVisible(false);
+		}
+	}
+
+	private void setFoundationsVisible(final boolean visible) {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
+				part.getMesh().setVisible(visible);
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
 }

@@ -22,18 +22,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.image.Image;
-import com.ardor3d.image.Texture.MinificationFilter;
-import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.util.awt.AWTImageLoader;
-import com.ardor3d.renderer.state.TextureState;
-import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.util.TextureKey;
 
 public class MapDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
@@ -102,29 +94,19 @@ public class MapDialog extends JDialog {
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				final int zoom = (Integer) zoomSpinner.getValue();
-				final double scale;
-				if (zoom == 21) {
-					scale = 0.5;
-				} else if (zoom == 20) {
-					scale = 1;
-				} else {
-					scale = (Math.pow(2, 20 - zoom));
-				}
-
 				final BufferedImage googleMapImage = getGoogleMapImage(true);
 				if (googleMapImage != null) {
-					SceneManager.getInstance().resizeMapLand(scale);
 					final Image image = AWTImageLoader.makeArdor3dImage(googleMapImage, true);
-					final Texture2D texture = new Texture2D();
-					texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
-					texture.setImage(image);
-					final TextureState textureState = new TextureState();
-					textureState.setTexture(texture);
-					final Mesh mesh = SceneManager.getInstance().getMapLand();
-					mesh.setRenderState(textureState);
-					mesh.setVisible(true);
-					setFoundationsVisible(false);
+					final int zoom = (Integer) zoomSpinner.getValue();
+					final double scale;
+					if (zoom == 21) {
+						scale = 0.5;
+					} else if (zoom == 20) {
+						scale = 1;
+					} else {
+						scale = (Math.pow(2, 20 - zoom));
+					}
+					Scene.getInstance().setMap(image, scale);
 					setVisible(false);
 				}
 			}
@@ -133,8 +115,7 @@ public class MapDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				SceneManager.getInstance().getMapLand().setVisible(false);
-				setFoundationsVisible(true);
+				Scene.getInstance().setMap(null, 1);
 				setVisible(false);
 			}
 		});
@@ -196,14 +177,5 @@ public class MapDialog extends JDialog {
 		}
 		JOptionPane.showMessageDialog(this, "Could not find the address!", "Error", JOptionPane.WARNING_MESSAGE);
 		return null;
-	}
-
-	void setFoundationsVisible(final boolean visible) {
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {
-				part.getMesh().setVisible(visible);
-			}
-		}
-		SceneManager.getInstance().refresh();
 	}
 }
