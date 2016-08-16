@@ -197,8 +197,10 @@ public class SolarRadiation {
 									computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
 								}
 							}
-						} else if (part instanceof SolarPanel || part instanceof Mirror || part instanceof Sensor) {
-							computeOnPlate(minute, dayLength, directionTowardSun, part);
+						} else if (part instanceof SolarPanel || part instanceof Mirror) {
+							computeOnPlate(minute, dayLength, directionTowardSun, part, Scene.getInstance().getPlateNx(), Scene.getInstance().getPlateNy());
+						} else if (part instanceof Sensor) {
+							computeOnPlate(minute, dayLength, directionTowardSun, part, 2, 2);
 						}
 					}
 				}
@@ -213,14 +215,14 @@ public class SolarRadiation {
 		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
 		Heliodon.getInstance().getCalendar().set(Calendar.HOUR_OF_DAY, hourOfDay);
 		Heliodon.getInstance().getCalendar().set(Calendar.MINUTE, minuteOfHour);
-		for (HousePart part : Scene.getInstance().getParts()) {
+		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Mirror) {
-				Mirror m = (Mirror) part;
+				final Mirror m = (Mirror) part;
 				if (m.getHeliostatTarget() != null) {
 					m.draw();
 				}
 			} else if (part instanceof SolarPanel) {
-				SolarPanel sp = (SolarPanel) part;
+				final SolarPanel sp = (SolarPanel) part;
 				if (sp.getTracker() != SolarPanel.NO_TRACKER) {
 					sp.draw();
 				}
@@ -335,35 +337,32 @@ public class SolarRadiation {
 
 	}
 
-	private void computeOnPlate(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart part) {
+	private void computeOnPlate(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart part, final int plateNx, final int plateNy) {
 
 		if (part instanceof Mirror) {
-			Mirror m = (Mirror) part;
+			final Mirror m = (Mirror) part;
 			if (m.getHeliostatTarget() != null) {
-				Calendar calendar = (Calendar) Heliodon.getInstance().getCalendar();
+				final Calendar calendar = Heliodon.getInstance().getCalendar();
 				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 				calendar.set(Calendar.MINUTE, minute % 60);
 				m.draw();
 			}
 		} else if (part instanceof SolarPanel) {
-			SolarPanel sp = (SolarPanel) part;
+			final SolarPanel sp = (SolarPanel) part;
 			if (sp.getTracker() != SolarPanel.NO_TRACKER) {
-				Calendar calendar = (Calendar) Heliodon.getInstance().getCalendar();
+				final Calendar calendar = Heliodon.getInstance().getCalendar();
 				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 				calendar.set(Calendar.MINUTE, minute % 60);
 				sp.draw();
 			}
 		}
 
-		int plateNx = Scene.getInstance().getPlateNx();
-		int plateNy = Scene.getInstance().getPlateNy();
-
-		ReadOnlyVector3 normal = part.getNormal();
+		final ReadOnlyVector3 normal = part.getNormal();
 		if (normal == null) // FIXME: Sometimes a solar panel can be created without a parent
 			throw new RuntimeException("Normal is null");
 
-		Mesh drawMesh = part.getRadiationMesh();
-		Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
+		final Mesh drawMesh = part.getRadiationMesh();
+		final Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null)
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, plateNx, plateNy);
@@ -409,8 +408,8 @@ public class SolarRadiation {
 			for (int y = 0; y < plateNy; y++) {
 				if (EnergyPanel.getInstance().isCancelled())
 					throw new CancellationException();
-				Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
-				Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
+				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
+				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
 				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
@@ -521,7 +520,7 @@ public class SolarRadiation {
 		return data;
 	}
 
-	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, int rows, int cols) {
+	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final int rows, final int cols) {
 		final MeshData data = new MeshData();
 		data.rows = rows;
 		data.cols = cols;
