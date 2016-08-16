@@ -31,10 +31,15 @@ import com.ardor3d.util.geom.BufferUtils;
 public class SolarPanel extends HousePart {
 
 	private static final long serialVersionUID = 1L;
+
 	public static final int NO_TRACKER = 0;
 	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
 	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
 	public static final int VERTICAL_SINGLE_AXIS_TRACKER = 3;
+
+	public static final int PARTIAL_SHADE_TOLERANCE = 0;
+	public static final int HIGH_SHADE_TOLERANCE = 1;
+	public static final int NO_SHADE_TOLERANCE = 2;
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -52,6 +57,7 @@ public class SolarPanel extends HousePart {
 	private double baseHeight = 6;
 	private boolean drawSunBeam;
 	private int rotationAxis;
+	private int shadeTolerance = HIGH_SHADE_TOLERANCE;
 	private int numberOfCellsInX = 6;
 	private int numberOfCellsInY = 10;
 	private transient double layoutGap = 0.01;
@@ -625,6 +631,14 @@ public class SolarPanel extends HousePart {
 
 	public int getNumberOfCellsInY() {
 		return numberOfCellsInY;
+	}
+
+	public void setShadeTolerance(final int shadeTolerance) {
+		this.shadeTolerance = shadeTolerance;
+	}
+
+	public int getShadeTolerance() {
+		return shadeTolerance;
 	}
 
 	public void setSunBeamVisible(final boolean drawSunBeam) {

@@ -183,7 +183,7 @@ public class Scene implements Serializable {
 					}
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
-						Foundation f = (Foundation) p;
+						final Foundation f = (Foundation) p;
 						switch (f.getSupportingType()) {
 						case Foundation.BUILDING:
 							e.getConstructionCostGraph().addGraph(f);
@@ -353,7 +353,7 @@ public class Scene implements Serializable {
 			plateNx = 2;
 		if (Util.isZero(plateNy))
 			plateNy = 2;
-		if (Util.isZero(solarContrast)) 
+		if (Util.isZero(solarContrast))
 			solarContrast = 50;
 
 		setEdited(false);
@@ -1652,6 +1652,22 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setCellWiringForSolarPanelsOnFoundation(final Foundation foundation, final int cellWiring) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setShadeTolerance(cellWiring);
+			}
+		}
+	}
+
+	public void setCellWiringForAllSolarPanels(final int cellWiring) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setShadeTolerance(cellWiring);
+			}
+		}
+	}
+
 	public void setSolarCellEfficiencyOnFoundation(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation)
@@ -2034,7 +2050,7 @@ public class Scene implements Serializable {
 		return showSunAngles;
 	}
 
-	public void setPlateNx(int plateNx) {
+	public void setPlateNx(final int plateNx) {
 		this.plateNx = plateNx;
 	}
 
@@ -2042,7 +2058,7 @@ public class Scene implements Serializable {
 		return plateNx;
 	}
 
-	public void setPlateNy(int plateNy) {
+	public void setPlateNy(final int plateNy) {
 		this.plateNy = plateNy;
 	}
 
