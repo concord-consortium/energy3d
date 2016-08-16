@@ -73,6 +73,7 @@ public class SolarRadiation {
 	private long maxValue;
 	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
 	private double peakRadiation;
+	private static double[][] cellOutputs; // temporarily hold the intermediate calculated solar radiation on the solar cells of a solar panel
 
 	private class MeshData {
 		public Vector3 p0;
@@ -459,13 +460,17 @@ public class SolarRadiation {
 		final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // row 0, col 0
 		final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // row 1, col 0
 		final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // row 0, col 1
-		final Vector3 u = p1.subtract(p0, null).normalizeLocal();
-		final Vector3 v = p2.subtract(p0, null).normalizeLocal();
+		final double d10 = p1.distance(p0);
+		final double d20 = p2.distance(p0);
+		final Vector3 p20 = p2.subtract(p0, null).normalizeLocal();
+		final Vector3 p10 = p1.subtract(p0, null).normalizeLocal();
 
-		// do the calculation to generate the heat map first. this doesn't affect the energy calculation, it just shows the distribution of solar radiation on the panel.
+		// generate the heat map first. this doesn't affect the energy calculation, it just shows the distribution of solar radiation on the panel.
 
-		double xSpacing = p1.distance(p0) / nx;
-		double ySpacing = p2.distance(p0) / ny;
+		double xSpacing = d10 / nx;
+		double ySpacing = d20 / ny;
+		Vector3 u = p10;
+		Vector3 v = p20;
 
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
 		for (int x = 0; x < nx; x++) {
@@ -497,11 +502,20 @@ public class SolarRadiation {
 
 		nx = panel.getNumberOfCellsInX();
 		ny = panel.getNumberOfCellsInY();
-		xSpacing = p1.distance(p0) / nx;
-		ySpacing = p2.distance(p0) / ny;
+		xSpacing = d20 / nx;
+		ySpacing = d10 / ny;
+		u = p20;
+		v = p10;
+		// FIXME: for unknown reason, the direction of internal coordinates must be rotated 90 degrees to have correct results (as opposed to the texture order above)
+		// System.out.println(nx + "=" + xSpacing * nx + "," + ny + "=" + ySpacing * ny);
+
 		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
 		final double a = panel.getPanelWidth() * panel.getPanelHeight() * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
+		if (cellOutputs == null || cellOutputs.length != nx || cellOutputs[0].length != ny) {
+			cellOutputs = new double[nx][ny];
+		}
 
+		// calculate the solar radiation first without worrying about the underlying cell wiring
 		for (int x = 0; x < nx; x++) {
 			for (int y = 0; y < ny; y++) {
 				if (EnergyPanel.getInstance().isCancelled())
@@ -523,8 +537,42 @@ public class SolarRadiation {
 					if (pickResults.getNumber() == 0)
 						radiation += directRadiation;
 				}
-				panel.getSolarPotential()[iMinute] += radiation * a;
+				cellOutputs[x][y] = radiation * a;
 			}
+		}
+
+		// now consider cell wiring
+		switch (panel.getShadeTolerance()) {
+		case SolarPanel.HIGH_SHADE_TOLERANCE:
+			for (int x = 0; x < nx; x++) {
+				for (int y = 0; y < ny; y++) {
+					panel.getSolarPotential()[iMinute] += cellOutputs[x][y];
+				}
+			}
+			break;
+		case SolarPanel.NO_SHADE_TOLERANCE:
+			double output;
+			double min = Double.MAX_VALUE;
+			for (int x = 0; x < nx; x++) {
+				for (int y = 0; y < ny; y++) {
+					output = cellOutputs[x][y];
+					if (output < min)
+						min = output;
+				}
+			}
+			panel.getSolarPotential()[iMinute] += min * ny * nx;
+			break;
+		case SolarPanel.PARTIAL_SHADE_TOLERANCE:
+			for (int x = 0; x < nx; x++) {
+				min = Double.MAX_VALUE;
+				for (int y = 0; y < ny; y++) {
+					output = cellOutputs[x][y];
+					if (output < min)
+						min = output;
+				}
+				panel.getSolarPotential()[iMinute] += min * ny;
+			}
+			break;
 		}
 
 	}

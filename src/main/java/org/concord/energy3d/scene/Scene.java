@@ -1817,6 +1817,22 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setCellWiringForSolarPanelsOnFoundation(final Foundation foundation, final int cellWiring) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setShadeTolerance(cellWiring);
+			}
+		}
+	}
+
+	public void setCellWiringForAllSolarPanels(final int cellWiring) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setShadeTolerance(cellWiring);
+			}
+		}
+	}
+
 	public void setSolarCellEfficiencyOnFoundation(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
