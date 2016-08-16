@@ -249,7 +249,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rotate90CwMenuItem;
 	private JMenuItem rotate90CcwMenuItem;
 	private JMenu geoLocationMenu;
-	private JMenuItem addGeoLocationMenuItem;
+	private JMenuItem setGeoLocationMenuItem;
 	private JMenuItem clearGeoLocationMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
@@ -1385,7 +1385,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			geoLocationMenu.add(getAddGeoLocationMenuItem());
+			geoLocationMenu.add(getSetGeoLocationMenuItem());
 			geoLocationMenu.add(getClearGeoLocationMenuItem());
 
 		}
@@ -1393,17 +1393,17 @@ public class MainFrame extends JFrame {
 
 	}
 
-	public JMenuItem getAddGeoLocationMenuItem() {
-		if (addGeoLocationMenuItem == null) {
-			addGeoLocationMenuItem = new JMenuItem("Add Location");
-			addGeoLocationMenuItem.addActionListener(new ActionListener() {
+	public JMenuItem getSetGeoLocationMenuItem() {
+		if (setGeoLocationMenuItem == null) {
+			setGeoLocationMenuItem = new JMenuItem("Set Location");
+			setGeoLocationMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					MapDialog.getInstance().setVisible(true);
 				}
 			});
 		}
-		return addGeoLocationMenuItem;
+		return setGeoLocationMenuItem;
 	}
 
 	public JMenuItem getClearGeoLocationMenuItem() {
