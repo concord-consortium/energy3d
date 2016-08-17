@@ -65,10 +65,10 @@ import com.ardor3d.util.TextureKey;
 public class Scene implements Serializable {
 	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
 	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.LIGHT_GRAY;
-	public static final int CLOUDY_SKY = 0;
-	public static final int DESERT = 1;
-	public static final int GRASSLAND = 2;
-	public static final int FOREST = 3;
+	public static final int CLOUDY_SKY_THEME = 0;
+	public static final int DESERT_THEME = 1;
+	public static final int GRASSLAND_THEME = 2;
+	public static final int FOREST_THEME = 3;
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("House Root");
@@ -2214,13 +2214,13 @@ public class Scene implements Serializable {
 		this.theme = theme;
 		ReadOnlyColorRGBA c;
 		switch (theme) {
-		case DESERT:
+		case DESERT_THEME:
 			c = new ColorRGBA(1, 1, 1, 0.5f);
 			break;
-		case GRASSLAND:
+		case GRASSLAND_THEME:
 			c = new ColorRGBA(0, 1, 0, 0.5f);
 			break;
-		case FOREST:
+		case FOREST_THEME:
 			c = new ColorRGBA(0, 1, 0.2f, 0.5f);
 			break;
 		default:

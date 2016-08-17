@@ -1371,10 +1371,10 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(cloudySkyMenuItem, Scene.getInstance().getTheme() == Scene.CLOUDY_SKY);
-					Util.selectSilently(desertMenuItem, Scene.getInstance().getTheme() == Scene.DESERT);
-					Util.selectSilently(grasslandMenuItem, Scene.getInstance().getTheme() == Scene.GRASSLAND);
-					Util.selectSilently(forestMenuItem, Scene.getInstance().getTheme() == Scene.FOREST);
+					Util.selectSilently(cloudySkyMenuItem, Scene.getInstance().getTheme() == Scene.CLOUDY_SKY_THEME);
+					Util.selectSilently(desertMenuItem, Scene.getInstance().getTheme() == Scene.DESERT_THEME);
+					Util.selectSilently(grasslandMenuItem, Scene.getInstance().getTheme() == Scene.GRASSLAND_THEME);
+					Util.selectSilently(forestMenuItem, Scene.getInstance().getTheme() == Scene.FOREST_THEME);
 				}
 			});
 
@@ -2622,7 +2622,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.CLOUDY_SKY);
+					Scene.getInstance().setTheme(Scene.CLOUDY_SKY_THEME);
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -2639,7 +2639,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.DESERT);
+					Scene.getInstance().setTheme(Scene.DESERT_THEME);
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -2656,7 +2656,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.GRASSLAND);
+					Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -2673,7 +2673,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.FOREST);
+					Scene.getInstance().setTheme(Scene.FOREST_THEME);
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}

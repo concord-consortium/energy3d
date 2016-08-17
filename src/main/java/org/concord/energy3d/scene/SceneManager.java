@@ -653,13 +653,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isNightTime = Heliodon.getInstance().isNightTime();
 			TextureState ts;
 			switch (Scene.getInstance().getTheme()) {
-			case Scene.DESERT:
+			case Scene.DESERT_THEME:
 				ts = isNightTime ? desertNight : desertDay;
 				break;
-			case Scene.GRASSLAND:
+			case Scene.GRASSLAND_THEME:
 				ts = isNightTime ? grasslandNight : grasslandDay;
 				break;
-			case Scene.FOREST:
+			case Scene.FOREST_THEME:
 				ts = isNightTime ? forestNight : forestDay;
 				break;
 			default:

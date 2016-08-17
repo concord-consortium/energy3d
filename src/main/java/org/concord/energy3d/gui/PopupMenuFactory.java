@@ -102,6 +102,7 @@ import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
@@ -178,28 +179,39 @@ public class PopupMenuFactory {
 
 	public static JPopupMenu getPopupMenu(final boolean onLand) {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof Window)
+		if (selectedPart instanceof Window) {
 			return getPopupMenuForWindow();
-		if (selectedPart instanceof Wall)
+		}
+		if (selectedPart instanceof Wall) {
 			return getPopupMenuForWall();
-		if (selectedPart instanceof Roof)
+		}
+		if (selectedPart instanceof Roof) {
 			return getPopupMenuForRoof();
-		if (selectedPart instanceof Door)
+		}
+		if (selectedPart instanceof Door) {
 			return getPopupMenuForDoor();
-		if (selectedPart instanceof Floor)
+		}
+		if (selectedPart instanceof Floor) {
 			return getPopupMenuForFloor();
-		if (selectedPart instanceof Foundation)
+		}
+		if (selectedPart instanceof Foundation) {
 			return getPopupMenuForFoundation();
-		if (selectedPart instanceof SolarPanel)
+		}
+		if (selectedPart instanceof SolarPanel) {
 			return getPopupMenuForSolarPanel();
-		if (selectedPart instanceof Mirror)
+		}
+		if (selectedPart instanceof Mirror) {
 			return getPopupMenuForMirror();
-		if (selectedPart instanceof Sensor)
+		}
+		if (selectedPart instanceof Sensor) {
 			return getPopupMenuForSensor();
-		if (selectedPart instanceof Tree)
+		}
+		if (selectedPart instanceof Tree) {
 			return getPopupMenuForTree();
-		if (selectedPart instanceof Human)
+		}
+		if (selectedPart instanceof Human) {
 			return getPopupMenuForHuman();
+		}
 		return onLand ? getPopupMenuForLand() : getPopupMenuForSky();
 	}
 
@@ -350,9 +362,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Background Albedo (dimensionless [0, 1])<hr><font size=2>Examples:<br>0.17 (soil), 0.25 (grass), 0.40 (sand), 0.55 (concrete), snow (0.9)</html>";
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getAlbedo());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 0 || val > 1) {
@@ -379,9 +391,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Ground Thermal Diffusivity (m<sup>2</sup>/s)<hr><font size=2>Examples:<br>0.039 (sand), 0.046 (clay), 0.05 (silt)</html>";
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGround().getThermalDiffusivity());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val <= 0) {
@@ -400,6 +412,27 @@ public class PopupMenuFactory {
 					}
 				}
 			});
+
+			final JMenu geoLocationMenu = new JMenu("Geo-Location");
+
+			final JMenuItem miSetLocation = new JMenuItem("Set Location");
+			miSetLocation.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MapDialog.getInstance().setVisible(true);
+				}
+			});
+			geoLocationMenu.add(miSetLocation);
+
+			final JMenuItem miClearLocation = new JMenuItem("Clear Location");
+			miClearLocation.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setMap(null, 1);
+					Scene.getInstance().setEdited(true);
+				}
+			});
+			geoLocationMenu.add(miClearLocation);
 
 			popupMenuForLand = new JPopupMenu();
 			popupMenuForLand.setInvoker(MainPanel.getInstance().getCanvasPanel());
@@ -431,6 +464,7 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miImport);
 			popupMenuForLand.add(miImportPrefabMenu);
 			popupMenuForLand.addSeparator();
+			popupMenuForLand.add(geoLocationMenu);
 			popupMenuForLand.add(colorAction);
 			popupMenuForLand.add(miAlbedo);
 			popupMenuForLand.add(miThermalDiffusivity);
@@ -456,6 +490,80 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu themeMenu = new JMenu("Theme");
+			final ButtonGroup themeButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem miCloudySky = new JRadioButtonMenuItem("Cloudy Sky");
+			miCloudySky.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ChangeThemeCommand c = new ChangeThemeCommand();
+					Scene.getInstance().setTheme(Scene.CLOUDY_SKY_THEME);
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(miCloudySky);
+			themeMenu.add(miCloudySky);
+
+			final JRadioButtonMenuItem miDesert = new JRadioButtonMenuItem("Desert");
+			miDesert.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ChangeThemeCommand c = new ChangeThemeCommand();
+					Scene.getInstance().setTheme(Scene.DESERT_THEME);
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(miDesert);
+			themeMenu.add(miDesert);
+
+			final JRadioButtonMenuItem miGrassland = new JRadioButtonMenuItem("Grassland");
+			miGrassland.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ChangeThemeCommand c = new ChangeThemeCommand();
+					Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(miGrassland);
+			themeMenu.add(miGrassland);
+
+			final JRadioButtonMenuItem miForest = new JRadioButtonMenuItem("Forest");
+			miForest.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final ChangeThemeCommand c = new ChangeThemeCommand();
+					Scene.getInstance().setTheme(Scene.FOREST_THEME);
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+			themeButtonGroup.add(miForest);
+			themeMenu.add(miForest);
+
+			themeMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					Util.selectSilently(miCloudySky, Scene.getInstance().getTheme() == Scene.CLOUDY_SKY_THEME);
+					Util.selectSilently(miDesert, Scene.getInstance().getTheme() == Scene.DESERT_THEME);
+					Util.selectSilently(miGrassland, Scene.getInstance().getTheme() == Scene.GRASSLAND_THEME);
+					Util.selectSilently(miForest, Scene.getInstance().getTheme() == Scene.FOREST_THEME);
+				}
+			});
+
 			popupMenuForSky = new JPopupMenu();
 			popupMenuForSky.setInvoker(MainPanel.getInstance().getCanvasPanel());
 			popupMenuForSky.addPopupMenuListener(new PopupMenuListener() {
@@ -478,6 +586,7 @@ public class PopupMenuFactory {
 			popupMenuForSky.add(miInfo);
 			popupMenuForSky.addSeparator();
 			popupMenuForSky.add(miHeliodon);
+			popupMenuForSky.add(themeMenu);
 
 		}
 
@@ -499,8 +608,9 @@ public class PopupMenuFactory {
 				@Override
 				public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null)
+					if (selectedPart == null) {
 						return;
+					}
 					final String s = selectedPart.toString();
 					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
 				}
@@ -719,13 +829,15 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window))
+					if (!(selectedPart instanceof Window)) {
 						return;
+					}
 					final Window window = (Window) selectedPart;
 					final JColorChooser colorChooser = MainFrame.getInstance().getColorChooser();
 					final ReadOnlyColorRGBA color = window.getShutterColor();
-					if (color != null)
+					if (color != null) {
 						colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+					}
 					final ActionListener actionListener = new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
@@ -745,8 +857,9 @@ public class PopupMenuFactory {
 							bg.add(rb1);
 							bg.add(rb2);
 							bg.add(rb3);
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 								return;
+							}
 							if (rb1.isSelected()) { // apply to only this window
 								final ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
 								window.setShutterColor(color);
@@ -774,8 +887,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window))
+					if (!(selectedPart instanceof Window)) {
 						return;
+					}
 					final Window window = (Window) selectedPart;
 					final String partInfo = window.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final String title = "<html>Relative Length of Shutter for " + partInfo + "</html>";
@@ -796,9 +910,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), params, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, window.getShutterLength());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val <= 0 || val > 1) {
@@ -856,8 +970,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window))
+					if (!(selectedPart instanceof Window)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Window window = (Window) selectedPart;
 					final String title = "<html>Solar Heat Gain Coefficient of " + partInfo + "</html>";
@@ -878,9 +993,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), params, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, window.getSolarHeatGainCoefficient());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 0 || val > 1) {
@@ -916,13 +1031,15 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window))
+					if (!(selectedPart instanceof Window)) {
 						return;
+					}
 					final Window window = (Window) selectedPart;
 					final JColorChooser colorChooser = MainFrame.getInstance().getColorChooser();
 					final ReadOnlyColorRGBA color = window.getColor();
-					if (color != null)
+					if (color != null) {
 						colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+					}
 					final ActionListener actionListener = new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
@@ -942,8 +1059,9 @@ public class PopupMenuFactory {
 							bg.add(rb1);
 							bg.add(rb2);
 							bg.add(rb3);
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 								return;
+							}
 							if (rb1.isSelected()) { // apply to only this window
 								final ChangePartColorCommand cmd = new ChangePartColorCommand(window);
 								window.setColor(color);
@@ -977,8 +1095,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window))
+					if (!(selectedPart instanceof Window)) {
 						return;
+					}
 					new EnergyDailyAnalysis().show("Daily Energy for Window");
 				}
 			});
@@ -989,8 +1108,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window))
+					if (!(selectedPart instanceof Window)) {
 						return;
+					}
 					new EnergyAnnualAnalysis().show("Annual Energy for Window");
 				}
 			});
@@ -1237,8 +1357,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Wall))
+					if (!(selectedPart instanceof Wall)) {
 						return;
+					}
 					new EnergyDailyAnalysis().show("Daily Energy for Wall");
 				}
 			});
@@ -1249,8 +1370,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Wall))
+					if (!(selectedPart instanceof Wall)) {
 						return;
+					}
 					new EnergyAnnualAnalysis().show("Annual Energy for Wall");
 				}
 			});
@@ -1302,20 +1424,22 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Roof))
+					if (!(selectedPart instanceof Roof)) {
 						return;
+					}
 					final Roof roof = (Roof) selectedPart;
 					while (true) {
 						SceneManager.getInstance().refresh(1);
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Overhang Length (m)", roof.getOverhangLength() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								double val = Double.parseDouble(newValue);
 								final double min = Roof.OVERHANG_MIN * Scene.getInstance().getAnnotationScale() * 10;
-								if (val < min && val >= 0)
+								if (val < min && val >= 0) {
 									val = min;
+								}
 								if (val < 0 || val > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 10.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -1360,8 +1484,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Roof))
+					if (!(selectedPart instanceof Roof)) {
 						return;
+					}
 					new EnergyDailyAnalysis().show("Daily Energy for Roof");
 				}
 			});
@@ -1372,8 +1497,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Roof))
+					if (!(selectedPart instanceof Roof)) {
 						return;
+					}
 					new EnergyAnnualAnalysis().show("Annual Energy for Roof");
 				}
 			});
@@ -1400,8 +1526,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Door))
+					if (!(selectedPart instanceof Door)) {
 						return;
+					}
 					new EnergyDailyAnalysis().show("Daily Energy for Door");
 				}
 			});
@@ -1412,8 +1539,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Door))
+					if (!(selectedPart instanceof Door)) {
 						return;
+					}
 					new EnergyAnnualAnalysis().show("Annual Energy for Door");
 				}
 			});
@@ -1461,8 +1589,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation))
+					if (!(selectedPart instanceof Foundation)) {
 						return;
+					}
 					new RescaleBuildingDialog((Foundation) selectedPart).setVisible(true);
 					Scene.getInstance().setEdited(true);
 				}
@@ -1623,8 +1752,9 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						final int n = f.countParts(SolarPanel.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
+						}
 						final JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
 						panel.add(new JLabel("Panel size:"));
 						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
@@ -1705,8 +1835,9 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
+						}
 						SceneManager.getTaskManager().update(new Callable<Object>() {
 							@Override
 							public Object call() {
@@ -1728,8 +1859,9 @@ public class PopupMenuFactory {
 						final Foundation f = (Foundation) selectedPart;
 						UtilityBill b = f.getUtilityBill();
 						if (b == null) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "No utility bill is found for this building. Create one?", "Utility Bill for Building #" + f.getId(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION)
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "No utility bill is found for this building. Create one?", "Utility Bill for Building #" + f.getId(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
 								return;
+							}
 							b = new UtilityBill();
 							f.setUtilityBill(b);
 						}
@@ -1771,11 +1903,13 @@ public class PopupMenuFactory {
 						final boolean lock = miLock.isSelected();
 						foundation.setFreeze(lock);
 						for (final HousePart p : Scene.getInstance().getParts()) {
-							if (p.getTopContainer() == foundation)
+							if (p.getTopContainer() == foundation) {
 								p.setFreeze(lock);
+							}
 						}
-						if (lock)
+						if (lock) {
 							SceneManager.getInstance().hideAllEditPoints();
+						}
 						foundation.draw();
 						foundation.drawChildren();
 						Scene.getInstance().setEdited(true);
@@ -1815,15 +1949,16 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation))
+					if (!(selectedPart instanceof Foundation)) {
 						return;
+					}
 					final Foundation f = (Foundation) selectedPart;
 					while (true) {
 						SceneManager.getInstance().refresh(1);
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Height (m)", f.getHeight() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 0 || val > 10) {
@@ -1899,11 +2034,13 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation))
+					if (!(selectedPart instanceof Foundation)) {
 						return;
+					}
 					final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap())
+					if (SceneManager.getInstance().getSolarHeatMap()) {
 						analysis.updateGraph();
+					}
 					analysis.show("Daily Energy");
 				}
 			});
@@ -1914,8 +2051,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation))
+					if (!(selectedPart instanceof Foundation)) {
 						return;
+					}
 					new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
@@ -1927,16 +2065,18 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation))
+					if (!(selectedPart instanceof Foundation)) {
 						return;
+					}
 					final Foundation foundation = (Foundation) selectedPart;
 					if (foundation.countParts(SolarPanel.class) <= 0) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					final PvDailyAnalysis a = new PvDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap())
+					if (SceneManager.getInstance().getSolarHeatMap()) {
 						a.updateGraph();
+					}
 					a.show();
 				}
 			});
@@ -1947,16 +2087,18 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation))
+					if (!(selectedPart instanceof Foundation)) {
 						return;
+					}
 					final Foundation foundation = (Foundation) selectedPart;
 					if (foundation.countParts(SolarPanel.class) <= 0) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					final PvAnnualAnalysis a = new PvAnnualAnalysis();
-					if (foundation.getUtilityBill() != null)
+					if (foundation.getUtilityBill() != null) {
 						a.setUtilityBill(foundation.getUtilityBill());
+					}
 					a.show();
 				}
 			});
@@ -1977,8 +2119,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Sensor))
+					if (!(selectedPart instanceof Sensor)) {
 						return;
+					}
 					final Sensor s = (Sensor) selectedPart;
 					s.setLightOff(!miLight.isSelected());
 					Scene.getInstance().setEdited(true);
@@ -1990,8 +2133,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Sensor))
+					if (!(selectedPart instanceof Sensor)) {
 						return;
+					}
 					final Sensor s = (Sensor) selectedPart;
 					s.setHeatFluxOff(!miHeatFlux.isSelected());
 					Scene.getInstance().setEdited(true);
@@ -2002,8 +2146,9 @@ public class PopupMenuFactory {
 				@Override
 				public void run() {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Sensor))
+					if (!(selectedPart instanceof Sensor)) {
 						return;
+					}
 					final Sensor s = (Sensor) selectedPart;
 					Util.selectSilently(miLight, !s.isLightOff());
 					Util.selectSilently(miHeatFlux, !s.isHeatFluxOff());
@@ -2035,8 +2180,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2055,8 +2201,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Choose shade tolerance level for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The energy generated by this panel comes from each cell proportionally (ideal case).<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Shade tolerance", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Shade tolerance", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
 						sp.setShadeTolerance(SolarPanel.HIGH_SHADE_TOLERANCE);
@@ -2082,8 +2229,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2102,8 +2250,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Choose shade tolerance level for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Use bypass diodes to direct current under shading conditions.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Shade tolerance", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Shade tolerance", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
 						sp.setShadeTolerance(SolarPanel.PARTIAL_SHADE_TOLERANCE);
@@ -2129,8 +2278,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2149,8 +2299,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Choose shade tolerance level for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Shading greatly reduces the output of the entire panel.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Shade tolerance", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Shade tolerance", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
 						sp.setShadeTolerance(SolarPanel.NO_SHADE_TOLERANCE);
@@ -2178,8 +2329,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2198,8 +2350,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Disable tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>No tracker will be used.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
 						sp.setTracker(SolarPanel.NO_TRACKER);
@@ -2225,8 +2378,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2245,8 +2399,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Enable horizontal single-axis tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable horizontal single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable horizontal single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
 						sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
@@ -2272,8 +2427,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2292,8 +2448,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Enable vertical single-axis tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable vertical single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable vertical single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
 						sp.setTracker(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
@@ -2319,8 +2476,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String partInfo = sp.toString().substring(0, sp.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2339,8 +2497,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Enable altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable altitude-azimuth dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable altitude-azimuth dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
 						sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
@@ -2365,8 +2524,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel s = (SolarPanel) selectedPart;
 					final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
 					s.setRotated(miRotateAroundNormal.isSelected());
@@ -2381,8 +2541,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
@@ -2403,18 +2564,19 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getTiltAngle());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									if (Util.isZero(val - 90))
+									if (Util.isZero(val - 90)) {
 										val = 89.999;
-									else if (Util.isZero(val + 90))
+									} else if (Util.isZero(val + 90)) {
 										val = -89.999;
+									}
 									if (rb1.isSelected()) {
 										final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(sp);
 										sp.setTiltAngle(val);
@@ -2447,8 +2609,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final Foundation foundation = sp.getTopContainer();
@@ -2470,17 +2633,19 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						double a = sp.getRelativeAzimuth() + foundation.getAzimuth();
-						if (a > 360)
+						if (a > 360) {
 							a -= 360;
+						}
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								a = val - foundation.getAzimuth();
-								if (a < 0)
+								if (a < 0) {
 									a += 360;
+								}
 								if (rb1.isSelected()) {
 									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(sp);
 									sp.setRelativeAzimuth(a);
@@ -2515,8 +2680,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel s = (SolarPanel) selectedPart;
 					final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
@@ -2549,8 +2715,9 @@ public class PopupMenuFactory {
 						}
 					});
 					gui.add(typeComboBox, BorderLayout.NORTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
 					s.setPanelWidth(w);
 					s.setPanelHeight(h);
@@ -2565,8 +2732,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final Foundation foundation = sp.getTopContainer();
@@ -2588,9 +2756,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getBaseHeight() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
 								if (rb1.isSelected()) {
@@ -2623,8 +2791,9 @@ public class PopupMenuFactory {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
 					sp.drawSunBeam();
@@ -2637,8 +2806,9 @@ public class PopupMenuFactory {
 				@Override
 				public void run() {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					switch (sp.getShadeTolerance()) {
 					case SolarPanel.HIGH_SHADE_TOLERANCE:
@@ -2706,8 +2876,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
 					final String title = "<html>Solar Cell Efficiency (%) of " + partInfo + "</html>";
@@ -2728,9 +2899,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getCellEfficiency() * 100);
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 10 || val > 30) {
@@ -2766,8 +2937,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
 					final String title = "<html>Micro Inverter Efficiency (%) of " + partInfo + "</html>";
@@ -2788,9 +2960,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getInverterEfficiency() * 100);
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 80 || val >= 100) {
@@ -2851,8 +3023,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					new PvDailyAnalysis().show();
 				}
 			});
@@ -2863,8 +3036,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel))
+					if (!(selectedPart instanceof SolarPanel)) {
 						return;
+					}
 					new PvAnnualAnalysis().show();
 				}
 			});
@@ -2885,8 +3059,9 @@ public class PopupMenuFactory {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final Mirror m = (Mirror) selectedPart;
 					m.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
 					m.draw();
@@ -2899,8 +3074,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2921,9 +3097,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getHeliostatTarget() == null ? "" : m.getHeliostatTarget().getId());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final int id = Integer.parseInt(newValue);
 								if (id < 0) {
@@ -2966,8 +3142,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
 					final JPanel panel = new JPanel();
@@ -2986,8 +3163,9 @@ public class PopupMenuFactory {
 					final String title = "<html>Disable heliostat for " + partInfo + "</html>";
 					final String footnote = "<html><hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					if (rb1.isSelected()) {
 						final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
 						m.setHeliostatTarget(null);
@@ -3012,8 +3190,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
 					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
@@ -3034,18 +3213,19 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getTiltAngle());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								double val = Double.parseDouble(newValue);
 								if (val < -90 || val > 90) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									if (Util.isZero(val - 90))
+									if (Util.isZero(val - 90)) {
 										val = 89.999;
-									else if (Util.isZero(val + 90))
+									} else if (Util.isZero(val + 90)) {
 										val = -89.999;
+									}
 									if (rb1.isSelected()) {
 										final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(m);
 										m.setTiltAngle(val);
@@ -3078,8 +3258,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Mirror mirror = (Mirror) selectedPart;
 					final Foundation foundation = mirror.getTopContainer();
@@ -3101,17 +3282,19 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						double a = mirror.getRelativeAzimuth() + foundation.getAzimuth();
-						if (a > 360)
+						if (a > 360) {
 							a -= 360;
+						}
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								a = val - foundation.getAzimuth();
-								if (a < 0)
+								if (a < 0) {
 									a += 360;
+								}
 								if (rb1.isSelected()) {
 									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 									mirror.setRelativeAzimuth(a);
@@ -3143,8 +3326,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new GridLayout(2, 2, 5, 5));
@@ -3157,8 +3341,9 @@ public class PopupMenuFactory {
 					final JTextField heightField = new JTextField(twoDecimalsFormat.format(m.getMirrorHeight()));
 					gui.add(heightField);
 					gui.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION)
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
+					}
 					final SetMirrorSizeCommand c = new SetMirrorSizeCommand(m);
 					try {
 						final double w = Double.parseDouble(widthField.getText());
@@ -3191,8 +3376,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Mirror m = (Mirror) selectedPart;
 					final Foundation foundation = m.getTopContainer();
@@ -3214,9 +3400,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getBaseHeight() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
 								if (rb1.isSelected()) {
@@ -3248,8 +3434,9 @@ public class PopupMenuFactory {
 				@Override
 				public void run() {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final Mirror m = (Mirror) selectedPart;
 					if (m.getHeliostatTarget() == null) {
 						miZenith.setEnabled(true);
@@ -3267,8 +3454,9 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror))
+					if (!(selectedPart instanceof Mirror)) {
 						return;
+					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Mirror m = (Mirror) selectedPart;
 					final String title = "<html>Reflectivity (%) of " + partInfo + "</html>";
@@ -3289,9 +3477,9 @@ public class PopupMenuFactory {
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getReflectivity() * 100);
-						if (newValue == null)
+						if (newValue == null) {
 							break;
-						else {
+						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 50 || val > 99) {
@@ -3350,8 +3538,9 @@ public class PopupMenuFactory {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
-					if (p instanceof Tree)
+					if (p instanceof Tree) {
 						((Tree) p).setShowPolygons(miPolygon.isSelected());
+					}
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -3366,8 +3555,9 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(new LockPartCommand(tree));
 						final boolean lock = miLock.isSelected();
 						tree.setFreeze(lock);
-						if (lock)
+						if (lock) {
 							SceneManager.getInstance().hideAllEditPoints();
+						}
 						tree.draw();
 						Scene.getInstance().setEdited(true);
 					}
@@ -3410,8 +3600,9 @@ public class PopupMenuFactory {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (!(selectedPart instanceof Thermalizable))
+				if (!(selectedPart instanceof Thermalizable)) {
 					return;
+				}
 				final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				final Thermalizable t = (Thermalizable) selectedPart;
 
@@ -3469,11 +3660,13 @@ public class PopupMenuFactory {
 					siField.getDocument().addDocumentListener(new DocumentListener() {
 
 						private void update() {
-							if (!siField.hasFocus())
+							if (!siField.hasFocus()) {
 								return;
+							}
 							final String newValue = siField.getText();
-							if ("".equals(newValue))
+							if ("".equals(newValue)) {
 								return;
+							}
 							try {
 								uValueField.setText(twoDecimalsFormat.format(Util.toUsUValue(Double.parseDouble(newValue))));
 							} catch (final Exception exception) {
@@ -3499,11 +3692,13 @@ public class PopupMenuFactory {
 					uValueField.getDocument().addDocumentListener(new DocumentListener() {
 
 						private void update() {
-							if (!uValueField.hasFocus())
+							if (!uValueField.hasFocus()) {
 								return;
+							}
 							final String newValue = uValueField.getText();
-							if ("".equals(newValue))
+							if ("".equals(newValue)) {
 								return;
+							}
 							try {
 								siField.setText(twoDecimalsFormat.format(1.0 / (Util.toSiRValue(1.0 / Double.parseDouble(newValue)))));
 							} catch (final Exception exception) {
@@ -3538,11 +3733,13 @@ public class PopupMenuFactory {
 					siField.getDocument().addDocumentListener(new DocumentListener() {
 
 						private void update() {
-							if (!siField.hasFocus())
+							if (!siField.hasFocus()) {
 								return;
+							}
 							final String newValue = siField.getText();
-							if ("".equals(newValue))
+							if ("".equals(newValue)) {
 								return;
+							}
 							try {
 								rValueField.setText(integerFormat.format(Util.toUsRValue(Double.parseDouble(newValue))));
 							} catch (final Exception exception) {
@@ -3568,11 +3765,13 @@ public class PopupMenuFactory {
 					rValueField.getDocument().addDocumentListener(new DocumentListener() {
 
 						private void update() {
-							if (!rValueField.hasFocus())
+							if (!rValueField.hasFocus()) {
 								return;
+							}
 							final String newValue = rValueField.getText();
-							if ("".equals(newValue))
+							if ("".equals(newValue)) {
 								return;
+							}
 							try {
 								siField.setText(twoDecimalsFormat.format(1.0 / Util.toSiRValue(Double.parseDouble(newValue))));
 							} catch (final Exception exception) {
@@ -3639,17 +3838,18 @@ public class PopupMenuFactory {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (!(selectedPart instanceof Thermalizable))
+				if (!(selectedPart instanceof Thermalizable)) {
 					return;
+				}
 				final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				final Thermalizable t = (Thermalizable) selectedPart;
 				final String title = "<html>Volumeric Heat Capacity of " + partInfo + " [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Examples:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
 				while (true) {
 					// final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());
 					final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), title, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, t.getVolumetricHeatCapacity());
-					if (newValue == null)
+					if (newValue == null) {
 						break;
-					else {
+					} else {
 						try {
 							final double val = Double.parseDouble(newValue);
 							if (val <= 0) {
@@ -3683,12 +3883,14 @@ public class PopupMenuFactory {
 			@Override
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart == null)
+				if (selectedPart == null) {
 					return;
+				}
 				final String s = selectedPart.toString();
 				miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
-				if (runWhenBecomingVisible != null)
+				if (runWhenBecomingVisible != null) {
 					runWhenBecomingVisible.run();
+				}
 			}
 
 			@Override
