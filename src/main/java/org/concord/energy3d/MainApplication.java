@@ -29,6 +29,7 @@ public class MainApplication {
 
 	public static void main(final String[] args) {
 		System.out.println("Initiating...");
+		final long t = System.nanoTime();
 		checkSingleInstance(MainApplication.class, args);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
@@ -112,6 +113,7 @@ public class MainApplication {
 		}.start();
 
 		System.out.println("Initiatialization phase 2 done.");
+		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
 	}
 
 	public static void addShutdownHook(final Runnable r) {
