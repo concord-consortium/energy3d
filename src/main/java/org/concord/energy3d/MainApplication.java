@@ -21,7 +21,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "5.7.7";
+	public static final String VERSION = "5.7.8";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -53,11 +53,13 @@ public class MainApplication {
 			System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Energy3D");
 		}
 		Config.setWebStart(System.getProperty("javawebstart.version", null) != null);
-		if (!Config.isWebStart())
+		if (!Config.isWebStart()) {
 			System.setProperty("jogamp.gluegen.UseTempJarCache", "false");
+		}
 		final boolean isJarOrEclipse = !Config.isWebStart() && !System.getProperty("java.library.path").contains("jogl");
-		if (isJarOrEclipse)
+		if (isJarOrEclipse) {
 			setupLibraryPath();
+		}
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -87,18 +89,21 @@ public class MainApplication {
 			@Override
 			public void run() {
 				try {
-					if (isMacOpeningFile)
+					if (isMacOpeningFile) {
 						return;
+					}
 					if (Config.isWebStart()) {
-						if (args.length > 1 && !args[args.length - 1].startsWith("-"))
+						if (args.length > 1 && !args[args.length - 1].startsWith("-")) {
 							mainFrame.open(args[args.length - 1]);
-						else
+						} else {
 							Scene.newFile();
+						}
 					} else {
-						if (args.length > 0)
+						if (args.length > 0) {
 							mainFrame.open(args[0]);
-						else
+						} else {
 							Scene.newFile();
+						}
 					}
 				} catch (final Exception e) {
 					e.printStackTrace();
@@ -110,19 +115,23 @@ public class MainApplication {
 	}
 
 	public static void addShutdownHook(final Runnable r) {
-		if (shutdownHooks == null)
+		if (shutdownHooks == null) {
 			shutdownHooks = new ArrayList<Runnable>();
-		if (!shutdownHooks.contains(r))
+		}
+		if (!shutdownHooks.contains(r)) {
 			shutdownHooks.add(r);
+		}
 	}
 
 	public static void exit() {
 		if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
-			for (final Runnable r : shutdownHooks)
+			for (final Runnable r : shutdownHooks) {
 				r.run();
+			}
 		}
-		if (!Config.isWebStart())
+		if (!Config.isWebStart()) {
 			Updater.install();
+		}
 		System.out.println("exit.");
 		System.exit(0);
 	}
@@ -133,20 +142,23 @@ public class MainApplication {
 		final String os = System.getProperty("os.name").toLowerCase();
 		if (os.startsWith("windows")) {
 			final String sunArch = System.getProperty("sun.arch.data.model");
-			if (sunArch != null && sunArch.startsWith("64"))
+			if (sunArch != null && sunArch.startsWith("64")) {
 				OSPath = "windows-64";
-			else
+			} else {
 				OSPath = "windows-32";
+			}
 		} else if (os.startsWith("mac")) {
 			OSPath = "mac-universal";
 		} else if (os.startsWith("linux")) {
 			final String sunArch = System.getProperty("sun.arch.data.model");
-			if (sunArch != null && sunArch.startsWith("64"))
+			if (sunArch != null && sunArch.startsWith("64")) {
 				OSPath = "linux-64";
-			else
+			} else {
 				OSPath = "linux-32";
-		} else
+			}
+		} else {
 			throw new RuntimeException("Unknown OS: " + os);
+		}
 
 		final String newLibraryPath = "./lib/jogl/native/" + OSPath;
 		System.setProperty("java.library.path", newLibraryPath);
@@ -185,36 +197,39 @@ public class MainApplication {
 	public static void newActivation(final String[] args) {
 		System.out.println("newActivation()");
 
-		for (final String s : args)
+		for (final String s : args) {
 			System.out.println(s);
+		}
 
-		if (args.length > 0)
+		if (args.length > 0) {
 			try {
 				MainFrame.getInstance().open(args[0]);
 				MainFrame.getInstance().updateTitleBar();
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
+		}
 
 		showAndBringToFront();
 	}
 
 	public static void showAndBringToFront() {
 		System.out.println("showAndBringToFront");
-		if (!MainFrame.getInstance().isVisible())
+		if (!MainFrame.getInstance().isVisible()) {
 			MainFrame.getInstance().setVisible(true);
-		if (MainFrame.getInstance().getState() == Frame.ICONIFIED)
+		}
+		if (MainFrame.getInstance().getState() == Frame.ICONIFIED) {
 			MainFrame.getInstance().setState(Frame.NORMAL);
-
-		else if (Config.isMac())
+		} else if (Config.isMac()) {
 			Mac.bringToFront();
-		else
+		} else {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					MainFrame.getInstance().toFront();
 				}
 			});
+		}
 	}
 
 }

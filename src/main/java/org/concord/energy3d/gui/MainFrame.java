@@ -1435,6 +1435,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setMap(null, 1);
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}

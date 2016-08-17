@@ -2065,11 +2065,11 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
-						Scene.getInstance().setCellWiringForSolarPanelsOnFoundation(foundation, SolarPanel.HIGH_SHADE_TOLERANCE);
+						Scene.getInstance().setShadeToleranceForSolarPanelsOnFoundation(foundation, SolarPanel.HIGH_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
-						Scene.getInstance().setCellWiringForAllSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
+						Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();
@@ -2112,11 +2112,11 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
-						Scene.getInstance().setCellWiringForSolarPanelsOnFoundation(foundation, SolarPanel.PARTIAL_SHADE_TOLERANCE);
+						Scene.getInstance().setShadeToleranceForSolarPanelsOnFoundation(foundation, SolarPanel.PARTIAL_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
-						Scene.getInstance().setCellWiringForAllSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
+						Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();
@@ -2159,11 +2159,11 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
-						Scene.getInstance().setCellWiringForSolarPanelsOnFoundation(foundation, SolarPanel.NO_SHADE_TOLERANCE);
+						Scene.getInstance().setShadeToleranceForSolarPanelsOnFoundation(foundation, SolarPanel.NO_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
-						Scene.getInstance().setCellWiringForAllSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
+						Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();

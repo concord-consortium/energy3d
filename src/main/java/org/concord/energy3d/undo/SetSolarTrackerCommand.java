@@ -9,16 +9,21 @@ import org.concord.energy3d.model.SolarPanel;
 public class SetSolarTrackerCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private int oldValue, newValue;
-	private SolarPanel sp;
+	private final int oldValue;
+	private int newValue;
+	private final SolarPanel sp;
 
-	public SetSolarTrackerCommand(SolarPanel sp) {
+	public SetSolarTrackerCommand(final SolarPanel sp) {
 		this.sp = sp;
 		oldValue = sp.getTracker();
 	}
 
 	public SolarPanel getSolarPanel() {
 		return sp;
+	}
+
+	public int getOldValue() {
+		return oldValue;
 	}
 
 	@Override

@@ -22,6 +22,10 @@ public class SetShadeToleranceCommand extends AbstractUndoableEdit {
 		return sp;
 	}
 
+	public int getOldValue() {
+		return oldValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();

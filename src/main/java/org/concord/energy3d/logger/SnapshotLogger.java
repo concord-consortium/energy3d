@@ -27,11 +27,11 @@ public class SnapshotLogger {
 		return instance;
 	}
 
-	public void setNoteEdited(boolean b) {
+	public void setNoteEdited(final boolean b) {
 		noteEdited = b;
 	}
 
-	public void setSceneEdited(boolean b) {
+	public void setSceneEdited(final boolean b) {
 		sceneEdited = b;
 	}
 
@@ -46,6 +46,7 @@ public class SnapshotLogger {
 
 	public void start(final int period) {
 		final Thread t = new Thread("Snapshots Logger") {
+			@Override
 			public void run() {
 				while (true) {
 					try {
@@ -75,7 +76,7 @@ public class SnapshotLogger {
 	private static void saveSnapshot(final File dir) throws Exception {
 		final Date date = Calendar.getInstance().getTime();
 		final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss").format(date) + ".ng3";
-		Scene.save(new File(filename).toURI().toURL(), false, false);
+		Scene.save(new File(filename).toURI().toURL(), false, false, true);
 	}
 
 }

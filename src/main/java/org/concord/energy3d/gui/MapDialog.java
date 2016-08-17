@@ -107,6 +107,8 @@ public class MapDialog extends JDialog {
 						scale = (Math.pow(2, 20 - zoom));
 					}
 					Scene.getInstance().setMap(image, scale);
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().clearStoredMapImageData();
 					setVisible(false);
 				}
 			}
@@ -115,7 +117,6 @@ public class MapDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				Scene.getInstance().setMap(null, 1);
 				setVisible(false);
 			}
 		});

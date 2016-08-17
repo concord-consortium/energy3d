@@ -127,6 +127,8 @@ public class Scene implements Serializable {
 	private Image mapImage;
 	private double mapScale;
 	private byte[] mapImageBytes;
+	private transient byte[] storedMapImageBytes;
+	private transient Image storedMapImage;
 
 	public static enum Unit {
 		InternationalSystemOfUnits, USCustomaryUnits
@@ -635,13 +637,14 @@ public class Scene implements Serializable {
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile) throws Exception {
-		save(url, setAsCurrentFile, true);
+		save(url, setAsCurrentFile, true, false);
 	}
 
-	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager) throws Exception {
+	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) throws Exception {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
+				instance.storeMapImageData();
 				if (notifyUndoManager) {
 					instance.cleanup();
 				}
@@ -656,8 +659,6 @@ public class Scene implements Serializable {
 				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
 				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
-				// instance.solarStep = SolarRadiation.getInstance().getSolarStep();
-				// instance.timeStep = SolarRadiation.getInstance().getTimeStep();
 
 				if (setAsCurrentFile) {
 					Scene.url = url;
@@ -673,6 +674,7 @@ public class Scene implements Serializable {
 				if (notifyUndoManager) {
 					SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 				}
+				instance.restoreMapImageData();
 				System.out.println("done");
 				return null;
 			}
@@ -1817,7 +1819,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setCellWiringForSolarPanelsOnFoundation(final Foundation foundation, final int cellWiring) {
+	public void setShadeToleranceForSolarPanelsOnFoundation(final Foundation foundation, final int cellWiring) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
 				((SolarPanel) p).setShadeTolerance(cellWiring);
@@ -1825,7 +1827,7 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setCellWiringForAllSolarPanels(final int cellWiring) {
+	public void setShadeToleranceForAllSolarPanels(final int cellWiring) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setShadeTolerance(cellWiring);
@@ -2267,10 +2269,14 @@ public class Scene implements Serializable {
 
 	public void setMap(final Image mapImage, final double mapScale) {
 		this.mapImage = mapImage;
-		this.mapScale = mapScale;
-		final ByteBuffer byteBuffer = mapImage.getData().get(0);
-		this.mapImageBytes = new byte[byteBuffer.limit()];
-		byteBuffer.get(this.mapImageBytes);
+		if (mapImage != null) {
+			this.mapScale = mapScale;
+			final ByteBuffer byteBuffer = mapImage.getData().get(0);
+			mapImageBytes = new byte[byteBuffer.limit()];
+			byteBuffer.get(mapImageBytes);
+		} else {
+			mapImageBytes = null;
+		}
 		applyMap(false);
 	}
 
@@ -2303,4 +2309,37 @@ public class Scene implements Serializable {
 		}
 		SceneManager.getInstance().refresh();
 	}
+
+	/** used by SnapshotLogger */
+	private void storeMapImageData() {
+		if (mapImageBytes != null) {
+			storedMapImage = mapImage;
+			final int n = mapImageBytes.length;
+			if (storedMapImageBytes == null || storedMapImageBytes.length != n) {
+				storedMapImageBytes = new byte[n];
+			}
+			for (int i = 0; i < n; i++) {
+				storedMapImageBytes[i] = mapImageBytes[i];
+			}
+			setMap(null, 1);
+		}
+	}
+
+	/** used by SnapshotLogger */
+	private void restoreMapImageData() {
+		if (storedMapImageBytes != null) {
+			final int n = storedMapImageBytes.length;
+			mapImageBytes = new byte[n];
+			for (int i = 0; i < n; i++) {
+				mapImageBytes[i] = storedMapImageBytes[i];
+			}
+			setMap(storedMapImage, 1);
+		}
+	}
+
+	public void clearStoredMapImageData() {
+		storedMapImage = null;
+		storedMapImageBytes = null;
+	}
+
 }
