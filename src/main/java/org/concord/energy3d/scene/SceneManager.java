@@ -188,10 +188,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Node newImport;
 	private Vector3 houseMoveStartPoint;
 	private ArrayList<Vector3> houseMovePoints;
-	private TextureState daySky, nightSky;
-	private TextureState desertDay, desertNight;
-	private TextureState grasslandDay, grasslandNight;
-	private TextureState forestDay, forestNight;
 	private double refreshTime = -1;
 	private int refreshCount = 0;
 	private boolean mouseControlEnabled = true;
@@ -622,49 +618,42 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Mesh createSky() {
-		daySky = new TextureState();
-		daySky.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		nightSky = new TextureState();
-		nightSky.setTexture(TextureManager.load("nightsky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		desertDay = new TextureState();
-		desertDay.setTexture(TextureManager.load("desert.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		desertNight = new TextureState();
-		desertNight.setTexture(TextureManager.load("desert-night.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		grasslandDay = new TextureState();
-		grasslandDay.setTexture(TextureManager.load("grassland.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		grasslandNight = new TextureState();
-		grasslandNight.setTexture(TextureManager.load("grassland-night.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		forestDay = new TextureState();
-		forestDay.setTexture(TextureManager.load("forest.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-		forestNight = new TextureState();
-		forestNight.setTexture(TextureManager.load("forest-night.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 		final Dome sky = new Dome("Sky", 100, 100, SKY_RADIUS);
 		sky.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		sky.setRenderState(daySky);
 		sky.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		sky.getSceneHints().setAllPickingHints(false);
 		sky.updateModelBound();
 		sky.updateWorldBound(true);
+		new Thread() {
+			@Override
+			public void run() {
+				final TextureState ts = new TextureState();
+				ts.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+				sky.setRenderState(ts);
+			}
+		}.start();
 		return sky;
 	}
 
 	public void changeSkyTexture() {
 		if (sky != null) {
 			final boolean isNightTime = Heliodon.getInstance().isNightTime();
-			TextureState ts;
+			String textureFile;
 			switch (Scene.getInstance().getTheme()) {
 			case Scene.DESERT_THEME:
-				ts = isNightTime ? desertNight : desertDay;
+				textureFile = isNightTime ? "desert-night.jpg" : "desert.jpg";
 				break;
 			case Scene.GRASSLAND_THEME:
-				ts = isNightTime ? grasslandNight : grasslandDay;
+				textureFile = isNightTime ? "grassland-night.jpg" : "grassland.jpg";
 				break;
 			case Scene.FOREST_THEME:
-				ts = isNightTime ? forestNight : forestDay;
+				textureFile = isNightTime ? "forest-night.jpg" : "forest.jpg";
 				break;
 			default:
-				ts = isNightTime ? nightSky : daySky;
+				textureFile = isNightTime ? "nightsky.jpg" : "daysky.jpg";
 			}
+			final TextureState ts = new TextureState();
+			ts.setTexture(TextureManager.load(textureFile, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
 			sky.setRenderState(ts);
 		}
 	}
