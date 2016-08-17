@@ -645,7 +645,9 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				instance.storeMapImageData();
+				if (logger) {
+					instance.storeMapImageData();
+				}
 				if (notifyUndoManager) {
 					instance.cleanup();
 				}
@@ -675,7 +677,9 @@ public class Scene implements Serializable {
 				if (notifyUndoManager) {
 					SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 				}
-				instance.restoreMapImageData();
+				if (logger) {
+					instance.restoreMapImageData();
+				}
 				System.out.println("done");
 				return null;
 			}
