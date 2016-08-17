@@ -108,10 +108,6 @@ public class Scene implements Serializable {
 	private boolean hideLightBeams;
 	private boolean showSunAngles;
 	private boolean showBuildingLabels;
-	private double solarStep = 2.0;
-	private int timeStep = 15; // in minutes
-	private int plateNx = 2; // number of grid cells in x direction for a plate
-	private int plateNy = 2; // number of grid cells in y direction for a plate
 	private boolean cleanup = false;
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
@@ -130,6 +126,20 @@ public class Scene implements Serializable {
 	private transient Image storedMapImage;
 	private transient double storedMapScale;
 	private transient byte[] storedMapImageBytes;
+
+	/* the following parameters specify the resolution of discretization for a simulation */
+
+	// increment of time in minutes
+	private int timeStep = 15;
+
+	// number of points in x and y directions when a plate (e.g., mirrors and solar panels) is discretized into a grid
+	// used in both radiation calculation and heat map visualization for mirrors
+	// used in heat map visualization for solar panels (for radiation calculation, solar panels use the underlying solar cell layout, e.g., 6x10, as the discretization)
+	// to meet the need of texture, these numbers must be power of 2
+	private int plateNx = 4, plateNy = 4;
+
+	// the step length of the discretized grid on any part that is not a plate
+	private double solarStep = 2.0;
 
 	public static enum Unit {
 		InternationalSystemOfUnits, USCustomaryUnits
@@ -374,10 +384,10 @@ public class Scene implements Serializable {
 			timeStep = 15;
 		}
 		if (Util.isZero(plateNx)) {
-			plateNx = 2;
+			plateNx = 4;
 		}
 		if (Util.isZero(plateNy)) {
-			plateNy = 2;
+			plateNy = 4;
 		}
 		if (Util.isZero(solarContrast)) {
 			solarContrast = 50;

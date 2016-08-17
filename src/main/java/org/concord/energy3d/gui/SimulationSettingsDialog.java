@@ -48,7 +48,7 @@ class SimulationSettingsDialog extends JDialog {
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
-		ActionListener okListener = new ActionListener() {
+		final ActionListener okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				double cellSize;
@@ -100,38 +100,38 @@ class SimulationSettingsDialog extends JDialog {
 			}
 		};
 
-		// set number of grid cells for a plate
-		panel.add(new JLabel("# Grid Cells in X-Direction: "));
+		// set number of grid points for a plate
+		panel.add(new JLabel("# Grid Points in X-Direction: "));
 		panel.add(plateNxTextField);
 		plateNxTextField.setColumns(6);
-		panel.add(new JLabel("For panels (must be power of 2)"));
+		panel.add(new JLabel("<html><font size=2>For mirrors and solar panels<br>(must be power of 2)</font></html>"));
 
-		// set number of grid cells for a plate
-		panel.add(new JLabel("# Grid Cells in Y-Direction: "));
+		// set number of grid points for a plate
+		panel.add(new JLabel("# Grid Points in Y-Direction: "));
 		panel.add(plateNyTextField);
-		panel.add(new JLabel("For panels (must be power of 2)"));
+		panel.add(new JLabel("<html><font size=2>For mirrors and solar panels<br>(must be power of 2)</font></html>"));
 
 		// set the grid size ("solar step")
 		panel.add(new JLabel("Radiation Grid Cell Size: "));
 		panel.add(cellSizeTextField);
-		panel.add(new JLabel("For non-panels (internal unit)"));
+		panel.add(new JLabel("<html><font size=2>For non-mirrors and non-solar panels<br>(internal unit)</font></html>"));
 
 		// set the heat arrow length
 		panel.add(new JLabel("Heat Arrow Length: "));
 		panel.add(heatVectorLengthTextField);
-		panel.add(new JLabel("Internal unit"));
+		panel.add(new JLabel("<html><font size=2>Internal unit</font></html>"));
 
 		// set the time step
 		panel.add(new JLabel("Time Step: "));
 		panel.add(timeStepTextField);
 		timeStepTextField.setColumns(6);
-		panel.add(new JLabel("Minutes"));
+		panel.add(new JLabel("<html><font size=2>Minutes</font></html>"));
 
 		// choose air mass
 		panel.add(new JLabel("Air Mass: "));
 		airMassComboBox.setSelectedIndex(SolarRadiation.getInstance().getAirMassSelection() + 1);
 		panel.add(airMassComboBox);
-		panel.add(new JLabel("Dimensionless"));
+		panel.add(new JLabel("<html><font size=2>Dimensionless</font></html>"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
