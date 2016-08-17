@@ -127,8 +127,9 @@ public class Scene implements Serializable {
 	private Image mapImage;
 	private double mapScale;
 	private byte[] mapImageBytes;
-	private transient byte[] storedMapImageBytes;
 	private transient Image storedMapImage;
+	private transient double storedMapScale;
+	private transient byte[] storedMapImageBytes;
 
 	public static enum Unit {
 		InternationalSystemOfUnits, USCustomaryUnits
@@ -2314,6 +2315,7 @@ public class Scene implements Serializable {
 	private void storeMapImageData() {
 		if (mapImageBytes != null) {
 			storedMapImage = mapImage;
+			storedMapScale = mapScale;
 			final int n = mapImageBytes.length;
 			if (storedMapImageBytes == null || storedMapImageBytes.length != n) {
 				storedMapImageBytes = new byte[n];
@@ -2333,13 +2335,8 @@ public class Scene implements Serializable {
 			for (int i = 0; i < n; i++) {
 				mapImageBytes[i] = storedMapImageBytes[i];
 			}
-			setMap(storedMapImage, 1);
+			setMap(storedMapImage, storedMapScale);
 		}
-	}
-
-	public void clearStoredMapImageData() {
-		storedMapImage = null;
-		storedMapImageBytes = null;
 	}
 
 }

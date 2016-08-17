@@ -108,7 +108,6 @@ public class MapDialog extends JDialog {
 					}
 					Scene.getInstance().setMap(image, scale);
 					Scene.getInstance().setEdited(true);
-					Scene.getInstance().clearStoredMapImageData();
 					setVisible(false);
 				}
 			}
