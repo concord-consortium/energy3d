@@ -2287,8 +2287,10 @@ public class Scene implements Serializable {
 		if (mapImage != null) {
 			this.mapScale = mapScale;
 			final ByteBuffer byteBuffer = mapImage.getData().get(0);
-			mapImageBytes = new byte[byteBuffer.limit()];
-			byteBuffer.get(mapImageBytes);
+			if (byteBuffer != null) {
+				mapImageBytes = new byte[byteBuffer.limit()];
+				byteBuffer.get(mapImageBytes);
+			}
 		} else {
 			mapImageBytes = null;
 		}

@@ -184,6 +184,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem roofDashedLineMenuItem;
 	private JCheckBoxMenuItem buildingLabelsMenuItem;
+	private JCheckBoxMenuItem showSolarLandMenuItem;
 	private JMenuItem exitMenuItem;
 	private JMenu helpMenu;
 	private JMenuItem aboutMenuItem;
@@ -1253,7 +1254,7 @@ public class MainFrame extends JFrame {
 			});
 			addModel(tutorialsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
 			addModel(tutorialsMenu, "Solar Box", "tutorials/solar-box.ng3");
-			addModel(tutorialsMenu, "Solar Heat Map", "tutorials/solar-heat-map.ng3");
+			addModel(tutorialsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
 			addModel(tutorialsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
 			addModel(tutorialsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 			addModel(tutorialsMenu, "Photovoltaic Solar Farm (Fixed Arrays)", "tutorials/pv-fixed-arrays.ng3");
@@ -1285,6 +1286,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
+					Util.selectSilently(showSolarLandMenuItem, SceneManager.getInstance().getSolarLand().isVisible());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					MainPanel.getInstance().defaultTool();
@@ -1314,6 +1316,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getShadowMenuItem());
 			viewMenu.add(getSunAnglesMenuItem());
 			viewMenu.add(getLightBeamsMenuItem());
+			viewMenu.add(getShowSolarLandMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getRoofDashedLineMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
@@ -1493,6 +1496,23 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return lightBeamsMenuItem;
+	}
+
+	private JCheckBoxMenuItem getShowSolarLandMenuItem() {
+		if (showSolarLandMenuItem == null) {
+			showSolarLandMenuItem = new JCheckBoxMenuItem("Solar Irradiance Heat Map on Land");
+			showSolarLandMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					// final ShowAxesCommand c = new ShowAxesCommand();
+					SceneManager.getInstance().getSolarLand().setVisible(showSolarLandMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAll();
+					// SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+		}
+		return showSolarLandMenuItem;
 	}
 
 	private JCheckBoxMenuItem getBuildingLabelsMenuItem() {
@@ -1987,7 +2007,7 @@ public class MainFrame extends JFrame {
 
 	private JCheckBoxMenuItem getSolarRadiationHeatMapMenuItem() {
 		if (solarRadiationHeatMapMenuItem == null) {
-			solarRadiationHeatMapMenuItem = new JCheckBoxMenuItem("Solar Heat Map");
+			solarRadiationHeatMapMenuItem = new JCheckBoxMenuItem("Solar Irradiance Heat Map");
 			solarRadiationHeatMapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
