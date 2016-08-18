@@ -1256,6 +1256,9 @@ public class MainFrame extends JFrame {
 			addModel(tutorialsMenu, "Solar Heat Map", "tutorials/solar-heat-map.ng3");
 			addModel(tutorialsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
 			addModel(tutorialsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
+			addModel(tutorialsMenu, "Photovoltaic Solar Farm (Fixed Arrays)", "tutorials/pv-fixed-arrays.ng3");
+			addModel(tutorialsMenu, "Photovoltaic Solar Farm (HSAT Arrays)", "tutorials/pv-hsat-arrays.ng3");
+			addModel(tutorialsMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
 		}
 		return tutorialsMenu;
 	}
