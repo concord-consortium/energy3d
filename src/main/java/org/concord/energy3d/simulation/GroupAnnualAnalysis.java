@@ -46,6 +46,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
@@ -63,19 +64,19 @@ public class GroupAnnualAnalysis extends Analysis {
 
 	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
-	private List<HousePart> selectedParts;
+	private final List<HousePart> selectedParts;
 
-	public GroupAnnualAnalysis(List<Long> ids) {
+	public GroupAnnualAnalysis(final List<Long> ids) {
 		super();
 		selectedParts = new ArrayList<HousePart>();
-		for (Long i : ids) {
+		for (final Long i : ids) {
 			selectedParts.add(Scene.getInstance().getPart(i));
 		}
 		double i = 0;
-		double n = selectedParts.size();
-		for (HousePart p : selectedParts) {
-			int a = (int) ((n - i) / n * 128);
-			int b = 255 - a;
+		final double n = selectedParts.size();
+		for (final HousePart p : selectedParts) {
+			final int a = (int) ((n - i) / n * 128);
+			final int b = 255 - a;
 			Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
 			Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
 			i++;
@@ -99,6 +100,7 @@ public class GroupAnnualAnalysis extends Analysis {
 						if (t != null) {
 							stopAnalysis();
 							EventQueue.invokeLater(new Runnable() {
+								@Override
 								public void run() {
 									Util.reportError(t);
 								}
@@ -114,37 +116,44 @@ public class GroupAnnualAnalysis extends Analysis {
 					}
 				});
 			}
+
 		});
 	}
 
 	@Override
 	public void updateGraph() {
-		for (HousePart p : selectedParts) {
+		for (final HousePart p : selectedParts) {
 			if (p instanceof Window) {
-				Window window = (Window) p;
+				final Window window = (Window) p;
 				final double solar = p.getSolarPotentialToday() * window.getSolarHeatGainCoefficient();
 				graph.addData("Solar " + p.getId(), solar);
 				final double[] loss = p.getHeatLoss();
 				double sum = 0;
-				for (final double x : loss)
+				for (final double x : loss) {
 					sum += x;
+				}
 				graph.addData("Heat Gain " + p.getId(), -sum);
 			} else if (p instanceof Wall || p instanceof Roof) {
 				final double[] loss = p.getHeatLoss();
 				double sum = 0;
-				for (final double x : loss)
+				for (final double x : loss) {
 					sum += x;
+				}
 				graph.addData("Heat Gain " + p.getId(), -sum);
 			} else if (p instanceof SolarPanel) {
 				final SolarPanel solarPanel = (SolarPanel) p;
 				final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
+				graph.addData("Solar " + p.getId(), solar);
+			} else if (p instanceof Mirror) {
+				final Mirror mirror = (Mirror) p;
+				final double solar = mirror.getSolarPotentialToday() * mirror.getReflectivity();
 				graph.addData("Solar " + p.getId(), solar);
 			}
 		}
 		graph.repaint();
 	}
 
-	public void show(String title) {
+	public void show(final String title) {
 
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), title, true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -160,17 +169,17 @@ public class GroupAnnualAnalysis extends Analysis {
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(menu);
@@ -179,8 +188,9 @@ public class GroupAnnualAnalysis extends Analysis {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to clear all the previous results\nrelated to the selected objects?", "Confirmation", JOptionPane.YES_NO_OPTION);
-				if (i != JOptionPane.YES_OPTION)
+				if (i != JOptionPane.YES_OPTION) {
 					return;
+				}
 				graph.clearRecords();
 				graph.repaint();
 				TimeSeriesLogger.getInstance().logClearGraphData(graph.getClass().getSimpleName());
@@ -198,7 +208,7 @@ public class GroupAnnualAnalysis extends Analysis {
 
 		miCopyImage.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				new ClipImage().copyImageToClipboard(graph);
 			}
 		});
@@ -207,16 +217,17 @@ public class GroupAnnualAnalysis extends Analysis {
 		final JMenu showTypeMenu = new JMenu("Types");
 		showTypeMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				showTypeMenu.removeAll();
 				final Set<String> dataNames = graph.getDataNames();
 				if (!dataNames.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
+						public void actionPerformed(final ActionEvent e) {
+							for (final String name : dataNames) {
 								graph.hideData(name, false);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", true);
 						}
@@ -225,9 +236,10 @@ public class GroupAnnualAnalysis extends Analysis {
 					mi = new JMenuItem("Hide All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
+						public void actionPerformed(final ActionEvent e) {
+							for (final String name : dataNames) {
 								graph.hideData(name, true);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", false);
 						}
@@ -250,11 +262,11 @@ public class GroupAnnualAnalysis extends Analysis {
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(showTypeMenu);
@@ -262,15 +274,16 @@ public class GroupAnnualAnalysis extends Analysis {
 		final JMenu showRunsMenu = new JMenu("Runs");
 		showRunsMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				showRunsMenu.removeAll();
 				if (!AnnualGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : AnnualGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : AnnualGraph.records) {
 								graph.hideRun(r.getID(), false);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", true);
 						}
@@ -279,19 +292,20 @@ public class GroupAnnualAnalysis extends Analysis {
 					mi = new JMenuItem("Hide All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : AnnualGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : AnnualGraph.records) {
 								graph.hideRun(r.getID(), true);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", false);
 						}
 					});
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
-					Map<String, Double> recordedResults = getRecordedResults("Net");
+					final Map<String, Double> recordedResults = getRecordedResults("Net");
 					for (final Results r : AnnualGraph.records) {
-						String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
-						Double result = recordedResults.get(key);
+						final String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
+						final Double result = recordedResults.get(key);
 						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key) * 365.0 / 12.0) + " kWh"), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
@@ -307,11 +321,11 @@ public class GroupAnnualAnalysis extends Analysis {
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(showRunsMenu);
@@ -338,18 +352,20 @@ public class GroupAnnualAnalysis extends Analysis {
 		});
 		buttonPanel.add(runButton);
 
-		JButton button = new JButton("Close");
+		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				stopAnalysis();
 				if (graph.hasData()) {
 					final Object[] options = { "Yes", "No", "Cancel" };
-					int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-					if (i == JOptionPane.CANCEL_OPTION)
+					final int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+					if (i == JOptionPane.CANCEL_OPTION) {
 						return;
-					if (i == JOptionPane.YES_OPTION)
+					}
+					if (i == JOptionPane.YES_OPTION) {
 						graph.keepResults();
+					}
 				}
 				windowLocation.setLocation(dialog.getLocationOnScreen());
 				dialog.dispose();
@@ -367,10 +383,11 @@ public class GroupAnnualAnalysis extends Analysis {
 		});
 
 		dialog.pack();
-		if (windowLocation.x > 0 && windowLocation.y > 0)
+		if (windowLocation.x > 0 && windowLocation.y > 0) {
 			dialog.setLocation(windowLocation);
-		else
+		} else {
 			dialog.setLocationRelativeTo(MainFrame.getInstance());
+		}
 		dialog.setVisible(true);
 
 	}
@@ -378,11 +395,14 @@ public class GroupAnnualAnalysis extends Analysis {
 	@Override
 	public String toJson() {
 		String type = "Unknown";
-		ArrayList<String> names = new ArrayList<String>();
-		for (HousePart p : selectedParts) {
+		final ArrayList<String> names = new ArrayList<String>();
+		for (final HousePart p : selectedParts) {
 			if (p instanceof SolarPanel) {
 				names.add("Solar " + p.getId());
 				type = "Solar Panel";
+			} else if (p instanceof Mirror) {
+				names.add("Solar " + p.getId());
+				type = "Mirror";
 			} else if (p instanceof Wall) {
 				names.add("Heat Gain " + p.getId());
 				type = "Wall";
@@ -399,13 +419,14 @@ public class GroupAnnualAnalysis extends Analysis {
 			}
 		}
 		String s = "{\"Type\": \"" + type + "\", \"Months\": " + getNumberOfDataPoints();
-		for (String name : names) {
-			List<Double> data = graph.getData(name);
-			if (data == null)
+		for (final String name : names) {
+			final List<Double> data = graph.getData(name);
+			if (data == null) {
 				continue;
+			}
 			s += ", \"" + name + "\": {";
 			s += "\"Monthly\": [";
-			for (Double x : data) {
+			for (final Double x : data) {
 				s += Graph.ENERGY_FORMAT.format(x) + ",";
 			}
 			s = s.substring(0, s.length() - 1);

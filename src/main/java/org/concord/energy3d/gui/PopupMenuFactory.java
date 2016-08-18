@@ -60,6 +60,8 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
+import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -1094,11 +1096,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Window) {
+						new EnergyDailyAnalysis().show("Daily Energy for Window");
 					}
-					new EnergyDailyAnalysis().show("Daily Energy for Window");
 				}
 			});
 			popupMenuForWindow.add(mi);
@@ -1107,11 +1107,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Window)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Window) {
+						new EnergyAnnualAnalysis().show("Annual Energy for Window");
 					}
-					new EnergyAnnualAnalysis().show("Annual Energy for Window");
 				}
 			});
 			popupMenuForWindow.add(mi);
@@ -1356,11 +1354,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Wall)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Wall) {
+						new EnergyDailyAnalysis().show("Daily Energy for Wall");
 					}
-					new EnergyDailyAnalysis().show("Daily Energy for Wall");
 				}
 			});
 			popupMenuForWall.add(mi);
@@ -1369,11 +1365,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Wall)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Wall) {
+						new EnergyAnnualAnalysis().show("Annual Energy for Wall");
 					}
-					new EnergyAnnualAnalysis().show("Annual Energy for Wall");
 				}
 			});
 			popupMenuForWall.add(mi);
@@ -1483,11 +1477,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Roof)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Roof) {
+						new EnergyDailyAnalysis().show("Daily Energy for Roof");
 					}
-					new EnergyDailyAnalysis().show("Daily Energy for Roof");
 				}
 			});
 			popupMenuForRoof.add(mi);
@@ -1496,11 +1488,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Roof)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Roof) {
+						new EnergyAnnualAnalysis().show("Annual Energy for Roof");
 					}
-					new EnergyAnnualAnalysis().show("Annual Energy for Roof");
 				}
 			});
 			popupMenuForRoof.add(mi);
@@ -1525,11 +1515,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Door)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Door) {
+						new EnergyDailyAnalysis().show("Daily Energy for Door");
 					}
-					new EnergyDailyAnalysis().show("Daily Energy for Door");
 				}
 			});
 			popupMenuForDoor.add(mi);
@@ -1538,11 +1526,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Door)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Door) {
+						new EnergyAnnualAnalysis().show("Annual Energy for Door");
 					}
-					new EnergyAnnualAnalysis().show("Annual Energy for Door");
 				}
 			});
 			popupMenuForDoor.add(mi);
@@ -2033,15 +2019,13 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
+						final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							analysis.updateGraph();
+						}
+						analysis.show("Daily Energy");
 					}
-					final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						analysis.updateGraph();
-					}
-					analysis.show("Daily Energy");
 				}
 			});
 			analysisMenu.add(mi);
@@ -2050,11 +2034,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
+						new EnergyAnnualAnalysis().show("Annual Energy");
 					}
-					new EnergyAnnualAnalysis().show("Annual Energy");
 				}
 			});
 			analysisMenu.add(mi);
@@ -2064,20 +2046,18 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
+						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
+						if (f.countParts(SolarPanel.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						final PvDailyAnalysis a = new PvDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
 					}
-					final Foundation foundation = (Foundation) selectedPart;
-					if (foundation.countParts(SolarPanel.class) <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final PvDailyAnalysis a = new PvDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						a.updateGraph();
-					}
-					a.show();
 				}
 			});
 			analysisMenu.add(mi);
@@ -2087,19 +2067,56 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Foundation)) {
-						return;
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						if (f.countParts(SolarPanel.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						final PvAnnualAnalysis a = new PvAnnualAnalysis();
+						if (f.getUtilityBill() != null) {
+							a.setUtilityBill(f.getUtilityBill());
+						}
+						a.show();
 					}
-					final Foundation foundation = (Foundation) selectedPart;
-					if (foundation.countParts(SolarPanel.class) <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+				}
+			});
+			analysisMenu.add(mi);
+			analysisMenu.addSeparator();
+
+			mi = new JMenuItem("Daily Mirror Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
+						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
+						if (f.countParts(Mirror.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
 					}
-					final PvAnnualAnalysis a = new PvAnnualAnalysis();
-					if (foundation.getUtilityBill() != null) {
-						a.setUtilityBill(foundation.getUtilityBill());
+				}
+			});
+			analysisMenu.add(mi);
+
+			mi = new JMenuItem("Annual Mirror Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						if (f.countParts(Mirror.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						new MirrorAnnualAnalysis().show();
 					}
-					a.show();
 				}
 			});
 			analysisMenu.add(mi);
@@ -3022,11 +3039,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof SolarPanel) {
+						new PvDailyAnalysis().show();
 					}
-					new PvDailyAnalysis().show();
 				}
 			});
 			popupMenuForSolarPanel.add(mi);
@@ -3035,11 +3050,9 @@ public class PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel)) {
-						return;
+					if (SceneManager.getInstance().getSelectedPart() instanceof SolarPanel) {
+						new PvAnnualAnalysis().show();
 					}
-					new PvAnnualAnalysis().show();
 				}
 			});
 			popupMenuForSolarPanel.add(mi);
@@ -3522,6 +3535,29 @@ public class PopupMenuFactory {
 			popupMenuForMirror.add(miSize);
 			popupMenuForMirror.add(miBaseHeight);
 			popupMenuForMirror.add(miReflectivity);
+			popupMenuForMirror.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Mirror) {
+						new MirrorDailyAnalysis().show();
+					}
+				}
+			});
+			popupMenuForMirror.add(mi);
+
+			mi = new JMenuItem("Annual Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Mirror) {
+						new MirrorAnnualAnalysis().show();
+					}
+				}
+			});
+			popupMenuForMirror.add(mi);
 
 		}
 

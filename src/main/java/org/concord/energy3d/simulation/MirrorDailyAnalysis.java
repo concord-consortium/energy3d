@@ -58,6 +58,7 @@ public class MirrorDailyAnalysis extends Analysis {
 				final Throwable t = compute();
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							Util.reportError(t);
 						}
@@ -67,17 +68,17 @@ public class MirrorDailyAnalysis extends Analysis {
 					@Override
 					public void run() {
 						onCompletion();
-						String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
+						final String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
 						String previousRuns = "";
-						Map<String, Double> recordedResults = getRecordedResults("Solar");
-						int n = recordedResults.size();
+						final Map<String, Double> recordedResults = getRecordedResults("Solar");
+						final int n = recordedResults.size();
 						if (n > 0) {
-							Object[] keys = recordedResults.keySet().toArray();
+							final Object[] keys = recordedResults.keySet().toArray();
 							for (int i = n - 1; i >= 0; i--) {
 								previousRuns += keys[i] + " : " + Graph.TWO_DECIMALS.format(recordedResults.get(keys[i])) + " kWh<br>";
 							}
 						}
-						JOptionPane.showMessageDialog(parent, "<html>The calculated daily output is <b>" + current + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Solar Panel Output", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(parent, "<html>The calculated daily output is <b>" + current + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Output", JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
 			}
@@ -95,7 +96,7 @@ public class MirrorDailyAnalysis extends Analysis {
 					graph.addData("Solar", m.getSolarPotentialNow() * m.getReflectivity());
 				} else if (selectedPart instanceof Foundation) {
 					double output = 0;
-					for (HousePart p : Scene.getInstance().getParts()) {
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Mirror && p.getTopContainer() == selectedPart) {
 							final Mirror m = (Mirror) p;
 							output += m.getSolarPotentialNow() * m.getReflectivity();
@@ -104,7 +105,7 @@ public class MirrorDailyAnalysis extends Analysis {
 					graph.addData("Solar", output);
 				} else if (selectedPart.getTopContainer() instanceof Foundation) {
 					double output = 0;
-					for (HousePart p : Scene.getInstance().getParts()) {
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Mirror && p.getTopContainer() == selectedPart.getTopContainer()) {
 							final Mirror m = (Mirror) p;
 							output += m.getSolarPotentialNow() * m.getReflectivity();
@@ -114,7 +115,7 @@ public class MirrorDailyAnalysis extends Analysis {
 				}
 			} else {
 				double output = 0;
-				for (HousePart p : Scene.getInstance().getParts()) {
+				for (final HousePart p : Scene.getInstance().getParts()) {
 					if (p instanceof Mirror) {
 						final Mirror m = (Mirror) p;
 						output += m.getSolarPotentialNow() * m.getReflectivity();
@@ -128,7 +129,7 @@ public class MirrorDailyAnalysis extends Analysis {
 
 	public void show() {
 
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
 		String title = "Daily Yield of All Mirrors";
@@ -155,17 +156,17 @@ public class MirrorDailyAnalysis extends Analysis {
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(menu);
@@ -174,8 +175,9 @@ public class MirrorDailyAnalysis extends Analysis {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to clear all the previous results\nrelated to the selected object?", "Confirmation", JOptionPane.YES_NO_OPTION);
-				if (i != JOptionPane.YES_OPTION)
+				if (i != JOptionPane.YES_OPTION) {
 					return;
+				}
 				graph.clearRecords();
 				graph.repaint();
 				TimeSeriesLogger.getInstance().logClearGraphData(graph.getClass().getSimpleName());
@@ -193,7 +195,7 @@ public class MirrorDailyAnalysis extends Analysis {
 
 		miCopyImage.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				new ClipImage().copyImageToClipboard(graph);
 			}
 		});
@@ -202,15 +204,16 @@ public class MirrorDailyAnalysis extends Analysis {
 		final JMenu showRunsMenu = new JMenu("Runs");
 		showRunsMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				showRunsMenu.removeAll();
 				if (!DailyGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : DailyGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : DailyGraph.records) {
 								graph.hideRun(r.getID(), false);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", true);
 						}
@@ -219,19 +222,20 @@ public class MirrorDailyAnalysis extends Analysis {
 					mi = new JMenuItem("Hide All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : DailyGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : DailyGraph.records) {
 								graph.hideRun(r.getID(), true);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", false);
 						}
 					});
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
-					Map<String, Double> recordedResults = getRecordedResults("Net");
+					final Map<String, Double> recordedResults = getRecordedResults("Net");
 					for (final Results r : DailyGraph.records) {
-						String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
-						Double result = recordedResults.get(key);
+						final String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
+						final Double result = recordedResults.get(key);
 						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key)) + " kWh"), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
@@ -247,11 +251,11 @@ public class MirrorDailyAnalysis extends Analysis {
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(showRunsMenu);
@@ -278,18 +282,20 @@ public class MirrorDailyAnalysis extends Analysis {
 		});
 		buttonPanel.add(runButton);
 
-		JButton button = new JButton("Close");
+		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				stopAnalysis();
 				if (graph.hasData()) {
 					final Object[] options = { "Yes", "No", "Cancel" };
-					int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-					if (i == JOptionPane.CANCEL_OPTION)
+					final int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+					if (i == JOptionPane.CANCEL_OPTION) {
 						return;
-					if (i == JOptionPane.YES_OPTION)
+					}
+					if (i == JOptionPane.YES_OPTION) {
 						graph.keepResults();
+					}
 				}
 				windowLocation.setLocation(dialog.getLocationOnScreen());
 				dialog.dispose();
@@ -307,10 +313,11 @@ public class MirrorDailyAnalysis extends Analysis {
 		});
 
 		dialog.pack();
-		if (windowLocation.x > 0 && windowLocation.y > 0)
+		if (windowLocation.x > 0 && windowLocation.y > 0) {
 			dialog.setLocation(windowLocation);
-		else
+		} else {
 			dialog.setLocationRelativeTo(MainFrame.getInstance());
+		}
 		dialog.setVisible(true);
 
 	}
@@ -330,11 +337,11 @@ public class MirrorDailyAnalysis extends Analysis {
 		} else {
 			s += "\"Mirror\": \"All\"";
 		}
-		String name = "Solar";
-		List<Double> data = graph.getData(name);
+		final String name = "Solar";
+		final List<Double> data = graph.getData(name);
 		s += ", \"" + name + "\": {";
 		s += "\"Hourly\": [";
-		for (Double x : data) {
+		for (final Double x : data) {
 			s += Graph.FIVE_DECIMALS.format(x) + ",";
 		}
 		s = s.substring(0, s.length() - 1);
