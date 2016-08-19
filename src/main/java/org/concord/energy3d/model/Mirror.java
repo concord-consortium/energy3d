@@ -6,8 +6,8 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
@@ -35,7 +35,7 @@ public class Mirror extends HousePart {
 	private transient Box surround;
 	private transient Line lightBeams;
 	private transient Cylinder post;
-	private double reflectivity = 0.75; // a number in (0, 1)
+	private double reflectivity = 0.82; // a number in (0, 1), iron glass has a reflectivity of 0.9, but dirt reduces it to 0.82
 	private double mirrorWidth = 2;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
@@ -54,14 +54,18 @@ public class Mirror extends HousePart {
 	protected void init() {
 		super.init();
 
-		if (Util.isZero(mirrorWidth))
+		if (Util.isZero(mirrorWidth)) {
 			mirrorWidth = 2;
-		if (Util.isZero(mirrorHeight))
+		}
+		if (Util.isZero(mirrorHeight)) {
 			mirrorHeight = 3;
-		if (Util.isZero(reflectivity))
+		}
+		if (Util.isZero(reflectivity)) {
 			reflectivity = 0.75;
-		if (Util.isZero(baseHeight))
+		}
+		if (Util.isZero(baseHeight)) {
 			baseHeight = 10;
+		}
 
 		mesh = new Mesh("Reflecting Mirror");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -143,14 +147,16 @@ public class Mirror extends HousePart {
 			Vector3.releaseTempInstance(p);
 		}
 		/* remove remaining edit shapes */
-		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++)
+		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++) {
 			pointsRoot.detachChildAt(points.size());
+		}
 	}
 
 	@Override
 	protected void drawMesh() {
-		if (container == null)
+		if (container == null) {
 			return;
+		}
 
 		normal = computeNormalAndKeepOnRoof();
 		updateEditShapes();
@@ -195,12 +201,12 @@ public class Mirror extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		Vector3 a = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 a = getAbsPoint(0).addLocal(0, 0, baseHeight);
 
 		if (heliostatTarget == null) {
 			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
 		} else {
-			ReadOnlyVector3 o = heliostatTarget.getTankCenter();
+			final ReadOnlyVector3 o = heliostatTarget.getTankCenter();
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
@@ -222,17 +228,18 @@ public class Mirror extends HousePart {
 	}
 
 	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
-	private void setNormal(double angle, double azimuth) {
-		Foundation foundation = getTopContainer();
+	private void setNormal(final double angle, final double azimuth) {
+		final Foundation foundation = getTopContainer();
 		Vector3 v = foundation.getAbsPoint(0);
-		Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
-		Vector3 vy = foundation.getAbsPoint(1).subtractLocal(v); // y direction
-		Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
-		Vector3 v1 = m.applyPost(vx, null);
-		Vector3 v2 = m.applyPost(vy, null);
+		final Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
+		final Vector3 vy = foundation.getAbsPoint(1).subtractLocal(v); // y direction
+		final Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
+		final Vector3 v1 = m.applyPost(vx, null);
+		final Vector3 v2 = m.applyPost(vy, null);
 		v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
-		if (v.getZ() < 0)
+		if (v.getZ() < 0) {
 			v.negateLocal();
+		}
 		normal = v.normalizeLocal();
 	}
 
@@ -243,21 +250,22 @@ public class Mirror extends HousePart {
 		}
 		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
 		double length = 100;
-		if (heliostatTarget != null)
+		if (heliostatTarget != null) {
 			length = heliostatTarget.getTankCenter().distance(o);
+		}
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-		FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
+		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 
 		if (drawSunBeam) {
-			Vector3 r = new Vector3(o);
+			final Vector3 r = new Vector3(o);
 			r.addLocal(sunLocation.multiply(5000, null));
 			beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 			beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 		}
 
-		Vector3 s = sunLocation.multiplyLocal(length);
-		Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
+		final Vector3 s = sunLocation.multiplyLocal(length);
+		final Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
 		p.addLocal(o);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
@@ -276,10 +284,12 @@ public class Mirror extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		if (container == null)
+		if (container == null) {
 			return true;
-		if (mesh.getWorldBound() == null)
+		}
+		if (mesh.getWorldBound() == null) {
 			return true;
+		}
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
 		bound.setExtent(bound.getExtent().divide(1.1, null).addLocal(0, 0, 1));
 		for (final HousePart child : container.getChildren()) {
@@ -340,16 +350,17 @@ public class Mirror extends HousePart {
 	}
 
 	private double overlap() {
-		double w1 = mirrorWidth / Scene.getInstance().getAnnotationScale();
+		final double w1 = mirrorWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getContainer() == container && p != this) {
 				if (p instanceof Mirror) {
-					Mirror s2 = (Mirror) p;
-					double w2 = s2.mirrorWidth / Scene.getInstance().getAnnotationScale();
-					double distance = p.getAbsCenter().distance(center);
-					if (distance < (w1 + w2) * 0.499)
+					final Mirror s2 = (Mirror) p;
+					final double w2 = s2.mirrorWidth / Scene.getInstance().getAnnotationScale();
+					final double distance = p.getAbsCenter().distance(center);
+					if (distance < (w1 + w2) * 0.499) {
 						return distance;
+					}
 				}
 			}
 		}
@@ -362,26 +373,28 @@ public class Mirror extends HousePart {
 		if (check) {
 			normal = container.getNormal();
 			if (container instanceof Foundation) {
-				Vector3 p0 = container.getAbsPoint(0);
-				Vector3 p1 = container.getAbsPoint(1);
-				Vector3 p2 = container.getAbsPoint(2);
-				double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
-				Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
+				final Vector3 p0 = container.getAbsPoint(0);
+				final Vector3 p1 = container.getAbsPoint(1);
+				final Vector3 p2 = container.getAbsPoint(2);
+				final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
+				final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
 				final double length = (1 + layoutGap) * mirrorWidth / Scene.getInstance().getAnnotationScale();
 				final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
-				double tx = length / p0.distance(p2);
-				double ty = length / p0.distance(p1);
-				double lx = s * v.getX() * tx;
-				double ly = s * v.getY() * ty;
+				final double tx = length / p0.distance(p2);
+				final double ty = length / p0.distance(p1);
+				final double lx = s * v.getX() * tx;
+				final double ly = s * v.getY() * ty;
 				final double newX = points.get(0).getX() + lx;
-				if (newX > 1 - tx || newX < tx) // reject it if out of range
+				if (newX > 1 - tx || newX < tx) {
 					return null;
+				}
 				final double newY = points.get(0).getY() + ly;
-				if (newY > 1 - ty || newY < ty) // reject it if out of range
+				if (newY > 1 - ty || newY < ty) {
 					return null;
+				}
 				c.points.get(0).setX(newX);
 				c.points.get(0).setY(newY);
-				double o = c.overlap();
+				final double o = c.overlap();
 				if (o >= 0) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new mirror is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
@@ -401,7 +414,7 @@ public class Mirror extends HousePart {
 		return reflectivity;
 	}
 
-	public void setMirrorWidth(double mirrorWidth) {
+	public void setMirrorWidth(final double mirrorWidth) {
 		this.mirrorWidth = mirrorWidth;
 	}
 
@@ -409,7 +422,7 @@ public class Mirror extends HousePart {
 		return mirrorWidth;
 	}
 
-	public void setMirrorHeight(double mirrorHeight) {
+	public void setMirrorHeight(final double mirrorHeight) {
 		this.mirrorHeight = mirrorHeight;
 	}
 
@@ -417,7 +430,7 @@ public class Mirror extends HousePart {
 		return mirrorHeight;
 	}
 
-	public void setBaseHeight(double baseHeight) {
+	public void setBaseHeight(final double baseHeight) {
 		this.baseHeight = baseHeight;
 	}
 
@@ -426,10 +439,11 @@ public class Mirror extends HousePart {
 	}
 
 	public void setRelativeAzimuth(double relativeAzimuth) {
-		if (relativeAzimuth < 0)
+		if (relativeAzimuth < 0) {
 			relativeAzimuth += 360;
-		else if (relativeAzimuth > 360)
+		} else if (relativeAzimuth > 360) {
 			relativeAzimuth -= 360;
+		}
 		this.relativeAzimuth = relativeAzimuth;
 	}
 
@@ -437,7 +451,7 @@ public class Mirror extends HousePart {
 		return relativeAzimuth;
 	}
 
-	public void setTiltAngle(double tiltAngle) {
+	public void setTiltAngle(final double tiltAngle) {
 		this.tiltAngle = tiltAngle;
 	}
 
@@ -445,7 +459,7 @@ public class Mirror extends HousePart {
 		return tiltAngle;
 	}
 
-	public void setHeliostatTarget(Foundation heliostatTarget) {
+	public void setHeliostatTarget(final Foundation heliostatTarget) {
 		this.heliostatTarget = heliostatTarget;
 	}
 
@@ -453,7 +467,7 @@ public class Mirror extends HousePart {
 		return heliostatTarget;
 	}
 
-	public void setDrawSunBeam(boolean drawSunBeam) {
+	public void setDrawSunBeam(final boolean drawSunBeam) {
 		this.drawSunBeam = drawSunBeam;
 	}
 
@@ -465,8 +479,9 @@ public class Mirror extends HousePart {
 	public void delete() {
 		super.delete();
 		if (bloomRenderPass != null) {
-			if (bloomRenderPass.contains(lightBeams))
+			if (bloomRenderPass.contains(lightBeams)) {
 				bloomRenderPass.remove(lightBeams);
+			}
 		}
 	}
 

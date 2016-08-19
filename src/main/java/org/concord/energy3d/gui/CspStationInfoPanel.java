@@ -22,8 +22,8 @@ public class CspStationInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private JPanel countPanel, costPanel, reflectingAreaPanel;
-	private ColorBar countBar, costBar, reflectingAreaBar;
+	private final JPanel countPanel, costPanel, packingDensityPanel;
+	private final ColorBar countBar, costBar, packingDensityBar;
 
 	public CspStationInfoPanel() {
 
@@ -31,7 +31,7 @@ public class CspStationInfoPanel extends JPanel {
 
 		noDecimals.setMaximumFractionDigits(0);
 
-		JPanel container = new JPanel();
+		final JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		add(container, BorderLayout.NORTH);
 
@@ -51,16 +51,16 @@ public class CspStationInfoPanel extends JPanel {
 
 		// total solar panel area on the selected base
 
-		reflectingAreaPanel = new JPanel(new BorderLayout());
-		reflectingAreaPanel.setBorder(EnergyPanel.createTitledBorder("<html>Total reflecting area (m<sup>2</sup>)</html>", true));
-		container.add(reflectingAreaPanel);
-		reflectingAreaBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
-		reflectingAreaBar.setUnit("");
-		reflectingAreaBar.setVerticalLineRepresentation(false);
-		reflectingAreaBar.setDecimalDigits(2);
-		reflectingAreaBar.setToolTipText(reflectingAreaPanel.getToolTipText());
-		reflectingAreaBar.setPreferredSize(new Dimension(100, 16));
-		reflectingAreaPanel.add(reflectingAreaBar, BorderLayout.CENTER);
+		packingDensityPanel = new JPanel(new BorderLayout());
+		packingDensityPanel.setBorder(EnergyPanel.createTitledBorder("<html>Packing density (mirror area / field area)</html>", true));
+		container.add(packingDensityPanel);
+		packingDensityBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		packingDensityBar.setUnit("");
+		packingDensityBar.setVerticalLineRepresentation(false);
+		packingDensityBar.setDecimalDigits(2);
+		packingDensityBar.setToolTipText(packingDensityPanel.getToolTipText());
+		packingDensityBar.setPreferredSize(new Dimension(100, 16));
+		packingDensityPanel.add(packingDensityBar, BorderLayout.CENTER);
 
 		// mirror cost on the selected base
 
@@ -78,17 +78,17 @@ public class CspStationInfoPanel extends JPanel {
 
 	}
 
-	void update(Foundation foundation) {
-		List<Mirror> mirrors = foundation.getMirrors();
+	void update(final Foundation foundation) {
+		final List<Mirror> mirrors = foundation.getMirrors();
 		countBar.setValue(mirrors.size());
 		double cost = 0;
 		double reflectingArea = 0;
-		for (Mirror m : mirrors) {
+		for (final Mirror m : mirrors) {
 			cost += Cost.getInstance().getPartCost(m);
 			reflectingArea += m.getMirrorWidth() * m.getMirrorHeight();
 		}
 		costBar.setValue(Math.round(cost));
-		reflectingAreaBar.setValue((float) reflectingArea);
+		packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
 	}
 
 }

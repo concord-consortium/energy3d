@@ -181,8 +181,9 @@ public class EnergyPanel extends JPanel {
 						c0.setTime(lastDate);
 						final Calendar c1 = new GregorianCalendar();
 						c1.setTime(d);
-						if (c0.get(Calendar.MONTH) == c1.get(Calendar.MONTH) && c0.get(Calendar.DAY_OF_MONTH) == c1.get(Calendar.DAY_OF_MONTH))
+						if (c0.get(Calendar.MONTH) == c1.get(Calendar.MONTH) && c0.get(Calendar.DAY_OF_MONTH) == c1.get(Calendar.DAY_OF_MONTH)) {
 							return;
+						}
 					}
 					Scene.getInstance().setDate(d);
 					Heliodon.getInstance().setDate(d);
@@ -270,8 +271,9 @@ public class EnergyPanel extends JPanel {
 					c0.setTime(lastDate);
 					final Calendar c1 = new GregorianCalendar();
 					c1.setTime(d);
-					if (c0.get(Calendar.HOUR_OF_DAY) == c1.get(Calendar.HOUR_OF_DAY) && c0.get(Calendar.MINUTE) == c1.get(Calendar.MINUTE))
+					if (c0.get(Calendar.HOUR_OF_DAY) == c1.get(Calendar.HOUR_OF_DAY) && c0.get(Calendar.MINUTE) == c1.get(Calendar.MINUTE)) {
 						return;
+					}
 				}
 				Heliodon.getInstance().setTime(d);
 				Scene.getInstance().setDate(d);
@@ -290,8 +292,9 @@ public class EnergyPanel extends JPanel {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {
-							for (final HousePart part : Scene.getInstance().getParts())
+							for (final HousePart part : Scene.getInstance().getParts()) {
 								part.drawHeatFlux();
+							}
 							return null;
 						}
 					});
@@ -491,8 +494,9 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (selectedPart == null)
+				if (selectedPart == null) {
 					return;
+				}
 				Foundation foundation = null;
 				if (selectedPart instanceof Foundation) {
 					foundation = (Foundation) selectedPart;
@@ -574,12 +578,13 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void compute(final UpdateRadiation updateRadiation) {
-		if (!computeEnabled)
+		if (!computeEnabled) {
 			return;
+		}
 		updateWeatherData(); // TODO: There got to be a better way to do this
-		if (thread != null && thread.isAlive())
+		if (thread != null && thread.isAlive()) {
 			computeRequest = true;
-		else {
+		} else {
 			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			thread = new Thread("Energy Computation") {
 				@Override
@@ -596,10 +601,12 @@ public class EnergyPanel extends JPanel {
 								if (!cancel) {
 									SceneManager.getInstance().getSolarLand().setVisible(true);
 									SceneManager.getInstance().refresh();
-								} else if (!autoRecomputeEnergy)
+								} else if (!autoRecomputeEnergy) {
 									turnOffCompute();
-							} else
+								}
+							} else {
 								turnOffCompute();
+							}
 						} catch (final Throwable e) {
 							e.printStackTrace();
 							Util.reportError(e);
@@ -657,8 +664,9 @@ public class EnergyPanel extends JPanel {
 
 			synchronized (SceneManager.getInstance()) {
 				final int timeStep = Scene.getInstance().getTimeStep();
-				for (final HousePart part : Scene.getInstance().getParts())
+				for (final HousePart part : Scene.getInstance().getParts()) {
 					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
+				}
 				SolarRadiation.getInstance().compute();
 				final Calendar c = (Calendar) Heliodon.getInstance().getCalendar().clone();
 				HeatLoad.getInstance().computeEnergyToday(c);
@@ -833,10 +841,12 @@ public class EnergyPanel extends JPanel {
 							partProperty3Label.setText("  Position:");
 							final double l = v.length();
 							double a = 90 + Math.toDegrees(Math.asin(-v.getY() / l));
-							if (v.getX() < 0)
+							if (v.getX() < 0) {
 								a = 360 - a;
-							if (Util.isZero(a - 360)) // reset 360 to 0
+							}
+							if (Util.isZero(a - 360)) {
 								a = 0;
+							}
 							partProperty1TextField.setText(oneDecimal.format(tree.getWidth() * scale) + " m");
 							partProperty2TextField.setText(oneDecimal.format(tree.getHeight() * scale) + " m");
 							partProperty3TextField.setText("(" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ") m or (" + oneDecimal.format(l * scale) + " m, " + oneDecimal.format(a) + "\u00B0)");
@@ -867,8 +877,9 @@ public class EnergyPanel extends JPanel {
 				if (sp.isDrawable()) {
 					final Foundation f = sp.getTopContainer();
 					double a = sp.getRelativeAzimuth() + f.getAzimuth();
-					if (a >= 360)
+					if (a >= 360) {
 						a -= 360;
+					}
 					final double az = a;
 					final boolean flat = (sp.getContainer() instanceof Roof && Util.isZero(sp.getContainer().getHeight())) || (sp.getContainer() instanceof Foundation);
 					EventQueue.invokeLater(new Runnable() {
@@ -911,8 +922,9 @@ public class EnergyPanel extends JPanel {
 				if (m.isDrawable()) {
 					final Foundation f = m.getTopContainer();
 					double a = m.getRelativeAzimuth() + f.getAzimuth();
-					if (a >= 360)
+					if (a >= 360) {
 						a -= 360;
+					}
 					final double az = a;
 					final boolean flat = m.getContainer() instanceof Foundation;
 					EventQueue.invokeLater(new Runnable() {
@@ -1128,8 +1140,9 @@ public class EnergyPanel extends JPanel {
 							partProperty2Label.setText("  Position:");
 							partProperty3Label.setText("  Height:");
 							partProperty1TextField.setText(oneDecimal.format(floor.getArea()) + " m\u00B2");
-							if (!Double.isNaN(cx) && !Double.isNaN(cy))
+							if (!Double.isNaN(cx) && !Double.isNaN(cy)) {
 								partProperty2TextField.setText("(" + oneDecimal.format(cx * scale) + ", " + oneDecimal.format(cy * scale) + ") m");
+							}
 							partProperty3TextField.setText(oneDecimal.format(cz * scale) + " m");
 							partProperty1TextField.setToolTipText("The area of the floor");
 							partProperty2TextField.setToolTipText("The (x, y) position of the center of the floor");
@@ -1167,8 +1180,9 @@ public class EnergyPanel extends JPanel {
 		} else {
 			selectedFoundation = selectedPart.getTopContainer();
 		}
-		if (selectedFoundation != null)
+		if (selectedFoundation != null) {
 			buildingInfoPanel.update(selectedFoundation);
+		}
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -1224,8 +1238,9 @@ public class EnergyPanel extends JPanel {
 
 	public void updateThermostat() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart == null)
+		if (selectedPart == null) {
 			return;
+		}
 		final Foundation selectedBuilding = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 		if (selectedBuilding != null) {
 			final Calendar c = Heliodon.getInstance().getCalendar();
@@ -1282,32 +1297,38 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void showHeatMapContrastSlider(final boolean b) {
-		if (b)
+		if (b) {
 			dataPanel.add(heatMapPanel);
-		else
+		} else {
 			dataPanel.remove(heatMapPanel);
+		}
 		dataPanel.repaint();
 	}
 
 	public void turnOffCompute() {
-		if (SceneManager.getInstance().getSolarHeatMap())
+		if (SceneManager.getInstance().getSolarHeatMap()) {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
+		}
 		int numberOfHouses = 0;
 		synchronized (SceneManager.getInstance()) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen())
+				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen()) {
 					numberOfHouses++;
-				if (numberOfHouses >= 2)
+				}
+				if (numberOfHouses >= 2) {
 					break;
+				}
 			}
-			for (final HousePart part : Scene.getInstance().getParts())
-				if (part instanceof Foundation)
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Foundation) {
 					((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+				}
+			}
 		}
 
 		if (SceneManager.getInstance().getSolarLand().isVisible()) {
