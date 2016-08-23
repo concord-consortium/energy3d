@@ -18,6 +18,16 @@
 		<os family="unix" />
 	</condition>
 	
+	<condition property="ext" value="..\runtime\lib\ext">
+		<os family="windows"/>
+	</condition>
+	<condition property="ext" value="../PlugIns/java.runtime/Contents/Home/jre/lib/ext">
+		<os family="mac"/>
+	</condition>
+	<condition property="ext" value="../runtime/lib/ext">
+		<os family="unix"/>
+	</condition>
+	
 	<condition property="bundle_type" value="exe">
 		<os family="windows" />
 	</condition>
@@ -86,7 +96,7 @@
 			</fx:info>
 			<fx:platform basedir="${JAVA_HOME}">
 				<fx:property name="java.library.path" value="./lib/jogl/native/${os}" />
-				<fx:property name="java.ext.dirs" value=""/>
+				<fx:property name="java.ext.dirs" value="${ext}"/>
 				<fx:jvmarg value="-Xdock:name=${app.name}"/>
 			</fx:platform>
 			<fx:resources>
