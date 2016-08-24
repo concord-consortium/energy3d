@@ -131,9 +131,9 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 /**
  * Pop-up menus for customizing individual elements.
- * 
+ *
  * @author Charles Xie
- * 
+ *
  */
 
 public class PopupMenuFactory {
@@ -421,7 +421,7 @@ public class PopupMenuFactory {
 			miSetLocation.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MapDialog.getInstance().setVisible(true);
+					MapDialog.showDialog();
 				}
 			});
 			geoLocationMenu.add(miSetLocation);

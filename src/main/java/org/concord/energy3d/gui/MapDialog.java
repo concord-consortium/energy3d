@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.SSLKeyException;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -37,7 +39,8 @@ public class MapDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
-	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA", 30);
+	private static final RuntimeException missingExtensionPathException = new RuntimeException();
+	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA");
 	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.00001));
 	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.00001));
 	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(2, zoomMin, zoomMax, 1));
@@ -45,18 +48,30 @@ public class MapDialog extends JDialog {
 	private static MapDialog instance;
 	private boolean lock = false;
 
-	public static MapDialog getInstance() {
+	public static void showDialog() {
 		if (instance == null) {
-			instance = new MapDialog(MainFrame.getInstance());
+			try {
+				instance = new MapDialog(MainFrame.getInstance());
+			} catch (final RuntimeException e) {
+				if (e == missingExtensionPathException) {
+					return;
+				} else {
+					e.printStackTrace();
+				}
+			}
 		}
-		return instance;
+		instance.setVisible(true);
 	}
 
 	private MapDialog(final JFrame owner) {
 		super(owner);
 		setTitle("Map");
-		latitudeSpinner.setEditor(new JSpinner.NumberEditor(latitudeSpinner, "0.00000"));
-		longitudeSpinner.setEditor(new JSpinner.NumberEditor(longitudeSpinner, "0.00000"));
+		final JSpinner.NumberEditor latEditor = new JSpinner.NumberEditor(latitudeSpinner, "0.00000");
+		final JSpinner.NumberEditor lngEditor = new JSpinner.NumberEditor(longitudeSpinner, "0.00000");
+		latEditor.getTextField().setColumns(6);
+		lngEditor.getTextField().setColumns(6);
+		latitudeSpinner.setEditor(latEditor);
+		longitudeSpinner.setEditor(lngEditor);
 		mapLabel.setAlignmentX(0.5f);
 		final Point point = new Point();
 		mapLabel.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -125,6 +140,8 @@ public class MapDialog extends JDialog {
 		zoomSpinner.addChangeListener(changeListener);
 		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 		final JPanel panel1 = new JPanel();
+		panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
+		panel1.setBorder(new EmptyBorder(5, 5, 0, 5));
 		panel1.add(new JLabel("Address:"));
 		panel1.add(addressField);
 		this.getContentPane().add(panel1);
@@ -173,7 +190,8 @@ public class MapDialog extends JDialog {
 	private void updateMap() {
 		final BufferedImage mapImage = getGoogleMapImage(false);
 		if (mapImage != null) {
-			mapLabel.setIcon(new ImageIcon(mapImage));
+			final int w = this.getContentPane().getPreferredSize().width;
+			mapLabel.setIcon(new ImageIcon(mapImage.getScaledInstance(w, w, java.awt.Image.SCALE_DEFAULT)));
 		}
 	}
 
@@ -188,7 +206,12 @@ public class MapDialog extends JDialog {
 			mapImage = ImageIO.read(url);
 		} catch (final IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Could not retrieve map from google!\nPlease check your internet connection and try again.", "Error", JOptionPane.WARNING_MESSAGE);
+			if (e.getCause() instanceof SSLKeyException) {
+				JOptionPane.showMessageDialog(this, "Missing feature! To use this feature you need to download and install the latest version of Energy3D.", this.getTitle(), JOptionPane.ERROR_MESSAGE);
+				throw missingExtensionPathException;
+			} else {
+				JOptionPane.showMessageDialog(this, "Could not retrieve map from google!\nPlease check your internet connection and try again.", this.getTitle(), JOptionPane.WARNING_MESSAGE);
+			}
 		}
 		return mapImage;
 	}
