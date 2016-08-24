@@ -58,11 +58,6 @@
 		<os family="unix" />
 	</condition>
 
-	<echo message="OS Name:    	${os}" />
-	<echo message="OS Arch: 	${os.arch}" />
-	<echo message="OS Version: 	${os.version}" />
-	<echo message="Dist dir:	${build.dist.dir}" />
-
 	<path id="CLASSPATH">
 		<fileset dir="exe">
 			<patternset id="jars.no.source">
@@ -82,7 +77,7 @@
 
 	<target name="deploy">
 		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${JAVA_HOME}/lib/ant-javafx.jar" />
-		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="${bundle_type}" verbose="true">
+		<fx:deploy outdir="${build.dist.dir}" outfile="energy3d" nativeBundles="${bundle_type}" verbose="false">
 			<fx:application name="${app.name}" mainClass="org.concord.energy3d.MainApplication" version="${app.version}" />
 			<fx:preferences shortcut="true" menu="true" />
 			<fx:bundleArgument arg="win.menuGroup" value="${app.name}" />

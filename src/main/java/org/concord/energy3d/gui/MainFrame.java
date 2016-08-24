@@ -1427,7 +1427,7 @@ public class MainFrame extends JFrame {
 			setGeoLocationMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MapDialog.getInstance().setVisible(true);
+					MapDialog.showDialog();
 				}
 			});
 		}
