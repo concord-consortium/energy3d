@@ -112,6 +112,7 @@ public class Scene implements Serializable {
 	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors = false;
 	private boolean fullEnergyInSolarMap = true;
+	private boolean onlyReflectedEnergyInMirrorSolarMap;
 	private boolean allowFoundationOverlap = false;
 	private Ground ground = new Ground();
 	private DesignSpecs designSpecs = new DesignSpecs();
@@ -2085,6 +2086,14 @@ public class Scene implements Serializable {
 
 	public void setOnlyAbsorptionInSolarMap(final boolean onlyAbsorptionInSolarMap) {
 		fullEnergyInSolarMap = !onlyAbsorptionInSolarMap;
+	}
+
+	public boolean getOnlyReflectedEnergyInMirrorSolarMap() {
+		return onlyReflectedEnergyInMirrorSolarMap;
+	}
+
+	public void setOnlyReflectedEnergyInMirrorSolarMap(final boolean onlyReflectedEnergyInMirrorSolarMap) {
+		this.onlyReflectedEnergyInMirrorSolarMap = onlyReflectedEnergyInMirrorSolarMap;
 	}
 
 	public void setAllowFoundationOverlap(final boolean allowFoundationOverlap) {

@@ -412,6 +412,7 @@ public class SolarRadiation {
 			}
 		}
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
+		final boolean reflectionMapOnly = Scene.getInstance().getOnlyReflectedEnergyInMirrorSolarMap();
 		for (int x = 0; x < nx; x++) {
 			for (int y = 0; y < ny; y++) {
 				if (EnergyPanel.getInstance().isCancelled()) {
@@ -434,11 +435,14 @@ public class SolarRadiation {
 					if (pickResults.getNumber() == 0) {
 
 						// for heat map generation
-						data.dailySolarIntensity[x][y] += directRadiation;
+						if (!reflectionMapOnly) {
+							data.dailySolarIntensity[x][y] += directRadiation;
+						}
 
 						if (receiver != null) {
 							// for concentrated energy calculation
-							final Ray3 rayToReceiver = new Ray3(p, receiver.subtract(p, null).normalizeLocal());
+							final Vector3 toReceiver = receiver.subtract(p, null);
+							final Ray3 rayToReceiver = new Ray3(p, toReceiver.normalize(null));
 							final PickResults pickResultsToReceiver = new PrimitivePickResults();
 							for (final Spatial spatial : collidables) {
 								if (spatial != collisionMesh) {
@@ -451,7 +455,10 @@ public class SolarRadiation {
 								}
 							}
 							if (pickResultsToReceiver.getNumber() == 0) {
-								mirror.getSolarPotential()[iMinute] += directRadiation * a;
+								mirror.getSolarPotential()[iMinute] += directRadiation * a * getAtmosphericTransmittance(toReceiver.length() * Scene.getInstance().getAnnotationScale() * 0.001, false);
+								if (reflectionMapOnly) {
+									data.dailySolarIntensity[x][y] += directRadiation;
+								}
 							}
 						}
 
@@ -460,6 +467,14 @@ public class SolarRadiation {
 			}
 		}
 
+	}
+
+	// Vittitoe-Biggs formula for atmospheric transmittance of light (s is in km)
+	private static double getAtmosphericTransmittance(final double s, final boolean haze) {
+		if (haze) {
+			return 0.98707 - 0.2748 * s + 0.03394 * s * s;
+		}
+		return 0.99326 - 0.1046 * s + 0.017 * s * s - 0.002845 * s * s * s;
 	}
 
 	private void computeOnSensor(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Sensor sensor) {

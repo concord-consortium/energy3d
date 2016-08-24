@@ -1852,7 +1852,7 @@ public class PopupMenuFactory {
 						panel.add(colSpacingField);
 						boolean ok = false;
 						while (true) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Circular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								final String rowValue = rowSpacingField.getText();
 								final String colValue = colSpacingField.getText();
 								try {
