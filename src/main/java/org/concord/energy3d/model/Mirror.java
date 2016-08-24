@@ -35,7 +35,7 @@ public class Mirror extends HousePart {
 	private transient Box surround;
 	private transient Line lightBeams;
 	private transient Cylinder post;
-	private double reflectivity = 0.82; // a number in (0, 1), iron glass has a reflectivity of 0.9, but dirt reduces it to 0.82
+	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82)
 	private double mirrorWidth = 2;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
@@ -61,7 +61,7 @@ public class Mirror extends HousePart {
 			mirrorHeight = 3;
 		}
 		if (Util.isZero(reflectivity)) {
-			reflectivity = 0.75;
+			reflectivity = 0.9;
 		}
 		if (Util.isZero(baseHeight)) {
 			baseHeight = 10;

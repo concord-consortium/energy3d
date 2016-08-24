@@ -108,12 +108,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		super.init();
 		resizeHouseMode = false;
 
-		if (Util.isZero(uValue))
+		if (Util.isZero(uValue)) {
 			uValue = 0.19;
-		if (Util.isZero(volumetricHeatCapacity))
+		}
+		if (Util.isZero(volumetricHeatCapacity)) {
 			volumetricHeatCapacity = 0.5;
-		if (thermostat == null)
+		}
+		if (thermostat == null) {
 			thermostat = new Thermostat();
+		}
 
 		mesh = new Mesh("Foundation");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -180,9 +183,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		updateTextureAndColor();
 
-		if (points.size() == 8)
-			for (int i = 0; i < 4; i++)
+		if (points.size() == 8) {
+			for (int i = 0; i < 4; i++) {
 				points.add(new Vector3());
+			}
+		}
 
 		// for (int i = 8; i < points.size(); i++)
 		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
@@ -192,8 +197,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
 		this.resizeHouseMode = resizeHouseMode;
 		if (!isFrozen()) {
-			if (resizeHouseMode)
+			if (resizeHouseMode) {
 				scanChildrenHeight();
+			}
 			setEditPointsVisible(resizeHouseMode);
 			boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
 		}
@@ -259,34 +265,39 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
-		for (final HousePart roof : roofs)
+		for (final HousePart roof : roofs) {
 			reverseFoundationResizeEffect(roof.getChildren(), dx, dxOrg, ratioX, dy, dyOrg, ratioY);
+		}
 	}
 
 	private void reverseFoundationResizeEffect(final HousePart child, final double dx, final double dxOrg, final double ratioX, final double dy, final double dyOrg, final double ratioY) {
 		for (final Vector3 childPoint : child.getPoints()) {
 			double x = childPoint.getX() / ratioX;
-			if (editPointIndex == 0 || editPointIndex == 1)
+			if (editPointIndex == 0 || editPointIndex == 1) {
 				x += (dx - dxOrg) / dx;
+			}
 			childPoint.setX(x);
 			double y = childPoint.getY() / ratioY;
-			if (editPointIndex == 0 || editPointIndex == 2)
+			if (editPointIndex == 0 || editPointIndex == 2) {
 				y += (dy - dyOrg) / dy;
+			}
 			childPoint.setY(y);
 		}
 	}
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		if (lockEdit && editPointIndex < 4)
+		if (lockEdit && editPointIndex < 4) {
 			return;
+		}
 		final int index;
-		if (editPointIndex == -1)
+		if (editPointIndex == -1) {
 			index = isFirstPointInserted() ? 3 : 0;
-		else if (SceneManager.getInstance().isTopView() && editPointIndex > 3)
+		} else if (SceneManager.getInstance().isTopView() && editPointIndex > 3) {
 			index = editPointIndex - 4;
-		else
+		} else {
 			index = editPointIndex;
+		}
 
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, (HousePart) null);
 		Vector3 p;
@@ -294,8 +305,9 @@ public class Foundation extends HousePart implements Thermalizable {
 			p = pick.getPoint().clone();
 			snapToGrid(p, getAbsPoint(index), getGridSize());
 			root.getSceneHints().setCullHint(CullHint.Never);
-		} else
+		} else {
 			p = points.get(index).clone();
+		}
 
 		if (!isFirstPointInserted()) {
 			points.get(index).set(p);
@@ -305,18 +317,20 @@ public class Foundation extends HousePart implements Thermalizable {
 		} else {
 			if (index < 4) {
 				p = ensureDistanceFromOtherFoundations(p, index);
-				if (!resizeHouseMode)
+				if (!resizeHouseMode) {
 					ensureIncludesChildren(p, index);
+				}
 
 				final int oppositeIndex;
-				if (index == 0)
+				if (index == 0) {
 					oppositeIndex = 3;
-				else if (index == 1)
+				} else if (index == 1) {
 					oppositeIndex = 2;
-				else if (index == 2)
+				} else if (index == 2) {
 					oppositeIndex = 1;
-				else
+				} else {
 					oppositeIndex = 0;
+				}
 
 				if (!Util.isEqual(p.getX(), points.get(oppositeIndex).getX()) && !Util.isEqual(p.getY(), points.get(oppositeIndex).getY())) {
 					points.get(index).set(p);
@@ -340,8 +354,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 				final Vector3 currentPoint = getAbsPoint(index);
 				snapToGrid(closestPoint, currentPoint, getGridSize());
-				if (closestPoint.getZ() < height + getGridSize())
+				if (closestPoint.getZ() < height + getGridSize()) {
 					closestPoint.setZ(height + getGridSize());
+				}
 				if (!closestPoint.equals(currentPoint)) {
 					newBoundingHeight = Math.max(0, closestPoint.getZ() - height);
 					applyNewHeight(boundingHeight, newBoundingHeight, false);
@@ -350,8 +365,9 @@ public class Foundation extends HousePart implements Thermalizable {
 			syncUpperPoints();
 		}
 
-		if (resizeHouseMode)
+		if (resizeHouseMode) {
 			drawChildren();
+		}
 		draw();
 		setEditPointsVisible(true);
 		updateHandlesOfAllFoudations();
@@ -361,18 +377,23 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void drawChildren() {
 		final List<HousePart> children = new ArrayList<HousePart>();
 		collectChildren(this, children);
-		for (final HousePart part : children)
-			if (part instanceof Roof)
+		for (final HousePart part : children) {
+			if (part instanceof Roof) {
 				part.draw();
-		for (final HousePart part : children)
+			}
+		}
+		for (final HousePart part : children) {
 			part.draw();
+		}
 	}
 
 	private void collectChildren(final HousePart part, final List<HousePart> children) {
-		if (!children.contains(part))
+		if (!children.contains(part)) {
 			children.add(part);
-		for (final HousePart child : part.getChildren())
+		}
+		for (final HousePart child : part.getChildren()) {
 			collectChildren(child, children);
+		}
 	}
 
 	// private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
@@ -399,13 +420,15 @@ public class Foundation extends HousePart implements Thermalizable {
 	// }
 
 	private void syncUpperPoints() {
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
+		}
 	}
 
 	private void ensureIncludesChildren(final Vector3 p, final int index) {
-		if (children.isEmpty())
+		if (children.isEmpty()) {
 			return;
+		}
 
 		useOrgPoints = true;
 		final List<Vector2> insidePoints = new ArrayList<Vector2>(children.size() * 2);
@@ -435,15 +458,19 @@ public class Foundation extends HousePart implements Thermalizable {
 		double vScaleMax = -Double.MAX_VALUE;
 		for (final Vector2 insidePoint : insidePoints) {
 			final double uScale = Util.projectPointOnLineScale(insidePoint, p0_2d, p2_2d);
-			if (uScaleMin > uScale)
+			if (uScaleMin > uScale) {
 				uScaleMin = uScale;
-			if (uScaleMax < uScale)
+			}
+			if (uScaleMax < uScale) {
 				uScaleMax = uScale;
+			}
 			final double vScale = Util.projectPointOnLineScale(insidePoint, p0_2d, p1_2d);
-			if (vScaleMin > vScale)
+			if (vScaleMin > vScale) {
 				vScaleMin = vScale;
-			if (vScaleMax < vScale)
+			}
+			if (vScaleMax < vScale) {
 				vScaleMax = vScale;
+			}
 		}
 
 		final double uScaleP = Util.projectPointOnLineScale(new Vector2(p.getX(), p.getY()), p0_2d, p2_2d);
@@ -456,20 +483,22 @@ public class Foundation extends HousePart implements Thermalizable {
 		final boolean isOnTop = vScaleP1 >= vScaleP0 && (index == 1 || index == 3);
 
 		final double uScale;
-		if (isOnRight && uScaleP < uScaleMax)
+		if (isOnRight && uScaleP < uScaleMax) {
 			uScale = uScaleMax;
-		else if (!isOnRight && uScaleP > uScaleMin)
+		} else if (!isOnRight && uScaleP > uScaleMin) {
 			uScale = uScaleMin;
-		else
+		} else {
 			uScale = uScaleP;
+		}
 
 		final double vScale;
-		if (isOnTop && vScaleP < vScaleMax)
+		if (isOnTop && vScaleP < vScaleMax) {
 			vScale = vScaleMax;
-		else if (!isOnTop && vScaleP > vScaleMin)
+		} else if (!isOnTop && vScaleP > vScaleMin) {
 			vScale = vScaleMin;
-		else
+		} else {
 			vScale = vScaleP;
+		}
 
 		final Vector3 u = p2.subtract(p0, null);
 		final Vector3 v = p1.subtract(p0, null);
@@ -529,12 +558,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	private void applyNewHeight(final double orgHeight, final double newHeight, final boolean finalize) {
-		if (newHeight == 0)
+		if (newHeight == 0) {
 			return;
+		}
 		final double scale = newHeight / orgHeight;
 		applyNewHeight(children, scale, finalize);
-		if (finalize)
+		if (finalize) {
 			boundingHeight = newHeight;
+		}
 	}
 
 	private void applyNewHeight(final ArrayList<HousePart> children, final double scale, final boolean finalize) {
@@ -549,8 +580,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	/** Rescale the building in the original X, Y, Z directions. */
 	public void rescale(final double scaleX, final double scaleY, final double scaleZ) {
 		final double a = Math.toRadians(getAzimuth());
-		if (!Util.isZero(a))
+		if (!Util.isZero(a)) {
 			rotate(a, null);
+		}
 		final Vector3 center = getAbsCenter().multiplyLocal(1, 1, 0);
 		move(center.negateLocal(), center.length());
 		for (int i = 0; i < points.size(); i++) {
@@ -562,8 +594,9 @@ public class Foundation extends HousePart implements Thermalizable {
 			r.setOverhangLength(r.getOverhangLength() * scaleZ);
 		}
 		move(center.negateLocal(), center.length());
-		if (!Util.isZero(a))
+		if (!Util.isZero(a)) {
 			rotate(-a, null);
+		}
 	}
 
 	/** Scale house for upgrading to new version. This can be removed in 2017. Don't call this if you intend to scale a building. Call rescale instead. */
@@ -574,20 +607,25 @@ public class Foundation extends HousePart implements Thermalizable {
 		height *= scale;
 		final double addHeight = height - oldHeight;
 		for (final HousePart wall : children) {
-			for (final Vector3 point : wall.points)
+			for (final Vector3 point : wall.points) {
 				point.addLocal(0, 0, addHeight);
-			for (final HousePart floor : wall.children)
-				if (floor instanceof Floor)
+			}
+			for (final HousePart floor : wall.children) {
+				if (floor instanceof Floor) {
 					floor.setHeight(floor.getHeight() + addHeight);
+				}
+			}
 		}
-		for (int i = 0; i < points.size(); i++)
+		for (int i = 0; i < points.size(); i++) {
 			points.get(i).multiplyLocal(10);
+		}
 	}
 
 	@Override
 	protected void drawMesh() {
-		if (boundingHeight == 0)
+		if (boundingHeight == 0) {
 			scanChildrenHeight();
+		}
 		final boolean drawable = points.size() == 12;
 		if (drawable) {
 			drawTopMesh();
@@ -617,8 +655,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				// bloomRenderPass.setNrBlurPasses(1);
 				SceneManager.getInstance().getPassManager().add(bloomRenderPass);
 			}
-			if (!bloomRenderPass.contains(tank))
+			if (!bloomRenderPass.contains(tank)) {
 				bloomRenderPass.add(tank);
+			}
 			bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countMirrors, 0.8f));
 			double rx = 0;
 			double ry = 0;
@@ -632,24 +671,26 @@ public class Foundation extends HousePart implements Thermalizable {
 					final Vector3 c = p.getAbsCenter();
 					rx += c.getX();
 					ry += c.getY();
-					if (xmin > c.getX())
+					if (xmin > c.getX()) {
 						xmin = c.getX();
-					else if (xmax < c.getX())
+					} else if (xmax < c.getX()) {
 						xmax = c.getX();
-					if (ymin > c.getY())
+					}
+					if (ymin > c.getY()) {
 						ymin = c.getY();
-					else if (ymax < c.getY())
+					} else if (ymax < c.getY()) {
 						ymax = c.getY();
+					}
 					count++;
 				}
 			}
 			Vector3 o;
 			if (count == 0) {
 				o = getAbsCenter();
-				o.setZ(getBoundingHeight() + height);
+				o.setZ(getTankHeight());
 				tank.setData(o, 10, 10, 10);
 			} else {
-				o = new Vector3(rx / count, ry / count, getBoundingHeight() + height);
+				o = new Vector3(rx / count, ry / count, getTankHeight());
 				tank.setData(o, (xmax - xmin) * 0.6, (ymax - ymin) * 0.6, 10);
 			}
 		}
@@ -670,11 +711,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		Vector3 o;
 		if (count == 0) {
 			o = getAbsCenter();
-			o.setZ(getBoundingHeight() + height);
+			o.setZ(getTankHeight());
 		} else {
-			o = new Vector3(rx / count, ry / count, getBoundingHeight() + height);
+			o = new Vector3(rx / count, ry / count, getTankHeight());
 		}
 		return o;
+	}
+
+	private double getTankHeight() {
+		return getBoundingHeight() + height;
 	}
 
 	public void drawSideMesh() {
@@ -731,20 +776,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		ReadOnlyVector3 normal;
 		normal = n1;
 		((UserData) sideMesh[0].getUserData()).setNormal(normal);
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++) {
 			normalBuffer0.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 		normal = n2;
 		((UserData) sideMesh[1].getUserData()).setNormal(normal);
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++) {
 			normalBuffer1.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 		normal = n1.negate(null);
 		((UserData) sideMesh[2].getUserData()).setNormal(normal);
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++) {
 			normalBuffer2.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 		normal = n2.negate(null);
 		((UserData) sideMesh[3].getUserData()).setNormal(normal);
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++) {
 			normalBuffer3.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 
 		for (int i = 0; i < 4; i++) {
 			sideMesh[i].updateModelBound();
@@ -775,8 +824,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 normal = Vector3.UNIT_Z;
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		normalBuffer.rewind();
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 6; i++) {
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 
 		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		textureBuffer.rewind();
@@ -855,11 +905,13 @@ public class Foundation extends HousePart implements Thermalizable {
 			final ReadOnlyVector3 lineP2 = lineP1.add(width, null);
 			points.add(lineP2);
 		}
-		if (points.size() < 2)
+		if (points.size() < 2) {
 			return;
+		}
 		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
-		for (final ReadOnlyVector3 p : points)
+		for (final ReadOnlyVector3 p : points) {
 			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.1f);
+		}
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 	}
@@ -873,8 +925,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void scanChildrenHeight() {
-		if (!isFirstPointInserted())
+		if (!isFirstPointInserted()) {
 			return;
+		}
 		boundingHeight = scanChildrenHeight(this) - height;
 		for (int i = 4; i < 8; i++) {
 			points.get(i).setZ(boundingHeight + height);
@@ -898,8 +951,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				maxHeight = Math.max(maxHeight, p.getZ());
 			}
 		}
-		for (final HousePart child : part.children)
+		for (final HousePart child : part.children) {
 			maxHeight = Math.max(maxHeight, scanChildrenHeight(child));
+		}
 		return maxHeight;
 	}
 
@@ -922,12 +976,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	@Override
 	public void setEditPoint(int editPoint) {
-		if (!resizeHouseMode && editPoint > 3 && editPoint < 8)
+		if (!resizeHouseMode && editPoint > 3 && editPoint < 8) {
 			editPoint -= 4;
+		}
 		// super.setEditPoint(editPoint);
 		editPointIndex = editPoint;
-		if (editPoint < 8)
+		if (editPoint < 8) {
 			drawCompleted = false;
+		}
 
 		if (!resizeHouseMode) {
 			saveOrgPoints();
@@ -960,8 +1016,9 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void saveOrgPoints() {
 		orgPoints = new ArrayList<Vector3>(4);
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			orgPoints.add(points.get(i).clone());
+		}
 	}
 
 	@Override
@@ -999,36 +1056,41 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void setSolarLabelValue(final double solarValue) {
 		scanChildrenHeight();
-		if (solarValue == -2)
+		if (solarValue == -2) {
 			buildingLabel.setVisible(false);
-		else {
+		} else {
 			buildingLabel.setVisible(SceneManager.getInstance().areBuildingLabelsVisible());
 			final String idLabel = "(#" + id + ")";
-			if (solarValue == -1 || solarValue == 0)
+			if (solarValue == -1 || solarValue == 0) {
 				buildingLabel.setText(idLabel);
-			else
+			} else {
 				buildingLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
+			}
 		}
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
-		if (lockEdit)
+		if (lockEdit) {
 			return;
+		}
 		final List<Vector3> orgPoints = new ArrayList<Vector3>(houseMovePoints.size());
-		for (int i = 0; i < points.size(); i++)
+		for (int i = 0; i < points.size(); i++) {
 			orgPoints.add(points.get(i));
+		}
 
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 newP = houseMovePoints.get(i).add(d, null);
 			points.set(i, newP);
 			if (i == points.size() - 1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
-				for (int j = 0; j < points.size(); j++)
+				for (int j = 0; j < points.size(); j++) {
 					points.set(j, orgPoints.get(j));
+				}
 				return;
 			}
 		}
-		if (SceneManager.getInstance().getSelectedPart() == this)
+		if (SceneManager.getInstance().getSelectedPart() == this) {
 			drawAzimuthArrow();
+		}
 		draw();
 		drawChildren();
 		updateHandlesOfAllFoudations();
@@ -1038,8 +1100,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		v.normalizeLocal();
 		v.multiplyLocal(steplength);
 		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
-		for (final Vector3 p : points)
+		for (final Vector3 p : points) {
 			movePoints.add(p.clone());
+		}
 		move(v, movePoints);
 	}
 
@@ -1131,8 +1194,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	/** If center is null, use the center of this foundation */
 	public void rotate(final double angle, ReadOnlyVector3 center) {
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
-		if (center == null)
+		if (center == null) {
 			center = toRelative(getCenter().clone());
+		}
 		for (int i = 0; i < points.size(); i++) {
 			final Vector3 p = getAbsPoint(i);
 			final Vector3 op = p.subtract(center, null);
@@ -1140,8 +1204,9 @@ public class Foundation extends HousePart implements Thermalizable {
 			op.add(center, p);
 			points.get(i).set(toRelative(p));
 		}
-		if (SceneManager.getInstance().getSelectedPart() == this)
+		if (SceneManager.getInstance().getSelectedPart() == this) {
 			drawAzimuthArrow();
+		}
 	}
 
 	/** @return the azimuth of the reference vector of this foundation in degrees */
@@ -1150,19 +1215,22 @@ public class Foundation extends HousePart implements Thermalizable {
 		final Vector3 v1 = getAbsPoint(1);
 		final double ly = v.distance(v1);
 		double a = 90 + Math.toDegrees(Math.asin((v.getY() - v1.getY()) / ly));
-		if (v.getX() > v1.getX())
+		if (v.getX() > v1.getX()) {
 			a = 360 - a;
-		if (Util.isZero(a - 360)) // reset 360 to 0
+		}
+		if (Util.isZero(a - 360)) {
 			a = 0;
+		}
 		return a;
 	}
 
 	@Override
 	public Vector3 getAbsPoint(final int index, final Vector3 result) {
-		if (useOrgPoints && orgPoints != null)
+		if (useOrgPoints && orgPoints != null) {
 			return super.toAbsolute(orgPoints.get(index), result);
-		else
+		} else {
 			return super.getAbsPoint(index, result);
+		}
 	}
 
 	public void setLockEdit(final boolean b) {
@@ -1232,8 +1300,9 @@ public class Foundation extends HousePart implements Thermalizable {
 						a.setZ(o.getZ());
 						drawArrow(a, normal, arrowsVertices, heat);
 					}
-					if (init)
+					if (init) {
 						init = false;
+					}
 				}
 			}
 			heatFlux.getMeshData().updateVertexCount();
@@ -1253,8 +1322,9 @@ public class Foundation extends HousePart implements Thermalizable {
 			final double C = 100.0;
 			final double scale = Scene.getInstance().getAnnotationScale();
 			area = Math.round(Math.round(p2.subtract(p0, null).length() * scale * C) / C * Math.round(p1.subtract(p0, null).length() * scale * C) / C * C) / C;
-		} else
+		} else {
 			area = 0.0;
+		}
 	}
 
 	@Override
@@ -1300,8 +1370,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Wall && p.getTopContainer() == this) {
 				for (final HousePart c : p.getChildren()) {
-					if (c instanceof Roof && !roofs.contains(c))
+					if (c instanceof Roof && !roofs.contains(c)) {
 						roofs.add((Roof) c);
+					}
 				}
 			}
 		}
@@ -1311,8 +1382,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	public int countParts(final Class<?> clazz) {
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == this && clazz.isInstance(p))
+			if (p.getTopContainer() == this && clazz.isInstance(p)) {
 				count++;
+			}
 		}
 		return count;
 	}
@@ -1320,8 +1392,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	public List<SolarPanel> getSolarPanels() {
 		final List<SolarPanel> list = new ArrayList<SolarPanel>();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof SolarPanel && p.getTopContainer() == this)
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
 				list.add((SolarPanel) p);
+			}
 		}
 		return list;
 	}
@@ -1329,21 +1402,25 @@ public class Foundation extends HousePart implements Thermalizable {
 	public List<Mirror> getMirrors() {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this)
+			if (p instanceof Mirror && p.getTopContainer() == this) {
 				list.add((Mirror) p);
+			}
 		}
 		return list;
 	}
 
 	public void updateHandlesOfAllFoudations() {
-		for (final HousePart part : Scene.getInstance().getParts())
-			if (part instanceof Foundation)
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
 				((Foundation) part).updateHandles();
+			}
+		}
 	}
 
 	public void updateHandles() {
-		if (points.size() < 8)
+		if (points.size() < 8) {
 			return;
+		}
 		final Vector3 p0 = getAbsPoint(0);
 		final Vector3 u = getAbsPoint(2).subtractLocal(p0).multiplyLocal(0.5);
 		final Vector3 v = getAbsPoint(1).subtractLocal(p0).multiplyLocal(0.5);
@@ -1352,8 +1429,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		updateHandle(points.get(10), v);
 		updateHandle(points.get(11), v.negateLocal());
 		if (pointsRoot.getNumberOfChildren() > 8) {
-			for (int i = 8; i < 12; i++)
+			for (int i = 8; i < 12; i++) {
 				getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+			}
 		}
 	}
 
@@ -1416,10 +1494,11 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public Mesh getRadiationMesh(final int index) {
-		if (index == 0)
+		if (index == 0) {
 			return mesh;
-		else
+		} else {
 			return sideMesh[index - 1];
+		}
 	}
 
 	public Mesh getRadiationCollisionSpatial(final int index) {
@@ -1430,36 +1509,107 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void delete() {
 		super.delete();
 		if (bloomRenderPass != null) {
-			if (bloomRenderPass.contains(tank))
+			if (bloomRenderPass.contains(tank)) {
 				bloomRenderPass.remove(tank);
+			}
 		}
 	}
 
-	public int getMirrorCount() {
-		int count = 0;
-		for (final HousePart p : children) {
-			if (p instanceof Mirror)
-				count++;
-		}
-		return count;
-	}
-
-	public void addCircularMirrorArrays() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
+	private List<HousePart> removeChildrenOfClass(final Class<?> clazz) {
+		final List<HousePart> removed = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
-			if (c instanceof Mirror)
-				mirrors.add(c);
+			if (clazz.isInstance(c)) {
+				removed.add(c);
+			}
 		}
-		for (final HousePart m : mirrors) {
+		for (final HousePart m : removed) {
 			Scene.getInstance().remove(m, false);
 		}
-		final AddArrayCommand command = new AddArrayCommand(mirrors, this, Mirror.class);
+		return removed;
+	}
+
+	public void addCircularMirrorArrays(final double mirrorWidth, final double mirrorHeight, final double radialSpacing, final double azimuthalSpacing, final int layout) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
+		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
+		final Vector3 center = getAbsCenter();
+		final double w = (mirrorWidth + azimuthalSpacing) / Scene.getInstance().getAnnotationScale();
+		final double h = (mirrorHeight + radialSpacing) / Scene.getInstance().getAnnotationScale();
+		final double rows = a / h;
+		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
+		for (int r = 0; r < nrows; r++) {
+			final double b = a * (1.0 - r / rows);
+			final int n = (int) (2 * Math.PI * b / w);
+			switch (layout) {
+			case 0:
+				for (int i = 0; i < n; i++) {
+					final double theta = i * 2.0 * Math.PI / n;
+					final Mirror m = new Mirror();
+					m.setContainer(this);
+					Scene.getInstance().add(m, false);
+					m.complete();
+					m.setRelativeAzimuth(90 - Math.toDegrees(theta));
+					final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
+					m.points.get(0).setX(v.getX());
+					m.points.get(0).setY(v.getY());
+					m.points.get(0).setZ(height);
+					m.setMirrorWidth(mirrorWidth);
+					m.setMirrorHeight(mirrorHeight);
+					m.draw();
+				}
+				break;
+			case 1:
+				for (int i = 0; i < n; i++) {
+					final double theta = i * 2.0 * Math.PI / n;
+					if (theta < Math.PI) {
+						final Mirror m = new Mirror();
+						m.setContainer(this);
+						Scene.getInstance().add(m, false);
+						m.complete();
+						m.setRelativeAzimuth(90 - Math.toDegrees(theta));
+						final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
+						m.points.get(0).setX(v.getX());
+						m.points.get(0).setY(v.getY());
+						m.points.get(0).setZ(height);
+						m.setMirrorWidth(mirrorWidth);
+						m.setMirrorHeight(mirrorHeight);
+						m.draw();
+					}
+				}
+				break;
+			case 2:
+				for (int i = 0; i < n; i++) {
+					final double theta = i * 2.0 * Math.PI / n;
+					if (theta > Math.PI) {
+						final Mirror m = new Mirror();
+						m.setContainer(this);
+						Scene.getInstance().add(m, false);
+						m.complete();
+						m.setRelativeAzimuth(90 - Math.toDegrees(theta));
+						final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
+						m.points.get(0).setX(v.getX());
+						m.points.get(0).setY(v.getY());
+						m.points.get(0).setZ(height);
+						m.setMirrorWidth(mirrorWidth);
+						m.setMirrorHeight(mirrorHeight);
+						m.draw();
+					}
+				}
+				break;
+			}
+		}
+		SceneManager.getInstance().getUndoManager().addEdit(command);
+	}
+
+	// http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
+	public void addRadialStaggerMirrorArrays() {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
 		Mirror m = new Mirror();
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
-		final double w = 1.5 * m.getMirrorWidth() / Scene.getInstance().getAnnotationScale();
-		final double h = 1.5 * m.getMirrorHeight() / Scene.getInstance().getAnnotationScale();
+		final double w = 2 * m.getMirrorWidth() / Scene.getInstance().getAnnotationScale();
+		final double h = 2 * m.getMirrorHeight() / Scene.getInstance().getAnnotationScale();
 		final double rows = a / h;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
 		for (int r = 0; r < nrows; r++) {
@@ -1484,18 +1634,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void addSolarPanelArrays(final double panelWidth, final double panelHeight, final double rowSpacing, final double colSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
-		for (final HousePart c : children) {
-			if (c instanceof SolarPanel)
-				panels.add(c);
-		}
-		for (final HousePart p : panels) {
-			Scene.getInstance().remove(p, false);
-		}
-		final AddArrayCommand command = new AddArrayCommand(panels, this, SolarPanel.class);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(SolarPanel.class), this, SolarPanel.class);
 		final double az = Math.toRadians(getAzimuth());
-		if (!Util.isZero(az))
+		if (!Util.isZero(az)) {
 			rotate(az, null);
+		}
 		final Vector3 p0 = getAbsPoint(0);
 		final double a = p0.distance(getAbsPoint(2));
 		final double b = p0.distance(getAbsPoint(1));
@@ -1546,20 +1689,24 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			break;
 		}
-		if (!Util.isZero(az))
+		if (!Util.isZero(az)) {
 			rotate(-az, null);
+		}
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 
 	public int getSupportingType() {
 		for (final HousePart p : children) {
-			if (p instanceof Wall)
+			if (p instanceof Wall) {
 				return BUILDING;
-			if (p instanceof SolarPanel)
+			}
+			if (p instanceof SolarPanel) {
 				return PV_STATION;
-			if (p instanceof Mirror)
+			}
+			if (p instanceof Mirror) {
 				return CSP_STATION;
+			}
 		}
 		return -1;
 	}

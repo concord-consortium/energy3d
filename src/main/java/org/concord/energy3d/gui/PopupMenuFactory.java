@@ -166,6 +166,11 @@ public class PopupMenuFactory {
 	private static int pvArrayRowAxis = 0;
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
+	private static double mirrorWidth = 2;
+	private static double mirrorHeight = 3;
+	private static double mirrorArrayRadialSpacing = 1;
+	private static double mirrorArrayAzimuthalSpacing = 1;
+	private static int mirrorArrayLayout = 0;
 
 	private static Action colorAction = new AbstractAction("Color...") {
 		private static final long serialVersionUID = 1L;
@@ -1742,7 +1747,7 @@ public class PopupMenuFactory {
 							return;
 						}
 						final JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
-						panel.add(new JLabel("Panel size:"));
+						panel.add(new JLabel("Panel Size:"));
 						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
@@ -1752,14 +1757,14 @@ public class PopupMenuFactory {
 							sizeComboBox.setSelectedIndex(2);
 						}
 						panel.add(sizeComboBox);
-						panel.add(new JLabel("Row axis:"));
+						panel.add(new JLabel("Row Axis:"));
 						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
 						rowAxisComboBox.setSelectedIndex(pvArrayRowAxis);
 						panel.add(rowAxisComboBox);
-						panel.add(new JLabel("Row spacing:"));
+						panel.add(new JLabel("Row Spacing:"));
 						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(pvArrayRowSpacing));
 						panel.add(rowSpacingField);
-						panel.add(new JLabel("Column spacing:"));
+						panel.add(new JLabel("Column Spacing:"));
 						final JTextField colSpacingField = new JTextField(twoDecimalsFormat.format(pvArrayColSpacing));
 						panel.add(colSpacingField);
 						boolean ok = false;
@@ -1812,6 +1817,8 @@ public class PopupMenuFactory {
 				}
 			});
 
+			layoutMenu.addSeparator();
+
 			final JMenuItem miMirrorCircularArrays = new JMenuItem("Circular Mirror Arrays");
 			layoutMenu.add(miMirrorCircularArrays);
 			miMirrorCircularArrays.addActionListener(new ActionListener() {
@@ -1824,10 +1831,81 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
+						final JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
+						final JLabel widthLabel = new JLabel("Mirror Width: ");
+						panel.add(widthLabel);
+						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorWidth));
+						panel.add(widthField);
+						final JLabel heightLabel = new JLabel("Mirror Height: ");
+						panel.add(heightLabel);
+						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorHeight));
+						panel.add(heightField);
+						panel.add(new JLabel("Layout:"));
+						final JComboBox<String> layoutComboBox = new JComboBox<String>(new String[] { "Circular (surrounding tower)", "Semicircular (north to tower)", "Semicircular (south to tower)" });
+						layoutComboBox.setSelectedIndex(mirrorArrayLayout);
+						panel.add(layoutComboBox);
+						panel.add(new JLabel("Radial Spacing:"));
+						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayRadialSpacing));
+						panel.add(rowSpacingField);
+						panel.add(new JLabel("Azimuthal Spacing:"));
+						final JTextField colSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayAzimuthalSpacing));
+						panel.add(colSpacingField);
+						boolean ok = false;
+						while (true) {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+								final String rowValue = rowSpacingField.getText();
+								final String colValue = colSpacingField.getText();
+								try {
+									mirrorArrayRadialSpacing = Double.parseDouble(rowValue);
+									mirrorArrayAzimuthalSpacing = Double.parseDouble(colValue);
+									mirrorWidth = Double.parseDouble(widthField.getText());
+									mirrorHeight = Double.parseDouble(heightField.getText());
+									if (mirrorArrayRadialSpacing < 0 || mirrorArrayAzimuthalSpacing < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorWidth < 1 || mirrorWidth > 6 || mirrorHeight < 1 || mirrorHeight > 6) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width and height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else {
+										ok = true;
+										break;
+									}
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								}
+							} else {
+								break;
+							}
+						}
+						if (ok) {
+							mirrorArrayLayout = layoutComboBox.getSelectedIndex();
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() {
+									f.addCircularMirrorArrays(mirrorWidth, mirrorHeight, mirrorArrayRadialSpacing, mirrorArrayAzimuthalSpacing, mirrorArrayLayout);
+									return null;
+								}
+							});
+							updateAfterEdit();
+						}
+					}
+				}
+			});
+
+			final JMenuItem miMirrorRadialStaggerArrays = new JMenuItem("Radial Stagger Mirror Arrays");
+			// layoutMenu.add(miMirrorRadialStaggerArrays);
+			miMirrorRadialStaggerArrays.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final int n = f.countParts(Mirror.class);
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+							return;
+						}
 						SceneManager.getTaskManager().update(new Callable<Object>() {
 							@Override
 							public Object call() {
-								f.addCircularMirrorArrays();
+								f.addRadialStaggerMirrorArrays();
 								return null;
 							}
 						});
@@ -3360,8 +3438,8 @@ public class PopupMenuFactory {
 					final SetMirrorSizeCommand c = new SetMirrorSizeCommand(m);
 					try {
 						final double w = Double.parseDouble(widthField.getText());
-						if (w < 1 || w > 5) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						if (w < 1 || w > 6) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 						} else {
 							m.setMirrorWidth(w);
 						}
@@ -3370,8 +3448,8 @@ public class PopupMenuFactory {
 					}
 					try {
 						final double h = Double.parseDouble(heightField.getText());
-						if (h < 1 || h > 5) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						if (h < 1 || h > 6) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 						} else {
 							m.setMirrorHeight(h);
 						}
