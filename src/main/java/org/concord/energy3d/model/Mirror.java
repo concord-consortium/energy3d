@@ -206,7 +206,7 @@ public class Mirror extends HousePart {
 		if (heliostatTarget == null) {
 			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
 		} else {
-			final ReadOnlyVector3 o = heliostatTarget.getTankCenter();
+			final ReadOnlyVector3 o = heliostatTarget.getSolarReceiverCenter();
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
@@ -251,7 +251,7 @@ public class Mirror extends HousePart {
 		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
 		double length = 100;
 		if (heliostatTarget != null) {
-			length = heliostatTarget.getTankCenter().distance(o);
+			length = heliostatTarget.getSolarReceiverCenter().distance(o);
 		}
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();

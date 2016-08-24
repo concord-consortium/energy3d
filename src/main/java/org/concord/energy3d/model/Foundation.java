@@ -53,7 +53,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh outlineMesh;
 	private transient Mesh sideMesh[];
 	private transient BMText buildingLabel;
-	private transient Box tank; // this is temporarily used to model a power tower (there got to be a better solution)
+	private transient Box solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient double minX;
@@ -174,12 +174,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		azimuthArrow.setDefaultColor(ColorRGBA.WHITE);
 		root.attachChild(azimuthArrow);
 
-		tank = new Box("Tower Tank");
-		tank.setDefaultColor(ColorRGBA.WHITE);
-		tank.setRenderState(offsetState);
-		tank.setModelBound(new BoundingBox());
-		tank.setVisible(false);
-		root.attachChild(tank);
+		solarReceiver = new Box("Solar Receiver");
+		solarReceiver.setDefaultColor(ColorRGBA.WHITE);
+		solarReceiver.setRenderState(offsetState);
+		solarReceiver.setModelBound(new BoundingBox());
+		solarReceiver.setVisible(false);
+		root.attachChild(solarReceiver);
 
 		updateTextureAndColor();
 
@@ -634,11 +634,11 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawOutline(outlineMesh, (float) height);
 			updateSolarLabelPosition();
 			updateHandles();
-			drawTank();
+			drawSolarReceiver();
 		}
 	}
 
-	public void drawTank() {
+	public void drawSolarReceiver() {
 		int countMirrors = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
@@ -648,15 +648,15 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
-		tank.setVisible(countMirrors > 0);
-		if (tank.isVisible()) {
+		solarReceiver.setVisible(countMirrors > 0);
+		if (solarReceiver.isVisible()) {
 			if (bloomRenderPass == null) {
 				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
 				// bloomRenderPass.setNrBlurPasses(1);
 				SceneManager.getInstance().getPassManager().add(bloomRenderPass);
 			}
-			if (!bloomRenderPass.contains(tank)) {
-				bloomRenderPass.add(tank);
+			if (!bloomRenderPass.contains(solarReceiver)) {
+				bloomRenderPass.add(solarReceiver);
 			}
 			bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countMirrors, 0.8f));
 			double rx = 0;
@@ -687,16 +687,16 @@ public class Foundation extends HousePart implements Thermalizable {
 			Vector3 o;
 			if (count == 0) {
 				o = getAbsCenter();
-				o.setZ(getTankHeight());
-				tank.setData(o, 10, 10, 10);
+				o.setZ(getSolarReceiverHeight());
+				solarReceiver.setData(o, 10, 10, 10);
 			} else {
-				o = new Vector3(rx / count, ry / count, getTankHeight());
-				tank.setData(o, (xmax - xmin) * 0.6, (ymax - ymin) * 0.6, 10);
+				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight());
+				solarReceiver.setData(o, (xmax - xmin) * 0.6, (ymax - ymin) * 0.6, 10);
 			}
 		}
 	}
 
-	Vector3 getTankCenter() {
+	public Vector3 getSolarReceiverCenter() {
 		double rx = 0;
 		double ry = 0;
 		int count = 0;
@@ -711,14 +711,14 @@ public class Foundation extends HousePart implements Thermalizable {
 		Vector3 o;
 		if (count == 0) {
 			o = getAbsCenter();
-			o.setZ(getTankHeight());
+			o.setZ(getSolarReceiverHeight());
 		} else {
-			o = new Vector3(rx / count, ry / count, getTankHeight());
+			o = new Vector3(rx / count, ry / count, getSolarReceiverHeight());
 		}
 		return o;
 	}
 
-	private double getTankHeight() {
+	private double getSolarReceiverHeight() {
 		return getBoundingHeight() + height;
 	}
 
@@ -1509,8 +1509,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void delete() {
 		super.delete();
 		if (bloomRenderPass != null) {
-			if (bloomRenderPass.contains(tank)) {
-				bloomRenderPass.remove(tank);
+			if (bloomRenderPass.contains(solarReceiver)) {
+				bloomRenderPass.remove(solarReceiver);
 			}
 		}
 	}

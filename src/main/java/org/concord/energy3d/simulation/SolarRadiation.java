@@ -205,9 +205,9 @@ public class SolarRadiation {
 						} else if (part instanceof SolarPanel) {
 							computeOnSolarPanel(minute, dayLength, directionTowardSun, (SolarPanel) part);
 						} else if (part instanceof Mirror) {
-							computeOnPlate(minute, dayLength, directionTowardSun, part);
+							computeOnMirror(minute, dayLength, directionTowardSun, (Mirror) part);
 						} else if (part instanceof Sensor) {
-							computeOnPlate(minute, dayLength, directionTowardSun, part);
+							computeOnSensor(minute, dayLength, directionTowardSun, (Sensor) part);
 						}
 					}
 				}
@@ -353,35 +353,128 @@ public class SolarRadiation {
 
 	}
 
-	// plate doesn't include solar panel, which requires handling solar cells built in the panel
-	private void computeOnPlate(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart part) {
+	// unlike PV solar panels, no indirect (ambient or diffuse) radiation should be included in mirror reflection calculation
+	private void computeOnMirror(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Mirror mirror) {
 
-		double a = 1;
-		int nx = 2, ny = 2;
-		if (part instanceof Mirror) {
-			final Mirror m = (Mirror) part;
-			a = m.getMirrorWidth() * m.getMirrorHeight();
-			nx = Scene.getInstance().getPlateNx();
-			ny = Scene.getInstance().getPlateNy();
-			if (m.getHeliostatTarget() != null) {
-				final Calendar calendar = Heliodon.getInstance().getCalendar();
-				calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
-				calendar.set(Calendar.MINUTE, minute % 60);
-				m.draw();
-			}
-		} else if (part instanceof Sensor) {
-			a = Sensor.WIDTH * Sensor.HEIGHT;
+		final int nx = Scene.getInstance().getPlateNx();
+		final int ny = Scene.getInstance().getPlateNy();
+		final Foundation target = mirror.getHeliostatTarget();
+		if (target != null) {
+			final Calendar calendar = Heliodon.getInstance().getCalendar();
+			calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+			calendar.set(Calendar.MINUTE, minute % 60);
+			mirror.draw();
 		}
 		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
-		a *= Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
+		final double a = mirror.getMirrorWidth() * mirror.getMirrorHeight() * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
 
-		final ReadOnlyVector3 normal = part.getNormal();
+		final ReadOnlyVector3 normal = mirror.getNormal();
 		if (normal == null) {
 			throw new RuntimeException("Normal is null");
 		}
 
-		final Mesh drawMesh = part.getRadiationMesh();
-		final Mesh collisionMesh = (Mesh) part.getRadiationCollisionSpatial();
+		final Mesh drawMesh = mirror.getRadiationMesh();
+		final Mesh collisionMesh = (Mesh) mirror.getRadiationCollisionSpatial();
+		MeshData data = onMesh.get(drawMesh);
+		if (data == null) {
+			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
+		}
+
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
+
+		calculatePeakRadiation(directionTowardSun, dayLength);
+		final double dot = normal.dot(directionTowardSun);
+		double directRadiation = 0;
+		if (dot > 0) {
+			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
+		}
+
+		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
+
+		final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
+		final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
+		final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
+		// final Vector3 q0 = drawMesh.localToWorld(p0, null);
+		// final Vector3 q1 = drawMesh.localToWorld(p1, null);
+		// final Vector3 q2 = drawMesh.localToWorld(p2, null);
+		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
+		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is the longer side (supposed to be y)
+		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is the shorter side (supposed to be x)
+		final double xSpacing = p1.distance(p0) / nx; // FIXME: for some reason, x and y must be swapped in order to have correct heat map texture
+		final double ySpacing = p2.distance(p0) / ny;
+
+		final Vector3 receiver = target != null ? target.getSolarReceiverCenter() : null;
+		List<Mesh> towerCollisionMeshes = null;
+		if (target != null) {
+			towerCollisionMeshes = new ArrayList<Mesh>();
+			for (final HousePart child : target.getChildren()) {
+				towerCollisionMeshes.add((Mesh) child.getRadiationCollisionSpatial());
+			}
+		}
+		final int iMinute = minute / Scene.getInstance().getTimeStep();
+		for (int x = 0; x < nx; x++) {
+			for (int y = 0; y < ny; y++) {
+				if (EnergyPanel.getInstance().isCancelled()) {
+					throw new CancellationException();
+				}
+				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
+				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
+				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final Ray3 pickRay = new Ray3(p, directionTowardSun);
+				if (dot > 0) {
+					final PickResults pickResults = new PrimitivePickResults();
+					for (final Spatial spatial : collidables) {
+						if (spatial != collisionMesh) {
+							PickingUtil.findPick(spatial, pickRay, pickResults, false);
+							if (pickResults.getNumber() != 0) {
+								break;
+							}
+						}
+					}
+					if (pickResults.getNumber() == 0) {
+
+						// for heat map generation
+						data.dailySolarIntensity[x][y] += directRadiation;
+
+						if (receiver != null) {
+							// for concentrated energy calculation
+							final Ray3 rayToReceiver = new Ray3(p, receiver.subtract(p, null).normalizeLocal());
+							final PickResults pickResultsToReceiver = new PrimitivePickResults();
+							for (final Spatial spatial : collidables) {
+								if (spatial != collisionMesh) {
+									if (towerCollisionMeshes != null && !towerCollisionMeshes.contains(spatial)) {
+										PickingUtil.findPick(spatial, rayToReceiver, pickResultsToReceiver, false);
+										if (pickResultsToReceiver.getNumber() != 0) {
+											break;
+										}
+									}
+								}
+							}
+							if (pickResultsToReceiver.getNumber() == 0) {
+								mirror.getSolarPotential()[iMinute] += directRadiation * a;
+							}
+						}
+
+					}
+				}
+			}
+		}
+
+	}
+
+	private void computeOnSensor(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Sensor sensor) {
+
+		final int nx = 2, ny = 2;
+		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
+		final double a = Sensor.WIDTH * Sensor.HEIGHT * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
+
+		final ReadOnlyVector3 normal = sensor.getNormal();
+		if (normal == null) {
+			throw new RuntimeException("Normal is null");
+		}
+
+		final Mesh drawMesh = sensor.getRadiationMesh();
+		final Mesh collisionMesh = (Mesh) sensor.getRadiationCollisionSpatial();
 		MeshData data = onMesh.get(drawMesh);
 		if (data == null) {
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
@@ -402,10 +495,6 @@ public class SolarRadiation {
 		final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
 		final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
 		final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
-		// final Vector3 q0 = drawMesh.localToWorld(p0, null);
-		// final Vector3 q1 = drawMesh.localToWorld(p1, null);
-		// final Vector3 q2 = drawMesh.localToWorld(p2, null);
-		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
 		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is the longer side (supposed to be y)
 		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is the shorter side (supposed to be x)
 		final double xSpacing = p1.distance(p0) / nx; // FIXME: for some reason, x and y must be swapped in order to have correct heat map texture
@@ -437,7 +526,7 @@ public class SolarRadiation {
 					}
 				}
 				data.dailySolarIntensity[x][y] += radiation;
-				part.getSolarPotential()[iMinute] += radiation * a;
+				sensor.getSolarPotential()[iMinute] += radiation * a;
 			}
 		}
 
