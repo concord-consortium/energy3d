@@ -54,6 +54,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh sideMesh[];
 	private transient BMText buildingLabel;
 	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
+	private double solarReceiverEfficiency = 0.86;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient double minX;
@@ -113,6 +114,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (Util.isZero(volumetricHeatCapacity)) {
 			volumetricHeatCapacity = 0.5;
+		}
+		if (Util.isZero(solarReceiverEfficiency)) {
+			solarReceiverEfficiency = 0.86;
 		}
 		if (thermostat == null) {
 			thermostat = new Thermostat();
@@ -1677,6 +1681,14 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 		}
 		return -1;
+	}
+
+	public void setSolarReceiverEfficiency(final double solarReceiverEfficiency) {
+		this.solarReceiverEfficiency = solarReceiverEfficiency;
+	}
+
+	public double getSolarReceiverEfficiency() {
+		return solarReceiverEfficiency;
 	}
 
 }

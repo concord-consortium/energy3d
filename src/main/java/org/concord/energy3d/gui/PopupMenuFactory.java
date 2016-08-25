@@ -65,6 +65,7 @@ import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.undo.ChangeAtmosphericDustLossCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
@@ -573,6 +574,35 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miDustLoss = new JMenuItem("Dust...");
+			miDustLoss.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String title = "<html>Loss of productivity due to atmospheric dust<br>(dimensionless [0, 1])</html>";
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getAtmosphere().getDustLoss());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 0 || val > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dust loss value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									final ChangeAtmosphericDustLossCommand c = new ChangeAtmosphericDustLossCommand();
+									Scene.getInstance().getAtmosphere().setDustLoss(val);
+									updateAfterEdit();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForSky = new JPopupMenu();
 			popupMenuForSky.setInvoker(MainPanel.getInstance().getCanvasPanel());
 			popupMenuForSky.addPopupMenuListener(new PopupMenuListener() {
@@ -594,6 +624,7 @@ public class PopupMenuFactory {
 
 			popupMenuForSky.add(miInfo);
 			popupMenuForSky.addSeparator();
+			popupMenuForSky.add(miDustLoss);
 			popupMenuForSky.add(miHeliodon);
 			popupMenuForSky.add(themeMenu);
 
@@ -1849,7 +1880,7 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Radial Spacing:"));
 						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayRadialSpacing));
 						panel.add(rowSpacingField);
-						panel.add(new JLabel("Radial Spacing Increment Ratio:"));
+						panel.add(new JLabel("Radial Spacing Increase Ratio:"));
 						final JTextField radialSpacingIncrementField = new JTextField(twoDecimalsFormat.format(mirrorArrayRadialSpacingIncrement));
 						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("Azimuthal Spacing:"));

@@ -142,11 +142,11 @@ public class GroupAnnualAnalysis extends Analysis {
 				graph.addData("Heat Gain " + p.getId(), -sum);
 			} else if (p instanceof SolarPanel) {
 				final SolarPanel solarPanel = (SolarPanel) p;
-				final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
+				final double solar = solarPanel.getSolarPotentialToday() * solarPanel.getSystemEfficiency();
 				graph.addData("Solar " + p.getId(), solar);
 			} else if (p instanceof Mirror) {
 				final Mirror mirror = (Mirror) p;
-				final double solar = mirror.getSolarPotentialToday() * mirror.getReflectivity();
+				final double solar = mirror.getSolarPotentialToday() * mirror.getSystemEfficiency();
 				graph.addData("Solar " + p.getId(), solar);
 			}
 		}

@@ -66,6 +66,7 @@ public class EnergyDailyAnalysis extends Analysis {
 				final Throwable t = compute();
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {
+						@Override
 						public void run() {
 							Util.reportError(t);
 						}
@@ -76,19 +77,20 @@ public class EnergyDailyAnalysis extends Analysis {
 					public void run() {
 						onCompletion();
 						if (graph instanceof BuildingEnergyDailyGraph) {
-							int net = (int) Math.round(getResult("Net"));
+							final int net = (int) Math.round(getResult("Net"));
 							String previousRuns = "";
-							Map<String, Double> recordedResults = getRecordedResults("Net");
-							int n = recordedResults.size();
+							final Map<String, Double> recordedResults = getRecordedResults("Net");
+							final int n = recordedResults.size();
 							if (n > 0) {
-								Object[] keys = recordedResults.keySet().toArray();
+								final Object[] keys = recordedResults.keySet().toArray();
 								for (int i = n - 1; i >= 0; i--) {
 									previousRuns += keys[i] + " : " + Math.round(recordedResults.get(keys[i])) + " kWh<br>";
 								}
 							}
 							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-							if (selectedPart instanceof Foundation)
+							if (selectedPart instanceof Foundation) {
 								EnergyPanel.getInstance().getBuildingDailyEnergyGraph().addGraph((Foundation) selectedPart);
+							}
 							JOptionPane.showMessageDialog(parent, "<html>The calculated daily net energy is <b>" + net + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Net Energy", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
@@ -99,7 +101,7 @@ public class EnergyDailyAnalysis extends Analysis {
 
 	@Override
 	public void updateGraph() {
-		int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
+		final int n = (int) Math.round(60.0 / Scene.getInstance().getTimeStep());
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -120,36 +122,38 @@ public class EnergyDailyAnalysis extends Analysis {
 					graph.addData("Solar", selectedPart.getSolarPotentialNow());
 				}
 			} else if (selectedPart instanceof Window) {
-				Window window = (Window) selectedPart;
+				final Window window = (Window) selectedPart;
 				final double solar = selectedPart.getSolarPotentialNow() * window.getSolarHeatGainCoefficient();
 				graph.addData("Solar", solar);
 				final double[] loss = selectedPart.getHeatLoss();
-				int t0 = n * i;
+				final int t0 = n * i;
 				double sum = 0;
-				for (int k = t0; k < t0 + n; k++)
+				for (int k = t0; k < t0 + n; k++) {
 					sum += loss[k];
+				}
 				graph.addData("Heat Gain", -sum);
 			} else if (selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door) {
 				final double solar = selectedPart.getSolarPotentialNow();
 				graph.addData("Solar", solar);
 				final double[] loss = selectedPart.getHeatLoss();
-				int t0 = n * i;
+				final int t0 = n * i;
 				double sum = 0;
-				for (int k = t0; k < t0 + n; k++)
+				for (int k = t0; k < t0 + n; k++) {
 					sum += loss[k];
+				}
 				graph.addData("Heat Gain", -sum);
 			} else if (selectedPart instanceof SolarPanel) {
 				final SolarPanel solarPanel = (SolarPanel) selectedPart;
-				final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
+				final double solar = solarPanel.getSolarPotentialNow() * solarPanel.getSystemEfficiency();
 				graph.addData("Solar", solar);
 			}
 		}
 		graph.repaint();
 	}
 
-	public void show(String title) {
+	public void show(final String title) {
 
-		HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
 		if (selectedPart != null) {
@@ -166,8 +170,9 @@ public class EnergyDailyAnalysis extends Analysis {
 						return;
 					}
 					if (!isBuildingComplete((Foundation) selectedPart)) {
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "The selected building has not been completed.\nAre you sure to continue?", "Incomplete Building", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 							return;
+						}
 					}
 				} else if (selectedPart instanceof Tree) {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
@@ -189,17 +194,17 @@ public class EnergyDailyAnalysis extends Analysis {
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(menu);
@@ -208,8 +213,9 @@ public class EnergyDailyAnalysis extends Analysis {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final int i = JOptionPane.showConfirmDialog(dialog, "Are you sure that you want to clear all the previous results\nrelated to the selected object?", "Confirmation", JOptionPane.YES_NO_OPTION);
-				if (i != JOptionPane.YES_OPTION)
+				if (i != JOptionPane.YES_OPTION) {
 					return;
+				}
 				graph.clearRecords();
 				graph.repaint();
 				TimeSeriesLogger.getInstance().logClearGraphData(graph.getClass().getSimpleName());
@@ -227,7 +233,7 @@ public class EnergyDailyAnalysis extends Analysis {
 
 		miCopyImage.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				new ClipImage().copyImageToClipboard(graph);
 			}
 		});
@@ -236,16 +242,17 @@ public class EnergyDailyAnalysis extends Analysis {
 		final JMenu showTypeMenu = new JMenu("Types");
 		showTypeMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				showTypeMenu.removeAll();
 				final Set<String> dataNames = graph.getDataNames();
 				if (!dataNames.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
+						public void actionPerformed(final ActionEvent e) {
+							for (final String name : dataNames) {
 								graph.hideData(name, false);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", true);
 						}
@@ -254,9 +261,10 @@ public class EnergyDailyAnalysis extends Analysis {
 					mi = new JMenuItem("Hide All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (String name : dataNames)
+						public void actionPerformed(final ActionEvent e) {
+							for (final String name : dataNames) {
 								graph.hideData(name, true);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowCurve(graph.getClass().getSimpleName(), "All", false);
 						}
@@ -279,11 +287,11 @@ public class EnergyDailyAnalysis extends Analysis {
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(showTypeMenu);
@@ -291,15 +299,16 @@ public class EnergyDailyAnalysis extends Analysis {
 		final JMenu showRunsMenu = new JMenu("Runs");
 		showRunsMenu.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
+			public void menuSelected(final MenuEvent e) {
 				showRunsMenu.removeAll();
 				if (!DailyGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : DailyGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : DailyGraph.records) {
 								graph.hideRun(r.getID(), false);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", true);
 						}
@@ -308,19 +317,20 @@ public class EnergyDailyAnalysis extends Analysis {
 					mi = new JMenuItem("Hide All");
 					mi.addActionListener(new ActionListener() {
 						@Override
-						public void actionPerformed(ActionEvent e) {
-							for (Results r : DailyGraph.records)
+						public void actionPerformed(final ActionEvent e) {
+							for (final Results r : DailyGraph.records) {
 								graph.hideRun(r.getID(), true);
+							}
 							graph.repaint();
 							TimeSeriesLogger.getInstance().logShowRun(graph.getClass().getSimpleName(), "All", false);
 						}
 					});
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
-					Map<String, Double> recordedResults = getRecordedResults("Net");
+					final Map<String, Double> recordedResults = getRecordedResults("Net");
 					for (final Results r : DailyGraph.records) {
-						String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
-						Double result = recordedResults.get(key);
+						final String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
+						final Double result = recordedResults.get(key);
 						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key)) + " kWh"), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
@@ -336,11 +346,11 @@ public class EnergyDailyAnalysis extends Analysis {
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 		menuBar.add(showRunsMenu);
@@ -367,18 +377,20 @@ public class EnergyDailyAnalysis extends Analysis {
 		});
 		buttonPanel.add(runButton);
 
-		JButton button = new JButton("Close");
+		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				stopAnalysis();
 				if (graph.hasData()) {
 					final Object[] options = { "Yes", "No", "Cancel" };
-					int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-					if (i == JOptionPane.CANCEL_OPTION)
+					final int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+					if (i == JOptionPane.CANCEL_OPTION) {
 						return;
-					if (i == JOptionPane.YES_OPTION)
+					}
+					if (i == JOptionPane.YES_OPTION) {
 						graph.keepResults();
+					}
 				}
 				windowLocation.setLocation(dialog.getLocationOnScreen());
 				dialog.dispose();
@@ -396,10 +408,11 @@ public class EnergyDailyAnalysis extends Analysis {
 		});
 
 		dialog.pack();
-		if (windowLocation.x > 0 && windowLocation.y > 0)
+		if (windowLocation.x > 0 && windowLocation.y > 0) {
 			dialog.setLocation(windowLocation);
-		else
+		} else {
 			dialog.setLocationRelativeTo(MainFrame.getInstance());
+		}
 		dialog.setVisible(true);
 
 	}
@@ -416,13 +429,14 @@ public class EnergyDailyAnalysis extends Analysis {
 			s += "\"Part\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			names = new String[] { "Solar", "Heat Gain" };
 		}
-		for (String name : names) {
-			List<Double> data = graph.getData(name);
-			if (data == null)
+		for (final String name : names) {
+			final List<Double> data = graph.getData(name);
+			if (data == null) {
 				continue;
+			}
 			s += ", \"" + name + "\": {";
 			s += "\"Hourly\": [";
-			for (Double x : data) {
+			for (final Double x : data) {
 				s += Graph.FIVE_DECIMALS.format(x) + ",";
 			}
 			s = s.substring(0, s.length() - 1);

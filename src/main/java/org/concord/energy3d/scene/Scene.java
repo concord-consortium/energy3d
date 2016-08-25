@@ -37,6 +37,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.Atmosphere;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -115,6 +116,7 @@ public class Scene implements Serializable {
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
 	private boolean allowFoundationOverlap = false;
 	private Ground ground = new Ground();
+	private Atmosphere atmosphere = new Atmosphere();
 	private DesignSpecs designSpecs = new DesignSpecs();
 	private HousePart copyBuffer, originalCopy;
 	private boolean dashedlineOnRoofs = true;
@@ -369,6 +371,9 @@ public class Scene implements Serializable {
 		}
 		if (ground == null) {
 			ground = new Ground();
+		}
+		if (atmosphere == null) {
+			atmosphere = new Atmosphere();
 		}
 		if (unit == null) {
 			unit = Unit.InternationalSystemOfUnits;
@@ -2189,6 +2194,10 @@ public class Scene implements Serializable {
 
 	public Ground getGround() {
 		return ground;
+	}
+
+	public Atmosphere getAtmosphere() {
+		return atmosphere;
 	}
 
 	public DesignSpecs getDesignSpecs() {

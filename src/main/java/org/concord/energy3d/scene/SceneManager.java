@@ -1042,10 +1042,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Window w = (Window) selectedPart;
 			w.move(v);
 			w.draw();
+		} else if (selectedPart instanceof Mirror) {
+			final Mirror m = (Mirror) selectedPart;
+			m.move(v, selectedPart.getGridSize());
+			m.draw();
+		} else if (selectedPart instanceof SolarPanel) {
+			final SolarPanel s = (SolarPanel) selectedPart;
+			s.move(v, selectedPart.getGridSize());
+			s.draw();
 		}
 		if (c != null) {
 			undoManager.addEdit(c);
 		}
+		SceneManager.getInstance().refresh();
 		Scene.getInstance().setEdited(true);
 	}
 

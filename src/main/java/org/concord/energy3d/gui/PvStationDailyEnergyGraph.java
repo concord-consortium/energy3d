@@ -44,13 +44,13 @@ public class PvStationDailyEnergyGraph extends JPanel {
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
 		buttonPanel.setBackground(Color.WHITE);
 		buttonPanel.add(Box.createVerticalGlue());
-		JButton button = new JButton("Show");
+		final JButton button = new JButton("Show");
 		button.setAlignmentX(CENTER_ALIGNMENT);
 		button.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				SceneManager.getInstance().autoSelectBuilding(true);
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
 					addGraph((Foundation) selectedPart);
 					EnergyPanel.getInstance().validate();
@@ -65,15 +65,16 @@ public class PvStationDailyEnergyGraph extends JPanel {
 		graph.setBackground(Color.WHITE);
 		graph.setBorder(BorderFactory.createEtchedBorder());
 		graph.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() >= 2) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
-						PvDailyAnalysis analysis = new PvDailyAnalysis();
+						final PvDailyAnalysis analysis = new PvDailyAnalysis();
 						analysis.updateGraph();
 						analysis.show();
 					}
@@ -82,7 +83,7 @@ public class PvStationDailyEnergyGraph extends JPanel {
 		});
 	}
 
-	public void setCalendar(Calendar today) {
+	public void setCalendar(final Calendar today) {
 		graph.setCalendar(today);
 	}
 
@@ -112,16 +113,17 @@ public class PvStationDailyEnergyGraph extends JPanel {
 	}
 
 	public void updateGraph() {
-		if (base == null)
+		if (base == null) {
 			return;
+		}
 		graph.clearData();
-		List<SolarPanel> panels = base.getSolarPanels();
+		final List<SolarPanel> panels = base.getSolarPanels();
 		if (!panels.isEmpty()) {
 			for (int i = 0; i < 24; i++) {
 				SolarRadiation.getInstance().computeEnergyAtHour(i);
 				double output = 0;
-				for (SolarPanel sp : panels) {
-					output += sp.getSolarPotentialNow() * sp.getCellEfficiency() * sp.getInverterEfficiency();
+				for (final SolarPanel sp : panels) {
+					output += sp.getSolarPotentialNow() * sp.getSystemEfficiency();
 				}
 				graph.addData("Solar", output);
 			}
@@ -129,7 +131,7 @@ public class PvStationDailyEnergyGraph extends JPanel {
 		repaint();
 	}
 
-	public void addGraph(Foundation base) {
+	public void addGraph(final Foundation base) {
 
 		removeAll();
 
@@ -147,11 +149,11 @@ public class PvStationDailyEnergyGraph extends JPanel {
 		String s = "{";
 		if (base != null) {
 			s += "\"Foundation\": " + base.getId();
-			List<Double> data = graph.getData("Solar");
+			final List<Double> data = graph.getData("Solar");
 			if (data != null) {
 				s += ", \"Solar\": {";
 				s += "\"Hourly\": [";
-				for (Double x : data) {
+				for (final Double x : data) {
 					s += Graph.FIVE_DECIMALS.format(x) + ",";
 				}
 				s = s.substring(0, s.length() - 1);

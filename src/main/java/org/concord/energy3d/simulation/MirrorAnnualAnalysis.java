@@ -152,13 +152,13 @@ public class MirrorAnnualAnalysis extends Analysis {
 		if (selectedPart != null) {
 			if (selectedPart instanceof Mirror) {
 				final Mirror m = (Mirror) selectedPart;
-				graph.addData("Solar", m.getSolarPotentialToday() * m.getReflectivity());
+				graph.addData("Solar", m.getSolarPotentialToday() * m.getSystemEfficiency());
 			} else if (selectedPart instanceof Foundation) {
 				double output = 0;
 				for (final HousePart p : Scene.getInstance().getParts()) {
 					if (p instanceof Mirror && p.getTopContainer() == selectedPart) {
 						final Mirror m = (Mirror) p;
-						output += m.getSolarPotentialToday() * m.getReflectivity();
+						output += m.getSolarPotentialToday() * m.getSystemEfficiency();
 					}
 				}
 				graph.addData("Solar", output);
@@ -167,7 +167,7 @@ public class MirrorAnnualAnalysis extends Analysis {
 				for (final HousePart p : Scene.getInstance().getParts()) {
 					if (p instanceof Mirror && p.getTopContainer() == selectedPart.getTopContainer()) {
 						final Mirror m = (Mirror) p;
-						output += m.getSolarPotentialToday() * m.getReflectivity();
+						output += m.getSolarPotentialToday() * m.getSystemEfficiency();
 					}
 				}
 				graph.addData("Solar", output);
@@ -177,7 +177,7 @@ public class MirrorAnnualAnalysis extends Analysis {
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Mirror) {
 					final Mirror m = (Mirror) p;
-					output += m.getSolarPotentialToday() * m.getReflectivity();
+					output += m.getSolarPotentialToday() * m.getSystemEfficiency();
 				}
 			}
 			graph.addData("Solar", output);

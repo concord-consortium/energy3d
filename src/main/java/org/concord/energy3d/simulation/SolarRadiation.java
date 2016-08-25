@@ -455,7 +455,7 @@ public class SolarRadiation {
 								}
 							}
 							if (pickResultsToReceiver.getNumber() == 0) {
-								final double r = directRadiation * getAtmosphericTransmittance(toReceiver.length() * Scene.getInstance().getAnnotationScale() * 0.001, false);
+								final double r = directRadiation * Atmosphere.getTransmittance(toReceiver.length() * Scene.getInstance().getAnnotationScale() * 0.001, false);
 								mirror.getSolarPotential()[iMinute] += r * a;
 								if (reflectionMapOnly) {
 									data.dailySolarIntensity[x][y] += r;
@@ -468,14 +468,6 @@ public class SolarRadiation {
 			}
 		}
 
-	}
-
-	// Vittitoe-Biggs formula for atmospheric transmittance of light (s must be in km)
-	private static double getAtmosphericTransmittance(final double s, final boolean haze) {
-		if (haze) {
-			return 0.98707 - 0.2748 * s + 0.03394 * s * s;
-		}
-		return 0.99326 - 0.1046 * s + 0.017 * s * s - 0.002845 * s * s * s;
 	}
 
 	private void computeOnSensor(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Sensor sensor) {
@@ -965,7 +957,7 @@ public class SolarRadiation {
 								passiveSolar[i] += houseChild.getSolarPotential()[i] * window.getSolarHeatGainCoefficient();
 							} else if (houseChild instanceof SolarPanel) {
 								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
+								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getSystemEfficiency();
 							}
 						}
 					}
@@ -1047,7 +1039,7 @@ public class SolarRadiation {
 								passiveSolar[i] += houseChild.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficient();
 							} else if (houseChild instanceof SolarPanel) {
 								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getCellEfficiency() * solarPanel.getInverterEfficiency();
+								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getSystemEfficiency();
 							}
 						}
 					}

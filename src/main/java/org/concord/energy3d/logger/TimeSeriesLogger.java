@@ -46,6 +46,7 @@ import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.AdjustThermostatCommand;
 import org.concord.energy3d.undo.AnimateSunCommand;
+import org.concord.energy3d.undo.ChangeAtmosphericDustLossCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
@@ -327,6 +328,9 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeGroundThermalDiffusivityCommand) {
 					final ChangeGroundThermalDiffusivityCommand c = (ChangeGroundThermalDiffusivityCommand) lastEdit;
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getGround().getThermalDiffusivity() + "}";
+				} else if (lastEdit instanceof ChangeAtmosphericDustLossCommand) {
+					final ChangeAtmosphericDustLossCommand c = (ChangeAtmosphericDustLossCommand) lastEdit;
+					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getAtmosphere().getDustLoss() + "}";
 				} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
 					final ChangeSolarHeatMapColorContrastCommand c = (ChangeSolarHeatMapColorContrastCommand) lastEdit;
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getSolarHeatMapColorContrast() + "}";
