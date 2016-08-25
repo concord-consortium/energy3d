@@ -88,7 +88,7 @@ public class Mirror extends HousePart {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		post = new Cylinder("Post Cylindr", 10, 10, 10, 0);
+		post = new Cylinder("Post Cylinder", 10, 10, 10, 0);
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRenderState(offsetState);
 		post.setModelBound(new BoundingBox());

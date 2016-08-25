@@ -34,7 +34,7 @@ import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
-import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
@@ -53,7 +53,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh outlineMesh;
 	private transient Mesh sideMesh[];
 	private transient BMText buildingLabel;
-	private transient Box solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
+	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient double minX;
@@ -174,7 +174,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		azimuthArrow.setDefaultColor(ColorRGBA.WHITE);
 		root.attachChild(azimuthArrow);
 
-		solarReceiver = new Box("Solar Receiver");
+		solarReceiver = new Cylinder("Solar Receiver", 10, 10, 10, 0, true);
 		solarReceiver.setDefaultColor(ColorRGBA.WHITE);
 		solarReceiver.setRenderState(offsetState);
 		solarReceiver.setModelBound(new BoundingBox());
@@ -684,15 +684,17 @@ public class Foundation extends HousePart implements Thermalizable {
 					count++;
 				}
 			}
+			solarReceiver.setHeight(20);
 			Vector3 o;
 			if (count == 0) {
 				o = getAbsCenter();
-				o.setZ(getSolarReceiverHeight());
-				solarReceiver.setData(o, 10, 10, 10);
+				o.setZ(getSolarReceiverHeight() - solarReceiver.getHeight() * 0.5 + 1);
+				solarReceiver.setRadius(10);
 			} else {
-				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight());
-				solarReceiver.setData(o, (xmax - xmin) * 0.6, (ymax - ymin) * 0.6, 10);
+				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight() - solarReceiver.getHeight() * 0.5 + 1);
+				solarReceiver.setRadius(Math.max((xmax - xmin), (ymax - ymin)));
 			}
+			solarReceiver.setTranslation(o);
 		}
 	}
 
@@ -1528,7 +1530,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		return removed;
 	}
 
-	public void addCircularMirrorArrays(final double mirrorWidth, final double mirrorHeight, final double radialSpacing, final double azimuthalSpacing, final int layout) {
+	public int addCircularMirrorArrays(final double mirrorWidth, final double mirrorHeight, final double radialSpacing, final double azimuthalSpacing, final double radialSpacingIncrement, final double startAngle, final double endAngle) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
@@ -1537,18 +1539,22 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double h = (mirrorHeight + radialSpacing) / Scene.getInstance().getAnnotationScale();
 		final double rows = a / h;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
-		for (int r = 0; r < nrows; r++) {
-			final double b = a * (1.0 - r / rows);
+		for (int r = nrows - 1; r >= 0; r--) {
+			double b = a * (1.0 - r / rows);
+			b += b * b * radialSpacingIncrement;
+			if (b > a) {
+				break;
+			}
 			final int n = (int) (2 * Math.PI * b / w);
-			switch (layout) {
-			case 0:
-				for (int i = 0; i < n; i++) {
-					final double theta = i * 2.0 * Math.PI / n;
+			for (int i = 0; i < n; i++) {
+				final double theta = i * 2.0 * Math.PI / n;
+				final double az = Math.toDegrees(theta);
+				if (az >= startAngle && az < endAngle) {
 					final Mirror m = new Mirror();
 					m.setContainer(this);
 					Scene.getInstance().add(m, false);
 					m.complete();
-					m.setRelativeAzimuth(90 - Math.toDegrees(theta));
+					m.setRelativeAzimuth(90 - az);
 					final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
 					m.points.get(0).setX(v.getX());
 					m.points.get(0).setY(v.getY());
@@ -1557,48 +1563,10 @@ public class Foundation extends HousePart implements Thermalizable {
 					m.setMirrorHeight(mirrorHeight);
 					m.draw();
 				}
-				break;
-			case 1:
-				for (int i = 0; i < n; i++) {
-					final double theta = i * 2.0 * Math.PI / n;
-					if (theta < Math.PI) {
-						final Mirror m = new Mirror();
-						m.setContainer(this);
-						Scene.getInstance().add(m, false);
-						m.complete();
-						m.setRelativeAzimuth(90 - Math.toDegrees(theta));
-						final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
-						m.points.get(0).setX(v.getX());
-						m.points.get(0).setY(v.getY());
-						m.points.get(0).setZ(height);
-						m.setMirrorWidth(mirrorWidth);
-						m.setMirrorHeight(mirrorHeight);
-						m.draw();
-					}
-				}
-				break;
-			case 2:
-				for (int i = 0; i < n; i++) {
-					final double theta = i * 2.0 * Math.PI / n;
-					if (theta > Math.PI) {
-						final Mirror m = new Mirror();
-						m.setContainer(this);
-						Scene.getInstance().add(m, false);
-						m.complete();
-						m.setRelativeAzimuth(90 - Math.toDegrees(theta));
-						final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
-						m.points.get(0).setX(v.getX());
-						m.points.get(0).setY(v.getY());
-						m.points.get(0).setZ(height);
-						m.setMirrorWidth(mirrorWidth);
-						m.setMirrorHeight(mirrorHeight);
-						m.draw();
-					}
-				}
-				break;
 			}
 		}
 		SceneManager.getInstance().getUndoManager().addEdit(command);
+		return countParts(Mirror.class);
 	}
 
 	// http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout

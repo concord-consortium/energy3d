@@ -455,9 +455,10 @@ public class SolarRadiation {
 								}
 							}
 							if (pickResultsToReceiver.getNumber() == 0) {
-								mirror.getSolarPotential()[iMinute] += directRadiation * a * getAtmosphericTransmittance(toReceiver.length() * Scene.getInstance().getAnnotationScale() * 0.001, false);
+								final double r = directRadiation * getAtmosphericTransmittance(toReceiver.length() * Scene.getInstance().getAnnotationScale() * 0.001, false);
+								mirror.getSolarPotential()[iMinute] += r * a;
 								if (reflectionMapOnly) {
-									data.dailySolarIntensity[x][y] += directRadiation;
+									data.dailySolarIntensity[x][y] += r;
 								}
 							}
 						}
@@ -469,7 +470,7 @@ public class SolarRadiation {
 
 	}
 
-	// Vittitoe-Biggs formula for atmospheric transmittance of light (s is in km)
+	// Vittitoe-Biggs formula for atmospheric transmittance of light (s must be in km)
 	private static double getAtmosphericTransmittance(final double s, final boolean haze) {
 		if (haze) {
 			return 0.98707 - 0.2748 * s + 0.03394 * s * s;

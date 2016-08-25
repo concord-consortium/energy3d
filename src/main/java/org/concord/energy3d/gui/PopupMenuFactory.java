@@ -169,8 +169,10 @@ public class PopupMenuFactory {
 	private static double mirrorWidth = 2;
 	private static double mirrorHeight = 3;
 	private static double mirrorArrayRadialSpacing = 1;
+	private static double mirrorArrayRadialSpacingIncrement = 0;
 	private static double mirrorArrayAzimuthalSpacing = 1;
-	private static int mirrorArrayLayout = 0;
+	private static double mirrorArrayStartAngle = 0;
+	private static double mirrorArrayEndAngle = 360;
 
 	private static Action colorAction = new AbstractAction("Color...") {
 		private static final long serialVersionUID = 1L;
@@ -1831,37 +1833,45 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
-						final JLabel widthLabel = new JLabel("Mirror Width: ");
-						panel.add(widthLabel);
+						final JPanel panel = new JPanel(new GridLayout(7, 2, 5, 5));
+						panel.add(new JLabel("Mirror Width:"));
 						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorWidth));
 						panel.add(widthField);
-						final JLabel heightLabel = new JLabel("Mirror Height: ");
-						panel.add(heightLabel);
+						panel.add(new JLabel("Mirror Height:"));
 						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorHeight));
 						panel.add(heightField);
-						panel.add(new JLabel("Layout:"));
-						final JComboBox<String> layoutComboBox = new JComboBox<String>(new String[] { "Circular (surrounding tower)", "Semicircular (north to tower)", "Semicircular (south to tower)" });
-						layoutComboBox.setSelectedIndex(mirrorArrayLayout);
-						panel.add(layoutComboBox);
+						panel.add(new JLabel("Start Angle (CCW from East):"));
+						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayStartAngle));
+						panel.add(startAngleField);
+						panel.add(new JLabel("End Angle (CCW from East):"));
+						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayEndAngle));
+						panel.add(endAngleField);
 						panel.add(new JLabel("Radial Spacing:"));
 						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayRadialSpacing));
 						panel.add(rowSpacingField);
+						panel.add(new JLabel("Radial Spacing Increment Ratio:"));
+						final JTextField radialSpacingIncrementField = new JTextField(twoDecimalsFormat.format(mirrorArrayRadialSpacingIncrement));
+						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("Azimuthal Spacing:"));
-						final JTextField colSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayAzimuthalSpacing));
-						panel.add(colSpacingField);
+						final JTextField azimuthalSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayAzimuthalSpacing));
+						panel.add(azimuthalSpacingField);
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Circular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-								final String rowValue = rowSpacingField.getText();
-								final String colValue = colSpacingField.getText();
 								try {
-									mirrorArrayRadialSpacing = Double.parseDouble(rowValue);
-									mirrorArrayAzimuthalSpacing = Double.parseDouble(colValue);
+									mirrorArrayRadialSpacing = Double.parseDouble(rowSpacingField.getText());
+									mirrorArrayRadialSpacingIncrement = Double.parseDouble(radialSpacingIncrementField.getText());
+									mirrorArrayAzimuthalSpacing = Double.parseDouble(azimuthalSpacingField.getText());
 									mirrorWidth = Double.parseDouble(widthField.getText());
 									mirrorHeight = Double.parseDouble(heightField.getText());
+									mirrorArrayStartAngle = Double.parseDouble(startAngleField.getText());
+									mirrorArrayEndAngle = Double.parseDouble(endAngleField.getText());
 									if (mirrorArrayRadialSpacing < 0 || mirrorArrayAzimuthalSpacing < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorArrayStartAngle < 0 || mirrorArrayStartAngle > 360 || mirrorArrayEndAngle < 0 || mirrorArrayEndAngle > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start and end angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorArrayEndAngle <= mirrorArrayStartAngle) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorWidth < 1 || mirrorWidth > 6 || mirrorHeight < 1 || mirrorHeight > 6) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width and height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
@@ -1876,11 +1886,13 @@ public class PopupMenuFactory {
 							}
 						}
 						if (ok) {
-							mirrorArrayLayout = layoutComboBox.getSelectedIndex();
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									f.addCircularMirrorArrays(mirrorWidth, mirrorHeight, mirrorArrayRadialSpacing, mirrorArrayAzimuthalSpacing, mirrorArrayLayout);
+									final int count = f.addCircularMirrorArrays(mirrorWidth, mirrorHeight, mirrorArrayRadialSpacing, mirrorArrayAzimuthalSpacing, mirrorArrayRadialSpacingIncrement, mirrorArrayStartAngle, mirrorArrayEndAngle);
+									if (count == 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+									}
 									return null;
 								}
 							});
@@ -3423,12 +3435,10 @@ public class PopupMenuFactory {
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new GridLayout(2, 2, 5, 5));
-					final JLabel widthLabel = new JLabel("Width: ");
-					gui.add(widthLabel);
+					gui.add(new JLabel("Width: "));
 					final JTextField widthField = new JTextField(twoDecimalsFormat.format(m.getMirrorWidth()));
 					gui.add(widthField);
-					final JLabel heightLabel = new JLabel("Height: ");
-					gui.add(heightLabel);
+					gui.add(new JLabel("Height: "));
 					final JTextField heightField = new JTextField(twoDecimalsFormat.format(m.getMirrorHeight()));
 					gui.add(heightField);
 					gui.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
