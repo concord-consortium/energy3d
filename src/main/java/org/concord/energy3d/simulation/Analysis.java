@@ -13,6 +13,7 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
@@ -91,7 +92,7 @@ public abstract class Analysis {
 		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
 		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
-		SceneManager.getInstance().getSolarLand().setVisible(true);
+		SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
 		graph.clearData();
 	}
 

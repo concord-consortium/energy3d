@@ -599,7 +599,7 @@ public class EnergyPanel extends JPanel {
 								alreadyRenderedHeatmap = true;
 								computeNow();
 								if (!cancel) {
-									SceneManager.getInstance().getSolarLand().setVisible(true);
+									SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
 									SceneManager.getInstance().refresh();
 								} else if (!autoRecomputeEnergy) {
 									turnOffCompute();
@@ -1331,10 +1331,8 @@ public class EnergyPanel extends JPanel {
 			}
 		}
 
-		if (SceneManager.getInstance().getSolarLand().isVisible()) {
-			SceneManager.getInstance().getSolarLand().setVisible(false);
-			Scene.getInstance().redrawAll();
-		}
+		SceneManager.getInstance().getSolarLand().setVisible(false);
+		Scene.getInstance().redrawAll();
 	}
 
 	public void updateGraphs() {

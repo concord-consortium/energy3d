@@ -109,12 +109,13 @@ public class Scene implements Serializable {
 	private boolean hideLightBeams;
 	private boolean showSunAngles;
 	private boolean showBuildingLabels;
-	private boolean cleanup = false;
+	private boolean cleanup;
 	private double heatVectorLength = 2000;
-	private boolean alwaysComputeHeatFluxVectors = false;
+	private boolean alwaysComputeHeatFluxVectors;
 	private boolean fullEnergyInSolarMap = true;
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
-	private boolean allowFoundationOverlap = false;
+	private boolean noSolarMapForLand;
+	private boolean allowFoundationOverlap;
 	private Ground ground = new Ground();
 	private Atmosphere atmosphere = new Atmosphere();
 	private DesignSpecs designSpecs = new DesignSpecs();
@@ -339,6 +340,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 		SceneManager.getInstance().setAxesVisible(!hideAxes);
 		SceneManager.getInstance().setBuildingLabelsVisible(showBuildingLabels);
+		SceneManager.getInstance().getSolarLand().setVisible(!noSolarMapForLand);
 
 		setTheme(theme);
 		SceneManager.getInstance().getLand().setDefaultColor(landColor != null ? landColor : new ColorRGBA(0, 1, 0, 0.5f));
@@ -1955,20 +1957,48 @@ public class Scene implements Serializable {
 	}
 
 	public void setTargetForMirrorsOnFoundation(final Foundation foundation, final Foundation target) {
+		final List<Foundation> oldTargets = new ArrayList<Foundation>();
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setHeliostatTarget(target);
+				final Mirror m = (Mirror) p;
+				final Foundation t = m.getHeliostatTarget();
+				if (t != null && !oldTargets.contains(t)) {
+					oldTargets.add(t);
+				}
+				m.setHeliostatTarget(target);
 				p.draw();
+			}
+		}
+		if (target != null) {
+			target.drawSolarReceiver();
+		}
+		if (!oldTargets.isEmpty()) {
+			for (final Foundation t : oldTargets) {
+				t.drawSolarReceiver();
 			}
 		}
 		SceneManager.getInstance().refresh();
 	}
 
 	public void setTargetForAllMirrors(final Foundation target) {
+		final List<Foundation> oldTargets = new ArrayList<Foundation>();
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
-				((Mirror) p).setHeliostatTarget(target);
+				final Mirror m = (Mirror) p;
+				final Foundation t = m.getHeliostatTarget();
+				if (t != null && !oldTargets.contains(t)) {
+					oldTargets.add(t);
+				}
+				m.setHeliostatTarget(target);
 				p.draw();
+			}
+		}
+		if (target != null) {
+			target.drawSolarReceiver();
+		}
+		if (!oldTargets.isEmpty()) {
+			for (final Foundation t : oldTargets) {
+				t.drawSolarReceiver();
 			}
 		}
 		SceneManager.getInstance().refresh();
@@ -2099,6 +2129,14 @@ public class Scene implements Serializable {
 
 	public void setOnlyReflectedEnergyInMirrorSolarMap(final boolean onlyReflectedEnergyInMirrorSolarMap) {
 		this.onlyReflectedEnergyInMirrorSolarMap = onlyReflectedEnergyInMirrorSolarMap;
+	}
+
+	public void setSolarMapForLand(final boolean showSolarMapForLand) {
+		noSolarMapForLand = !showSolarMapForLand;
+	}
+
+	public boolean getSolarMapForLand() {
+		return !noSolarMapForLand;
 	}
 
 	public void setAllowFoundationOverlap(final boolean allowFoundationOverlap) {

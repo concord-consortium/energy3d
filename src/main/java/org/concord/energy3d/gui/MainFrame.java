@@ -1261,6 +1261,8 @@ public class MainFrame extends JFrame {
 			addModel(tutorialsMenu, "Photovoltaic Solar Farm (Fixed Arrays)", "tutorials/pv-fixed-arrays.ng3");
 			addModel(tutorialsMenu, "Photovoltaic Solar Farm (HSAT Arrays)", "tutorials/pv-hsat-arrays.ng3");
 			addModel(tutorialsMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
+			addModel(tutorialsMenu, "Cosine Efficiency (CSP Tower)", "tutorials/csp-cosine-efficiency.ng3");
+			addModel(tutorialsMenu, "Shadowing and Blocking (CSP Tower)", "tutorials/csp-shadowing-blocking.ng3");
 		}
 		return tutorialsMenu;
 	}
@@ -1283,12 +1285,13 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(solarRadiationHeatMapMenuItem, SceneManager.getInstance().getSolarHeatMap());
 					Util.selectSilently(solarAbsorptionHeatMapMenuItem, Scene.getInstance().getOnlyAbsorptionInSolarMap());
 					Util.selectSilently(mirrorReflectionHeatMapMenuItem, Scene.getInstance().getOnlyReflectedEnergyInMirrorSolarMap());
+					Util.selectSilently(showSolarLandMenuItem, Scene.getInstance().getSolarMapForLand());
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
-					Util.selectSilently(showSolarLandMenuItem, SceneManager.getInstance().getSolarLand().isVisible());
+					Util.selectSilently(showSolarLandMenuItem, Scene.getInstance().getSolarMapForLand());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					MainPanel.getInstance().defaultTool();
@@ -2014,8 +2017,10 @@ public class MainFrame extends JFrame {
 			showSolarLandMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					// final ShowAxesCommand c = new ShowAxesCommand();
-					SceneManager.getInstance().getSolarLand().setVisible(showSolarLandMenuItem.isSelected());
+					// final ShowSolarLandCommand c = new ShowSolarLandCommand();
+					final boolean b = showSolarLandMenuItem.isSelected();
+					SceneManager.getInstance().getSolarLand().setVisible(b);
+					Scene.getInstance().setSolarMapForLand(b);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 					// SceneManager.getInstance().getUndoManager().addEdit(c);

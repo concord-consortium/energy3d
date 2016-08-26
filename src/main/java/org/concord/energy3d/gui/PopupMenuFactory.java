@@ -3243,9 +3243,13 @@ public class PopupMenuFactory {
 									if (p instanceof Foundation) {
 										final Foundation f = (Foundation) p;
 										if (rb1.isSelected()) {
+											final Foundation oldTarget = m.getHeliostatTarget();
 											final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
 											m.setHeliostatTarget(f);
 											m.draw();
+											if (oldTarget != null) {
+												oldTarget.drawSolarReceiver();
+											}
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else if (rb2.isSelected()) {
 											final Foundation foundation = m.getTopContainer();
@@ -3257,6 +3261,7 @@ public class PopupMenuFactory {
 											Scene.getInstance().setTargetForAllMirrors(f);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
+										f.drawSolarReceiver();
 										updateAfterEdit();
 									} else {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -3302,6 +3307,9 @@ public class PopupMenuFactory {
 					}
 					if (rb1.isSelected()) {
 						final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
+						if (m.getHeliostatTarget() != null) {
+							m.getHeliostatTarget().drawSolarReceiver();
+						}
 						m.setHeliostatTarget(null);
 						m.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -3573,9 +3581,11 @@ public class PopupMenuFactory {
 					if (m.getHeliostatTarget() == null) {
 						miZenith.setEnabled(true);
 						miAzimuth.setEnabled(true);
+						miDisableHeliostat.setEnabled(false);
 					} else {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
+						miDisableHeliostat.setEnabled(true);
 					}
 					Util.selectSilently(cbmiDrawSunBeam, m.getDrawSunBeam());
 				}
