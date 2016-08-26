@@ -245,6 +245,32 @@ public class MapDialog extends JDialog {
 		return null;
 	}
 
+	private void getGoogleMapElevation() {
+		final double x = (Double) latitudeSpinner.getValue();
+		final double y = (Double) longitudeSpinner.getValue();
+		try {
+			final URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" + x + "," + y + "&key=AIzaSyD__-N66iYRaNL7yQkAC4ZP6bBUHu6x_HY");
+			final Scanner scanner = new Scanner(url.openStream());
+			try {
+				while (scanner.hasNext()) {
+					final String line = scanner.nextLine();
+					if (line.indexOf("elevation") != -1) {
+						final double result = Double.valueOf(line.substring(line.indexOf(':') + 1, line.length() - 1));
+						System.out.println(result);
+						return;
+					}
+				}
+			} finally {
+				scanner.close();
+			}
+		} catch (final IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Could not retrieve map from google!\nPlease check your internet connection and try again.", "Error", JOptionPane.WARNING_MESSAGE);
+		}
+		JOptionPane.showMessageDialog(this, "Could not find the address!", "Error", JOptionPane.WARNING_MESSAGE);
+		return;
+	}
+
 	private double getScale() {
 		final int zoom = (Integer) zoomSpinner.getValue();
 		final double scale;
