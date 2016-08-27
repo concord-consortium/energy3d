@@ -2024,6 +2024,28 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSizeForMirrorsOnFoundation(final Foundation foundation, final double width, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror && p.getTopContainer() == foundation) {
+				((Mirror) p).setMirrorWidth(width);
+				((Mirror) p).setMirrorHeight(height);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForAllMirrors(final double width, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Mirror) {
+				((Mirror) p).setMirrorWidth(width);
+				((Mirror) p).setMirrorHeight(height);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public boolean isEdited() {
 		return edited;
 	}

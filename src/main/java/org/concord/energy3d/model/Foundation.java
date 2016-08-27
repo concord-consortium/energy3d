@@ -647,6 +647,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void drawSolarReceiver() {
+		if (solarReceiver == null) {
+			return;
+		}
 		int countMirrors = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {

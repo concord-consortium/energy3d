@@ -107,11 +107,13 @@ import org.concord.energy3d.undo.RescaleBuildingCommand;
 import org.concord.energy3d.undo.RescaleCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
+import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
 import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
 import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
 import org.concord.energy3d.undo.SetMirrorSizeCommand;
 import org.concord.energy3d.undo.SetShadeToleranceCommand;
 import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ShowAnnotationCommand;
@@ -576,6 +578,13 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
 					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + m.getMirrorWidth();
 					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + m.getMirrorHeight() + "}";
+				} else if (lastEdit instanceof SetFoundationMirrorSizeCommand) {
+					final Foundation f = ((SetFoundationMirrorSizeCommand) lastEdit).getFoundation();
+					final List<Mirror> mirrors = f.getMirrors();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
+				} else if (lastEdit instanceof SetSizeForAllMirrorsCommand) {
+					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+					stateValue = "{\"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
 				}
 
 				else if (lastEdit instanceof ChangeMirrorReflectivityCommand) {

@@ -478,7 +478,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			return false;
 		}
 		setWindowsVisible(false);
-		passManager.renderPasses(renderer);
+		try {
+			passManager.renderPasses(renderer);
+		} catch (final Throwable e) {
+			e.printStackTrace();
+		}
 		try {
 			if (!Heliodon.getInstance().isNightTime()) {
 				shadowPass.renderPass(renderer);

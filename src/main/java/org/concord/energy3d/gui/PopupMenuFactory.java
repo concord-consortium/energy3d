@@ -119,11 +119,13 @@ import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
+import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
 import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
 import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
 import org.concord.energy3d.undo.SetMirrorSizeCommand;
 import org.concord.energy3d.undo.SetShadeToleranceCommand;
 import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
 import org.concord.energy3d.util.Config;
@@ -1908,10 +1910,10 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorCircularFieldLayout.getEndAngle() <= mirrorCircularFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getMirrorWidth() < 1 || mirrorCircularFieldLayout.getMirrorWidth() > 6) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getMirrorHeight() < 1 || mirrorCircularFieldLayout.getMirrorHeight() > 6) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getMirrorWidth() < 1 || mirrorCircularFieldLayout.getMirrorWidth() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getMirrorHeight() < 1 || mirrorCircularFieldLayout.getMirrorHeight() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;
@@ -1995,12 +1997,16 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Scaling factor must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getAxisRoadWidth() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getStartAngle() < 0 || mirrorSpiralFieldLayout.getStartAngle() > 360 || mirrorSpiralFieldLayout.getEndAngle() < 0 || mirrorSpiralFieldLayout.getEndAngle() > 360) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start and end angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralFieldLayout.getStartAngle() < 0 || mirrorSpiralFieldLayout.getStartAngle() > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralFieldLayout.getEndAngle() < 0 || mirrorSpiralFieldLayout.getEndAngle() > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getEndAngle() <= mirrorSpiralFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getMirrorWidth() < 1 || mirrorSpiralFieldLayout.getMirrorWidth() > 6 || mirrorSpiralFieldLayout.getMirrorHeight() < 1 || mirrorSpiralFieldLayout.getMirrorHeight() > 6) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width and height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralFieldLayout.getMirrorWidth() < 1 || mirrorSpiralFieldLayout.getMirrorWidth() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralFieldLayout.getMirrorHeight() < 1 || mirrorSpiralFieldLayout.getMirrorHeight() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;
@@ -3545,42 +3551,68 @@ public class PopupMenuFactory {
 						return;
 					}
 					final Mirror m = (Mirror) selectedPart;
+					final Foundation foundation = m.getTopContainer();
 					final String partInfo = m.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final JPanel gui = new JPanel(new GridLayout(2, 2, 5, 5));
-					gui.add(new JLabel("Width: "));
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Width: "));
 					final JTextField widthField = new JTextField(twoDecimalsFormat.format(m.getMirrorWidth()));
-					gui.add(widthField);
-					gui.add(new JLabel("Height: "));
+					inputPanel.add(widthField);
+					inputPanel.add(new JLabel("Height: "));
 					final JTextField heightField = new JTextField(twoDecimalsFormat.format(m.getMirrorHeight()));
-					gui.add(heightField);
-					gui.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					inputPanel.add(heightField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Mirrors");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.NORTH);
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
-					final SetMirrorSizeCommand c = new SetMirrorSizeCommand(m);
+					double w = 0, h = 0;
 					try {
-						final double w = Double.parseDouble(widthField.getText());
-						if (w < 1 || w > 6) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-						} else {
-							m.setMirrorWidth(w);
+						w = Double.parseDouble(widthField.getText());
+						if (w < 1 || w > 50) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} catch (final NumberFormatException x) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 					}
 					try {
-						final double h = Double.parseDouble(heightField.getText());
-						if (h < 1 || h > 6) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-						} else {
-							m.setMirrorHeight(h);
+						h = Double.parseDouble(heightField.getText());
+						if (h < 1 || h > 50) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 						}
 					} catch (final NumberFormatException x) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 					}
-					m.draw();
+					if (rb1.isSelected()) {
+						final SetMirrorSizeCommand c = new SetMirrorSizeCommand(m);
+						m.setMirrorWidth(w);
+						m.setMirrorHeight(h);
+						m.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						final SetFoundationMirrorSizeCommand c = new SetFoundationMirrorSizeCommand(foundation);
+						Scene.getInstance().setSizeForMirrorsOnFoundation(foundation, w, h);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
+						Scene.getInstance().setSizeForAllMirrors(w, h);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 					updateAfterEdit();
-					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 
