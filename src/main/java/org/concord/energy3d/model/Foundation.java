@@ -1538,26 +1538,35 @@ public class Foundation extends HousePart implements Thermalizable {
 		return removed;
 	}
 
-	public int addCircularMirrorArrays(final double mirrorWidth, final double mirrorHeight, final double radialSpacing, final double azimuthalSpacing, final double radialSpacingIncrement, final double startAngle, final double endAngle) {
+	private static boolean nearAxes(final double x, final double eps) {
+		return Math.abs(x) < eps || Math.abs(x - 90) < eps || Math.abs(x - 180) < eps || Math.abs(x - 270) < eps || Math.abs(x - 360) < eps;
+	}
+
+	public int addCircularMirrorArrays(final MirrorCircularFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
-		final double w = (mirrorWidth + azimuthalSpacing) / Scene.getInstance().getAnnotationScale();
-		final double h = (mirrorHeight + radialSpacing) / Scene.getInstance().getAnnotationScale();
+		final double w = (layout.getMirrorWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double h = (layout.getMirrorHeight() + layout.getRadialSpacing()) / Scene.getInstance().getAnnotationScale();
 		final double rows = a / h;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
+		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
 		for (int r = nrows - 1; r >= 0; r--) {
 			double b = a * (1.0 - r / rows);
-			b += b * b * radialSpacingIncrement;
+			b += b * b * layout.getRadialSpacingIncrement();
 			if (b > a) {
 				break;
 			}
+			final double roadAngle = Math.toDegrees(Math.atan(roadHalfWidth / b));
 			final int n = (int) (2 * Math.PI * b / w);
 			for (int i = 0; i < n; i++) {
 				final double theta = i * 2.0 * Math.PI / n;
 				final double az = Math.toDegrees(theta);
-				if (az >= startAngle && az < endAngle) {
+				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
+					if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
+						continue;
+					}
 					final Mirror m = new Mirror();
 					m.setContainer(this);
 					Scene.getInstance().add(m, false);
@@ -1567,8 +1576,8 @@ public class Foundation extends HousePart implements Thermalizable {
 					m.points.get(0).setX(v.getX());
 					m.points.get(0).setY(v.getY());
 					m.points.get(0).setZ(height);
-					m.setMirrorWidth(mirrorWidth);
-					m.setMirrorHeight(mirrorHeight);
+					m.setMirrorWidth(layout.getMirrorWidth());
+					m.setMirrorHeight(layout.getMirrorHeight());
 					m.draw();
 				}
 			}
@@ -1577,14 +1586,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		return countParts(Mirror.class);
 	}
 
-	public int addSpiralMirrorArrays(final int spiralType, final double mirrorWidth, final double mirrorHeight, final int startTurn, final double scalingFactor, final double startAngle, final double endAngle) {
+	public int addSpiralMirrorArrays(final MirrorSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
-		final double b = scalingFactor * Math.max(mirrorWidth, mirrorHeight) / Scene.getInstance().getAnnotationScale();
+		final double b = layout.getScalingFactor() * Math.max(layout.getMirrorWidth(), layout.getMirrorHeight()) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
-		final double theta0 = startTurn * 2 * Math.PI;
-		switch (spiralType) {
+		final double theta0 = layout.getStartTurn() * 2 * Math.PI;
+		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
+		switch (layout.getSpiralType()) {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < 10000; i++) {
 				final double r = b * Math.sqrt(i);
@@ -1595,9 +1605,13 @@ public class Foundation extends HousePart implements Thermalizable {
 				if (theta < theta0) {
 					continue;
 				}
+				final double roadAngle = Math.toDegrees(Math.atan(roadHalfWidth / r));
 				double az = Math.toDegrees(theta);
 				az = az % 360;
-				if (az >= startAngle && az < endAngle) {
+				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
+					if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
+						continue;
+					}
 					final Mirror m = new Mirror();
 					m.setContainer(this);
 					Scene.getInstance().add(m, false);
@@ -1607,8 +1621,8 @@ public class Foundation extends HousePart implements Thermalizable {
 					m.points.get(0).setX(v.getX());
 					m.points.get(0).setY(v.getY());
 					m.points.get(0).setZ(height);
-					m.setMirrorWidth(mirrorWidth);
-					m.setMirrorHeight(mirrorHeight);
+					m.setMirrorWidth(layout.getMirrorWidth());
+					m.setMirrorHeight(layout.getMirrorHeight());
 					m.draw();
 				}
 			}

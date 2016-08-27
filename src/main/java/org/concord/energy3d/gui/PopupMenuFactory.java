@@ -48,6 +48,8 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.MirrorCircularFieldLayout;
+import org.concord.energy3d.model.MirrorSpiralFieldLayout;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -167,16 +169,8 @@ public class PopupMenuFactory {
 	private static int pvArrayRowAxis = 0;
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
-	private static double mirrorWidth = 2;
-	private static double mirrorHeight = 3;
-	private static double mirrorArrayRadialSpacing = 1;
-	private static double mirrorArrayRadialSpacingIncrement = 0;
-	private static double mirrorArrayAzimuthalSpacing = 1;
-	private static double mirrorArrayStartAngle = 0;
-	private static double mirrorArrayEndAngle = 360;
-	private static int mirrorSpiralType = Foundation.FERMAT_SPIRAL;
-	private static int mirrorSpiralStartTurn = 10;
-	private static double mirrorSpiralScalingFactor = 1;
+	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
+	private static MirrorSpiralFieldLayout mirrorSpiralFieldLayout = new MirrorSpiralFieldLayout();
 
 	private static Action colorAction = new AbstractAction("Color...") {
 		private static final long serialVersionUID = 1L;
@@ -1867,47 +1861,57 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(7, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
 						panel.add(new JLabel("Mirror Width:"));
-						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorWidth));
+						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorWidth()));
 						panel.add(widthField);
 						panel.add(new JLabel("Mirror Height:"));
-						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorHeight));
+						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("Start Angle (CCW from East):"));
-						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayStartAngle));
+						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getStartAngle()));
 						panel.add(startAngleField);
 						panel.add(new JLabel("End Angle (CCW from East):"));
-						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayEndAngle));
+						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getEndAngle()));
 						panel.add(endAngleField);
 						panel.add(new JLabel("Radial Spacing:"));
-						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayRadialSpacing));
+						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacing()));
 						panel.add(rowSpacingField);
 						panel.add(new JLabel("Radial Spacing Increase Ratio:"));
-						final JTextField radialSpacingIncrementField = new JTextField(twoDecimalsFormat.format(mirrorArrayRadialSpacingIncrement));
+						final JTextField radialSpacingIncrementField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacingIncrement()));
 						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("Azimuthal Spacing:"));
-						final JTextField azimuthalSpacingField = new JTextField(twoDecimalsFormat.format(mirrorArrayAzimuthalSpacing));
+						final JTextField azimuthalSpacingField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getAzimuthalSpacing()));
 						panel.add(azimuthalSpacingField);
+						panel.add(new JLabel("Axis Road Width:"));
+						final JTextField axisRoadWidthField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getAxisRoadWidth()));
+						panel.add(axisRoadWidthField);
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Circular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								try {
-									mirrorArrayRadialSpacing = Double.parseDouble(rowSpacingField.getText());
-									mirrorArrayRadialSpacingIncrement = Double.parseDouble(radialSpacingIncrementField.getText());
-									mirrorArrayAzimuthalSpacing = Double.parseDouble(azimuthalSpacingField.getText());
-									mirrorWidth = Double.parseDouble(widthField.getText());
-									mirrorHeight = Double.parseDouble(heightField.getText());
-									mirrorArrayStartAngle = Double.parseDouble(startAngleField.getText());
-									mirrorArrayEndAngle = Double.parseDouble(endAngleField.getText());
-									if (mirrorArrayRadialSpacing < 0 || mirrorArrayAzimuthalSpacing < 0) {
+									mirrorCircularFieldLayout.setRadialSpacing(Double.parseDouble(rowSpacingField.getText()));
+									mirrorCircularFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
+									mirrorCircularFieldLayout.setAzimuthalSpacing(Double.parseDouble(azimuthalSpacingField.getText()));
+									mirrorCircularFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
+									mirrorCircularFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
+									mirrorCircularFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
+									mirrorCircularFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
+									mirrorCircularFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
+									if (mirrorCircularFieldLayout.getRadialSpacing() < 0 || mirrorCircularFieldLayout.getAzimuthalSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorArrayStartAngle < 0 || mirrorArrayStartAngle > 360 || mirrorArrayEndAngle < 0 || mirrorArrayEndAngle > 360) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start and end angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorArrayEndAngle <= mirrorArrayStartAngle) {
+									} else if (mirrorCircularFieldLayout.getAxisRoadWidth() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getStartAngle() < 0 || mirrorCircularFieldLayout.getStartAngle() > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getEndAngle() < 0 || mirrorCircularFieldLayout.getEndAngle() > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getEndAngle() <= mirrorCircularFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorWidth < 1 || mirrorWidth > 6 || mirrorHeight < 1 || mirrorHeight > 6) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width and height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getMirrorWidth() < 1 || mirrorCircularFieldLayout.getMirrorWidth() > 6) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getMirrorHeight() < 1 || mirrorCircularFieldLayout.getMirrorHeight() > 6) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;
@@ -1923,7 +1927,7 @@ public class PopupMenuFactory {
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									final int count = f.addCircularMirrorArrays(mirrorWidth, mirrorHeight, mirrorArrayRadialSpacing, mirrorArrayAzimuthalSpacing, mirrorArrayRadialSpacingIncrement, mirrorArrayStartAngle, mirrorArrayEndAngle);
+									final int count = f.addCircularMirrorArrays(mirrorCircularFieldLayout);
 									if (count == 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 									}
@@ -1948,46 +1952,54 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
+						panel.add(new JLabel("Type:"));
 						final JComboBox<String> spiralTypeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
-						spiralTypeComboBox.setSelectedIndex(mirrorSpiralType);
+						spiralTypeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getSpiralType());
+						panel.add(spiralTypeComboBox);
 						panel.add(new JLabel("Mirror Width:"));
-						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorWidth));
+						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorWidth()));
 						panel.add(widthField);
 						panel.add(new JLabel("Mirror Height:"));
-						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorHeight));
+						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("Start Turn:"));
-						final JTextField startTurnField = new JTextField(mirrorSpiralStartTurn + "");
+						final JTextField startTurnField = new JTextField(mirrorSpiralFieldLayout.getStartTurn() + "");
 						panel.add(startTurnField);
 						panel.add(new JLabel("Scaling Factor:"));
-						final JTextField scalingFactorField = new JTextField(twoDecimalsFormat.format(mirrorSpiralScalingFactor));
+						final JTextField scalingFactorField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getScalingFactor()));
 						panel.add(scalingFactorField);
 						panel.add(new JLabel("Start Angle (CCW from East):"));
-						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayStartAngle));
+						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getStartAngle()));
 						panel.add(startAngleField);
 						panel.add(new JLabel("End Angle (CCW from East):"));
-						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayEndAngle));
+						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getEndAngle()));
 						panel.add(endAngleField);
+						panel.add(new JLabel("Axis Road Width:"));
+						final JTextField axisRoadWidthField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getAxisRoadWidth()));
+						panel.add(axisRoadWidthField);
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Spiral Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								try {
-									mirrorWidth = Double.parseDouble(widthField.getText());
-									mirrorHeight = Double.parseDouble(heightField.getText());
-									mirrorSpiralStartTurn = Integer.parseInt(startTurnField.getText());
-									mirrorSpiralScalingFactor = Double.parseDouble(scalingFactorField.getText());
-									mirrorArrayStartAngle = Double.parseDouble(startAngleField.getText());
-									mirrorArrayEndAngle = Double.parseDouble(endAngleField.getText());
-									if (mirrorSpiralStartTurn < 0) {
+									mirrorSpiralFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
+									mirrorSpiralFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
+									mirrorSpiralFieldLayout.setStartTurn(Integer.parseInt(startTurnField.getText()));
+									mirrorSpiralFieldLayout.setScalingFactor(Double.parseDouble(scalingFactorField.getText()));
+									mirrorSpiralFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
+									mirrorSpiralFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
+									mirrorSpiralFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
+									if (mirrorSpiralFieldLayout.getStartTurn() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start turn cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralScalingFactor <= 0) {
+									} else if (mirrorSpiralFieldLayout.getScalingFactor() <= 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Scaling factor must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorArrayStartAngle < 0 || mirrorArrayStartAngle > 360 || mirrorArrayEndAngle < 0 || mirrorArrayEndAngle > 360) {
+									} else if (mirrorSpiralFieldLayout.getAxisRoadWidth() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralFieldLayout.getStartAngle() < 0 || mirrorSpiralFieldLayout.getStartAngle() > 360 || mirrorSpiralFieldLayout.getEndAngle() < 0 || mirrorSpiralFieldLayout.getEndAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start and end angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorArrayEndAngle <= mirrorArrayStartAngle) {
+									} else if (mirrorSpiralFieldLayout.getEndAngle() <= mirrorSpiralFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorWidth < 1 || mirrorWidth > 6 || mirrorHeight < 1 || mirrorHeight > 6) {
+									} else if (mirrorSpiralFieldLayout.getMirrorWidth() < 1 || mirrorSpiralFieldLayout.getMirrorWidth() > 6 || mirrorSpiralFieldLayout.getMirrorHeight() < 1 || mirrorSpiralFieldLayout.getMirrorHeight() > 6) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width and height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
@@ -2001,10 +2013,11 @@ public class PopupMenuFactory {
 							}
 						}
 						if (ok) {
+							mirrorSpiralFieldLayout.setSpiralType(spiralTypeComboBox.getSelectedIndex());
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									final int count = f.addSpiralMirrorArrays(spiralTypeComboBox.getSelectedIndex(), mirrorWidth, mirrorHeight, mirrorSpiralStartTurn, mirrorSpiralScalingFactor, mirrorArrayStartAngle, mirrorArrayEndAngle);
+									final int count = f.addSpiralMirrorArrays(mirrorSpiralFieldLayout);
 									if (count == 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 									}
