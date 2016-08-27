@@ -174,6 +174,9 @@ public class PopupMenuFactory {
 	private static double mirrorArrayAzimuthalSpacing = 1;
 	private static double mirrorArrayStartAngle = 0;
 	private static double mirrorArrayEndAngle = 360;
+	private static int mirrorSpiralType = Foundation.FERMAT_SPIRAL;
+	private static int mirrorSpiralStartTurn = 10;
+	private static double mirrorSpiralScalingFactor = 1;
 
 	private static Action colorAction = new AbstractAction("Color...") {
 		private static final long serialVersionUID = 1L;
@@ -1852,7 +1855,7 @@ public class PopupMenuFactory {
 
 			layoutMenu.addSeparator();
 
-			final JMenuItem miMirrorCircularArrays = new JMenuItem("Circular Mirror Arrays");
+			final JMenuItem miMirrorCircularArrays = new JMenuItem("Mirror Circular Layout...");
 			layoutMenu.add(miMirrorCircularArrays);
 			miMirrorCircularArrays.addActionListener(new ActionListener() {
 				@Override
@@ -1933,9 +1936,9 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miMirrorRadialStaggerArrays = new JMenuItem("Radial Stagger Mirror Arrays");
-			// layoutMenu.add(miMirrorRadialStaggerArrays);
-			miMirrorRadialStaggerArrays.addActionListener(new ActionListener() {
+			final JMenuItem miMirrorFermatSpiralArrays = new JMenuItem("Mirror Spiral Layout...");
+			layoutMenu.add(miMirrorFermatSpiralArrays);
+			miMirrorFermatSpiralArrays.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1945,14 +1948,71 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						SceneManager.getTaskManager().update(new Callable<Object>() {
-							@Override
-							public Object call() {
-								f.addRadialStaggerMirrorArrays();
-								return null;
+						final JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+						final JComboBox<String> spiralTypeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
+						spiralTypeComboBox.setSelectedIndex(mirrorSpiralType);
+						panel.add(new JLabel("Mirror Width:"));
+						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorWidth));
+						panel.add(widthField);
+						panel.add(new JLabel("Mirror Height:"));
+						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorHeight));
+						panel.add(heightField);
+						panel.add(new JLabel("Start Turn:"));
+						final JTextField startTurnField = new JTextField(mirrorSpiralStartTurn + "");
+						panel.add(startTurnField);
+						panel.add(new JLabel("Scaling Factor:"));
+						final JTextField scalingFactorField = new JTextField(twoDecimalsFormat.format(mirrorSpiralScalingFactor));
+						panel.add(scalingFactorField);
+						panel.add(new JLabel("Start Angle (CCW from East):"));
+						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayStartAngle));
+						panel.add(startAngleField);
+						panel.add(new JLabel("End Angle (CCW from East):"));
+						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorArrayEndAngle));
+						panel.add(endAngleField);
+						boolean ok = false;
+						while (true) {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Spiral Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+								try {
+									mirrorWidth = Double.parseDouble(widthField.getText());
+									mirrorHeight = Double.parseDouble(heightField.getText());
+									mirrorSpiralStartTurn = Integer.parseInt(startTurnField.getText());
+									mirrorSpiralScalingFactor = Double.parseDouble(scalingFactorField.getText());
+									mirrorArrayStartAngle = Double.parseDouble(startAngleField.getText());
+									mirrorArrayEndAngle = Double.parseDouble(endAngleField.getText());
+									if (mirrorSpiralStartTurn < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start turn cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralScalingFactor <= 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Scaling factor must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorArrayStartAngle < 0 || mirrorArrayStartAngle > 360 || mirrorArrayEndAngle < 0 || mirrorArrayEndAngle > 360) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start and end angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorArrayEndAngle <= mirrorArrayStartAngle) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorWidth < 1 || mirrorWidth > 6 || mirrorHeight < 1 || mirrorHeight > 6) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width and height must be between 1 and 6 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else {
+										ok = true;
+										break;
+									}
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								}
+							} else {
+								break;
 							}
-						});
-						updateAfterEdit();
+						}
+						if (ok) {
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() {
+									final int count = f.addSpiralMirrorArrays(spiralTypeComboBox.getSelectedIndex(), mirrorWidth, mirrorHeight, mirrorSpiralStartTurn, mirrorSpiralScalingFactor, mirrorArrayStartAngle, mirrorArrayEndAngle);
+									if (count == 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+									}
+									return null;
+								}
+							});
+							updateAfterEdit();
+						}
 					}
 				}
 			});

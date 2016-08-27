@@ -43,9 +43,13 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Foundation extends HousePart implements Thermalizable {
 
 	private static final long serialVersionUID = 1L;
+	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+
 	public static final int BUILDING = 0;
 	public static final int PV_STATION = 1;
 	public static final int CSP_STATION = 2;
+
+	public static final int FERMAT_SPIRAL = 0;
 
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;
@@ -1568,6 +1572,47 @@ public class Foundation extends HousePart implements Thermalizable {
 					m.draw();
 				}
 			}
+		}
+		SceneManager.getInstance().getUndoManager().addEdit(command);
+		return countParts(Mirror.class);
+	}
+
+	public int addSpiralMirrorArrays(final int spiralType, final double mirrorWidth, final double mirrorHeight, final int startTurn, final double scalingFactor, final double startAngle, final double endAngle) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
+		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
+		final double b = scalingFactor * Math.max(mirrorWidth, mirrorHeight) / Scene.getInstance().getAnnotationScale();
+		final Vector3 center = getAbsCenter();
+		final double theta0 = startTurn * 2 * Math.PI;
+		switch (spiralType) {
+		case FERMAT_SPIRAL:
+			for (int i = 1; i < 10000; i++) {
+				final double r = b * Math.sqrt(i);
+				if (r > a) {
+					break;
+				}
+				final double theta = i * GOLDEN_ANGLE;
+				if (theta < theta0) {
+					continue;
+				}
+				double az = Math.toDegrees(theta);
+				az = az % 360;
+				if (az >= startAngle && az < endAngle) {
+					final Mirror m = new Mirror();
+					m.setContainer(this);
+					Scene.getInstance().add(m, false);
+					m.complete();
+					m.setRelativeAzimuth(90 - az);
+					final Vector3 v = m.toRelative(new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0));
+					m.points.get(0).setX(v.getX());
+					m.points.get(0).setY(v.getY());
+					m.points.get(0).setZ(height);
+					m.setMirrorWidth(mirrorWidth);
+					m.setMirrorHeight(mirrorHeight);
+					m.draw();
+				}
+			}
+			break;
 		}
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 		return countParts(Mirror.class);
