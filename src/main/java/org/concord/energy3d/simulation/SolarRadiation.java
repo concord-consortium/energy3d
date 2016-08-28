@@ -410,6 +410,14 @@ public class SolarRadiation {
 			for (final HousePart child : target.getChildren()) {
 				towerCollisionMeshes.add((Mesh) child.getRadiationCollisionSpatial());
 			}
+			final List<Roof> roofs = target.getRoofs();
+			if (!roofs.isEmpty()) {
+				for (final Roof r : roofs) {
+					for (final Spatial roofPart : r.getRoofPartsRoot().getChildren()) {
+						towerCollisionMeshes.add((Mesh) ((Node) roofPart).getChild(6));
+					}
+				}
+			}
 		}
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
 		final boolean reflectionMapOnly = Scene.getInstance().getOnlyReflectedEnergyInMirrorSolarMap();

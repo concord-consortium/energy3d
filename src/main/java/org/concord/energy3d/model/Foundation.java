@@ -734,7 +734,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	private double getSolarReceiverHeight() {
-		return getBoundingHeight() + height;
+		return getBoundingHeight() + height - 0.1; // shift a small distance to avoid collision with a possible roof
 	}
 
 	public void drawSideMesh() {
