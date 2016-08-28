@@ -50,6 +50,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	public static final int CSP_STATION = 2;
 
 	public static final int FERMAT_SPIRAL = 0;
+	public static final int EQUAL_AZIMUTHAL_SPACING = 0;
+	public static final int RADIAL_STAGGER = 1;
 
 	private static DecimalFormat format = new DecimalFormat();
 	private transient ArrayList<Vector3> orgPoints;
@@ -1545,6 +1547,21 @@ public class Foundation extends HousePart implements Thermalizable {
 		return Math.abs(x) < eps || Math.abs(x - 90) < eps || Math.abs(x - 180) < eps || Math.abs(x - 270) < eps || Math.abs(x - 360) < eps;
 	}
 
+	private void addMirror(final Vector3 p, final double w, final double h, final double az) {
+		final Mirror m = new Mirror();
+		m.setContainer(this);
+		Scene.getInstance().add(m, false);
+		m.complete();
+		m.setRelativeAzimuth(90 - az);
+		final Vector3 v = m.toRelative(p);
+		m.points.get(0).setX(v.getX());
+		m.points.get(0).setY(v.getY());
+		m.points.get(0).setZ(height);
+		m.setMirrorWidth(w);
+		m.setMirrorHeight(h);
+		m.draw();
+	}
+
 	public int addCircularMirrorArrays(final MirrorCircularFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
@@ -1555,35 +1572,53 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double rows = a / h;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
 		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
-		for (int r = nrows - 1; r >= 0; r--) {
-			double b = a * (1.0 - r / rows);
-			b += b * b * layout.getRadialSpacingIncrement();
-			if (b > a) {
-				break;
-			}
-			final double roadAngle = Math.toDegrees(Math.atan(roadHalfWidth / b));
-			final int n = (int) (2 * Math.PI * b / w);
-			for (int i = 0; i < n; i++) {
-				final double theta = i * 2.0 * Math.PI / n;
-				final double az = Math.toDegrees(theta);
-				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
-					if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
-						continue;
+		switch (layout.getType()) {
+		case EQUAL_AZIMUTHAL_SPACING:
+			for (int r = nrows - 1; r >= 0; r--) {
+				double b = a * (1.0 - r / rows);
+				b += b * b * layout.getRadialSpacingIncrement();
+				if (b > a) {
+					break;
+				}
+				final double roadAngle = Math.toDegrees(Math.atan(roadHalfWidth / b));
+				final int n = (int) (2 * Math.PI * b / w);
+				for (int i = 0; i < n; i++) {
+					final double theta = i * 2.0 * Math.PI / n;
+					final double az = Math.toDegrees(theta);
+					if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
+						if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
+							continue;
+						}
+						final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
+						addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 					}
-					final Mirror m = new Mirror();
-					m.setContainer(this);
-					Scene.getInstance().add(m, false);
-					m.complete();
-					m.setRelativeAzimuth(90 - az);
-					final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
-					m.points.get(0).setX(v.getX());
-					m.points.get(0).setY(v.getY());
-					m.points.get(0).setZ(height);
-					m.setMirrorWidth(layout.getMirrorWidth());
-					m.setMirrorHeight(layout.getMirrorHeight());
-					m.draw();
 				}
 			}
+			break;
+		case RADIAL_STAGGER: // http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
+			final double rmin = a * (1.0 - (nrows - 5) / rows);
+			final int n = (int) (rmin / layout.getMirrorWidth() * Scene.getInstance().getAnnotationScale());
+			for (int i = 0; i < n; i++) {
+				double theta = i * 2.0 * Math.PI / n;
+				double az = Math.toDegrees(theta);
+				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
+					for (int j = 0; j < nrows; j++) {
+						final double r = a * (1.0 - j / rows);
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					}
+				}
+				theta = (i + 0.5) * 2.0 * Math.PI / n;
+				az = Math.toDegrees(theta);
+				if (az >= layout.getStartAngle() && az < layout.getEndAngle()) {
+					for (int j = 0; j < nrows; j++) {
+						final double r = a * (1.0 - j / rows) - 0.5 * h;
+						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+						addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					}
+				}
+			}
+			break;
 		}
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 		return countParts(Mirror.class);
@@ -1597,7 +1632,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final Vector3 center = getAbsCenter();
 		final double theta0 = layout.getStartTurn() * 2 * Math.PI;
 		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
-		switch (layout.getSpiralType()) {
+		switch (layout.getType()) {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < 10000; i++) {
 				final double r = b * Math.sqrt(i);
@@ -1615,55 +1650,14 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (!Util.isZero(roadAngle) && nearAxes(az, roadAngle)) {
 						continue;
 					}
-					final Mirror m = new Mirror();
-					m.setContainer(this);
-					Scene.getInstance().add(m, false);
-					m.complete();
-					m.setRelativeAzimuth(90 - az);
-					final Vector3 v = m.toRelative(new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0));
-					m.points.get(0).setX(v.getX());
-					m.points.get(0).setY(v.getY());
-					m.points.get(0).setZ(height);
-					m.setMirrorWidth(layout.getMirrorWidth());
-					m.setMirrorHeight(layout.getMirrorHeight());
-					m.draw();
+					final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
+					addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 				}
 			}
 			break;
 		}
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 		return countParts(Mirror.class);
-	}
-
-	// http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
-	public void addRadialStaggerMirrorArrays() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
-		Mirror m = new Mirror();
-		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
-		final Vector3 center = getAbsCenter();
-		final double w = 2 * m.getMirrorWidth() / Scene.getInstance().getAnnotationScale();
-		final double h = 2 * m.getMirrorHeight() / Scene.getInstance().getAnnotationScale();
-		final double rows = a / h;
-		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
-		for (int r = 0; r < nrows; r++) {
-			final double b = a * (1.0 - r / rows);
-			final int n = (int) (2 * Math.PI * b / w);
-			for (int i = 0; i < n; i++) {
-				m = new Mirror();
-				m.setContainer(this);
-				Scene.getInstance().add(m, false);
-				m.complete();
-				final double theta = i * 2.0 * Math.PI / n;
-				m.setRelativeAzimuth(90 - Math.toDegrees(theta));
-				final Vector3 v = m.toRelative(new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0));
-				m.points.get(0).setX(v.getX());
-				m.points.get(0).setY(v.getY());
-				m.points.get(0).setZ(height);
-				m.draw();
-			}
-		}
-		SceneManager.getInstance().getUndoManager().addEdit(command);
 	}
 
 	public void addSolarPanelArrays(final double panelWidth, final double panelHeight, final double rowSpacing, final double colSpacing, final int rowAxis) {

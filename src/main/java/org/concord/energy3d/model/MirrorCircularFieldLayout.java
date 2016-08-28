@@ -9,6 +9,15 @@ public class MirrorCircularFieldLayout extends MirrorFieldLayout {
 	private double radialSpacing = 1;
 	private double radialSpacingIncrement = 0;
 	private double azimuthalSpacing = 1;
+	private int type = Foundation.EQUAL_AZIMUTHAL_SPACING;
+
+	public void setType(final int type) {
+		this.type = type;
+	}
+
+	public int getType() {
+		return type;
+	}
 
 	public void setRadialSpacing(final double radialSpacing) {
 		this.radialSpacing = radialSpacing;

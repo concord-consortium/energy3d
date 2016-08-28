@@ -1863,7 +1863,11 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
+						panel.add(new JLabel("Type:"));
+						final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Equal Azimuthal Spacing", "Radial Stagger" });
+						typeComboBox.setSelectedIndex(mirrorCircularFieldLayout.getType());
+						panel.add(typeComboBox);
 						panel.add(new JLabel("Mirror Width:"));
 						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorWidth()));
 						panel.add(widthField);
@@ -1926,6 +1930,7 @@ public class PopupMenuFactory {
 							}
 						}
 						if (ok) {
+							mirrorCircularFieldLayout.setType(typeComboBox.getSelectedIndex());
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
@@ -1956,9 +1961,9 @@ public class PopupMenuFactory {
 						}
 						final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
 						panel.add(new JLabel("Type:"));
-						final JComboBox<String> spiralTypeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
-						spiralTypeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getSpiralType());
-						panel.add(spiralTypeComboBox);
+						final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
+						typeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getType());
+						panel.add(typeComboBox);
 						panel.add(new JLabel("Mirror Width:"));
 						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorWidth()));
 						panel.add(widthField);
@@ -2019,7 +2024,7 @@ public class PopupMenuFactory {
 							}
 						}
 						if (ok) {
-							mirrorSpiralFieldLayout.setSpiralType(spiralTypeComboBox.getSelectedIndex());
+							mirrorSpiralFieldLayout.setType(typeComboBox.getSelectedIndex());
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {

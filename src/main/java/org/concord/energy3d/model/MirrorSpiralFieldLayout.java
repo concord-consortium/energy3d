@@ -6,16 +6,16 @@ package org.concord.energy3d.model;
  */
 public class MirrorSpiralFieldLayout extends MirrorFieldLayout {
 
-	private int spiralType = Foundation.FERMAT_SPIRAL;
+	private int type = Foundation.FERMAT_SPIRAL;
 	private int startTurn = 10;
-	private double scalingFactor = 1;
+	private double scalingFactor = 0.8;
 
-	public void setSpiralType(final int spiralType) {
-		this.spiralType = spiralType;
+	public void setType(final int type) {
+		this.type = type;
 	}
 
-	public int getSpiralType() {
-		return spiralType;
+	public int getType() {
+		return type;
 	}
 
 	public void setStartTurn(final int startTurn) {
