@@ -268,6 +268,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (Heliodon.getInstance() != null) {
 					Heliodon.getInstance().updateBloom();
 				}
+				Foundation.updateBloom();
+				Mirror.updateBloom();
 			}
 		});
 		panel.add(canvasComponent, BorderLayout.CENTER);

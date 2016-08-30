@@ -287,6 +287,12 @@ public class Mirror extends HousePart {
 		}
 	}
 
+	public static void updateBloom() {
+		if (bloomRenderPass != null) {
+			bloomRenderPass.markNeedsRefresh();
+		}
+	}
+
 	@Override
 	public boolean isDrawable() {
 		if (container == null) {

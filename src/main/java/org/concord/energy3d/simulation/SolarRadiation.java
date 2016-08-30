@@ -409,7 +409,6 @@ public class SolarRadiation {
 			towerCollisionMeshes = new ArrayList<Mesh>();
 			for (final HousePart child : target.getChildren()) {
 				towerCollisionMeshes.add((Mesh) child.getRadiationCollisionSpatial());
-				System.out.println("****" + child + ">>>" + Scene.getInstance().getParts().contains(child));
 			}
 			final List<Roof> roofs = target.getRoofs();
 			if (!roofs.isEmpty()) {
