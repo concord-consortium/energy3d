@@ -21,7 +21,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "5.8.5";
+	public static final String VERSION = "5.8.6";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;

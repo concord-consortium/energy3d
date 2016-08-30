@@ -152,7 +152,7 @@ import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.resource.URLResourceSource;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
-	public static final double SKY_RADIUS = 10000;
+	public static final int SKY_RADIUS = 10000;
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance().getCanvasPanel());
 	private static final double MOVE_SPEED = 5;
@@ -663,7 +663,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private Spatial createAxes() {
-		final int axisLen = 10000;
+		final int axisLen = SKY_RADIUS;
 		final Node axisRoot = new Node();
 		FloatBuffer buf;
 		Line line;
@@ -1163,7 +1163,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final double ratio = (double) size.width / size.height;
 
 		final double near = 1;
-		final double far = 20000;
+		final double far = 2 * SKY_RADIUS;
 		if (camera.getProjectionMode() == ProjectionMode.Parallel) {
 			camera.setFrustum(near, far, -orthoWidth / 2, orthoWidth / 2, orthoWidth / ratio / 2, -orthoWidth / ratio / 2);
 		} else {

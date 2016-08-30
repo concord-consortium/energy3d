@@ -68,8 +68,8 @@ class SimulationSettingsDialog extends JDialog {
 					return;
 				}
 				// range check
-				if (cellSize < 0.1 || cellSize > 10) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Cell size must be in 0.1-10 (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (cellSize < 0.1 || cellSize > 20) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Cell size must be in 0.1-20 (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (heatVectorLength < 1000) {

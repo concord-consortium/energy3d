@@ -68,6 +68,10 @@ public class Mirror extends HousePart {
 			baseHeight = 10;
 		}
 
+		if (heliostatTarget != null) { // FIXME: Somehow the target, when copied, doesn't point to the right object. This is not a prefect solution, but it fixes the problem.
+			heliostatTarget = (Foundation) Scene.getInstance().getPart(heliostatTarget.getId());
+		}
+
 		mesh = new Mesh("Reflecting Mirror");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);

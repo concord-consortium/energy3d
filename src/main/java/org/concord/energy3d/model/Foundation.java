@@ -697,14 +697,14 @@ public class Foundation extends HousePart implements Thermalizable {
 					count++;
 				}
 			}
-			solarReceiver.setHeight(20);
+			solarReceiver.setHeight(getSolarReceiverHeight() * 0.1);
 			Vector3 o;
 			if (count == 0) {
 				o = getAbsCenter();
-				o.setZ(getSolarReceiverHeight() - solarReceiver.getHeight() * 0.5 + 1);
+				o.setZ(getSolarReceiverHeight() - solarReceiver.getHeight() * 0.45);
 				solarReceiver.setRadius(10);
 			} else {
-				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight() - solarReceiver.getHeight() * 0.5 + 1);
+				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight() - solarReceiver.getHeight() * 0.45);
 				solarReceiver.setRadius(Math.max((xmax - xmin), (ymax - ymin)));
 			}
 			solarReceiver.setTranslation(o);
