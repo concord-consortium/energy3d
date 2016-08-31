@@ -6,7 +6,7 @@ package org.concord.energy3d.model;
  */
 public abstract class MirrorFieldLayout {
 
-	double mirrorWidth = 2;
+	double mirrorWidth = 5;
 	double mirrorHeight = 3;
 	double startAngle = 0;
 	double endAngle = 360;

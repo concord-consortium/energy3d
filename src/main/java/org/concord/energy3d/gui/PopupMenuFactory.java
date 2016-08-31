@@ -144,11 +144,13 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 public class PopupMenuFactory {
 
 	private static DecimalFormat integerFormat = new DecimalFormat();
-	private static DecimalFormat twoDecimalsFormat = new DecimalFormat();
+	private static DecimalFormat threeDecimalsFormat = new DecimalFormat();
+	private static DecimalFormat sixDecimalsFormat = new DecimalFormat();
 
 	static {
 		integerFormat.setMaximumFractionDigits(0);
-		twoDecimalsFormat.setMaximumFractionDigits(3);
+		threeDecimalsFormat.setMaximumFractionDigits(3);
+		sixDecimalsFormat.setMaximumFractionDigits(6);
 	}
 
 	private static JPopupMenu popupMenuForWindow;
@@ -1794,10 +1796,10 @@ public class PopupMenuFactory {
 						rowAxisComboBox.setSelectedIndex(pvArrayRowAxis);
 						panel.add(rowAxisComboBox);
 						panel.add(new JLabel("Row Spacing:"));
-						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(pvArrayRowSpacing));
+						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(pvArrayRowSpacing));
 						panel.add(rowSpacingField);
 						panel.add(new JLabel("Column Spacing:"));
-						final JTextField colSpacingField = new JTextField(twoDecimalsFormat.format(pvArrayColSpacing));
+						final JTextField colSpacingField = new JTextField(threeDecimalsFormat.format(pvArrayColSpacing));
 						panel.add(colSpacingField);
 						boolean ok = false;
 						while (true) {
@@ -1869,28 +1871,28 @@ public class PopupMenuFactory {
 						typeComboBox.setSelectedIndex(mirrorCircularFieldLayout.getType());
 						panel.add(typeComboBox);
 						panel.add(new JLabel("Mirror Width:"));
-						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorWidth()));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorWidth()));
 						panel.add(widthField);
 						panel.add(new JLabel("Mirror Height:"));
-						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorHeight()));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("Start Angle (CCW from East):"));
-						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getStartAngle()));
+						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getStartAngle()));
 						panel.add(startAngleField);
 						panel.add(new JLabel("End Angle (CCW from East):"));
-						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getEndAngle()));
+						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getEndAngle()));
 						panel.add(endAngleField);
 						panel.add(new JLabel("Radial Spacing:"));
-						final JTextField rowSpacingField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacing()));
+						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacing()));
 						panel.add(rowSpacingField);
 						panel.add(new JLabel("Radial Spacing Increase Ratio:"));
-						final JTextField radialSpacingIncrementField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacingIncrement()));
+						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacingIncrement()));
 						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("Azimuthal Spacing:"));
-						final JTextField azimuthalSpacingField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getAzimuthalSpacing()));
+						final JTextField azimuthalSpacingField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getAzimuthalSpacing()));
 						panel.add(azimuthalSpacingField);
 						panel.add(new JLabel("Axis Road Width:"));
-						final JTextField axisRoadWidthField = new JTextField(twoDecimalsFormat.format(mirrorCircularFieldLayout.getAxisRoadWidth()));
+						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getAxisRoadWidth()));
 						panel.add(axisRoadWidthField);
 						boolean ok = false;
 						while (true) {
@@ -1906,6 +1908,8 @@ public class PopupMenuFactory {
 									mirrorCircularFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
 									if (mirrorCircularFieldLayout.getRadialSpacing() < 0 || mirrorCircularFieldLayout.getAzimuthalSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getRadialSpacingIncrement() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial spacing increment ratio cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorCircularFieldLayout.getAxisRoadWidth() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorCircularFieldLayout.getStartAngle() < 0 || mirrorCircularFieldLayout.getStartAngle() > 360) {
@@ -1959,31 +1963,34 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
 						panel.add(new JLabel("Type:"));
 						final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
 						typeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getType());
 						panel.add(typeComboBox);
 						panel.add(new JLabel("Mirror Width:"));
-						final JTextField widthField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorWidth()));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorWidth()));
 						panel.add(widthField);
 						panel.add(new JLabel("Mirror Height:"));
-						final JTextField heightField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorHeight()));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("Start Turn:"));
 						final JTextField startTurnField = new JTextField(mirrorSpiralFieldLayout.getStartTurn() + "");
 						panel.add(startTurnField);
 						panel.add(new JLabel("Scaling Factor:"));
-						final JTextField scalingFactorField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getScalingFactor()));
+						final JTextField scalingFactorField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getScalingFactor()));
 						panel.add(scalingFactorField);
+						panel.add(new JLabel("Radial Spacing Increase Ratio:"));
+						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(mirrorSpiralFieldLayout.getRadialSpacingIncrement()));
+						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("Start Angle (CCW from East):"));
-						final JTextField startAngleField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getStartAngle()));
+						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getStartAngle()));
 						panel.add(startAngleField);
 						panel.add(new JLabel("End Angle (CCW from East):"));
-						final JTextField endAngleField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getEndAngle()));
+						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getEndAngle()));
 						panel.add(endAngleField);
 						panel.add(new JLabel("Axis Road Width:"));
-						final JTextField axisRoadWidthField = new JTextField(twoDecimalsFormat.format(mirrorSpiralFieldLayout.getAxisRoadWidth()));
+						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getAxisRoadWidth()));
 						panel.add(axisRoadWidthField);
 						boolean ok = false;
 						while (true) {
@@ -1993,6 +2000,7 @@ public class PopupMenuFactory {
 									mirrorSpiralFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
 									mirrorSpiralFieldLayout.setStartTurn(Integer.parseInt(startTurnField.getText()));
 									mirrorSpiralFieldLayout.setScalingFactor(Double.parseDouble(scalingFactorField.getText()));
+									mirrorSpiralFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
 									mirrorSpiralFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
 									mirrorSpiralFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
 									mirrorSpiralFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
@@ -2000,6 +2008,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start turn cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getScalingFactor() <= 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Scaling factor must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralFieldLayout.getRadialSpacingIncrement() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial spacing increment ratio cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getAxisRoadWidth() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getStartAngle() < 0 || mirrorSpiralFieldLayout.getStartAngle() > 360) {
@@ -3562,10 +3572,10 @@ public class PopupMenuFactory {
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
 					inputPanel.add(new JLabel("Width: "));
-					final JTextField widthField = new JTextField(twoDecimalsFormat.format(m.getMirrorWidth()));
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(m.getMirrorWidth()));
 					inputPanel.add(widthField);
 					inputPanel.add(new JLabel("Height: "));
-					final JTextField heightField = new JTextField(twoDecimalsFormat.format(m.getMirrorHeight()));
+					final JTextField heightField = new JTextField(threeDecimalsFormat.format(m.getMirrorHeight()));
 					inputPanel.add(heightField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
@@ -3927,7 +3937,7 @@ public class PopupMenuFactory {
 				if (useUValue) {
 
 					unitPanel.add(new JLabel("U-Value in US Unit:"));
-					final JTextField uValueField = new JTextField(twoDecimalsFormat.format(Util.toUsUValue(t.getUValue())), 10);
+					final JTextField uValueField = new JTextField(threeDecimalsFormat.format(Util.toUsUValue(t.getUValue())), 10);
 					uValueField.setAlignmentX(Component.LEFT_ALIGNMENT);
 					unitPanel.add(uValueField);
 					unitPanel.add(new JLabel("<html>Btu/(h&middot;ft<sup>2</sup>&middot;&deg;F)</html>"));
@@ -3943,7 +3953,7 @@ public class PopupMenuFactory {
 								return;
 							}
 							try {
-								uValueField.setText(twoDecimalsFormat.format(Util.toUsUValue(Double.parseDouble(newValue))));
+								uValueField.setText(threeDecimalsFormat.format(Util.toUsUValue(Double.parseDouble(newValue))));
 							} catch (final Exception exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
@@ -3975,7 +3985,7 @@ public class PopupMenuFactory {
 								return;
 							}
 							try {
-								siField.setText(twoDecimalsFormat.format(1.0 / (Util.toSiRValue(1.0 / Double.parseDouble(newValue)))));
+								siField.setText(threeDecimalsFormat.format(1.0 / (Util.toSiRValue(1.0 / Double.parseDouble(newValue)))));
 							} catch (final Exception exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
@@ -4048,7 +4058,7 @@ public class PopupMenuFactory {
 								return;
 							}
 							try {
-								siField.setText(twoDecimalsFormat.format(1.0 / Util.toSiRValue(Double.parseDouble(newValue))));
+								siField.setText(threeDecimalsFormat.format(1.0 / Util.toSiRValue(Double.parseDouble(newValue))));
 							} catch (final Exception exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}

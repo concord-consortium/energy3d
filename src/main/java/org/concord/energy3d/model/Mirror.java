@@ -37,7 +37,7 @@ public class Mirror extends HousePart {
 	private transient Line lightBeams;
 	private transient Cylinder post;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double mirrorWidth = 2;
+	private double mirrorWidth = 5;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
 	private double tiltAngle;
@@ -56,7 +56,7 @@ public class Mirror extends HousePart {
 		super.init();
 
 		if (Util.isZero(mirrorWidth)) {
-			mirrorWidth = 2;
+			mirrorWidth = 5;
 		}
 		if (Util.isZero(mirrorHeight)) {
 			mirrorHeight = 3;
@@ -284,6 +284,12 @@ public class Mirror extends HousePart {
 		}
 		if (!bloomRenderPass.contains(lightBeams)) {
 			bloomRenderPass.add(lightBeams);
+		}
+	}
+
+	public static void updateBloom() {
+		if (bloomRenderPass != null) {
+			bloomRenderPass.markNeedsRefresh();
 		}
 	}
 
