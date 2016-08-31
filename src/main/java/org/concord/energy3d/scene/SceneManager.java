@@ -205,6 +205,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean showHeatFlux = false;
 	private boolean cameraChanged;
 	private boolean fineGrid;
+	private long frames;
+	private long framesStartTime = -1;
 
 	public enum Operation {
 		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_MIRROR, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
@@ -498,6 +500,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		passManager.renderPasses(renderer);
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
 		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
+		if (framesStartTime != -1) {
+			frames++;
+			final long t = (System.nanoTime() - framesStartTime) / 1000000000;
+			if (t != 0) {
+				System.out.println(frames / t);
+			}
+		}
 		return true;
 	}
 
@@ -1174,6 +1183,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void toggleSpinView() {
 		cameraControl.reset();
 		rotAnim = !rotAnim;
+		if (rotAnim) {
+			framesStartTime = System.nanoTime();
+			frames = 0;
+		} else {
+			framesStartTime = -1;
+		}
 	}
 
 	public boolean getSpinView() {

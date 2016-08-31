@@ -107,17 +107,22 @@ public class Wall extends HousePart implements Thermalizable {
 		super.init();
 		wallThickness = 0.5;
 		neighbors = new Snap[2];
-		if (thicknessNormal != null)
+		if (thicknessNormal != null) {
 			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
+		}
 
-		if (Util.isZero(uValue))
+		if (Util.isZero(uValue)) {
 			uValue = 0.28;
-		if (Util.isZero(volumetricHeatCapacity))
+		}
+		if (Util.isZero(volumetricHeatCapacity)) {
 			volumetricHeatCapacity = 0.5;
-		if (Util.isZero(columnRadius))
+		}
+		if (Util.isZero(columnRadius)) {
 			columnRadius = 1;
-		if (Util.isZero(railRadius))
+		}
+		if (Util.isZero(railRadius)) {
 			railRadius = 0.1;
+		}
 
 		mesh = new Mesh("Wall");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
@@ -214,20 +219,24 @@ public class Wall extends HousePart implements Thermalizable {
 				picked = null;
 			}
 
-			if (container == null)
+			if (container == null) {
 				return;
+			}
 
 			Vector3 p = null;
-			if (picked != null)
+			if (picked != null) {
 				p = picked.getPoint().clone();
-			else
+			} else {
 				p = findClosestPointOnFoundation(x, y);
+			}
 
-			if (p == null)
+			if (p == null) {
 				return;
+			}
 
-			if (container != null)
+			if (container != null) {
 				p.setZ(container.height);
+			}
 			final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 			boolean snappedToWall = snapToWall(p, index);
 			if (!snappedToWall) {
@@ -235,11 +244,13 @@ public class Wall extends HousePart implements Thermalizable {
 				snappedToWall = snapToWall(p, index); // see if it can be snapped after grid move
 			}
 
-			if (!snappedToWall)
+			if (!snappedToWall) {
 				snapToFoundation(p);
+			}
 
-			if (index == 2) // make sure z of 2nd base point is same as 2st (needed for platform picking side)
+			if (index == 2) {
 				p.setZ(points.get(0).getZ());
+			}
 			final Vector3 p_rel = toRelative(p);
 			points.get(index).set(p_rel);
 			points.get(index + 1).set(p_rel).setZ(p.getZ() + height);
@@ -259,8 +270,9 @@ public class Wall extends HousePart implements Thermalizable {
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
 
-		if (container != null)
+		if (container != null) {
 			((Foundation) container).scanChildrenHeight();
+		}
 	}
 
 	@Override
@@ -271,34 +283,35 @@ public class Wall extends HousePart implements Thermalizable {
 	public Vector3 findClosestPointOnFoundation(final int x, final int y) {
 		final PickedHousePart floorPick = SelectUtil.pickPart(x, y, (HousePart) null);
 		if (floorPick != null) {
-			Vector3 p = floorPick.getPoint().clone();
-			ReadOnlyVector3 closesPoint = container.points.get(0);
-			for (int i = 1; i < 4; i++)
-				if (closesPoint.distance(p) > container.points.get(i).distance(p))
-					closesPoint = container.points.get(i);
-			ReadOnlyVector3 secondClosesPoint = closesPoint == container.points.get(0) ? container.points.get(1) : container.points.get(0);
-			for (int i = 0; i < 4; i++)
-				if (secondClosesPoint.distance(p) > container.points.get(i).distance(p) && container.points.get(i) != closesPoint)
-					secondClosesPoint = container.points.get(i);
-			final Vector3 dir = closesPoint.subtract(secondClosesPoint, null).normalizeLocal();
-			p = Util.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
-			snapToGrid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize());
-			p = Util.closestPoint(closesPoint, dir, p, Vector3.NEG_UNIT_Z);
-			p.setX(MathUtils.clamp(p.getX(), Math.min(container.points.get(0).getX(), container.points.get(2).getX()), Math.max(container.points.get(0).getX(), container.points.get(2).getX())));
-			p.setY(MathUtils.clamp(p.getY(), Math.min(container.points.get(0).getY(), container.points.get(1).getY()), Math.max(container.points.get(0).getY(), container.points.get(1).getY())));
-			p.getZ();
+			final int[] lines = { 0, 1, 3, 2, 0 };
+			final Vector3 p = floorPick.getPoint().clone();
+			final Vector2 p_2d = new Vector2(p.getX(), p.getY());
+			Vector2 newP_2d = null;
+			for (int i = 0; i < lines.length - 1; i++) {
+				final Vector3 p1 = container.points.get(lines[i]);
+				final Vector3 p2 = container.points.get(lines[i + 1]);
+				final Vector2 p1_2d = new Vector2(p1.getX(), p1.getY());
+				final Vector2 p2_2d = new Vector2(p2.getX(), p2.getY());
+				final Vector2 result = Util.projectPointOnLine(p_2d, p1_2d, p2_2d, true);
+				if (newP_2d == null || newP_2d.distance(p_2d) > result.distance(p_2d)) {
+					newP_2d = result;
+				}
+			}
+			p.setX(newP_2d.getX());
+			p.setY(newP_2d.getY());
 			return p;
-		} else
+		} else {
 			return null;
-
+		}
 	}
 
 	private void drawThisAndNeighbors(final boolean extendToRoofEnabled) {
 		thicknessNormal = null;
 		isShortWall = true;
 		Wall.extendToRoofEnabled = extendToRoofEnabled;
-		if (isDrawable())
+		if (isDrawable()) {
 			computeInsideDirectionOfAttachedWalls(true);
+		}
 		draw();
 		drawChildren();
 		Wall.extendToRoofEnabled = true;
@@ -330,25 +343,28 @@ public class Wall extends HousePart implements Thermalizable {
 		final double snapDistance = isSnapToObjects() ? getGridSize() : SNAP_DISTANCE;
 
 		final boolean snap;
-		if (isFirstPointInserted() && p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() < getGridSize() * 2)
+		if (isFirstPointInserted() && p.subtract(getAbsPoint(index == 0 ? 2 : 0), null).length() < getGridSize() * 2) {
 			snap = false;
-		else if (closestDistance < snapDistance)
+		} else if (closestDistance < snapDistance) {
 			snap = true;
-		else if (neighbors[index / 2] != null && closestDistance < snapDistance + getGridSize())
+		} else if (neighbors[index / 2] != null && closestDistance < snapDistance + getGridSize()) {
 			snap = true;
-		else
+		} else {
 			snap = false;
+		}
 
 		if (snap) {
 			p.set(closestPoint);
 			return true;
-		} else
+		} else {
 			return false;
+		}
 	}
 
 	private boolean snapToFoundation(final Vector3 current) {
-		if (container == null)
+		if (container == null) {
 			return false;
+		}
 		ReadOnlyVector3 snapPoint = null;
 		double snapDistance = Double.MAX_VALUE;
 		final int[] indices = new int[] { 0, 2, 3, 1, 0 };
@@ -367,8 +383,9 @@ public class Wall extends HousePart implements Thermalizable {
 		if (snapDistance < getGridSize() / 2) {
 			current.set(snapPoint.getX(), snapPoint.getY(), current.getZ());
 			return true;
-		} else
+		} else {
 			return false;
+		}
 	}
 
 	@Override
@@ -379,13 +396,15 @@ public class Wall extends HousePart implements Thermalizable {
 	public boolean isAtSamePlaceAsAnotherPart() {
 		final Vector3 p0 = getAbsPoint(0);
 		final Vector3 p2 = getAbsPoint(2);
-		for (final HousePart part : container.getChildren())
+		for (final HousePart part : container.getChildren()) {
 			if (part != this && part instanceof Wall && part.isDrawCompleted()) {
 				final Vector3 q0 = part.getAbsPoint(0);
 				final Vector3 q2 = part.getAbsPoint(2);
-				if ((p0.equals(q0) && p2.equals(q2)) || (p2.equals(q0) && p0.equals(q2)))
+				if ((p0.equals(q0) && p2.equals(q2)) || (p2.equals(q0) && p0.equals(q2))) {
 					return true;
+				}
 			}
+		}
 		return false;
 	}
 
@@ -400,8 +419,9 @@ public class Wall extends HousePart implements Thermalizable {
 		surroundMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
 		windowsSurroundMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
 
-		if (!drawable)
+		if (!drawable) {
 			return;
+		}
 
 		computeNormalAndXYTransform();
 
@@ -466,21 +486,24 @@ public class Wall extends HousePart implements Thermalizable {
 			if (Scene.getInstance().isDrawThickness() && isShortWall) {
 				final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
 				if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted()) {
-					if (isPerpendicularToNeighbor(0))
+					if (isPerpendicularToNeighbor(0)) {
 						reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 0);
+					}
 				}
 				if (neighbors[1] != null && neighbors[1].getNeighborOf(this).isFirstPointInserted()) {
 					dir.normalizeLocal().negateLocal();
-					if (isPerpendicularToNeighbor(1))
+					if (isPerpendicularToNeighbor(1)) {
 						reduceBackMeshWidth(wallAndWindowsPoints.get(0), dir, 1);
+					}
 				}
 			}
 			drawOutline(wallAndWindowsPoints);
 			if (!isFrozen()) {
-				if (isDrawBackMesh())
+				if (isDrawBackMesh()) {
 					drawBackMesh(computeWallAndWindowPolygon(true));
-				else
+				} else {
 					backMesh.getSceneHints().setCullHint(CullHint.Always);
+				}
 				drawSurroundMesh(thicknessNormal);
 				drawWindowsSurroundMesh(thicknessNormal);
 			}
@@ -495,14 +518,17 @@ public class Wall extends HousePart implements Thermalizable {
 
 	private boolean isDrawBackMesh() {
 		final double MIN_WIDTH = 2;
-		if (getAbsPoint(0).distance(getAbsPoint(2)) < MIN_WIDTH)
+		if (getAbsPoint(0).distance(getAbsPoint(2)) < MIN_WIDTH) {
 			return false;
-		for (int i = 0; i < 2; i++)
+		}
+		for (int i = 0; i < 2; i++) {
 			if (neighbors[i] != null) {
 				final Wall neighbor = neighbors[i].getNeighborOf(this);
-				if (neighbor.getAbsPoint(0).distance(neighbor.getAbsPoint(2)) < MIN_WIDTH)
+				if (neighbor.getAbsPoint(0).distance(neighbor.getAbsPoint(2)) < MIN_WIDTH) {
 					return false;
+				}
 			}
+		}
 		return true;
 	}
 
@@ -543,8 +569,9 @@ public class Wall extends HousePart implements Thermalizable {
 				@Override
 				public void visit(final Wall currentWall, final Snap prev, final Snap next) {
 					final Floor f = currentWall.getFloor();
-					if (f != null)
+					if (f != null) {
 						floor = f;
+					}
 				}
 			});
 		}
@@ -571,8 +598,9 @@ public class Wall extends HousePart implements Thermalizable {
 		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
 		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
@@ -614,8 +642,9 @@ public class Wall extends HousePart implements Thermalizable {
 
 	private Floor getFloor() {
 		for (final HousePart hp : children) {
-			if (hp instanceof Floor)
+			if (hp instanceof Floor) {
 				return (Floor) hp;
+			}
 		}
 		return null;
 	}
@@ -661,8 +690,9 @@ public class Wall extends HousePart implements Thermalizable {
 					@Override
 					public void visit(final Wall currentWall, final Snap prev, final Snap next) {
 						final Floor f = currentWall.getFloor();
-						if (f != null)
+						if (f != null) {
 							floor = f;
+						}
 					}
 				});
 			}
@@ -743,8 +773,9 @@ public class Wall extends HousePart implements Thermalizable {
 			toXY.transform(o);
 			toXY.transform(u);
 			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, o, u, v, true);
-		} else
+		} else {
 			MeshLib.fillMeshWithPolygon(mesh, polygon, fromXY, normal, null, null, null, true);
+		}
 	}
 
 	private void drawOutline(final List<List<Vector3>> wallAndWindowsPoints) {
@@ -796,8 +827,9 @@ public class Wall extends HousePart implements Thermalizable {
 
 		// Add window holes
 		for (final HousePart child : children) {
-			if (child instanceof Window && includeWindow(child))
+			if (child instanceof Window && includeWindow(child)) {
 				polygonPoints.add(computeWindowHole(child, trans));
+			}
 		}
 		return polygonPoints;
 	}
@@ -816,8 +848,9 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	private void extendToRoof(final List<Vector3> polygon) {
-		if (!extendToRoofEnabled)
+		if (!extendToRoofEnabled) {
 			return;
+		}
 
 		final ReadOnlyVector3 o = polygon.get(0).clone();
 		final Vector3 dir = polygon.get(3).subtract(o, null);
@@ -862,16 +895,18 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	public ReadOnlyVector3 findRoofIntersection(final ReadOnlyVector3 p, final ReadOnlyVector3 direction, final double offset) {
-		if (roof == null)
+		if (roof == null) {
 			return p;
+		}
 
 		final Vector3 origin = new Vector3(p.getX(), p.getY(), direction.equals(Vector3.UNIT_Z) ? 0 : p.getZ());
 		final PickResults pickResults = new PrimitivePickResults();
 		PickingUtil.findPick(roof.getRoofPartsRoot(), new Ray3(origin, direction), pickResults, false);
-		if (pickResults.getNumber() > 0)
+		if (pickResults.getNumber() > 0) {
 			return pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0).add(direction.multiply(roof.getOverhangLength() > 0.05 ? offset : 0, null), null);
-		else
+		} else {
 			return p;
+		}
 	}
 
 	public boolean isPerpendicularToNeighbor(final int neighbor) {
@@ -900,9 +935,11 @@ public class Wall extends HousePart implements Thermalizable {
 		extendToRoof(polygon.get(0));
 
 		/* lower the z of back wall to ensure it doesn't stick up through the roof */
-		if (roof != null)
-			for (final Vector3 p : polygon.get(0))
+		if (roof != null) {
+			for (final Vector3 p : polygon.get(0)) {
 				p.setZ(p.getZ() - 0.3);
+			}
+		}
 
 		drawPolygon(polygon, backMesh, true, true, false);
 	}
@@ -932,10 +969,11 @@ public class Wall extends HousePart implements Thermalizable {
 		final Vector3 otherWallDir = otherWall.getAbsPoint(neighborPointIndex == 0 ? 2 : 0).subtract(otherWall.getAbsPoint(neighborPointIndex), null).normalizeLocal();
 		final double angle = Math.max(0.1, otherWallDir.smallestAngleBetween(wallDir));
 		final double angle360;
-		if (wallDir.dot(otherWall.getThicknessNormal().normalize(null)) < 0)
+		if (wallDir.dot(otherWall.getThicknessNormal().normalize(null)) < 0) {
 			angle360 = Math.PI + angle;
-		else
+		} else {
 			angle360 = angle;
+		}
 
 		final boolean reverse = angle360 >= Math.PI;
 		final double length = wallThickness * Math.tan((Math.PI - angle) / 2) * (reverse ? -1 : 1);
@@ -952,8 +990,9 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	public Vector3 getThicknessNormal() {
-		if (thicknessNormal != null)
+		if (thicknessNormal != null) {
 			return thicknessNormal;
+		}
 		computeNormalAndXYTransform();
 		final Vector3 n = normal.clone();
 		final Snap neighbor;
@@ -963,15 +1002,17 @@ public class Wall extends HousePart implements Thermalizable {
 			/*
 			 * if edit point has snapped to a new wall then use the angle with new wall to determine inside direction of this wall otherwise use the angle with the other wall attached to none moving corner of the this wall
 			 */
-			if (neighbors[0] == null)
+			if (neighbors[0] == null) {
 				whichNeighbor = 1;
-			else
+			} else {
 				whichNeighbor = 0;
+			}
 		} else {
-			if (neighbors[1] == null)
+			if (neighbors[1] == null) {
 				whichNeighbor = 0;
-			else
+			} else {
 				whichNeighbor = 1;
+			}
 		}
 		neighbor = neighbors[whichNeighbor];
 
@@ -979,12 +1020,14 @@ public class Wall extends HousePart implements Thermalizable {
 			final HousePart other = neighbor.getNeighborOf(this);
 			final int otherPointIndex = neighbor.getSnapPointIndexOfNeighborOf(this);
 			final Vector3 otherWallDir = other.getAbsPoint(otherPointIndex == 0 ? 2 : 0).subtract(other.getAbsPoint(otherPointIndex), null).normalizeLocal();
-			if (n.dot(otherWallDir) < 0)
+			if (n.dot(otherWallDir) < 0) {
 				n.negateLocal();
+			}
 		} else {
 			final ReadOnlyVector3 camera = SceneManager.getInstance().getCamera().getDirection();
-			if (camera.dot(n) < 0)
+			if (camera.dot(n) < 0) {
 				n.negateLocal();
+			}
 		}
 		n.multiplyLocal(wallThickness);
 		thicknessNormal = n;
@@ -1007,14 +1050,17 @@ public class Wall extends HousePart implements Thermalizable {
 		final boolean visible = roof == null || noNeighbor0 || noNeighbor1;
 		surroundMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
 		if (!visible) {
-			if (surroundMesh.getModelBound() != null)
+			if (surroundMesh.getModelBound() != null) {
 				surroundMesh.setModelBound(null);
+			}
 		} else {
-			if (surroundMesh.getModelBound() == null)
+			if (surroundMesh.getModelBound() == null) {
 				surroundMesh.setModelBound(new BoundingBox());
+			}
 		}
-		if (!visible)
+		if (!visible) {
 			return;
+		}
 
 		final FloatBuffer vertexBuffer = surroundMesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = surroundMesh.getMeshData().getNormalBuffer();
@@ -1024,12 +1070,15 @@ public class Wall extends HousePart implements Thermalizable {
 		normalBuffer.limit(normalBuffer.capacity());
 
 		final Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();
-		if (noNeighbor0)
+		if (noNeighbor0) {
 			addSurroundQuad(0, 1, sideNormal.negate(null), thickness, vertexBuffer, normalBuffer);
-		if (noNeighbor1)
+		}
+		if (noNeighbor1) {
 			addSurroundQuad(3, 2, sideNormal, thickness, vertexBuffer, normalBuffer);
-		if (roof == null)
+		}
+		if (roof == null) {
 			addSurroundQuad(1, 3, Vector3.UNIT_Z, thickness, vertexBuffer, normalBuffer);
+		}
 
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
@@ -1048,8 +1097,9 @@ public class Wall extends HousePart implements Thermalizable {
 		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
 		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			normalBuffer.put(n.getXf()).put(n.getYf()).put(n.getZf());
+		}
 	}
 
 	private void drawWindowsSurroundMesh(final Vector3 thickness) {
@@ -1069,8 +1119,9 @@ public class Wall extends HousePart implements Thermalizable {
 			if (child instanceof Window && includeWindow(child)) {
 				int[] order = order1;
 				final Vector3 windowDirection = child.getAbsPoint(2).subtract(child.getAbsPoint(0), null);
-				if (windowDirection.dot(wallDirection) < 0)
+				if (windowDirection.dot(wallDirection) < 0) {
 					order = order2;
+				}
 				for (int index = 0; index < order.length - 1; index++) {
 					int i = order[index];
 					p.set(child.getAbsPoint(i));
@@ -1085,19 +1136,24 @@ public class Wall extends HousePart implements Thermalizable {
 
 					if (index == 1 || index == 3) {
 						int z = 1;
-						if (index == 1)
+						if (index == 1) {
 							z = -z;
+						}
 						final boolean reversedThickness = getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal().crossLocal(wallDirection.normalize(null)).dot(thicknessNormal.normalize(null)) >= 0;
-						if (!reversedThickness)
+						if (!reversedThickness) {
 							z = -z;
-						for (int j = 0; j < 4; j++)
+						}
+						for (int j = 0; j < 4; j++) {
 							normalBuffer.put(0).put(0).put(z);
+						}
 					} else if (index == 0 || index == 2) {
 						n.set(sideNormal);
-						if (index == 2)
+						if (index == 2) {
 							n.negateLocal();
-						for (int j = 0; j < 4; j++)
+						}
+						for (int j = 0; j < 4; j++) {
 							normalBuffer.put(n.getXf()).put(n.getYf()).put(n.getZf());
+						}
 					}
 				}
 			}
@@ -1110,11 +1166,14 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	public Snap getOtherSnap(final Snap snap) {
-		if (snap == null && neighbors[1] != null)
+		if (snap == null && neighbors[1] != null) {
 			return neighbors[1];
-		for (final Snap s : neighbors)
-			if (s != null && !s.equals(snap))
+		}
+		for (final Snap s : neighbors) {
+			if (s != null && !s.equals(snap)) {
 				return s;
+			}
+		}
 		return null;
 	}
 
@@ -1128,8 +1187,9 @@ public class Wall extends HousePart implements Thermalizable {
 		// return;
 		// }
 
-		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap)))
+		if (!updateNeighbors || oldSnap == newSnap || (oldSnap != null && oldSnap.equals(newSnap))) {
 			return;
+		}
 
 		if (oldSnap != null) {
 			final Wall neighbor = oldSnap.getNeighborOf(this);
@@ -1147,8 +1207,9 @@ public class Wall extends HousePart implements Thermalizable {
 	protected void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		points.get(1).setZ(newHeight + container.height);
-		if (isFirstPointInserted())
+		if (isFirstPointInserted()) {
 			points.get(3).setZ(newHeight + container.height);
+		}
 	}
 
 	@Override
@@ -1156,31 +1217,35 @@ public class Wall extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 n = getNormal();
 		double angle = n.smallestAngleBetween(Vector3.NEG_UNIT_Y);
 
-		if (n.dot(Vector3.UNIT_X) < 0)
+		if (n.dot(Vector3.UNIT_X) < 0) {
 			angle = -angle;
+		}
 
 		root.setRotation((new Matrix3().fromAngles(0, 0, -flattenTime * angle)));
 
 		super.flatten(flattenTime);
 
-		for (final HousePart part : children)
+		for (final HousePart part : children) {
 			if (!part.isPrintable()) {
 				part.getRoot().setTransform(root.getTransform());
 				part.getRoot().updateGeometricState(0);
 			}
+		}
 	}
 
 	@Override
 	public ReadOnlyVector3 getNormal() {
-		if (thicknessNormal == null)
+		if (thicknessNormal == null) {
 			thicknessNormal = getThicknessNormal();
+		}
 		return thicknessNormal.negate(null).normalizeLocal();
 	}
 
 	@Override
 	public void drawAnnotations() {
-		if (points.size() < 4)
+		if (points.size() < 4) {
 			return;
+		}
 		final ReadOnlyVector3 faceDirection = getNormal();
 		int annotCounter = 0;
 		int angleAnnotCounter = 0;
@@ -1194,10 +1259,12 @@ public class Wall extends HousePart implements Thermalizable {
 			double low = lowestWallZ;
 			double hi = Math.max(wallPolygonPoints.get(0).getZ(), wallPolygonPoints.get(3).getZ());
 			for (int i = 4; i < wallPolygonPoints.size(); i++) {
-				if (wallPolygonPoints.get(i).getZ() < low)
+				if (wallPolygonPoints.get(i).getZ() < low) {
 					low = wallPolygonPoints.get(i).getZ();
-				if (wallPolygonPoints.get(i).getZ() > hi)
+				}
+				if (wallPolygonPoints.get(i).getZ() > hi) {
 					hi = wallPolygonPoints.get(i).getZ();
+				}
 			}
 
 			final float lineWidth = original == null ? 1f : 2f;
@@ -1217,18 +1284,20 @@ public class Wall extends HousePart implements Thermalizable {
 				fetchSizeAnnot(annotCounter++).setRange(p3, p4, getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
 				fetchSizeAnnot(annotCounter++).setRange(p4, p1, getCenter(), faceDirection, front, front ? Align.South : Align.Center, true, reverse, Scene.isDrawAnnotationsInside());
 
-				for (int i = 0; i < annotCounter; i++)
+				for (int i = 0; i < annotCounter; i++) {
 					fetchSizeAnnot(i).setLineWidth(lineWidth);
+				}
 
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p2, p1, p3, getNormal());
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p3, p2, p4, getNormal());
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p4, p3, p1, getNormal());
 				fetchAngleAnnot(angleAnnotCounter++).setRange(p1, p4, p2, getNormal());
 
-				for (int i = 0; i < annotCounter; i++)
+				for (int i = 0; i < annotCounter; i++) {
 					fetchAngleAnnot(i).setLineWidth(lineWidth);
+				}
 
-			} else
+			} else {
 				for (int i = 0; i < wallPolygonPoints.size(); i++) {
 					final boolean front = i == 1 && original == null;
 					final ReadOnlyVector3 p1 = wallPolygonPoints.get(i);
@@ -1249,6 +1318,7 @@ public class Wall extends HousePart implements Thermalizable {
 						angleAnnot.setLineWidth(lineWidth);
 					}
 				}
+			}
 		}
 	}
 
@@ -1259,8 +1329,9 @@ public class Wall extends HousePart implements Thermalizable {
 		while (currentWall != null && !currentWall.isVisited()) {
 			currentWall.visit();
 			snap = currentWall.getOtherSnap(snap);
-			if (snap == null)
+			if (snap == null) {
 				break;
+			}
 			currentWall = snap.getNeighborOf(currentWall);
 		}
 
@@ -1285,23 +1356,27 @@ public class Wall extends HousePart implements Thermalizable {
 			snap = currentWall.getOtherSnap(snap);
 			visits.add(new VisitInfo(currentWall, prevSnap, snap));
 			currentWall.visit();
-			if (snap == null)
+			if (snap == null) {
 				break;
+			}
 			currentWall = snap.getNeighborOf(currentWall);
 		}
-		for (final VisitInfo visit : visits)
+		for (final VisitInfo visit : visits) {
 			visitor.visit(visit.wall, visit.prev, visit.next);
+		}
 	}
 
 	public void computeInsideDirectionOfAttachedWalls(final boolean drawNeighborWalls) {
-		if (this.thicknessNormal != null)
+		if (this.thicknessNormal != null) {
 			return;
+		}
 
 		final ArrayList<Wall> walls;
-		if (drawNeighborWalls)
+		if (drawNeighborWalls) {
 			walls = new ArrayList<Wall>();
-		else
+		} else {
 			walls = null;
+		}
 
 		final double[] side = new double[] { 0.0 };
 
@@ -1318,8 +1393,9 @@ public class Wall extends HousePart implements Thermalizable {
 					final ReadOnlyVector3 p2_p3 = p3.subtract(p2, null).normalizeLocal();
 					side[0] += Util.angleBetween(p1_p2, p2_p3, Vector3.UNIT_Z);
 				}
-				if (drawNeighborWalls && wall != Wall.this && !walls.contains(wall))
+				if (drawNeighborWalls && wall != Wall.this && !walls.contains(wall)) {
 					walls.add(wall);
+				}
 			}
 		});
 
@@ -1333,25 +1409,28 @@ public class Wall extends HousePart implements Thermalizable {
 					final Vector3 p2 = wall.getAbsPoint(indexP2);
 					final Vector3 p1_p2 = p2.subtract(p1, null);
 					wall.thicknessNormal = p1_p2.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wallThickness);
-					if (side[0] > 0)
+					if (side[0] > 0) {
 						wall.thicknessNormal.negateLocal();
+					}
 				} else if (prev != null) {
 					final int indexP2 = prev.getSnapPointIndexOf(wall);
 					final Vector3 p2 = wall.getAbsPoint(indexP2);
 					final Vector3 p3 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
 					final Vector3 p2_p3 = p3.subtract(p2, null);
 					wall.thicknessNormal = p2_p3.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wallThickness);
-					if (side[0] > 0)
+					if (side[0] > 0) {
 						wall.thicknessNormal.negateLocal();
+					}
 				}
 			}
 		});
 
-		if (drawNeighborWalls)
+		if (drawNeighborWalls) {
 			for (final HousePart wall : walls) {
 				wall.draw();
 				wall.drawChildren();
 			}
+		}
 	}
 
 	@Override
@@ -1435,28 +1514,33 @@ public class Wall extends HousePart implements Thermalizable {
 			if (pMiddle.getZ() > this.height) {
 				ReadOnlyVector3 tmp;
 				tmp = findRoofIntersection(pMiddle, width.normalize(null), 0);
-				if (tmp != pMiddle)
+				if (tmp != pMiddle) {
 					lineP1 = tmp;
+				}
 				tmp = findRoofIntersection(pMiddle, width.normalize(null).negateLocal(), 0);
-				if (tmp != pMiddle)
+				if (tmp != pMiddle) {
 					lineP2 = tmp;
+				}
 			}
 			points.add(lineP1);
 			points.add(lineP2);
 		}
-		if (points.size() < 2)
+		if (points.size() < 2) {
 			return;
+		}
 		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
-		for (final ReadOnlyVector3 p : points)
+		for (final ReadOnlyVector3 p : points) {
 			buf.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
 		gridsMesh.getMeshData().setVertexBuffer(buf);
 	}
 
 	@Override
 	public void reset() {
 		super.reset();
-		if (root == null)
+		if (root == null) {
 			init();
+		}
 		thicknessNormal = null;
 		neighbors[0] = neighbors[1] = null;
 	}
@@ -1473,13 +1557,14 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	public void connectedWalls() {
-		if (!isDrawable() || (neighbors[0] != null && neighbors[1] != null))
+		if (!isDrawable() || (neighbors[0] != null && neighbors[1] != null)) {
 			return;
+		}
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Wall && part != this && part.isDrawCompleted()) {
 				final Wall otherWall = (Wall) part;
-				for (int index = 0; index < 2; index++)
-					if (neighbors[index] == null)
+				for (int index = 0; index < 2; index++) {
+					if (neighbors[index] == null) {
 						for (int otherIndex = 0; otherIndex < 2; otherIndex++) {
 							// if ((otherWall.neighbors[otherIndex] == null || otherWall.neighbors[otherIndex].getNeighborOf(otherWall) == this) && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
 							if (otherWall.neighbors[otherIndex] == null && Util.isEqual(otherWall.getAbsPoint(otherIndex * 2), getAbsPoint(index * 2))) {
@@ -1487,15 +1572,20 @@ public class Wall extends HousePart implements Thermalizable {
 								break;
 							}
 						}
+					}
+				}
 			}
 		}
 	}
 
 	public boolean windowsFit() {
-		for (final HousePart part : children)
-			if (part instanceof Window)
-				if (!fits(part))
+		for (final HousePart part : children) {
+			if (part instanceof Window) {
+				if (!fits(part)) {
 					return false;
+				}
+			}
+		}
 		return true;
 	}
 
@@ -1507,14 +1597,17 @@ public class Wall extends HousePart implements Thermalizable {
 		final ArrayList<Vector3> polygon = new ArrayList<Vector3>(wallAndWindowsPoints.get(0).size());
 		for (int i = 0; i < wallAndWindowsPoints.get(0).size(); i++) {
 			final Vector3 p = wallAndWindowsPoints.get(0).get(i).clone();
-			if (i == 0 || i > 2)
+			if (i == 0 || i > 2) {
 				p.subtractLocal(0, 0, minDistanceToRoof);
+			}
 			polygon.add(p);
 		}
 		applyXYTransform(polygon);
-		for (final Vector3 p : hole)
-			if (!Util.insidePolygon(p, polygon))
+		for (final Vector3 p : hole) {
+			if (!Util.insidePolygon(p, polygon)) {
 				return false;
+			}
+		}
 		return true;
 	}
 
@@ -1534,11 +1627,14 @@ public class Wall extends HousePart implements Thermalizable {
 	@Override
 	public double getArea() {
 		double areaWithoutWindows = area;
-		for (final HousePart child : children)
-			if (child instanceof Window || child instanceof Door)
+		for (final HousePart child : children) {
+			if (child instanceof Window || child instanceof Door) {
 				areaWithoutWindows -= child.getArea();
-		if (areaWithoutWindows < 0)
+			}
+		}
+		if (areaWithoutWindows < 0) {
 			areaWithoutWindows = 0;
+		}
 		return areaWithoutWindows;
 	}
 
@@ -1553,21 +1649,24 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	public Spatial getCollisionSpatial() {
-		if (SceneManager.getInstance().isTopView())
+		if (SceneManager.getInstance().isTopView()) {
 			return root;
-		else
+		} else {
 			return invisibleMesh;
+		}
 	}
 
 	@Override
 	public void drawHeatFlux() {
-		if (type != SOLID_WALL)
+		if (type != SOLID_WALL) {
 			return;
+		}
 		double zmax = -Double.MAX_VALUE;
 		final List<Vector3> wallPolygonPoints = getWallPolygonPoints();
 		for (final Vector3 a : wallPolygonPoints) {
-			if (a.getZ() > zmax)
+			if (a.getZ() > zmax) {
 				zmax = a.getZ();
+			}
 		}
 
 		final Path2D.Double path = new Path2D.Double();
@@ -1618,11 +1717,13 @@ public class Wall extends HousePart implements Thermalizable {
 					a.setZ(o.getZ() + g * zmax / rows);
 					a.subtract(wallPolygonPoints.get(0), v1);
 					if (Util.isZero(v1.getX())) {
-						if (!path.contains(v1.getY(), v1.getZ()))
+						if (!path.contains(v1.getY(), v1.getZ())) {
 							break;
+						}
 					} else {
-						if (!path.contains(v1.getX(), v1.getZ()))
+						if (!path.contains(v1.getX(), v1.getZ())) {
 							break;
+						}
 					}
 					drawArrow(a, normal, arrowsVertices, heat);
 				}
@@ -1680,8 +1781,9 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isValid() {
-		if (!super.isValid())
+		if (!super.isValid()) {
 			return false;
+		}
 		final double minLength = 0.2;
 		return points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= minLength && getAbsPoint(0).distance(getAbsPoint(1)) >= minLength;
 	}
