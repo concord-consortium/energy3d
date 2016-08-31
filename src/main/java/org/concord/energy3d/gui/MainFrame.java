@@ -1253,16 +1253,28 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
-			addModel(tutorialsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
-			addModel(tutorialsMenu, "Solar Box", "tutorials/solar-box.ng3");
-			addModel(tutorialsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
-			addModel(tutorialsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
-			addModel(tutorialsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
-			addModel(tutorialsMenu, "Photovoltaic Solar Farm (Fixed Arrays)", "tutorials/pv-fixed-arrays.ng3");
-			addModel(tutorialsMenu, "Photovoltaic Solar Farm (HSAT Arrays)", "tutorials/pv-hsat-arrays.ng3");
-			addModel(tutorialsMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
-			addModel(tutorialsMenu, "Cosine Efficiency (CSP Tower)", "tutorials/csp-cosine-efficiency.ng3");
-			addModel(tutorialsMenu, "Shadowing and Blocking (CSP Tower)", "tutorials/csp-shadowing-blocking.ng3");
+
+			final JMenu basicsMenu = new JMenu("Solar Science Basics");
+			tutorialsMenu.add(basicsMenu);
+			addModel(basicsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
+			addModel(basicsMenu, "Solar Box", "tutorials/solar-box.ng3");
+			addModel(basicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
+			addModel(basicsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
+
+			final JMenu pvMenu = new JMenu("Photovoltatic Systems");
+			tutorialsMenu.add(pvMenu);
+			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Arrays)", "tutorials/pv-fixed-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Arrays)", "tutorials/pv-hsat-arrays.ng3");
+
+			final JMenu cspMenu = new JMenu("Concentrated Solar Power Systems");
+			tutorialsMenu.add(cspMenu);
+			addModel(cspMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
+			addModel(cspMenu, "Cosine Efficiency", "tutorials/csp-cosine-efficiency.ng3");
+			addModel(cspMenu, "Shadowing and Blocking", "tutorials/csp-shadowing-blocking.ng3");
+			addModel(cspMenu, "Shadowing and Blocking (Reduced Mirror Height)", "tutorials/csp-shadowing-blocking-less.ng3");
+			addModel(cspMenu, "Shadowing and Blocking (Increased Radial Spacing)", "tutorials/csp-shadowing-blocking-even-less.ng3");
+
 		}
 		return tutorialsMenu;
 	}

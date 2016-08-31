@@ -697,7 +697,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					count++;
 				}
 			}
-			solarReceiver.setHeight(getSolarReceiverHeight() * 0.1);
+			solarReceiver.setHeight(getSolarReceiverHeight() * 0.15);
 			Vector3 o;
 			if (count == 0) {
 				o = getAbsCenter();
@@ -705,7 +705,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				solarReceiver.setRadius(10);
 			} else {
 				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight() - solarReceiver.getHeight() * 0.5);
-				solarReceiver.setRadius(Math.max((xmax - xmin), (ymax - ymin)));
+				final double r1 = Math.max((xmax - xmin), (ymax - ymin)) / 2;
+				final double r2 = Math.max(r1 * 0.4, 4);
+				solarReceiver.setRadius(r1 + r2);
 			}
 			solarReceiver.setTranslation(o);
 		}
@@ -1641,7 +1643,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		switch (layout.getType()) {
 		case FERMAT_SPIRAL:
 			for (int i = 1; i < 10000; i++) {
-				final double r = b * Math.sqrt(i);
+				double r = b * Math.sqrt(i);
+				r += r * r * layout.getRadialSpacingIncrement();
 				if (r > a) {
 					break;
 				}

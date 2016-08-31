@@ -1103,7 +1103,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Camera camera = getCamera();
 		cameraControl.setMouseButtonActions(ButtonAction.MOVE, ButtonAction.MOVE);
 		cameraControl.setMoveSpeed(MOVE_SPEED);
-		ReadOnlyVector3 loc = new Vector3(0, -120, 50);
+		ReadOnlyVector3 loc = new Vector3(0, -100, 25);
 		ReadOnlyVector3 up = new Vector3(0, 0, 1);
 		ReadOnlyVector3 lookAt = new Vector3(0, 0, 0);
 
@@ -1163,7 +1163,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Dimension size = ((Component) canvas).getSize();
 		camera.resize(size.width, size.height);
 		final double ratio = (double) size.width / size.height;
-
 		final double near = 1;
 		final double far = 2 * SKY_RADIUS;
 		if (camera.getProjectionMode() == ProjectionMode.Parallel) {
