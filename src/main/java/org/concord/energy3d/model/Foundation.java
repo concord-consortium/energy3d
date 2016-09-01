@@ -1669,6 +1669,50 @@ public class Foundation extends HousePart implements Thermalizable {
 		return countParts(Mirror.class);
 	}
 
+	public int addRectangularMirrorArrays(final MirrorRectangularFieldLayout layout) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
+		final double az = Math.toRadians(getAzimuth());
+		if (!Util.isZero(az)) {
+			rotate(az, null);
+		}
+		final Vector3 p0 = getAbsPoint(0);
+		final double a = p0.distance(getAbsPoint(2));
+		final double b = p0.distance(getAbsPoint(1));
+		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
+		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
+		final double w = (layout.getMirrorWidth() + layout.getColumnSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double h = (layout.getMirrorHeight() + layout.getRowSpacing()) / Scene.getInstance().getAnnotationScale();
+		switch (layout.getRowAxis()) {
+		case 0: // north-south axis
+			int rows = (int) Math.floor(b / w);
+			int cols = (int) Math.floor(a / h);
+			for (int c = 0; c < cols; c++) {
+				for (int r = 0; r < rows; r++) {
+					final Vector3 p = new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0);
+					addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+				}
+			}
+			break;
+		case 1: // east-west axis
+			rows = (int) Math.floor(a / w);
+			cols = (int) Math.floor(b / h);
+			for (int c = 0; c < cols; c++) {
+				for (int r = 0; r < rows; r++) {
+					final Vector3 p = new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0);
+					addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+				}
+			}
+			break;
+		}
+		if (!Util.isZero(az)) {
+			rotate(-az, null);
+		}
+		Scene.getInstance().redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(command);
+		return countParts(Mirror.class);
+	}
+
 	public void addSolarPanelArrays(final double panelWidth, final double panelHeight, final double rowSpacing, final double colSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(SolarPanel.class), this, SolarPanel.class);

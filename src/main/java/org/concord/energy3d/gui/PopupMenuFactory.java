@@ -49,6 +49,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.MirrorCircularFieldLayout;
+import org.concord.energy3d.model.MirrorRectangularFieldLayout;
 import org.concord.energy3d.model.MirrorSpiralFieldLayout;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -173,6 +174,7 @@ public class PopupMenuFactory {
 	private static int pvArrayRowAxis = 0;
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
+	private static MirrorRectangularFieldLayout mirrorRectangularFieldLayout = new MirrorRectangularFieldLayout();
 	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
 	private static MirrorSpiralFieldLayout mirrorSpiralFieldLayout = new MirrorSpiralFieldLayout();
 
@@ -1960,6 +1962,78 @@ public class PopupMenuFactory {
 								@Override
 								public Object call() {
 									final int count = f.addCircularMirrorArrays(mirrorCircularFieldLayout);
+									if (count == 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+									}
+									return null;
+								}
+							});
+							updateAfterEdit();
+						}
+					}
+				}
+			});
+
+			final JMenuItem miMirrorRectangularArrays = new JMenuItem("Mirror Rectangular Layout...");
+			layoutMenu.add(miMirrorRectangularArrays);
+			miMirrorRectangularArrays.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final int n = f.countParts(Mirror.class);
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+							return;
+						}
+						final JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
+						panel.add(new JLabel("Row Axis:"));
+						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						rowAxisComboBox.setSelectedIndex(mirrorRectangularFieldLayout.getRowAxis());
+						panel.add(rowAxisComboBox);
+						panel.add(new JLabel("Mirror Width:"));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getMirrorWidth()));
+						panel.add(widthField);
+						panel.add(new JLabel("Mirror Height:"));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getMirrorHeight()));
+						panel.add(heightField);
+						panel.add(new JLabel("Row Spacing:"));
+						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getRowSpacing()));
+						panel.add(rowSpacingField);
+						panel.add(new JLabel("Column Spacing:"));
+						final JTextField columnSpacingField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getColumnSpacing()));
+						panel.add(columnSpacingField);
+						boolean ok = false;
+						while (true) {
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Rectangular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+								try {
+									mirrorRectangularFieldLayout.setRowSpacing(Double.parseDouble(rowSpacingField.getText()));
+									mirrorRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
+									mirrorRectangularFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
+									mirrorRectangularFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
+									if (mirrorRectangularFieldLayout.getRowSpacing() < 0 || mirrorRectangularFieldLayout.getColumnSpacing() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorRectangularFieldLayout.getMirrorWidth() < 1 || mirrorRectangularFieldLayout.getMirrorWidth() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorRectangularFieldLayout.getMirrorHeight() < 1 || mirrorRectangularFieldLayout.getMirrorHeight() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else {
+										ok = true;
+										break;
+									}
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								}
+							} else {
+								break;
+							}
+						}
+						if (ok) {
+							mirrorRectangularFieldLayout.setRowAxis(rowAxisComboBox.getSelectedIndex());
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() {
+									final int count = f.addRectangularMirrorArrays(mirrorRectangularFieldLayout);
 									if (count == 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 									}

@@ -253,6 +253,7 @@ public class MainFrame extends JFrame {
 	private JMenu geoLocationMenu;
 	private JMenuItem setGeoLocationMenuItem;
 	private JMenuItem clearGeoLocationMenuItem;
+	private JCheckBoxMenuItem showMapMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -1431,11 +1432,13 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					Util.selectSilently(showMapMenuItem, SceneManager.getInstance().getMapLand().isVisible());
 				}
 			});
 
 			geoLocationMenu.add(getSetGeoLocationMenuItem());
 			geoLocationMenu.add(getClearGeoLocationMenuItem());
+			geoLocationMenu.add(getShowMapMenuItem());
 
 		}
 		return geoLocationMenu;
@@ -1467,6 +1470,25 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return clearGeoLocationMenuItem;
+	}
+
+	private JCheckBoxMenuItem getShowMapMenuItem() {
+		if (showMapMenuItem == null) {
+			showMapMenuItem = new JCheckBoxMenuItem("Show Map");
+			showMapMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					// final ShowSolarLandCommand c = new ShowSolarLandCommand();
+					final boolean b = showMapMenuItem.isSelected();
+					SceneManager.getInstance().getMapLand().setVisible(b);
+					Scene.getInstance().setShowMap(b);
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAll();
+					// SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			});
+		}
+		return showMapMenuItem;
 	}
 
 	public JCheckBoxMenuItem getAxesMenuItem() {
