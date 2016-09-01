@@ -129,6 +129,7 @@ public class Scene implements Serializable {
 	private transient BufferedImage mapImage;
 	private transient boolean avoidSavingMapImage;
 	private double mapScale;
+	private boolean hideMap;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -2375,7 +2376,7 @@ public class Scene implements Serializable {
 			textureState.setTexture(texture);
 			final Mesh mesh = SceneManager.getInstance().getMapLand();
 			mesh.setRenderState(textureState);
-			mesh.setVisible(true);
+			mesh.setVisible(!hideMap);
 			setFoundationsVisible(false);
 		}
 	}
@@ -2387,6 +2388,14 @@ public class Scene implements Serializable {
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	public void setShowMap(final boolean showMap) {
+		hideMap = !showMap;
+	}
+
+	public boolean getShowMap() {
+		return !hideMap;
 	}
 
 	/** used by SnapshotLogger */

@@ -58,7 +58,7 @@ public class Wall extends HousePart implements Thermalizable {
 	public static final int COLUMNS_RAILS = 4;
 	public static final int VERTICAL_EDGES_ONLY = 5;
 	public static final int FENCE = 6;
-	public static final int BOARD_ONLY = 7;
+	public static final int STEEL_FRAME = 7;
 
 	private transient Mesh backMesh;
 	private transient Mesh surroundMesh;
@@ -80,7 +80,7 @@ public class Wall extends HousePart implements Thermalizable {
 	private int type = SOLID_WALL;
 	private transient Mesh columns;
 	private transient Mesh rails;
-	private transient Mesh board;
+	private transient Mesh steelFrame;
 	private double columnRadius = 1;
 	private double railRadius = 0.1;
 	private transient Floor floor;
@@ -198,13 +198,13 @@ public class Wall extends HousePart implements Thermalizable {
 		rails.setModelBound(new BoundingBox());
 		root.attachChild(rails);
 
-		board = new Mesh("Board");
-		board.getMeshData().setIndexMode(IndexMode.Quads);
-		board.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		board.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(4));
-		board.setRenderState(offsetState);
-		board.setModelBound(new BoundingBox());
-		root.attachChild(board);
+		steelFrame = new Mesh("Steel Frame");
+		steelFrame.getMeshData().setIndexMode(IndexMode.Quads);
+		steelFrame.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
+		steelFrame.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
+		steelFrame.setRenderState(offsetState);
+		steelFrame.setModelBound(new BoundingBox());
+		root.attachChild(steelFrame);
 
 	}
 
@@ -433,34 +433,34 @@ public class Wall extends HousePart implements Thermalizable {
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			rails.getSceneHints().setCullHint(CullHint.Always);
-			board.getSceneHints().setCullHint(CullHint.Always);
+			steelFrame.getSceneHints().setCullHint(CullHint.Always);
 			break;
 		case VERTICAL_EDGES_ONLY:
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			rails.getSceneHints().setCullHint(CullHint.Always);
-			board.getSceneHints().setCullHint(CullHint.Always);
-			drawVerticalEdges();
+			steelFrame.getSceneHints().setCullHint(CullHint.Always);
+			drawVerticalEdges(columnRadius);
 			break;
 		case COLUMNS_ONLY:
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			rails.getSceneHints().setCullHint(CullHint.Always);
-			board.getSceneHints().setCullHint(CullHint.Always);
+			steelFrame.getSceneHints().setCullHint(CullHint.Always);
 			drawColumns(10);
 			break;
 		case RAILS_ONLY:
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			rails.getSceneHints().setCullHint(CullHint.Inherit);
-			board.getSceneHints().setCullHint(CullHint.Always);
+			steelFrame.getSceneHints().setCullHint(CullHint.Always);
 			drawRails(1, false);
 			break;
 		case COLUMNS_RAILS:
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			rails.getSceneHints().setCullHint(CullHint.Inherit);
-			board.getSceneHints().setCullHint(CullHint.Always);
+			steelFrame.getSceneHints().setCullHint(CullHint.Always);
 			drawColumns(10);
 			drawRails(1, false);
 			break;
@@ -468,21 +468,22 @@ public class Wall extends HousePart implements Thermalizable {
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			rails.getSceneHints().setCullHint(CullHint.Inherit);
-			board.getSceneHints().setCullHint(CullHint.Always);
+			steelFrame.getSceneHints().setCullHint(CullHint.Always);
 			drawRails(1, true);
 			break;
-		case BOARD_ONLY:
+		case STEEL_FRAME:
 			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
-			columns.getSceneHints().setCullHint(CullHint.Always);
+			columns.getSceneHints().setCullHint(CullHint.Inherit);
 			rails.getSceneHints().setCullHint(CullHint.Always);
-			board.getSceneHints().setCullHint(CullHint.Inherit);
-			drawBoard();
+			steelFrame.getSceneHints().setCullHint(CullHint.Inherit);
+			drawVerticalEdges(1);
+			drawSteelFrame(0.25, 10);
 			break;
 		default:
 			outlineMesh.getSceneHints().setCullHint(drawable ? CullHint.Inherit : CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			rails.getSceneHints().setCullHint(CullHint.Always);
-			board.getSceneHints().setCullHint(CullHint.Always);
+			steelFrame.getSceneHints().setCullHint(CullHint.Always);
 			if (Scene.getInstance().isDrawThickness() && isShortWall) {
 				final Vector3 dir = getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal();
 				if (neighbors[0] != null && neighbors[0].getNeighborOf(this).isFirstPointInserted()) {
@@ -532,7 +533,7 @@ public class Wall extends HousePart implements Thermalizable {
 		return true;
 	}
 
-	private void drawVerticalEdges() {
+	private void drawVerticalEdges(final double size) {
 		columns.setDefaultColor(getColor());
 		final FloatBuffer vertexBuffer = columns.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = columns.getMeshData().getNormalBuffer();
@@ -540,72 +541,15 @@ public class Wall extends HousePart implements Thermalizable {
 		normalBuffer.rewind();
 		vertexBuffer.limit(vertexBuffer.capacity());
 		normalBuffer.limit(normalBuffer.capacity());
-
 		final ReadOnlyVector3 o = getAbsPoint(0);
 		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
-
-		final Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(columnRadius);
+		final Vector3 dir = new Vector3(u).normalizeLocal().multiplyLocal(size);
 		Util.addPointToQuad(normal, o, getAbsPoint(1), dir, vertexBuffer, normalBuffer);
 		Util.addPointToQuad(normal, getAbsPoint(2), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
-
 		vertexBuffer.limit(vertexBuffer.position());
 		normalBuffer.limit(normalBuffer.position());
 		columns.getMeshData().updateVertexCount();
 		columns.updateModelBound();
-	}
-
-	private void drawBoard() {
-		board.setDefaultColor(getColor());
-		final FloatBuffer vertexBuffer = board.getMeshData().getVertexBuffer();
-		final FloatBuffer normalBuffer = board.getMeshData().getNormalBuffer();
-		vertexBuffer.rewind();
-		normalBuffer.rewind();
-		vertexBuffer.limit(vertexBuffer.capacity());
-		normalBuffer.limit(normalBuffer.capacity());
-
-		floor = getFloor();
-		if (floor == null) {
-			visitNeighbors(new WallVisitor() {
-				@Override
-				public void visit(final Wall currentWall, final Snap prev, final Snap next) {
-					final Floor f = currentWall.getFloor();
-					if (f != null) {
-						floor = f;
-					}
-				}
-			});
-		}
-		final Vector3 p1;
-		final Vector3 p2;
-		final Vector3 p3;
-		final Vector3 p4;
-		if (floor == null) {
-			final double heightRatio = 0.33;
-			p1 = getAbsPoint(0);
-			p2 = getAbsPoint(1).multiplyLocal(1, 1, heightRatio);
-			p3 = getAbsPoint(3).multiplyLocal(1, 1, heightRatio);
-			p4 = getAbsPoint(2);
-		} else {
-			final double z0 = floor.getAbsPoint(0).getZ();
-			p1 = getAbsPoint(0);
-			p1.setZ(z0);
-			p2 = getAbsPoint(1);
-			p3 = getAbsPoint(3);
-			p4 = getAbsPoint(2);
-			p4.setZ(z0);
-		}
-		vertexBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
-		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
-		for (int i = 0; i < 4; i++) {
-			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
-		}
-
-		vertexBuffer.limit(vertexBuffer.position());
-		normalBuffer.limit(normalBuffer.position());
-		board.getMeshData().updateVertexCount();
-		board.updateModelBound();
 	}
 
 	private void drawColumns(final double distance) {
@@ -739,6 +683,40 @@ public class Wall extends HousePart implements Thermalizable {
 		normalBuffer.limit(normalBuffer.position());
 		rails.getMeshData().updateVertexCount();
 		rails.updateModelBound();
+	}
+
+	private void drawSteelFrame(final double size, final int n) {
+		steelFrame.setDefaultColor(getColor());
+		final FloatBuffer vertexBuffer = steelFrame.getMeshData().getVertexBuffer();
+		final FloatBuffer normalBuffer = steelFrame.getMeshData().getNormalBuffer();
+		vertexBuffer.rewind();
+		normalBuffer.rewind();
+		vertexBuffer.limit(vertexBuffer.capacity());
+		normalBuffer.limit(normalBuffer.capacity());
+
+		final ReadOnlyVector3 p0 = getAbsPoint(0);
+		final ReadOnlyVector3 p1 = getAbsPoint(1);
+		final ReadOnlyVector3 p2 = getAbsPoint(2);
+		final ReadOnlyVector3 p3 = getAbsPoint(3);
+		final Vector3 d10 = p1.subtract(p0, null);
+		final Vector3 d32 = p3.subtract(p2, null);
+		d10.setZ(d10.getZ() / n);
+		d32.setZ(d32.getZ() / n);
+		final Vector3 dir = d10.normalize(null).multiplyLocal(size);
+		for (int i = 0; i < n; i++) {
+			final Vector3 a = p0.add(d10.multiply(1, 1, i, null), null);
+			final Vector3 b = p2.add(d32.multiply(1, 1, i, null), null);
+			Util.addPointToQuad(normal, a, b, dir, vertexBuffer, normalBuffer);
+			final Vector3 c = p2.add(d32.multiply(1, 1, i + 1, null), null);
+			Util.addPointToQuad(normal, a, c, dir, vertexBuffer, normalBuffer);
+			final Vector3 d = p0.add(d10.multiply(1, 1, i + 1, null), null);
+			Util.addPointToQuad(normal, b, d, dir, vertexBuffer, normalBuffer);
+		}
+
+		vertexBuffer.limit(vertexBuffer.position());
+		normalBuffer.limit(normalBuffer.position());
+		steelFrame.getMeshData().updateVertexCount();
+		steelFrame.updateModelBound();
 	}
 
 	private void drawPolygon(final List<List<Vector3>> wallAndWindowsPoints, final Mesh mesh, final boolean drawHoles, final boolean normal, final boolean texture) {
