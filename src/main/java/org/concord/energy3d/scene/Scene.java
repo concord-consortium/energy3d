@@ -1,12 +1,13 @@
 package org.concord.energy3d.scene;
 
 import java.awt.EventQueue;
+import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
@@ -50,9 +52,9 @@ import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
-import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture2D;
+import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -124,12 +126,9 @@ public class Scene implements Serializable {
 	private boolean onlySolarAnalysis;
 	private UtilityBill utilityBill;
 	private int theme;
-	private Image mapImage;
+	private transient BufferedImage mapImage;
+	private transient boolean avoidSavingMapImage;
 	private double mapScale;
-	private byte[] mapImageBytes;
-	private transient Image storedMapImage;
-	private transient double storedMapScale;
-	private transient byte[] storedMapImageBytes;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -272,7 +271,7 @@ public class Scene implements Serializable {
 				instance.cleanup();
 				loadCameraLocation();
 			}
-			instance.applyMap(true);
+			instance.applyMap();
 			SceneManager.getInstance().hideAllEditPoints();
 			final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 			if (cameraControl != null) {
@@ -683,9 +682,6 @@ public class Scene implements Serializable {
 
 				if (setAsCurrentFile) {
 					Scene.url = url;
-				}
-				if (instance.mapImage != null) {
-					instance.mapImage.setData((ByteBuffer) null);
 				}
 				System.out.print("Saving " + url + "...");
 				ObjectOutputStream out;
@@ -2360,33 +2356,21 @@ public class Scene implements Serializable {
 		return timeStep;
 	}
 
-	public void setMap(final Image mapImage, final double mapScale) {
+	public void setMap(final BufferedImage mapImage, final double mapScale) {
 		this.mapImage = mapImage;
-		if (mapImage != null) {
-			this.mapScale = mapScale;
-			final ByteBuffer byteBuffer = mapImage.getData().get(0);
-			if (byteBuffer != null) {
-				mapImageBytes = new byte[byteBuffer.limit()];
-				byteBuffer.get(mapImageBytes);
-			}
-		} else {
-			mapImageBytes = null;
-		}
-		applyMap(false);
+		this.mapScale = mapScale;
+		applyMap();
 	}
 
-	private void applyMap(final boolean init) {
+	private void applyMap() {
 		if (mapImage == null) {
 			SceneManager.getInstance().getMapLand().setVisible(false);
 			setFoundationsVisible(true);
 		} else {
-			if (init) {
-				mapImage.setData(ByteBuffer.wrap(mapImageBytes));
-			}
 			SceneManager.getInstance().resizeMapLand(mapScale);
 			final Texture2D texture = new Texture2D();
 			texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
-			texture.setImage(mapImage);
+			texture.setImage(AWTImageLoader.makeArdor3dImage(mapImage, true));
 			final TextureState textureState = new TextureState();
 			textureState.setTexture(texture);
 			final Mesh mesh = SceneManager.getInstance().getMapLand();
@@ -2407,30 +2391,24 @@ public class Scene implements Serializable {
 
 	/** used by SnapshotLogger */
 	private void storeMapImageData() {
-		if (mapImageBytes != null) {
-			storedMapImage = mapImage;
-			storedMapScale = mapScale;
-			final int n = mapImageBytes.length;
-			if (storedMapImageBytes == null || storedMapImageBytes.length != n) {
-				storedMapImageBytes = new byte[n];
-			}
-			for (int i = 0; i < n; i++) {
-				storedMapImageBytes[i] = mapImageBytes[i];
-			}
-			setMap(null, 1);
-		}
+		avoidSavingMapImage = true;
 	}
 
 	/** used by SnapshotLogger */
 	private void restoreMapImageData() {
-		if (storedMapImageBytes != null) {
-			final int n = storedMapImageBytes.length;
-			mapImageBytes = new byte[n];
-			for (int i = 0; i < n; i++) {
-				mapImageBytes[i] = storedMapImageBytes[i];
-			}
-			setMap(storedMapImage, storedMapScale);
+		avoidSavingMapImage = false;
+	}
+
+	private void writeObject(final ObjectOutputStream out) throws IOException {
+		out.defaultWriteObject();
+		if (mapImage != null && !avoidSavingMapImage) {
+			ImageIO.write(mapImage, "jpg", out);
 		}
+	}
+
+	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		mapImage = ImageIO.read(in);
 	}
 
 }

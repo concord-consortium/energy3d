@@ -31,8 +31,6 @@ import javax.swing.event.ChangeListener;
 
 import org.concord.energy3d.scene.Scene;
 
-import com.ardor3d.image.Image;
-import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.math.MathUtils;
 
 public class MapDialog extends JDialog {
@@ -163,10 +161,9 @@ public class MapDialog extends JDialog {
 					JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large. Please zoom in and try again.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				final BufferedImage googleMapImage = getGoogleMapImage(true);
-				if (googleMapImage != null) {
-					final Image image = AWTImageLoader.makeArdor3dImage(googleMapImage, true);
-					Scene.getInstance().setMap(image, getScale());
+				final BufferedImage mapImage = getGoogleMapImage(true);
+				if (mapImage != null) {
+					Scene.getInstance().setMap(mapImage, getScale());
 					Scene.getInstance().setEdited(true);
 					setVisible(false);
 				}
