@@ -1347,6 +1347,24 @@ public class PopupMenuFactory {
 			typeMenu.add(rbmiFence);
 			typeGroup.add(rbmiFence);
 
+			final JRadioButtonMenuItem rbmiSteelFrame = new JRadioButtonMenuItem("Steel Frame");
+			rbmiSteelFrame.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						final Wall wall = (Wall) selectedPart;
+						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+						wall.setType(Wall.STEEL_FRAME);
+						wall.draw();
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			typeMenu.add(rbmiSteelFrame);
+			typeGroup.add(rbmiSteelFrame);
+
 			typeMenu.addMenuListener(new MenuListener() {
 
 				@Override
@@ -1372,6 +1390,9 @@ public class PopupMenuFactory {
 							break;
 						case Wall.COLUMNS_RAILS:
 							Util.selectSilently(rbmiColumnsAndRailings, true);
+							break;
+						case Wall.STEEL_FRAME:
+							Util.selectSilently(rbmiSteelFrame, true);
 							break;
 						}
 					}

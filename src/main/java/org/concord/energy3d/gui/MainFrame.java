@@ -2567,17 +2567,23 @@ public class MainFrame extends JFrame {
 			topViewCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final TopViewCommand c = new TopViewCommand();
-					final boolean isTopView = topViewCheckBoxMenuItem.isSelected();
-					if (isTopView) {
-						Scene.saveCameraLocation();
-						SceneManager.getInstance().resetCamera(ViewMode.TOP_VIEW);
-					} else {
-						Scene.loadCameraLocation();
-						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-					}
-					SceneManager.getInstance().refresh();
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							final TopViewCommand c = new TopViewCommand();
+							final boolean isTopView = topViewCheckBoxMenuItem.isSelected();
+							if (isTopView) {
+								Scene.saveCameraLocation();
+								SceneManager.getInstance().resetCamera(ViewMode.TOP_VIEW);
+							} else {
+								Scene.loadCameraLocation();
+								SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+							}
+							SceneManager.getInstance().refresh();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							return null;
+						}
+					});
 				}
 			});
 		}

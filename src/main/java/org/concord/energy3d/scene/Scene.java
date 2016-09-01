@@ -684,7 +684,10 @@ public class Scene implements Serializable {
 				if (setAsCurrentFile) {
 					Scene.url = url;
 				}
+
+				List<ByteBuffer> imageBuffer = null;
 				if (instance.mapImage != null) {
+					imageBuffer = instance.mapImage.getData();
 					instance.mapImage.setData((ByteBuffer) null);
 				}
 				System.out.print("Saving " + url + "...");
@@ -694,6 +697,9 @@ public class Scene implements Serializable {
 				out.close();
 				if (notifyUndoManager) {
 					SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+				}
+				if (instance.mapImage != null) {
+					instance.mapImage.setData(imageBuffer);
 				}
 				if (logger) {
 					instance.restoreMapImageData();
