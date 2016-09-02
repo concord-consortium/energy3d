@@ -577,9 +577,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public Mesh drawGrids(final double gridSize) {
-		final Mesh gridsMesh = new Line("Floor Grids");
+		final Mesh gridsMesh = new Line("Ground Grids");
 		gridsMesh.getSceneHints().setCullHint(CullHint.Always);
-		gridsMesh.setDefaultColor(ColorRGBA.BLUE);
+		gridsMesh.setDefaultColor(new ColorRGBA(0, 0, 1, 1));
+		final BlendState blendState = new BlendState();
+		blendState.setBlendEnabled(true);
+		gridsMesh.setRenderState(blendState);
+		gridsMesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 
 		final ReadOnlyVector3 width = Vector3.UNIT_X.multiply(2000, null);
 		final ReadOnlyVector3 height = Vector3.UNIT_Y.multiply(2000, null);

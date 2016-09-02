@@ -1142,12 +1142,15 @@ public class SolarRadiation {
 	public static ColorRGBA computeColor(final double value, final long maxValue) {
 		final ReadOnlyColorRGBA[] colors = EnergyPanel.solarColors;
 		long valuePerColorRange = maxValue / (colors.length - 1);
-		final int colorIndex;
+		int colorIndex;
 		if (valuePerColorRange == 0) {
 			valuePerColorRange = 1;
 			colorIndex = 0;
 		} else {
 			colorIndex = (int) Math.min(value / valuePerColorRange, colors.length - 2);
+			if (colorIndex < 0) {
+				colorIndex = 0;
+			}
 		}
 		final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
 		final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
