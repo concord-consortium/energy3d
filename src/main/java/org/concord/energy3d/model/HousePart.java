@@ -67,12 +67,12 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 
 public abstract class HousePart implements Serializable {
-
-	public static final OffsetState offsetState = new OffsetState();
 	private static final long serialVersionUID = 1L;
+	public static final OffsetState offsetState = new OffsetState();
 	protected static final double SNAP_DISTANCE = 0.5;
-	protected static int printSequence;
+	protected static final double STRETCH_ROOF_STEP = 1;
 	protected static final float printOutlineThickness = 2f;
+	protected static int printSequence;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = true;
 	private static boolean snapToGrids = true;

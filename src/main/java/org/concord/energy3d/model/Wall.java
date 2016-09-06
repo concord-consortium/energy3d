@@ -426,7 +426,7 @@ public class Wall extends HousePart implements Thermalizable {
 		computeNormalAndXYTransform();
 
 		wallAndWindowsPoints = computeWallAndWindowPolygon(false);
-		extendToRoof(wallAndWindowsPoints.get(0));
+		stretchToRoof(wallAndWindowsPoints.get(0));
 
 		switch (type) {
 		case EMPTY:
@@ -825,7 +825,7 @@ public class Wall extends HousePart implements Thermalizable {
 		points.add(housePart.getAbsPoint(index).addLocal(trans));
 	}
 
-	private void extendToRoof(final List<Vector3> polygon) {
+	private void stretchToRoof(final List<Vector3> polygon) {
 		if (!extendToRoofEnabled) {
 			return;
 		}
@@ -848,8 +848,7 @@ public class Wall extends HousePart implements Thermalizable {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 
-			final double step = 0.1;
-			for (double d = length - step; d > step; d -= step) {
+			for (double d = length - STRETCH_ROOF_STEP; d > STRETCH_ROOF_STEP; d -= STRETCH_ROOF_STEP) {
 				final Vector3 p = dir.multiply(d, null).addLocal(o);
 				final double findRoofIntersection = findRoofIntersection(p);
 
@@ -910,7 +909,7 @@ public class Wall extends HousePart implements Thermalizable {
 		}
 
 		enforceGablePointsRangeAndRemoveDuplicatedGablePoints(polygon.get(0));
-		extendToRoof(polygon.get(0));
+		stretchToRoof(polygon.get(0));
 
 		/* lower the z of back wall to ensure it doesn't stick up through the roof */
 		if (roof != null) {
