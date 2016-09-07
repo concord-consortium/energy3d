@@ -2846,22 +2846,50 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JCheckBoxMenuItem miRotateAroundNormal = new JCheckBoxMenuItem("Rotate 90\u00B0");
-			miRotateAroundNormal.addActionListener(new ActionListener() {
+			final JMenu orientationMenu = new JMenu("Orientation");
+			final ButtonGroup orientationGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiLandscape = new JRadioButtonMenuItem("Landscape");
+			rbmiLandscape.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel)) {
-						return;
+					if (rbmiLandscape.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (!(selectedPart instanceof SolarPanel)) {
+							return;
+						}
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+						s.setRotated(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						s.draw();
+						updateAfterEdit();
 					}
-					final SolarPanel s = (SolarPanel) selectedPart;
-					final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
-					s.setRotated(miRotateAroundNormal.isSelected());
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-					s.draw();
-					updateAfterEdit();
 				}
 			});
+			orientationMenu.add(rbmiLandscape);
+			orientationGroup.add(rbmiLandscape);
+
+			final JRadioButtonMenuItem rbmiPortrait = new JRadioButtonMenuItem("Portrait", true);
+			rbmiPortrait.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (rbmiPortrait.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (!(selectedPart instanceof SolarPanel)) {
+							return;
+						}
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+						s.setRotated(false);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						s.draw();
+						updateAfterEdit();
+					}
+				}
+			});
+			orientationMenu.add(rbmiPortrait);
+			orientationGroup.add(rbmiPortrait);
 
 			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
 			miTiltAngle.addActionListener(new ActionListener() {
@@ -3149,7 +3177,8 @@ public class PopupMenuFactory {
 						break;
 					}
 					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
-					Util.selectSilently(miRotateAroundNormal, sp.isRotated());
+					Util.selectSilently(rbmiLandscape, sp.isRotated());
+					Util.selectSilently(rbmiPortrait, !sp.isRotated());
 					switch (sp.getTracker()) {
 					case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 						Util.selectSilently(miAltazimuthDualAxisTracker, true);
@@ -3332,11 +3361,11 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(trackerMenu);
 			popupMenuForSolarPanel.addSeparator();
-			popupMenuForSolarPanel.add(miRotateAroundNormal);
 			popupMenuForSolarPanel.add(miTiltAngle);
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miBaseHeight);
+			popupMenuForSolarPanel.add(orientationMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
 			popupMenuForSolarPanel.addSeparator();
