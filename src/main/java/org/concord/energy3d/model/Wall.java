@@ -826,7 +826,7 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	private void stretchToRoof(final List<Vector3> polygon) {
-		if (!extendToRoofEnabled) {
+		if (!extendToRoofEnabled || roof == null || roof.isSingleFlatMesh()) {
 			return;
 		}
 
@@ -844,7 +844,7 @@ public class Wall extends HousePart implements Thermalizable {
 			tp.set(tp.getX(), tp.getY(), z);
 		}
 
-		if (roof != null && !isFrozen()) {
+		if (!isFrozen()) {
 			Vector3 direction = null;
 			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
 

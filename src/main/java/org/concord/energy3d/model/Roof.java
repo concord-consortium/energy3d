@@ -322,7 +322,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 					}
 					final ArrayList<ReadOnlyVector3> array = foundBreak[0] ? resultAfterBreak : resultBeforeBreak;
 					final int orgSize = array.size();
-					stretchToRoof(array, roofPartMesh, currentWall.getAbsPoint(indexP1), currentWall.getAbsPoint(indexP2));
+					stretchToRoof(array, roofPartMesh, currentWall.getAbsPoint(indexP1), currentWall.getAbsPoint(indexP2), currentWall.points.get(1).getZ());
 					if (!foundBreak[0] && array.size() == orgSize) {
 						foundBreak[0] = true;
 					}
@@ -348,7 +348,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		}
 	}
 
-	private void stretchToRoof(final ArrayList<ReadOnlyVector3> result, final Mesh roof, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {
+	private void stretchToRoof(final ArrayList<ReadOnlyVector3> result, final Mesh roof, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final double z) {
 		final Vector3 dir = p2.subtract(p1, null).multiplyLocal(1, 1, 0);
 		final double length = dir.length();
 		dir.normalizeLocal();
@@ -357,11 +357,18 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		ReadOnlyVector3 previousStretchPoint = null;
 		boolean firstInsert = false;
 
+		final boolean isSingleMesh = isSingleFlatMesh();
 		final double minDistance = STRETCH_ROOF_STEP * 3;
 		final Vector3 p = new Vector3();
 		for (double d = STRETCH_ROOF_STEP; d < length; d += STRETCH_ROOF_STEP) {
 			dir.multiply(d, p).addLocal(p1);
-			final ReadOnlyVector3 currentStretchPoint = findRoofIntersection(roof, p);
+			final ReadOnlyVector3 currentStretchPoint;
+			if (isSingleMesh) {
+				p.setZ(z);
+				currentStretchPoint = p.clone();
+			} else {
+				currentStretchPoint = findRoofIntersection(roof, p);
+			}
 
 			if (currentStretchPoint != null && !firstInsert) {
 				result.add(currentStretchPoint);
@@ -1423,6 +1430,10 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			}
 		}
 		return true;
+	}
+
+	public boolean isSingleFlatMesh() {
+		return getRoofPartsRoot().getNumberOfChildren() == 1 && Util.isEqual((ReadOnlyVector3) getRoofPartsRoot().getChild(0).getUserData(), Vector3.UNIT_Z, 0.01);
 	}
 
 }
