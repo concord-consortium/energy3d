@@ -2043,6 +2043,26 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setThicknessOfWallsOnFoundation(final Foundation foundation, final double thickness) {
+		for (final HousePart p : parts) {
+			if (p instanceof Wall && p.getTopContainer() == foundation) {
+				((Wall) p).setThickness(thickness);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setThicknessForAllWalls(final double thickness) {
+		for (final HousePart p : parts) {
+			if (p instanceof Wall) {
+				((Wall) p).setThickness(thickness);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public boolean isEdited() {
 		return edited;
 	}

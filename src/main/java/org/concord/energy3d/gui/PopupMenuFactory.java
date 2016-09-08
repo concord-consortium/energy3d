@@ -94,6 +94,7 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
@@ -109,10 +110,12 @@ import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
+import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
@@ -1202,6 +1205,70 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miThickness = new JMenuItem("Thickness...");
+			miThickness.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Wall)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Wall w = (Wall) selectedPart;
+					final String title = "<html>Thickness of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Thickness of wall is in meters.<hr></html>";
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
+					final JRadioButton rb2 = new JRadioButton("All Walls on This Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Walls");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, w.getThickness() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								double val = Double.parseDouble(newValue);
+								if (val < 0.1 || val > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The thickness of a wall must be between 0.1 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									val /= Scene.getInstance().getAnnotationScale();
+									Wall.setDefaultThickess(val);
+									if (rb1.isSelected()) {
+										final ChangeWallThicknessCommand c = new ChangeWallThicknessCommand(w);
+										w.setThickness(val);
+										w.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = w.getTopContainer();
+										final ChangeFoundationWallThicknessCommand c = new ChangeFoundationWallThicknessCommand(foundation);
+										Scene.getInstance().setThicknessOfWallsOnFoundation(foundation, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										final ChangeThicknessForAllWallsCommand c = new ChangeThicknessForAllWallsCommand(w);
+										Scene.getInstance().setThicknessForAllWalls(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									updateAfterEdit();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForWall = createPopupMenu(false, false, new Runnable() {
 				@Override
 				public void run() {
@@ -1214,6 +1281,7 @@ public class PopupMenuFactory {
 			popupMenuForWall.add(miClear);
 			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
+			popupMenuForWall.add(miThickness);
 			popupMenuForWall.add(createInsulationMenuItem(false));
 			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForWall.addSeparator();
@@ -2225,6 +2293,41 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu editOptionsMenu = new JMenu("Edit Options");
+
+			final JMenuItem miChildGridSize = new JMenuItem("Grid Size...");
+			miChildGridSize.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation f = (Foundation) selectedPart;
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Grid Size (m)", f.getChildGridSize() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 0.1 || val > 5) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Grid size must be between 0.1 and 5 m.", "Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									f.setChildGridSize(val / Scene.getInstance().getAnnotationScale());
+									updateAfterEdit();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								exception.printStackTrace();
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+			editOptionsMenu.add(miChildGridSize);
+
 			final JMenuItem miThermostat = new JMenuItem("Thermostat...");
 			miThermostat.addActionListener(new ActionListener() {
 				@Override
@@ -2311,6 +2414,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
+			popupMenuForFoundation.add(editOptionsMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class

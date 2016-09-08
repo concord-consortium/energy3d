@@ -72,6 +72,7 @@ public class Wall extends HousePart implements Thermalizable {
 	private transient XYToAnyTransform fromXY;
 	private transient List<List<Vector3>> wallAndWindowsPoints;
 	private double wallThickness;
+	private static double defaultWallThickness = 1;
 	private transient Snap[] neighbors;
 	private transient Vector3 thicknessNormal;
 	private boolean isShortWall;
@@ -105,12 +106,10 @@ public class Wall extends HousePart implements Thermalizable {
 	@Override
 	protected void init() {
 		super.init();
-		wallThickness = 0.5;
-		neighbors = new Snap[2];
-		if (thicknessNormal != null) {
-			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
-		}
 
+		if (Util.isZero(wallThickness)) {
+			wallThickness = defaultWallThickness;
+		}
 		if (Util.isZero(uValue)) {
 			uValue = 0.28;
 		}
@@ -122,6 +121,11 @@ public class Wall extends HousePart implements Thermalizable {
 		}
 		if (Util.isZero(railRadius)) {
 			railRadius = 0.1;
+		}
+
+		neighbors = new Snap[2];
+		if (thicknessNormal != null) {
+			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
 		}
 
 		mesh = new Mesh("Wall");
@@ -277,7 +281,8 @@ public class Wall extends HousePart implements Thermalizable {
 
 	@Override
 	public double getGridSize() {
-		return SceneManager.getInstance().isFineGrid() ? 0.5 : 2.5;
+		final double s = ((Foundation) container).getChildGridSize();
+		return SceneManager.getInstance().isFineGrid() ? 0.2 * s : s;
 	}
 
 	public Vector3 findClosestPointOnFoundation(final int x, final int y) {
@@ -1385,7 +1390,7 @@ public class Wall extends HousePart implements Thermalizable {
 					final Vector3 p1 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
 					final Vector3 p2 = wall.getAbsPoint(indexP2);
 					final Vector3 p1_p2 = p2.subtract(p1, null);
-					wall.thicknessNormal = p1_p2.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wallThickness);
+					wall.thicknessNormal = p1_p2.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wall.getThickness());
 					if (side[0] > 0) {
 						wall.thicknessNormal.negateLocal();
 					}
@@ -1394,7 +1399,7 @@ public class Wall extends HousePart implements Thermalizable {
 					final Vector3 p2 = wall.getAbsPoint(indexP2);
 					final Vector3 p3 = wall.getAbsPoint(indexP2 == 0 ? 2 : 0);
 					final Vector3 p2_p3 = p3.subtract(p2, null);
-					wall.thicknessNormal = p2_p3.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wallThickness);
+					wall.thicknessNormal = p2_p3.cross(Vector3.UNIT_Z, null).normalizeLocal().multiplyLocal(wall.getThickness());
 					if (side[0] > 0) {
 						wall.thicknessNormal.negateLocal();
 					}
@@ -1763,6 +1768,25 @@ public class Wall extends HousePart implements Thermalizable {
 		}
 		final double minLength = 0.2;
 		return points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= minLength && getAbsPoint(0).distance(getAbsPoint(1)) >= minLength;
+	}
+
+	public static void setDefaultThickess(final double thickness) {
+		defaultWallThickness = thickness;
+	}
+
+	public static double getDefaultThickness() {
+		return defaultWallThickness;
+	}
+
+	public void setThickness(final double thickness) {
+		wallThickness = thickness;
+		if (thicknessNormal != null) {
+			thicknessNormal.normalizeLocal().multiplyLocal(wallThickness);
+		}
+	}
+
+	public double getThickness() {
+		return wallThickness;
 	}
 
 }

@@ -86,6 +86,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private UtilityBill utilityBill;
 	private transient Line azimuthArrow;
 	private static transient BloomRenderPass bloomRenderPass;
+	private double childGridSize = 2.5;
 
 	static {
 		format.setGroupingUsed(true);
@@ -123,6 +124,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (Util.isZero(solarReceiverEfficiency)) {
 			solarReceiverEfficiency = 0.86;
+		}
+		if (Util.isZero(childGridSize)) {
+			childGridSize = 2.5;
 		}
 		if (thermostat == null) {
 			thermostat = new Thermostat();
@@ -1798,6 +1802,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public double getSolarReceiverEfficiency() {
 		return solarReceiverEfficiency;
+	}
+
+	public void setChildGridSize(final double childGridSize) {
+		this.childGridSize = childGridSize;
+	}
+
+	public double getChildGridSize() {
+		return childGridSize;
 	}
 
 }
