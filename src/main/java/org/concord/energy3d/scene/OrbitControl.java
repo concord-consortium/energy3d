@@ -29,8 +29,9 @@ public class OrbitControl extends CameraControl {
 
 	@Override
 	protected void rotate(final Camera camera, final double dx, final double dy) {
-		if (_center.length() == 0)
+		if (_center.length() == 0) {
 			_center.set(camera.getDirection()).multiplyLocal(frontDistance).addLocal(camera.getLocation());
+		}
 		_workerMatrix.fromAngleNormalAxis(_mouseRotateSpeed * dx, _upAxis != null ? _upAxis : camera.getUp());
 		_workerMatrix_2.fromAngleNormalAxis(_mouseRotateSpeed * dy, camera.getLeft());
 		_workerMatrix.multiplyLocal(_workerMatrix_2);
@@ -38,8 +39,8 @@ public class OrbitControl extends CameraControl {
 		_workerMatrix.applyPost(_workerVector, _workerVector);
 		_workerVector.addLocal(_center);
 		final Vector3 d = _workerVector.subtract(_center, null).normalizeLocal();
-		final double MIN = 0.1;
-		if (Math.abs(d.getX()) > MIN || Math.abs(d.getY()) > MIN) {
+		final double MIN = 0.99;
+		if (!(d.dot(Vector3.UNIT_Z) > MIN || d.dot(Vector3.NEG_UNIT_Z) > MIN)) {
 			if (_workerVector.length() > SceneManager.SKY_RADIUS) {
 				zoom(SceneManager.getInstance().getCanvas(), 1, -0.1);
 				return;
@@ -55,8 +56,9 @@ public class OrbitControl extends CameraControl {
 		camera.getModelViewProjectionMatrix().applyPost(_workerVector4, _workerVector4);
 		_workerVector.set(_workerVector4.getX(), _workerVector4.getY(), _workerVector4.getZ());
 		_workerVector.addLocal(camera.getLocation());
-		if (_workerVector.length() > SceneManager.SKY_RADIUS)
+		if (_workerVector.length() > SceneManager.SKY_RADIUS) {
 			return;
+		}
 		camera.setLocation(_workerVector);
 		clearOrbitCenter();
 	}
