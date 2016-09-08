@@ -1313,7 +1313,6 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The height of a wall must be between 1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									val /= Scene.getInstance().getAnnotationScale();
-									Wall.setDefaultThickess(val);
 									if (rb1.isSelected()) {
 										final ChangeWallHeightCommand c = new ChangeWallHeightCommand(w);
 										w.setHeight(val, true);

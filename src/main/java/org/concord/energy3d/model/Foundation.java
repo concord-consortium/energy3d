@@ -593,6 +593,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	/** Rescale the building in the original X, Y, Z directions. */
 	public void rescale(final double scaleX, final double scaleY, final double scaleZ) {
+		final boolean currentOverlapAllowance = Scene.getInstance().getAllowFoundationOverlap();
+		Scene.getInstance().setAllowFoundationOverlap(true);
 		final double a = Math.toRadians(getAzimuth());
 		if (!Util.isZero(a)) {
 			rotate(a, null);
@@ -611,6 +613,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (!Util.isZero(a)) {
 			rotate(-a, null);
 		}
+		Scene.getInstance().setAllowFoundationOverlap(currentOverlapAllowance);
 	}
 
 	/** Scale house for upgrading to new version. This can be removed in 2017. Don't call this if you intend to scale a building. Call rescale instead. */
