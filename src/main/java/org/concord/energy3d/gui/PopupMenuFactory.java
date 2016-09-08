@@ -94,8 +94,11 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
+import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
+import org.concord.energy3d.undo.ChangeHeightForConnectedWallsCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
@@ -115,6 +118,7 @@ import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallHeightCommand;
 import org.concord.energy3d.undo.ChangeWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -1269,6 +1273,77 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miHeight = new JMenuItem("Height...");
+			miHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Wall)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Wall w = (Wall) selectedPart;
+					final String title = "<html>Height of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Height of wall is in meters.<hr></html>";
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
+					final JRadioButton rb2 = new JRadioButton("All Connected Walls (Direct and Indirect)");
+					final JRadioButton rb3 = new JRadioButton("All Walls on This Foundation");
+					final JRadioButton rb4 = new JRadioButton("All Walls");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					panel.add(rb4);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					bg.add(rb4);
+					final Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, w.getHeight() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								double val = Double.parseDouble(newValue);
+								if (val < 1 || val > 1000) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The height of a wall must be between 1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									val /= Scene.getInstance().getAnnotationScale();
+									Wall.setDefaultThickess(val);
+									if (rb1.isSelected()) {
+										final ChangeWallHeightCommand c = new ChangeWallHeightCommand(w);
+										w.setHeight(val, true);
+										w.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										final ChangeHeightForConnectedWallsCommand c = new ChangeHeightForConnectedWallsCommand(w);
+										Scene.getInstance().setHeightOfConnectedWalls(w, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										final Foundation foundation = w.getTopContainer();
+										final ChangeFoundationWallHeightCommand c = new ChangeFoundationWallHeightCommand(foundation);
+										Scene.getInstance().setHeightOfWallsOnFoundation(foundation, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb4.isSelected()) {
+										final ChangeHeightForAllWallsCommand c = new ChangeHeightForAllWallsCommand(w);
+										Scene.getInstance().setHeightForAllWalls(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									updateAfterEdit();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForWall = createPopupMenu(false, false, new Runnable() {
 				@Override
 				public void run() {
@@ -1282,6 +1357,7 @@ public class PopupMenuFactory {
 			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
 			popupMenuForWall.add(miThickness);
+			popupMenuForWall.add(miHeight);
 			popupMenuForWall.add(createInsulationMenuItem(false));
 			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForWall.addSeparator();

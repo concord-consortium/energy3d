@@ -1186,7 +1186,7 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	@Override
-	protected void setHeight(final double newHeight, final boolean finalize) {
+	public void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
 		points.get(1).setZ(newHeight + container.height);
 		if (isFirstPointInserted()) {

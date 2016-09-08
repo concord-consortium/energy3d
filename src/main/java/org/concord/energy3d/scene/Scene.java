@@ -51,6 +51,7 @@ import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture2D;
@@ -2057,6 +2058,37 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof Wall) {
 				((Wall) p).setThickness(thickness);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeightOfConnectedWalls(final Wall w, final double height) {
+		w.visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+				currentWall.setHeight(height, true);
+				currentWall.draw();
+			}
+		});
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeightOfWallsOnFoundation(final Foundation foundation, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Wall && p.getTopContainer() == foundation) {
+				((Wall) p).setHeight(height, true);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeightForAllWalls(final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Wall) {
+				((Wall) p).setHeight(height, true);
 				p.draw();
 			}
 		}
