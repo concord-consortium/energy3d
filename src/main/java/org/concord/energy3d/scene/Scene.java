@@ -2095,6 +2095,17 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setColorOfConnectedWalls(final Wall w, final ColorRGBA color) {
+		w.visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+				currentWall.setColor(color);
+				currentWall.draw();
+			}
+		});
+		SceneManager.getInstance().refresh();
+	}
+
 	public boolean isEdited() {
 		return edited;
 	}

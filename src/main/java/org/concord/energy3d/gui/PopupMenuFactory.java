@@ -1289,7 +1289,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
-					final JRadioButton rb2 = new JRadioButton("All Connected Walls (Direct and Indirect)");
+					final JRadioButton rb2 = new JRadioButton("All Walls Connected to This One (Direct and Indirect)");
 					final JRadioButton rb3 = new JRadioButton("All Walls on This Foundation");
 					final JRadioButton rb4 = new JRadioButton("All Walls");
 					panel.add(rb1);
@@ -3467,7 +3467,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miInverterEff = new JMenuItem("Micro Inverter Efficiency...");
+			final JMenuItem miInverterEff = new JMenuItem("Inverter Efficiency...");
 			miInverterEff.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3477,7 +3477,7 @@ public class PopupMenuFactory {
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Micro Inverter Efficiency (%) of " + partInfo + "</html>";
+					final String title = "<html>Inverter Efficiency (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The efficiency of a micro inverter for converting electricity from DC to AC is typically 95%.<hr></html>";
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -3501,7 +3501,7 @@ public class PopupMenuFactory {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 80 || val >= 100) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Micro inverter efficiency must be greater than 80% and less than 100%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than 80% and less than 100%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final ChangeMicroInverterEfficiencyCommand c = new ChangeMicroInverterEfficiencyCommand(solarPanel);
