@@ -1280,20 +1280,22 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
-	public void removeAllSolarPanels() {
-		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
+	public void removeAllSolarPanels(ArrayList<HousePart> panels) {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart != null) {
-			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
-			for (final HousePart part : parts) {
-				if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
-					panels.add(part);
+		if (panels == null) {
+			panels = new ArrayList<HousePart>();
+			if (selectedPart != null) {
+				final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+				for (final HousePart part : parts) {
+					if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
+						panels.add(part);
+					}
 				}
-			}
-		} else {
-			for (final HousePart part : parts) {
-				if (part instanceof SolarPanel && !part.isFrozen()) {
-					panels.add(part);
+			} else {
+				for (final HousePart part : parts) {
+					if (part instanceof SolarPanel && !part.isFrozen()) {
+						panels.add(part);
+					}
 				}
 			}
 		}

@@ -3276,7 +3276,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().removeAllSolarPanels();
+							Scene.getInstance().removeAllSolarPanels(null);
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {

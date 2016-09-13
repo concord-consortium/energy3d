@@ -12,6 +12,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.swing.AbstractAction;
@@ -140,6 +142,7 @@ import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 /**
@@ -1873,7 +1876,7 @@ public class PopupMenuFactory {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().removeAllSolarPanels();
+							Scene.getInstance().removeAllSolarPanels(null);
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
@@ -3537,6 +3540,53 @@ public class PopupMenuFactory {
 			shadeToleranceMenu.add(miPartialTolerance);
 			shadeToleranceMenu.add(miHighTolerance);
 
+			final JMenuItem miDeleteRow = new JMenuItem("Delete Row");
+			miDeleteRow.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel)) {
+						return;
+					}
+					final SolarPanel pick = (SolarPanel) selectedPart;
+					final double minDistance = (pick.isRotated() ? pick.getPanelHeight() : pick.getPanelWidth()) / Scene.getInstance().getAnnotationScale() * 1.05;
+					final Foundation f = pick.getTopContainer();
+					final List<SolarPanel> panels = f.getSolarPanels();
+
+					final ArrayList<HousePart> row = new ArrayList<HousePart>();
+					row.add(pick);
+					final ArrayList<HousePart> oldNeighbors = new ArrayList<HousePart>();
+					oldNeighbors.add(pick);
+					final ArrayList<HousePart> newNeighbors = new ArrayList<HousePart>();
+
+					do {
+						newNeighbors.clear();
+						for (final HousePart oldNeighbor : oldNeighbors) {
+							final Vector3 c = oldNeighbor.getAbsCenter();
+							for (final SolarPanel x : panels) {
+								if (x != oldNeighbor && !row.contains(x)) {
+									if (x.getAbsCenter().distance(c) < minDistance) {
+										newNeighbors.add(x);
+									}
+								}
+							}
+						}
+						row.addAll(newNeighbors);
+						oldNeighbors.clear();
+						oldNeighbors.addAll(newNeighbors);
+					} while (!newNeighbors.isEmpty());
+
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllSolarPanels(row);
+							return null;
+						}
+					});
+				}
+			});
+			popupMenuForSolarPanel.add(miDeleteRow);
+
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(trackerMenu);
 			popupMenuForSolarPanel.addSeparator();
@@ -4385,7 +4435,9 @@ public class PopupMenuFactory {
 
 				}
 
-				while (true) {
+				while (true)
+
+				{
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						final String newValue = siField.getText();
 						try {
