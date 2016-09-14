@@ -51,6 +51,7 @@ import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture2D;
@@ -1279,20 +1280,22 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
-	public void removeAllSolarPanels() {
-		final ArrayList<HousePart> panels = new ArrayList<HousePart>();
+	public void removeAllSolarPanels(ArrayList<HousePart> panels) {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart != null) {
-			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
-			for (final HousePart part : parts) {
-				if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
-					panels.add(part);
+		if (panels == null) {
+			panels = new ArrayList<HousePart>();
+			if (selectedPart != null) {
+				final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+				for (final HousePart part : parts) {
+					if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
+						panels.add(part);
+					}
 				}
-			}
-		} else {
-			for (final HousePart part : parts) {
-				if (part instanceof SolarPanel && !part.isFrozen()) {
-					panels.add(part);
+			} else {
+				for (final HousePart part : parts) {
+					if (part instanceof SolarPanel && !part.isFrozen()) {
+						panels.add(part);
+					}
 				}
 			}
 		}
@@ -2060,6 +2063,48 @@ public class Scene implements Serializable {
 				p.draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeightOfConnectedWalls(final Wall w, final double height) {
+		w.visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+				currentWall.setHeight(height, true);
+				currentWall.draw();
+			}
+		});
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeightOfWallsOnFoundation(final Foundation foundation, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Wall && p.getTopContainer() == foundation) {
+				((Wall) p).setHeight(height, true);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeightForAllWalls(final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Wall) {
+				((Wall) p).setHeight(height, true);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setColorOfConnectedWalls(final Wall w, final ColorRGBA color) {
+		w.visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+				currentWall.setColor(color);
+				currentWall.draw();
+			}
+		});
 		SceneManager.getInstance().refresh();
 	}
 

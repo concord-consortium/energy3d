@@ -102,6 +102,7 @@ import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
+import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
@@ -2820,15 +2821,18 @@ public class MainFrame extends JFrame {
 						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 						final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
-						final JRadioButton rb2 = new JRadioButton("All Walls of this Building");
-						final JRadioButton rb3 = new JRadioButton("All Walls");
+						final JRadioButton rb2 = new JRadioButton("All Walls Connected to This One (Direct and Indirect)");
+						final JRadioButton rb3 = new JRadioButton("All Walls of this Building");
+						final JRadioButton rb4 = new JRadioButton("All Walls");
 						panel.add(rb1);
 						panel.add(rb2);
 						panel.add(rb3);
+						panel.add(rb4);
 						final ButtonGroup bg = new ButtonGroup();
 						bg.add(rb1);
 						bg.add(rb2);
 						bg.add(rb3);
+						bg.add(rb4);
 						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
@@ -2837,6 +2841,10 @@ public class MainFrame extends JFrame {
 							selectedPart.setColor(color);
 							SceneManager.getInstance().getUndoManager().addEdit(cmd);
 						} else if (rb2.isSelected()) {
+							final ChangeColorOfConnectedWallsCommand cmd = new ChangeColorOfConnectedWallsCommand((Wall) selectedPart);
+							Scene.getInstance().setColorOfConnectedWalls((Wall) selectedPart, color);
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+						} else if (rb3.isSelected()) {
 							final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
 							Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
 							SceneManager.getInstance().getUndoManager().addEdit(cmd);
@@ -3268,7 +3276,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().removeAllSolarPanels();
+							Scene.getInstance().removeAllSolarPanels(null);
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {

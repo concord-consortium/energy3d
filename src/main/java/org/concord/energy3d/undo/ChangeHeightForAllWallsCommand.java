@@ -10,19 +10,19 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeThicknessForAllWallsCommand extends AbstractUndoableEdit {
+public class ChangeHeightForAllWallsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final List<HousePart> walls;
 
-	public ChangeThicknessForAllWallsCommand(final Wall w) {
+	public ChangeHeightForAllWallsCommand(final Wall w) {
 		walls = Scene.getInstance().getAllPartsOfSameType(w);
 		final int n = walls.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = ((Wall) walls.get(i)).getThickness();
+			oldValues[i] = ((Wall) walls.get(i)).getHeight();
 		}
 	}
 
@@ -37,10 +37,10 @@ public class ChangeThicknessForAllWallsCommand extends AbstractUndoableEdit {
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			final Wall w = (Wall) walls.get(i);
-			newValues[i] = w.getThickness();
-			w.setThickness(oldValues[i]);
-			w.draw();
+			newValues[i] = w.getHeight();
+			w.setHeight(oldValues[i], true);
 		}
+		Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -49,14 +49,14 @@ public class ChangeThicknessForAllWallsCommand extends AbstractUndoableEdit {
 		final int n = walls.size();
 		for (int i = 0; i < n; i++) {
 			final Wall w = (Wall) walls.get(i);
-			w.setThickness(newValues[i]);
-			w.draw();
+			w.setHeight(newValues[i], true);
 		}
+		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Change Thickness for All Walls";
+		return "Change Height for All Walls";
 	}
 
 }

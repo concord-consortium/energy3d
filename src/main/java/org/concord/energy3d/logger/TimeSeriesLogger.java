@@ -72,8 +72,11 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
+import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
+import org.concord.energy3d.undo.ChangeHeightForConnectedWallsCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
@@ -96,6 +99,7 @@ import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.undo.ChangeWallHeightCommand;
 import org.concord.energy3d.undo.ChangeWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
@@ -665,7 +669,9 @@ public class TimeSeriesLogger {
 					final Wall w = c.getWall();
 					stateValue = "{\"Building\": " + w.getContainer().getId() + ", \"ID\": " + w.getId();
 					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + w.getType() + "}";
-				} else if (lastEdit instanceof ChangeWallThicknessCommand) {
+				}
+
+				else if (lastEdit instanceof ChangeWallThicknessCommand) {
 					final ChangeWallThicknessCommand c = (ChangeWallThicknessCommand) lastEdit;
 					final Wall w = c.getWall();
 					stateValue = "{\"Building\": " + w.getContainer().getId() + ", \"ID\": " + w.getId();
@@ -677,6 +683,23 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeThicknessForAllWallsCommand) {
 					final ChangeThicknessForAllWallsCommand c = (ChangeThicknessForAllWallsCommand) lastEdit;
 					stateValue = "{\"New Value\": " + (c.getWalls().isEmpty() ? -1 : ((Wall) c.getWalls().get(0)).getThickness()) + "}";
+				}
+
+				else if (lastEdit instanceof ChangeWallHeightCommand) {
+					final ChangeWallHeightCommand c = (ChangeWallHeightCommand) lastEdit;
+					final Wall w = c.getWall();
+					stateValue = "{\"Building\": " + w.getContainer().getId() + ", \"ID\": " + w.getId();
+					stateValue += ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + w.getHeight() + "}";
+				} else if (lastEdit instanceof ChangeFoundationWallHeightCommand) {
+					final ChangeFoundationWallHeightCommand c = (ChangeFoundationWallHeightCommand) lastEdit;
+					final Foundation f = c.getFoundation();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + c.getWalls().get(0).getHeight() + "}";
+				} else if (lastEdit instanceof ChangeHeightForAllWallsCommand) {
+					final ChangeHeightForAllWallsCommand c = (ChangeHeightForAllWallsCommand) lastEdit;
+					stateValue = "{\"New Value\": " + (c.getWalls().isEmpty() ? -1 : ((Wall) c.getWalls().get(0)).getHeight()) + "}";
+				} else if (lastEdit instanceof ChangeHeightForConnectedWallsCommand) {
+					final ChangeHeightForConnectedWallsCommand c = (ChangeHeightForConnectedWallsCommand) lastEdit;
+					stateValue = "{\"New Value\": " + (c.getWalls().isEmpty() ? -1 : c.getWalls().get(0).getHeight()) + "}";
 				}
 
 				/* window properties */

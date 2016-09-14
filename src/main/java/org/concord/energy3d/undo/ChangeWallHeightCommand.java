@@ -6,16 +6,16 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Wall;
 
-public class ChangeWallThicknessCommand extends AbstractUndoableEdit {
+public class ChangeWallHeightCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;
 	private double newValue;
 	private final Wall wall;
 
-	public ChangeWallThicknessCommand(final Wall wall) {
+	public ChangeWallHeightCommand(final Wall wall) {
 		this.wall = wall;
-		oldValue = wall.getThickness();
+		oldValue = wall.getHeight();
 	}
 
 	public Wall getWall() {
@@ -29,21 +29,21 @@ public class ChangeWallThicknessCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = wall.getThickness();
-		wall.setThickness(oldValue);
+		newValue = wall.getHeight();
+		wall.setHeight(oldValue, true);
 		wall.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		wall.setThickness(newValue);
+		wall.setHeight(newValue, true);
 		wall.draw();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Change Thickness for Selected Wall";
+		return "Change Height for Selected Wall";
 	}
 
 }
