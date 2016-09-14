@@ -41,7 +41,6 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Foundation extends HousePart implements Thermalizable {
-
 	private static final long serialVersionUID = 1L;
 	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
@@ -54,13 +53,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	public static final int RADIAL_STAGGER = 1;
 
 	private static DecimalFormat format = new DecimalFormat();
+	private static transient BloomRenderPass bloomRenderPass;
 	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
 	private transient Mesh sideMesh[];
 	private transient BMText buildingLabel;
 	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
-	private double solarReceiverEfficiency = 0.86;
+	private transient Line azimuthArrow;
 	private transient double newBoundingHeight;
 	private transient double boundingHeight;
 	private transient double minX;
@@ -79,14 +79,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient double totalEnergyToday;
 	private transient boolean resizeHouseMode = false;
 	private transient boolean useOrgPoints = false;
-	private boolean lockEdit = false;
-	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
-	private double uValue = 0.568; // default is R10 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private Thermostat thermostat = new Thermostat();
 	private UtilityBill utilityBill;
-	private transient Line azimuthArrow;
-	private static transient BloomRenderPass bloomRenderPass;
+	private FoundationPolygon foundationPolygon;
+	private double solarReceiverEfficiency = 0.86;
+	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
+	private double uValue = 0.568; // default is R10 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private double childGridSize = 2.5;
+	private boolean lockEdit = false;
 
 	static {
 		format.setGroupingUsed(true);
@@ -139,6 +139,11 @@ public class Foundation extends HousePart implements Thermalizable {
 		mesh.setRenderState(offsetState);
 		mesh.setModelBound(new BoundingBox());
 		root.attachChild(mesh);
+
+		if (foundationPolygon == null) {
+			foundationPolygon = new FoundationPolygon(this);
+		}
+		root.attachChild(foundationPolygon.getRoot());
 
 		sideMesh = new Mesh[4];
 		for (int i = 0; i < 4; i++) {
@@ -649,6 +654,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateSolarLabelPosition();
 			updateHandles();
 			drawSolarReceiver();
+			foundationPolygon.draw();
 		}
 	}
 
