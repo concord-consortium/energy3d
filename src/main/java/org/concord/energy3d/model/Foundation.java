@@ -1821,4 +1821,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		return childGridSize;
 	}
 
+	public FoundationPolygon getPolygon() {
+		return foundationPolygon;
+	}
+
 }

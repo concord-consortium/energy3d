@@ -2334,6 +2334,20 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JCheckBoxMenuItem miFieldBorder = new JCheckBoxMenuItem("Field Border");
+			miFieldBorder.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation foundation = (Foundation) selectedPart;
+						foundation.getPolygon().setVisible(miFieldBorder.isSelected());
+						foundation.draw();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+
 			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Lock");
 			miLock.addItemListener(new ItemListener() {
 				@Override
@@ -2477,6 +2491,7 @@ public class PopupMenuFactory {
 						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
 						Util.selectSilently(miLock, f.isFrozen());
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
+						Util.selectSilently(miFieldBorder, f.getPolygon().isVisible());
 					}
 				}
 			});
@@ -2490,6 +2505,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.add(layoutMenu);
 			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miFieldBorder);
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.add(editOptionsMenu);

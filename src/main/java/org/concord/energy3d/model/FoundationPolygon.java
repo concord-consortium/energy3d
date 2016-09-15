@@ -10,10 +10,12 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class FoundationPolygon extends HousePart {
 	private static final long serialVersionUID = 1L;
+	private boolean visible;
 
 	public FoundationPolygon(final Foundation foundation) {
 		super(1, 8, 0, true);
@@ -35,6 +37,7 @@ public class FoundationPolygon extends HousePart {
 		line.setModelBound(new BoundingBox());
 		root.attachChild(line);
 		mesh = line;
+		setVisible(visible);
 	}
 
 	@Override
@@ -95,6 +98,15 @@ public class FoundationPolygon extends HousePart {
 	@Override
 	public void updateTextureAndColor() {
 
+	}
+
+	public void setVisible(final boolean visible) {
+		this.visible = visible;
+		mesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+	}
+
+	public boolean isVisible() {
+		return visible;
 	}
 
 }

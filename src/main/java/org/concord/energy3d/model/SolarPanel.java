@@ -48,6 +48,7 @@ public class SolarPanel extends HousePart {
 	private transient Mesh supportFrame;
 	private transient Line sunBeam;
 	private double efficiency = 0.15; // a number in (0, 1)
+	private double temperatureCoefficientPmax = -0.005;
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
@@ -560,6 +561,16 @@ public class SolarPanel extends HousePart {
 	/** a number between 0 and 1 */
 	public double getCellEfficiency() {
 		return efficiency;
+	}
+
+	/** a number between 0 and 1 to specify power output change with respect to STC temperature (25C) */
+	public void setTemperatureCoefficientPmax(final double temperatureCoefficientPmax) {
+		this.temperatureCoefficientPmax = temperatureCoefficientPmax;
+	}
+
+	/** a number between 0 and 1 to specify power output change with respect to STC temperature (25C) */
+	public double getTemperatureCoefficientPmax() {
+		return temperatureCoefficientPmax;
 	}
 
 	/** a number between 0 and 1, typically 0.95 */
