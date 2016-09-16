@@ -6,15 +6,16 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeMicroInverterEfficiencyCommand extends AbstractUndoableEdit {
+public class ChangeTemperatureCoefficientPmaxCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
-	private SolarPanel solarPanel;
+	private final double oldValue;
+	private double newValue;
+	private final SolarPanel solarPanel;
 
-	public ChangeMicroInverterEfficiencyCommand(SolarPanel solarPanel) {
+	public ChangeTemperatureCoefficientPmaxCommand(final SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
-		oldValue = solarPanel.getInverterEfficiency();
+		oldValue = solarPanel.getTemperatureCoefficientPmax();
 	}
 
 	public SolarPanel getSolarPanel() {
@@ -28,19 +29,19 @@ public class ChangeMicroInverterEfficiencyCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = solarPanel.getInverterEfficiency();
-		solarPanel.setInverterEfficiency(oldValue);
+		newValue = solarPanel.getTemperatureCoefficientPmax();
+		solarPanel.setTemperatureCoefficientPmax(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		solarPanel.setInverterEfficiency(newValue);
+		solarPanel.setTemperatureCoefficientPmax(newValue);
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Micro Inverter Efficiency Change for Selected Solar Panel";
+		return "Temperature Coefficient of Pmax Change for Selected Solar Panel";
 	}
 
 }

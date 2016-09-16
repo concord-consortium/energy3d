@@ -1874,6 +1874,22 @@ public class Scene implements Serializable {
 		}
 	}
 
+	public void setTemperatureCoefficientPmaxOnFoundation(final Foundation foundation, final double tcPmax) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				((SolarPanel) p).setTemperatureCoefficientPmax(tcPmax);
+			}
+		}
+	}
+
+	public void setTemperatureCoefficientPmaxForAll(final double tcPmax) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setTemperatureCoefficientPmax(tcPmax);
+			}
+		}
+	}
+
 	public void setSolarPanelInverterEfficiencyOnFoundation(final Foundation foundation, final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {

@@ -92,14 +92,12 @@ public class PvDailyAnalysis extends Analysis {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart != null) {
 				if (selectedPart instanceof SolarPanel) {
-					final SolarPanel sp = (SolarPanel) selectedPart;
-					graph.addData("Solar", sp.getSolarPotentialNow() * sp.getSystemEfficiency());
+					graph.addData("Solar", ((SolarPanel) selectedPart).getYieldNow());
 				} else if (selectedPart instanceof Foundation) {
 					double output = 0;
 					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof SolarPanel && p.getTopContainer() == selectedPart) {
-							final SolarPanel sp = (SolarPanel) p;
-							output += sp.getSolarPotentialNow() * sp.getSystemEfficiency();
+							output += ((SolarPanel) p).getYieldNow();
 						}
 					}
 					graph.addData("Solar", output);
@@ -107,8 +105,7 @@ public class PvDailyAnalysis extends Analysis {
 					double output = 0;
 					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof SolarPanel && p.getTopContainer() == selectedPart.getTopContainer()) {
-							final SolarPanel sp = (SolarPanel) p;
-							output += sp.getSolarPotentialNow() * sp.getSystemEfficiency();
+							output += ((SolarPanel) p).getYieldNow();
 						}
 					}
 					graph.addData("Solar", output);
@@ -117,8 +114,7 @@ public class PvDailyAnalysis extends Analysis {
 				double output = 0;
 				for (final HousePart p : Scene.getInstance().getParts()) {
 					if (p instanceof SolarPanel) {
-						final SolarPanel sp = (SolarPanel) p;
-						output += sp.getSolarPotentialNow() * sp.getSystemEfficiency();
+						output += ((SolarPanel) p).getYieldNow();
 					}
 				}
 				graph.addData("Solar", output);

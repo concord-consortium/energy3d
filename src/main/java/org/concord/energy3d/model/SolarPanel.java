@@ -47,6 +47,8 @@ public class SolarPanel extends HousePart {
 	private transient Box surround;
 	private transient Mesh supportFrame;
 	private transient Line sunBeam;
+	private transient double yieldNow; // solar output at current hour
+	private transient double yieldToday;
 	private double efficiency = 0.15; // a number in (0, 1)
 	private double temperatureCoefficientPmax = -0.005;
 	private double inverterEfficiency = 0.95;
@@ -81,6 +83,9 @@ public class SolarPanel extends HousePart {
 		}
 		if (Util.isZero(efficiency)) {
 			efficiency = 0.15;
+		}
+		if (Util.isZero(temperatureCoefficientPmax)) {
+			temperatureCoefficientPmax = -0.005;
 		}
 		if (Util.isZero(inverterEfficiency)) {
 			inverterEfficiency = 0.95;
@@ -553,6 +558,22 @@ public class SolarPanel extends HousePart {
 		return c;
 	}
 
+	public double getYieldNow() {
+		return yieldNow;
+	}
+
+	public void setYieldNow(final double yieldNow) {
+		this.yieldNow = yieldNow;
+	}
+
+	public double getYieldToday() {
+		return yieldToday;
+	}
+
+	public void setYieldToday(final double yieldToday) {
+		this.yieldToday = yieldToday;
+	}
+
 	/** a number between 0 and 1 */
 	public void setCellEfficiency(final double efficiency) {
 		this.efficiency = efficiency;
@@ -701,13 +722,13 @@ public class SolarPanel extends HousePart {
 		points.get(0).set(toRelative(p));
 	}
 
-	public double getSystemEfficiency() {
+	public double getSystemEfficiency(final double temperature) {
 		double e = efficiency * inverterEfficiency;
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss();
 		}
-		return e;
+		return e * (1 + temperatureCoefficientPmax * (temperature - 25));
 	}
 
 }

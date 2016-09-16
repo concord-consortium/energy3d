@@ -86,7 +86,7 @@ import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
@@ -101,8 +101,8 @@ import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
 import org.concord.energy3d.undo.ChangeHeightForConnectedWallsCommand;
-import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
@@ -114,6 +114,7 @@ import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
@@ -138,6 +139,7 @@ import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ShowFieldBorderCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -2341,6 +2343,7 @@ public class PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
+						SceneManager.getInstance().getUndoManager().addEdit(new ShowFieldBorderCommand(foundation));
 						foundation.getPolygon().setVisible(miFieldBorder.isSelected());
 						foundation.draw();
 						Scene.getInstance().setEdited(true);
@@ -3523,18 +3526,79 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than 80% and less than 100%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final ChangeMicroInverterEfficiencyCommand c = new ChangeMicroInverterEfficiencyCommand(solarPanel);
+										final ChangeInverterEfficiencyCommand c = new ChangeInverterEfficiencyCommand(solarPanel);
 										solarPanel.setInverterEfficiency(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										final ChangeFoundationMicroInverterEfficiencyCommand c = new ChangeFoundationMicroInverterEfficiencyCommand(foundation);
+										final ChangeFoundationInverterEfficiencyCommand c = new ChangeFoundationInverterEfficiencyCommand(foundation);
 										Scene.getInstance().setSolarPanelInverterEfficiencyOnFoundation(foundation, val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										final ChangeMicroInverterEfficiencyForAllCommand c = new ChangeMicroInverterEfficiencyForAllCommand();
+										final ChangeInverterEfficiencyForAllCommand c = new ChangeInverterEfficiencyForAllCommand();
 										Scene.getInstance().setSolarPanelInverterEfficiencyForAll(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									updateAfterEdit();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miTemperatureCoefficientPmax = new JMenuItem("Temperature Coefficient of Pmax...");
+			miTemperatureCoefficientPmax.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final String title = "<html>Temperature Coefficient of Pmax (%/&deg;C) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Increased temperature reduces solar cell efficiency.<hr></html>";
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, solarPanel.getTemperatureCoefficientPmax() * 100);
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < -1 || val > 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final ChangeTemperatureCoefficientPmaxCommand c = new ChangeTemperatureCoefficientPmaxCommand(solarPanel);
+										solarPanel.setTemperatureCoefficientPmax(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = solarPanel.getTopContainer();
+										// final ChangeFoundationInverterEfficiencyCommand c = new ChangeFoundationInverterEfficiencyCommand(foundation);
+										Scene.getInstance().setTemperatureCoefficientPmaxOnFoundation(foundation, val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										// final ChangeInverterEfficiencyForAllCommand c = new ChangeInverterEfficiencyForAllCommand();
+										Scene.getInstance().setTemperatureCoefficientPmaxForAll(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									updateAfterEdit();
 									break;
@@ -3615,6 +3679,7 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miEff);
+			popupMenuForSolarPanel.add(miTemperatureCoefficientPmax);
 			popupMenuForSolarPanel.add(miInverterEff);
 			popupMenuForSolarPanel.add(shadeToleranceMenu);
 			popupMenuForSolarPanel.addSeparator();

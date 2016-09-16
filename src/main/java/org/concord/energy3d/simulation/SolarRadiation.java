@@ -951,21 +951,27 @@ public class SolarRadiation {
 					}
 				}
 				double solarPotentialTotal = 0.0;
-				for (final HousePart houseChild : Scene.getInstance().getParts()) {
-					if (houseChild.getTopContainer() == foundation) {
-						houseChild.setSolarPotentialToday(0.0);
+				for (final HousePart child : Scene.getInstance().getParts()) {
+					if (child.getTopContainer() == foundation) {
+						child.setSolarPotentialToday(0);
+						if (child instanceof SolarPanel) {
+							((SolarPanel) child).setYieldToday(0);
+						}
 						for (int i = 0; i < n; i++) {
-							solarPotentialTotal += houseChild.getSolarPotential()[i];
-							houseChild.setSolarPotentialToday(houseChild.getSolarPotentialToday() + houseChild.getSolarPotential()[i]);
-							if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof) {
-								heatLoss[i] += houseChild.getHeatLoss()[i];
+							solarPotentialTotal += child.getSolarPotential()[i];
+							child.setSolarPotentialToday(child.getSolarPotentialToday() + child.getSolarPotential()[i]);
+							if (child instanceof Wall || child instanceof Door || child instanceof Window || child instanceof Roof) {
+								heatLoss[i] += child.getHeatLoss()[i];
 							}
-							if (houseChild instanceof Window) {
-								final Window window = (Window) houseChild;
-								passiveSolar[i] += houseChild.getSolarPotential()[i] * window.getSolarHeatGainCoefficient();
-							} else if (houseChild instanceof SolarPanel) {
-								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[i] * solarPanel.getSystemEfficiency();
+							if (child instanceof Window) {
+								final Window window = (Window) child;
+								passiveSolar[i] += child.getSolarPotential()[i] * window.getSolarHeatGainCoefficient();
+							} else if (child instanceof SolarPanel) {
+								final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * Scene.getInstance().getTimeStep());
+								final SolarPanel sp = (SolarPanel) child;
+								final double yield = sp.getSolarPotential()[i] * sp.getSystemEfficiency(outsideTemperature);
+								sp.setYieldToday(sp.getYieldToday() + yield);
+								photovoltaic[i] += yield;
 							}
 						}
 					}
@@ -1033,21 +1039,26 @@ public class SolarRadiation {
 					}
 				}
 				double solarPotentialTotal = 0.0;
-				for (final HousePart houseChild : Scene.getInstance().getParts()) {
-					if (houseChild.getTopContainer() == foundation) {
-						houseChild.setSolarPotentialNow(0);
+				for (final HousePart child : Scene.getInstance().getParts()) {
+					if (child.getTopContainer() == foundation) {
+						child.setSolarPotentialNow(0);
+						if (child instanceof SolarPanel) {
+							((SolarPanel) child).setYieldNow(0);
+						}
 						for (int i = 0; i < n; i++) {
-							solarPotentialTotal += houseChild.getSolarPotential()[t0 + i];
-							houseChild.setSolarPotentialNow(houseChild.getSolarPotentialNow() + houseChild.getSolarPotential()[t0 + i]);
-							if (houseChild instanceof Wall || houseChild instanceof Door || houseChild instanceof Window || houseChild instanceof Roof) {
-								heatLoss[i] += houseChild.getHeatLoss()[t0 + i];
+							solarPotentialTotal += child.getSolarPotential()[t0 + i];
+							child.setSolarPotentialNow(child.getSolarPotentialNow() + child.getSolarPotential()[t0 + i]);
+							if (child instanceof Wall || child instanceof Door || child instanceof Window || child instanceof Roof) {
+								heatLoss[i] += child.getHeatLoss()[t0 + i];
 							}
-							if (houseChild instanceof Window) {
-								final Window window = (Window) houseChild;
-								passiveSolar[i] += houseChild.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficient();
-							} else if (houseChild instanceof SolarPanel) {
-								final SolarPanel solarPanel = (SolarPanel) houseChild;
-								photovoltaic[i] += houseChild.getSolarPotential()[t0 + i] * solarPanel.getSystemEfficiency();
+							if (child instanceof Window) {
+								final Window window = (Window) child;
+								passiveSolar[i] += window.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficient();
+							} else if (child instanceof SolarPanel) {
+								final SolarPanel sp = (SolarPanel) child;
+								final double yield = sp.getSolarPotential()[t0 + i] * sp.getSystemEfficiency(outsideTemperature);
+								photovoltaic[i] += yield;
+								sp.setYieldNow(sp.getYieldNow() + yield);
 							}
 						}
 					}

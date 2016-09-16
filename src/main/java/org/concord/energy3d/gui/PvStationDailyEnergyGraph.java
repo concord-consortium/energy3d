@@ -123,7 +123,7 @@ public class PvStationDailyEnergyGraph extends JPanel {
 				SolarRadiation.getInstance().computeEnergyAtHour(i);
 				double output = 0;
 				for (final SolarPanel sp : panels) {
-					output += sp.getSolarPotentialNow() * sp.getSystemEfficiency();
+					output += sp.getYieldNow();
 				}
 				graph.addData("Solar", output);
 			}

@@ -62,7 +62,7 @@ import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationMicroInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
@@ -79,8 +79,8 @@ import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
 import org.concord.energy3d.undo.ChangeHeightForConnectedWallsCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
-import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeMicroInverterEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
@@ -509,15 +509,15 @@ public class TimeSeriesLogger {
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getCellEfficiency()) + "}";
 				}
 
-				else if (lastEdit instanceof ChangeMicroInverterEfficiencyCommand) {
-					final ChangeMicroInverterEfficiencyCommand c = (ChangeMicroInverterEfficiencyCommand) lastEdit;
+				else if (lastEdit instanceof ChangeInverterEfficiencyCommand) {
+					final ChangeInverterEfficiencyCommand c = (ChangeInverterEfficiencyCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getInverterEfficiency() + "}";
-				} else if (lastEdit instanceof ChangeFoundationMicroInverterEfficiencyCommand) {
-					final Foundation f = ((ChangeFoundationMicroInverterEfficiencyCommand) lastEdit).getFoundation();
+				} else if (lastEdit instanceof ChangeFoundationInverterEfficiencyCommand) {
+					final Foundation f = ((ChangeFoundationInverterEfficiencyCommand) lastEdit).getFoundation();
 					final List<SolarPanel> solarPanels = f.getSolarPanels();
 					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
-				} else if (lastEdit instanceof ChangeMicroInverterEfficiencyForAllCommand) {
+				} else if (lastEdit instanceof ChangeInverterEfficiencyForAllCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
 				}
