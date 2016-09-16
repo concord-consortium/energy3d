@@ -78,6 +78,11 @@ public class FoundationPolygon extends HousePart {
 			BufferUtils.setInBuffer(p, buf, i);
 			points.get(n + i).set(points.get(i)).addLocal(points.get(i == 0 ? n - 1 : i - 1)).multiplyLocal(0.5);
 		}
+		// ensure the points are on the upper surface of the foundation
+		final double h = container.getHeight();
+		for (int i = 0; i < points.size(); i++) {
+			points.get(i).setZ(h);
+		}
 	}
 
 	@Override

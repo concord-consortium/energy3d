@@ -96,6 +96,7 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationTemperatureCoefficientPmaxCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
@@ -114,6 +115,7 @@ import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeTemperatrureCoeffientPmaxForAllCommand;
 import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
@@ -3592,13 +3594,13 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										// final ChangeFoundationInverterEfficiencyCommand c = new ChangeFoundationInverterEfficiencyCommand(foundation);
+										final ChangeFoundationTemperatureCoefficientPmaxCommand c = new ChangeFoundationTemperatureCoefficientPmaxCommand(foundation);
 										Scene.getInstance().setTemperatureCoefficientPmaxOnFoundation(foundation, val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										// final ChangeInverterEfficiencyForAllCommand c = new ChangeInverterEfficiencyForAllCommand();
+										final ChangeTemperatrureCoeffientPmaxForAllCommand c = new ChangeTemperatrureCoeffientPmaxForAllCommand();
 										Scene.getInstance().setTemperatureCoefficientPmaxForAll(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									updateAfterEdit();
 									break;

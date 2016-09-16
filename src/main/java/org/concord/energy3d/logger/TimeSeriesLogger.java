@@ -72,15 +72,16 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationTemperatureCoefficientPmaxCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
 import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
 import org.concord.energy3d.undo.ChangeHeightForConnectedWallsCommand;
-import org.concord.energy3d.undo.ChangeLandColorCommand;
-import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeLandColorCommand;
+import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
@@ -91,6 +92,8 @@ import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeTemperatrureCoeffientPmaxForAllCommand;
+import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
@@ -507,6 +510,19 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeSolarCellEfficiencyForAllCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getCellEfficiency()) + "}";
+				}
+
+				else if (lastEdit instanceof ChangeTemperatureCoefficientPmaxCommand) {
+					final ChangeTemperatureCoefficientPmaxCommand c = (ChangeTemperatureCoefficientPmaxCommand) lastEdit;
+					final SolarPanel sp = c.getSolarPanel();
+					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getTemperatureCoefficientPmax() + "}";
+				} else if (lastEdit instanceof ChangeFoundationTemperatureCoefficientPmaxCommand) {
+					final Foundation f = ((ChangeFoundationTemperatureCoefficientPmaxCommand) lastEdit).getFoundation();
+					final List<SolarPanel> solarPanels = f.getSolarPanels();
+					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTemperatureCoefficientPmax()) + "}";
+				} else if (lastEdit instanceof ChangeTemperatrureCoeffientPmaxForAllCommand) {
+					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
+					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTemperatureCoefficientPmax()) + "}";
 				}
 
 				else if (lastEdit instanceof ChangeInverterEfficiencyCommand) {

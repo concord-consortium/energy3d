@@ -1740,6 +1740,18 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
 		final double w = (panelWidth + colSpacing) / Scene.getInstance().getAnnotationScale();
 		final double h = (panelHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
+		Path2D.Double path = null;
+		if (foundationPolygon != null) {
+			path = new Path2D.Double();
+			final int n = foundationPolygon.points.size();
+			Vector3 v = foundationPolygon.getAbsPoint(0);
+			path.moveTo(v.getX(), v.getY());
+			for (int i = 1; i < n; i++) {
+				v = foundationPolygon.getAbsPoint(i);
+				path.lineTo(v.getX(), v.getY());
+			}
+			path.closePath();
+		}
 		switch (rowAxis) {
 		case 0: // north-south axis
 			int rows = (int) Math.floor(b / w);
@@ -1747,16 +1759,20 @@ public class Foundation extends HousePart implements Thermalizable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final SolarPanel sp = new SolarPanel(false);
+					sp.setContainer(this);
+					Vector3 v = sp.toRelative(new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0));
+					sp.points.get(0).setX(v.getX());
+					sp.points.get(0).setY(v.getY());
+					v = sp.getAbsPoint(0);
+					if (path != null && !path.contains(v.getX(), v.getY())) {
+						continue;
+					}
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
-					sp.setContainer(this);
 					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
 					sp.setRelativeAzimuth(90);
-					final Vector3 v = sp.toRelative(new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0));
-					sp.points.get(0).setX(v.getX());
-					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
 					sp.draw();
 				}
@@ -1768,15 +1784,19 @@ public class Foundation extends HousePart implements Thermalizable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final SolarPanel sp = new SolarPanel(false);
+					sp.setContainer(this);
+					Vector3 v = sp.toRelative(new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0));
+					sp.points.get(0).setX(v.getX());
+					sp.points.get(0).setY(v.getY());
+					v = sp.getAbsPoint(0);
+					if (path != null && !path.contains(v.getX(), v.getY())) {
+						continue;
+					}
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
-					sp.setContainer(this);
 					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
-					final Vector3 v = sp.toRelative(new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0));
-					sp.points.get(0).setX(v.getX());
-					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
 					sp.draw();
 				}
