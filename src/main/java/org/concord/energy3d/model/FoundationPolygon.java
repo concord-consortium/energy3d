@@ -25,6 +25,7 @@ public class FoundationPolygon extends HousePart {
 		points.get(1).set(0.9, 0.1, h);
 		points.get(2).set(0.9, 0.9, h);
 		points.get(3).set(0.1, 0.9, h);
+		setVisible(visible); // needed because edit shapes are not creates in init() yet
 	}
 
 	@Override
@@ -108,10 +109,21 @@ public class FoundationPolygon extends HousePart {
 	public void setVisible(final boolean visible) {
 		this.visible = visible;
 		mesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+		super.setEditPointsVisible(false);
+		for (int i = 0; i < points.size(); i++) {
+			getEditPointShape(i).getSceneHints().setAllPickingHints(visible);
+		}
 	}
 
 	public boolean isVisible() {
 		return visible;
+	}
+
+	@Override
+	public void setEditPointsVisible(final boolean visible) {
+		if (this.visible) {
+			super.setEditPointsVisible(visible);
+		}
 	}
 
 }
