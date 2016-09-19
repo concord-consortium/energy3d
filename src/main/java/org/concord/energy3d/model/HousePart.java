@@ -369,7 +369,7 @@ public abstract class HousePart implements Serializable {
 					}
 				}
 				if (userData != null && userData.getHousePart().isDrawCompleted()) {
-					if (!(this instanceof Roof) || ((Wall) userData.getHousePart()).getRoof() == null) {
+					if (!(userData.getHousePart() instanceof FoundationPolygon) && (!(this instanceof Roof) || ((Wall) userData.getHousePart()).getRoof() == null)) {
 						container = userData.getHousePart();
 						container.getChildren().add(this);
 					}
