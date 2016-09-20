@@ -923,7 +923,9 @@ public class SolarRadiation {
 					}
 				}
 			}
-			part.drawHeatFlux();
+			if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
+				part.drawHeatFlux();
+			}
 		}
 
 		final Calendar today = Heliodon.getInstance().getCalendar();

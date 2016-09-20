@@ -845,7 +845,7 @@ public class Scene implements Serializable {
 			if (!oldRoofs.isEmpty() && !newRoofs.isEmpty()) {
 				for (int i = 0; i < newRoofs.size(); i++) {
 					final Map<Integer, List<Wall>> oldMap = oldRoofs.get(i).getGableEditPointToWallMap();
-					if (oldMap.isEmpty()) {
+					if (oldMap == null || oldMap.isEmpty()) {
 						continue;
 					}
 					final Map<Integer, List<Wall>> newMap = new HashMap<Integer, List<Wall>>();
