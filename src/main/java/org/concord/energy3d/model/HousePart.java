@@ -245,7 +245,7 @@ public abstract class HousePart implements Serializable {
 		final Sphere pointShape = new Sphere("Point", Vector3.ZERO, 8, 8, 0.1);
 		pointShape.setUserData(new UserData(this, i, true));
 		pointShape.updateModelBound(); // important
-		pointShape.getSceneHints().setCullHint(CullHint.Always);
+		pointShape.setVisible(false);
 		pointShape.getSceneHints().setLightCombineMode(LightCombineMode.Off);
 		pointShape.getSceneHints().setCastsShadows(false);
 		pointShape.setModelBound(new BoundingBox());
@@ -324,8 +324,8 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void setEditPointsVisible(final boolean visible) {
-		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
-			pointsRoot.getChild(i).getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+		for (int i = 0; i < points.size(); i++) {
+			getEditPointShape(i).setVisible(visible);
 		}
 	}
 

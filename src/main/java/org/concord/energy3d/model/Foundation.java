@@ -232,9 +232,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void setEditPointsVisible(final boolean visible) {
 		for (int i = 0; i < points.size(); i++) {
 			final boolean visible_i = visible && (resizeHouseMode || i < 4 || i > 7);
-			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
-			sceneHints.setCullHint(visible_i ? CullHint.Inherit : CullHint.Always);
-			sceneHints.setAllPickingHints(visible_i);
+			getEditPointShape(i).setVisible(visible_i);
+			getEditPointShape(i).getSceneHints().setAllPickingHints(visible_i);
 		}
 	}
 

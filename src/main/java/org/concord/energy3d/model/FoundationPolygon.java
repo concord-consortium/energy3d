@@ -60,6 +60,7 @@ public class FoundationPolygon extends HousePart {
 				editPointShape.setDefaultColor(ColorRGBA.RED);
 				points.add(editPointIndex, relativeP);
 				points.add(new Vector3());
+				setEditPointsVisible(true);
 			}
 			draw();
 		}
@@ -77,7 +78,6 @@ public class FoundationPolygon extends HousePart {
 			points.get(n + i).set(points.get(i)).addLocal(points.get(i == 0 ? n - 1 : i - 1)).multiplyLocal(0.5);
 		}
 		updateEditShapes();
-		setEditPointsVisible(true);
 	}
 
 	@Override
