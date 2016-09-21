@@ -37,6 +37,9 @@ public class SelectUtil {
 			if (!housePart.isFrozen()) {
 				PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
 				PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+				if (housePart instanceof Foundation) {
+					PickingUtil.findPick(((Foundation) housePart).getPolygon().getEditPointsRoot(), pickRay, pickResults, false);
+				}
 			}
 		}
 		return getPickResult(pickRay);
