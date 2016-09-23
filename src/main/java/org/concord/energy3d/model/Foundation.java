@@ -1740,12 +1740,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double w = (panelWidth + colSpacing) / Scene.getInstance().getAnnotationScale();
 		final double h = (panelHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
 		Path2D.Double path = null;
-		if (foundationPolygon != null) {
+		if (foundationPolygon != null && foundationPolygon.isVisible()) {
 			path = new Path2D.Double();
 			final int n = foundationPolygon.points.size();
 			Vector3 v = foundationPolygon.getAbsPoint(0);
 			path.moveTo(v.getX(), v.getY());
-			for (int i = 1; i < n; i++) {
+			for (int i = 1; i < n / 2; i++) { // use only the first half of the vertices from the polygon
 				v = foundationPolygon.getAbsPoint(i);
 				path.lineTo(v.getX(), v.getY());
 			}
@@ -1757,22 +1757,23 @@ public class Foundation extends HousePart implements Thermalizable {
 			int cols = (int) Math.floor(a / h);
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
-					final SolarPanel sp = new SolarPanel(false);
-					sp.setContainer(this);
-					Vector3 v = sp.toRelative(new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0));
-					sp.points.get(0).setX(v.getX());
-					sp.points.get(0).setY(v.getY());
-					v = sp.getAbsPoint(0);
-					if (path != null && !path.contains(v.getX(), v.getY())) {
+					final double x = x0 + h * (c + 0.5);
+					final double y = y0 + w * (r + 0.5);
+					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
+					final SolarPanel sp = new SolarPanel(false);
+					sp.setContainer(this);
+					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
+					sp.points.get(0).setX(v.getX());
+					sp.points.get(0).setY(v.getY());
+					sp.points.get(0).setZ(height);
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
 					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
 					sp.setRelativeAzimuth(90);
-					sp.points.get(0).setZ(height);
 					sp.draw();
 				}
 			}
@@ -1782,21 +1783,22 @@ public class Foundation extends HousePart implements Thermalizable {
 			cols = (int) Math.floor(b / h);
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
-					final SolarPanel sp = new SolarPanel(false);
-					sp.setContainer(this);
-					Vector3 v = sp.toRelative(new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0));
-					sp.points.get(0).setX(v.getX());
-					sp.points.get(0).setY(v.getY());
-					v = sp.getAbsPoint(0);
-					if (path != null && !path.contains(v.getX(), v.getY())) {
+					final double x = x0 + w * (r + 0.5);
+					final double y = y0 + h * (c + 0.5);
+					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
+					final SolarPanel sp = new SolarPanel(false);
+					sp.setContainer(this);
+					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
+					sp.points.get(0).setX(v.getX());
+					sp.points.get(0).setY(v.getY());
+					sp.points.get(0).setZ(height);
 					sp.setPanelWidth(panelWidth);
 					sp.setPanelHeight(panelHeight);
 					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
-					sp.points.get(0).setZ(height);
 					sp.draw();
 				}
 			}
