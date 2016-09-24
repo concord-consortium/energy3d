@@ -141,7 +141,7 @@ import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ShowFieldBorderCommand;
+import org.concord.energy3d.undo.ShowBorderLineCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -2338,15 +2338,15 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JCheckBoxMenuItem miFieldBorder = new JCheckBoxMenuItem("Field Border");
-			miFieldBorder.addItemListener(new ItemListener() {
+			final JCheckBoxMenuItem miBorderLine = new JCheckBoxMenuItem("Border Line");
+			miBorderLine.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						SceneManager.getInstance().getUndoManager().addEdit(new ShowFieldBorderCommand(foundation));
-						foundation.getPolygon().setVisible(miFieldBorder.isSelected());
+						SceneManager.getInstance().getUndoManager().addEdit(new ShowBorderLineCommand(foundation));
+						foundation.getPolygon().setVisible(miBorderLine.isSelected());
 						foundation.draw();
 						Scene.getInstance().setEdited(true);
 					}
@@ -2496,7 +2496,7 @@ public class PopupMenuFactory {
 						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
 						Util.selectSilently(miLock, f.isFrozen());
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
-						Util.selectSilently(miFieldBorder, f.getPolygon().isVisible());
+						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
 					}
 				}
 			});
@@ -2510,7 +2510,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.add(layoutMenu);
 			popupMenuForFoundation.addSeparator();
-			popupMenuForFoundation.add(miFieldBorder);
+			popupMenuForFoundation.add(miBorderLine);
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.add(editOptionsMenu);

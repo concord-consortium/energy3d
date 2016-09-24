@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.util.SelectUtil;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.math.ColorRGBA;
@@ -20,7 +21,7 @@ public class FoundationPolygon extends HousePart {
 	public FoundationPolygon(final Foundation foundation) {
 		super(1, 8, 0, true);
 		this.container = foundation;
-		final double h = foundation.getHeight();
+		final double h = foundation.getHeight() + 10;
 		points.get(0).set(0.1, 0.1, h);
 		points.get(1).set(0.9, 0.1, h);
 		points.get(2).set(0.9, 0.9, h);
@@ -36,6 +37,8 @@ public class FoundationPolygon extends HousePart {
 		line.setLineWidth(3);
 		line.getMeshData().setIndexMode(IndexMode.LineLoop);
 		line.setModelBound(new BoundingBox());
+		// line.setStipplePattern((short) 0xf);
+		Util.disablePickShadowLight(line);
 		root.attachChild(line);
 		mesh = line;
 		setVisible(visible);
@@ -129,7 +132,7 @@ public class FoundationPolygon extends HousePart {
 		for (int i = 0; i < n; i++) {
 			points.get((i + 1) % n).subtract(points.get(i), v1).normalizeLocal();
 			points.get((i + 2) % n).subtract(points.get((i + 1) % n), v2).normalizeLocal();
-			if (v1.dot(v2) > 0.95) {
+			if (v1.dot(v2) > 0.995) {
 				points.remove((i + 1) % n);
 				points.remove(points.size() - 1);
 				i--;

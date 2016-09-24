@@ -6,14 +6,14 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 
-public class ShowFieldBorderCommand extends AbstractUndoableEdit {
+public class ShowBorderLineCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue;
 	private boolean newValue;
 	private final Foundation foundation;
 
-	public ShowFieldBorderCommand(final Foundation foundation) {
+	public ShowBorderLineCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		oldValue = foundation.getPolygon().isVisible();
 	}
@@ -35,7 +35,7 @@ public class ShowFieldBorderCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Field Border";
+		return "Show Border Line";
 	}
 
 }
