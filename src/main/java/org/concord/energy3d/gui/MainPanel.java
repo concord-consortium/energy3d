@@ -112,8 +112,9 @@ public class MainPanel extends JPanel {
 	MouseAdapter operationStickAndRefreshUponExit = new MouseAdapter() {
 		@Override
 		public void mouseClicked(final MouseEvent e) {
-			if (e.getClickCount() > 1)
+			if (e.getClickCount() > 1) {
 				SceneManager.getInstance().setOperationStick(true);
+			}
 		}
 
 		@Override
@@ -338,6 +339,7 @@ public class MainPanel extends JPanel {
 
 		// create solar menu
 		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")), true);
+		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Rack", new ImageIcon(getClass().getResource("icons/solarpanel.png")), true);
 		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Reflecting Mirror", new ImageIcon(getClass().getResource("icons/mirror.png")), true);
 		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")), true);
 		final ActionListener solarAction = new ActionListener() {
@@ -348,6 +350,9 @@ public class MainPanel extends JPanel {
 				if (selected == miSolarPanel) {
 					solaCommand = SceneManager.Operation.DRAW_SOLAR_PANEL;
 					solarButton.setToolTipText("Insert a solar panel");
+				} else if (selected == miRack) {
+					solaCommand = SceneManager.Operation.DRAW_RACK;
+					solarButton.setToolTipText("Insert a rack");
 				} else if (selected == miMirror) {
 					solaCommand = SceneManager.Operation.DRAW_MIRROR;
 					solarButton.setToolTipText("Insert a reflecting mirror");
@@ -361,14 +366,17 @@ public class MainPanel extends JPanel {
 			}
 		};
 		miSolarPanel.addActionListener(solarAction);
+		miRack.addActionListener(solarAction);
 		miMirror.addActionListener(solarAction);
 		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
 		solaMenu.add(miSolarPanel);
+		solaMenu.add(miRack);
 		solaMenu.add(miMirror);
 		solaMenu.add(miSensor);
 		bg = new ButtonGroup();
 		bg.add(miSolarPanel);
+		bg.add(miRack);
 		bg.add(miMirror);
 		bg.add(miSensor);
 
@@ -550,10 +558,11 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ShowShadowCommand c = new ShowShadowCommand();
-					if (SceneManager.getInstance().isSunAnimation() || Heliodon.getInstance().isNightTime())
+					if (SceneManager.getInstance().isSunAnimation() || Heliodon.getInstance().isNightTime()) {
 						SceneManager.getInstance().setShading(shadowButton.isSelected());
-					else
+					} else {
 						SceneManager.getInstance().setShading(false);
+					}
 					SceneManager.getInstance().setShadow(shadowButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
@@ -620,8 +629,9 @@ public class MainPanel extends JPanel {
 					energyViewButton.setSelected(false);
 					final AnimateSunCommand c = new AnimateSunCommand();
 					SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
-					if (shadowButton.isSelected())
+					if (shadowButton.isSelected()) {
 						SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
+					}
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
@@ -712,8 +722,9 @@ public class MainPanel extends JPanel {
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
 					if (c != getPreviewButton() && c != getSelectButton() && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
-						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
+						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected()) {
 							c.setEnabled(enabled);
+						}
 					}
 				}
 			}
@@ -726,8 +737,9 @@ public class MainPanel extends JPanel {
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
 					if (c != getNoteButton() && c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
-						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected())
+						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected()) {
 							c.setEnabled(enabled);
+						}
 					}
 				}
 			}
@@ -771,7 +783,7 @@ public class MainPanel extends JPanel {
 			energyViewButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					EnergyPanel p = EnergyPanel.getInstance();
+					final EnergyPanel p = EnergyPanel.getInstance();
 					p.showHeatMapContrastSlider(energyViewButton.isSelected());
 					if (energyViewButton.isSelected()) {
 						defaultTool();
@@ -1123,8 +1135,9 @@ public class MainPanel extends JPanel {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					MainPanel.getInstance().setNoteVisible(noteButton.isSelected());
-					if (noteButton.isSelected())
+					if (noteButton.isSelected()) {
 						getNoteTextArea().requestFocusInWindow();
+					}
 				}
 			});
 		}
