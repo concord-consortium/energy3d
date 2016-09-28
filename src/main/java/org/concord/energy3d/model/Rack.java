@@ -161,10 +161,14 @@ public class Rack extends HousePart {
 
 		final Vector3 center = getAbsPoint(0);
 		postsRoot.detachAllChildren();
-		for (double x = pollDistanceX; x < mirrorWidth / 1; x += pollDistanceX) {
-			for (double y = pollDistanceY; y < mirrorHeight / 1; y += pollDistanceY) {
-				final Vector3 position = getAbsPoint(0).addLocal((x - mirrorWidth / 2) / annotationScale, (y - mirrorHeight / 2) / annotationScale, 0);
-				final double dz = Math.tan(Math.toRadians(tiltAngle)) * (position.getY() - center.getY());
+		final HousePart container = getContainerRelative();
+		final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
+		final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
+		for (double u = pollDistanceX; u < mirrorWidth / 1; u += pollDistanceX) {
+			for (double v = pollDistanceY; v < mirrorHeight / 1; v += pollDistanceY) {
+				final double vFactor = (v - mirrorHeight / 2) / annotationScale;
+				final Vector3 position = uDir.multiply((u - mirrorWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+				final double dz = Math.tan(Math.toRadians(tiltAngle)) * vFactor;
 
 				final Cylinder post = new Cylinder("Post Cylinder", 10, 10, 10, 0);
 				post.setRadius(0.6);
@@ -178,7 +182,6 @@ public class Rack extends HousePart {
 				postsRoot.attachChild(post);
 			}
 		}
-		setEditPointsVisible(true);
 	}
 
 	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
