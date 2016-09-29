@@ -73,10 +73,12 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeAtmosphericDustLossCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeAzimuthForAllRacksCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllRacksCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForSolarPanelRowCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
@@ -93,6 +95,9 @@ import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationRackAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationRackBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
@@ -122,6 +127,7 @@ import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForSolarPanelRowCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
@@ -135,12 +141,14 @@ import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
+import org.concord.energy3d.undo.SetFoundationRackSizeCommand;
 import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
 import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
-import org.concord.energy3d.undo.SetMirrorSizeCommand;
+import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetShadeToleranceCommand;
 import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
+import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ShowBorderLineCommand;
@@ -178,6 +186,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForHuman;
 	private static JPopupMenu popupMenuForFoundation;
 	private static JPopupMenu popupMenuForSolarPanel;
+	private static JPopupMenu popupMenuForRack;
 	private static JPopupMenu popupMenuForMirror;
 	private static JPopupMenu popupMenuForSensor;
 	private static JPopupMenu popupMenuForLand;
@@ -227,6 +236,9 @@ public class PopupMenuFactory {
 		}
 		if (selectedPart instanceof SolarPanel) {
 			return getPopupMenuForSolarPanel();
+		}
+		if (selectedPart instanceof Rack) {
+			return getPopupMenuForRack();
 		}
 		if (selectedPart instanceof Mirror) {
 			return getPopupMenuForMirror();
@@ -3709,6 +3721,301 @@ public class PopupMenuFactory {
 
 	}
 
+	private static JPopupMenu getPopupMenuForRack() {
+
+		if (popupMenuForRack == null) {
+
+			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
+			miTiltAngle.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Rack rack = (Rack) selectedPart;
+					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>The tilt angle of a rack is the angle between its surface and the ground surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on This Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, rack.getTiltAngle());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								double val = Double.parseDouble(newValue);
+								if (val < -90 || val > 90) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (Util.isZero(val - 90)) {
+										val = 89.999;
+									} else if (Util.isZero(val + 90)) {
+										val = -89.999;
+									}
+									if (rb1.isSelected()) {
+										final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(rack);
+										rack.setTiltAngle(val);
+										rack.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = rack.getTopContainer();
+										final ChangeFoundationRackTiltAngleCommand c = new ChangeFoundationRackTiltAngleCommand(foundation);
+										Scene.getInstance().setTiltAngleForRacksOnFoundation(foundation, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										final ChangeTiltAngleForAllRacksCommand c = new ChangeTiltAngleForAllRacksCommand();
+										Scene.getInstance().setTiltAngleForAllRacks(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									rack.draw();
+									updateAfterEdit();
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
+			miAzimuth.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Rack rack = (Rack) selectedPart;
+					final Foundation foundation = rack.getTopContainer();
+					final String title = "<html>Azimuth Angle of " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final Object[] params = { title, footnote, panel };
+					while (true) {
+						double a = rack.getRelativeAzimuth() + foundation.getAzimuth();
+						if (a > 360) {
+							a -= 360;
+						}
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								a = val - foundation.getAzimuth();
+								if (a < 0) {
+									a += 360;
+								}
+								if (rb1.isSelected()) {
+									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
+									rack.setRelativeAzimuth(a);
+									rack.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb2.isSelected()) {
+									final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
+									Scene.getInstance().setAzimuthForRacksOnFoundation(foundation, a);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
+									final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
+									Scene.getInstance().setAzimuthForAllRacks(a);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								rack.draw();
+								updateAfterEdit();
+								break;
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miSize = new JMenuItem("Size...");
+			miSize.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack rack = (Rack) selectedPart;
+					final Foundation foundation = rack.getTopContainer();
+					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Width: "));
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth()));
+					inputPanel.add(widthField);
+					inputPanel.add(new JLabel("Height: "));
+					final JTextField heightField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight()));
+					inputPanel.add(heightField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.NORTH);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					double w = 0, h = 0;
+					try {
+						w = Double.parseDouble(widthField.getText());
+						if (w < 1 || w > 500) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 500 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						}
+					} catch (final NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					try {
+						h = Double.parseDouble(heightField.getText());
+						if (h < 1 || h > 20) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						}
+					} catch (final NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					if (rb1.isSelected()) {
+						final SetPartSizeCommand c = new SetPartSizeCommand(rack);
+						rack.setRackWidth(w);
+						rack.setRackHeight(h);
+						rack.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						final SetFoundationRackSizeCommand c = new SetFoundationRackSizeCommand(foundation);
+						Scene.getInstance().setSizeForRacksOnFoundation(foundation, w, h);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
+						Scene.getInstance().setSizeForAllRacks(w, h);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					updateAfterEdit();
+				}
+			});
+
+			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
+			miBaseHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Rack rack = (Rack) selectedPart;
+					final Foundation foundation = rack.getTopContainer();
+					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					final Object[] params = { title, footnote, panel };
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, rack.getBaseHeight() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
+								if (rb1.isSelected()) {
+									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
+									rack.setBaseHeight(val);
+									rack.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb2.isSelected()) {
+									final ChangeFoundationRackBaseHeightCommand c = new ChangeFoundationRackBaseHeightCommand(foundation);
+									Scene.getInstance().setBaseHeightForRacksOnFoundation(foundation, val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
+									final ChangeBaseHeightForAllRacksCommand c = new ChangeBaseHeightForAllRacksCommand();
+									Scene.getInstance().setBaseHeightForAllRacks(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								rack.draw();
+								updateAfterEdit();
+								break;
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
+			popupMenuForRack = createPopupMenu(true, true, new Runnable() {
+				@Override
+				public void run() {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+				}
+			});
+
+			popupMenuForRack.addSeparator();
+			popupMenuForRack.add(miTiltAngle);
+			popupMenuForRack.add(miAzimuth);
+			popupMenuForRack.add(miSize);
+			popupMenuForRack.add(miBaseHeight);
+
+		}
+
+		return popupMenuForRack;
+
+	}
+
 	private static JPopupMenu getPopupMenuForMirror() {
 
 		if (popupMenuForMirror == null) {
@@ -4044,7 +4351,7 @@ public class PopupMenuFactory {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 					}
 					if (rb1.isSelected()) {
-						final SetMirrorSizeCommand c = new SetMirrorSizeCommand(m);
+						final SetPartSizeCommand c = new SetPartSizeCommand(m);
 						m.setMirrorWidth(w);
 						m.setMirrorHeight(h);
 						m.draw();
@@ -4329,7 +4636,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Door) {
 						s = "<html>U-Value of " + partInfo + "<hr><font size=2>Examples:<br>US 1.20 (uninsulated metal), US 0.60 (insulated metal), US 0.50 (wood)</html>";
 					} else {
-						s = "<html>U-Value of " + partInfo + "<hr><font size=2>Examples:<br>US 1.30 (single glass), US 0.81 (double glass), US 0.53 (triple glass)</html>";
+						s = "<html>U-Value of " + partInfo + "<hr><font size=2>Examples:<br>US 1.30 (single glass), US 0.48 (double glass), US 0.25 (triple glass)</html>";
 					}
 				} else {
 					s = "<html>Insulation Value of " + partInfo + "<hr><font size=2>Examples:<br>US R13 (cellulose, 3.5\"), US R16 (mineral wool, 5.25\"), US R31 (fiberglass, 10\")</html>";

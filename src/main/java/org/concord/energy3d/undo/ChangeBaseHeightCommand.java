@@ -6,20 +6,24 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
 public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldValue, newValue;
-	private HousePart part;
+	private final HousePart part;
 
-	public ChangeBaseHeightCommand(HousePart part) {
+	public ChangeBaseHeightCommand(final HousePart part) {
 		this.part = part;
-		if (part instanceof SolarPanel)
+		if (part instanceof SolarPanel) {
 			oldValue = ((SolarPanel) part).getBaseHeight();
-		else if (part instanceof Mirror)
+		} else if (part instanceof Rack) {
+			oldValue = ((Rack) part).getBaseHeight();
+		} else if (part instanceof Mirror) {
 			oldValue = ((Mirror) part).getBaseHeight();
+		}
 	}
 
 	public HousePart getPart() {
@@ -33,6 +37,8 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 	public double getNewValue() {
 		if (part instanceof SolarPanel) {
 			newValue = ((SolarPanel) part).getBaseHeight();
+		} else if (part instanceof Rack) {
+			newValue = ((Rack) part).getBaseHeight();
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getBaseHeight();
 		}
@@ -45,6 +51,9 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 		if (part instanceof SolarPanel) {
 			newValue = ((SolarPanel) part).getBaseHeight();
 			((SolarPanel) part).setBaseHeight(oldValue);
+		} else if (part instanceof Rack) {
+			newValue = ((Rack) part).getBaseHeight();
+			((Rack) part).setBaseHeight(oldValue);
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getBaseHeight();
 			((Mirror) part).setBaseHeight(oldValue);
@@ -55,10 +64,13 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		if (part instanceof SolarPanel)
+		if (part instanceof SolarPanel) {
 			((SolarPanel) part).setBaseHeight(newValue);
-		else if (part instanceof Mirror)
+		} else if (part instanceof Rack) {
+			((Rack) part).setBaseHeight(newValue);
+		} else if (part instanceof Mirror) {
 			((Mirror) part).setBaseHeight(newValue);
+		}
 		part.draw();
 	}
 

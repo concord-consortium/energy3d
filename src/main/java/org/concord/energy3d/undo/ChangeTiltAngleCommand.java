@@ -6,20 +6,24 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
 public class ChangeTiltAngleCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldValue, newValue;
-	private HousePart part;
+	private final HousePart part;
 
-	public ChangeTiltAngleCommand(HousePart part) {
+	public ChangeTiltAngleCommand(final HousePart part) {
 		this.part = part;
-		if (part instanceof SolarPanel)
+		if (part instanceof SolarPanel) {
 			oldValue = ((SolarPanel) part).getTiltAngle();
-		else if (part instanceof Mirror)
+		} else if (part instanceof Rack) {
+			oldValue = ((Rack) part).getTiltAngle();
+		} else if (part instanceof Mirror) {
 			oldValue = ((Mirror) part).getTiltAngle();
+		}
 	}
 
 	public HousePart getPart() {
@@ -33,6 +37,8 @@ public class ChangeTiltAngleCommand extends AbstractUndoableEdit {
 	public double getNewValue() {
 		if (part instanceof SolarPanel) {
 			newValue = ((SolarPanel) part).getTiltAngle();
+		} else if (part instanceof Rack) {
+			newValue = ((Rack) part).getTiltAngle();
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getTiltAngle();
 		}
@@ -45,6 +51,9 @@ public class ChangeTiltAngleCommand extends AbstractUndoableEdit {
 		if (part instanceof SolarPanel) {
 			newValue = ((SolarPanel) part).getTiltAngle();
 			((SolarPanel) part).setTiltAngle(oldValue);
+		} else if (part instanceof Rack) {
+			newValue = ((Rack) part).getTiltAngle();
+			((Rack) part).setTiltAngle(oldValue);
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getTiltAngle();
 			((Mirror) part).setTiltAngle(oldValue);
@@ -57,6 +66,8 @@ public class ChangeTiltAngleCommand extends AbstractUndoableEdit {
 		super.redo();
 		if (part instanceof SolarPanel) {
 			((SolarPanel) part).setTiltAngle(newValue);
+		} else if (part instanceof Rack) {
+			((Rack) part).setTiltAngle(newValue);
 		} else if (part instanceof Mirror) {
 			((Mirror) part).setTiltAngle(newValue);
 		}

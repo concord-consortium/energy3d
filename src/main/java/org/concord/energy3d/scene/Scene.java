@@ -29,6 +29,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
@@ -1904,6 +1905,98 @@ public class Scene implements Serializable {
 				((SolarPanel) p).setInverterEfficiency(eff);
 			}
 		}
+	}
+
+	public List<Rack> getAllRacks() {
+		final List<Rack> list = new ArrayList<Rack>();
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				list.add((Rack) p);
+			}
+		}
+		return list;
+	}
+
+	public void setTiltAngleForRacksOnFoundation(final Foundation foundation, final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack && p.getTopContainer() == foundation) {
+				((Rack) p).setTiltAngle(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTiltAngleForAllRacks(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setTiltAngle(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAzimuthForRacksOnFoundation(final Foundation foundation, final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack && p.getTopContainer() == foundation) {
+				((Rack) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAzimuthForAllRacks(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForRacksOnFoundation(final Foundation foundation, final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack && p.getTopContainer() == foundation) {
+				((Rack) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForAllRacks(final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForRacksOnFoundation(final Foundation foundation, final double width, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack && p.getTopContainer() == foundation) {
+				((Rack) p).setRackWidth(width);
+				((Rack) p).setRackHeight(height);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForAllRacks(final double width, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setRackWidth(width);
+				((Rack) p).setRackHeight(height);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public List<Mirror> getAllMirrors() {

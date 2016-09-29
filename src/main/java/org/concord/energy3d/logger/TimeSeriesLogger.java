@@ -18,6 +18,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
@@ -41,99 +42,7 @@ import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
-import org.concord.energy3d.undo.AddArrayCommand;
-import org.concord.energy3d.undo.AddMultiplePartsCommand;
-import org.concord.energy3d.undo.AddPartCommand;
-import org.concord.energy3d.undo.AdjustThermostatCommand;
-import org.concord.energy3d.undo.AnimateSunCommand;
-import org.concord.energy3d.undo.ChangeAtmosphericDustLossCommand;
-import org.concord.energy3d.undo.ChangeAzimuthCommand;
-import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeBuildingColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
-import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
-import org.concord.energy3d.undo.ChangeCityCommand;
-import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
-import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
-import org.concord.energy3d.undo.ChangeDateCommand;
-import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationTemperatureCoefficientPmaxCommand;
-import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
-import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
-import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
-import org.concord.energy3d.undo.ChangeHeightForConnectedWallsCommand;
-import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
-import org.concord.energy3d.undo.ChangeLandColorCommand;
-import org.concord.energy3d.undo.ChangeLatitudeCommand;
-import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
-import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
-import org.concord.energy3d.undo.ChangePartColorCommand;
-import org.concord.energy3d.undo.ChangePartUValueCommand;
-import org.concord.energy3d.undo.ChangeReflectivityForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
-import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
-import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
-import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeTemperatrureCoeffientPmaxForAllCommand;
-import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
-import org.concord.energy3d.undo.ChangeTextureCommand;
-import org.concord.energy3d.undo.ChangeThemeCommand;
-import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeTimeCommand;
-import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
-import org.concord.energy3d.undo.ChangeWallHeightCommand;
-import org.concord.energy3d.undo.ChangeWallThicknessCommand;
-import org.concord.energy3d.undo.ChangeWallTypeCommand;
-import org.concord.energy3d.undo.ChangeWindowShgcCommand;
-import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
-import org.concord.energy3d.undo.DeleteUtilityBillCommand;
-import org.concord.energy3d.undo.EditPartCommand;
-import org.concord.energy3d.undo.MoveBuildingCommand;
-import org.concord.energy3d.undo.PastePartCommand;
-import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
-import org.concord.energy3d.undo.RemovePartCommand;
-import org.concord.energy3d.undo.RescaleBuildingCommand;
-import org.concord.energy3d.undo.RescaleCommand;
-import org.concord.energy3d.undo.RotateBuildingCommand;
-import org.concord.energy3d.undo.RotateSolarPanelCommand;
-import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
-import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
-import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
-import org.concord.energy3d.undo.SetMirrorSizeCommand;
-import org.concord.energy3d.undo.SetShadeToleranceCommand;
-import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
-import org.concord.energy3d.undo.SetSolarTrackerCommand;
-import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ShowAnnotationCommand;
-import org.concord.energy3d.undo.ShowAxesCommand;
-import org.concord.energy3d.undo.ShowHeatFluxCommand;
-import org.concord.energy3d.undo.ShowHeliodonCommand;
-import org.concord.energy3d.undo.ShowShadowCommand;
-import org.concord.energy3d.undo.SpinViewCommand;
-import org.concord.energy3d.undo.TopViewCommand;
-import org.concord.energy3d.undo.ZoomCommand;
+import org.concord.energy3d.undo.*;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.Vector3;
@@ -483,6 +392,19 @@ public class TimeSeriesLogger {
 					final ChangeBaseHeightCommand c = (ChangeBaseHeightCommand) lastEdit;
 					final HousePart p = c.getPart();
 					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
+				} else if (lastEdit instanceof SetPartSizeCommand) {
+					final SetPartSizeCommand c = (SetPartSizeCommand) lastEdit;
+					if (c.getPart() instanceof Mirror) {
+						final Mirror m = (Mirror) c.getPart();
+						stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
+						stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + m.getMirrorWidth();
+						stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + m.getMirrorHeight() + "}";
+					} else if (c.getPart() instanceof Rack) {
+						final Rack r = (Rack) c.getPart();
+						stateValue = "{\"Foundation\": " + r.getTopContainer().getId() + ", \"ID\": " + r.getId();
+						stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + r.getRackWidth();
+						stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + r.getRackHeight() + "}";
+					}
 				}
 
 				/* solar panel properties */
@@ -593,15 +515,47 @@ public class TimeSeriesLogger {
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getBaseHeight()) + "}";
 				}
 
+				/* rack properties */
+
+				else if (lastEdit instanceof SetFoundationRackSizeCommand) {
+					final Foundation f = ((SetFoundationRackSizeCommand) lastEdit).getFoundation();
+					final List<Rack> racks = f.getRacks();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (racks.isEmpty() ? -1 : racks.get(0).getRackWidth()) + ", \"New Height\": " + (racks.isEmpty() ? -1 : racks.get(0).getRackHeight()) + "}";
+				} else if (lastEdit instanceof SetSizeForAllRacksCommand) {
+					final List<Rack> racks = Scene.getInstance().getAllRacks();
+					stateValue = "{\"New Width\": " + (racks.isEmpty() ? -1 : racks.get(0).getRackWidth()) + ", \"New Height\": " + (racks.isEmpty() ? -1 : racks.get(0).getRackHeight()) + "}";
+				}
+
+				else if (lastEdit instanceof ChangeFoundationRackTiltAngleCommand) {
+					final Foundation f = ((ChangeFoundationRackTiltAngleCommand) lastEdit).getFoundation();
+					final List<Rack> racks = f.getRacks();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getTiltAngle()) + "}";
+				} else if (lastEdit instanceof ChangeTiltAngleForAllRacksCommand) {
+					final List<Rack> racks = Scene.getInstance().getAllRacks();
+					stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getTiltAngle()) + "}";
+				}
+
+				else if (lastEdit instanceof ChangeFoundationRackAzimuthCommand) {
+					final Foundation f = ((ChangeFoundationRackAzimuthCommand) lastEdit).getFoundation();
+					final List<Rack> racks = f.getRacks();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getRelativeAzimuth()) + "}";
+				} else if (lastEdit instanceof ChangeAzimuthForAllRacksCommand) {
+					final List<Rack> racks = Scene.getInstance().getAllRacks();
+					stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getRelativeAzimuth()) + "}";
+				}
+
+				else if (lastEdit instanceof ChangeFoundationRackBaseHeightCommand) {
+					final Foundation f = ((ChangeFoundationRackBaseHeightCommand) lastEdit).getFoundation();
+					final List<Rack> racks = f.getRacks();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getBaseHeight()) + "}";
+				} else if (lastEdit instanceof ChangeBaseHeightForAllRacksCommand) {
+					final List<Rack> racks = Scene.getInstance().getAllRacks();
+					stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getBaseHeight()) + "}";
+				}
+
 				/* mirror properties */
 
-				else if (lastEdit instanceof SetMirrorSizeCommand) {
-					final SetMirrorSizeCommand c = (SetMirrorSizeCommand) lastEdit;
-					final Mirror m = c.getMirror();
-					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
-					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + m.getMirrorWidth();
-					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + m.getMirrorHeight() + "}";
-				} else if (lastEdit instanceof SetFoundationMirrorSizeCommand) {
+				else if (lastEdit instanceof SetFoundationMirrorSizeCommand) {
 					final Foundation f = ((SetFoundationMirrorSizeCommand) lastEdit).getFoundation();
 					final List<Mirror> mirrors = f.getMirrors();
 					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
