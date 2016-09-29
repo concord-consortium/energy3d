@@ -1,6 +1,8 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -740,6 +742,33 @@ public class SolarPanel extends HousePart {
 			e *= 1 - atm.getDustLoss();
 		}
 		return e * (1 + temperatureCoefficientPmax * (temperature - 25));
+	}
+
+	public List<SolarPanel> getRow() {
+		final double minDistance = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale() * 1.05;
+		final List<SolarPanel> panels = getTopContainer().getSolarPanels();
+		final List<SolarPanel> row = new ArrayList<SolarPanel>();
+		row.add(this);
+		final ArrayList<SolarPanel> oldNeighbors = new ArrayList<SolarPanel>();
+		oldNeighbors.add(this);
+		final ArrayList<SolarPanel> newNeighbors = new ArrayList<SolarPanel>();
+		do {
+			newNeighbors.clear();
+			for (final HousePart oldNeighbor : oldNeighbors) {
+				final Vector3 c = oldNeighbor.getAbsCenter();
+				for (final SolarPanel x : panels) {
+					if (x != oldNeighbor && !row.contains(x)) {
+						if (x.getAbsCenter().distance(c) < minDistance) {
+							newNeighbors.add(x);
+						}
+					}
+				}
+			}
+			row.addAll(newNeighbors);
+			oldNeighbors.clear();
+			oldNeighbors.addAll(newNeighbors);
+		} while (!newNeighbors.isEmpty());
+		return row;
 	}
 
 }
