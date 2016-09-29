@@ -513,7 +513,7 @@ public class SolarPanel extends HousePart {
 					isOutside = !((Roof) c.container).insideWallsPolygon(c.getAbsCenter());
 				} else if (container instanceof Rack) {
 					final double panelDx = (rotated ? panelHeight : panelWidth) / 2 / annotationScale;
-					final double rackDx = ((Rack) container).getMirrorWidth() / 2 / annotationScale;
+					final double rackDx = ((Rack) container).getRackWidth() / 2 / annotationScale;
 					isOutside = c.getAbsPoint(0).multiplyLocal(1, 1, 0).distance(container.getAbsPoint(0).multiplyLocal(1, 1, 0)) > rackDx - panelDx;
 				} else {
 					isOutside = false;

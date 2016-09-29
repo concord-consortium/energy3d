@@ -33,11 +33,11 @@ public class Rack extends HousePart {
 	private transient double layoutGap = 0.01;
 	private double rackWidth = 15;
 	private double rackHeight = 3;
-	private double relativeAzimuth = 25;
+	private double relativeAzimuth = 0;
 	private double tiltAngle = -25;
 	private double baseHeight = 15;
-	private final double poleDistanceX = 3;
-	private final double poleDistanceY = 1;
+	private double poleDistanceX = 3;
+	private double poleDistanceY = 1;
 
 	public Rack() {
 		super(1, 1, 0);
@@ -46,14 +46,16 @@ public class Rack extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-		mesh = new Mesh("Reflecting Mirror");
+		mesh = new Mesh("Reflecting Rack");
+		mesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		surround = new Box("Mirror (Surround)");
+		surround = new Box("Rack (Surround)");
+		surround.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
 		offset.setFactor(1);
@@ -61,7 +63,7 @@ public class Rack extends HousePart {
 		surround.setRenderState(offset);
 		root.attachChild(surround);
 
-		outlineMesh = new Line("Mirror (Outline)");
+		outlineMesh = new Line("Rack (Outline)");
 		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
 		outlineMesh.setModelBound(new OrientedBoundingBox());
@@ -160,7 +162,6 @@ public class Rack extends HousePart {
 
 				final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
 				pole.setRadius(0.6);
-				pole.setDefaultColor(ColorRGBA.WHITE);
 				pole.setRenderState(offsetState);
 				pole.setHeight(baseHeight - dz - 0.1);
 				pole.setModelBound(new BoundingBox());
@@ -208,7 +209,7 @@ public class Rack extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, ColorRGBA.GRAY, TextureMode.None);
+		updateTextureAndColor(mesh, ColorRGBA.LIGHT_GRAY, TextureMode.None);
 	}
 
 	@Override
@@ -302,7 +303,7 @@ public class Rack extends HousePart {
 				c.points.get(0).setY(newY);
 				final double o = c.overlap();
 				if (o >= 0) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new mirror is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
 			}
@@ -310,19 +311,19 @@ public class Rack extends HousePart {
 		return c;
 	}
 
-	public void setMirrorWidth(final double mirrorWidth) {
-		this.rackWidth = mirrorWidth;
+	public void setRackWidth(final double rackWidth) {
+		this.rackWidth = rackWidth;
 	}
 
-	public double getMirrorWidth() {
+	public double getRackWidth() {
 		return rackWidth;
 	}
 
-	public void setMirrorHeight(final double mirrorHeight) {
-		this.rackHeight = mirrorHeight;
+	public void setRackHeight(final double rackHeight) {
+		this.rackHeight = rackHeight;
 	}
 
-	public double getMirrorHeight() {
+	public double getRackHeight() {
 		return rackHeight;
 	}
 
@@ -360,6 +361,22 @@ public class Rack extends HousePart {
 		v.multiplyLocal(steplength);
 		final Vector3 p = getAbsPoint(0).addLocal(v);
 		points.get(0).set(toRelative(p));
+	}
+
+	public double getPoleDistanceX() {
+		return poleDistanceX;
+	}
+
+	public void setPoleDistanceX(final double poleDistanceX) {
+		this.poleDistanceX = poleDistanceX;
+	}
+
+	public double getPoleDistanceY() {
+		return poleDistanceY;
+	}
+
+	public void setPoleDistanceY(final double poleDistanceY) {
+		this.poleDistanceY = poleDistanceY;
 	}
 
 }
