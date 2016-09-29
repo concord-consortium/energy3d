@@ -1280,21 +1280,21 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
-	public void removeAllSolarPanels(ArrayList<HousePart> panels) {
+	public void removeAllSolarPanels(List<SolarPanel> panels) {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (panels == null) {
-			panels = new ArrayList<HousePart>();
+			panels = new ArrayList<SolarPanel>();
 			if (selectedPart != null) {
 				final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 				for (final HousePart part : parts) {
 					if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
-						panels.add(part);
+						panels.add((SolarPanel) part);
 					}
 				}
 			} else {
 				for (final HousePart part : parts) {
 					if (part instanceof SolarPanel && !part.isFrozen()) {
-						panels.add(part);
+						panels.add((SolarPanel) part);
 					}
 				}
 			}
@@ -1306,7 +1306,7 @@ public class Scene implements Serializable {
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + panels.size() + " solar panels" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
 		}
-		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(panels);
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(new ArrayList<HousePart>(panels));
 		for (final HousePart part : panels) {
 			remove(part, false);
 		}

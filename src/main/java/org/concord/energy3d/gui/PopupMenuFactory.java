@@ -12,7 +12,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -53,6 +52,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.MirrorCircularFieldLayout;
 import org.concord.energy3d.model.MirrorRectangularFieldLayout;
 import org.concord.energy3d.model.MirrorSpiralFieldLayout;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -78,6 +78,7 @@ import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForSolarPanelRowCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
@@ -122,6 +123,7 @@ import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeTiltAngleForSolarPanelRowCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
 import org.concord.energy3d.undo.ChangeWallHeightCommand;
 import org.concord.energy3d.undo.ChangeWallThicknessCommand;
@@ -146,7 +148,6 @@ import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 /**
@@ -2498,6 +2499,8 @@ public class PopupMenuFactory {
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
 						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
 					}
+					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Mirror || copyBuffer instanceof Rack);
 				}
 			});
 
@@ -3110,15 +3113,18 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on This Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					final JRadioButton rb2 = new JRadioButton("Only this Row", true);
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels on This Foundation");
+					final JRadioButton rb4 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
 					panel.add(rb3);
+					panel.add(rb4);
 					final ButtonGroup bg = new ButtonGroup();
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					bg.add(rb4);
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getTiltAngle());
@@ -3141,11 +3147,18 @@ public class PopupMenuFactory {
 										sp.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
+										final List<SolarPanel> row = sp.getRow();
+										final ChangeTiltAngleForSolarPanelRowCommand c = new ChangeTiltAngleForSolarPanelRowCommand(row);
+										for (final SolarPanel x : row) {
+											x.setTiltAngle(val);
+										}
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
 										final Foundation foundation = sp.getTopContainer();
 										final ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
 										Scene.getInstance().setTiltAngleForSolarPanelsOnFoundation(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
-									} else if (rb3.isSelected()) {
+									} else if (rb4.isSelected()) {
 										final ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
 										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -3302,15 +3315,18 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					final JRadioButton rb2 = new JRadioButton("Only this Row");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels on this Foundation");
+					final JRadioButton rb4 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
 					panel.add(rb3);
+					panel.add(rb4);
 					final ButtonGroup bg = new ButtonGroup();
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					bg.add(rb4);
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, sp.getBaseHeight() * Scene.getInstance().getAnnotationScale());
@@ -3325,10 +3341,17 @@ public class PopupMenuFactory {
 									sp.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
+									final List<SolarPanel> row = sp.getRow();
+									final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
+									for (final SolarPanel x : row) {
+										x.setBaseHeight(val);
+									}
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								} else if (rb3.isSelected()) {
 									final ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
 									Scene.getInstance().setBaseHeightForSolarPanelsOnFoundation(foundation, val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
-								} else if (rb3.isSelected()) {
+								} else if (rb4.isSelected()) {
 									final ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
 									Scene.getInstance().setBaseHeightForAllSolarPanels(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -3630,38 +3653,10 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel)) {
 						return;
 					}
-					final SolarPanel pick = (SolarPanel) selectedPart;
-					final double minDistance = (pick.isRotated() ? pick.getPanelHeight() : pick.getPanelWidth()) / Scene.getInstance().getAnnotationScale() * 1.05;
-					final Foundation f = pick.getTopContainer();
-					final List<SolarPanel> panels = f.getSolarPanels();
-
-					final ArrayList<HousePart> row = new ArrayList<HousePart>();
-					row.add(pick);
-					final ArrayList<HousePart> oldNeighbors = new ArrayList<HousePart>();
-					oldNeighbors.add(pick);
-					final ArrayList<HousePart> newNeighbors = new ArrayList<HousePart>();
-
-					do {
-						newNeighbors.clear();
-						for (final HousePart oldNeighbor : oldNeighbors) {
-							final Vector3 c = oldNeighbor.getAbsCenter();
-							for (final SolarPanel x : panels) {
-								if (x != oldNeighbor && !row.contains(x)) {
-									if (x.getAbsCenter().distance(c) < minDistance) {
-										newNeighbors.add(x);
-									}
-								}
-							}
-						}
-						row.addAll(newNeighbors);
-						oldNeighbors.clear();
-						oldNeighbors.addAll(newNeighbors);
-					} while (!newNeighbors.isEmpty());
-
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().removeAllSolarPanels(row);
+							Scene.getInstance().removeAllSolarPanels(((SolarPanel) selectedPart).getRow());
 							return null;
 						}
 					});
