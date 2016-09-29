@@ -1200,7 +1200,18 @@ public abstract class HousePart implements Serializable {
 			return null;
 		}
 		ReadOnlyVector3 n = Vector3.UNIT_Z;
-		if (container instanceof Roof) {
+		final boolean isRoof = container instanceof Roof;
+		final boolean isRack = container instanceof Rack;
+		if (isRack) {
+			final PickResults pickResults = new PrimitivePickResults();
+			final Ray3 ray = new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
+			PickingUtil.findPick(container.getCollisionSpatial(), ray, pickResults, false);
+			if (pickResults.getNumber() != 0) {
+				final PickData pickData = pickResults.getPickData(0);
+				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
+				points.get(0).setZ(p.getZ());
+			}
+		} else if (isRoof) {
 			final int[] editPointToRoofIndex = new int[points.size()];
 			for (int i = 0; i < points.size(); i++) {
 				final PickResults pickResults = new PrimitivePickResults();
@@ -1239,9 +1250,11 @@ public abstract class HousePart implements Serializable {
 						}
 					}
 				}
-				n = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
 			}
-		} else {
+		}
+		if (isRoof) {
+			n = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
+		} else if (isRack) {
 			n = container.getNormal();
 		}
 		return n;

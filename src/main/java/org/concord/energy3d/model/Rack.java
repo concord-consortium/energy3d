@@ -26,19 +26,18 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Rack extends HousePart {
 	private static final long serialVersionUID = 1L;
-	private static double pollDistanceX = 3;
-	private static double pollDistanceY = 1;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
-	private transient Node postsRoot;
+	private transient Node polesRoot;
 	private transient double layoutGap = 0.01;
-	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double mirrorWidth = 15;
-	private double mirrorHeight = 3;
-	private double relativeAzimuth;
+	private double rackWidth = 15;
+	private double rackHeight = 3;
+	private double relativeAzimuth = 25;
 	private double tiltAngle = -25;
 	private double baseHeight = 15;
+	private final double poleDistanceX = 3;
+	private final double poleDistanceY = 1;
 
 	public Rack() {
 		super(1, 1, 0);
@@ -47,20 +46,6 @@ public class Rack extends HousePart {
 	@Override
 	protected void init() {
 		super.init();
-
-		if (Util.isZero(mirrorWidth)) {
-			mirrorWidth = 5;
-		}
-		if (Util.isZero(mirrorHeight)) {
-			mirrorHeight = 3;
-		}
-		if (Util.isZero(reflectivity)) {
-			reflectivity = 0.9;
-		}
-		if (Util.isZero(baseHeight)) {
-			baseHeight = 10;
-		}
-
 		mesh = new Mesh("Reflecting Mirror");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
@@ -82,8 +67,8 @@ public class Rack extends HousePart {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		postsRoot = new Node("Posts Root");
-		root.attachChild(postsRoot);
+		polesRoot = new Node("Poles Root");
+		root.attachChild(polesRoot);
 	}
 
 	@Override
@@ -110,7 +95,7 @@ public class Rack extends HousePart {
 		normal = computeNormalAndKeepOnRoof();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0), mirrorWidth / 2.0 / annotationScale, mirrorHeight / 2.0 / annotationScale, 0.15);
+		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -160,26 +145,26 @@ public class Rack extends HousePart {
 		outlineMesh.setRotation(mesh.getRotation());
 
 		final Vector3 center = getAbsPoint(0);
-		postsRoot.detachAllChildren();
+		polesRoot.detachAllChildren();
 		final HousePart container = getContainerRelative();
 		final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
 		final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
-		for (double u = pollDistanceX; u < mirrorWidth / 1; u += pollDistanceX) {
-			for (double v = pollDistanceY; v < mirrorHeight / 1; v += pollDistanceY) {
-				final double vFactor = (v - mirrorHeight / 2) / annotationScale;
-				final Vector3 position = uDir.multiply((u - mirrorWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+		for (double u = poleDistanceX; u < rackWidth / 1; u += poleDistanceX) {
+			for (double v = poleDistanceY; v < rackHeight / 1; v += poleDistanceY) {
+				final double vFactor = (v - rackHeight / 2) / annotationScale;
+				final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 				final double dz = Math.tan(Math.toRadians(tiltAngle)) * vFactor;
 
-				final Cylinder post = new Cylinder("Post Cylinder", 10, 10, 10, 0);
-				post.setRadius(0.6);
-				post.setDefaultColor(ColorRGBA.WHITE);
-				post.setRenderState(offsetState);
-				post.setHeight(baseHeight - dz - 0.1);
-				post.setModelBound(new BoundingBox());
-				post.updateModelBound();
-				position.setZ(container.getHeight() + post.getHeight() / 2);
-				post.setTranslation(position);
-				postsRoot.attachChild(post);
+				final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
+				pole.setRadius(0.6);
+				pole.setDefaultColor(ColorRGBA.WHITE);
+				pole.setRenderState(offsetState);
+				pole.setHeight(baseHeight - dz - 0.1);
+				pole.setModelBound(new BoundingBox());
+				pole.updateModelBound();
+				position.setZ(container.getHeight() + pole.getHeight() / 2);
+				pole.setTranslation(position);
+				polesRoot.attachChild(pole);
 			}
 		}
 	}
@@ -240,12 +225,12 @@ public class Rack extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return mirrorWidth / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
+		return rackWidth / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
 	}
 
 	@Override
 	protected void computeArea() {
-		area = mirrorWidth * mirrorHeight;
+		area = rackWidth * rackHeight;
 	}
 
 	@Override
@@ -268,13 +253,13 @@ public class Rack extends HousePart {
 	}
 
 	private double overlap() {
-		final double w1 = mirrorWidth / Scene.getInstance().getAnnotationScale();
+		final double w1 = rackWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getContainer() == container && p != this) {
 				if (p instanceof Rack) {
 					final Rack s2 = (Rack) p;
-					final double w2 = s2.mirrorWidth / Scene.getInstance().getAnnotationScale();
+					final double w2 = s2.rackWidth / Scene.getInstance().getAnnotationScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -296,7 +281,7 @@ public class Rack extends HousePart {
 				final Vector3 p2 = container.getAbsPoint(2);
 				final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 				final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-				final double length = (1 + layoutGap) * mirrorWidth / Scene.getInstance().getAnnotationScale();
+				final double length = (1 + layoutGap) * rackWidth / Scene.getInstance().getAnnotationScale();
 				final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 				final double tx = length / p0.distance(p2);
 				final double ty = length / p0.distance(p1);
@@ -323,19 +308,19 @@ public class Rack extends HousePart {
 	}
 
 	public void setMirrorWidth(final double mirrorWidth) {
-		this.mirrorWidth = mirrorWidth;
+		this.rackWidth = mirrorWidth;
 	}
 
 	public double getMirrorWidth() {
-		return mirrorWidth;
+		return rackWidth;
 	}
 
 	public void setMirrorHeight(final double mirrorHeight) {
-		this.mirrorHeight = mirrorHeight;
+		this.rackHeight = mirrorHeight;
 	}
 
 	public double getMirrorHeight() {
-		return mirrorHeight;
+		return rackHeight;
 	}
 
 	public void setBaseHeight(final double baseHeight) {
