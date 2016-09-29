@@ -149,6 +149,9 @@ public class Rack extends HousePart {
 		final HousePart container = getContainerRelative();
 		final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
 		final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
+		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(relativeAzimuth));
+		matrix.applyPost(uDir, uDir);
+		matrix.applyPost(vDir, vDir);
 		for (double u = poleDistanceX; u < rackWidth / 1; u += poleDistanceX) {
 			for (double v = poleDistanceY; v < rackHeight / 1; v += poleDistanceY) {
 				final double vFactor = (v - rackHeight / 2) / annotationScale;
