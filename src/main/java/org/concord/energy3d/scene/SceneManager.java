@@ -761,7 +761,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					final MouseState prevMouseState = firstClickState.getCurrent().getMouseState();
 					final ReadOnlyVector2 p1 = new Vector2(prevMouseState.getX(), prevMouseState.getY());
 					final ReadOnlyVector2 p2 = new Vector2(mouseState.getX(), mouseState.getY());
-					if (selectedPart instanceof Roof || selectedPart instanceof Floor || selectedPart instanceof SolarPanel || selectedPart instanceof Mirror || selectedPart instanceof Sensor || selectedPart instanceof Tree || selectedPart instanceof Human || p1.distance(p2) > 10) {
+					if (!(selectedPart instanceof Foundation || selectedPart instanceof Wall || selectedPart instanceof Window || selectedPart instanceof Door) || p1.distance(p2) > 10) {
 						firstClickState = null;
 						mouseReleased(inputStates.getCurrent().getMouseState());
 					}
