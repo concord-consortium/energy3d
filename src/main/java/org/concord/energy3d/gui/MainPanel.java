@@ -339,7 +339,7 @@ public class MainPanel extends JPanel {
 
 		// create solar menu
 		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")), true);
-		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Rack", new ImageIcon(getClass().getResource("icons/solarpanel.png")), true);
+		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
 		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Reflecting Mirror", new ImageIcon(getClass().getResource("icons/mirror.png")), true);
 		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")), true);
 		final ActionListener solarAction = new ActionListener() {
