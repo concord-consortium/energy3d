@@ -333,7 +333,7 @@ public class Mirror extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return mirrorWidth / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
+		return Math.min(mirrorWidth, mirrorHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
 	}
 
 	@Override

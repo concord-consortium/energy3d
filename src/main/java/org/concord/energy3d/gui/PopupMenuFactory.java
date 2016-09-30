@@ -141,10 +141,13 @@ import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
 import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
+import org.concord.energy3d.undo.SetFoundationRackPoleSpacingCommand;
 import org.concord.energy3d.undo.SetFoundationRackSizeCommand;
 import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
 import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
+import org.concord.energy3d.undo.SetPoleSpacingForAllRacksCommand;
+import org.concord.energy3d.undo.SetRackPoleSpacingCommand;
 import org.concord.energy3d.undo.SetShadeToleranceCommand;
 import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
@@ -3916,38 +3919,45 @@ public class PopupMenuFactory {
 						return;
 					}
 					double w = 0, h = 0;
+					boolean ok = true;
 					try {
 						w = Double.parseDouble(widthField.getText());
 						if (w < 1 || w > 500) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 500 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
 						}
 					} catch (final NumberFormatException x) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
 					}
 					try {
 						h = Double.parseDouble(heightField.getText());
 						if (h < 1 || h > 20) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
 						}
 					} catch (final NumberFormatException x) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
 					}
-					if (rb1.isSelected()) {
-						final SetPartSizeCommand c = new SetPartSizeCommand(rack);
-						rack.setRackWidth(w);
-						rack.setRackHeight(h);
-						rack.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb2.isSelected()) {
-						final SetFoundationRackSizeCommand c = new SetFoundationRackSizeCommand(foundation);
-						Scene.getInstance().setSizeForRacksOnFoundation(foundation, w, h);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb3.isSelected()) {
-						final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
-						Scene.getInstance().setSizeForAllRacks(w, h);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+					if (ok) {
+						if (rb1.isSelected()) {
+							final SetPartSizeCommand c = new SetPartSizeCommand(rack);
+							rack.setRackWidth(w);
+							rack.setRackHeight(h);
+							rack.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb2.isSelected()) {
+							final SetFoundationRackSizeCommand c = new SetFoundationRackSizeCommand(foundation);
+							Scene.getInstance().setSizeForRacksOnFoundation(foundation, w, h);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
+							Scene.getInstance().setSizeForAllRacks(w, h);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						updateAfterEdit();
 					}
-					updateAfterEdit();
 				}
 			});
 
@@ -4010,6 +4020,88 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miPoleSpacing = new JMenuItem("Pole Spacing...");
+			miPoleSpacing.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack rack = (Rack) selectedPart;
+					final Foundation foundation = rack.getTopContainer();
+					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Distance X: "));
+					final JTextField dxField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceX()));
+					inputPanel.add(dxField);
+					inputPanel.add(new JLabel("Distance Y: "));
+					final JTextField dyField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceY()));
+					inputPanel.add(dyField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.NORTH);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Pole Spacing for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					double dx = 0, dy = 0;
+					boolean ok = true;
+					try {
+						dx = Double.parseDouble(dxField.getText());
+						if (dx < 1 || dx > 10) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dx must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
+						}
+					} catch (final NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), dxField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
+					}
+					try {
+						dy = Double.parseDouble(dyField.getText());
+						if (dy < 1 || dy > 10) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
+						}
+					} catch (final NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), dyField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
+					}
+					if (ok) {
+						if (rb1.isSelected()) {
+							final SetRackPoleSpacingCommand c = new SetRackPoleSpacingCommand(rack);
+							rack.setPoleDistanceX(dx);
+							rack.setPoleDistanceY(dy);
+							rack.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb2.isSelected()) {
+							final SetFoundationRackPoleSpacingCommand c = new SetFoundationRackPoleSpacingCommand(foundation);
+							Scene.getInstance().setPoleSpacingForRacksOnFoundation(foundation, dx, dy);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							final SetPoleSpacingForAllRacksCommand c = new SetPoleSpacingForAllRacksCommand();
+							Scene.getInstance().setPoleSpacingForAllRacks(dx, dy);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						updateAfterEdit();
+					}
+				}
+			});
+
 			popupMenuForRack = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
@@ -4028,6 +4120,7 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miAzimuth);
 			popupMenuForRack.add(miSize);
 			popupMenuForRack.add(miBaseHeight);
+			popupMenuForRack.add(miPoleSpacing);
 
 		}
 
@@ -4353,38 +4446,45 @@ public class PopupMenuFactory {
 						return;
 					}
 					double w = 0, h = 0;
+					boolean ok = true;
 					try {
 						w = Double.parseDouble(widthField.getText());
 						if (w < 1 || w > 50) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
 						}
 					} catch (final NumberFormatException x) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
 					}
 					try {
 						h = Double.parseDouble(heightField.getText());
 						if (h < 1 || h > 50) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
 						}
 					} catch (final NumberFormatException x) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
 					}
-					if (rb1.isSelected()) {
-						final SetPartSizeCommand c = new SetPartSizeCommand(m);
-						m.setMirrorWidth(w);
-						m.setMirrorHeight(h);
-						m.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb2.isSelected()) {
-						final SetFoundationMirrorSizeCommand c = new SetFoundationMirrorSizeCommand(foundation);
-						Scene.getInstance().setSizeForMirrorsOnFoundation(foundation, w, h);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb3.isSelected()) {
-						final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
-						Scene.getInstance().setSizeForAllMirrors(w, h);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+					if (ok) {
+						if (rb1.isSelected()) {
+							final SetPartSizeCommand c = new SetPartSizeCommand(m);
+							m.setMirrorWidth(w);
+							m.setMirrorHeight(h);
+							m.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb2.isSelected()) {
+							final SetFoundationMirrorSizeCommand c = new SetFoundationMirrorSizeCommand(foundation);
+							Scene.getInstance().setSizeForMirrorsOnFoundation(foundation, w, h);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
+							Scene.getInstance().setSizeForAllMirrors(w, h);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						updateAfterEdit();
 					}
-					updateAfterEdit();
 				}
 			});
 

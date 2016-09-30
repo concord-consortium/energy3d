@@ -2029,6 +2029,28 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setPoleSpacingForRacksOnFoundation(final Foundation foundation, final double dx, final double dy) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack && p.getTopContainer() == foundation) {
+				((Rack) p).setPoleDistanceX(dx);
+				((Rack) p).setPoleDistanceY(dy);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setPoleSpacingForAllRacks(final double dx, final double dy) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setPoleDistanceX(dx);
+				((Rack) p).setPoleDistanceY(dy);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public List<Mirror> getAllMirrors() {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : parts) {

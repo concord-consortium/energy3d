@@ -422,7 +422,7 @@ public class SolarPanel extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return panelWidth / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
+		return Math.min(panelWidth, panelHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
 	}
 
 	@Override

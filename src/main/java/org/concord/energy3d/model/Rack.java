@@ -257,7 +257,7 @@ public class Rack extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return rackHeight / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
+		return Math.min(rackWidth, rackHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
 	}
 
 	@Override
