@@ -2601,8 +2601,8 @@ public class MainFrame extends JFrame {
 								Scene.saveCameraLocation();
 								SceneManager.getInstance().resetCamera(ViewMode.TOP_VIEW);
 							} else {
-								Scene.loadCameraLocation();
 								SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+								Scene.loadCameraLocation();
 							}
 							SceneManager.getInstance().refresh();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
