@@ -1262,6 +1262,8 @@ public class MainFrame extends JFrame {
 			addModel(basicsMenu, "Solar Box", "tutorials/solar-box.ng3");
 			addModel(basicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
 			addModel(basicsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
+			addModel(basicsMenu, "Solar Panel Azimuthal Angles", "tutorials/solar-panel-azimuth-angle.ng3");
+			addModel(basicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
 
 			final JMenu pvMenu = new JMenu("Photovoltatic Systems");
 			tutorialsMenu.add(pvMenu);
