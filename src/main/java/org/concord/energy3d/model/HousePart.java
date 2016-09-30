@@ -1199,7 +1199,6 @@ public abstract class HousePart implements Serializable {
 		if (container == null) {
 			return null;
 		}
-		ReadOnlyVector3 n = Vector3.UNIT_Z;
 		final boolean isRoof = container instanceof Roof;
 		final boolean isRack = container instanceof Rack;
 		if (isRack) {
@@ -1253,11 +1252,10 @@ public abstract class HousePart implements Serializable {
 			}
 		}
 		if (isRoof) {
-			n = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
-		} else if (isRack) {
-			n = container.getNormal();
+			return (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
+		} else {
+			return container.getNormal();
 		}
-		return n;
 	}
 
 	protected boolean fits(final HousePart child) {
