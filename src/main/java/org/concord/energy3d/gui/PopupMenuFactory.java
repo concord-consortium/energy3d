@@ -3725,6 +3725,22 @@ public class PopupMenuFactory {
 
 		if (popupMenuForRack == null) {
 
+			final JMenuItem miPaste = new JMenuItem("Paste");
+			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miPaste.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().pasteToPickedLocationOnRack();
+							Scene.getInstance().setEdited(true);
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
 			miTiltAngle.addActionListener(new ActionListener() {
 				@Override
@@ -4001,9 +4017,12 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof Rack)) {
 						return;
 					}
+					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel);
 				}
 			});
 
+			popupMenuForRack.add(miPaste);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miTiltAngle);
 			popupMenuForRack.add(miAzimuth);

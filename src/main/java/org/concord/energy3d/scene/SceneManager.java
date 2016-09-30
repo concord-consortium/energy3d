@@ -1070,6 +1070,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final SolarPanel s = (SolarPanel) selectedPart;
 			s.move(v, selectedPart.getGridSize());
 			s.draw();
+		} else if (selectedPart instanceof Rack) {
+			final Rack r = (Rack) selectedPart;
+			r.move(v, selectedPart.getGridSize());
+			r.draw();
 		}
 		if (c != null) {
 			undoManager.addEdit(c);
@@ -2155,6 +2159,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (pasteMouseState != null) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Roof) {
+				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
+				if (pick != null) {
+					return pick.getPoint().clone();
+				}
+			}
+			pasteMouseState = null;
+		}
+		return null;
+	}
+
+	Vector3 getPickedLocationOnRack() {
+		if (pasteMouseState != null) {
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Rack) {
 				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
 				if (pick != null) {
 					return pick.getPoint().clone();
