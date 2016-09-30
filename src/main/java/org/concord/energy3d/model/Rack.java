@@ -89,7 +89,8 @@ public class Rack extends HousePart {
 		}
 		if (container != null) {
 			draw();
-			updateSolarPanels();
+			moveSolarPanels(getPoints().get(0).clone().subtractLocal(moveStartPoint), solarOrgPoints);
+			drawChildren();
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
@@ -179,6 +180,7 @@ public class Rack extends HousePart {
 				polesRoot.attachChild(pole);
 			}
 		}
+		drawChildren();
 	}
 
 	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -354,9 +356,7 @@ public class Rack extends HousePart {
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, Math.toRadians(this.relativeAzimuth - relativeAzimuth));
 		for (final HousePart child : children) {
 			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
-			System.out.println(v.length());
 			matrix.applyPost(v, v);
-			System.out.println(v.length());
 			v.addLocal(center);
 			child.getPoints().get(0).set(child.toRelative(v));
 		}
@@ -406,12 +406,18 @@ public class Rack extends HousePart {
 		}
 	}
 
-	private void updateSolarPanels() {
-		final Vector3 d = getPoints().get(0).clone().subtractLocal(moveStartPoint);
+	public void moveSolarPanels(final Vector3 d) {
+		moveSolarPanels(d, null);
+	}
+
+	private void moveSolarPanels(final Vector3 d, final ArrayList<Vector3> orgPoints) {
 		int i = 0;
 		for (final HousePart child : children) {
-			child.getPoints().get(0).set(solarOrgPoints.get(i++).add(d, null));
-			child.draw();
+			if (orgPoints == null) {
+				child.getPoints().get(0).addLocal(d);
+			} else {
+				child.getPoints().get(0).set(orgPoints.get(i++).add(d, null));
+			}
 		}
 	}
 

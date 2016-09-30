@@ -1027,6 +1027,9 @@ public class Scene implements Serializable {
 			final Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
 		}
+		if (c instanceof Rack) {
+			((Rack) c).moveSolarPanels(position);
+		}
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
