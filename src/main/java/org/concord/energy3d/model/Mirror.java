@@ -19,8 +19,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -133,38 +131,13 @@ public class Mirror extends HousePart {
 	}
 
 	@Override
-	public void updateEditShapes() {
-		final Vector3 p = Vector3.fetchTempInstance();
-		try {
-			for (int i = 0; i < points.size(); i++) {
-				getAbsPoint(i, p);
-				final Camera camera = SceneManager.getInstance().getCamera();
-				if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
-					final double distance = camera.getLocation().distance(p);
-					getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
-				} else {
-					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
-				}
-				p.setZ(p.getZ() + baseHeight);
-				getEditPointShape(i).setTranslation(p);
-			}
-		} finally {
-			Vector3.releaseTempInstance(p);
-		}
-		/* remove remaining edit shapes */
-		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++) {
-			pointsRoot.detachChildAt(points.size());
-		}
-	}
-
-	@Override
 	protected void drawMesh() {
 		if (container == null) {
 			return;
 		}
 
 		normal = computeNormalAndKeepOnRoof();
-		updateEditShapes();
+		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		surround.setData(new Vector3(0, 0, 0), mirrorWidth / 2.0 / annotationScale, mirrorHeight / 2.0 / annotationScale, 0.15);
@@ -206,7 +179,7 @@ public class Mirror extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		final Vector3 a = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 a = getAbsPoint(0);
 
 		if (heliostatTarget == null) {
 			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
@@ -226,7 +199,7 @@ public class Mirror extends HousePart {
 
 		post.setRadius(0.6);
 		post.setHeight(baseHeight - 0.5 * post.getRadius());
-		post.setTranslation(getAbsPoint(0).addLocal(0, 0, post.getHeight() / 2));
+		post.setTranslation(getAbsPoint(0).addLocal(0, 0, post.getHeight() / 2 - baseHeight));
 
 		drawLightBeams();
 
@@ -253,7 +226,7 @@ public class Mirror extends HousePart {
 			lightBeams.setVisible(false);
 			return;
 		}
-		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 o = getAbsPoint(0);
 		double length = 100;
 		if (heliostatTarget != null) {
 			length = heliostatTarget.getSolarReceiverCenter().distance(o);
@@ -299,6 +272,10 @@ public class Mirror extends HousePart {
 			return true;
 		}
 		if (mesh.getWorldBound() == null) {
+			return true;
+		}
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null || selectedPart.isDrawCompleted()) { // if nothing is really selected, skip overlap check
 			return true;
 		}
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);

@@ -390,6 +390,10 @@ public class SolarPanel extends HousePart {
 		if (mesh.getWorldBound() == null) {
 			return true;
 		}
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart == null || selectedPart.isDrawCompleted()) { // if nothing is really selected, skip overlap check
+			return true;
+		}
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
 		bound.setExtent(bound.getExtent().divide(1.1, null).addLocal(0, 0, 1));
 		for (final HousePart child : container.getChildren()) {
