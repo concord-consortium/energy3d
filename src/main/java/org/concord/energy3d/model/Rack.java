@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
@@ -30,6 +31,8 @@ public class Rack extends HousePart {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Node polesRoot;
+	private transient ArrayList<Vector3> solarOrgPoints;
+	private transient Vector3 moveStartPoint;
 	private transient double layoutGap = 0.01;
 	private double rackWidth = 15;
 	private double rackHeight = 3;
@@ -75,6 +78,9 @@ public class Rack extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		if (moveStartPoint == null) {
+			initSolarPanelsForMove();
+		}
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
 		if (picked != null) {
 			final Vector3 p = picked.getPoint().clone();
@@ -83,6 +89,7 @@ public class Rack extends HousePart {
 		}
 		if (container != null) {
 			draw();
+			updateSolarPanels();
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
@@ -378,6 +385,30 @@ public class Rack extends HousePart {
 
 	public void setPoleDistanceY(final double poleDistanceY) {
 		this.poleDistanceY = poleDistanceY;
+	}
+
+	private void initSolarPanelsForMove() {
+		moveStartPoint = getPoints().get(0).clone();
+		solarOrgPoints = new ArrayList<Vector3>(children.size());
+		for (final HousePart child : children) {
+			solarOrgPoints.add(child.getPoints().get(0).clone());
+		}
+	}
+
+	private void updateSolarPanels() {
+		final Vector3 d = getPoints().get(0).clone().subtractLocal(moveStartPoint);
+		int i = 0;
+		for (final HousePart child : children) {
+			child.getPoints().get(0).set(solarOrgPoints.get(i++).add(d, null));
+			child.draw();
+		}
+	}
+
+	@Override
+	public void complete() {
+		super.complete();
+		moveStartPoint = null;
+		solarOrgPoints = null;
 	}
 
 }
