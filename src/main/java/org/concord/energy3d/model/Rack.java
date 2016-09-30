@@ -349,6 +349,17 @@ public class Rack extends HousePart {
 		} else if (relativeAzimuth > 360) {
 			relativeAzimuth -= 360;
 		}
+		// rotate all solar panels
+		final Vector3 center = getAbsPoint(0);
+		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, Math.toRadians(this.relativeAzimuth - relativeAzimuth));
+		for (final HousePart child : children) {
+			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
+			System.out.println(v.length());
+			matrix.applyPost(v, v);
+			System.out.println(v.length());
+			v.addLocal(center);
+			child.getPoints().get(0).set(child.toRelative(v));
+		}
 		this.relativeAzimuth = relativeAzimuth;
 	}
 
