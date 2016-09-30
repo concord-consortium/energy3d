@@ -16,8 +16,6 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.Camera;
-import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -90,32 +88,6 @@ public class Rack extends HousePart {
 		}
 	}
 
-	// FIXME: Saeid, I temporarily added this to raise the point to the surface of the rack
-	@Override
-	public void updateEditShapes() {
-		final Vector3 p = Vector3.fetchTempInstance();
-		try {
-			for (int i = 0; i < points.size(); i++) {
-				getAbsPoint(i, p);
-				final Camera camera = SceneManager.getInstance().getCamera();
-				if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
-					final double distance = camera.getLocation().distance(p);
-					getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
-				} else {
-					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
-				}
-				p.setZ(p.getZ() + baseHeight);
-				getEditPointShape(i).setTranslation(p);
-			}
-		} finally {
-			Vector3.releaseTempInstance(p);
-		}
-		/* remove remaining edit shapes */
-		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++) {
-			pointsRoot.detachChildAt(points.size());
-		}
-	}
-
 	@Override
 	protected void drawMesh() {
 		if (container == null) {
@@ -123,6 +95,7 @@ public class Rack extends HousePart {
 		}
 
 		normal = computeNormalAndKeepOnRoof();
+		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
@@ -164,7 +137,7 @@ public class Rack extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		final Vector3 a = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 a = getAbsPoint(0);
 		setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
 		mesh.setTranslation(a);
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
