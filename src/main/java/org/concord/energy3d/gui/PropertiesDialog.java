@@ -36,20 +36,24 @@ class PropertiesDialog extends JDialog {
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final JComboBox<String> unitSystemComboBox = new JComboBox<String>(new String[] { "International System of Units", "United States Customary Units" });
-		if (Scene.getInstance().getUnit() == Scene.Unit.USCustomaryUnits)
+		if (Scene.getInstance().getUnit() == Scene.Unit.USCustomaryUnits) {
 			unitSystemComboBox.setSelectedIndex(1);
+		}
 		final JComboBox<String> studentModeComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
-		if (Scene.getInstance().isStudentMode())
+		if (Scene.getInstance().isStudentMode()) {
 			studentModeComboBox.setSelectedIndex(1);
+		}
 		final JTextField projectNameField = new JTextField(Scene.getInstance().getProjectName());
-		final JComboBox<String> allowFoundationOverlapComboBox = new JComboBox<String>(new String[] { "Disallowed", "Allowed" });
-		if (Scene.getInstance().getAllowFoundationOverlap())
-			allowFoundationOverlapComboBox.setSelectedIndex(1);
+		final JComboBox<String> foundationOverlapComboBox = new JComboBox<String>(new String[] { "Disallowed", "Allowed" });
+		if (!Scene.getInstance().getDisallowFoundationOverlap()) {
+			foundationOverlapComboBox.setSelectedIndex(1);
+		}
 		final JComboBox<String> onlySolarAnalysisComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
-		if (Scene.getInstance().getOnlySolarAnalysis())
+		if (Scene.getInstance().getOnlySolarAnalysis()) {
 			onlySolarAnalysisComboBox.setSelectedIndex(1);
+		}
 
-		ActionListener okListener = new ActionListener() {
+		final ActionListener okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				switch (unitSystemComboBox.getSelectedIndex()) {
@@ -62,7 +66,7 @@ class PropertiesDialog extends JDialog {
 				}
 				Scene.getInstance().setProjectName(projectNameField.getText());
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
-				Scene.getInstance().setAllowFoundationOverlap(allowFoundationOverlapComboBox.getSelectedIndex() == 1);
+				Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().updateWeatherData();
@@ -85,7 +89,7 @@ class PropertiesDialog extends JDialog {
 
 		// allow building overlap
 		panel.add(new JLabel("Foundation Overlap: "));
-		panel.add(allowFoundationOverlapComboBox);
+		panel.add(foundationOverlapComboBox);
 
 		// restrict to only solar analysis
 		panel.add(new JLabel("Only Solar Analysis: "));

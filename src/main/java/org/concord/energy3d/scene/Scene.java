@@ -119,7 +119,7 @@ public class Scene implements Serializable {
 	private boolean fullEnergyInSolarMap = true;
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
 	private boolean noSolarMapForLand;
-	private boolean allowFoundationOverlap;
+	private boolean disallowFoundationOverlap;
 	private Ground ground = new Ground();
 	private Atmosphere atmosphere = new Atmosphere();
 	private DesignSpecs designSpecs = new DesignSpecs();
@@ -2384,12 +2384,12 @@ public class Scene implements Serializable {
 		return !noSolarMapForLand;
 	}
 
-	public void setAllowFoundationOverlap(final boolean allowFoundationOverlap) {
-		this.allowFoundationOverlap = allowFoundationOverlap;
+	public void setDisallowFoundationOverlap(final boolean disallowFoundationOverlap) {
+		this.disallowFoundationOverlap = disallowFoundationOverlap;
 	}
 
-	public boolean getAllowFoundationOverlap() {
-		return allowFoundationOverlap;
+	public boolean getDisallowFoundationOverlap() {
+		return disallowFoundationOverlap;
 	}
 
 	public void setSolarHeatMapColorContrast(final int solarContrast) {
