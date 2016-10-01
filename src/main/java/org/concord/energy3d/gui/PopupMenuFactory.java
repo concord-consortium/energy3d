@@ -199,6 +199,7 @@ public class PopupMenuFactory {
 	private static double pvArrayRowSpacing = 1;
 	private static double pvArrayColSpacing = 0.5;
 	private static int pvArrayRowAxis = 0;
+	private static int panelFaceOrientation = 0;
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
 	private static MirrorRectangularFieldLayout mirrorRectangularFieldLayout = new MirrorRectangularFieldLayout();
@@ -4125,7 +4126,64 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miAddSolarPanels = new JMenuItem("Add Solar Panel Array...");
+			miAddSolarPanels.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack f = (Rack) selectedPart;
+					final int n = f.getChildren().size();
+					if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this rack must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					final JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+					panel.add(new JLabel("Panel Size:"));
+					final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
+					if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
+						sizeComboBox.setSelectedIndex(0);
+					} else if (Util.isZero(1.04 - solarPanelWidth) && Util.isZero(1.55 - solarPanelHeight)) {
+						sizeComboBox.setSelectedIndex(1);
+					} else {
+						sizeComboBox.setSelectedIndex(2);
+					}
+					panel.add(sizeComboBox);
+					panel.add(new JLabel("Orientation:"));
+					final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
+					rowAxisComboBox.setSelectedIndex(panelFaceOrientation);
+					panel.add(rowAxisComboBox);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						switch (sizeComboBox.getSelectedIndex()) {
+						case 0:
+							solarPanelWidth = 0.99;
+							solarPanelHeight = 1.65;
+							break;
+						case 1:
+							solarPanelWidth = 1.04;
+							solarPanelHeight = 1.55;
+							break;
+						default:
+							solarPanelWidth = 0.99;
+							solarPanelHeight = 1.96;
+							break;
+						}
+						panelFaceOrientation = rowAxisComboBox.getSelectedIndex();
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() {
+								f.addSolarPanels(solarPanelWidth, solarPanelHeight, panelFaceOrientation == 0);
+								return null;
+							}
+						});
+						updateAfterEdit();
+					}
+				}
+			});
+
 			popupMenuForRack = createPopupMenu(true, true, new Runnable() {
+
 				@Override
 				public void run() {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -4135,6 +4193,7 @@ public class PopupMenuFactory {
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					miPaste.setEnabled(copyBuffer instanceof SolarPanel);
 				}
+
 			});
 
 			popupMenuForRack.add(miPaste);
@@ -4145,6 +4204,7 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miSize);
 			popupMenuForRack.add(miBaseHeight);
 			popupMenuForRack.add(miPoleSpacing);
+			popupMenuForRack.add(miAddSolarPanels);
 
 		}
 

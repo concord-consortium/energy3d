@@ -1567,8 +1567,8 @@ public class Foundation extends HousePart implements Thermalizable {
 				removed.add(c);
 			}
 		}
-		for (final HousePart m : removed) {
-			Scene.getInstance().remove(m, false);
+		for (final HousePart x : removed) {
+			Scene.getInstance().remove(x, false);
 		}
 		return removed;
 	}
