@@ -384,6 +384,8 @@ public class Rack extends HousePart {
 		v.multiplyLocal(steplength);
 		final Vector3 p = getAbsPoint(0).addLocal(v);
 		points.get(0).set(toRelative(p));
+		// TODO: Move solar panels as well, the following doesn't work
+		// moveSolarPanels(toRelative(v));
 	}
 
 	public double getPoleDistanceX() {

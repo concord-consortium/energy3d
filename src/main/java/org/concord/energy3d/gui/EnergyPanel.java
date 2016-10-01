@@ -53,6 +53,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
@@ -913,6 +914,38 @@ public class EnergyPanel extends JPanel {
 								partProperty3Label.setText("  Efficiency:");
 								partProperty3TextField.setText(eff);
 								partProperty3TextField.setToolTipText("The solar cell efficiency of the solar panel");
+							}
+						}
+					});
+				}
+			} else if (selectedPart instanceof Rack) {
+				final Rack sp = (Rack) selectedPart;
+				if (sp.isDrawable()) {
+					final Foundation f = sp.getTopContainer();
+					double a = sp.getRelativeAzimuth() + f.getAzimuth();
+					if (a >= 360) {
+						a -= 360;
+					}
+					final double az = a;
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							final String title = "Rack (" + sp.getId() + ")";
+							partPanelBorder.setTitle(title);
+							partProperty1Label.setText("  Size & Position:");
+							partProperty1TextField.setText(twoDecimals.format(sp.getRackWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(sp.getRackHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+							partProperty2Label.setText("  Angles:");
+							partProperty2TextField.setText("tilt: " + oneDecimal.format(sp.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0");
+							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the rack");
+							partProperty2TextField.setToolTipText("The angles of the rack");
+							if (energyViewShown) {
+								partProperty3Label.setText("  ---");
+								partProperty3TextField.setText("---");
+								partProperty3TextField.setToolTipText("");
+							} else {
+								partProperty3Label.setText("  ---");
+								partProperty3TextField.setText("---");
+								partProperty3TextField.setToolTipText("");
 							}
 						}
 					});

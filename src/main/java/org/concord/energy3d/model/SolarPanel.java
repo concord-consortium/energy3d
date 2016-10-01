@@ -523,7 +523,7 @@ public class SolarPanel extends HousePart {
 					isOutside = false;
 				}
 				if (isOutside) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel outside a roof or rack.", "Error", JOptionPane.ERROR_MESSAGE);
 					return null;
 				}
 				final double o = c.overlap();

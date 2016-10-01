@@ -1319,10 +1319,18 @@ public class Scene implements Serializable {
 		if (panels == null) {
 			panels = new ArrayList<SolarPanel>();
 			if (selectedPart != null) {
-				final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
-				for (final HousePart part : parts) {
-					if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
-						panels.add((SolarPanel) part);
+				if (selectedPart instanceof Rack) {
+					for (final HousePart part : selectedPart.getChildren()) {
+						if (part instanceof SolarPanel) {
+							panels.add((SolarPanel) part);
+						}
+					}
+				} else {
+					final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+					for (final HousePart part : parts) {
+						if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
+							panels.add((SolarPanel) part);
+						}
 					}
 				}
 			} else {

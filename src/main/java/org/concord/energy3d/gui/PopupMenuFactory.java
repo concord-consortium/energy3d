@@ -3443,7 +3443,7 @@ public class PopupMenuFactory {
 						miAltazimuthDualAxisTracker.setEnabled(flat);
 						miHorizontalSingleAxisTracker.setEnabled(flat);
 						miVerticalSingleAxisTracker.setEnabled(flat);
-					} else if (sp.getContainer() instanceof Wall) {
+					} else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
 						miAltazimuthDualAxisTracker.setEnabled(false);
 						miHorizontalSingleAxisTracker.setEnabled(false);
 						miVerticalSingleAxisTracker.setEnabled(false);
@@ -3454,15 +3454,18 @@ public class PopupMenuFactory {
 					} else {
 						miTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);
+						miBaseHeight.setEnabled(true);
 						if (sp.getContainer() instanceof Roof) {
 							final Roof roof = (Roof) sp.getContainer();
 							if (roof.getHeight() > 0) {
 								miTiltAngle.setEnabled(false);
 								miAzimuth.setEnabled(false);
+								miBaseHeight.setEnabled(false);
 							}
-						} else if (sp.getContainer() instanceof Wall) {
+						} else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
 							miTiltAngle.setEnabled(false);
 							miAzimuth.setEnabled(false);
+							miBaseHeight.setEnabled(false);
 						}
 					}
 				}
@@ -3738,6 +3741,26 @@ public class PopupMenuFactory {
 						public Object call() throws Exception {
 							Scene.getInstance().pasteToPickedLocationOnRack();
 							Scene.getInstance().setEdited(true);
+							return null;
+						}
+					});
+				}
+			});
+
+			final JMenuItem miClear = new JMenuItem("Clear");
+			miClear.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllSolarPanels(null);
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
 							return null;
 						}
 					});
@@ -4115,6 +4138,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForRack.add(miPaste);
+			popupMenuForRack.add(miClear);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miTiltAngle);
 			popupMenuForRack.add(miAzimuth);

@@ -39,6 +39,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.PrintController;
@@ -1087,6 +1088,12 @@ public class MainPanel extends JPanel {
 												final ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												solarPanel.draw();
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											} else if (hp instanceof Rack) {
+												final Rack rack = (Rack) hp;
+												final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
+												rack.setRelativeAzimuth(rack.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
+												rack.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											} else if (hp instanceof Mirror) {
 												final Mirror mirror = (Mirror) hp;
