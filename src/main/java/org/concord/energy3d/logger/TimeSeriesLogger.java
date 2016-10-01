@@ -165,8 +165,14 @@ public class TimeSeriesLogger {
 					}
 				} else if (lastEdit instanceof AddArrayCommand) {
 					final AddArrayCommand c = (AddArrayCommand) lastEdit;
-					final Foundation f = c.getFoundation();
-					stateValue = "{\"Foundation\": " + f.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + f.countParts(c.getType()) + "}";
+					final HousePart p = c.getParent();
+					if (p instanceof Foundation) {
+						final Foundation f = (Foundation) p;
+						stateValue = "{\"Foundation\": " + f.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + f.countParts(c.getType()) + "}";
+					} else if (p instanceof Rack) {
+						final Foundation f = p.getTopContainer();
+						stateValue = "{\"Foundation\": " + f.getId() + ", \"Rack\": " + p.getId() + ", \"Old Array Size\": " + c.getOldArray().size() + ", \"New Array Size\": " + p.getChildren().size() + "}";
+					}
 				} else if (lastEdit instanceof PastePartCommand) {
 					actedPart = ((PastePartCommand) lastEdit).getPart();
 					if (actedPart instanceof Foundation) {

@@ -1,7 +1,9 @@
 package org.concord.energy3d.model;
 
+import java.awt.EventQueue;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -10,6 +12,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -435,17 +438,31 @@ public class Rack extends HousePart {
 		solarOrgPoints = null;
 	}
 
+	private List<HousePart> removeAllChildren() {
+		final List<HousePart> removed = new ArrayList<HousePart>();
+		for (final HousePart c : children) {
+			removed.add(c);
+		}
+		for (final HousePart x : removed) {
+			Scene.getInstance().remove(x, false);
+		}
+		return removed;
+	}
+
 	public void addSolarPanels(final double panelWidth, final double panelHeight, final boolean portrait) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		final AddArrayCommand command = new AddArrayCommand(removeAllChildren(), this, SolarPanel.class);
 		final ArrayList<HousePart> c0 = new ArrayList<HousePart>(children);
 		for (final HousePart c : c0) { // make a copy to avoid concurrent modification
 			Scene.getInstance().remove(c, false);
 		}
 		final Foundation foundation = getTopContainer();
-		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final double az = Math.toRadians(foundation.getAzimuth());
-		if (!Util.isZero(az)) {
-			foundation.rotate(az, null);
+		final double azFoundation = Math.toRadians(foundation.getAzimuth());
+		if (!Util.isZero(azFoundation)) {
+			foundation.rotate(azFoundation, null);
 		}
+		final double azRack = relativeAzimuth;
+		setRelativeAzimuth(0);
 		final double a = portrait ? panelWidth : panelHeight;
 		final double b = portrait ? panelHeight : panelWidth;
 		final int rows = (int) Math.floor(rackWidth / a);
@@ -474,10 +491,18 @@ public class Rack extends HousePart {
 				sp.draw();
 			}
 		}
-		if (!Util.isZero(az)) {
-			foundation.rotate(-az, null);
+		if (!Util.isZero(azFoundation)) {
+			foundation.rotate(-azFoundation, null);
 		}
+		setRelativeAzimuth(azRack);
 		Scene.getInstance().redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(command);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
 	}
 
 }

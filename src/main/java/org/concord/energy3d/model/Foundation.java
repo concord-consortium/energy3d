@@ -1,5 +1,6 @@
 package org.concord.energy3d.model;
 
+import java.awt.EventQueue;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
@@ -1651,6 +1652,12 @@ public class Foundation extends HousePart implements Thermalizable {
 			break;
 		}
 		SceneManager.getInstance().getUndoManager().addEdit(command);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
 		return countParts(Mirror.class);
 	}
 
@@ -1688,6 +1695,12 @@ public class Foundation extends HousePart implements Thermalizable {
 			break;
 		}
 		SceneManager.getInstance().getUndoManager().addEdit(command);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
 		return countParts(Mirror.class);
 	}
 
@@ -1732,6 +1745,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
 		return countParts(Mirror.class);
 	}
 
@@ -1819,6 +1838,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
 	}
 
 	public int getSupportingType() {
