@@ -452,12 +452,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		useOrgPoints = true;
 		final List<Vector2> insidePoints = new ArrayList<Vector2>(children.size() * 2);
 		for (final HousePart part : children) {
-			if (part.children.size() > 2) {
+			if (part.children.size() > 2 && part.getPoints().size() > 1) {
 				final Vector3 p0 = part.getAbsPoint(0);
 				final Vector3 p2 = part.getAbsPoint(2);
 				insidePoints.add(new Vector2(p0.getX(), p0.getY()));
 				insidePoints.add(new Vector2(p2.getX(), p2.getY()));
-			} else { // if the child is a solar panel
+			} else { // if the child is a solar panel, a rack, or a mirror
 				final Vector3 p0 = part.getAbsPoint(0);
 				insidePoints.add(new Vector2(p0.getX(), p0.getY()));
 			}
@@ -1028,7 +1028,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			maxX = -Double.MAX_VALUE;
 			maxY = -Double.MAX_VALUE;
 			for (final HousePart part : children) {
-				if (part.children.size() > 2) {
+				if (part.children.size() > 2 && part.getPoints().size() > 1) {
 					final Vector3 p1 = part.getAbsPoint(0);
 					final Vector3 p2 = part.getAbsPoint(2);
 					minX = Math.min(p1.getX(), minX);
@@ -1039,7 +1039,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					maxX = Math.max(p2.getX(), maxX);
 					maxY = Math.max(p1.getY(), maxY);
 					maxY = Math.max(p2.getY(), maxY);
-				} else { // if the child is a solar panel
+				} else { // if the child is a solar panel, a rack, or a mirror
 					final Vector3 p1 = part.getAbsPoint(0);
 					minX = Math.min(p1.getX(), minX);
 					minY = Math.min(p1.getY(), minY);
