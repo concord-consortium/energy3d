@@ -230,6 +230,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
 	private JMenu templatesMenu;
+	private JMenu exampleTemplatesMenu;
 	private JMenu otherTemplatesMenu;
 	private JMenu tutorialsMenu;
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
@@ -1216,6 +1217,12 @@ public class MainFrame extends JFrame {
 			addModel(templatesMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
 			addModel(templatesMenu, "Shed Roof", "templates/shed-roof-template.ng3");
 			templatesMenu.addSeparator();
+			exampleTemplatesMenu = new JMenu("Examples");
+			templatesMenu.add(exampleTemplatesMenu);
+			addModel(exampleTemplatesMenu, "Cape Cod with Front Porch", "templates/example-cape-cod-front-porch.ng3");
+			addModel(exampleTemplatesMenu, "Cape Cod with Garage", "templates/example-cape-cod-attached-garage.ng3");
+			addModel(exampleTemplatesMenu, "Dutch Colonial with Front Porch", "templates/example-dutch-colonial.ng3");
+			addModel(exampleTemplatesMenu, "Federal", "templates/example-federal.ng3");
 			otherTemplatesMenu = new JMenu("Others");
 			templatesMenu.add(otherTemplatesMenu);
 			addModel(otherTemplatesMenu, "Dome", "templates/dome-template.ng3");

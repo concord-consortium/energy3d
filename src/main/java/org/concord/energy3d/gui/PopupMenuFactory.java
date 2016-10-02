@@ -4087,8 +4087,8 @@ public class PopupMenuFactory {
 					boolean ok = true;
 					try {
 						dx = Double.parseDouble(dxField.getText());
-						if (dx < 1 || dx > 10) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dx must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						if (dx < 1 || dx > 50) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dx must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							ok = false;
 						}
 					} catch (final NumberFormatException x) {
@@ -4097,8 +4097,8 @@ public class PopupMenuFactory {
 					}
 					try {
 						dy = Double.parseDouble(dyField.getText());
-						if (dy < 1 || dy > 10) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						if (dy < 1 || dy > 50) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dy must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							ok = false;
 						}
 					} catch (final NumberFormatException x) {
