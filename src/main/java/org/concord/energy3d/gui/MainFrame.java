@@ -1273,6 +1273,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Single Solar Rack", "tutorials/solar-single-rack.ng3");
 			addModel(pvMenu, "Multiple Solar Racks", "tutorials/solar-multiple-racks.ng3");
 			addModel(pvMenu, "Solar Rack Array", "tutorials/solar-rack-array.ng3");
+			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
 
 			final JMenu cspMenu = new JMenu("Concentrated Solar Power Systems");
 			tutorialsMenu.add(cspMenu);
