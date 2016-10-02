@@ -282,6 +282,8 @@ public class Foundation extends HousePart implements Thermalizable {
 					reverseFoundationResizeEffect(roof, dx, dxOrg, ratioX, dy, dyOrg, ratioY);
 					roofs.add(roof);
 				}
+			} else if (child instanceof Rack) {
+				reverseFoundationResizeEffect(child.getChildren(), dx, dxOrg, ratioX, dy, dyOrg, ratioY);
 			}
 		}
 		for (final HousePart roof : roofs) {
