@@ -206,7 +206,7 @@ public class Scene implements Serializable {
 					if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
 						MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
 						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-						SceneManager.getInstance().resetCamera();
+						loadCameraLocation();
 					}
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Foundation) {
