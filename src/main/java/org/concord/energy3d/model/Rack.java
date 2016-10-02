@@ -380,6 +380,9 @@ public class Rack extends HousePart {
 	}
 
 	public void setTiltAngle(final double tiltAngle) {
+		// TODO: rotate all solar panels
+		for (final HousePart child : children) {
+		}
 		this.tiltAngle = tiltAngle;
 	}
 
@@ -476,12 +479,13 @@ public class Rack extends HousePart {
 		final Vector3 p0 = getAbsPoint(0);
 		final double w = a / Scene.getInstance().getAnnotationScale();
 		final double h = b / Scene.getInstance().getAnnotationScale();
+		final double costilt = Math.cos(Math.toRadians(tiltAngle));
 		final double x0 = p0.getX() - 0.5 * (rackWidth - remainderX) / Scene.getInstance().getAnnotationScale();
-		final double y0 = p0.getY() - 0.5 * (rackHeight - remainderY) / Scene.getInstance().getAnnotationScale();
+		final double y0 = p0.getY() - 0.5 * (rackHeight - remainderY) / Scene.getInstance().getAnnotationScale() * costilt;
 		for (int r = 0; r < rows; r++) {
 			for (int c = 0; c < cols; c++) {
 				final double x = x0 + w * (r + 0.5);
-				final double y = y0 + h * (c + 0.5);
+				final double y = y0 + h * (c + 0.5) * costilt;
 				final SolarPanel sp = new SolarPanel(false);
 				sp.setContainer(this);
 				final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
