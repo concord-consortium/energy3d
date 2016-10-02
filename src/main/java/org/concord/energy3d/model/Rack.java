@@ -167,11 +167,15 @@ public class Rack extends HousePart {
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(relativeAzimuth));
 		matrix.applyPost(uDir, uDir);
 		matrix.applyPost(vDir, vDir);
+		if (vDir.dot(normal) < 0) {
+			vDir.negateLocal();
+		}
+		final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
 		for (double u = poleDistanceX; u < rackWidth / 1; u += poleDistanceX) {
 			for (double v = poleDistanceY; v < rackHeight / 1; v += poleDistanceY) {
 				final double vFactor = (v - rackHeight / 2) / annotationScale;
 				final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
-				final double dz = Math.tan(Math.toRadians(tiltAngle)) * vFactor;
+				final double dz = tanTiltAngle * vFactor;
 
 				final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
 				pole.setRadius(0.6);
