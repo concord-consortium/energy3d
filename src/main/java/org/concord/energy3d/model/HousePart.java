@@ -1209,6 +1209,17 @@ public abstract class HousePart implements Serializable {
 				final PickData pickData = pickResults.getPickData(0);
 				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
 				points.get(0).setZ(p.getZ());
+			} else {
+				final Rack rack = (Rack) container;
+				if (rack.getBaseHeight() < Math.abs(0.5 * rack.getRackHeight() / Scene.getInstance().getAnnotationScale() * Math.sin(Math.toRadians(rack.getTiltAngle())))) {
+					final Ray3 ray2 = new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.NEG_UNIT_Z);
+					PickingUtil.findPick(container.getCollisionSpatial(), ray2, pickResults, false);
+					if (pickResults.getNumber() != 0) {
+						final PickData pickData = pickResults.getPickData(0);
+						final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
+						points.get(0).setZ(p.getZ());
+					}
+				}
 			}
 		} else if (isRoof) {
 			final int[] editPointToRoofIndex = new int[points.size()];

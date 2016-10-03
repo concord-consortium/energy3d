@@ -171,8 +171,8 @@ public class Rack extends HousePart {
 			vDir.negateLocal();
 		}
 		final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
-		for (double u = poleDistanceX; u < rackWidth / 1; u += poleDistanceX) {
-			for (double v = poleDistanceY; v < rackHeight / 1; v += poleDistanceY) {
+		for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+			for (double v = poleDistanceY; v < rackHeight; v += poleDistanceY) {
 				final double vFactor = (v - rackHeight / 2) / annotationScale;
 				final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 				final double dz = tanTiltAngle * vFactor;
