@@ -672,7 +672,9 @@ public class Scene implements Serializable {
 					instance.cleanup();
 				}
 				// save camera to file
-				saveCameraLocation();
+				if (SceneManager.getInstance().getViewMode() == ViewMode.NORMAL) {
+					saveCameraLocation();
+				}
 
 				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
 				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
