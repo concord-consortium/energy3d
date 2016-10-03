@@ -421,6 +421,10 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
+	public Vector3 toRelativeVector(final ReadOnlyVector3 v) {
+		return toRelative(v.add(getContainerRelative().getAbsPoint(0), null));
+	}
+
 	protected Vector3 toAbsolute(final ReadOnlyVector3 p) {
 		return toAbsolute(p, null);
 	}
