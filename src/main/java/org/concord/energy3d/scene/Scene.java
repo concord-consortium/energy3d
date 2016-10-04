@@ -2601,6 +2601,10 @@ public class Scene implements Serializable {
 		this.mapScale = mapScale;
 		applyMap();
 	}
+	
+	public boolean isMapEnabled() {
+		return mapImage != null;
+	}
 
 	private void applyMap() {
 		if (mapImage == null) {

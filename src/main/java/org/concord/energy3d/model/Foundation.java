@@ -241,8 +241,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void setMovePointsVisible(final boolean visible) {
 		final int n = points.size();
 		for (int i = n - 4; i < n; i++) {
-			final SceneHints sceneHints = pointsRoot.getChild(i).getSceneHints();
-			sceneHints.setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+			Spatial editPoint = pointsRoot.getChild(i);
+			((Mesh)editPoint).setVisible(visible);
+			final SceneHints sceneHints = editPoint.getSceneHints();
 			sceneHints.setAllPickingHints(visible);
 		}
 	}
@@ -840,6 +841,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void drawTopMesh() {
+		mesh.setVisible(!Scene.getInstance().isMapEnabled());
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		ReadOnlyVector3 p;
