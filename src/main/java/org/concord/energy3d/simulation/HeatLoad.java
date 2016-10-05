@@ -12,8 +12,11 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
@@ -37,42 +40,52 @@ public class HeatLoad {
 	}
 
 	private double getUValue(final HousePart part) {
-		if (part instanceof Foundation)
+		if (part instanceof Foundation) {
 			return ((Foundation) part).getUValue();
-		if (part instanceof Wall)
+		}
+		if (part instanceof Wall) {
 			return ((Wall) part).getUValue();
-		if (part instanceof Door)
+		}
+		if (part instanceof Door) {
 			return ((Door) part).getUValue();
-		if (part instanceof Roof)
+		}
+		if (part instanceof Roof) {
 			return ((Roof) part).getUValue();
-		if (part instanceof Window)
+		}
+		if (part instanceof Window) {
 			return ((Window) part).getUValue();
+		}
 		if (part instanceof Sensor) {
 			final HousePart container = part.getContainer();
 			if (container instanceof Wall) {
 				final HousePart x = insideChild(part.getPoints().get(0), container);
-				if (x instanceof Window)
+				if (x instanceof Window) {
 					return ((Window) x).getUValue();
-				if (x instanceof Door)
+				}
+				if (x instanceof Door) {
 					return ((Door) x).getUValue();
+				}
 				return ((Wall) container).getUValue();
 			}
-			if (container instanceof Roof)
+			if (container instanceof Roof) {
 				return ((Roof) container).getUValue();
-			if (container instanceof Foundation)
+			}
+			if (container instanceof Foundation) {
 				return ((Foundation) container).getUValue();
+			}
 		}
 		return 0;
 	}
 
 	public void computeEnergyToday(final Calendar today) {
-		
+
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 
-		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals(""))
+		if (EnergyPanel.getInstance().getCityComboBox().getSelectedItem().equals("")) {
 			return;
+		}
 
 		final int timeStep = Scene.getInstance().getTimeStep();
 		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
@@ -82,8 +95,9 @@ public class HeatLoad {
 			iMinute = minute / timeStep;
 			final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], minute);
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Human || part instanceof Tree || part instanceof Floor) // these should not be in the heat load calculations
+				if (part instanceof Human || part instanceof Tree || part instanceof Floor || part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror) {
 					continue;
+				}
 				final float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
 				if (part instanceof Roof) { // need to compute piece by piece for a roof because sun affects outside temperature of roof part
 					final Roof roof = (Roof) part;
@@ -96,16 +110,19 @@ public class HeatLoad {
 							final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 							if (part.isDrawCompleted()) {
 								final double uValue = getUValue(part);
-								if (Util.isZero(uValue))
+								if (Util.isZero(uValue)) {
 									continue;
+								}
 								double heatloss = roof.getAreaWithoutOverhang(mesh) * uValue * deltaT / 1000.0 / 60 * timeStep;
 								// if the lowest outside temperature is high enough, there is no need to turn on the heater hence no heat loss
-								if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY)
+								if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY) {
 									heatloss = 0;
+								}
 								roof.getHeatLoss()[iMinute] += heatloss;
 								final double[] heatLossArray = SolarRadiation.getInstance().getHeatLoss(mesh);
-								if (heatLossArray != null)
+								if (heatLossArray != null) {
 									heatLossArray[iMinute] += heatloss;
+								}
 							}
 						}
 					}
@@ -116,9 +133,10 @@ public class HeatLoad {
 					final double deltaT = insideTemperature - groundTemperature;
 					if (foundation.isDrawCompleted()) {
 						final double uValue = getUValue(part);
-						if (Util.isZero(uValue))
+						if (Util.isZero(uValue)) {
 							continue;
-						Building building = new Building(foundation);
+						}
+						final Building building = new Building(foundation);
 						double area;
 						if (building.isWallComplete()) {
 							building.calculate();
@@ -132,18 +150,21 @@ public class HeatLoad {
 					}
 				} else {
 					double solarHeat = part.getSolarPotential()[iMinute] * absorption;
-					if (part instanceof Thermalizable)
+					if (part instanceof Thermalizable) {
 						solarHeat /= ((Thermalizable) part).getVolumetricHeatCapacity();
+					}
 					final double insideTemperature = part.getTopContainer().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, minute / 60);
 					final double deltaT = insideTemperature - (outsideTemperature + solarHeat);
 					if (part.isDrawCompleted()) {
 						final double uValue = getUValue(part);
-						if (Util.isZero(uValue))
+						if (Util.isZero(uValue)) {
 							continue;
+						}
 						double heatloss = part.getArea() * uValue * deltaT / 1000.0 / 60 * timeStep;
 						// if outside is warm enough, there is no need to turn on the heater hence no heat loss
-						if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY)
+						if (heatloss > 0 && outsideTemperatureRange[0] >= LOWEST_TEMPERATURE_OF_WARM_DAY) {
 							heatloss = 0;
+						}
 						part.getHeatLoss()[iMinute] += heatloss;
 					}
 				}
@@ -153,9 +174,11 @@ public class HeatLoad {
 	}
 
 	private static HousePart insideChild(final Vector3 point, final HousePart parent) {
-		for (final HousePart x : parent.getChildren())
-			if (insideRectangle(point, x.getPoints()))
+		for (final HousePart x : parent.getChildren()) {
+			if (insideRectangle(point, x.getPoints())) {
 				return x;
+			}
+		}
 		return null;
 	}
 
@@ -168,14 +191,18 @@ public class HeatLoad {
 		double ymin = Double.MAX_VALUE;
 		double ymax = -Double.MAX_VALUE;
 		for (final Vector3 v : rect) {
-			if (xmin > v.getX())
+			if (xmin > v.getX()) {
 				xmin = v.getX();
-			if (xmax < v.getX())
+			}
+			if (xmax < v.getX()) {
 				xmax = v.getX();
-			if (ymin > v.getZ())
+			}
+			if (ymin > v.getZ()) {
 				ymin = v.getZ();
-			if (ymax < v.getZ())
+			}
+			if (ymax < v.getZ()) {
 				ymax = v.getZ();
+			}
 		}
 		return x > xmin && x < xmax && y > ymin && y < ymax;
 	}
