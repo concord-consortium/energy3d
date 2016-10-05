@@ -85,7 +85,7 @@ public class Rack extends HousePart {
 		if (moveStartPoint == null) {
 			initSolarPanelsForMove();
 		}
-		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class });
 		if (picked != null) {
 			final Vector3 p = picked.getPoint().clone();
 			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
@@ -107,7 +107,15 @@ public class Rack extends HousePart {
 		}
 
 		normal = computeNormalAndKeepOnRoof();
-		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
+
+		final double baseZ;
+		if (this.container instanceof Foundation) {
+			baseZ = this.container.getHeight();
+		} else {
+			baseZ = this.container.getPoints().get(0).getZ();
+		}
+
+		points.get(0).setZ(baseZ + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
@@ -183,7 +191,8 @@ public class Rack extends HousePart {
 				pole.setHeight(baseHeight - dz - 0.1);
 				pole.setModelBound(new BoundingBox());
 				pole.updateModelBound();
-				position.setZ(container.getHeight() + pole.getHeight() / 2);
+				position.setZ(baseZ + pole.getHeight() / 2);
+
 				pole.setTranslation(position);
 				polesRoot.attachChild(pole);
 			}
