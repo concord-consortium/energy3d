@@ -101,9 +101,11 @@ public class SolarRadiation {
 		}
 		maxValue = 1;
 		computeToday();
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part.isDrawCompleted()) {
-				part.drawHeatFlux();
+		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part.isDrawCompleted()) {
+					part.drawHeatFlux();
+				}
 			}
 		}
 	}
