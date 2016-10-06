@@ -25,6 +25,7 @@ import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.util.geom.BufferUtils;
@@ -115,7 +116,10 @@ public class Rack extends HousePart {
 			baseZ = this.container.getPoints().get(0).getZ();
 		}
 
-		points.get(0).setZ(baseZ + baseHeight);
+		final boolean onFlatSurface = onFlatSurface();
+		if (onFlatSurface) {
+			points.get(0).setZ(baseZ + baseHeight);
+		}
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
@@ -157,9 +161,10 @@ public class Rack extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		final Vector3 a = getAbsPoint(0);
-		setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
-		mesh.setTranslation(a);
+		if (onFlatSurface) {
+			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+		}
+		mesh.setTranslation(getAbsPoint(0));
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
@@ -197,6 +202,7 @@ public class Rack extends HousePart {
 				polesRoot.attachChild(pole);
 			}
 		}
+		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
 		drawChildren();
 	}
 
@@ -520,6 +526,17 @@ public class Rack extends HousePart {
 				EnergyPanel.getInstance().updateProperties();
 			}
 		});
+	}
+
+	private boolean onFlatSurface() {
+		if (container instanceof Roof) {
+			if (Util.isZero(container.getHeight())) {
+				return true;
+			}
+		} else if (container instanceof Foundation) {
+			return true;
+		}
+		return false;
 	}
 
 }
