@@ -919,33 +919,33 @@ public class EnergyPanel extends JPanel {
 					});
 				}
 			} else if (selectedPart instanceof Rack) {
-				final Rack sp = (Rack) selectedPart;
-				if (sp.isDrawable()) {
-					final Foundation f = sp.getTopContainer();
-					double a = sp.getRelativeAzimuth() + f.getAzimuth();
+				final Rack rack = (Rack) selectedPart;
+				if (rack.isDrawable()) {
+					final Foundation f = rack.getTopContainer();
+					double a = rack.getRelativeAzimuth() + f.getAzimuth();
 					if (a >= 360) {
 						a -= 360;
 					}
 					final double az = a;
+					final int n = rack.getChildren().size();
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							final String title = "Rack (" + sp.getId() + ")";
+							final String title = "Rack (" + rack.getId() + ")";
 							partPanelBorder.setTitle(title);
 							partProperty1Label.setText("  Size & Position:");
-							partProperty1TextField.setText(twoDecimals.format(sp.getRackWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(sp.getRackHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+							partProperty1TextField.setText(twoDecimals.format(rack.getRackWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(rack.getRackHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
 							partProperty2Label.setText("  Angles:");
-							partProperty2TextField.setText("tilt: " + oneDecimal.format(sp.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0");
+							partProperty2TextField.setText("tilt: " + oneDecimal.format(rack.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0");
 							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the rack");
 							partProperty2TextField.setToolTipText("The angles of the rack");
+							partProperty3Label.setText("  Solar Panels:");
 							if (energyViewShown) {
-								partProperty3Label.setText("  ---");
 								partProperty3TextField.setText("---");
 								partProperty3TextField.setToolTipText("");
 							} else {
-								partProperty3Label.setText("  ---");
-								partProperty3TextField.setText("---");
-								partProperty3TextField.setToolTipText("");
+								partProperty3TextField.setText("" + n);
+								partProperty3TextField.setToolTipText("Number of solar panels on this rack");
 							}
 						}
 					});

@@ -735,7 +735,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 				if (firstClickState == null) {
 					firstClickState = inputStates;
-					mousePressed(inputStates.getCurrent().getMouseState());
+					mousePressed(inputStates.getCurrent().getMouseState(), inputStates.getCurrent().getKeyboardState());
 				} else {
 					firstClickState = null;
 					mouseReleased(inputStates.getCurrent().getMouseState());
@@ -773,8 +773,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public void mouseClicked(final MouseEvent e) {
 				if (Util.isRightClick(e)) {
-					final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-					mouseRightClicked(e.getX(), cp.getHeight() - e.getY());
+					mouseRightClicked(e);
 				}
 			}
 
@@ -1671,7 +1670,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	// the x and y coordinates come from MouseEvent, not MouseState.
-	private void mouseRightClicked(final int x, final int y) {
+	private void mouseRightClicked(final MouseEvent e) {
+		final JPanel cp = MainPanel.getInstance().getCanvasPanel();
+		final int x = e.getX();
+		final int y = cp.getHeight() - e.getY();
 		mouseState = new MouseState(x, y, 0, 0, 0, null, null);
 		pasteMouseState = mouseState;
 		refresh = true;
@@ -1687,6 +1689,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 						final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
 						selectedPart = pick == null ? null : pick.getHousePart();
+						if (e.isAltDown()) {
+							if (selectedPart instanceof SolarPanel && selectedPart.getContainer() instanceof Rack) { // special case
+								selectedPart = selectedPart.getContainer();
+							}
+						}
 						System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
 						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedPart) {
 							previousSelectedHousePart.setEditPointsVisible(false);
@@ -1713,7 +1720,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 	}
 
-	private void mousePressed(final MouseState mouseState) {
+	private void mousePressed(final MouseState mouseState, final KeyboardState keyboardState) {
 		refresh = true;
 		taskManager.update(new Callable<Object>() {
 			@Override
@@ -1733,8 +1740,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							} else {
 								selectedPart = pick.getHousePart();
 							}
-							if (selectedPart != null && selectedPart.isFrozen()) {
-								selectedPart = null;
+							if (selectedPart != null) {
+								if (selectedPart.isFrozen()) {
+									selectedPart = null;
+								}
+								if (keyboardState.isDown(Key.LMENU) || keyboardState.isDown(Key.RMENU)) {
+									if (selectedPart instanceof SolarPanel && selectedPart.getContainer() instanceof Rack) { // special case
+										selectedPart = selectedPart.getContainer();
+									}
+								}
 							}
 							System.out.println("Clicked on: " + pick);
 							if (pick != null && pick.isEditPoint()) {
@@ -1910,7 +1924,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		if (selectedPart != null && !selectedPart.isDrawCompleted()) {
 			mouseReleased(lastSelectedEditPointMouseState);
 		} else {
-			mousePressed(lastSelectedEditPointMouseState);
+			mousePressed(lastSelectedEditPointMouseState, null);
 		}
 	}
 

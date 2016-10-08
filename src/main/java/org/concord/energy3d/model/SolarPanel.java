@@ -395,7 +395,7 @@ public class SolarPanel extends HousePart {
 			return true;
 		}
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
-		bound.setExtent(bound.getExtent().divide(1.1, null).addLocal(0, 0, 1));
+		bound.setExtent(bound.getExtent().divide(1.5, null).addLocal(0, 0, 1));
 		for (final HousePart child : container.getChildren()) {
 			if (child != this && child instanceof SolarPanel && bound.intersects(child.mesh.getWorldBound())) {
 				return false;
