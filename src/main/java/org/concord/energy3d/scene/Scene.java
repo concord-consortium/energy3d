@@ -904,12 +904,10 @@ public class Scene implements Serializable {
 			return;
 		}
 		final Wall wall = (Wall) selectedPart;
-		if (c instanceof Window) { // windows can be pasted to a different wall
-			if (wall != c.getContainer()) {
+		if (wall != c.getContainer()) { // windows and solar panels can be pasted to a different wall
+			if (c instanceof Window) {
 				((Window) c).moveTo(wall);
-			}
-		} else if (c instanceof SolarPanel) { // solar panels can be pasted to a different parent
-			if (wall != c.getContainer()) {
+			} else if (c instanceof SolarPanel) {
 				((SolarPanel) c).moveTo(wall);
 			}
 		}
@@ -951,6 +949,10 @@ public class Scene implements Serializable {
 		if (copyBuffer instanceof Foundation) {
 			return;
 		}
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (!(selectedPart instanceof Roof)) {
+			return;
+		}
 		final HousePart c = copyBuffer.copy(false);
 		if (c == null) {
 			return;
@@ -959,11 +961,8 @@ public class Scene implements Serializable {
 		if (position == null) {
 			return;
 		}
-		if (c instanceof SolarPanel) { // solar panels can be pasted to a different parent
-			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-			if (selectedPart instanceof Roof && selectedPart != c.getContainer()) {
-				((SolarPanel) c).moveTo(selectedPart);
-			}
+		if (c instanceof SolarPanel && selectedPart != c.getContainer()) { // solar panels can be pasted to a different parent
+			((SolarPanel) c).moveTo(selectedPart);
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
 		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
@@ -973,12 +972,22 @@ public class Scene implements Serializable {
 			final Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
 		}
+		if (c instanceof Rack) {
+			((Rack) c).moveSolarPanels(position);
+			if (selectedPart != c.getContainer()) {
+				c.setContainer(selectedPart);
+			}
+		}
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
 	public void pasteToPickedLocationOnRack() {
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (!(selectedPart instanceof Rack)) {
+			return;
+		}
 		if (!(copyBuffer instanceof SolarPanel)) {
 			return;
 		}
@@ -991,8 +1000,7 @@ public class Scene implements Serializable {
 		if (position == null) {
 			return;
 		}
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart instanceof Rack && selectedPart != c.getContainer()) {
+		if (selectedPart != c.getContainer()) {
 			((SolarPanel) c).moveTo(selectedPart);
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
@@ -1033,6 +1041,7 @@ public class Scene implements Serializable {
 			final Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
 		}
+		c.setContainer(selectedPart);
 		if (c instanceof Rack) {
 			((Rack) c).moveSolarPanels(position);
 		}

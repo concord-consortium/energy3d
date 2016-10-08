@@ -6,16 +6,17 @@ import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -408,18 +409,23 @@ public class Util {
 			return;
 		}
 
-		final String mailTo = "qxie@concord.org";
-		final String cc = "snourian@concord.org";
-		final String subject = "Energy3DError";
-		final String body = msg;
-		final String s = String.format("mailto:%s?subject=%s&cc=%s&body=%s", mailTo, subject, cc, body);
-		try {
-			Desktop.getDesktop().mail(new URI(s));
-		} catch (final IOException e1) {
-			e1.printStackTrace();
-		} catch (final URISyntaxException e1) {
-			e1.printStackTrace();
-		}
+		// TODO: temporary solution
+		final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clpbrd.setContents(new StringSelection(msg), null);
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
+
+		// final String mailTo = "qxie@concord.org";
+		// final String cc = "snourian@concord.org";
+		// final String subject = "Energy3DError";
+		// final String body = msg;
+		// final String s = String.format("mailto:%s?subject=%s&cc=%s&body=%s", mailTo, subject, cc, body);
+		// try {
+		// Desktop.getDesktop().mail(new URI(s));
+		// } catch (final IOException e1) {
+		// e1.printStackTrace();
+		// } catch (final URISyntaxException e1) {
+		// e1.printStackTrace();
+		// }
 	}
 
 	public final static void openBrowser(final String url) {

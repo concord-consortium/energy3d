@@ -1689,7 +1689,7 @@ public class PopupMenuFactory {
 				@Override
 				public void run() {
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
-					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Window);
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Window || copyBuffer instanceof Rack);
 				}
 			});
 
