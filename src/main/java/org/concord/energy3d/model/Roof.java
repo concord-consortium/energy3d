@@ -1310,8 +1310,8 @@ public abstract class Roof extends HousePart implements Thermalizable {
 	public void drawHeatFlux() {
 		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
 		final Foundation foundation = getTopContainer();
-		final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / heatFluxUnitArea);
-		final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / heatFluxUnitArea);
+		final int cols = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(2)) / Scene.getInstance().getHeatVectorGridSize());
+		final int rows = (int) Math.max(2, foundation.getAbsPoint(0).distance(foundation.getAbsPoint(1)) / Scene.getInstance().getHeatVectorGridSize());
 		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
 		final ReadOnlyVector3 o = foundation.getAbsPoint(0);

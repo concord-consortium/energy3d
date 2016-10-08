@@ -241,8 +241,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void setMovePointsVisible(final boolean visible) {
 		final int n = points.size();
 		for (int i = n - 4; i < n; i++) {
-			Spatial editPoint = pointsRoot.getChild(i);
-			((Mesh)editPoint).setVisible(visible);
+			final Spatial editPoint = pointsRoot.getChild(i);
+			((Mesh) editPoint).setVisible(visible);
 			final SceneHints sceneHints = editPoint.getSceneHints();
 			sceneHints.setAllPickingHints(visible);
 		}
@@ -1316,8 +1316,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void drawHeatFlux() {
 
 		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
-		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / Scene.getInstance().getHeatVectorGridSize());
+		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / Scene.getInstance().getHeatVectorGridSize());
 		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
 		final double heat = calculateHeatVector();

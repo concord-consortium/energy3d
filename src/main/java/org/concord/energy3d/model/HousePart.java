@@ -109,7 +109,6 @@ public abstract class HousePart implements Serializable {
 	private boolean freeze;
 
 	transient Line heatFlux;
-	transient static float heatFluxUnitArea = 2;
 
 	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
 
@@ -1074,8 +1073,8 @@ public abstract class HousePart implements Serializable {
 
 	public void drawHeatFlux() {
 		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
-		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / heatFluxUnitArea);
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / Scene.getInstance().getHeatVectorGridSize());
+		final int rows = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(1)) / Scene.getInstance().getHeatVectorGridSize());
 		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
 		final double heat = calculateHeatVector();

@@ -1678,8 +1678,8 @@ public class Wall extends HousePart implements Thermalizable {
 		heatFlux.getSceneHints().setCullHint(CullHint.Inherit);
 
 		FloatBuffer arrowsVertices = heatFlux.getMeshData().getVertexBuffer();
-		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / heatFluxUnitArea);
-		final int rows = (int) Math.max(2, zmax / heatFluxUnitArea);
+		final int cols = (int) Math.max(2, getAbsPoint(0).distance(getAbsPoint(2)) / Scene.getInstance().getHeatVectorGridSize());
+		final int rows = (int) Math.max(2, zmax / Scene.getInstance().getHeatVectorGridSize());
 		arrowsVertices = BufferUtils.createVector3Buffer(rows * cols * 6);
 		heatFlux.getMeshData().setVertexBuffer(arrowsVertices);
 		final double heat = calculateHeatVector();

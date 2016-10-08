@@ -132,6 +132,7 @@ public class Scene implements Serializable {
 	private transient boolean avoidSavingMapImage;
 	private double mapScale;
 	private boolean hideMap;
+	private double heatFluxGridSize = 2;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -386,6 +387,9 @@ public class Scene implements Serializable {
 		// restore the default values
 		if (Util.isZero(heatVectorLength)) {
 			heatVectorLength = 5000;
+		}
+		if (Util.isZero(heatFluxGridSize)) {
+			heatFluxGridSize = 2;
 		}
 		if (Util.isZero(solarStep)) {
 			solarStep = 2;
@@ -2362,6 +2366,14 @@ public class Scene implements Serializable {
 		return heatVectorLength;
 	}
 
+	public void setHeatFluxGridSize(final double heatFluxGridSize) {
+		this.heatFluxGridSize = heatFluxGridSize;
+	}
+
+	public double getHeatVectorGridSize() {
+		return heatFluxGridSize;
+	}
+
 	public boolean getAlwaysComputeHeatFluxVectors() {
 		return alwaysComputeHeatFluxVectors;
 	}
@@ -2601,7 +2613,7 @@ public class Scene implements Serializable {
 		this.mapScale = mapScale;
 		applyMap();
 	}
-	
+
 	public boolean isMapEnabled() {
 		return mapImage != null;
 	}

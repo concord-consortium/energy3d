@@ -36,7 +36,7 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(6, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(7, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -45,6 +45,7 @@ class SimulationSettingsDialog extends JDialog {
 		final JTextField plateNyTextField = new JTextField(s.getPlateNy() + "");
 		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
+		final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getAnnotationScale()));
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
@@ -54,11 +55,13 @@ class SimulationSettingsDialog extends JDialog {
 				double cellSize;
 				int timeStep;
 				double heatVectorLength;
+				double heatVectorGridSize;
 				int plateNx;
 				int plateNy;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
+					heatVectorGridSize = Double.parseDouble(heatVectorGridSizeTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
 					plateNx = Integer.parseInt(plateNxTextField.getText());
 					plateNy = Integer.parseInt(plateNyTextField.getText());
@@ -74,6 +77,10 @@ class SimulationSettingsDialog extends JDialog {
 				}
 				if (heatVectorLength < 1000) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Heat arrow length must be greater than 1000.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (heatVectorGridSize < 0.4) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Heat arrow grid size must not be less than 0.4 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (timeStep < 5 || timeStep > 60) {
@@ -93,6 +100,7 @@ class SimulationSettingsDialog extends JDialog {
 				s.setPlateNx(plateNx);
 				s.setPlateNy(plateNy);
 				s.setHeatVectorLength(heatVectorLength);
+				s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getAnnotationScale());
 				s.setEdited(true);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
 				EnergyPanel.getInstance().clearRadiationHeatMap();
@@ -120,6 +128,11 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(new JLabel("Heat Arrow Length: "));
 		panel.add(heatVectorLengthTextField);
 		panel.add(new JLabel("<html><font size=2>Internal unit</font></html>"));
+
+		// set the heat arrow grid size
+		panel.add(new JLabel("Heat Arrow Grid Size: "));
+		panel.add(heatVectorGridSizeTextField);
+		panel.add(new JLabel("<html><font size=2>Meter</font></html>"));
 
 		// set the time step
 		panel.add(new JLabel("Time Step: "));
