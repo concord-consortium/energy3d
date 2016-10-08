@@ -961,8 +961,12 @@ public class Scene implements Serializable {
 		if (position == null) {
 			return;
 		}
-		if (c instanceof SolarPanel && selectedPart != c.getContainer()) { // solar panels can be pasted to a different parent
-			((SolarPanel) c).moveTo(selectedPart);
+		if (selectedPart != c.getContainer()) { // solar panels and racks can be pasted to a different parent
+			if (c instanceof SolarPanel) {
+				((SolarPanel) c).moveTo(selectedPart);
+			} else if (c instanceof Rack) {
+				((Rack) c).moveTo(selectedPart);
+			}
 		}
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
 		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
@@ -974,9 +978,6 @@ public class Scene implements Serializable {
 		}
 		if (c instanceof Rack) {
 			((Rack) c).moveSolarPanels(position);
-			if (selectedPart != c.getContainer()) {
-				c.setContainer(selectedPart);
-			}
 		}
 		add(c, true);
 		copyBuffer = c;
@@ -1033,6 +1034,7 @@ public class Scene implements Serializable {
 		if (position == null) {
 			return;
 		}
+		c.setContainer(selectedPart); // move to this foundation
 		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
 		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
 		position = position.subtractLocal(center);
@@ -1041,7 +1043,6 @@ public class Scene implements Serializable {
 			final Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
 		}
-		c.setContainer(selectedPart);
 		if (c instanceof Rack) {
 			((Rack) c).moveSolarPanels(position);
 		}
