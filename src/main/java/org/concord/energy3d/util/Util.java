@@ -1,5 +1,6 @@
 package org.concord.energy3d.util;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
@@ -10,9 +11,11 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +24,9 @@ import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
@@ -61,10 +66,12 @@ public class Util {
 	 * platform-independent check for Windows' equivalent of right click of mouse button. This can be used as an alternative as MouseEvent.isPopupTrigger(), which requires checking within both mousePressed() and mouseReleased() methods.
 	 */
 	public static boolean isRightClick(final MouseEvent e) {
-		if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0)
+		if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
 			return true;
-		if (System.getProperty("os.name").startsWith("Mac") && e.isControlDown())
+		}
+		if (System.getProperty("os.name").startsWith("Mac") && e.isControlDown()) {
 			return true;
+		}
 		return false;
 	}
 
@@ -130,8 +137,9 @@ public class Util {
 					if (p.getX() <= Math.max(p1.getX(), p2.getX())) {
 						if (p1.getY() != p2.getY()) {
 							xinters = (p.getY() - p1.getY()) * (p2.getX() - p1.getX()) / (p2.getY() - p1.getY()) + p1.getX();
-							if (p1.getX() == p2.getX() || p.getX() <= xinters)
+							if (p1.getX() == p2.getX() || p.getX() <= xinters) {
 								counter++;
+							}
 						}
 					}
 				}
@@ -139,10 +147,11 @@ public class Util {
 			p1 = p2;
 		}
 
-		if (counter % 2 == 0)
+		if (counter % 2 == 0) {
 			return false;
-		else
+		} else {
 			return true;
+		}
 	}
 
 	public static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
@@ -218,10 +227,12 @@ public class Util {
 		double numer, denom;
 
 		p13 = p1.subtract(p3, null);
-		if (Math.abs(p43.getX()) < EPS && Math.abs(p43.getY()) < EPS && Math.abs(p43.getZ()) < EPS)
+		if (Math.abs(p43.getX()) < EPS && Math.abs(p43.getY()) < EPS && Math.abs(p43.getZ()) < EPS) {
 			return null;
-		if (Math.abs(p21.length()) < EPS)
+		}
+		if (Math.abs(p21.length()) < EPS) {
 			return null;
+		}
 
 		d1343 = p13.getX() * p43.getX() + p13.getY() * p43.getY() + p13.getZ() * p43.getZ();
 		d4321 = p43.getX() * p21.getX() + p43.getY() * p21.getY() + p43.getZ() * p21.getZ();
@@ -230,8 +241,9 @@ public class Util {
 		d2121 = p21.getX() * p21.getX() + p21.getY() * p21.getY() + p21.getZ() * p21.getZ();
 
 		denom = d2121 * d4343 - d4321 * d4321;
-		if (Math.abs(denom) < EPS)
+		if (Math.abs(denom) < EPS) {
 			return null;
+		}
 		numer = d1343 * d4321 - d1321 * d4343;
 
 		final double mua = numer / denom;
@@ -242,18 +254,20 @@ public class Util {
 
 	public static Vector2 projectPointOnLine(final ReadOnlyVector2 point, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final boolean limitToLineSegment) {
 		final double t = projectPointOnLineScale(point, p1, p2);
-		if (limitToLineSegment && t < 0.0)
+		if (limitToLineSegment && t < 0.0) {
 			return p1.clone();
-		else if (limitToLineSegment && t > 1.0)
+		} else if (limitToLineSegment && t > 1.0) {
 			return p2.clone();
-		else
+		} else {
 			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
+		}
 	}
 
 	public static double projectPointOnLineScale(final ReadOnlyVector2 point, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2) {
 		final double l2 = p1.distanceSquared(p2);
-		if (l2 == 0.0)
+		if (l2 == 0.0) {
 			return 0.0;
+		}
 		final double t = point.subtract(p1, null).dot(p2.subtract(p1, null)) / l2; // dot(p - v, w - v) / l2;
 		return t;
 	}
@@ -266,12 +280,13 @@ public class Util {
 		// new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()),
 		// false);
 		final double t = projectPointOnLineScale(point, p1, p2);
-		if (limitToLineSegment && t < 0.0)
+		if (limitToLineSegment && t < 0.0) {
 			return p1.clone();
-		else if (limitToLineSegment && t > 1.0)
+		} else if (limitToLineSegment && t > 1.0) {
 			return p2.clone();
-		else
+		} else {
 			return p2.subtract(p1, null).multiplyLocal(t).addLocal(p1); // v + t * (w - v);
+		}
 	}
 
 	/*
@@ -279,10 +294,11 @@ public class Util {
 	 */
 	public static double projectPointOnLineScale(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {
 		final boolean isHorizontal = Util.isZero(p2.subtract(p1, null).normalizeLocal().getZ());
-		if (isHorizontal)
+		if (isHorizontal) {
 			return Util.projectPointOnLineScale(new Vector2(point.getX(), point.getY()), new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()));
-		else
+		} else {
 			return Util.projectPointOnLineScale(new Vector2(0, point.getZ()), new Vector2(0, p1.getZ()), new Vector2(0, p2.getZ()));
+		}
 	}
 
 	public static Vector2 snapToPolygon(final ReadOnlyVector3 point, final List<ReadOnlyVector3> polygon, final List<ReadOnlyVector3> wallNormals) {
@@ -305,17 +321,19 @@ public class Util {
 					shortestDistance = distance;
 					closestPoint = pointOnLine;
 					if (wallNormals != null) {
-						if (l1.distanceSquared(closestPoint) <= l2.distanceSquared(pointOnLine))
+						if (l1.distanceSquared(closestPoint) <= l2.distanceSquared(pointOnLine)) {
 							closestNormal = wallNormals.get(i);
-						else
+						} else {
 							closestNormal = wallNormals.get((i + 1) % n);
+						}
 					}
 				}
 			}
 		}
 
-		if (wallNormals != null)
+		if (wallNormals != null) {
 			closestPoint.addLocal(-closestNormal.getX() / 100.0, -closestNormal.getY() / 100.0);
+		}
 
 		return closestPoint;
 	}
@@ -329,12 +347,14 @@ public class Util {
 			final double ua = ua_t / u_b;
 			final double ub = ub_t / u_b;
 
-			if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1)
+			if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
 				return new Vector3(a1.getX() + ua * (a2.getX() - a1.getX()), a1.getY() + ua * (a2.getY() - a1.getY()), a1.getZ());
-			else
+			} else {
 				return null;
-		} else
+			}
+		} else {
 			return null;
+		}
 	}
 
 	public static void initHousePartLabel(final BMText label) {
@@ -352,7 +372,7 @@ public class Util {
 		return a.distance(b) < MathUtils.ZERO_TOLERANCE;
 	}
 
-	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b, double tolerance) {
+	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b, final double tolerance) {
 		return a.distance(b) < tolerance;
 	}
 
@@ -372,16 +392,34 @@ public class Util {
 	public static boolean suppressReportError = false;
 
 	public static void reportError(final Throwable e) {
-		if (suppressReportError)
+		if (suppressReportError) {
 			return;
+		}
 		e.printStackTrace();
 		final StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
-		final String exceptionAsString = sw.toString();
-		final JTextArea textArea = new JTextArea(exceptionAsString);
-		final JScrollPane scrollPane = new JScrollPane(textArea);
-		scrollPane.setPreferredSize(new Dimension(300, 400));
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), scrollPane, "Error", JOptionPane.ERROR_MESSAGE);
+		final String msg = sw.toString();
+		final JPanel panel = new JPanel(new BorderLayout(10, 10));
+		final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
+		scrollPane.setPreferredSize(new Dimension(400, 400));
+		panel.add(scrollPane, BorderLayout.CENTER);
+		panel.add(new JLabel("<html><b>Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.NO_OPTION) {
+			return;
+		}
+
+		final String mailTo = "qxie@concord.org";
+		final String cc = "snourian@concord.org";
+		final String subject = "Energy3DError";
+		final String body = msg;
+		final String s = String.format("mailto:%s?subject=%s&cc=%s&body=%s", mailTo, subject, cc, body);
+		try {
+			Desktop.getDesktop().mail(new URI(s));
+		} catch (final IOException e1) {
+			e1.printStackTrace();
+		} catch (final URISyntaxException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	public final static void openBrowser(final String url) {
@@ -407,15 +445,19 @@ public class Util {
 
 	/** return the file name of this path */
 	public static String getFileName(final String path) {
-		if (path == null)
+		if (path == null) {
 			return null;
+		}
 		int i = path.lastIndexOf("/");
-		if (i == -1)
+		if (i == -1) {
 			i = path.lastIndexOf("\\");
-		if (i == -1)
+		}
+		if (i == -1) {
 			i = path.lastIndexOf(System.getProperty("file.separator"));
-		if (i == -1)
+		}
+		if (i == -1) {
 			return path;
+		}
 		return path.substring(i + 1, path.length());
 	}
 
@@ -428,15 +470,19 @@ public class Util {
 			public void run() {
 				final ItemListener[] itemListeners = button.getItemListeners();
 				final ActionListener[] actionListeners = button.getActionListeners();
-				for (final ItemListener x : itemListeners)
+				for (final ItemListener x : itemListeners) {
 					button.removeItemListener(x);
-				for (final ActionListener x : actionListeners)
+				}
+				for (final ActionListener x : actionListeners) {
 					button.removeActionListener(x);
+				}
 				button.setSelected(selected);
-				for (final ItemListener x : itemListeners)
+				for (final ItemListener x : itemListeners) {
 					button.addItemListener(x);
-				for (final ActionListener x : actionListeners)
+				}
+				for (final ActionListener x : actionListeners) {
 					button.addActionListener(x);
+				}
 			}
 		});
 	}
@@ -450,15 +496,19 @@ public class Util {
 			public void run() {
 				final ItemListener[] itemListeners = comboBox.getItemListeners();
 				final ActionListener[] actionListeners = comboBox.getActionListeners();
-				for (final ItemListener x : itemListeners)
+				for (final ItemListener x : itemListeners) {
 					comboBox.removeItemListener(x);
-				for (final ActionListener x : actionListeners)
+				}
+				for (final ActionListener x : actionListeners) {
 					comboBox.removeActionListener(x);
+				}
 				comboBox.setSelectedIndex(selectedIndex);
-				for (final ItemListener x : itemListeners)
+				for (final ItemListener x : itemListeners) {
 					comboBox.addItemListener(x);
-				for (final ActionListener x : actionListeners)
+				}
+				for (final ActionListener x : actionListeners) {
 					comboBox.addActionListener(x);
+				}
 			}
 		});
 	}
@@ -472,15 +522,19 @@ public class Util {
 			public void run() {
 				final ItemListener[] itemListeners = comboBox.getItemListeners();
 				final ActionListener[] actionListeners = comboBox.getActionListeners();
-				for (final ItemListener x : itemListeners)
+				for (final ItemListener x : itemListeners) {
 					comboBox.removeItemListener(x);
-				for (final ActionListener x : actionListeners)
+				}
+				for (final ActionListener x : actionListeners) {
 					comboBox.removeActionListener(x);
+				}
 				comboBox.setSelectedItem(item);
-				for (final ItemListener x : itemListeners)
+				for (final ItemListener x : itemListeners) {
 					comboBox.addItemListener(x);
-				for (final ActionListener x : actionListeners)
+				}
+				for (final ActionListener x : actionListeners) {
 					comboBox.addActionListener(x);
+				}
 			}
 		});
 	}
@@ -493,8 +547,9 @@ public class Util {
 			@Override
 			public void run() {
 				final ChangeListener[] changeListeners = spinner.getChangeListeners();
-				for (final ChangeListener x : changeListeners)
+				for (final ChangeListener x : changeListeners) {
 					spinner.removeChangeListener(x);
+				}
 				spinner.setValue(value);
 				final JComponent editor = spinner.getEditor();
 				if (editor instanceof JSpinner.DateEditor) {
@@ -506,8 +561,9 @@ public class Util {
 				} else {
 					((DefaultEditor) spinner.getEditor()).getTextField().setText("" + value);
 				}
-				for (final ChangeListener x : changeListeners)
+				for (final ChangeListener x : changeListeners) {
 					spinner.addChangeListener(x);
+				}
 			}
 		});
 	}
@@ -520,11 +576,13 @@ public class Util {
 			@Override
 			public void run() {
 				final ChangeListener[] changeListeners = slider.getChangeListeners();
-				for (final ChangeListener x : changeListeners)
+				for (final ChangeListener x : changeListeners) {
 					slider.removeChangeListener(x);
+				}
 				slider.setValue(value);
-				for (final ChangeListener x : changeListeners)
+				for (final ChangeListener x : changeListeners) {
 					slider.addChangeListener(x);
+				}
 			}
 		});
 	}
@@ -537,11 +595,13 @@ public class Util {
 			@Override
 			public void run() {
 				final ChangeListener[] changeListeners = tabbedPane.getChangeListeners();
-				for (final ChangeListener x : changeListeners)
+				for (final ChangeListener x : changeListeners) {
 					tabbedPane.removeChangeListener(x);
+				}
 				tabbedPane.setSelectedComponent(value);
-				for (final ChangeListener x : changeListeners)
+				for (final ChangeListener x : changeListeners) {
 					tabbedPane.addChangeListener(x);
+				}
 				tabbedPane.repaint();
 			}
 		});
@@ -556,11 +616,13 @@ public class Util {
 			public void run() {
 				final AbstractDocument doc = (AbstractDocument) tc.getDocument();
 				final DocumentListener[] documentListeners = doc.getDocumentListeners();
-				for (final DocumentListener x : documentListeners)
+				for (final DocumentListener x : documentListeners) {
 					doc.removeDocumentListener(x);
+				}
 				tc.setText(text);
-				for (final DocumentListener x : documentListeners)
+				for (final DocumentListener x : documentListeners) {
 					doc.addDocumentListener(x);
+				}
 			}
 		});
 	}
@@ -591,8 +653,9 @@ public class Util {
 		int coord; // coord to ignore: 1=x, 2=y, 3=z
 		int i, j, k; // loop indices
 
-		if (n < 3)
+		if (n < 3) {
 			return 0; // a degenerate polygon
+		}
 
 		// select largest abs coordinate to ignore for projection
 		ax = (normal.getX() > 0 ? normal.getX() : -normal.getX()); // abs x-coord
@@ -601,24 +664,29 @@ public class Util {
 
 		coord = 3; // ignore z-coord
 		if (ax > ay) {
-			if (ax > az)
+			if (ax > az) {
 				coord = 1; // ignore x-coord
-		} else if (ay > az)
+			}
+		} else if (ay > az) {
 			coord = 2; // ignore y-coord
+		}
 
 		// compute area of the 2D projection
 		switch (coord) {
 		case 1:
-			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++)
+			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++) {
 				area += (points.get(i).getY() * (points.get(j).getZ() - points.get(k).getZ()));
+			}
 			break;
 		case 2:
-			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++)
+			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++) {
 				area += (points.get(i).getZ() * (points.get(j).getX() - points.get(k).getX()));
+			}
 			break;
 		case 3:
-			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++)
+			for (i = 1, j = 2, k = 0; i < n; i++, j++, k++) {
 				area += (points.get(i).getX() * (points.get(j).getY() - points.get(k).getY()));
+			}
 			break;
 		}
 		switch (coord) { // wrap-around term
@@ -701,8 +769,9 @@ public class Util {
 		vertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
 		vertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
 		vertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 	}
 
 }

@@ -114,6 +114,7 @@ public class MainApplication {
 
 		System.out.println("Initiatialization phase 2 done.");
 		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
+
 	}
 
 	public static void addShutdownHook(final Runnable r) {
