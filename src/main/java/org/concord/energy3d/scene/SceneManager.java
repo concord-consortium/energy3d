@@ -1852,9 +1852,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							} else {
 								if (editPartCommand != null) {
 									editPartCommand.undo();
+									selectedPart.setHighlight(false);
+									selectedPart.complete();
 								}
-								selectedPart.setHighlight(false);
-								// selectedHousePart = null;
 							}
 							if (editPartCommand != null) {
 								if (editPartCommand.isReallyEdited()) {
@@ -1885,7 +1885,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							}
 						}
 						if (selectedPart != null && selectedPart.isDrawCompleted()) {
+							final boolean drawCompletedOrg = selectedPart.isDrawCompleted();
+							selectedPart.setDrawCompleted(false); // because solar panels.isDrawble() only works if incomplete
 							if (selectedPart.isDrawable()) {
+								selectedPart.setDrawCompleted(drawCompletedOrg);
 								if (addPartCommand != null) {
 									undoManager.addEdit(addPartCommand);
 								}
