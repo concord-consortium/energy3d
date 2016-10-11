@@ -775,4 +775,13 @@ public class SolarPanel extends HousePart {
 		return row;
 	}
 
+	@Override
+	public void setEditPointsVisible(final boolean visible) {
+		super.setEditPointsVisible(visible);
+		if (getContainer() instanceof Rack) {
+			getContainer().setEditPointsVisible(visible);
+		}
+
+	}
+
 }
