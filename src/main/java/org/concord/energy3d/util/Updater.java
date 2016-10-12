@@ -2,6 +2,10 @@ package org.concord.energy3d.util;
 
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
+import org.concord.energy3d.gui.MainFrame;
+
 import com.threerings.getdown.launcher.Getdown;
 import com.threerings.getdown.launcher.GetdownApp;
 
@@ -9,7 +13,7 @@ public class Updater {
 
 	public static void download() {
 		System.out.println("Updater.download()");
-		if (!Config.isWebStart() && !Config.isEclipse())
+		if (!Config.isWebStart() && !Config.isEclipse()) {
 			new Thread() {
 				@Override
 				public void run() {
@@ -22,8 +26,22 @@ public class Updater {
 					System.setProperty("no_install", "true");
 					System.setProperty("silent", "true");
 					GetdownApp.main(new String[] { "." });
+					for (int i = 0; i < 60; i++) {
+						try {
+							Thread.sleep(1000);
+						} catch (final InterruptedException e) {
+							e.printStackTrace();
+						}
+						if (Getdown.isUpdateAvailable()) {
+							if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "New update is available. Would you like to exit the program in order to install the updates now?", "Update", JOptionPane.YES_NO_OPTION)) {
+								MainFrame.getInstance().exit();
+							}
+						}
+					}
+
 				};
 			}.start();
+		}
 	}
 
 	public static void install() {
