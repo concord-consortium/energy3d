@@ -9,7 +9,7 @@ public class Updater {
 
 	public static void download() {
 		System.out.println("Updater.download()");
-		if (!Config.isWebStart() && !Config.isEclipse())
+		if (!Config.isWebStart() && !Config.isEclipse()) {
 			new Thread() {
 				@Override
 				public void run() {
@@ -22,8 +22,15 @@ public class Updater {
 					System.setProperty("no_install", "true");
 					System.setProperty("silent", "true");
 					GetdownApp.main(new String[] { "." });
+					// EventQueue.invokeLater(new Runnable() {
+					// @Override
+					// public void run() {
+					// JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h2>A new update is available.</h2>You may restart the program now or later to get it.</html>", "Update Notice", JOptionPane.INFORMATION_MESSAGE);
+					// }
+					// });
 				};
 			}.start();
+		}
 	}
 
 	public static void install() {
