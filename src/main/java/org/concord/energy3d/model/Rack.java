@@ -93,8 +93,8 @@ public class Rack extends HousePart {
 			points.get(0).set(toRelative(p));
 		}
 		if (container != null) {
-			draw();
 			moveSolarPanels(getPoints().get(0).clone().subtractLocal(moveStartPoint), solarOrgPoints);
+			draw();
 			drawChildren();
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
@@ -107,7 +107,17 @@ public class Rack extends HousePart {
 			return;
 		}
 
+		final ReadOnlyVector3 previousNormal = normal;
 		normal = computeNormalAndKeepOnRoof();
+
+		if (normal.dot(previousNormal) < 0.95) {
+			double angle = normal.multiply(1, 1, 0, null).normalizeLocal().smallestAngleBetween(previousNormal.multiply(1, 1, 0, null).normalizeLocal());
+			if (normal.dot(previousNormal.cross(Vector3.UNIT_Z, null)) > 0) {
+				angle = -angle;
+			}
+			rotateSolarPanels(angle);
+			initSolarPanelsForMove();
+		}
 
 		final double baseZ;
 		if (this.container instanceof Foundation) {
@@ -378,16 +388,19 @@ public class Rack extends HousePart {
 		} else if (relativeAzimuth > 360) {
 			relativeAzimuth -= 360;
 		}
-		// rotate all solar panels
+		rotateSolarPanels(Math.toRadians(this.relativeAzimuth - relativeAzimuth));
+		this.relativeAzimuth = relativeAzimuth;
+	}
+
+	private void rotateSolarPanels(final double angle) {
 		final Vector3 center = getAbsPoint(0);
-		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, Math.toRadians(this.relativeAzimuth - relativeAzimuth));
+		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
 		for (final HousePart child : children) {
 			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
 			matrix.applyPost(v, v);
 			v.addLocal(center);
 			child.getPoints().get(0).set(child.toRelative(v));
 		}
-		this.relativeAzimuth = relativeAzimuth;
 	}
 
 	public double getRelativeAzimuth() {
