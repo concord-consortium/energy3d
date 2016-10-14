@@ -1821,7 +1821,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							}
 						}
 					} else {
-						selectedPart.addPoint(mouseState.getX(), mouseState.getY());
+						if (selectedPart != null) { // selected part can be null in modes other than specified in the if clause
+							selectedPart.addPoint(mouseState.getX(), mouseState.getY());
+						}
 					}
 				} catch (final Throwable t) {
 					t.printStackTrace();
