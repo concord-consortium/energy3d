@@ -14,9 +14,15 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +45,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -409,23 +416,40 @@ public class Util {
 			return;
 		}
 
-		// TODO: temporary solution
-		final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-		clpbrd.setContents(new StringSelection(msg), null);
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
+		try {
+			String s = "{\"ip_address\":\"" + InetAddress.getLocalHost().getHostAddress() + "\"";
+			s += ",";
+			s += "\"os_name\":\"" + URLEncoder.encode(System.getProperty("os.name"), "UTF-8") + "\"";
+			s += ",";
+			s += "\"os_version\":\"" + System.getProperty("os.version") + "\"";
+			s += ",";
+			s += "\"energy3d_version\":\"" + MainApplication.VERSION + "\"";
+			s += ",";
+			s += "\"error_message\":\"" + URLEncoder.encode(msg, "UTF-8") + "\"}";
+			final URL url = new URL("https://staff.concord.org/~emcelroy/error/error.php?error=" + s);
+			System.out.println(url);
+			final URLConnection urlConnection = url.openConnection();
+			urlConnection.setDoOutput(true);
+			final BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+			String receipt = "";
+			String line = null;
+			while ((line = in.readLine()) != null) {
+				if (line != null) {
+					receipt += line;
+				}
+			}
+			in.close();
+			if ("success".equalsIgnoreCase(receipt)) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error message received. Thank you!", "Notice", JOptionPane.INFORMATION_MESSAGE);
+			}
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+			// backup solution
+			final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clpbrd.setContents(new StringSelection(msg), null);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
+		}
 
-		// final String mailTo = "qxie@concord.org";
-		// final String cc = "snourian@concord.org";
-		// final String subject = "Energy3DError";
-		// final String body = msg;
-		// final String s = String.format("mailto:%s?subject=%s&cc=%s&body=%s", mailTo, subject, cc, body);
-		// try {
-		// Desktop.getDesktop().mail(new URI(s));
-		// } catch (final IOException e1) {
-		// e1.printStackTrace();
-		// } catch (final URISyntaxException e1) {
-		// e1.printStackTrace();
-		// }
 	}
 
 	public final static void openBrowser(final String url) {
