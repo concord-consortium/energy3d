@@ -11,6 +11,8 @@ import com.threerings.getdown.launcher.GetdownApp;
 
 public class Updater {
 
+	private static boolean firstTime = true;
+
 	public static void download() {
 		System.out.println("Updater.download()");
 		if (!Config.isWebStart() && !Config.isEclipse()) {
@@ -27,14 +29,19 @@ public class Updater {
 					System.setProperty("silent", "true");
 					GetdownApp.main(new String[] { "." });
 					for (int i = 0; i < 60; i++) {
+						if (!firstTime) {
+							break;
+						}
 						try {
 							Thread.sleep(1000);
 						} catch (final InterruptedException e) {
 							e.printStackTrace();
 						}
 						if (Getdown.isUpdateAvailable()) {
-							if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "New update is available. Would you like to exit the program in order to install the updates now?", "Update", JOptionPane.YES_NO_OPTION)) {
+							if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>A new update is available. Please exit the program and then restart it.<br>Is it good time to do it now?</html>", "Update", JOptionPane.YES_NO_OPTION)) {
 								MainFrame.getInstance().exit();
+							} else {
+								firstTime = false;
 							}
 						}
 					}
