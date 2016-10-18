@@ -3881,7 +3881,6 @@ public class PopupMenuFactory {
 								if (rb1.isSelected()) {
 									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
 									rack.setRelativeAzimuth(a);
-									rack.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);

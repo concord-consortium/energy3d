@@ -217,6 +217,7 @@ public class Rack extends HousePart {
 			}
 		}
 		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
+		root.updateGeometricState(0);
 		drawChildren();
 	}
 
