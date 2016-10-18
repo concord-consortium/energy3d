@@ -417,17 +417,16 @@ public class Util {
 		}
 
 		try {
-			String s = "{\"ip_address\":\"" + InetAddress.getLocalHost().getHostAddress() + "\"";
+			String s = "{\"ip_address\":\"" + URLEncoder.encode(InetAddress.getLocalHost().getHostAddress(), "UTF-8") + "\"";
 			s += ",";
 			s += "\"os_name\":\"" + URLEncoder.encode(System.getProperty("os.name"), "UTF-8") + "\"";
 			s += ",";
-			s += "\"os_version\":\"" + System.getProperty("os.version") + "\"";
+			s += "\"os_version\":\"" + URLEncoder.encode(System.getProperty("os.version"), "UTF-8") + "\"";
 			s += ",";
 			s += "\"energy3d_version\":\"" + MainApplication.VERSION + "\"";
 			s += ",";
 			s += "\"error_message\":\"" + URLEncoder.encode(msg, "UTF-8") + "\"}";
 			final URL url = new URL("https://staff.concord.org/~emcelroy/error/error.php?error=" + s);
-			System.out.println(url);
 			final URLConnection urlConnection = url.openConnection();
 			urlConnection.setDoOutput(true);
 			final BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));

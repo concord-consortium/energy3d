@@ -721,6 +721,9 @@ public class SolarRadiation {
 
 	private MeshData initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean updateTexture) {
 		final MeshData data = new MeshData();
+		if (normal == null) { // TODO: Temporarily allow the program to move forward behind this point
+			return data;
+		}
 
 		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
 		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
