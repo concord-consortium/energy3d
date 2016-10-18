@@ -12,7 +12,6 @@ import org.concord.energy3d.model.HousePart;
 import com.ardor3d.math.Vector3;
 
 public class EditPartCommand extends AbstractUndoableEdit {
-
 	private static final long serialVersionUID = 1L;
 	private final HousePart housePart;
 	protected final ArrayList<Vector3> orgPoints;
@@ -25,8 +24,9 @@ public class EditPartCommand extends AbstractUndoableEdit {
 		this.housePart = housePart;
 		orgHeight = housePart.getHeight();
 		orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());
-		for (final Vector3 p : housePart.getPoints())
+		for (final Vector3 p : housePart.getPoints()) {
 			orgPoints.add(p.clone());
+		}
 		editPoint = housePart.getEditPoint();
 	}
 
@@ -38,11 +38,13 @@ public class EditPartCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		housePart.setHeight(orgHeight);
-		for (int i = 0; i < orgPoints.size(); i++)
+		for (int i = 0; i < orgPoints.size(); i++) {
 			housePart.getPoints().set(i, orgPoints.get(i).clone());
+		}
 		housePart.draw();
-		if (housePart.getContainer() != null)
+		if (housePart.getContainer() != null) {
 			housePart.getContainer().draw();
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
@@ -50,11 +52,13 @@ public class EditPartCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		housePart.setHeight(newHeight);
-		for (int i = 0; i < newPoints.size(); i++)
+		for (int i = 0; i < newPoints.size(); i++) {
 			housePart.getPoints().set(i, newPoints.get(i).clone());
+		}
 		housePart.draw();
-		if (housePart.getContainer() != null)
+		if (housePart.getContainer() != null) {
 			housePart.getContainer().draw();
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
@@ -71,8 +75,9 @@ public class EditPartCommand extends AbstractUndoableEdit {
 	public void saveNewPoints() {
 		newHeight = housePart.getHeight();
 		newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
-		for (final Vector3 p : housePart.getPoints())
+		for (final Vector3 p : housePart.getPoints()) {
 			newPoints.add(p.clone());
+		}
 	}
 
 }

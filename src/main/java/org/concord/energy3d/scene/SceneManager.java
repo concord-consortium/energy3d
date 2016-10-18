@@ -61,6 +61,7 @@ import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MoveBuildingCommand;
+import org.concord.energy3d.undo.RackEditPartCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.UndoManager;
@@ -1806,6 +1807,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									selectedPart.setGridsVisible(true);
 									if (selectedPart instanceof Foundation) {
 										editPartCommand = new EditFoundationCommand((Foundation) selectedPart, !pick.isEditPoint());
+									} else if (selectedPart instanceof Rack) {
+										editPartCommand = new RackEditPartCommand((Rack) selectedPart);
 									} else {
 										editPartCommand = new EditPartCommand(selectedPart);
 									}

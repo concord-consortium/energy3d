@@ -110,7 +110,7 @@ public class Rack extends HousePart {
 		final ReadOnlyVector3 previousNormal = normal;
 		normal = computeNormalAndKeepOnRoof();
 
-		if (previousNormal != null && normal.dot(previousNormal) < 0.95) {
+		if (container instanceof Roof && previousNormal != null && normal.dot(previousNormal) < 0.95) {
 			double angle = normal.multiply(1, 1, 0, null).normalizeLocal().smallestAngleBetween(previousNormal.multiply(1, 1, 0, null).normalizeLocal());
 			if (normal.dot(previousNormal.cross(Vector3.UNIT_Z, null)) > 0) {
 				angle = -angle;
