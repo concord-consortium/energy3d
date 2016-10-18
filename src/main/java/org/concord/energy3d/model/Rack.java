@@ -107,6 +107,7 @@ public class Rack extends HousePart {
 			return;
 		}
 
+		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		final ReadOnlyVector3 previousNormal = normal;
 		normal = computeNormalAndKeepOnRoof();
 
@@ -130,6 +131,9 @@ public class Rack extends HousePart {
 		if (onFlatSurface) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
+
+		final int editPointOffsetZ = 1;
+		points.get(0).addLocal(0, 0, editPointOffsetZ);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
@@ -174,7 +178,7 @@ public class Rack extends HousePart {
 		if (onFlatSurface) {
 			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 		}
-		mesh.setTranslation(getAbsPoint(0));
+		mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, -editPointOffsetZ));
 		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
