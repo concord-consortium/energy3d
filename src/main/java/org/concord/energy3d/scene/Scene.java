@@ -669,41 +669,45 @@ public class Scene implements Serializable {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				if (logger) {
-					instance.storeMapImageData();
-				}
-				if (notifyUndoManager) {
-					instance.cleanup();
-				}
-				// save camera to file
-				if (SceneManager.getInstance().getViewMode() == ViewMode.NORMAL) {
-					saveCameraLocation();
-				}
+				try {
+					if (logger) {
+						instance.storeMapImageData();
+					}
+					if (notifyUndoManager) {
+						instance.cleanup();
+					}
+					// save camera to file
+					if (SceneManager.getInstance().getViewMode() == ViewMode.NORMAL) {
+						saveCameraLocation();
+					}
 
-				instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
-				instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
-				instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
-				instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
-				instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-				instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
-				instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
-				instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
+					instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
+					instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
+					instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
+					instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
+					instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
+					instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
+					instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
 
-				if (setAsCurrentFile) {
-					Scene.url = url;
+					if (setAsCurrentFile) {
+						Scene.url = url;
+					}
+					System.out.print("Saving " + url + "...");
+					ObjectOutputStream out;
+					out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
+					out.writeObject(instance);
+					out.close();
+					if (notifyUndoManager) {
+						SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+					}
+					if (logger) {
+						instance.restoreMapImageData();
+					}
+					System.out.println("done");
+				} catch (final Throwable e) {
+					Util.reportError(e);
 				}
-				System.out.print("Saving " + url + "...");
-				ObjectOutputStream out;
-				out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
-				out.writeObject(instance);
-				out.close();
-				if (notifyUndoManager) {
-					SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
-				}
-				if (logger) {
-					instance.restoreMapImageData();
-				}
-				System.out.println("done");
 				return null;
 			}
 		});
