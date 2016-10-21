@@ -521,7 +521,7 @@ public class Scene implements Serializable {
 	}
 
 	/** This can be used by the user to fix problems that are caused by bugs based on our observations. This is different than cleanup() as the latter cannot be used to remove undrawables. */
-	public void fixProblems() {
+	public void fixProblems(final boolean redraw) {
 
 		// remove all undrawables
 		final ArrayList<HousePart> a = new ArrayList<HousePart>();
@@ -536,7 +536,9 @@ public class Scene implements Serializable {
 		a.clear();
 
 		cleanup();
-		redrawAll(true);
+		if (redraw) {
+			redrawAll(true);
+		}
 
 	}
 
@@ -709,15 +711,16 @@ public class Scene implements Serializable {
 					Util.reportError(e);
 				}
 
-				try {
-					System.out.print("Opening..." + url + "...");
-					final ObjectInputStream in = new ObjectInputStream(url.openStream());
-					final Scene localInstance = (Scene) in.readObject();
-					in.close();
-					throw new RuntimeException("what the hell");
-				} catch (final Throwable e) {
-					instance.setEdited(true);
-					Util.reportError(e, "Save Verification Error:");
+				if (!logger) {
+					try {
+						System.out.print("Opening..." + url + "...");
+						final ObjectInputStream in = new ObjectInputStream(url.openStream());
+						final Scene localInstance = (Scene) in.readObject();
+						in.close();
+					} catch (final Throwable e) {
+						instance.setEdited(true);
+						Util.reportError(e, "Save Verification Error:");
+					}
 				}
 				return null;
 			}

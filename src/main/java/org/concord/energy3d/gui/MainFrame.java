@@ -3592,7 +3592,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().fixProblems();
+							Scene.getInstance().fixProblems(true);
 							return null;
 						}
 					});
