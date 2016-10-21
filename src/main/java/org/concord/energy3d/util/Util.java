@@ -400,6 +400,10 @@ public class Util {
 	public static boolean suppressReportError = false;
 
 	public static void reportError(final Throwable e) {
+		reportError(e, "");
+	}
+
+	public static void reportError(final Throwable e, final String header) {
 		if (suppressReportError) {
 			return;
 		}
@@ -425,7 +429,7 @@ public class Util {
 			s += ",";
 			s += "\"energy3d_version\":\"" + MainApplication.VERSION + "\"";
 			s += ",";
-			s += "\"error_message\":\"" + URLEncoder.encode(msg, "UTF-8") + "\"}";
+			s += "\"error_message\":\"" + URLEncoder.encode(header + "\n" + msg, "UTF-8") + "\"}";
 			final URL url = new URL("https://staff.concord.org/~emcelroy/error/error.php?error=" + s);
 			final URLConnection urlConnection = url.openConnection();
 			urlConnection.setDoOutput(true);

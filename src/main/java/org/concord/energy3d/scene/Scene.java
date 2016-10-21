@@ -698,6 +698,7 @@ public class Scene implements Serializable {
 					out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
 					out.writeObject(instance);
 					out.close();
+
 					if (notifyUndoManager) {
 						SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 					}
@@ -707,6 +708,15 @@ public class Scene implements Serializable {
 					System.out.println("done");
 				} catch (final Throwable e) {
 					Util.reportError(e);
+				}
+
+				try {
+					System.out.print("Opening..." + url + "...");
+					final ObjectInputStream in = new ObjectInputStream(url.openStream());
+					final Scene localInstance = (Scene) in.readObject();
+					in.close();
+				} catch (final Throwable e) {
+					Util.reportError(e, "Save Verification Error:");
 				}
 				return null;
 			}
