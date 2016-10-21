@@ -694,8 +694,7 @@ public class Scene implements Serializable {
 						Scene.url = url;
 					}
 					System.out.print("Saving " + url + "...");
-					ObjectOutputStream out;
-					out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
+					final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
 					out.writeObject(instance);
 					out.close();
 
@@ -715,7 +714,9 @@ public class Scene implements Serializable {
 					final ObjectInputStream in = new ObjectInputStream(url.openStream());
 					final Scene localInstance = (Scene) in.readObject();
 					in.close();
+					throw new RuntimeException("what the hell");
 				} catch (final Throwable e) {
+					instance.setEdited(true);
 					Util.reportError(e, "Save Verification Error:");
 				}
 				return null;
