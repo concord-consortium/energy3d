@@ -719,7 +719,7 @@ public class Scene implements Serializable {
 					}
 					System.out.println("done");
 				} catch (final Throwable e) {
-					Util.reportError(e);
+					Util.reportError(e, "Save file Error: " + url + " : ");
 				}
 				return null;
 			}
