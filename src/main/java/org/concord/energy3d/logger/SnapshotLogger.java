@@ -54,17 +54,15 @@ public class SnapshotLogger {
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
-					if (Scene.getURL() != null) { // log only when student starts with a template
-						if (noteEdited || sceneEdited) {
-							try {
-								saveSnapshot(LoggerUtil.getLogFolder());
-							} catch (final Exception e) {
-								e.printStackTrace();
-								Util.reportError(e);
-								break;
-							}
-							reset();
+					if (noteEdited || sceneEdited) {
+						try {
+							saveSnapshot(LoggerUtil.getLogFolder());
+						} catch (final Exception e) {
+							e.printStackTrace();
+							Util.reportError(e);
+							break;
 						}
+						reset();
 					}
 				}
 			}

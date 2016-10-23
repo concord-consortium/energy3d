@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -68,6 +69,7 @@ import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.logger.PostProcessor;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
@@ -140,6 +142,7 @@ public class MainFrame extends JFrame {
 	private JMenu fileMenu;
 	private JMenuItem newMenuItem;
 	private JMenuItem openMenuItem;
+	private JMenuItem recoveryMenuItem;
 	private JMenuItem replayFolderMenuItem;
 	private JMenuItem replayLastFolderMenuItem;
 	private JMenu replayControlsMenu;
@@ -573,6 +576,7 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getOpenMenuItem());
 			addItemToFileMenu(getSaveMenuItem());
 			addItemToFileMenu(getSaveasMenuItem());
+			addItemToFileMenu(getRecoveryMenuItem());
 			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getCopyImageMenuItem());
 			addItemToFileMenu(getExportImageMenuItem());
@@ -736,6 +740,53 @@ public class MainFrame extends JFrame {
 			});
 			topViewCheckBoxMenuItem.setSelected(false);
 		}
+	}
+
+	private JMenuItem getRecoveryMenuItem() {
+		if (recoveryMenuItem == null) {
+			recoveryMenuItem = new JMenuItem("Recover from Log...");
+			recoveryMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final File[] files = SnapshotLogger.getLogFolder().listFiles(new FilenameFilter() {
+						@Override
+						public boolean accept(final File dir, final String name) {
+							return name.endsWith(".ng3");
+						}
+					});
+					final int n = files.length;
+					if (n > 0) {
+						Arrays.sort(files);
+						for (int i = n - 1; i >= 0; i--) {
+							if (files[i].length() > 0) {
+								final File f = files[i];
+								SceneManager.getTaskManager().update(new Callable<Object>() {
+									@Override
+									public Object call() {
+										try {
+											Scene.open(f.toURI().toURL());
+											EventQueue.invokeLater(new Runnable() {
+												@Override
+												public void run() {
+													updateTitleBar();
+													JOptionPane.showMessageDialog(MainFrame.instance, "<html>Please overwrite the file you wish to restore with the recovered file.</html>", "File Recovery", JOptionPane.INFORMATION_MESSAGE);
+													saveasMenuItem.doClick();
+												}
+											});
+										} catch (final Throwable err) {
+											Util.reportError(err, "Recovery error");
+										}
+										return null;
+									}
+								});
+								break;
+							}
+						}
+					}
+				}
+			});
+		}
+		return recoveryMenuItem;
 	}
 
 	private JMenuItem getAnalyzeFolderMenuItem() {
