@@ -38,6 +38,7 @@ public class Rack extends HousePart {
 	private transient Node polesRoot;
 	private transient ArrayList<Vector3> solarOrgPoints;
 	private transient Vector3 moveStartPoint;
+	private transient Vector3 center;
 	private transient double layoutGap = 0.01;
 	private double rackWidth = 15;
 	private double rackHeight = 3;
@@ -115,10 +116,10 @@ public class Rack extends HousePart {
 		final boolean nonflatContainer = container instanceof Roof && (((Roof) container).getRoofPartsRoot().getNumberOfChildren() > 1 || normal.dot(Vector3.UNIT_Z) < equalDot);
 		if (nonflatContainer && previousNormal != null && normal.dot(previousNormal) < equalDot) {
 			double angle = normal.multiply(1, 1, 0, null).normalizeLocal().smallestAngleBetween(previousNormal.multiply(1, 1, 0, null).normalizeLocal());
-			if (normal.dot(previousNormal.cross(Vector3.UNIT_Z, null)) > 0) {
+			if (normal.dot(previousNormal.cross(Vector3.UNIT_Z, null).normalizeLocal()) > 0) {
 				angle = -angle;
 			}
-			rotateSolarPanels(angle);
+			rotateSolarPanelsAzimuth(angle);
 			initSolarPanelsForMove();
 		}
 
@@ -133,6 +134,8 @@ public class Rack extends HousePart {
 		if (onFlatSurface) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
+
+		center = getAbsPoint(0); // save center before adding offset
 
 		final int editPointOffsetZ = 1;
 		points.get(0).addLocal(0, 0, editPointOffsetZ);
@@ -395,11 +398,11 @@ public class Rack extends HousePart {
 		} else if (relativeAzimuth > 360) {
 			relativeAzimuth -= 360;
 		}
-		rotateSolarPanels(Math.toRadians(this.relativeAzimuth - relativeAzimuth));
+		rotateSolarPanelsAzimuth(Math.toRadians(this.relativeAzimuth - relativeAzimuth));
 		this.relativeAzimuth = relativeAzimuth;
 	}
 
-	private void rotateSolarPanels(final double angle) {
+	private void rotateSolarPanelsAzimuth(final double angle) {
 		final Vector3 center = getAbsPoint(0);
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
 		for (final HousePart child : children) {
@@ -415,10 +418,22 @@ public class Rack extends HousePart {
 	}
 
 	public void setTiltAngle(final double tiltAngle) {
-		// TODO: rotate all solar panels
-		for (final HousePart child : children) {
-		}
+		rotateSolarPanelsTilt(Math.toRadians(tiltAngle - this.tiltAngle));
 		this.tiltAngle = tiltAngle;
+	}
+
+	private void rotateSolarPanelsTilt(final double angle) {
+		final Vector3 horizontal = normal.cross(Vector3.UNIT_Z, null).normalizeLocal();
+		if (this.tiltAngle > 0) {
+			horizontal.negateLocal();
+		}
+		final Matrix3 matrix = new Matrix3().fromAngleAxis(angle, horizontal);
+		for (final HousePart child : children) {
+			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
+			matrix.applyPost(v, v);
+			v.addLocal(center);
+			child.getPoints().get(0).set(child.toRelative(v));
+		}
 	}
 
 	public double getTiltAngle() {
