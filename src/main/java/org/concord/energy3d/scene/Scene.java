@@ -85,8 +85,10 @@ public class Scene implements Serializable {
 	private static boolean redrawAll = false;
 	private static boolean drawThickness = false;
 	private static boolean drawAnnotationsInside = false;
-	private Unit unit = Unit.InternationalSystemOfUnits;
+	private static boolean isSaving;
 	private transient boolean edited = false;
+	private transient BufferedImage mapImage;
+	private transient boolean avoidSavingMapImage;
 	private final List<HousePart> parts = new ArrayList<HousePart>();
 	private final Calendar calendar = Calendar.getInstance();
 	private TextureMode textureMode = TextureMode.Full;
@@ -98,41 +100,40 @@ public class Scene implements Serializable {
 	private ReadOnlyColorRGBA doorColor;
 	private ReadOnlyColorRGBA floorColor;
 	private ReadOnlyColorRGBA roofColor;
-	private double annotationScale = 0.2;
-	private int version = currentVersion;
-	private boolean isAnnotationsVisible = true;
-	private long idCounter;
-	private boolean studentMode;
+	private Unit unit = Unit.InternationalSystemOfUnits;
+	private Ground ground = new Ground();
+	private Atmosphere atmosphere = new Atmosphere();
+	private DesignSpecs designSpecs = new DesignSpecs();
+	private HousePart copyBuffer, originalCopy;
+	private UtilityBill utilityBill;
 	private String projectName;
 	private String city;
-	private int latitude;
-	private boolean isHeliodonVisible;
 	private String note;
+	private long idCounter;
+	private int version = currentVersion;
+	private int latitude;
 	private int solarContrast;
+	private int theme;
+	private double annotationScale = 0.2;
+	private double heatVectorLength = 2000;
+	private double mapScale;
+	private double heatFluxGridSize = 2;
+	private boolean isAnnotationsVisible = true;
+	private boolean studentMode;
+	private boolean isHeliodonVisible;
 	private boolean hideAxes;
 	private boolean hideLightBeams;
 	private boolean showSunAngles;
 	private boolean showBuildingLabels;
 	private boolean cleanup;
-	private double heatVectorLength = 2000;
 	private boolean alwaysComputeHeatFluxVectors;
 	private boolean fullEnergyInSolarMap = true;
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
 	private boolean noSolarMapForLand;
 	private boolean disallowFoundationOverlap;
-	private Ground ground = new Ground();
-	private Atmosphere atmosphere = new Atmosphere();
-	private DesignSpecs designSpecs = new DesignSpecs();
-	private HousePart copyBuffer, originalCopy;
 	private boolean dashedlineOnRoofs = true;
 	private boolean onlySolarAnalysis;
-	private UtilityBill utilityBill;
-	private int theme;
-	private transient BufferedImage mapImage;
-	private transient boolean avoidSavingMapImage;
-	private double mapScale;
 	private boolean hideMap;
-	private double heatFluxGridSize = 2;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -668,6 +669,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) throws Exception {
+		isSaving = true;
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
@@ -720,6 +722,8 @@ public class Scene implements Serializable {
 					System.out.println("done");
 				} catch (final Throwable e) {
 					Util.reportError(e, "Save file Error: " + url + " : ");
+				} finally {
+					isSaving = false;
 				}
 				return null;
 			}
@@ -2700,6 +2704,10 @@ public class Scene implements Serializable {
 	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
 		mapImage = ImageIO.read(in);
+	}
+
+	public static boolean isSaving() {
+		return isSaving;
 	}
 
 }

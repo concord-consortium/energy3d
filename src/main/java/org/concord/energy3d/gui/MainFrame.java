@@ -3050,6 +3050,9 @@ public class MainFrame extends JFrame {
 			final int save = JOptionPane.showConfirmDialog(this, "Do you want to save changes?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 			if (save == JOptionPane.YES_OPTION) {
 				save();
+				while (Scene.isSaving()) {
+					Thread.yield();
+				}
 				if (!Scene.getInstance().isEdited()) {
 					MainApplication.exit();
 				}
