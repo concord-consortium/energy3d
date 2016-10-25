@@ -568,9 +568,7 @@ public class Scene implements Serializable {
 			// remove all invalid parts or orphan parts without a top container
 			if (!p.isValid() || ((p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Floor) && p.getContainer() == null)) {
 				toBeRemoved.add(p);
-			}
-			// remove walls that are at the same position
-			if (p instanceof Wall) {
+			} else if (p instanceof Wall) { // remove walls that are at the same position
 				if (((Wall) p).isAtSamePlaceAsAnotherPart()) {
 					toBeRemoved.add(p);
 				}
