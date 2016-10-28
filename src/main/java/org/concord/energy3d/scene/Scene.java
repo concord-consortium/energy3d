@@ -706,20 +706,9 @@ public class Scene implements Serializable {
 					if (logger) {
 						instance.restoreMapImageData();
 					}
-					if (!logger) {
-						try {
-							System.out.print("Opening..." + url + "...");
-							final ObjectInputStream in = new ObjectInputStream(url.openStream());
-							final Scene localInstance = (Scene) in.readObject();
-							in.close();
-						} catch (final Throwable e) {
-							instance.setEdited(true);
-							Util.reportError(e, "Save Verification Error:");
-						}
-					}
 					System.out.println("done");
 				} catch (final Throwable e) {
-					Util.reportError(e, "Save file Error: " + url + " : ");
+					Util.reportError(e);
 				} finally {
 					isSaving = false;
 				}
