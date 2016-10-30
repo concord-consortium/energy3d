@@ -986,6 +986,7 @@ public class Scene implements Serializable {
 		}
 		if (c instanceof Rack) {
 			((Rack) c).moveSolarPanels(position);
+			setIdOfChildren(c);
 		}
 		add(c, true);
 		copyBuffer = c;
@@ -1053,6 +1054,7 @@ public class Scene implements Serializable {
 		}
 		if (c instanceof Rack) {
 			((Rack) c).moveSolarPanels(position);
+			setIdOfChildren(c);
 		}
 		add(c, true);
 		copyBuffer = c;
