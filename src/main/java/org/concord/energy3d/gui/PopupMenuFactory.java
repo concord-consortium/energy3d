@@ -145,7 +145,7 @@ import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
 import org.concord.energy3d.undo.SetFoundationRackPoleSpacingCommand;
 import org.concord.energy3d.undo.SetFoundationRackSizeCommand;
 import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
-import org.concord.energy3d.undo.SetFoundationSolarTrackerCommand;
+import org.concord.energy3d.undo.SetFoundationSolarTrackersCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetPoleSpacingForAllRacksCommand;
 import org.concord.energy3d.undo.SetRackPoleSpacingCommand;
@@ -154,7 +154,7 @@ import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
-import org.concord.energy3d.undo.SetTrackerForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.SetAllSolarTrackersCommand;
 import org.concord.energy3d.undo.ShowBorderLineCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -2910,11 +2910,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
 						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -2959,11 +2959,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
 						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3008,11 +3008,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
 						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3057,11 +3057,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
 						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -4223,13 +4223,13 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						// final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
 						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.NO_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						// final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.NO_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();
 				}
@@ -4272,13 +4272,13 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						// final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
 						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						// final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();
 				}
@@ -4321,13 +4321,13 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						// final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
 						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						// final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();
 				}
@@ -4370,13 +4370,13 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						// final SetFoundationSolarTrackerCommand c = new SetFoundationSolarTrackerCommand(foundation);
+						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
 						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						// final SetTrackerForAllSolarPanelsCommand c = new SetTrackerForAllSolarPanelsCommand();
+						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();
 				}
