@@ -31,13 +31,8 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class SolarPanel extends HousePart {
+public class SolarPanel extends HousePart implements Trackable {
 	private static final long serialVersionUID = 1L;
-
-	public static final int NO_TRACKER = 0;
-	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
-	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
-	public static final int VERTICAL_SINGLE_AXIS_TRACKER = 3;
 
 	public static final int PARTIAL_SHADE_TOLERANCE = 0;
 	public static final int HIGH_SHADE_TOLERANCE = 1;
@@ -259,7 +254,7 @@ public class SolarPanel extends HousePart {
 			int xRotationAxis = 1;
 			int yRotationAxis = 0;
 			switch (rotationAxis) {
-			case 1:
+			case EAST_WEST_AXIS:
 				xRotationAxis = 0;
 				yRotationAxis = 1;
 				break;
@@ -673,18 +668,22 @@ public class SolarPanel extends HousePart {
 		return tiltAngle;
 	}
 
+	@Override
 	public void setTracker(final int tracker) {
 		this.trackerType = tracker;
 	}
 
+	@Override
 	public int getTracker() {
 		return trackerType;
 	}
 
+	@Override
 	public void setRotationAxis(final int rotationAxis) {
 		this.rotationAxis = rotationAxis;
 	}
 
+	@Override
 	public int getRotationAxis() {
 		return rotationAxis;
 	}

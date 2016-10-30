@@ -1785,7 +1785,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			path.closePath();
 		}
 		switch (rowAxis) {
-		case 0: // north-south axis
+		case Trackable.NORTH_SOUTH_AXIS:
 			int rows = (int) Math.floor(b / w);
 			int cols = (int) Math.floor(a / h);
 			for (int c = 0; c < cols; c++) {
@@ -1811,7 +1811,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 			break;
-		case 1: // east-west axis
+		case Trackable.EAST_WEST_AXIS:
 			rows = (int) Math.floor(a / w);
 			cols = (int) Math.floor(b / h);
 			for (int c = 0; c < cols; c++) {

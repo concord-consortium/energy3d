@@ -2088,6 +2088,26 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setTrackerForRacksOnFoundation(final Foundation foundation, final int tracker) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack && p.getTopContainer() == foundation) {
+				((Rack) p).setTracker(tracker);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTrackerForAllRacks(final int tracker) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setTracker(tracker);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public List<Mirror> getAllMirrors() {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : parts) {

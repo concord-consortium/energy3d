@@ -50,6 +50,7 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.ShedRoof;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
@@ -457,11 +458,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 					} else if (part instanceof SolarPanel) {
 						final SolarPanel sp = (SolarPanel) part;
-						if (!night && sp.getTracker() != SolarPanel.NO_TRACKER) {
+						if (!night && sp.getTracker() != Trackable.NO_TRACKER) {
 							sp.draw();
 						}
 						if (sp.isDrawSunBeamVisible()) {
 							sp.drawSunBeam();
+						}
+					} else if (part instanceof Rack) {
+						final Rack rack = (Rack) part;
+						if (!night && rack.getTracker() != Trackable.NO_TRACKER) {
+							rack.draw();
 						}
 					}
 				}

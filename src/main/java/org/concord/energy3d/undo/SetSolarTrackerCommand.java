@@ -4,22 +4,23 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Trackable;
 
 public class SetSolarTrackerCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;
 	private int newValue;
-	private final SolarPanel sp;
+	private final Trackable tracker;
 
-	public SetSolarTrackerCommand(final SolarPanel sp) {
-		this.sp = sp;
-		oldValue = sp.getTracker();
+	public SetSolarTrackerCommand(final Trackable tracker) {
+		this.tracker = tracker;
+		oldValue = tracker.getTracker();
 	}
 
-	public SolarPanel getSolarPanel() {
-		return sp;
+	public Trackable getTracker() {
+		return tracker;
 	}
 
 	public int getOldValue() {
@@ -29,25 +30,31 @@ public class SetSolarTrackerCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = sp.getTracker();
-		sp.setTracker(oldValue);
-		sp.draw();
+		newValue = tracker.getTracker();
+		tracker.setTracker(oldValue);
+		if (tracker instanceof HousePart) {
+			((HousePart) tracker).draw();
+		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		sp.setTracker(newValue);
-		sp.draw();
+		tracker.setTracker(newValue);
+		if (tracker instanceof HousePart) {
+			((HousePart) tracker).draw();
+		}
 	}
 
 	@Override
 	public String getPresentationName() {
 		switch (oldValue) {
-		case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			return "Enable Dual-Axis Tracker";
-		case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
-			return "Enable Single-Axis Tracker";
+		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+			return "Enable Horizontal Single-Axis Tracker";
+		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+			return "Enable Vertical Single-Axis Tracker";
 		default:
 			return "Disable Tracker";
 		}
