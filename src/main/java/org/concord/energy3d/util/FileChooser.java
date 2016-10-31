@@ -25,7 +25,7 @@ public class FileChooser {
 	private static final int MAX = 4;
 	private static FileChooser instance;
 	private final List<String> recentFiles = new ArrayList<String>();
-	private JFileChooser fileChooser;
+	private final JFileChooser fileChooser;
 	private FileDialog fileDialog;
 
 	public static FileChooser getInstance() {
@@ -46,7 +46,7 @@ public class FileChooser {
 		if (!Config.isWebStart() && directoryPath == null) {
 			directoryPath = System.getProperties().getProperty("user.dir");
 		}
-		
+
 		fileChooser = new JFileChooser(directoryPath);
 		if (Config.isMac()) {
 			fileDialog = new FileDialog(MainFrame.getInstance());
@@ -108,8 +108,7 @@ public class FileChooser {
 				System.out.println("cancelled.");
 				return null;
 			} else {
-				final String filenameFull = fileDialog.getDirectory() + filename + (filename.endsWith(dotExtension) ? "" : dotExtension);
-				System.out.println(filenameFull);
+				final String filenameFull = fileDialog.getDirectory() + filename + (filename.toLowerCase().endsWith(dotExtension) ? "" : dotExtension);
 				final File file = new File(filenameFull);
 				Preferences.userNodeForPackage(MainApplication.class).put("dir", fileDialog.getDirectory());
 				return file;
@@ -137,7 +136,10 @@ public class FileChooser {
 				} else if (fileChooser.showOpenDialog(parent) == JFileChooser.CANCEL_OPTION) {
 					return null;
 				}
-				final File file = fileChooser.getSelectedFile();
+				File file = fileChooser.getSelectedFile();
+				if (!file.toString().toLowerCase().endsWith(dotExtension)) {
+					file = new File(file.getParentFile(), Util.getFileName(file.toString()) + dotExtension);
+				}
 				if (!isSaveDialog || !file.exists() || JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(parent, "File \"" + file.getName() + "\" already exists. Overwrite?", "Save File", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) {
 					Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getCurrentDirectory().toString());
 					return file;

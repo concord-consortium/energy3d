@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<property name="app.name" value="Energy3D"/>
-	<property name="app.version" value="5.8"/>
+	<property name="app.version" value="6.0"/>
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
