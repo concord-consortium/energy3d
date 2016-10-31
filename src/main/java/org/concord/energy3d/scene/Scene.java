@@ -662,11 +662,11 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public static void save(final URL url, final boolean setAsCurrentFile) throws Exception {
+	public static void save(final URL url, final boolean setAsCurrentFile) {
 		save(url, setAsCurrentFile, true, false);
 	}
 
-	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) throws Exception {
+	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) {
 		isSaving = true;
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
