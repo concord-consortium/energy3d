@@ -12,6 +12,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.Util;
 
@@ -30,7 +31,7 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Rack extends HousePart {
+public class Rack extends HousePart implements Trackable {
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -47,6 +48,8 @@ public class Rack extends HousePart {
 	private double baseHeight = 15;
 	private double poleDistanceX = 3;
 	private double poleDistanceY = 1;
+	private int trackerType = NO_TRACKER;
+	private int rotationAxis;
 
 	public Rack() {
 		super(1, 1, 0);
@@ -108,9 +111,43 @@ public class Rack extends HousePart {
 			return;
 		}
 
+		final boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		final ReadOnlyVector3 previousNormal = normal;
 		normal = computeNormalAndKeepOnRoof();
+
+		switch (trackerType) {
+		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			break;
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+			int xRotationAxis = 1;
+			int yRotationAxis = 0;
+			switch (rotationAxis) {
+			case EAST_WEST_AXIS:
+				xRotationAxis = 0;
+				yRotationAxis = 1;
+				break;
+			}
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
+			break;
+		case VERTICAL_SINGLE_AXIS_TRACKER:
+			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
+			final Vector3 b = Vector3.UNIT_Z.cross(a, null);
+			final Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
+			normal = m.applyPost(a, null);
+			if (normal.getZ() < 0) {
+				normal = normal.negate(null);
+			}
+			break;
+		default:
+			if (onFlatSurface) {
+				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+			}
+		}
+		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
+		}
 
 		final double equalDot = 0.95;
 		final boolean nonflatContainer = container instanceof Roof && (((Roof) container).getRoofPartsRoot().getNumberOfChildren() > 1 || normal.dot(Vector3.UNIT_Z) < equalDot);
@@ -130,7 +167,6 @@ public class Rack extends HousePart {
 			baseZ = this.container.getPoints().get(0).getZ();
 		}
 
-		final boolean onFlatSurface = onFlatSurface();
 		if (onFlatSurface) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
@@ -180,11 +216,8 @@ public class Rack extends HousePart {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		if (onFlatSurface) {
-			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
-		}
+		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
 		mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, -editPointOffsetZ));
-		mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -572,6 +605,26 @@ public class Rack extends HousePart {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void setTracker(final int tracker) {
+		this.trackerType = tracker;
+	}
+
+	@Override
+	public int getTracker() {
+		return trackerType;
+	}
+
+	@Override
+	public void setRotationAxis(final int rotationAxis) {
+		this.rotationAxis = rotationAxis;
+	}
+
+	@Override
+	public int getRotationAxis() {
+		return rotationAxis;
 	}
 
 }

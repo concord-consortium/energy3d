@@ -986,6 +986,7 @@ public class Scene implements Serializable {
 		}
 		if (c instanceof Rack) {
 			((Rack) c).moveSolarPanels(position);
+			setIdOfChildren(c);
 		}
 		add(c, true);
 		copyBuffer = c;
@@ -1053,6 +1054,7 @@ public class Scene implements Serializable {
 		}
 		if (c instanceof Rack) {
 			((Rack) c).moveSolarPanels(position);
+			setIdOfChildren(c);
 		}
 		add(c, true);
 		copyBuffer = c;
@@ -1890,7 +1892,7 @@ public class Scene implements Serializable {
 
 	public void setTrackerForSolarPanelsOnFoundation(final Foundation foundation, final int tracker) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation && !(p.getContainer() instanceof Rack)) { // no tracker for solar panels on racks as they use rack trackers
 				((SolarPanel) p).setTracker(tracker);
 				p.draw();
 			}
@@ -1900,7 +1902,7 @@ public class Scene implements Serializable {
 
 	public void setTrackerForAllSolarPanels(final int tracker) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel) {
+			if (p instanceof SolarPanel && !(p.getContainer() instanceof Rack)) { // no tracker for solar panels on racks as they use rack trackers
 				((SolarPanel) p).setTracker(tracker);
 				p.draw();
 			}
@@ -2080,6 +2082,26 @@ public class Scene implements Serializable {
 			if (p instanceof Rack) {
 				((Rack) p).setPoleDistanceX(dx);
 				((Rack) p).setPoleDistanceY(dy);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTrackerForRacksOnFoundation(final Foundation foundation, final int tracker) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack && p.getTopContainer() == foundation) {
+				((Rack) p).setTracker(tracker);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTrackerForAllRacks(final int tracker) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setTracker(tracker);
 				p.draw();
 			}
 		}

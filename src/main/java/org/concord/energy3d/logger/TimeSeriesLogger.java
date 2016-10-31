@@ -22,6 +22,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -466,20 +467,6 @@ public class TimeSeriesLogger {
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
 				}
 
-				else if (lastEdit instanceof SetSolarTrackerCommand) {
-					final SetSolarTrackerCommand c = (SetSolarTrackerCommand) lastEdit;
-					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getTracker() + "}";
-				} else if (lastEdit instanceof SetFoundationSolarTrackerCommand) {
-					final SetFoundationSolarTrackerCommand c = (SetFoundationSolarTrackerCommand) lastEdit;
-					final Foundation f = c.getFoundation();
-					final List<SolarPanel> solarPanels = f.getSolarPanels();
-					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTracker()) + "}";
-				} else if (lastEdit instanceof SetTrackerForAllSolarPanelsCommand) {
-					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
-					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTracker()) + "}";
-				}
-
 				else if (lastEdit instanceof SetShadeToleranceCommand) {
 					final SetShadeToleranceCommand c = (SetShadeToleranceCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
@@ -557,6 +544,41 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeBaseHeightForAllRacksCommand) {
 					final List<Rack> racks = Scene.getInstance().getAllRacks();
 					stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getBaseHeight()) + "}";
+				}
+
+				/* tracker properties */
+
+				else if (lastEdit instanceof SetSolarTrackerCommand) {
+					final SetSolarTrackerCommand c = (SetSolarTrackerCommand) lastEdit;
+					final Trackable tracker = c.getTracker();
+					long bid = -1;
+					long cid = -1;
+					if (tracker instanceof HousePart) {
+						bid = ((HousePart) tracker).getTopContainer().getId();
+						cid = ((HousePart) tracker).getId();
+					}
+					stateValue = "{\"Building\": " + bid + ", \"ID\": " + cid + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + tracker.getTracker() + "}";
+				} else if (lastEdit instanceof SetFoundationSolarTrackersCommand) {
+					final SetFoundationSolarTrackersCommand c = (SetFoundationSolarTrackersCommand) lastEdit;
+					final Foundation f = c.getFoundation();
+					final Trackable tracker = c.getTracker();
+					if (tracker instanceof SolarPanel) {
+						final List<SolarPanel> solarPanels = f.getSolarPanels();
+						stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTracker()) + "}";
+					} else if (tracker instanceof Rack) {
+						final List<Rack> racks = f.getRacks();
+						stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getTracker()) + "}";
+					}
+				} else if (lastEdit instanceof SetAllSolarTrackersCommand) {
+					final SetAllSolarTrackersCommand c = (SetAllSolarTrackersCommand) lastEdit;
+					final Trackable tracker = c.getTracker();
+					if (tracker instanceof SolarPanel) {
+						final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
+						stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTracker()) + "}";
+					} else if (tracker instanceof Rack) {
+						final List<Rack> racks = Scene.getInstance().getAllRacks();
+						stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getTracker()) + "}";
+					}
 				}
 
 				/* mirror properties */
