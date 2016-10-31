@@ -46,11 +46,10 @@ public class FileChooser {
 		if (!Config.isWebStart() && directoryPath == null) {
 			directoryPath = System.getProperties().getProperty("user.dir");
 		}
-
+		
+		fileChooser = new JFileChooser(directoryPath);
 		if (Config.isMac()) {
 			fileDialog = new FileDialog(MainFrame.getInstance());
-		} else {
-			fileChooser = new JFileChooser(directoryPath);
 		}
 	}
 
@@ -87,7 +86,7 @@ public class FileChooser {
 	}
 
 	public File showDialog(final String dotExtension, final FileFilter filter, final boolean isSaveDialog) {
-		if (Config.isMac()) {
+		if (Config.isMac() && filter != null) {
 			fileDialog.setMode(isSaveDialog ? FileDialog.SAVE : FileDialog.LOAD);
 			fileDialog.setTitle(isSaveDialog ? "Save" : "Open");
 			fileDialog.setFilenameFilter(new FilenameFilter() {
