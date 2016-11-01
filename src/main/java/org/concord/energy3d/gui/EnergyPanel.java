@@ -663,8 +663,6 @@ public class EnergyPanel extends JPanel {
 				}
 			});
 
-			Scene.getInstance().fixProblems(false);
-
 			synchronized (SceneManager.getInstance()) {
 				final int timeStep = Scene.getInstance().getTimeStep();
 				for (final HousePart part : Scene.getInstance().getParts()) {
