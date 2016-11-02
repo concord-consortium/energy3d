@@ -647,9 +647,9 @@ public class MainFrame extends JFrame {
 						ok = true;
 					}
 					if (ok) {
-						new Thread() {
+						SceneManager.getTaskManager().update(new Callable<Object>() {
 							@Override
-							public void run() {
+							public Object call() throws Exception {
 								try {
 									Scene.newFile();
 									SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
@@ -658,8 +658,9 @@ public class MainFrame extends JFrame {
 								} catch (final Throwable err) {
 									Util.reportError(err);
 								}
+								return null;
 							}
-						}.start();
+						});
 					}
 				}
 			});

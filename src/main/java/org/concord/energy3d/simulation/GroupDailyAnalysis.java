@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,12 +39,13 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class GroupDailyAnalysis extends Analysis {
 
@@ -72,9 +74,10 @@ public class GroupDailyAnalysis extends Analysis {
 	private void runAnalysis(final JDialog parent) {
 		graph.info = "Calculating...";
 		graph.repaint();
-		super.runAnalysis(new Runnable() {
+		onStart();
+		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
-			public void run() {
+			public Object call() {
 				final Throwable t = compute();
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {
@@ -90,6 +93,7 @@ public class GroupDailyAnalysis extends Analysis {
 						onCompletion();
 					}
 				});
+				return null;
 			}
 		});
 	}

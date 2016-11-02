@@ -31,7 +31,6 @@ public class Mac {
 			@Override
 			public void openFiles(final OpenFilesEvent e) {
 				MainApplication.isMacOpeningFile = true;
-				// MainFrame.getInstance().open(e.getFiles().get(0).toString());
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {

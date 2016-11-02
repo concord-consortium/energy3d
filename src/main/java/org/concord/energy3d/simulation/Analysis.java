@@ -19,7 +19,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public abstract class Analysis {
 
@@ -56,11 +56,6 @@ public abstract class Analysis {
 		analysisStopped = true;
 	}
 
-	void runAnalysis(final Runnable task) {
-		onStart();
-		new Thread(task, getClass().getName()).start();
-	}
-
 	// return the exception if unsuccessful
 	Throwable compute() {
 		graph.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -73,7 +68,6 @@ public abstract class Analysis {
 			graph.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		}
 		updateGraph();
-		SceneManager.getInstance().refreshNow();
 		return null;
 	}
 

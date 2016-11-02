@@ -83,8 +83,9 @@ public class PostProcessor extends PlayControl {
 							} catch (final Exception e) {
 								e.printStackTrace();
 							}
-							if (date0 == null)
+							if (date0 == null) {
 								date0 = c.getTime();
+							}
 							timestamp = Math.round((c.getTime().getTime() - date0.getTime()) * 0.001);
 						} else {
 							System.err.println("File timestamp error");
@@ -98,7 +99,7 @@ public class PostProcessor extends PlayControl {
 							EnergyPanel.getInstance().computeNow();
 							SceneManager.getInstance().refresh();
 							update.run();
-							EventQueue.invokeLater(new Runnable(){
+							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
 									EnergyPanel.getInstance().update();
@@ -118,50 +119,55 @@ public class PostProcessor extends PlayControl {
 						int doorCount = 0;
 						if (buildings0 == null) {
 							buildings0 = new ArrayList<Building>();
-							synchronized (parts) {
-								for (final HousePart x : parts) {
-									final Building b = new Building(Building.getBuildingFoundation(x));
-									if (!buildings0.contains(b))
-										buildings0.add(b);
+							for (final HousePart x : parts) {
+								final Building b = new Building(Building.getBuildingFoundation(x));
+								if (!buildings0.contains(b)) {
+									buildings0.add(b);
 								}
 							}
 						}
-						synchronized (parts) {
-							for (final HousePart x : parts) {
-								// count the pieces by categories
-								if (x instanceof Window)
-									windowCount++;
-								else if (x instanceof Foundation)
-									foundationCount++;
-								else if (x instanceof Roof)
-									roofCount++;
-								else if (x instanceof Floor)
-									floorCount++;
-								else if (x instanceof Door)
-									doorCount++;
-								else if (x instanceof Wall) {
-									wallCount++;
-									final Building b = new Building(Building.getBuildingFoundation(x));
-									if (!buildings.contains(b) && !buildings0.contains(b))
-										buildings.add(b);
+						for (final HousePart x : parts) {
+							// count the pieces by categories
+							if (x instanceof Window) {
+								windowCount++;
+							} else if (x instanceof Foundation) {
+								foundationCount++;
+							} else if (x instanceof Roof) {
+								roofCount++;
+							} else if (x instanceof Floor) {
+								floorCount++;
+							} else if (x instanceof Door) {
+								doorCount++;
+							} else if (x instanceof Wall) {
+								wallCount++;
+								final Building b = new Building(Building.getBuildingFoundation(x));
+								if (!buildings.contains(b) && !buildings0.contains(b)) {
+									buildings.add(b);
 								}
 							}
 						}
 						// scan again to compute building properties
-						if (total0 == -1)
+						if (total0 == -1) {
 							total0 = parts.size();
-						if (wallCount0 == -1)
+						}
+						if (wallCount0 == -1) {
 							wallCount0 = wallCount;
-						if (windowCount0 == -1)
+						}
+						if (windowCount0 == -1) {
 							windowCount0 = windowCount;
-						if (foundationCount0 == -1)
+						}
+						if (foundationCount0 == -1) {
 							foundationCount0 = foundationCount;
-						if (roofCount0 == -1)
+						}
+						if (roofCount0 == -1) {
 							roofCount0 = roofCount;
-						if (floorCount0 == -1)
+						}
+						if (floorCount0 == -1) {
 							floorCount0 = floorCount;
-						if (doorCount0 == -1)
+						}
+						if (doorCount0 == -1) {
 							doorCount0 = doorCount;
+						}
 						final Calendar heliodonCalendar = Heliodon.getInstance().getCalendar();
 						String heliodonTime = FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.MONTH) + 1);
 						heliodonTime += "/" + FORMAT_TWO_DIGITS.format(heliodonCalendar.get(Calendar.DAY_OF_MONTH));
@@ -205,8 +211,9 @@ public class PostProcessor extends PlayControl {
 								}
 							}
 							forward = false;
-							if (i == n - 1)
+							if (i == n - 1) {
 								i = n - 2;
+							}
 						}
 					}
 				}

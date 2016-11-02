@@ -14,6 +14,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -45,7 +46,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class EnergyDailyAnalysis extends Analysis {
 
@@ -60,9 +61,10 @@ public class EnergyDailyAnalysis extends Analysis {
 	private void runAnalysis(final JDialog parent) {
 		graph.info = "Calculating...";
 		graph.repaint();
-		super.runAnalysis(new Runnable() {
+		onStart();
+		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
-			public void run() {
+			public Object call() {
 				final Throwable t = compute();
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {
@@ -95,6 +97,7 @@ public class EnergyDailyAnalysis extends Analysis {
 						}
 					}
 				});
+				return null;
 			}
 		});
 	}

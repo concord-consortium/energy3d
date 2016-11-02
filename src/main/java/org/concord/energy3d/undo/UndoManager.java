@@ -9,13 +9,12 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 
 public class UndoManager extends javax.swing.undo.UndoManager {
-
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public synchronized boolean addEdit(final UndoableEdit anEdit) {
+	public boolean addEdit(final UndoableEdit anEdit) {
 		final boolean result = super.addEdit(anEdit);
-		boolean saveFlag = anEdit instanceof SaveCommand;
+		final boolean saveFlag = anEdit instanceof SaveCommand;
 		Scene.getInstance().setEdited(!saveFlag);
 		refreshUndoRedoGui();
 		if (saveFlag) {
@@ -27,7 +26,7 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	}
 
 	@Override
-	public synchronized void undo() throws CannotUndoException {
+	public void undo() throws CannotUndoException {
 		super.undo();
 		SaveCommand.setGloabalSignificant(true);
 		Scene.getInstance().setEdited(!(editToBeUndone() instanceof SaveCommand));
@@ -37,7 +36,7 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	}
 
 	@Override
-	public synchronized void redo() throws CannotRedoException {
+	public void redo() throws CannotRedoException {
 		super.redo();
 		SaveCommand.setGloabalSignificant(true);
 		Scene.getInstance().setEdited(!(editToBeUndone() instanceof SaveCommand));

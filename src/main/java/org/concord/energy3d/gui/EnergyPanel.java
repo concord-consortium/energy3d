@@ -89,8 +89,8 @@ public class EnergyPanel extends JPanel {
 	private final DecimalFormat oneDecimal = new DecimalFormat();
 	private final DecimalFormat twoDecimals = new DecimalFormat();
 	private static boolean autoRecomputeEnergy = false;
-	private Thread thread;
 	private boolean computeRequest;
+	private boolean computing;
 	private boolean cancel;
 	private boolean alreadyRenderedHeatmap = false;
 	private boolean computeEnabled = true;
@@ -583,73 +583,71 @@ public class EnergyPanel extends JPanel {
 			return;
 		}
 		updateWeatherData(); // TODO: There got to be a better way to do this
-		if (thread != null && thread.isAlive()) {
-			computeRequest = true;
-		} else {
-			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			thread = new Thread("Energy Computation") {
-				@Override
-				public void run() {
-					do {
-						computeRequest = false;
-						cancel = false;
-						/* since this thread can accept multiple computeRequest, cannot use updateRadiationColorMap parameter directly */
-						try {
-							final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
-							if (doCompute) {
-								alreadyRenderedHeatmap = true;
-								computeNow();
-								if (!cancel) {
-									SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
-									SceneManager.getInstance().refresh();
-								} else if (!autoRecomputeEnergy) {
-									turnOffCompute();
-								}
-							} else {
-								turnOffCompute();
-							}
-						} catch (final Throwable e) {
-							e.printStackTrace();
-							Util.reportError(e);
-							return;
-						} finally {
-							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-						}
-						EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
-							@Override
-							public void run() {
-								progress(0);
-								if (SceneManager.getInstance().getSolarHeatMap()) {
-									final HousePart p = SceneManager.getInstance().getSelectedPart();
-									if (p instanceof Foundation) {
-										final Foundation f = (Foundation) p;
-										switch (f.getSupportingType()) {
-										case Foundation.BUILDING:
-											Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
-											buildingDailyEnergyGraph.addGraph(f);
-											TimeSeriesLogger.getInstance().logAnalysis(buildingDailyEnergyGraph);
-											break;
-										case Foundation.PV_STATION:
-											Util.setSilently(pvStationTabbedPane, pvStationDailyEnergyGraph);
-											pvStationDailyEnergyGraph.addGraph(f);
-											TimeSeriesLogger.getInstance().logAnalysis(pvStationDailyEnergyGraph);
-											break;
-										case Foundation.CSP_STATION:
-											Util.setSilently(cspStationTabbedPane, cspStationDailyEnergyGraph);
-											cspStationDailyEnergyGraph.addGraph(f);
-											TimeSeriesLogger.getInstance().logAnalysis(cspStationDailyEnergyGraph);
-											break;
-										}
-									}
-								}
-							}
-						});
-					} while (computeRequest);
-					thread = null;
-				}
-			};
-			thread.start();
+		((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
+		if (!doCompute && computing) {
+			cancel();
+			return;
 		}
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				computing = true;
+				computeRequest = false;
+				cancel = false;
+				try {
+					if (doCompute) {
+						alreadyRenderedHeatmap = true;
+						computeNow();
+						if (!cancel) {
+							SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
+							SceneManager.getInstance().refresh();
+						} else if (!autoRecomputeEnergy) {
+							turnOffCompute();
+						}
+					} else {
+						turnOffCompute();
+					}
+				} catch (final Throwable e) {
+					e.printStackTrace();
+					Util.reportError(e);
+					return null;
+				} finally {
+					((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				}
+				EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
+					@Override
+					public void run() {
+						progress(0);
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							final HousePart p = SceneManager.getInstance().getSelectedPart();
+							if (p instanceof Foundation) {
+								final Foundation f = (Foundation) p;
+								switch (f.getSupportingType()) {
+								case Foundation.BUILDING:
+									Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
+									buildingDailyEnergyGraph.addGraph(f);
+									TimeSeriesLogger.getInstance().logAnalysis(buildingDailyEnergyGraph);
+									break;
+								case Foundation.PV_STATION:
+									Util.setSilently(pvStationTabbedPane, pvStationDailyEnergyGraph);
+									pvStationDailyEnergyGraph.addGraph(f);
+									TimeSeriesLogger.getInstance().logAnalysis(pvStationDailyEnergyGraph);
+									break;
+								case Foundation.CSP_STATION:
+									Util.setSilently(cspStationTabbedPane, cspStationDailyEnergyGraph);
+									cspStationDailyEnergyGraph.addGraph(f);
+									TimeSeriesLogger.getInstance().logAnalysis(cspStationDailyEnergyGraph);
+									break;
+								}
+							}
+						}
+						computing = false;
+					}
+				});
+				return null;
+			}
+		});
 	}
 
 	public void computeNow() {
@@ -665,16 +663,14 @@ public class EnergyPanel extends JPanel {
 
 			Scene.getInstance().fixProblems(false);
 
-			synchronized (SceneManager.getInstance()) {
-				final int timeStep = Scene.getInstance().getTimeStep();
-				for (final HousePart part : Scene.getInstance().getParts()) {
-					part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
-				}
-				SolarRadiation.getInstance().compute();
-				final Calendar c = (Calendar) Heliodon.getInstance().getCalendar().clone();
-				HeatLoad.getInstance().computeEnergyToday(c);
-				SolarRadiation.getInstance().computeTotalEnergyForBuildings();
+			final int timeStep = Scene.getInstance().getTimeStep();
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				part.setHeatLoss(new double[SolarRadiation.MINUTES_OF_DAY / timeStep]);
 			}
+			SolarRadiation.getInstance().compute();
+			final Calendar c = (Calendar) Heliodon.getInstance().getCalendar().clone();
+			HeatLoad.getInstance().computeEnergyToday(c);
+			SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 			Scene.getInstance().setTreeLeaves();
 
 			EventQueue.invokeLater(new Runnable() {
@@ -1350,19 +1346,17 @@ public class EnergyPanel extends JPanel {
 			});
 		}
 		int numberOfHouses = 0;
-		synchronized (SceneManager.getInstance()) {
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen()) {
-					numberOfHouses++;
-				}
-				if (numberOfHouses >= 2) {
-					break;
-				}
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen()) {
+				numberOfHouses++;
 			}
-			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Foundation) {
-					((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
-				}
+			if (numberOfHouses >= 2) {
+				break;
+			}
+		}
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
+				((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
 			}
 		}
 

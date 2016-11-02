@@ -13,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -43,7 +44,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * This calculates and visualizes the angular dependence of all energy items for any selected part or building.
- * 
+ *
  * @author Charles Xie
  *
  */
@@ -60,11 +61,10 @@ public class EnergyAngularAnalysis extends Analysis {
 	}
 
 	private void runAnalysis(final JDialog parent) {
-		super.runAnalysis(new Runnable() {
-			@Override
-			public void run() {
-				SceneManager.getInstance().setRefreshOnlyMode(true);
-				for (int i = 0; i < nRotation; i++) {
+		for (int i = 0; i < nRotation; i++) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() {
 					if (!analysisStopped) {
 						SceneManager.getInstance().rotateBuilding(2.0 * Math.PI / nRotation, false);
 						Scene.getInstance().redrawAllNow();
@@ -77,21 +77,23 @@ public class EnergyAngularAnalysis extends Analysis {
 									Util.reportError(t);
 								}
 							});
-							break;
-						}
-						try {
-							Thread.sleep(500);
-						} catch (final InterruptedException e) {
 						}
 					}
+					return null;
 				}
-				SceneManager.getInstance().setRefreshOnlyMode(false);
+			});
+		}
+
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() {
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						onCompletion();
 					}
 				});
+				return null;
 			}
 		});
 	}

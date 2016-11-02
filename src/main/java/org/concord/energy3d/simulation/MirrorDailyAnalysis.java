@@ -13,6 +13,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -38,7 +39,7 @@ import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class MirrorDailyAnalysis extends Analysis {
 
@@ -52,9 +53,10 @@ public class MirrorDailyAnalysis extends Analysis {
 	private void runAnalysis(final JDialog parent) {
 		graph.info = "Calculating...";
 		graph.repaint();
-		super.runAnalysis(new Runnable() {
+		onStart();
+		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
-			public void run() {
+			public Object call() {
 				final Throwable t = compute();
 				if (t != null) {
 					EventQueue.invokeLater(new Runnable() {
@@ -81,6 +83,7 @@ public class MirrorDailyAnalysis extends Analysis {
 						JOptionPane.showMessageDialog(parent, "<html>The calculated daily output is <b>" + current + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Output", JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
+				return null;
 			}
 		});
 	}

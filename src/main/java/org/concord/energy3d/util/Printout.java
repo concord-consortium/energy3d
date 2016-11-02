@@ -78,7 +78,7 @@ public class Printout implements Printable, Pageable {
 		return printCorners.size();
 	}
 
-	private synchronized BufferedImage getScreenShot(final Renderer renderer, final ReadOnlyVector3 printCorner) {
+	private BufferedImage getScreenShot(final Renderer renderer, final ReadOnlyVector3 printCorner) {
 		final Camera camera = Camera.getCurrentCamera();
 		final int width = camera.getWidth(), height = camera.getHeight();
 
@@ -105,13 +105,14 @@ public class Printout implements Printable, Pageable {
 				currentY += height;
 			}
 
-			if (cameraLocation.getX() + visibleSceneWidth < pageToX)
+			if (cameraLocation.getX() + visibleSceneWidth < pageToX) {
 				cameraLocation.addLocal(visibleSceneWidth, 0, 0);
-			else if (cameraLocation.getZ() - visibleSceneHeight > pageToZ) {
+			} else if (cameraLocation.getZ() - visibleSceneHeight > pageToZ) {
 				cameraLocation.setX(printCorner.getX() + visibleSceneWidth / 2.0);
 				cameraLocation.addLocal(0, 0, -visibleSceneHeight);
-			} else
+			} else {
 				break;
+			}
 		}
 
 		return image;
@@ -145,8 +146,9 @@ public class Printout implements Printable, Pageable {
 
 				final int imgX = currentX + x;
 				final int imgY = currentY + y;
-				if (imgX < image.getWidth() && imgY < image.getHeight())
+				if (imgX < image.getWidth() && imgY < image.getHeight()) {
 					image.setRGB(imgX, imgY, argb);
+				}
 			}
 		}
 	}

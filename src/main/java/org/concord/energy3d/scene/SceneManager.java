@@ -200,7 +200,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean operationStick = false;
 	private boolean operationFlag = false;
 	private boolean refresh = true;
-	private boolean refreshOnlyMode = false;
 	private boolean zoomLock = false;
 	private boolean solarHeatMap = false;
 	private boolean heatFluxDaily = true;
@@ -372,7 +371,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final boolean isUpdateTime = refreshTime != -1 && now <= refreshTime;
 			final boolean isTaskAvailable = taskManager.getQueue(GameTaskQueue.UPDATE).size() > 0 || taskManager.getQueue(GameTaskQueue.RENDER).size() > 0;
 			final boolean isPrintPreviewAnim = !PrintController.getInstance().isFinished();
-			final boolean doRefresh = refresh || !refreshOnlyMode && (isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating()));
+			final boolean doRefresh = refresh || isTaskAvailable || isPrintPreviewAnim || Scene.isRedrawAll() || isUpdateTime || rotAnim || Blinker.getInstance().getTarget() != null || sunAnim || (cameraControl != null && cameraControl.isAnimating());
 			if (doRefresh || refreshCount > 0) {
 				if (now > refreshTime) {
 					refreshTime = -1;
@@ -384,9 +383,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					refreshCount--;
 				}
 				try {
-					synchronized (this) {
-						frameHandler.updateFrame();
-					}
+					frameHandler.updateFrame();
 				} catch (final Throwable e) {
 					e.printStackTrace();
 					Util.reportError(e);
@@ -414,7 +411,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
-		taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
+		// taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 
 		if (operationFlag) {
@@ -480,7 +477,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 
 		root.updateGeometricState(tpf);
-
 	}
 
 	@Override
@@ -1529,10 +1525,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
 		try {
-			if (editPartCommand != null && editPartCommand.isReallyEdited()) {
-				EnergyPanel.getInstance().cancel();
-			}
-
 			if (selectedPart != null && !selectedPart.isDrawCompleted()) {
 				selectedPart.setPreviewPoint(x, y);
 			} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedPart instanceof Foundation) && selectedPart.isDrawCompleted()) {
@@ -1632,7 +1624,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		refresh = true;
 	}
 
-	public synchronized void refreshNow() {
+	public void refreshNow() {
 		refresh = true;
 		try {
 			wait();
@@ -2130,14 +2122,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				return null;
 			}
 		});
-	}
-
-	public boolean isRefreshOnlyMode() {
-		return refreshOnlyMode;
-	}
-
-	public void setRefreshOnlyMode(final boolean refreshOnlyMode) {
-		this.refreshOnlyMode = refreshOnlyMode;
 	}
 
 	private boolean onLand(final int x, final int y) {

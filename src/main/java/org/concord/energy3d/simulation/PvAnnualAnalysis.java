@@ -27,6 +27,7 @@ import java.awt.event.WindowEvent;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -55,9 +56,9 @@ import org.concord.energy3d.util.Util;
 
 /**
  * For fast feedback, only 12 days are calculated.
- * 
+ *
  * @author Charles Xie
- * 
+ *
  */
 public class PvAnnualAnalysis extends Analysis {
 
@@ -74,16 +75,16 @@ public class PvAnnualAnalysis extends Analysis {
 	private void runAnalysis(final JDialog parent) {
 		graph.info = "Calculating...";
 		graph.repaint();
-		super.runAnalysis(new Runnable() {
-			@Override
-			public void run() {
-				final EnergyPanel e = EnergyPanel.getInstance();
-				Calendar today;
-				for (final int m : MONTHS) {
+		onStart();
+		final EnergyPanel e = EnergyPanel.getInstance();
+		for (final int m : MONTHS) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
-						today = (Calendar) c.clone();
+						final Calendar today = (Calendar) c.clone();
 						Scene.getInstance().updateSolarPanels();
 						final Throwable t = compute();
 						if (t != null) {
@@ -94,7 +95,6 @@ public class PvAnnualAnalysis extends Analysis {
 									Util.reportError(t);
 								}
 							});
-							break;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) { // synchronize with daily graph
@@ -120,9 +120,15 @@ public class PvAnnualAnalysis extends Analysis {
 							}
 						});
 					}
+					return null;
 				}
-				EventQueue.invokeLater(new Runnable() {
+			});
+		}
 
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() {
+				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						onCompletion();
@@ -143,6 +149,7 @@ public class PvAnnualAnalysis extends Analysis {
 					}
 
 				});
+				return null;
 			}
 		});
 	}

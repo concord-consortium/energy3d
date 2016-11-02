@@ -197,44 +197,42 @@ public class Scene implements Serializable {
 
 	public static void open(final URL file) throws Exception {
 		openNow(file);
-		synchronized (SceneManager.getInstance()) {
-			EnergyPanel.getInstance().clearRadiationHeatMap();
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					final EnergyPanel e = EnergyPanel.getInstance();
-					e.update();
-					e.clearAllGraphs();
-					if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
-						MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
-						SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
-						loadCameraLocation();
-					}
-					final HousePart p = SceneManager.getInstance().getSelectedPart();
-					if (p instanceof Foundation) {
-						final Foundation f = (Foundation) p;
-						switch (f.getSupportingType()) {
-						case Foundation.BUILDING:
-							e.getConstructionCostGraph().addGraph(f);
-							e.getBuildingDailyEnergyGraph().clearData();
-							e.getBuildingDailyEnergyGraph().addGraph(f);
-							e.validate();
-							break;
-						case Foundation.PV_STATION:
-							e.getPvStationDailyEnergyGraph().clearData();
-							e.getPvStationDailyEnergyGraph().addGraph(f);
-							e.validate();
-							break;
-						case Foundation.CSP_STATION:
-							e.getCspStationDailyEnergyGraph().clearData();
-							e.getCspStationDailyEnergyGraph().addGraph(f);
-							e.validate();
-							break;
-						}
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				final EnergyPanel e = EnergyPanel.getInstance();
+				e.update();
+				e.clearAllGraphs();
+				if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
+					MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
+					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
+					loadCameraLocation();
+				}
+				final HousePart p = SceneManager.getInstance().getSelectedPart();
+				if (p instanceof Foundation) {
+					final Foundation f = (Foundation) p;
+					switch (f.getSupportingType()) {
+					case Foundation.BUILDING:
+						e.getConstructionCostGraph().addGraph(f);
+						e.getBuildingDailyEnergyGraph().clearData();
+						e.getBuildingDailyEnergyGraph().addGraph(f);
+						e.validate();
+						break;
+					case Foundation.PV_STATION:
+						e.getPvStationDailyEnergyGraph().clearData();
+						e.getPvStationDailyEnergyGraph().addGraph(f);
+						e.validate();
+						break;
+					case Foundation.CSP_STATION:
+						e.getCspStationDailyEnergyGraph().clearData();
+						e.getCspStationDailyEnergyGraph().addGraph(f);
+						e.validate();
+						break;
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	public static void openNow(final URL file) throws Exception {
@@ -245,63 +243,60 @@ public class Scene implements Serializable {
 			}
 		}
 
-		synchronized (SceneManager.getInstance()) {
-			Scene.url = file;
+		Scene.url = file;
 
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					MainPanel.getInstance().getHeliodonButton().setSelected(false);
-					MainPanel.getInstance().getSunAnimationButton().setSelected(false);
-				}
-			});
-			SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
-			Wall.resetDefaultWallHeight();
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				MainPanel.getInstance().getHeliodonButton().setSelected(false);
+				MainPanel.getInstance().getSunAnimationButton().setSelected(false);
+			}
+		});
+		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
+		Wall.resetDefaultWallHeight();
 
-			if (instance != null) {
-				instance.deleteAll();
-			}
-			if (url == null) {
-				instance = new Scene();
-				System.out.println("done");
-			} else {
-				System.out.print("Opening..." + file + "...");
-				final ObjectInputStream in = new ObjectInputStream(file.openStream());
-				instance = (Scene) in.readObject();
-				in.close();
-				for (final HousePart part : instance.parts) {
-					part.getRoot();
-				}
-				instance.upgradeSceneToNewVersion();
-				instance.cleanup();
-				loadCameraLocation();
-			}
-			instance.applyMap();
-			SceneManager.getInstance().hideAllEditPoints();
-			final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
-			if (cameraControl != null) {
-				cameraControl.reset();
-			}
-
-			int count = 0;
-			Foundation first = null;
-			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p instanceof Foundation && !p.isFrozen()) {
-					if (count == 0) {
-						first = (Foundation) p;
-					}
-					count++;
-				}
-			}
-			if (count == 1) {
-				SceneManager.getInstance().setSelectedPart(first);
-			}
-
-			instance.init();
-			instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
-			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
-
+		if (instance != null) {
+			instance.deleteAll();
 		}
+		if (url == null) {
+			instance = new Scene();
+			System.out.println("done");
+		} else {
+			System.out.print("Opening..." + file + "...");
+			final ObjectInputStream in = new ObjectInputStream(file.openStream());
+			instance = (Scene) in.readObject();
+			in.close();
+			for (final HousePart part : instance.parts) {
+				part.getRoot();
+			}
+			instance.upgradeSceneToNewVersion();
+			instance.cleanup();
+			loadCameraLocation();
+		}
+		instance.applyMap();
+		SceneManager.getInstance().hideAllEditPoints();
+		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
+		if (cameraControl != null) {
+			cameraControl.reset();
+		}
+
+		int count = 0;
+		Foundation first = null;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation && !p.isFrozen()) {
+				if (count == 0) {
+					first = (Foundation) p;
+				}
+				count++;
+			}
+		}
+		if (count == 1) {
+			SceneManager.getInstance().setSelectedPart(first);
+		}
+
+		instance.init();
+		instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
+		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
 
@@ -471,29 +466,27 @@ public class Scene implements Serializable {
 
 			if (url != null) {
 				final AddMultiplePartsCommand cmd = new AddMultiplePartsCommand(new ArrayList<HousePart>(instance.getParts()), url);
-				synchronized (SceneManager.getInstance()) {
-					double cx = 0;
-					double cy = 0;
-					int count = 0;
-					for (final HousePart p : instance.getParts()) {
-						p.setId(max + p.getId());
-						Scene.getInstance().parts.add(p);
-						originalHouseRoot.attachChild(p.getRoot());
-						if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
-							final Vector3 c = p.getAbsCenter();
-							cx += c.getX();
-							cy += c.getY();
-							count++;
-						}
+				double cx = 0;
+				double cy = 0;
+				int count = 0;
+				for (final HousePart p : instance.getParts()) {
+					p.setId(max + p.getId());
+					Scene.getInstance().parts.add(p);
+					originalHouseRoot.attachChild(p.getRoot());
+					if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
+						final Vector3 c = p.getAbsCenter();
+						cx += c.getX();
+						cy += c.getY();
+						count++;
 					}
-					final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
-					if (position != null) {
-						final Vector3 shift = position.subtractLocal(count == 0 ? new Vector3(0, 0, 0) : new Vector3(cx / count, cy / count, 0));
-						for (final HousePart p : instance.getParts()) {
-							if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
-								for (int i = 0; i < p.getPoints().size(); i++) {
-									p.getPoints().get(i).addLocal(shift);
-								}
+				}
+				final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
+				if (position != null) {
+					final Vector3 shift = position.subtractLocal(count == 0 ? new Vector3(0, 0, 0) : new Vector3(cx / count, cy / count, 0));
+					for (final HousePart p : instance.getParts()) {
+						if (p instanceof Foundation || p instanceof Tree || p instanceof Human) {
+							for (int i = 0; i < p.getPoints().size(); i++) {
+								p.getPoints().get(i).addLocal(shift);
 							}
 						}
 					}
@@ -1144,10 +1137,8 @@ public class Scene implements Serializable {
 
 	public static void setDrawAnnotationsInside(final boolean drawAnnotationsInside) {
 		Scene.drawAnnotationsInside = drawAnnotationsInside;
-		synchronized (SceneManager.getInstance()) {
-			for (final HousePart part : instance.getParts()) {
-				part.drawAnnotations();
-			}
+		for (final HousePart part : instance.getParts()) {
+			part.drawAnnotations();
 		}
 		if (PrintController.getInstance().getPrintParts() != null) {
 			for (final HousePart part : PrintController.getInstance().getPrintParts()) {
@@ -1171,33 +1162,31 @@ public class Scene implements Serializable {
 
 	public void redrawAllNow() {
 		System.out.println("redrawAllNow()");
-		synchronized (SceneManager.getInstance()) {
-			final long t = System.nanoTime();
-			if (cleanup) {
-				cleanup();
-				cleanup = false;
-			}
-			connectWalls();
-			Snap.clearAnnotationDrawn();
-			for (final HousePart part : parts) {
-				if (part instanceof Roof) {
-					part.draw();
-				}
-			}
-			for (final HousePart part : parts) {
-				if (!(part instanceof Roof)) {
-					part.draw();
-				}
-			}
-			// need to draw roof again because roof holes depend on drawn windows
-			for (final HousePart part : parts) {
-				if (part instanceof Roof) {
-					part.draw();
-					// System.out.println(((Roof) part).getIntersectionCache().size());
-				}
-			}
-			System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
+		final long t = System.nanoTime();
+		if (cleanup) {
+			cleanup();
+			cleanup = false;
 		}
+		connectWalls();
+		Snap.clearAnnotationDrawn();
+		for (final HousePart part : parts) {
+			if (part instanceof Roof) {
+				part.draw();
+			}
+		}
+		for (final HousePart part : parts) {
+			if (!(part instanceof Roof)) {
+				part.draw();
+			}
+		}
+		// need to draw roof again because roof holes depend on drawn windows
+		for (final HousePart part : parts) {
+			if (part instanceof Roof) {
+				part.draw();
+				// System.out.println(((Roof) part).getIntersectionCache().size());
+			}
+		}
+		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
 		// no need for redrawing print parts because they will be regenerated from original parts anyways
 		redrawAll = false;
 	}

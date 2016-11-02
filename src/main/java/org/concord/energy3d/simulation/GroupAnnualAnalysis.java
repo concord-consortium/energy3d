@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -52,13 +53,14 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
- * 
+ *
  */
 public class GroupAnnualAnalysis extends Analysis {
 
@@ -89,10 +91,11 @@ public class GroupAnnualAnalysis extends Analysis {
 	private void runAnalysis(final JDialog parent) {
 		graph.info = "Calculating...";
 		graph.repaint();
-		super.runAnalysis(new Runnable() {
-			@Override
-			public void run() {
-				for (final int m : MONTHS) {
+		onStart();
+		for (final int m : MONTHS) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
@@ -105,18 +108,24 @@ public class GroupAnnualAnalysis extends Analysis {
 									Util.reportError(t);
 								}
 							});
-							break;
 						}
 					}
+					return null;
 				}
+			});
+		}
+
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() {
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
 						onCompletion();
 					}
 				});
+				return null;
 			}
-
 		});
 	}
 

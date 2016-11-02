@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -59,11 +60,11 @@ import org.concord.energy3d.util.Util;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
- * 
+ *
  * For fast feedback, only 12 days are calculated.
- * 
+ *
  * @author Charles Xie
- * 
+ *
  */
 public class EnergyAnnualAnalysis extends Analysis {
 
@@ -80,12 +81,13 @@ public class EnergyAnnualAnalysis extends Analysis {
 	private void runAnalysis(final JDialog parent) {
 		graph.info = "Calculating...";
 		graph.repaint();
-		super.runAnalysis(new Runnable() {
-			@Override
-			public void run() {
-				final EnergyPanel e = EnergyPanel.getInstance();
-				Calendar today;
-				for (final int m : MONTHS) {
+		onStart();
+		final EnergyPanel e = EnergyPanel.getInstance();
+		for (final int m : MONTHS) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					Calendar today;
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
@@ -99,7 +101,6 @@ public class EnergyAnnualAnalysis extends Analysis {
 									Util.reportError(t);
 								}
 							});
-							break;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) { // synchronize with daily graph
@@ -123,7 +124,13 @@ public class EnergyAnnualAnalysis extends Analysis {
 							}
 						});
 					}
+					return null;
 				}
+			});
+		}
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
@@ -146,6 +153,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 						}
 					}
 				});
+				return null;
 			}
 		});
 	}
