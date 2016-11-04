@@ -1525,30 +1525,34 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
 		try {
-			if (selectedPart != null && !selectedPart.isDrawCompleted()) {
-				selectedPart.setPreviewPoint(x, y);
-			} else if (houseMoveStartPoint != null && (operation == Operation.RESIZE || selectedPart instanceof Foundation) && selectedPart.isDrawCompleted()) {
-				final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
-				if (pick != null) {
-					if (selectedPart instanceof Foundation) {
-						final Foundation foundation = (Foundation) selectedPart;
-						final Vector3 pickPoint = pick.getPoint().clone();
-						// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
-						final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-						foundation.move(d, houseMovePoints);
+			if (selectedPart != null) {
+				if (!selectedPart.isDrawCompleted()) {
+					selectedPart.setPreviewPoint(x, y);
+				} else if (houseMoveStartPoint != null) {
+					if ((operation == Operation.RESIZE || selectedPart instanceof Foundation)) {
+						final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
+						if (pick != null) {
+							if (selectedPart instanceof Foundation) {
+								final Foundation foundation = (Foundation) selectedPart;
+								final Vector3 pickPoint = pick.getPoint().clone();
+								// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
+								final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+								foundation.move(d, houseMovePoints);
+							}
+						}
+					} else if (selectedPart instanceof Tree) {
+						final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
+						if (pick != null) {
+							final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+							((Tree) selectedPart).move(d, houseMovePoints);
+						}
+					} else if (selectedPart instanceof Window) {
+						final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedPart.getContainer());
+						if (pick != null) {
+							final Vector3 d = pick.getPoint().subtract(houseMoveStartPoint, null);
+							((Window) selectedPart).move(d, houseMovePoints);
+						}
 					}
-				}
-			} else if (houseMoveStartPoint != null && selectedPart != null && selectedPart.isDrawCompleted() && selectedPart instanceof Tree) {
-				final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
-				if (pick != null) {
-					final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-					((Tree) selectedPart).move(d, houseMovePoints);
-				}
-			} else if (houseMoveStartPoint != null && selectedPart != null && selectedPart.isDrawCompleted() && selectedPart instanceof Window) {
-				final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedPart.getContainer());
-				if (pick != null) {
-					final Vector3 d = pick.getPoint().clone().subtractLocal(houseMoveStartPoint);
-					((Window) selectedPart).move(d, houseMovePoints);
 				}
 			} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 				final PickedHousePart pickedPart = SelectUtil.selectHousePart(x, y, false);
