@@ -33,14 +33,14 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Rack extends HousePart implements Trackable {
 	private static final long serialVersionUID = 1L;
+	private transient ArrayList<Vector3> solarOrgPoints;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Node polesRoot;
-	private transient ArrayList<Vector3> solarOrgPoints;
 	private transient Vector3 moveStartPoint;
-	private transient Vector3 center;
 	private transient double layoutGap = 0.01;
+	private ReadOnlyVector3 previousNormal;
 	private double rackWidth = 15;
 	private double rackHeight = 3;
 	private double relativeAzimuth = 0;
@@ -113,7 +113,6 @@ public class Rack extends HousePart implements Trackable {
 
 		final boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
-		final ReadOnlyVector3 previousNormal = normal;
 		normal = computeNormalAndKeepOnRoof();
 
 		switch (trackerType) {
@@ -149,15 +148,21 @@ public class Rack extends HousePart implements Trackable {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
 
-		final double equalDot = 0.95;
-		final boolean nonflatContainer = container instanceof Roof && (((Roof) container).getRoofPartsRoot().getNumberOfChildren() > 1 || normal.dot(Vector3.UNIT_Z) < equalDot);
-		if (nonflatContainer && previousNormal != null && normal.dot(previousNormal) < equalDot) {
+		if (previousNormal == null) {
+			previousNormal = normal;
+		}
+		if (previousNormal != null && normal.dot(previousNormal) < 0.9999) {
 			double angle = normal.multiply(1, 1, 0, null).normalizeLocal().smallestAngleBetween(previousNormal.multiply(1, 1, 0, null).normalizeLocal());
 			if (normal.dot(previousNormal.cross(Vector3.UNIT_Z, null).normalizeLocal()) > 0) {
 				angle = -angle;
 			}
 			rotateSolarPanelsAzimuth(angle);
+			final double dz = normal.getZ() - previousNormal.getZ();
+			if (!Util.isZero(dz)) {
+				rotateSolarPanelsTilt(Math.asin(dz));
+			}
 			initSolarPanelsForMove();
+			previousNormal = normal;
 		}
 
 		final double baseZ;
@@ -170,11 +175,6 @@ public class Rack extends HousePart implements Trackable {
 		if (onFlatSurface) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
-
-		center = getAbsPoint(0); // save center before adding offset
-
-		final int editPointOffsetZ = 1;
-		points.get(0).addLocal(0, 0, editPointOffsetZ);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
@@ -217,7 +217,7 @@ public class Rack extends HousePart implements Trackable {
 		outlineMesh.updateModelBound();
 
 		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
-		mesh.setTranslation(getAbsPoint(0).addLocal(0, 0, -editPointOffsetZ));
+		mesh.setTranslation(getAbsPoint(0));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -431,7 +431,6 @@ public class Rack extends HousePart implements Trackable {
 		} else if (relativeAzimuth > 360) {
 			relativeAzimuth -= 360;
 		}
-		rotateSolarPanelsAzimuth(Math.toRadians(this.relativeAzimuth - relativeAzimuth));
 		this.relativeAzimuth = relativeAzimuth;
 	}
 
@@ -451,7 +450,6 @@ public class Rack extends HousePart implements Trackable {
 	}
 
 	public void setTiltAngle(final double tiltAngle) {
-		rotateSolarPanelsTilt(Math.toRadians(tiltAngle - this.tiltAngle));
 		this.tiltAngle = tiltAngle;
 	}
 
@@ -460,6 +458,7 @@ public class Rack extends HousePart implements Trackable {
 		if (this.tiltAngle > 0) {
 			horizontal.negateLocal();
 		}
+		final Vector3 center = getAbsPoint(0);
 		final Matrix3 matrix = new Matrix3().fromAngleAxis(angle, horizontal);
 		for (final HousePart child : children) {
 			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
@@ -625,6 +624,12 @@ public class Rack extends HousePart implements Trackable {
 	@Override
 	public int getRotationAxis() {
 		return rotationAxis;
+	}
+
+	@Override
+	public void updateEditShapes() {
+		super.updateEditShapes();
+		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, 1));
 	}
 
 }
