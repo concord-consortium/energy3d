@@ -40,6 +40,7 @@ public class Rack extends HousePart implements Trackable {
 	private transient Node polesRoot;
 	private transient Vector3 moveStartPoint;
 	private transient double layoutGap = 0.01;
+	private transient boolean allowAzimuthLargeRotation;
 	private ReadOnlyVector3 previousNormal;
 	private double rackWidth = 15;
 	private double rackHeight = 3;
@@ -115,6 +116,7 @@ public class Rack extends HousePart implements Trackable {
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		normal = computeNormalAndKeepOnRoof();
 
+		final double dotE = 0.9999;
 		switch (trackerType) {
 		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
@@ -141,7 +143,7 @@ public class Rack extends HousePart implements Trackable {
 			break;
 		default:
 			if (onFlatSurface) {
-				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
 			}
 		}
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
@@ -151,19 +153,24 @@ public class Rack extends HousePart implements Trackable {
 		if (previousNormal == null) {
 			previousNormal = normal;
 		}
-		if (previousNormal != null && normal.dot(previousNormal) < 0.9999) {
-			double angle = normal.multiply(1, 1, 0, null).normalizeLocal().smallestAngleBetween(previousNormal.multiply(1, 1, 0, null).normalizeLocal());
-			if (normal.dot(previousNormal.cross(Vector3.UNIT_Z, null).normalizeLocal()) > 0) {
-				angle = -angle;
+		if (previousNormal != null && normal.dot(previousNormal) < dotE) {
+			// azimuth rotation
+			Matrix3 matrix = null;
+			if (allowAzimuthLargeRotation && Util.isEqual(normal.multiply(1, 1, 0, null).normalizeLocal(), previousNormal.multiply(1, 1, 0, null).negateLocal().normalizeLocal())) {
+				matrix = new Matrix3().fromAngleAxis(Math.PI, Vector3.UNIT_Z);
+			} else if (normal.multiply(1, 1, 0, null).normalizeLocal().dot(previousNormal.multiply(1, 1, 0, null).normalizeLocal()) > -dotE) {
+				matrix = findRotationMatrix(previousNormal.multiply(1, 1, 0, null).normalizeLocal(), normal.multiply(1, 1, 0, null).normalizeLocal());
 			}
-			rotateSolarPanelsAzimuth(angle);
-			final double dz = normal.getZ() - previousNormal.getZ();
-			if (!Util.isZero(dz)) {
-				rotateSolarPanelsTilt(Math.asin(dz));
+			if (matrix != null) {
+				rotateSolarPanels(matrix);
+				previousNormal = matrix.applyPost(previousNormal, null);
 			}
+			// tilt rotation
+			rotateSolarPanels(findRotationMatrix(previousNormal, normal));
 			initSolarPanelsForMove();
 			previousNormal = normal;
 		}
+		allowAzimuthLargeRotation = false;
 
 		final double baseZ;
 		if (this.container instanceof Foundation) {
@@ -432,6 +439,7 @@ public class Rack extends HousePart implements Trackable {
 			relativeAzimuth -= 360;
 		}
 		this.relativeAzimuth = relativeAzimuth;
+		this.allowAzimuthLargeRotation = true;
 	}
 
 	private void rotateSolarPanelsAzimuth(final double angle) {
@@ -453,19 +461,21 @@ public class Rack extends HousePart implements Trackable {
 		this.tiltAngle = tiltAngle;
 	}
 
-	private void rotateSolarPanelsTilt(final double angle) {
-		final Vector3 horizontal = normal.cross(Vector3.UNIT_Z, null).normalizeLocal();
-		if (this.tiltAngle > 0) {
-			horizontal.negateLocal();
-		}
+	private void rotateSolarPanels(final Matrix3 matrix) {
 		final Vector3 center = getAbsPoint(0);
-		final Matrix3 matrix = new Matrix3().fromAngleAxis(angle, horizontal);
 		for (final HousePart child : children) {
 			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
 			matrix.applyPost(v, v);
 			v.addLocal(center);
 			child.getPoints().get(0).set(child.toRelative(v));
 		}
+	}
+
+	private Matrix3 findRotationMatrix(final ReadOnlyVector3 v1, final ReadOnlyVector3 v2) {
+		final double angle = v1.smallestAngleBetween(v2);
+		final Vector3 axis = v1.cross(v2, null).normalizeLocal();
+		final Matrix3 matrix = new Matrix3().fromAngleAxis(angle, axis);
+		return matrix;
 	}
 
 	public double getTiltAngle() {
