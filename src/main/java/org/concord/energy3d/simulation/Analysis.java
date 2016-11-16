@@ -54,6 +54,7 @@ public abstract class Analysis {
 
 	void stopAnalysis() {
 		analysisStopped = true;
+		EnergyPanel.getInstance().cancel();
 	}
 
 	// return the exception if unsuccessful
