@@ -17,6 +17,7 @@ import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
@@ -262,6 +263,8 @@ public class Rack extends HousePart implements Trackable {
 			}
 		}
 		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
 		root.updateGeometricState(0);
 		drawChildren();
 	}
