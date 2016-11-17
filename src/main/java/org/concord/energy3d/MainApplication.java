@@ -3,6 +3,9 @@ package org.concord.energy3d;
 import java.awt.EventQueue;
 import java.awt.Frame;
 import java.io.File;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -18,6 +21,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Updater;
+import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
@@ -31,6 +35,7 @@ public class MainApplication {
 		System.out.println("Initiating...");
 		final long t = System.nanoTime();
 		checkSingleInstance(MainApplication.class, args);
+		startDeadlockDetectionThread();
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
@@ -233,6 +238,39 @@ public class MainApplication {
 				}
 			});
 		}
+	}
+
+	public static void startDeadlockDetectionThread() {
+		new Thread() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						sleep(3000);
+					} catch (final InterruptedException e) {
+					}
+
+					final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+					final long[] threadIds = threadBean.findDeadlockedThreads();
+
+					if (threadIds != null) {
+						String msg = "";
+						msg += "Number of deadlocked threads: " + threadIds.length + "\n";
+						final ThreadInfo[] infos = threadBean.getThreadInfo(threadIds, true, true);
+						for (final ThreadInfo ti : infos) {
+							msg += ti.toString() + "\n";
+						}
+						try {
+							System.err.println(msg);
+							Util.sendError(msg);
+						} catch (final Exception e) {
+							e.printStackTrace();
+						}
+						break;
+					}
+				}
+			}
+		}.start();
 	}
 
 }

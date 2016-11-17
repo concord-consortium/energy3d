@@ -422,27 +422,7 @@ public class Util {
 		}
 
 		try {
-			String s = "{\"ip_address\":\"" + URLEncoder.encode(InetAddress.getLocalHost().getHostAddress(), "UTF-8") + "\"";
-			s += ",";
-			s += "\"os_name\":\"" + URLEncoder.encode(System.getProperty("os.name"), "UTF-8") + "\"";
-			s += ",";
-			s += "\"os_version\":\"" + URLEncoder.encode(System.getProperty("os.version"), "UTF-8") + "\"";
-			s += ",";
-			s += "\"energy3d_version\":\"" + MainApplication.VERSION + "\"";
-			s += ",";
-			s += "\"error_message\":\"" + URLEncoder.encode(header + "\n" + msg, "UTF-8") + "\"}";
-			final URL url = new URL("https://staff.concord.org/~emcelroy/error/error.php?error=" + s);
-			final URLConnection urlConnection = url.openConnection();
-			urlConnection.setDoOutput(true);
-			final BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-			String receipt = "";
-			String line = null;
-			while ((line = in.readLine()) != null) {
-				if (line != null) {
-					receipt += line;
-				}
-			}
-			in.close();
+			final String receipt = sendError(header + "\n" + msg);
 			if ("success".equalsIgnoreCase(receipt)) {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error message received. Thank you!", "Notice", JOptionPane.INFORMATION_MESSAGE);
 			}
@@ -454,6 +434,31 @@ public class Util {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
 		}
 
+	}
+
+	public static String sendError(final String msg) throws Exception {
+		String s = "{\"ip_address\":\"" + URLEncoder.encode(InetAddress.getLocalHost().getHostAddress(), "UTF-8") + "\"";
+		s += ",";
+		s += "\"os_name\":\"" + URLEncoder.encode(System.getProperty("os.name"), "UTF-8") + "\"";
+		s += ",";
+		s += "\"os_version\":\"" + URLEncoder.encode(System.getProperty("os.version"), "UTF-8") + "\"";
+		s += ",";
+		s += "\"energy3d_version\":\"" + MainApplication.VERSION + "\"";
+		s += ",";
+		s += "\"error_message\":\"" + URLEncoder.encode(msg.replace("\"", "\\\""), "UTF-8") + "\"}";
+		final URL url = new URL("https://staff.concord.org/~emcelroy/error/error.php?error=" + s);
+		final URLConnection urlConnection = url.openConnection();
+		urlConnection.setDoOutput(true);
+		final BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+		String receipt = "";
+		String line = null;
+		while ((line = in.readLine()) != null) {
+			if (line != null) {
+				receipt += line;
+			}
+		}
+		in.close();
+		return receipt;
 	}
 
 	public final static void openBrowser(final String url) {
