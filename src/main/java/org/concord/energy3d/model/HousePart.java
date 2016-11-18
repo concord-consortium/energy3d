@@ -292,6 +292,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void complete() {
+		firstPointInserted = true;
 		drawCompleted = true;
 		orgHeight = height;
 		if (isDrawable()) {
@@ -1205,6 +1206,15 @@ public abstract class HousePart implements Serializable {
 		final boolean isRoof = container instanceof Roof;
 		final boolean isRack = container instanceof Rack;
 		if (isRack) {
+			// final ReadOnlyVector3 normal = container.getNormal();
+			// final PickResults pickResults = new PrimitivePickResults();
+			// final Ray3 ray = new Ray3(getAbsPoint(0).subtractLocal(normal.multiply(1000, null)), normal);
+			// PickingUtil.findPick(container.getCollisionSpatial(), ray, pickResults, false);
+			// if (pickResults.getNumber() != 0) {
+			// final PickData pickData = pickResults.getPickData(0);
+			// final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
+			// points.get(0).set(toRelative(p));
+			// }
 			final PickResults pickResults = new PrimitivePickResults();
 			final Ray3 ray = new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
 			PickingUtil.findPick(container.getCollisionSpatial(), ray, pickResults, false);
