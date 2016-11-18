@@ -22,6 +22,7 @@ import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
@@ -92,14 +93,32 @@ public class Rack extends HousePart implements Trackable {
 		if (moveStartPoint == null) {
 			initSolarPanelsForMove();
 		}
-		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class });
-		if (picked != null) {
-			final Vector3 p = picked.getPoint().clone();
-			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
-			points.get(0).set(toRelative(p));
+		if (editPointIndex <= 0) {
+			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class });
+			if (picked != null) {
+				final Vector3 p = picked.getPoint().clone();
+				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
+				points.get(0).set(toRelative(p));
+			}
+			if (container != null) {
+				moveSolarPanels(getPoints().get(0).clone().subtractLocal(moveStartPoint), solarOrgPoints);
+			}
+		} else {
+			final ReadOnlyVector3 pEdit = getEditPointShape(editPointIndex).getTranslation();
+			final Vector3 p;
+			if (editPointIndex % 2 == 0) {
+				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
+				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
+				getEditPointShape(editPointIndex).setTranslation(p);
+				setRackWidth(p.distance(p1) / 2 * 2.0 * Scene.getInstance().getAnnotationScale());
+			} else {
+				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
+				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
+				getEditPointShape(editPointIndex).setTranslation(p);
+				setRackHeight(p.distance(p1) / 2 * 2.0 * Scene.getInstance().getAnnotationScale());
+			}
 		}
 		if (container != null) {
-			moveSolarPanels(getPoints().get(0).clone().subtractLocal(moveStartPoint), solarOrgPoints);
 			draw();
 			drawChildren();
 			setEditPointsVisible(true);
@@ -641,6 +660,23 @@ public class Rack extends HousePart implements Trackable {
 
 	@Override
 	public void updateEditShapes() {
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final Vector3 v1 = new Vector3();
+		final Vector3 v2 = new Vector3();
+		int i = 1;
+		BufferUtils.populateFromBuffer(v1, buf, 0);
+		BufferUtils.populateFromBuffer(v2, buf, 1);
+		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
+		BufferUtils.populateFromBuffer(v1, buf, 1);
+		BufferUtils.populateFromBuffer(v2, buf, 2);
+		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
+		BufferUtils.populateFromBuffer(v1, buf, 2);
+		BufferUtils.populateFromBuffer(v2, buf, 4);
+		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
+		BufferUtils.populateFromBuffer(v1, buf, 4);
+		BufferUtils.populateFromBuffer(v2, buf, 0);
+		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
 		super.updateEditShapes();
 		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, 1));
 	}

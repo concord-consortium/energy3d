@@ -324,7 +324,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void setEditPointsVisible(final boolean visible) {
-		for (int i = 0; i < points.size(); i++) {
+		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
 			getEditPointShape(i).setVisible(visible);
 		}
 	}
@@ -581,6 +581,9 @@ public abstract class HousePart implements Serializable {
 		try {
 			for (int i = 0; i < points.size(); i++) {
 				getAbsPoint(i, p);
+				getEditPointShape(i).setTranslation(p);
+			}
+			for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
 				final Camera camera = SceneManager.getInstance().getCamera();
 				if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
 					final double distance = camera.getLocation().distance(p);
@@ -588,15 +591,14 @@ public abstract class HousePart implements Serializable {
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
 				}
-				getEditPointShape(i).setTranslation(p);
 			}
 		} finally {
 			Vector3.releaseTempInstance(p);
 		}
-		/* remove remaining edit shapes */
-		for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++) {
-			pointsRoot.detachChildAt(points.size());
-		}
+		// /* remove remaining edit shapes */
+		// for (int i = points.size(); i < pointsRoot.getNumberOfChildren(); i++) {
+		// pointsRoot.detachChildAt(points.size());
+		// }
 	}
 
 	public void computeOrientedBoundingBox() {
