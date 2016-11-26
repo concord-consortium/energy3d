@@ -43,6 +43,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	private transient Box surround;
 	private transient Mesh supportFrame;
 	private transient Line sunBeam;
+	private transient Line normalVector;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private double efficiency = 0.15; // a number in (0, 1)
@@ -133,6 +134,15 @@ public class SolarPanel extends HousePart implements Trackable {
 		sunBeam.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		sunBeam.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
 		root.attachChild(sunBeam);
+
+		normalVector = new Line("Normal Vector");
+		normalVector.setLineWidth(0.01f);
+		normalVector.setStipplePattern((short) 0xffff);
+		normalVector.setModelBound(null);
+		Util.disablePickShadowLight(normalVector);
+		normalVector.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		normalVector.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 1f));
+		root.attachChild(normalVector);
 
 		updateTextureAndColor();
 
@@ -353,13 +363,14 @@ public class SolarPanel extends HousePart implements Trackable {
 	public void drawSunBeam() {
 		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
 			sunBeam.setVisible(false);
+			normalVector.setVisible(false);
 			return;
 		}
-		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 o = getContainer() instanceof Rack ? getAbsPoint(0) : getAbsPoint(0).addLocal(0, 0, baseHeight);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
-		final Vector3 r = new Vector3(o);
+		Vector3 r = new Vector3(o); // draw sun vector
 		r.addLocal(sunLocation.multiply(5000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
@@ -374,6 +385,16 @@ public class SolarPanel extends HousePart implements Trackable {
 		if (!bloomRenderPass.contains(sunBeam)) {
 			bloomRenderPass.add(sunBeam);
 		}
+		final FloatBuffer normalVertices = normalVector.getMeshData().getVertexBuffer();
+		r = new Vector3(o); // draw normal vector
+		r.addLocal(normal.multiply(5, null));
+		normalVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		// TODO final Vector3 s = new Vector3(r);
+		// normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		// normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+		normalVector.updateModelBound();
+		normalVector.setVisible(true);
 	}
 
 	@Override
