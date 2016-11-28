@@ -969,7 +969,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			return;
 		}
 		boundingHeight = scanChildrenHeight(this) - height;
-		for (int i = 4; i < 8; i++) {
+		for (int i = 4; i < Math.min(8, points.size()); i++) {
 			points.get(i).setZ(boundingHeight + height);
 		}
 		newBoundingHeight = boundingHeight;
