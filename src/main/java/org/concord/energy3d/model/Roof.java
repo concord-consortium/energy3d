@@ -713,7 +713,11 @@ public abstract class Roof extends HousePart implements Thermalizable {
 
 	public Wall findGableWall(final int roofPartIndex, final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints) {
 		final ReadOnlyVector3[] roofMeshBase = findBasePoints((Mesh) ((Node) getRoofPartsRoot().getChild(roofPartIndex)).getChild(0), roofPartMeshUpperPoints);
-		return findGableWall(roofMeshBase[0], roofMeshBase[1]);
+		if (roofMeshBase == null) {
+			return null;
+		} else {
+			return findGableWall(roofMeshBase[0], roofMeshBase[1]);
+		}
 	}
 
 	public void setGable(final Wall wall, final boolean isGable, final boolean redraw, final ArrayList<ReadOnlyVector3> roofPartMeshUpperPoints) {
