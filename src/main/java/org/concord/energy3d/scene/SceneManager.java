@@ -497,7 +497,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		} catch (final Throwable e) {
 			e.printStackTrace();
-			Util.reportError(e);
 			if (shadowPass.isEnabled()) {
 				shadowPass.setEnabled(false);
 			}
