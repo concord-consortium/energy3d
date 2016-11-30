@@ -197,7 +197,6 @@ public class Scene implements Serializable {
 
 	public static void open(final URL file) throws Exception {
 		openNow(file);
-		EnergyPanel.getInstance().clearRadiationHeatMap();
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -295,11 +294,8 @@ public class Scene implements Serializable {
 		}
 
 		instance.init();
-		instance.redrawAllNow(); // needed in case Heliodon is on and needs to be drawn with correct size
-		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
-
 			@Override
 			public void run() {
 				if (instance.textureMode == TextureMode.None) {
@@ -312,7 +308,6 @@ public class Scene implements Serializable {
 				MainPanel.getInstance().getAnnotationButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 			}
-
 		});
 
 	}
@@ -496,12 +491,9 @@ public class Scene implements Serializable {
 			}
 
 			root.updateWorldBound(true);
-			SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					// SceneManager.getInstance().getUndoManager().die();
-					// MainFrame.getInstance().refreshUndoRedo();
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
@@ -1183,9 +1175,13 @@ public class Scene implements Serializable {
 		for (final HousePart part : parts) {
 			if (part instanceof Roof) {
 				part.draw();
-				// System.out.println(((Roof) part).getIntersectionCache().size());
 			}
 		}
+
+		if (Heliodon.getInstance().isVisible()) {
+			Heliodon.getInstance().updateSize();
+		}
+
 		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
 		// no need for redrawing print parts because they will be regenerated from original parts anyways
 		redrawAll = false;
