@@ -139,9 +139,54 @@ public class MainApplication {
 		}
 		if (!Config.isWebStart()) {
 			Updater.install();
+			if (Updater.isRestartRequested()) {
+				restartApplication();
+			}
 		}
 		System.out.println("exit.");
 		System.exit(0);
+	}
+
+	private static void restartApplication() {
+		try {
+			System.out.println("Restarting...");
+			final String exe;
+			final String userDir = System.getProperty("user.dir");
+			if (Config.isWindows()) {
+				exe = userDir + File.separator + ".." + File.separator + "Energy3D.exe";
+			} else {
+				final int indexOfApp = userDir.indexOf(".app");
+				if (indexOfApp != -1) {
+					exe = userDir.substring(0, indexOfApp + 4);
+				} else {
+					exe = null;
+				}
+			}
+			System.out.println(exe);
+			if (exe != null && new File(exe).exists()) {
+				final ProcessBuilder builder = new ProcessBuilder(exe);
+				builder.start();
+			} else {
+				final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+				final File currentJar = new File(MainApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+				/* is it a jar file? */
+				if (!currentJar.getName().endsWith(".jar")) {
+					return;
+				}
+
+				/* Build command: java -jar application.jar */
+				final ArrayList<String> command = new ArrayList<String>();
+				command.add(javaBin);
+				command.add("-jar");
+				command.add(currentJar.getPath());
+
+				final ProcessBuilder builder = new ProcessBuilder(command);
+				builder.start();
+			}
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void setupLibraryPath() {

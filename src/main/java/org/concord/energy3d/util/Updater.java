@@ -10,8 +10,8 @@ import com.threerings.getdown.launcher.Getdown;
 import com.threerings.getdown.launcher.GetdownApp;
 
 public class Updater {
-
 	private static boolean firstTime = true;
+	private static boolean restartRequested = false;
 
 	public static void download() {
 		System.out.println("Updater.download()");
@@ -39,6 +39,7 @@ public class Updater {
 						}
 						if (Getdown.isUpdateAvailable()) {
 							if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>A new update is available. Please exit the program and then restart it.<br>Is it good time to do it now?</html>", "Update", JOptionPane.YES_NO_OPTION)) {
+								restartRequested = true;
 								MainFrame.getInstance().exit();
 							} else {
 								firstTime = false;
@@ -61,4 +62,7 @@ public class Updater {
 		}
 	}
 
+	public static boolean isRestartRequested() {
+		return restartRequested;
+	}
 }
