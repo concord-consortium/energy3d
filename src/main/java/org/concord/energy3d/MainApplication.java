@@ -2,7 +2,6 @@ package org.concord.energy3d;
 
 import java.awt.EventQueue;
 import java.awt.Frame;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.lang.management.ManagementFactory;
@@ -165,8 +164,8 @@ public class MainApplication {
 				if (indexOfApp != -1) {
 					final String appFile = userDir.substring(0, indexOfApp + 4);
 					if (new File(appFile).exists()) {
-						File scriptFile = File.createTempFile("gc3_tmp_", ".sh");
-						FileWriter writer = new FileWriter(scriptFile);
+						final File scriptFile = File.createTempFile("gc3_tmp_", ".sh");
+						final FileWriter writer = new FileWriter(scriptFile);
 						writer.write("sleep 1\n");
 						writer.write("open " + appFile + "\n");
 						writer.flush();
@@ -178,7 +177,7 @@ public class MainApplication {
 					}
 				}
 			}
-			
+
 			final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
 			final File currentJar = new File(MainApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI());
 
@@ -192,7 +191,7 @@ public class MainApplication {
 			command.add(javaBin);
 			command.add("-jar");
 			command.add(currentJar.getPath());
-			
+
 			System.out.println(javaBin + " -jar " + currentJar.getPath());
 
 			final ProcessBuilder builder = new ProcessBuilder(command);

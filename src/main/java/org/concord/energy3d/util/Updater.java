@@ -13,7 +13,7 @@ public class Updater {
 	private static boolean firstTime = true;
 	private static boolean restartRequested = false;
 
-	public static void download() {		
+	public static void download() {
 		System.out.println("Updater.download()");
 		if (!Config.isWebStart() && !Config.isEclipse()) {
 			new Thread() {
@@ -38,7 +38,7 @@ public class Updater {
 							e.printStackTrace();
 						}
 						if (Getdown.isUpdateAvailable()) {
-							if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>A new update is available. Please exit the program and then restart it.<br>Is it good time to do it now?</html>", "Update", JOptionPane.YES_NO_OPTION)) {
+							if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "A new update is available. Would you like to install updates and restart now?", "Update", JOptionPane.YES_NO_OPTION)) {
 								restartRequested = true;
 								MainFrame.getInstance().exit();
 							} else {
