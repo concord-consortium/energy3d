@@ -13,7 +13,7 @@ public class Updater {
 	private static boolean firstTime = true;
 	private static boolean restartRequested = false;
 
-	public static void download() {
+	public static void download() {		
 		System.out.println("Updater.download()");
 		if (!Config.isWebStart() && !Config.isEclipse()) {
 			new Thread() {

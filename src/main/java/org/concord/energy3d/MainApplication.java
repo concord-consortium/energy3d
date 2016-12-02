@@ -2,7 +2,9 @@ package org.concord.energy3d;
 
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -150,40 +152,51 @@ public class MainApplication {
 	private static void restartApplication() {
 		try {
 			System.out.println("Restarting...");
-			final String exe;
 			final String userDir = System.getProperty("user.dir");
 			if (Config.isWindows()) {
-				exe = userDir + File.separator + ".." + File.separator + "Energy3D.exe";
-			} else {
-				final int indexOfApp = userDir.indexOf(".app");
-				if (indexOfApp != -1) {
-					exe = userDir.substring(0, indexOfApp + 4);
-				} else {
-					exe = null;
-				}
-			}
-			System.out.println(exe);
-			if (exe != null && new File(exe).exists()) {
-				final ProcessBuilder builder = new ProcessBuilder(exe);
-				builder.start();
-			} else {
-				final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
-				final File currentJar = new File(MainApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-
-				/* is it a jar file? */
-				if (!currentJar.getName().endsWith(".jar")) {
+				final String exeFile = userDir + File.separator + ".." + File.separator + "Energy3D.exe";
+				if (new File(exeFile).exists()) {
+					System.out.println(exeFile);
+					Runtime.getRuntime().exec(exeFile);
 					return;
 				}
-
-				/* Build command: java -jar application.jar */
-				final ArrayList<String> command = new ArrayList<String>();
-				command.add(javaBin);
-				command.add("-jar");
-				command.add(currentJar.getPath());
-
-				final ProcessBuilder builder = new ProcessBuilder(command);
-				builder.start();
+			} else if (Config.isMac()) {
+				final int indexOfApp = userDir.indexOf(".app");
+				if (indexOfApp != -1) {
+					final String appFile = userDir.substring(0, indexOfApp + 4);
+					if (new File(appFile).exists()) {
+						File scriptFile = File.createTempFile("gc3_tmp_", ".sh");
+						FileWriter writer = new FileWriter(scriptFile);
+						writer.write("sleep 1\n");
+						writer.write("open " + appFile + "\n");
+						writer.flush();
+						writer.close();
+						System.out.println("open " + appFile);
+						System.out.println("sh " + scriptFile.getAbsolutePath());
+						Runtime.getRuntime().exec("sh " + scriptFile.getAbsolutePath());
+						return;
+					}
+				}
 			}
+			
+			final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+			final File currentJar = new File(MainApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+			/* is it a jar file? */
+			if (!currentJar.getName().endsWith(".jar")) {
+				return;
+			}
+
+			/* Build command: java -jar application.jar */
+			final ArrayList<String> command = new ArrayList<String>();
+			command.add(javaBin);
+			command.add("-jar");
+			command.add(currentJar.getPath());
+			
+			System.out.println(javaBin + " -jar " + currentJar.getPath());
+
+			final ProcessBuilder builder = new ProcessBuilder(command);
+			builder.start();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

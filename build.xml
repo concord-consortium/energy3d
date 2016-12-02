@@ -11,7 +11,7 @@
 	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\${jdk}\">
 		<os family="windows" />
 	</condition>
-	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/${jdk}.jdk/Contents/Home">
+	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_101.jdk/Contents/Home">
 		<os family="mac" />
 	</condition>
 	<condition property="JAVA_HOME" value="">
