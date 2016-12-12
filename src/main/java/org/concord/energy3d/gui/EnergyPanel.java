@@ -190,8 +190,7 @@ public class EnergyPanel extends JPanel {
 					Heliodon.getInstance().setDate(d);
 					clearRadiationHeatMap();
 					Scene.getInstance().setTreeLeaves();
-					Scene.getInstance().updateMirrors();
-					Scene.getInstance().updateSolarPanels();
+					Scene.getInstance().updateTrackables();
 					Scene.getInstance().setEdited(true);
 					updateThermostat();
 					EnergyPanel.this.validate();
@@ -234,8 +233,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().setCity(city);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
-				Scene.getInstance().updateMirrors();
-				Scene.getInstance().updateSolarPanels();
+				Scene.getInstance().updateTrackables();
 				Scene.getInstance().setTreeLeaves();
 				Scene.getInstance().setEdited(true);
 			}
@@ -300,8 +298,7 @@ public class EnergyPanel extends JPanel {
 						}
 					});
 				}
-				Scene.getInstance().updateMirrors();
-				Scene.getInstance().updateSolarPanels();
+				Scene.getInstance().updateTrackables();
 				lastDate = d;
 				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}
@@ -327,8 +324,7 @@ public class EnergyPanel extends JPanel {
 				final ChangeLatitudeCommand c = new ChangeLatitudeCommand();
 				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				clearRadiationHeatMap();
-				Scene.getInstance().updateMirrors();
-				Scene.getInstance().updateSolarPanels();
+				Scene.getInstance().updateTrackables();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().getUndoManager().addEdit(c);
 			}

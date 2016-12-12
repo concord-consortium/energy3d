@@ -45,7 +45,7 @@ public class EditFoundationCommand extends EditPartCommand {
 		foundation.draw();
 		foundation.drawChildren();
 		foundation.updateHandlesOfAllFoudations();
-		Scene.getInstance().updateMirrors();
+		Scene.getInstance().updateTrackables();
 		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
@@ -66,19 +66,20 @@ public class EditFoundationCommand extends EditPartCommand {
 		foundation.draw();
 		foundation.drawChildren();
 		foundation.updateHandlesOfAllFoudations();
-		Scene.getInstance().updateMirrors();
+		Scene.getInstance().updateTrackables();
 		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public String getPresentationName() {
-		if (isMoveMode)
+		if (isMoveMode) {
 			return "Move Building";
-		else if (isResizeMode)
+		} else if (isResizeMode) {
 			return "Resize Building";
-		else
+		} else {
 			return "Edit " + foundation.getClass().getSimpleName();
+		}
 	}
 
 }

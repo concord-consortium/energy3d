@@ -61,7 +61,7 @@ public class Rack extends HousePart implements Trackable {
 	@Override
 	protected void init() {
 		super.init();
-		mesh = new Mesh("Reflecting Rack");
+		mesh = new Mesh("Rack");
 		mesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
