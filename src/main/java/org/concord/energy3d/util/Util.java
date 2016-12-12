@@ -445,7 +445,7 @@ public class Util {
 		s += ",";
 		s += "\"energy3d_version\":\"" + MainApplication.VERSION + "\"";
 		s += ",";
-		s += "\"error_message\":\"" + URLEncoder.encode(msg.replace("\"", "\\\""), "UTF-8") + "\"}";
+		s += "\"error_message\":\"" + URLEncoder.encode(msg.replace("\"", "\\\"").replace("\\", "\\\\\\\\"), "UTF-8") + "\"}";
 		final URL url = new URL("https://staff.concord.org/~emcelroy/error/error.php?error=" + s);
 		final URLConnection urlConnection = url.openConnection();
 		urlConnection.setDoOutput(true);

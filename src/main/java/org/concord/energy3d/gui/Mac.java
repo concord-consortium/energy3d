@@ -37,7 +37,7 @@ public class Mac {
 						try {
 							Scene.open(new File(e.getFiles().get(0).toString()).toURI().toURL());
 						} catch (final Throwable err) {
-							Util.reportError(err);
+							Util.reportError(err, e.getFiles().get(0).toString());
 						}
 						return null;
 					}

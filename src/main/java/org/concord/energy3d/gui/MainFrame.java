@@ -125,7 +125,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class MainFrame extends JFrame {
-
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
@@ -536,7 +535,7 @@ public class MainFrame extends JFrame {
 														updateTitleBar();
 														FileChooser.getInstance().rememberFile(rf.getPath());
 													} catch (final Throwable err) {
-														Util.reportError(err);
+														Util.reportError(err, rf.getAbsolutePath());
 													}
 													return null;
 												}
@@ -707,7 +706,7 @@ public class MainFrame extends JFrame {
 					Scene.open(file.toURI().toURL());
 					FileChooser.getInstance().rememberFile(file.getPath());
 				} catch (final Throwable err) {
-					Util.reportError(err);
+					Util.reportError(err, file.getAbsolutePath());
 				}
 				return null;
 			}
@@ -2930,18 +2929,18 @@ public class MainFrame extends JFrame {
 	}
 
 	public void open(final String filename) {
-		try {
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				try {
 					Scene.open(new File(filename).toURI().toURL());
 					FileChooser.getInstance().rememberFile(filename);
-					return null;
+				} catch (final Throwable e) {
+					Util.reportError(e, new File(filename).getAbsolutePath());
 				}
-			});
-		} catch (final Throwable e) {
-			Util.reportError(e);
-		}
+				return null;
+			}
+		});
 	}
 
 	private void openModel(final URL url) {
