@@ -219,11 +219,11 @@ public class Rack extends HousePart implements Trackable {
 		vertexBuffer.rewind();
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
-		final float spw = (float) (rackWidth / sampleSolarPanel.getPanelWidth());
-		final float sph = (float) (rackHeight / sampleSolarPanel.getPanelHeight());
+		final float spw = monolithic ? (float) (rackWidth / sampleSolarPanel.getPanelWidth()) : 1;
+		final float sph = monolithic ? (float) (rackHeight / sampleSolarPanel.getPanelHeight()) : 1;
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(monolithic ? spw : 1).put(0);
+		textureBuffer.put(spw).put(0);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
@@ -233,18 +233,18 @@ public class Rack extends HousePart implements Trackable {
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(0).put(monolithic ? sph : 1);
-		textureBuffer.put(0).put(monolithic ? sph : 1);
+		textureBuffer.put(0).put(sph);
+		textureBuffer.put(0).put(sph);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(monolithic ? spw : 1).put(monolithic ? sph : 1);
+		textureBuffer.put(spw).put(sph);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(monolithic ? spw : 1).put(0);
+		textureBuffer.put(spw).put(0);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 
 		mesh.updateModelBound();
@@ -733,6 +733,14 @@ public class Rack extends HousePart implements Trackable {
 
 	public boolean isMonolithic() {
 		return monolithic;
+	}
+
+	public void setSampleSolarPanel(final SolarPanel sampleSolarPanel) {
+		this.sampleSolarPanel = sampleSolarPanel;
+	}
+
+	public SolarPanel getSampleSolarPanel() {
+		return sampleSolarPanel;
 	}
 
 }

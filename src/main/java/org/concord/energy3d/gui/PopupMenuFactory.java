@@ -4396,8 +4396,49 @@ public class PopupMenuFactory {
 						return;
 					}
 					final Rack rack = (Rack) selectedPart;
-					rack.setMonolithic(cbmiMonolithic.isSelected());
-					rack.draw();
+					if (cbmiMonolithic.isSelected()) {
+						final JPanel panel = new JPanel(new GridLayout(4, 2, 5, 5));
+						panel.add(new JLabel("Panel Size:"));
+						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
+						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
+							sizeComboBox.setSelectedIndex(0);
+						} else if (Util.isZero(1.04 - solarPanelWidth) && Util.isZero(1.55 - solarPanelHeight)) {
+							sizeComboBox.setSelectedIndex(1);
+						} else {
+							sizeComboBox.setSelectedIndex(2);
+						}
+						panel.add(sizeComboBox);
+						panel.add(new JLabel("Orientation:"));
+						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
+						rowAxisComboBox.setSelectedIndex(panelFaceOrientation);
+						panel.add(rowAxisComboBox);
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							switch (sizeComboBox.getSelectedIndex()) {
+							case 0:
+								solarPanelWidth = 0.99;
+								solarPanelHeight = 1.65;
+								break;
+							case 1:
+								solarPanelWidth = 1.04;
+								solarPanelHeight = 1.55;
+								break;
+							default:
+								solarPanelWidth = 0.99;
+								solarPanelHeight = 1.96;
+								break;
+							}
+							panelFaceOrientation = rowAxisComboBox.getSelectedIndex();
+							final SolarPanel sp = new SolarPanel(panelFaceOrientation == 1);
+							sp.setPanelWidth(solarPanelWidth);
+							sp.setPanelHeight(solarPanelHeight);
+							rack.setMonolithic(true);
+							rack.setSampleSolarPanel(sp);
+							rack.draw();
+						}
+					} else {
+						rack.setMonolithic(false);
+						rack.draw();
+					}
 				}
 			});
 
