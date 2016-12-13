@@ -251,37 +251,73 @@ public class Rack extends HousePart implements Trackable {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
-		final Vector3 center = getAbsPoint(0);
 		polesRoot.detachAllChildren();
-		final HousePart container = getContainerRelative();
-		final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
-		final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
+		final Vector3 center = getAbsPoint(0);
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(relativeAzimuth));
-		matrix.applyPost(uDir, uDir);
-		matrix.applyPost(vDir, vDir);
-		if (vDir.dot(normal) < 0) {
-			vDir.negateLocal();
-		}
-		final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
-		for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
-			for (double v = poleDistanceY; v < rackHeight; v += poleDistanceY) {
-				final double vFactor = (v - rackHeight / 2) / annotationScale;
-				final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
-				final double dz = tanTiltAngle * vFactor;
+		switch (trackerType) {
+		case Trackable.NO_TRACKER:
+			final HousePart container = getContainerRelative();
+			final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
+			final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
+			matrix.applyPost(uDir, uDir);
+			matrix.applyPost(vDir, vDir);
+			if (vDir.dot(normal) < 0) {
+				vDir.negateLocal();
+			}
+			final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
+			for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+				for (double v = poleDistanceY; v < rackHeight; v += poleDistanceY) {
+					final double vFactor = (v - rackHeight / 2) / annotationScale;
+					final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+					final double dz = tanTiltAngle * vFactor;
 
+					final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
+					pole.setRadius(1);
+					pole.setRenderState(offsetState);
+					pole.setHeight(baseHeight - dz - 0.1);
+					pole.setModelBound(new BoundingBox());
+					pole.updateModelBound();
+					position.setZ(baseZ + pole.getHeight() / 2);
+
+					pole.setTranslation(position);
+					polesRoot.attachChild(pole);
+				}
+			}
+			break;
+		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
+			final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
+			// final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
+			final Vector3 p10 = p1.subtract(p0, null).normalizeLocal();
+			matrix.applyPost(p10, p10);
+			for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+				final Vector3 position = p10.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
 				final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
-				pole.setRadius(0.6);
+				pole.setRadius(1);
 				pole.setRenderState(offsetState);
-				pole.setHeight(baseHeight - dz - 0.1);
+				pole.setHeight(baseHeight - 0.1);
 				pole.setModelBound(new BoundingBox());
 				pole.updateModelBound();
 				position.setZ(baseZ + pole.getHeight() / 2);
-
 				pole.setTranslation(position);
 				polesRoot.attachChild(pole);
 			}
+			break;
+		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+			final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
+			pole.setRadius(1);
+			pole.setRenderState(offsetState);
+			pole.setHeight(baseHeight - 0.1);
+			pole.setModelBound(new BoundingBox());
+			pole.updateModelBound();
+			pole.setHeight(baseHeight - 0.5 * pole.getRadius());
+			pole.setTranslation(getAbsPoint(0).addLocal(0, 0, pole.getHeight() / 2 - baseHeight));
+			polesRoot.attachChild(pole);
+			break;
 		}
 		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
+
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
 		root.updateGeometricState(0);
@@ -379,7 +415,7 @@ public class Rack extends HousePart implements Trackable {
 		final double w1 = rackWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getContainer() == container && p != this) {
+			if (p.container == container && p != this) {
 				if (p instanceof Rack) {
 					final Rack s2 = (Rack) p;
 					final double w2 = s2.rackWidth / Scene.getInstance().getAnnotationScale();

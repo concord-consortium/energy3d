@@ -366,7 +366,7 @@ public class SolarPanel extends HousePart implements Trackable {
 			normalVector.setVisible(false);
 			return;
 		}
-		final Vector3 o = getContainer() instanceof Rack ? getAbsPoint(0) : getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 o = container instanceof Rack ? getAbsPoint(0) : getAbsPoint(0).addLocal(0, 0, baseHeight);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
@@ -472,7 +472,7 @@ public class SolarPanel extends HousePart implements Trackable {
 		final double w1 = (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getContainer() == container && p != this) {
+			if (p.container == container && p != this) {
 				if (p instanceof SolarPanel) {
 					final SolarPanel s2 = (SolarPanel) p;
 					final double w2 = (s2.rotated ? s2.panelHeight : s2.panelWidth) / Scene.getInstance().getAnnotationScale();
@@ -797,8 +797,8 @@ public class SolarPanel extends HousePart implements Trackable {
 	@Override
 	public void setEditPointsVisible(final boolean visible) {
 		super.setEditPointsVisible(visible);
-		if (getContainer() instanceof Rack) {
-			getContainer().setEditPointsVisible(visible);
+		if (container instanceof Rack) {
+			container.setEditPointsVisible(visible);
 		}
 
 	}

@@ -341,7 +341,7 @@ public class Mirror extends HousePart {
 		final double w1 = mirrorWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getContainer() == container && p != this) {
+			if (p.container == container && p != this) {
 				if (p instanceof Mirror) {
 					final Mirror s2 = (Mirror) p;
 					final double w2 = s2.mirrorWidth / Scene.getInstance().getAnnotationScale();
