@@ -141,6 +141,7 @@ import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
+import org.concord.energy3d.undo.SetAllSolarTrackersCommand;
 import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
 import org.concord.energy3d.undo.SetFoundationRackPoleSpacingCommand;
 import org.concord.energy3d.undo.SetFoundationRackSizeCommand;
@@ -154,7 +155,6 @@ import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
-import org.concord.energy3d.undo.SetAllSolarTrackersCommand;
 import org.concord.energy3d.undo.ShowBorderLineCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -4387,6 +4387,20 @@ public class PopupMenuFactory {
 			trackerMenu.add(miVerticalSingleAxisTracker);
 			trackerMenu.add(miAltazimuthDualAxisTracker);
 
+			final JCheckBoxMenuItem cbmiMonolithic = new JCheckBoxMenuItem("Monolithic");
+			cbmiMonolithic.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack rack = (Rack) selectedPart;
+					rack.setMonolithic(cbmiMonolithic.isSelected());
+					rack.draw();
+				}
+			});
+
 			popupMenuForRack = createPopupMenu(true, true, new Runnable() {
 
 				@Override
@@ -4412,6 +4426,7 @@ public class PopupMenuFactory {
 						Util.selectSilently(miNoTracker, true);
 						break;
 					}
+					Util.selectSilently(cbmiMonolithic, rack.isMonolithic());
 					miAltazimuthDualAxisTracker.setEnabled(true);
 					miHorizontalSingleAxisTracker.setEnabled(true);
 					miVerticalSingleAxisTracker.setEnabled(true);
@@ -4445,6 +4460,7 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miPaste);
 			popupMenuForRack.add(miClear);
 			popupMenuForRack.addSeparator();
+			popupMenuForRack.add(cbmiMonolithic);
 			popupMenuForRack.add(trackerMenu);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miTiltAngle);
