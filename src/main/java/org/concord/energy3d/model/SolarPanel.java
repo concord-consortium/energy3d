@@ -64,7 +64,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
 
-	public SolarPanel(final boolean rotated) {
+	public SolarPanel() {
 		super(1, 1, 0);
 	}
 

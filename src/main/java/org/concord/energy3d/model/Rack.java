@@ -90,7 +90,7 @@ public class Rack extends HousePart implements Trackable {
 		root.attachChild(polesRoot);
 		updateTextureAndColor();
 
-		sampleSolarPanel = new SolarPanel(false);
+		sampleSolarPanel = new SolarPanel();
 	}
 
 	@Override
@@ -219,8 +219,8 @@ public class Rack extends HousePart implements Trackable {
 		vertexBuffer.rewind();
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
-		final float spw = monolithic ? (float) (rackWidth / sampleSolarPanel.getPanelWidth()) : 1;
-		final float sph = monolithic ? (float) (rackHeight / sampleSolarPanel.getPanelHeight()) : 1;
+		final float spw = monolithic ? (float) (rackWidth / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth())) : 1;
+		final float sph = monolithic ? (float) (rackHeight / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight())) : 1;
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(spw).put(0);
@@ -623,47 +623,54 @@ public class Rack extends HousePart implements Trackable {
 		for (final HousePart c : c0) { // make a copy to avoid concurrent modification
 			Scene.getInstance().remove(c, false);
 		}
-		final Foundation foundation = getTopContainer();
-		final double azFoundation = Math.toRadians(foundation.getAzimuth());
-		if (!Util.isZero(azFoundation)) {
-			foundation.rotate(azFoundation, null);
-		}
-		final double azRack = relativeAzimuth;
-		setRelativeAzimuth(0);
-		final double a = portrait ? panelWidth : panelHeight;
-		final double b = portrait ? panelHeight : panelWidth;
-		final int rows = (int) Math.floor(rackWidth / a);
-		final int cols = (int) Math.floor(rackHeight / b);
-		final double remainderX = rackWidth - rows * a;
-		final double remainderY = rackHeight - cols * b;
-		final Vector3 p0 = getAbsPoint(0);
-		final double w = a / Scene.getInstance().getAnnotationScale();
-		final double h = b / Scene.getInstance().getAnnotationScale();
-		final double costilt = Math.cos(Math.toRadians(tiltAngle));
-		final double x0 = p0.getX() - 0.5 * (rackWidth - remainderX) / Scene.getInstance().getAnnotationScale();
-		final double y0 = p0.getY() - 0.5 * (rackHeight - remainderY) / Scene.getInstance().getAnnotationScale() * costilt;
-		for (int r = 0; r < rows; r++) {
-			for (int c = 0; c < cols; c++) {
-				final double x = x0 + w * (r + 0.5);
-				final double y = y0 + h * (c + 0.5) * costilt;
-				final SolarPanel sp = new SolarPanel(false);
-				sp.setContainer(this);
-				final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
-				sp.points.get(0).setX(v.getX());
-				sp.points.get(0).setY(v.getY());
-				sp.setPanelWidth(panelWidth);
-				sp.setPanelHeight(panelHeight);
-				sp.setRotated(!portrait);
-				Scene.getInstance().add(sp, false);
-				sp.complete();
-				sp.draw();
+		if (monolithic) {
+			sampleSolarPanel.setPanelWidth(panelWidth);
+			sampleSolarPanel.setPanelHeight(panelHeight);
+			sampleSolarPanel.setRotated(!portrait);
+			draw();
+		} else {
+			final Foundation foundation = getTopContainer();
+			final double azFoundation = Math.toRadians(foundation.getAzimuth());
+			if (!Util.isZero(azFoundation)) {
+				foundation.rotate(azFoundation, null);
 			}
+			final double azRack = relativeAzimuth;
+			setRelativeAzimuth(0);
+			final double a = portrait ? panelWidth : panelHeight;
+			final double b = portrait ? panelHeight : panelWidth;
+			final int rows = (int) Math.floor(rackWidth / a);
+			final int cols = (int) Math.floor(rackHeight / b);
+			final double remainderX = rackWidth - rows * a;
+			final double remainderY = rackHeight - cols * b;
+			final Vector3 p0 = getAbsPoint(0);
+			final double w = a / Scene.getInstance().getAnnotationScale();
+			final double h = b / Scene.getInstance().getAnnotationScale();
+			final double costilt = Math.cos(Math.toRadians(tiltAngle));
+			final double x0 = p0.getX() - 0.5 * (rackWidth - remainderX) / Scene.getInstance().getAnnotationScale();
+			final double y0 = p0.getY() - 0.5 * (rackHeight - remainderY) / Scene.getInstance().getAnnotationScale() * costilt;
+			for (int r = 0; r < rows; r++) {
+				for (int c = 0; c < cols; c++) {
+					final double x = x0 + w * (r + 0.5);
+					final double y = y0 + h * (c + 0.5) * costilt;
+					final SolarPanel sp = new SolarPanel();
+					sp.setContainer(this);
+					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
+					sp.points.get(0).setX(v.getX());
+					sp.points.get(0).setY(v.getY());
+					sp.setPanelWidth(panelWidth);
+					sp.setPanelHeight(panelHeight);
+					sp.setRotated(!portrait);
+					Scene.getInstance().add(sp, false);
+					sp.complete();
+					sp.draw();
+				}
+			}
+			if (!Util.isZero(azFoundation)) {
+				foundation.rotate(-azFoundation, null);
+			}
+			setRelativeAzimuth(azRack);
+			Scene.getInstance().redrawAll();
 		}
-		if (!Util.isZero(azFoundation)) {
-			foundation.rotate(-azFoundation, null);
-		}
-		setRelativeAzimuth(azRack);
-		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 		EventQueue.invokeLater(new Runnable() {
 			@Override

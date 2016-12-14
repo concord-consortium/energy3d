@@ -1795,7 +1795,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
-					final SolarPanel sp = new SolarPanel(false);
+					final SolarPanel sp = new SolarPanel();
 					sp.setContainer(this);
 					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
 					sp.points.get(0).setX(v.getX());
@@ -1821,7 +1821,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
-					final SolarPanel sp = new SolarPanel(false);
+					final SolarPanel sp = new SolarPanel();
 					sp.setContainer(this);
 					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
 					sp.points.get(0).setX(v.getX());

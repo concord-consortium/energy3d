@@ -1285,7 +1285,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Floor();
 			drawn.setColor(Scene.getInstance().getFloorColor());
 		} else if (operation == Operation.DRAW_SOLAR_PANEL) {
-			drawn = new SolarPanel(false);
+			drawn = new SolarPanel();
 		} else if (operation == Operation.DRAW_RACK) {
 			drawn = new Rack();
 		} else if (operation == Operation.DRAW_MIRROR) {
