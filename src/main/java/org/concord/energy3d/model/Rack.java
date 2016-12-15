@@ -90,7 +90,9 @@ public class Rack extends HousePart implements Trackable {
 		root.attachChild(polesRoot);
 		updateTextureAndColor();
 
-		sampleSolarPanel = new SolarPanel();
+		if (sampleSolarPanel == null) {
+			sampleSolarPanel = new SolarPanel();
+		}
 	}
 
 	@Override
@@ -115,12 +117,12 @@ public class Rack extends HousePart implements Trackable {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				getEditPointShape(editPointIndex).setTranslation(p);
-				setRackWidth(p.distance(p1) / 2 * 2.0 * Scene.getInstance().getAnnotationScale());
+				setRackWidth(p.distance(p1) * Scene.getInstance().getAnnotationScale());
 			} else {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				getEditPointShape(editPointIndex).setTranslation(p);
-				setRackHeight(p.distance(p1) / 2 * 2.0 * Scene.getInstance().getAnnotationScale());
+				setRackHeight(p.distance(p1) * Scene.getInstance().getAnnotationScale());
 			}
 		}
 		if (container != null) {
@@ -616,7 +618,7 @@ public class Rack extends HousePart implements Trackable {
 		return removed;
 	}
 
-	public void addSolarPanels(final double panelWidth, final double panelHeight, final boolean portrait) {
+	public void addSolarPanels() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeAllChildren(), this, SolarPanel.class);
 		final ArrayList<HousePart> c0 = new ArrayList<HousePart>(children);
@@ -624,9 +626,6 @@ public class Rack extends HousePart implements Trackable {
 			Scene.getInstance().remove(c, false);
 		}
 		if (monolithic) {
-			sampleSolarPanel.setPanelWidth(panelWidth);
-			sampleSolarPanel.setPanelHeight(panelHeight);
-			sampleSolarPanel.setRotated(!portrait);
 			draw();
 		} else {
 			final Foundation foundation = getTopContainer();
@@ -636,8 +635,9 @@ public class Rack extends HousePart implements Trackable {
 			}
 			final double azRack = relativeAzimuth;
 			setRelativeAzimuth(0);
-			final double a = portrait ? panelWidth : panelHeight;
-			final double b = portrait ? panelHeight : panelWidth;
+			final boolean portrait = !sampleSolarPanel.isRotated();
+			final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
+			final double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 			final int rows = (int) Math.floor(rackWidth / a);
 			final int cols = (int) Math.floor(rackHeight / b);
 			final double remainderX = rackWidth - rows * a;
@@ -657,8 +657,8 @@ public class Rack extends HousePart implements Trackable {
 					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
 					sp.points.get(0).setX(v.getX());
 					sp.points.get(0).setY(v.getY());
-					sp.setPanelWidth(panelWidth);
-					sp.setPanelHeight(panelHeight);
+					sp.setPanelWidth(sampleSolarPanel.getPanelWidth());
+					sp.setPanelHeight(sampleSolarPanel.getPanelHeight());
 					sp.setRotated(!portrait);
 					Scene.getInstance().add(sp, false);
 					sp.complete();

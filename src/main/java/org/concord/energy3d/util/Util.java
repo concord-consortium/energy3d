@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -423,9 +424,7 @@ public class Util {
 
 		try {
 			final String receipt = sendError(header + "\n" + msg);
-			if ("success".equalsIgnoreCase(receipt)) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Error message received. Thank you!", "Notice", JOptionPane.INFORMATION_MESSAGE);
-			}
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), receipt, "Notice", JOptionPane.INFORMATION_MESSAGE);
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 			// backup solution
@@ -437,6 +436,20 @@ public class Util {
 	}
 
 	public static String sendError(final String msg) throws Exception {
+		final MultipartUtility multipart = new MultipartUtility("https://staff.concord.org/~emcelroy/error2/error.php", "UTF-8");
+		multipart.addFormField("ip_address", InetAddress.getLocalHost().getHostAddress());
+		multipart.addFormField("os_name", System.getProperty("os.name"));
+		multipart.addFormField("os_version", System.getProperty("os.version"));
+		multipart.addFormField("energy3d_version", MainApplication.VERSION);
+		multipart.addFormField("error_message", msg);
+		if (Scene.getURL() != null && !Scene.isTemplate()) {
+			multipart.addFormField("model_name", getFileName(Scene.getURL().getFile()));
+			multipart.addFilePart("energy3d_file", new File(Scene.getURL().toURI()));
+		}
+		return multipart.finish();
+	}
+
+	public static String sendError2(final String msg) throws Exception {
 		String s = "{\"ip_address\":\"" + URLEncoder.encode(InetAddress.getLocalHost().getHostAddress(), "UTF-8") + "\"";
 		s += ",";
 		s += "\"os_name\":\"" + URLEncoder.encode(System.getProperty("os.name"), "UTF-8") + "\"";
