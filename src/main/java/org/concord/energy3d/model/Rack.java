@@ -730,12 +730,14 @@ public class Rack extends HousePart implements Trackable {
 		BufferUtils.populateFromBuffer(v1, buf, 4);
 		BufferUtils.populateFromBuffer(v2, buf, 0);
 		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
-		final Vector3 d31 = p3.subtract(p1, null).normalizeLocal();
-		final Vector3 d42 = p4.subtract(p2, null).normalizeLocal();
-		p1.subtractLocal(d31.multiply(2.5, null));
-		p3.addLocal(d31.multiply(2.5, null));
-		p2.subtractLocal(d42.multiply(2.5, null));
-		p4.addLocal(d42.multiply(2.5, null));
+		if (!monolithic) { // the rack may be filled with individual solar panels whose center may overlap with the handles when zooming out, so shift them out
+			final Vector3 d31 = p3.subtract(p1, null).normalizeLocal();
+			final Vector3 d42 = p4.subtract(p2, null).normalizeLocal();
+			p1.subtractLocal(d31.multiply(2.5, null));
+			p3.addLocal(d31.multiply(2.5, null));
+			p2.subtractLocal(d42.multiply(2.5, null));
+			p4.addLocal(d42.multiply(2.5, null));
+		}
 		getEditPointShape(i++).setTranslation(p1);
 		getEditPointShape(i++).setTranslation(p2);
 		getEditPointShape(i++).setTranslation(p3);

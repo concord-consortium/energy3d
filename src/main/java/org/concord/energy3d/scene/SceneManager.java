@@ -1553,7 +1553,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 					}
 				}
-			} else if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
+			}
+			hoveredPart = null;
+			if ((operation == Operation.SELECT || operation == Operation.RESIZE) && mouseState.getButtonState(MouseButton.LEFT) == ButtonState.UP && mouseState.getButtonState(MouseButton.MIDDLE) == ButtonState.UP && mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.UP) {
 				final PickedHousePart pickedPart = SelectUtil.selectHousePart(x, y, false);
 				pick = pickedPart == null ? null : pickedPart.getUserData();
 				final HousePart housePart = pick == null ? null : pick.getHousePart();
@@ -1565,8 +1567,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (pick.getIndex() != -1) {
 						lastSelectedEditPointMouseState = mouseState;
 					}
-				} else {
-					hoveredPart = null;
 				}
 			}
 			mouseState = null;
@@ -1575,10 +1575,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Util.reportError(t);
 		}
 		final Component canvasComponent = (Component) canvas;
-		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null && pick.getIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Sensor || hoveredPart instanceof Window || hoveredPart instanceof Tree || hoveredPart instanceof Human)) {
-			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-		} else {
-			canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
+			if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
+				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+			} else {
+				if (pick.getIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+					canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+				}
+			}
 		}
 	}
 
