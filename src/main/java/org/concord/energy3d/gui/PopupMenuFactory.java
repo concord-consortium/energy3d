@@ -4150,7 +4150,7 @@ public class PopupMenuFactory {
 					if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this rack must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
-					final SolarPanel solarPanel = rack.getSampleSolarPanel();
+					final SolarPanel solarPanel = rack.getSolarPanel();
 					final JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
 					panel.add(new JLabel("Monolithic:"));
 					final JComboBox<String> monolithicComboBox = new JComboBox<String>(new String[] { "No", "Yes" });

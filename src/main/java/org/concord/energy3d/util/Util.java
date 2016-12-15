@@ -14,16 +14,11 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -444,34 +439,9 @@ public class Util {
 		multipart.addFormField("error_message", msg);
 		if (Scene.getURL() != null && !Scene.isTemplate()) {
 			multipart.addFormField("model_name", getFileName(Scene.getURL().getFile()));
-			multipart.addFilePart("energy3d_file", new File(Scene.getURL().toURI()));
+			multipart.addFilePart("model", new File(Scene.getURL().toURI()));
 		}
 		return multipart.finish();
-	}
-
-	public static String sendError2(final String msg) throws Exception {
-		String s = "{\"ip_address\":\"" + URLEncoder.encode(InetAddress.getLocalHost().getHostAddress(), "UTF-8") + "\"";
-		s += ",";
-		s += "\"os_name\":\"" + URLEncoder.encode(System.getProperty("os.name"), "UTF-8") + "\"";
-		s += ",";
-		s += "\"os_version\":\"" + URLEncoder.encode(System.getProperty("os.version"), "UTF-8") + "\"";
-		s += ",";
-		s += "\"energy3d_version\":\"" + MainApplication.VERSION + "\"";
-		s += ",";
-		s += "\"error_message\":\"" + URLEncoder.encode(msg.replace("\"", "\\\"").replace("\\", "\\\\\\\\"), "UTF-8") + "\"}";
-		final URL url = new URL("https://staff.concord.org/~emcelroy/error/error.php?error=" + s);
-		final URLConnection urlConnection = url.openConnection();
-		urlConnection.setDoOutput(true);
-		final BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-		String receipt = "";
-		String line = null;
-		while ((line = in.readLine()) != null) {
-			if (line != null) {
-				receipt += line;
-			}
-		}
-		in.close();
-		return receipt;
 	}
 
 	public final static void openBrowser(final String url) {

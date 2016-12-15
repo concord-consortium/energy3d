@@ -49,8 +49,8 @@ public class Rack extends HousePart implements Trackable {
 	private double relativeAzimuth = 0;
 	private double tiltAngle = -25;
 	private double baseHeight = 15;
-	private double poleDistanceX = 3;
-	private double poleDistanceY = 1;
+	private double poleDistanceX = 4;
+	private double poleDistanceY = 2;
 	private int trackerType = NO_TRACKER;
 	private int rotationAxis;
 	private boolean monolithic; // true if the whole rack is covered by solar panels
@@ -720,16 +720,26 @@ public class Rack extends HousePart implements Trackable {
 		int i = 1;
 		BufferUtils.populateFromBuffer(v1, buf, 0);
 		BufferUtils.populateFromBuffer(v2, buf, 1);
-		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
+		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
 		BufferUtils.populateFromBuffer(v1, buf, 1);
 		BufferUtils.populateFromBuffer(v2, buf, 2);
-		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
+		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
 		BufferUtils.populateFromBuffer(v1, buf, 2);
 		BufferUtils.populateFromBuffer(v2, buf, 4);
-		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
+		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
 		BufferUtils.populateFromBuffer(v1, buf, 4);
 		BufferUtils.populateFromBuffer(v2, buf, 0);
-		getEditPointShape(i++).setTranslation(trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5));
+		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		final Vector3 d31 = p3.subtract(p1, null).normalizeLocal();
+		final Vector3 d42 = p4.subtract(p2, null).normalizeLocal();
+		p1.subtractLocal(d31.multiply(2.5, null));
+		p3.addLocal(d31.multiply(2.5, null));
+		p2.subtractLocal(d42.multiply(2.5, null));
+		p4.addLocal(d42.multiply(2.5, null));
+		getEditPointShape(i++).setTranslation(p1);
+		getEditPointShape(i++).setTranslation(p2);
+		getEditPointShape(i++).setTranslation(p3);
+		getEditPointShape(i++).setTranslation(p4);
 		super.updateEditShapes();
 		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, 1));
 	}
@@ -742,11 +752,7 @@ public class Rack extends HousePart implements Trackable {
 		return monolithic;
 	}
 
-	public void setSampleSolarPanel(final SolarPanel sampleSolarPanel) {
-		this.sampleSolarPanel = sampleSolarPanel;
-	}
-
-	public SolarPanel getSampleSolarPanel() {
+	public SolarPanel getSolarPanel() {
 		return sampleSolarPanel;
 	}
 
