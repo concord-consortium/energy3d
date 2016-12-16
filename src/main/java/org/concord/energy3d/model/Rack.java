@@ -96,7 +96,7 @@ public class Rack extends HousePart implements Trackable {
 			sampleSolarPanel = new SolarPanel();
 		}
 
-		oldRackCenter = new Vector3(points.get(0));
+		oldRackCenter = points.get(0).clone();
 		oldRackWidth = rackWidth;
 		oldRackHeight = rackHeight;
 	}
@@ -113,13 +113,19 @@ public class Rack extends HousePart implements Trackable {
 				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 				points.get(0).set(toRelative(p));
 			}
+			if (outOfBound()) {
+				if (oldRackCenter != null) {
+					points.get(0).set(oldRackCenter);
+				}
+			} else {
+				oldRackCenter = points.get(0).clone();
+			}
 			if (container != null) {
 				moveSolarPanels(getPoints().get(0).clone().subtractLocal(moveStartPoint), solarOrgPoints);
 			}
 		} else {
 			final ReadOnlyVector3 pEdit = getEditPointShape(editPointIndex).getTranslation();
 			final Vector3 p;
-			boolean withinBound = true;
 			if (editPointIndex % 2 == 0) {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
@@ -130,25 +136,14 @@ public class Rack extends HousePart implements Trackable {
 					getEditPointShape(editPointIndex).setTranslation(p);
 					points.get(0).set(newCenter);
 					setRackWidth(Math.max(rw, pw));
-					drawMesh();
-					if (container instanceof Foundation) {
-						final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
-						for (int i = 0; i < n; i++) {
-							final Vector3 a = getVertex(i);
-							if (!((Foundation) container).containsPoint(a.getX(), a.getY())) {
-								withinBound = false;
-								break;
-							}
-						}
-					}
-					if (withinBound) {
-						oldRackCenter = newCenter;
-						oldRackWidth = rackWidth;
-					} else {
+					if (outOfBound()) {
 						if (oldRackCenter != null) {
 							points.get(0).set(oldRackCenter);
 						}
 						setRackWidth(oldRackWidth);
+					} else {
+						oldRackCenter = newCenter;
+						oldRackWidth = rackWidth;
 					}
 				}
 			} else {
@@ -161,25 +156,14 @@ public class Rack extends HousePart implements Trackable {
 					getEditPointShape(editPointIndex).setTranslation(p);
 					points.get(0).set(newCenter);
 					setRackHeight(Math.max(rh, ph));
-					drawMesh();
-					if (container instanceof Foundation) {
-						final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
-						for (int i = 0; i < n; i++) {
-							final Vector3 a = getVertex(i);
-							if (!((Foundation) container).containsPoint(a.getX(), a.getY())) {
-								withinBound = false;
-								break;
-							}
-						}
-					}
-					if (withinBound) {
-						oldRackCenter = newCenter;
-						oldRackHeight = rackHeight;
-					} else {
+					if (outOfBound()) {
 						if (oldRackCenter != null) {
 							points.get(0).set(oldRackCenter);
 						}
 						setRackHeight(oldRackHeight);
+					} else {
+						oldRackCenter = newCenter;
+						oldRackHeight = rackHeight;
 					}
 				}
 			}
@@ -190,6 +174,20 @@ public class Rack extends HousePart implements Trackable {
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
+	}
+
+	private boolean outOfBound() {
+		drawMesh();
+		if (container instanceof Foundation) {
+			final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
+			for (int i = 0; i < n; i++) {
+				final Vector3 a = getVertex(i);
+				if (!((Foundation) container).containsPoint(a.getX(), a.getY())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -561,6 +559,8 @@ public class Rack extends HousePart implements Trackable {
 		return baseHeight;
 	}
 
+	private transient double oldRelativeAzimuth;
+
 	public void setRelativeAzimuth(double relativeAzimuth) {
 		if (relativeAzimuth < 0) {
 			relativeAzimuth += 360;
@@ -568,7 +568,12 @@ public class Rack extends HousePart implements Trackable {
 			relativeAzimuth -= 360;
 		}
 		this.relativeAzimuth = relativeAzimuth;
-		this.allowAzimuthLargeRotation = true;
+		if (outOfBound()) { // undo the rotation
+			this.relativeAzimuth = oldRelativeAzimuth;
+		} else {
+			oldRelativeAzimuth = this.relativeAzimuth;
+		}
+		allowAzimuthLargeRotation = true;
 	}
 
 	private void rotateSolarPanelsAzimuth(final double angle) {
@@ -618,6 +623,13 @@ public class Rack extends HousePart implements Trackable {
 		points.get(0).addLocal(v_rel);
 		moveSolarPanels(v_rel);
 		draw();
+		if (outOfBound()) {
+			if (oldRackCenter != null) {
+				points.get(0).set(oldRackCenter);
+			}
+		} else {
+			oldRackCenter = points.get(0).clone();
+		}
 	}
 
 	public double getPoleDistanceX() {
