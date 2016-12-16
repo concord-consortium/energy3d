@@ -19,6 +19,7 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
@@ -57,6 +58,10 @@ public class Rack extends HousePart implements Trackable {
 	private SolarPanel sampleSolarPanel;
 	private transient Vector3 oldRackCenter;
 	private transient double oldRackWidth, oldRackHeight;
+	private boolean drawSunBeam;
+	private transient Line sunBeam;
+	private transient Line normalVector;
+	private static transient BloomRenderPass bloomRenderPass;
 
 	public Rack() {
 		super(1, 1, 0);
@@ -87,6 +92,24 @@ public class Rack extends HousePart implements Trackable {
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
+
+		sunBeam = new Line("Sun Beam");
+		sunBeam.setLineWidth(0.01f);
+		sunBeam.setStipplePattern((short) 0xffff);
+		sunBeam.setModelBound(null);
+		Util.disablePickShadowLight(sunBeam);
+		sunBeam.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		sunBeam.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
+		root.attachChild(sunBeam);
+
+		normalVector = new Line("Normal Vector");
+		normalVector.setLineWidth(0.01f);
+		normalVector.setStipplePattern((short) 0xffff);
+		normalVector.setModelBound(null);
+		Util.disablePickShadowLight(normalVector);
+		normalVector.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		normalVector.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 1f));
+		root.attachChild(normalVector);
 
 		polesRoot = new Node("Poles Root");
 		root.attachChild(polesRoot);
@@ -142,7 +165,7 @@ public class Rack extends HousePart implements Trackable {
 						}
 						setRackWidth(oldRackWidth);
 					} else {
-						oldRackCenter = newCenter;
+						oldRackCenter = points.get(0).clone();
 						oldRackWidth = rackWidth;
 					}
 				}
@@ -162,7 +185,7 @@ public class Rack extends HousePart implements Trackable {
 						}
 						setRackHeight(oldRackHeight);
 					} else {
-						oldRackCenter = newCenter;
+						oldRackCenter = points.get(0).clone();
 						oldRackHeight = rackHeight;
 					}
 				}
@@ -179,10 +202,14 @@ public class Rack extends HousePart implements Trackable {
 	private boolean outOfBound() {
 		drawMesh();
 		if (container instanceof Foundation) {
+			final Foundation foundation = (Foundation) container;
 			final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
 			for (int i = 0; i < n; i++) {
 				final Vector3 a = getVertex(i);
-				if (!((Foundation) container).containsPoint(a.getX(), a.getY())) {
+				if (a.getZ() < foundation.getHeight() * 1.1) { // left a 10% margin above the foundation
+					return true;
+				}
+				if (!foundation.containsPoint(a.getX(), a.getY())) {
 					return true;
 				}
 			}
@@ -383,6 +410,10 @@ public class Rack extends HousePart implements Trackable {
 			break;
 		}
 		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
+
+		if (drawSunBeam) {
+			drawSunBeam();
+		}
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
@@ -697,6 +728,7 @@ public class Rack extends HousePart implements Trackable {
 			Scene.getInstance().remove(c, false);
 		}
 		if (monolithic) {
+			ensureFullSolarPanels();
 			draw();
 		} else {
 			final Foundation foundation = getTopContainer();
@@ -833,6 +865,86 @@ public class Rack extends HousePart implements Trackable {
 
 	public SolarPanel getSolarPanel() {
 		return sampleSolarPanel;
+	}
+
+	public void ensureFullSolarPanels() {
+		if (monolithic) {
+			if (editPointIndex > 0) { // the rack has been resized
+				final boolean portrait = !sampleSolarPanel.isRotated();
+				final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
+				final double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
+				final int nw = (int) Math.floor(rackWidth / a);
+				final int nh = (int) Math.floor(rackHeight / b);
+				setRackWidth(nw * a);
+				setRackHeight(nh * b);
+				drawMesh();
+			}
+		}
+	}
+
+	public int getSolarPanelCount() {
+		final boolean portrait = !sampleSolarPanel.isRotated();
+		final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
+		final double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
+		final int nw = (int) Math.floor(rackWidth / a);
+		final int nh = (int) Math.floor(rackHeight / b);
+		return nw * nh;
+	}
+
+	public void drawSunBeam() {
+		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
+			sunBeam.setVisible(false);
+			normalVector.setVisible(false);
+			return;
+		}
+		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
+		beamsVertices.rewind();
+		Vector3 r = o.clone(); // draw sun vector
+		r.addLocal(sunLocation.multiply(5000, null));
+		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		sunBeam.updateModelBound();
+		sunBeam.setVisible(true);
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
+			bloomRenderPass.setNrBlurPasses(2);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+		}
+		if (!bloomRenderPass.contains(sunBeam)) {
+			bloomRenderPass.add(sunBeam);
+		}
+		final FloatBuffer normalVertices = normalVector.getMeshData().getVertexBuffer();
+		normalVertices.rewind();
+		r = o.clone(); // draw normal vector
+		r.addLocal(normal.multiply(5, null));
+		normalVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		// TODO final Vector3 s = new Vector3(r);
+		// normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		// normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+		normalVector.updateModelBound();
+		normalVector.setVisible(true);
+	}
+
+	@Override
+	public void delete() {
+		super.delete();
+		if (bloomRenderPass != null) {
+			if (bloomRenderPass.contains(sunBeam)) {
+				bloomRenderPass.remove(sunBeam);
+			}
+		}
+	}
+
+	public void setSunBeamVisible(final boolean drawSunBeam) {
+		this.drawSunBeam = drawSunBeam;
+	}
+
+	public boolean isDrawSunBeamVisible() {
+		return drawSunBeam;
 	}
 
 }

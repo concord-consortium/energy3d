@@ -4402,6 +4402,22 @@ public class PopupMenuFactory {
 			trackerMenu.add(miVerticalSingleAxisTracker);
 			trackerMenu.add(miAltazimuthDualAxisTracker);
 
+			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
+			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack rack = (Rack) selectedPart;
+					rack.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
+					rack.drawSunBeam();
+					rack.draw();
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
 			popupMenuForRack = createPopupMenu(true, true, new Runnable() {
 
 				@Override
@@ -4453,6 +4469,7 @@ public class PopupMenuFactory {
 							}
 						}
 					}
+					Util.selectSilently(cbmiDrawSunBeam, rack.isDrawSunBeamVisible());
 				}
 
 			});
@@ -4468,6 +4485,8 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miBaseHeight);
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.add(miAddSolarPanels);
+			popupMenuForRack.addSeparator();
+			popupMenuForRack.add(cbmiDrawSunBeam);
 
 		}
 

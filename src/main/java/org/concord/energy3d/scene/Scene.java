@@ -2515,7 +2515,7 @@ public class Scene implements Serializable {
 						} else if (part instanceof Rack) {
 							final Rack rack = (Rack) part;
 							if (night) {
-								// sp.drawSunBeam(); // call this so that the sun beam can be set invisible
+								rack.drawSunBeam(); // call this so that the sun beam can be set invisible
 							} else {
 								rack.draw();
 							}

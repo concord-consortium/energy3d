@@ -370,7 +370,7 @@ public class SolarPanel extends HousePart implements Trackable {
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
-		Vector3 r = new Vector3(o); // draw sun vector
+		Vector3 r = o.clone(); // draw sun vector
 		r.addLocal(sunLocation.multiply(5000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
@@ -386,7 +386,8 @@ public class SolarPanel extends HousePart implements Trackable {
 			bloomRenderPass.add(sunBeam);
 		}
 		final FloatBuffer normalVertices = normalVector.getMeshData().getVertexBuffer();
-		r = new Vector3(o); // draw normal vector
+		normalVertices.rewind();
+		r = o.clone(); // draw normal vector
 		r.addLocal(normal.multiply(5, null));
 		normalVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
