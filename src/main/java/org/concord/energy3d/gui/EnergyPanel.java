@@ -922,7 +922,7 @@ public class EnergyPanel extends JPanel {
 						a -= 360;
 					}
 					final double az = a;
-					final int n = rack.getChildren().size();
+					final int n = rack.isMonolithic() ? rack.getSolarPanelCount() : rack.getChildren().size();
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {

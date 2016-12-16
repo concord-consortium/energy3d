@@ -902,7 +902,7 @@ public class Rack extends HousePart implements Trackable {
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 		Vector3 r = o.clone(); // draw sun vector
-		r.addLocal(sunLocation.multiply(5000, null));
+		r.addLocal(sunLocation.multiply(1000000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 		sunBeam.updateModelBound();

@@ -107,9 +107,8 @@ public class PvStationInfoPanel extends JPanel {
 		final List<Rack> racks = foundation.getRacks();
 		if (!racks.isEmpty()) {
 			for (final Rack r : racks) {
-				final int count = r.getSolarPanelCount();
-				countSolarPanels += count;
-				cost += Cost.getInstance().getPartCost(r.getSolarPanel()) * count;
+				countSolarPanels += r.getSolarPanelCount();
+				cost += Cost.getInstance().getPartCost(r);
 				panelArea += r.getArea();
 			}
 		}
