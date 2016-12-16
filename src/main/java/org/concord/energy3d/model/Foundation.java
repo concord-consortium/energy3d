@@ -1311,7 +1311,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		azimuthArrow.setVisible(b);
 	}
 
-	/* Draw the heat flux through the floor area on the foundation */
+	/** Draw the heat flux through the floor area on the foundation */
 	@Override
 	public void drawHeatFlux() {
 
@@ -1883,6 +1883,16 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public FoundationPolygon getPolygon() {
 		return foundationPolygon;
+	}
+
+	public boolean containsPoint(final double x, final double y) {
+		final Path2D foundationPoly = new Path2D.Double();
+		foundationPoly.moveTo(points.get(0).getX(), points.get(0).getY());
+		foundationPoly.lineTo(points.get(2).getX(), points.get(2).getY());
+		foundationPoly.lineTo(points.get(3).getX(), points.get(3).getY());
+		foundationPoly.lineTo(points.get(1).getX(), points.get(1).getY());
+		foundationPoly.closePath();
+		return foundationPoly.contains(x, y);
 	}
 
 }

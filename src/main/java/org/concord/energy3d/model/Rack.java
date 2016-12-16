@@ -55,6 +55,8 @@ public class Rack extends HousePart implements Trackable {
 	private int rotationAxis;
 	private boolean monolithic; // true if the whole rack is covered by solar panels
 	private SolarPanel sampleSolarPanel;
+	private transient Vector3 oldRackCenter;
+	private transient double oldRackWidth, oldRackHeight;
 
 	public Rack() {
 		super(1, 1, 0);
@@ -93,6 +95,10 @@ public class Rack extends HousePart implements Trackable {
 		if (sampleSolarPanel == null) {
 			sampleSolarPanel = new SolarPanel();
 		}
+
+		oldRackCenter = new Vector3(points.get(0));
+		oldRackWidth = rackWidth;
+		oldRackHeight = rackHeight;
 	}
 
 	@Override
@@ -113,15 +119,37 @@ public class Rack extends HousePart implements Trackable {
 		} else {
 			final ReadOnlyVector3 pEdit = getEditPointShape(editPointIndex).getTranslation();
 			final Vector3 p;
+			boolean withinBound = true;
 			if (editPointIndex % 2 == 0) {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 				final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 				if (rw > pw) {
+					final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
 					getEditPointShape(editPointIndex).setTranslation(p);
-					points.get(0).set(toRelative(p.add(p1, null).multiplyLocal(0.5)));
+					points.get(0).set(newCenter);
 					setRackWidth(Math.max(rw, pw));
+					drawMesh();
+					if (container instanceof Foundation) {
+						final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
+						for (int i = 0; i < n; i++) {
+							final Vector3 a = getVertex(i);
+							if (!((Foundation) container).containsPoint(a.getX(), a.getY())) {
+								withinBound = false;
+								break;
+							}
+						}
+					}
+					if (withinBound) {
+						oldRackCenter = newCenter;
+						oldRackWidth = rackWidth;
+					} else {
+						if (oldRackCenter != null) {
+							points.get(0).set(oldRackCenter);
+						}
+						setRackWidth(oldRackWidth);
+					}
 				}
 			} else {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
@@ -129,9 +157,30 @@ public class Rack extends HousePart implements Trackable {
 				final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 				final double ph = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 				if (rh > ph) {
+					final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
 					getEditPointShape(editPointIndex).setTranslation(p);
-					points.get(0).set(toRelative(p.add(p1, null).multiplyLocal(0.5)));
+					points.get(0).set(newCenter);
 					setRackHeight(Math.max(rh, ph));
+					drawMesh();
+					if (container instanceof Foundation) {
+						final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
+						for (int i = 0; i < n; i++) {
+							final Vector3 a = getVertex(i);
+							if (!((Foundation) container).containsPoint(a.getX(), a.getY())) {
+								withinBound = false;
+								break;
+							}
+						}
+					}
+					if (withinBound) {
+						oldRackCenter = newCenter;
+						oldRackHeight = rackHeight;
+					} else {
+						if (oldRackCenter != null) {
+							points.get(0).set(oldRackCenter);
+						}
+						setRackHeight(oldRackHeight);
+					}
 				}
 			}
 		}
@@ -754,6 +803,12 @@ public class Rack extends HousePart implements Trackable {
 		getEditPointShape(i++).setTranslation(p4);
 		super.updateEditShapes();
 		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, 1));
+	}
+
+	private Vector3 getVertex(final int i) {
+		final Vector3 v = new Vector3();
+		BufferUtils.populateFromBuffer(v, mesh.getMeshData().getVertexBuffer(), i);
+		return mesh.getWorldTransform().applyForward(v);
 	}
 
 	public void setMonolithic(final boolean monolithic) {

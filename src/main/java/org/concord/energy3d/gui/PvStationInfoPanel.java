@@ -22,8 +22,8 @@ public class PvStationInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private JPanel countPanel, costPanel, landAreaPanel, panelAreaPanel;
-	private ColorBar countBar, costBar, landAreaBar, panelAreaBar;
+	private final JPanel countPanel, costPanel, landAreaPanel, panelAreaPanel;
+	private final ColorBar countBar, costBar, landAreaBar, panelAreaBar;
 
 	public PvStationInfoPanel() {
 
@@ -31,7 +31,7 @@ public class PvStationInfoPanel extends JPanel {
 
 		noDecimals.setMaximumFractionDigits(0);
 
-		JPanel container = new JPanel();
+		final JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		add(container, BorderLayout.NORTH);
 
@@ -91,18 +91,20 @@ public class PvStationInfoPanel extends JPanel {
 
 	}
 
-	void update(Foundation foundation) {
-		List<SolarPanel> panels = foundation.getSolarPanels();
-		countBar.setValue(panels.size());
-		landAreaBar.setValue((float) foundation.getArea() / panels.size());
-		double cost = 0;
-		double panelArea = 0;
-		for (SolarPanel s : panels) {
-			cost += Cost.getInstance().getPartCost(s);
-			panelArea += s.getPanelWidth() * s.getPanelHeight();
+	void update(final Foundation foundation) {
+		final List<SolarPanel> panels = foundation.getSolarPanels();
+		if (!panels.isEmpty()) {
+			countBar.setValue(panels.size());
+			landAreaBar.setValue((float) foundation.getArea() / panels.size());
+			double cost = 0;
+			double panelArea = 0;
+			for (final SolarPanel s : panels) {
+				cost += Cost.getInstance().getPartCost(s);
+				panelArea += s.getPanelWidth() * s.getPanelHeight();
+			}
+			costBar.setValue(Math.round(cost));
+			panelAreaBar.setValue((float) panelArea);
 		}
-		costBar.setValue(Math.round(cost));
-		panelAreaBar.setValue((float) panelArea);
 	}
 
 }
