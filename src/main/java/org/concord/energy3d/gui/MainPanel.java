@@ -54,6 +54,7 @@ import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
+import org.concord.energy3d.util.Util;
 
 public class MainPanel extends JPanel {
 
@@ -569,6 +570,7 @@ public class MainPanel extends JPanel {
 					disableSunAnim();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 					// Scene.getInstance().setEdited(false); // shadow not saved -- make sense because it doesn't work on some machines
+					Util.reportError(new RuntimeException("Error from Xie"));
 				}
 			});
 		}

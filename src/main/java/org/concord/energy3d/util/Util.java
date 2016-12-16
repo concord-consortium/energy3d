@@ -431,7 +431,7 @@ public class Util {
 	}
 
 	public static String sendError(final String msg) throws Exception {
-		final MultipartUtility multipart = new MultipartUtility("https://staff.concord.org/~emcelroy/error2/error.php", "UTF-8");
+		final MultipartUtility multipart = new MultipartUtility("http://energy3d.concord.org/errors/error.php", "UTF-8");
 		multipart.addFormField("ip_address", InetAddress.getLocalHost().getHostAddress());
 		multipart.addFormField("os_name", System.getProperty("os.name"));
 		multipart.addFormField("os_version", System.getProperty("os.version"));
