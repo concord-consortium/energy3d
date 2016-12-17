@@ -939,7 +939,12 @@ public class EnergyPanel extends JPanel {
 								partProperty3TextField.setText("---");
 								partProperty3TextField.setToolTipText("");
 							} else {
-								partProperty3TextField.setText("" + n);
+								if (rack.isMonolithic()) {
+									final int[] rnc = rack.getSolarPanelRowAndColumnNumbers();
+									partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + ")");
+								} else {
+									partProperty3TextField.setText("" + n);
+								}
 								partProperty3TextField.setToolTipText("Number of solar panels on this rack");
 							}
 						}

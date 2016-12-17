@@ -48,7 +48,7 @@ public class Rack extends HousePart implements Trackable {
 	private double rackWidth = 15;
 	private double rackHeight = 3;
 	private double relativeAzimuth = 0;
-	private double tiltAngle = -25;
+	private double tiltAngle = 0;
 	private double baseHeight = 15;
 	private double poleDistanceX = 4;
 	private double poleDistanceY = 2;
@@ -119,7 +119,9 @@ public class Rack extends HousePart implements Trackable {
 			sampleSolarPanel = new SolarPanel();
 		}
 
-		oldRackCenter = points.get(0).clone();
+		if (!points.isEmpty()) {
+			oldRackCenter = points.get(0).clone();
+		}
 		oldRackWidth = rackWidth;
 		oldRackHeight = rackHeight;
 	}
@@ -365,7 +367,7 @@ public class Rack extends HousePart implements Trackable {
 					final double dz = tanTiltAngle * vFactor;
 
 					final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
-					pole.setRadius(1);
+					pole.setRadius(0.6);
 					pole.setRenderState(offsetState);
 					pole.setHeight(baseHeight - dz - 0.1);
 					pole.setModelBound(new BoundingBox());
@@ -863,6 +865,10 @@ public class Rack extends HousePart implements Trackable {
 		return monolithic;
 	}
 
+	public void setSolarPanel(final SolarPanel sp) {
+		sampleSolarPanel = sp;
+	}
+
 	public SolarPanel getSolarPanel() {
 		return sampleSolarPanel;
 	}
@@ -873,8 +879,8 @@ public class Rack extends HousePart implements Trackable {
 				final boolean portrait = !sampleSolarPanel.isRotated();
 				final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 				final double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
-				final int nw = (int) Math.floor(rackWidth / a);
-				final int nh = (int) Math.floor(rackHeight / b);
+				final int nw = (int) Math.round(rackWidth / a);
+				final int nh = (int) Math.round(rackHeight / b);
 				setRackWidth(nw * a);
 				setRackHeight(nh * b);
 				drawMesh();
@@ -882,13 +888,25 @@ public class Rack extends HousePart implements Trackable {
 		}
 	}
 
-	public int getSolarPanelCount() {
+	void roundUpRackWidth() {
+		final boolean portrait = !sampleSolarPanel.isRotated();
+		final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
+		final int nw = (int) Math.round(rackWidth / a);
+		setRackWidth(nw * a);
+	}
+
+	public int[] getSolarPanelRowAndColumnNumbers() {
 		final boolean portrait = !sampleSolarPanel.isRotated();
 		final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 		final double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
-		final int nw = (int) Math.floor(rackWidth / a);
-		final int nh = (int) Math.floor(rackHeight / b);
-		return nw * nh;
+		final int nw = (int) Math.round(rackWidth / a);
+		final int nh = (int) Math.round(rackHeight / b);
+		return new int[] { nw, nh };
+	}
+
+	public int getSolarPanelCount() {
+		final int[] n = getSolarPanelRowAndColumnNumbers();
+		return n[0] * n[1];
 	}
 
 	public void drawSunBeam() {

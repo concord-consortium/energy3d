@@ -1850,6 +1850,99 @@ public class Foundation extends HousePart implements Thermalizable {
 		});
 	}
 
+	public void addSolarRackArrays(final SolarPanel panel, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Rack.class), this, Rack.class);
+		final double az = Math.toRadians(getAzimuth());
+		if (!Util.isZero(az)) {
+			rotate(az, null);
+		}
+		final Vector3 p0 = getAbsPoint(0);
+		final double a = p0.distance(getAbsPoint(2));
+		final double b = p0.distance(getAbsPoint(1));
+		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
+		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
+		final double x1 = Math.max(Math.max(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
+		final double y1 = Math.max(Math.max(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
+		final double panelHeight = panel.isRotated() ? panel.getPanelWidth() : panel.getPanelHeight();
+		final double rackHeight = panelHeight * panelRowsPerRack;
+		final double h = (rackHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
+		Path2D.Double path = null;
+		if (foundationPolygon != null && foundationPolygon.isVisible()) {
+			path = new Path2D.Double();
+			final int n = foundationPolygon.points.size();
+			Vector3 v = foundationPolygon.getAbsPoint(0);
+			path.moveTo(v.getX(), v.getY());
+			for (int i = 1; i < n / 2; i++) { // use only the first half of the vertices from the polygon
+				v = foundationPolygon.getAbsPoint(i);
+				path.lineTo(v.getX(), v.getY());
+			}
+			path.closePath();
+		}
+		double x, y, rackWidth, rows;
+		switch (rowAxis) {
+		case Trackable.EAST_WEST_AXIS:
+			x = (x0 + x1) * 0.5;
+			rackWidth = a * Scene.getInstance().getAnnotationScale() - panelHeight;
+			rows = (int) Math.floor(b / h);
+			for (int r = 0; r < rows; r++) {
+				y = y0 + h * (r + 0.5);
+				final Rack rack = new Rack();
+				rack.setContainer(this);
+				rack.setSolarPanel(panel);
+				rack.setMonolithic(true);
+				final Vector3 v = rack.toRelative(new Vector3(x, y, 0));
+				rack.points.get(0).setX(v.getX());
+				rack.points.get(0).setY(v.getY());
+				rack.points.get(0).setZ(height);
+				rack.setRackWidth(rackWidth);
+				rack.setRackHeight(rackHeight);
+				rack.roundUpRackWidth();
+				rack.setRotationAxis(rowAxis);
+				Scene.getInstance().add(rack, false);
+				rack.complete();
+				rack.setRelativeAzimuth(90);
+				rack.draw();
+			}
+			break;
+		case Trackable.NORTH_SOUTH_AXIS:
+			y = (y0 + y1) * 0.5;
+			rackWidth = b * Scene.getInstance().getAnnotationScale() - panelHeight;
+			rows = (int) Math.floor(a / h);
+			for (int r = 0; r < rows; r++) {
+				x = x0 + h * (r + 0.5);
+				final Rack rack = new Rack();
+				rack.setContainer(this);
+				rack.setSolarPanel(panel);
+				rack.setMonolithic(true);
+				final Vector3 v = rack.toRelative(new Vector3(x, y, 0));
+				rack.points.get(0).setX(v.getX());
+				rack.points.get(0).setY(v.getY());
+				rack.points.get(0).setZ(height);
+				rack.setRackWidth(rackWidth);
+				rack.setRackHeight(rackHeight);
+				rack.roundUpRackWidth();
+				rack.setRotationAxis(rowAxis);
+				Scene.getInstance().add(rack, false);
+				rack.complete();
+				rack.setRelativeAzimuth(90);
+				rack.draw();
+			}
+			break;
+		}
+		if (!Util.isZero(az)) {
+			rotate(-az, null);
+		}
+		Scene.getInstance().redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(command);
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				EnergyPanel.getInstance().updateProperties();
+			}
+		});
+	}
+
 	public int getSupportingType() {
 		for (final HousePart p : children) {
 			if (p instanceof Wall) {
