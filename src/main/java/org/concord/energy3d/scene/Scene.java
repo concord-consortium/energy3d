@@ -1821,6 +1821,30 @@ public class Scene implements Serializable {
 		return list;
 	}
 
+	public void setCellNumbersForSolarPanelsOnFoundation(final Foundation foundation, final int nx, final int ny) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
+				final SolarPanel s = (SolarPanel) p;
+				s.setNumberOfCellsInX(nx);
+				s.setNumberOfCellsInY(ny);
+				s.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setCellNumbersForAllSolarPanels(final int nx, final int ny) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				final SolarPanel s = (SolarPanel) p;
+				s.setNumberOfCellsInX(nx);
+				s.setNumberOfCellsInY(ny);
+				s.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setTiltAngleForSolarPanelsOnFoundation(final Foundation foundation, final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {

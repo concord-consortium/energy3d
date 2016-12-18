@@ -86,6 +86,8 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
+import org.concord.energy3d.undo.ChangeCellNumbersCommand;
+import org.concord.energy3d.undo.ChangeCellNumbersForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
@@ -102,6 +104,7 @@ import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelCellNumbersCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeFoundationTemperatureCoefficientPmaxCommand;
 import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
@@ -3415,6 +3418,95 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miCells = new JMenuItem("Cells...");
+			miCells.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel)) {
+						return;
+					}
+					final SolarPanel s = (SolarPanel) selectedPart;
+					final HousePart container = s.getContainer();
+					final Foundation foundation = s.getTopContainer();
+					int nx = s.getNumberOfCellsInX();
+					int ny = s.getNumberOfCellsInY();
+					final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel inputFields = new JPanel();
+					inputFields.setBorder(BorderFactory.createTitledBorder("Cell Numbers for " + partInfo));
+					final JTextField nxField = new JTextField(nx + "", 10);
+					inputFields.add(nxField);
+					inputFields.add(new JLabel("   \u00D7   "));
+					final JTextField nyField = new JTextField(ny + "", 10);
+					inputFields.add(nyField);
+					final JPanel scopeFields = new JPanel();
+					scopeFields.setLayout(new BoxLayout(scopeFields, BoxLayout.Y_AXIS));
+					scopeFields.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Rack");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels on this Foundation");
+					final JRadioButton rb4 = new JRadioButton("All Solar Panels");
+					scopeFields.add(rb1);
+					if (container instanceof Rack) {
+						scopeFields.add(rb2);
+					}
+					scopeFields.add(rb3);
+					scopeFields.add(rb4);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					bg.add(rb4);
+					final JPanel panel = new JPanel(new BorderLayout());
+					panel.add(inputFields, BorderLayout.NORTH);
+					panel.add(scopeFields, BorderLayout.CENTER);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Set Cell Numbers", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					try {
+						nx = Integer.parseInt(nxField.getText());
+					} catch (final NumberFormatException ex) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), nxField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					try {
+						ny = Integer.parseInt(nyField.getText());
+					} catch (final NumberFormatException ex) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), nyField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if (rb1.isSelected()) {
+						final ChangeCellNumbersCommand c = new ChangeCellNumbersCommand(s);
+						s.setNumberOfCellsInX(nx);
+						s.setNumberOfCellsInY(ny);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						if (container instanceof Rack) {
+							final List<HousePart> children = ((Rack) container).getChildren();
+							// final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
+							for (final HousePart x : children) {
+								if (x instanceof SolarPanel) {
+									((SolarPanel) x).setNumberOfCellsInX(nx);
+									((SolarPanel) x).setNumberOfCellsInY(ny);
+								}
+							}
+							// SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+					} else if (rb3.isSelected()) {
+						final ChangeFoundationSolarPanelCellNumbersCommand c = new ChangeFoundationSolarPanelCellNumbersCommand(foundation);
+						Scene.getInstance().setCellNumbersForSolarPanelsOnFoundation(foundation, nx, ny);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb4.isSelected()) {
+						final ChangeCellNumbersForAllSolarPanelsCommand c = new ChangeCellNumbersForAllSolarPanelsCommand();
+						Scene.getInstance().setCellNumbersForAllSolarPanels(nx, ny);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					s.draw();
+					updateAfterEdit();
+				}
+			});
+
 			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
 			miBaseHeight.addActionListener(new ActionListener() {
 				@Override
@@ -3790,6 +3882,7 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miTiltAngle);
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miSize);
+			popupMenuForSolarPanel.add(miCells);
 			popupMenuForSolarPanel.add(miBaseHeight);
 			popupMenuForSolarPanel.add(orientationMenu);
 			popupMenuForSolarPanel.addSeparator();
