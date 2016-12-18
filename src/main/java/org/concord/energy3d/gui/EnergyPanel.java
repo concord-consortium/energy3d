@@ -936,12 +936,15 @@ public class EnergyPanel extends JPanel {
 							partProperty2TextField.setToolTipText("The angles of the rack");
 							partProperty3Label.setText("  Solar Panels:");
 							if (energyViewShown) {
-								partProperty3TextField.setText("---");
-								partProperty3TextField.setToolTipText("");
+								final SolarPanel sp = rack.getSolarPanel();
+								final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
+								partProperty3Label.setText("  Efficiency & Yield:");
+								partProperty3TextField.setText(eff + ", " + twoDecimals.format(rack.getSolarPotentialToday() * sp.getCellEfficiency()) + " kWh");
+								partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel array on the rack");
 							} else {
 								if (rack.isMonolithic()) {
 									final int[] rnc = rack.getSolarPanelRowAndColumnNumbers();
-									partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + ")");
+									partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + rack.getSolarPanel().getPanelWidth() + "\u00D7" + rack.getSolarPanel().getPanelHeight() + " m");
 								} else {
 									partProperty3TextField.setText("" + n);
 								}

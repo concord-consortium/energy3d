@@ -307,8 +307,9 @@ public class Rack extends HousePart implements Trackable {
 		vertexBuffer.rewind();
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
-		final float spw = monolithic ? (float) (rackWidth / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth())) : 1;
-		final float sph = monolithic ? (float) (rackHeight / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight())) : 1;
+		// when the heat map is on, use a single texture from the radiation calculation, don't repeat
+		final float spw = SceneManager.getInstance().getSolarHeatMap() ? 1 : (monolithic ? (float) (rackWidth / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth())) : 1);
+		final float sph = SceneManager.getInstance().getSolarHeatMap() ? 1 : (monolithic ? (float) (rackHeight / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight())) : 1);
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(spw).put(0);
