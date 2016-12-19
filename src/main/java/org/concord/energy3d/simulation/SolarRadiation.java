@@ -374,8 +374,8 @@ public class SolarRadiation {
 	// unlike PV solar panels, no indirect (ambient or diffuse) radiation should be included in mirror reflection calculation
 	private void computeOnMirror(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Mirror mirror) {
 
-		final int nx = Scene.getInstance().getPlateNx();
-		final int ny = Scene.getInstance().getPlateNy();
+		final int nx = Scene.getInstance().getMirrorNx();
+		final int ny = Scene.getInstance().getMirrorNy();
 		final Foundation target = mirror.getHeliostatTarget();
 		if (target != null) {
 			final Calendar calendar = Heliodon.getInstance().getCalendar();
@@ -581,8 +581,8 @@ public class SolarRadiation {
 			throw new RuntimeException("Normal is null");
 		}
 
-		int nx = Scene.getInstance().getPlateNx();
-		int ny = Scene.getInstance().getPlateNy();
+		int nx = Scene.getInstance().getSolarPanelNx();
+		int ny = Scene.getInstance().getSolarPanelNy();
 
 		final Mesh drawMesh = panel.getRadiationMesh();
 		final Mesh collisionMesh = (Mesh) panel.getRadiationCollisionSpatial();
@@ -743,8 +743,8 @@ public class SolarRadiation {
 			throw new RuntimeException("Normal is null");
 		}
 
-		int nx = Scene.getInstance().getPlateNx();
-		int ny = Scene.getInstance().getPlateNy();
+		int nx = Scene.getInstance().getRackNx();
+		int ny = Scene.getInstance().getRackNy();
 
 		final Mesh drawMesh = rack.getRadiationMesh();
 		final Mesh collisionMesh = (Mesh) rack.getRadiationCollisionSpatial();

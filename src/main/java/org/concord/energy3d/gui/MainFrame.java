@@ -160,6 +160,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleMenuItem;
 	private JMenuItem overallUtilityBillMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
+	private JMenuItem visualizationSettingsMenuItem;
 	private JMenuItem annualEnergyAnalysisMenuItem;
 	private JMenuItem annualEnergyAnalysisForSelectionMenuItem;
 	private JMenuItem dailyEnergyAnalysisMenuItem;
@@ -1149,6 +1150,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 					simulationSettingsMenuItem.setEnabled(true);
+					visualizationSettingsMenuItem.setEnabled(true);
 					enableEnergyAnalysis(true);
 				}
 
@@ -1156,13 +1158,16 @@ public class MainFrame extends JFrame {
 				public void menuDeselected(final MenuEvent e) {
 					SceneManager.getInstance().refresh();
 					simulationSettingsMenuItem.setEnabled(true);
+					visualizationSettingsMenuItem.setEnabled(true);
 					enableEnergyAnalysis(true);
 				}
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
 					MainPanel.getInstance().defaultTool();
-					simulationSettingsMenuItem.setEnabled(!Scene.getInstance().isStudentMode());
+					final boolean b = !Scene.getInstance().isStudentMode();
+					simulationSettingsMenuItem.setEnabled(b);
+					visualizationSettingsMenuItem.setEnabled(b);
 					enableEnergyAnalysis(!Scene.getInstance().getOnlySolarAnalysis());
 				}
 			});
@@ -1364,11 +1369,12 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(solarHeatMapMenu);
 			viewMenu.add(getHeatFluxMenuItem());
-			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getShadowMenuItem());
 			viewMenu.add(getSunAnglesMenuItem());
 			viewMenu.add(getLightBeamsMenuItem());
+			viewMenu.add(getVisualizationSettingsMenuItem());
 			viewMenu.addSeparator();
+			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getRoofDashedLineMenuItem());
 			viewMenu.add(getBuildingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
@@ -1637,7 +1643,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getSimulationSettingsMenuItem() {
 		if (simulationSettingsMenuItem == null) {
-			simulationSettingsMenuItem = new JMenuItem("Change Settings...");
+			simulationSettingsMenuItem = new JMenuItem("Change Simulation Settings...");
 			simulationSettingsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1646,6 +1652,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return simulationSettingsMenuItem;
+	}
+
+	private JMenuItem getVisualizationSettingsMenuItem() {
+		if (visualizationSettingsMenuItem == null) {
+			visualizationSettingsMenuItem = new JMenuItem("Change Visualization Settings...");
+			visualizationSettingsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new VisualizationSettingsDialog().setVisible(true);
+				}
+			});
+		}
+		return visualizationSettingsMenuItem;
 	}
 
 	private JMenuItem getAnnualEnergyAnalysisMenuItem() {
@@ -3164,7 +3183,7 @@ public class MainFrame extends JFrame {
 
 	private JCheckBoxMenuItem getInfoPanelCheckBoxMenuItem() {
 		if (infoPanelCheckBoxMenuItem == null) {
-			infoPanelCheckBoxMenuItem = new JCheckBoxMenuItem("Show Information Panel");
+			infoPanelCheckBoxMenuItem = new JCheckBoxMenuItem("Show Information Panel", true);
 			infoPanelCheckBoxMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

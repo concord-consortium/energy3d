@@ -141,11 +141,17 @@ public class Scene implements Serializable {
 	// increment of time in minutes
 	private int timeStep = 15;
 
-	// number of points in x and y directions when a plate (e.g., mirrors and solar panels) is discretized into a grid
-	// used in both radiation calculation and heat map visualization for mirrors
+	// number of points in x and y directions when a solar panel is discretized into a grid (to meet the need of texture, these numbers must be power of 2)
 	// used in heat map visualization for solar panels (for radiation calculation, solar panels use the underlying solar cell layout, e.g., 6x10, as the discretization)
-	// to meet the need of texture, these numbers must be power of 2
-	private int plateNx = 4, plateNy = 4;
+	private int solarPanelNx = 4, solarPanelNy = 4;
+
+	// number of points in x and y directions when a solar rack is discretized into a grid (to meet the need of texture, these numbers must be power of 2)
+	// used in both radiation calculation and heat map visualization for racks
+	private int rackNx = 8, rackNy = 4;
+
+	// number of points in x and y directions when a mirror is discretized into a grid (to meet the need of texture, these numbers must be power of 2)
+	// used in both radiation calculation and heat map visualization for mirrors
+	private int mirrorNx = 4, mirrorNy = 4;
 
 	// the step length of the discretized grid on any part that is not a plate
 	private double solarStep = 2.0;
@@ -389,11 +395,23 @@ public class Scene implements Serializable {
 		if (Util.isZero(timeStep)) {
 			timeStep = 15;
 		}
-		if (Util.isZero(plateNx)) {
-			plateNx = 4;
+		if (Util.isZero(solarPanelNx)) {
+			solarPanelNx = 4;
 		}
-		if (Util.isZero(plateNy)) {
-			plateNy = 4;
+		if (Util.isZero(solarPanelNy)) {
+			solarPanelNy = 4;
+		}
+		if (Util.isZero(rackNx)) {
+			rackNx = 8;
+		}
+		if (Util.isZero(rackNy)) {
+			rackNy = 4;
+		}
+		if (Util.isZero(mirrorNx)) {
+			mirrorNx = 4;
+		}
+		if (Util.isZero(mirrorNy)) {
+			mirrorNy = 4;
 		}
 		if (Util.isZero(solarContrast)) {
 			solarContrast = 50;
@@ -2627,20 +2645,52 @@ public class Scene implements Serializable {
 		return showSunAngles;
 	}
 
-	public void setPlateNx(final int plateNx) {
-		this.plateNx = plateNx;
+	public void setSolarPanelNx(final int solarPanelNx) {
+		this.solarPanelNx = solarPanelNx;
 	}
 
-	public int getPlateNx() {
-		return plateNx;
+	public int getSolarPanelNx() {
+		return solarPanelNx;
 	}
 
-	public void setPlateNy(final int plateNy) {
-		this.plateNy = plateNy;
+	public void setSolarPanelNy(final int solarPanelNy) {
+		this.solarPanelNy = solarPanelNy;
 	}
 
-	public int getPlateNy() {
-		return plateNy;
+	public int getSolarPanelNy() {
+		return solarPanelNy;
+	}
+
+	public void setRackNx(final int rackNx) {
+		this.rackNx = rackNx;
+	}
+
+	public int getRackNx() {
+		return rackNx;
+	}
+
+	public void setRackNy(final int rackNy) {
+		this.rackNy = rackNy;
+	}
+
+	public int getRackNy() {
+		return rackNy;
+	}
+
+	public void setMirrorNx(final int mirrorNx) {
+		this.mirrorNx = mirrorNx;
+	}
+
+	public int getMirrorNx() {
+		return mirrorNx;
+	}
+
+	public void setMirrorNy(final int mirrorNy) {
+		this.mirrorNy = mirrorNy;
+	}
+
+	public int getMirrorNy() {
+		return mirrorNy;
 	}
 
 	public void setSolarStep(final double solarStep) {

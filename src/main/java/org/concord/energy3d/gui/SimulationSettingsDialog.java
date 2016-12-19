@@ -26,7 +26,6 @@ import org.concord.energy3d.simulation.SolarRadiation;
 class SimulationSettingsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
 	private final static DecimalFormat FORMAT2 = new DecimalFormat("##");
 
 	public SimulationSettingsDialog() {
@@ -36,71 +35,63 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(7, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(4, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final Scene s = Scene.getInstance();
-		final JTextField plateNxTextField = new JTextField(s.getPlateNx() + "");
-		final JTextField plateNyTextField = new JTextField(s.getPlateNy() + "");
-		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep()));
-		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
-		final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getAnnotationScale()));
+		final JTextField rackNxTextField = new JTextField(s.getRackNx() + "", 6);
+		final JTextField rackNyTextField = new JTextField(s.getRackNy() + "", 6);
+		final JTextField mirrorNxTextField = new JTextField(s.getMirrorNx() + "", 6);
+		final JTextField mirrorNyTextField = new JTextField(s.getMirrorNy() + "", 6);
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
 		final ActionListener okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				double cellSize;
+				int rackNx;
+				int rackNy;
+				int mirrorNx;
+				int mirrorNy;
 				int timeStep;
-				double heatVectorLength;
-				double heatVectorGridSize;
-				int plateNx;
-				int plateNy;
 				try {
-					cellSize = Double.parseDouble(cellSizeTextField.getText());
-					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
-					heatVectorGridSize = Double.parseDouble(heatVectorGridSizeTextField.getText());
+					rackNx = Integer.parseInt(rackNxTextField.getText());
+					rackNy = Integer.parseInt(rackNyTextField.getText());
+					mirrorNx = Integer.parseInt(mirrorNxTextField.getText());
+					mirrorNy = Integer.parseInt(mirrorNyTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
-					plateNx = Integer.parseInt(plateNxTextField.getText());
-					plateNy = Integer.parseInt(plateNyTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				// range check
-				if (cellSize < 0.1 || cellSize > 20) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Cell size must be in 0.1-20 (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (heatVectorLength < 1000) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Heat arrow length must be greater than 1000.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (heatVectorGridSize < 0.4) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Heat arrow grid size must not be less than 0.4 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
 				if (timeStep < 5 || timeStep > 60) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-60 seconds.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (plateNx < 2 || plateNy < 2) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (rackNx < 2 || rackNy < 2) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of rack grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if ((plateNx & (plateNx - 1)) != 0 || (plateNy & (plateNy - 1)) != 0) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+				if ((rackNx & (rackNx - 1)) != 0 || (rackNy & (rackNy - 1)) != 0) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of rack grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				s.setSolarStep(cellSize);
+				if (mirrorNx < 2 || mirrorNy < 2) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if ((mirrorNx & (mirrorNx - 1)) != 0 || (mirrorNy & (mirrorNy - 1)) != 0) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				s.setRackNx(rackNx);
+				s.setRackNy(rackNy);
+				s.setMirrorNx(mirrorNx);
+				s.setMirrorNy(mirrorNy);
 				s.setTimeStep(timeStep);
-				s.setPlateNx(plateNx);
-				s.setPlateNy(plateNy);
-				s.setHeatVectorLength(heatVectorLength);
-				s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getAnnotationScale());
 				s.setEdited(true);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
 				EnergyPanel.getInstance().clearRadiationHeatMap();
@@ -108,43 +99,35 @@ class SimulationSettingsDialog extends JDialog {
 			}
 		};
 
-		// set number of grid points for a plate
-		panel.add(new JLabel("# Grid Points in X-Direction: "));
-		panel.add(plateNxTextField);
-		plateNxTextField.setColumns(6);
-		panel.add(new JLabel("<html><font size=2>For mirrors and solar panels<br>(must be power of 2)</font></html>"));
+		// set number of grid points for a solar rack, used in both heat map generation and energy calculation
+		panel.add(new JLabel("Rack mesh: "));
+		JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		p1.add(rackNxTextField);
+		p1.add(new JLabel("  \u00D7  "));
+		p1.add(rackNyTextField);
+		panel.add(p1);
+		panel.add(new JLabel("Must be power of 2"));
 
-		// set number of grid points for a plate
-		panel.add(new JLabel("# Grid Points in Y-Direction: "));
-		panel.add(plateNyTextField);
-		panel.add(new JLabel("<html><font size=2>For mirrors and solar panels<br>(must be power of 2)</font></html>"));
-
-		// set the grid size ("solar step")
-		panel.add(new JLabel("Radiation Grid Cell Size: "));
-		panel.add(cellSizeTextField);
-		panel.add(new JLabel("<html><font size=2>For non-mirrors and non-solar panels<br>(internal unit)</font></html>"));
-
-		// set the heat arrow length
-		panel.add(new JLabel("Heat Arrow Length: "));
-		panel.add(heatVectorLengthTextField);
-		panel.add(new JLabel("<html><font size=2>Internal unit</font></html>"));
-
-		// set the heat arrow grid size
-		panel.add(new JLabel("Heat Arrow Grid Size: "));
-		panel.add(heatVectorGridSizeTextField);
-		panel.add(new JLabel("<html><font size=2>Meter</font></html>"));
+		// set number of grid points for a mirror, used in both heat map generation and energy calculation
+		panel.add(new JLabel("Mirror mesh: "));
+		p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		p1.add(mirrorNxTextField);
+		p1.add(new JLabel("  \u00D7  "));
+		p1.add(mirrorNyTextField);
+		panel.add(p1);
+		panel.add(new JLabel("Must be power of 2"));
 
 		// set the time step
-		panel.add(new JLabel("Time Step: "));
+		panel.add(new JLabel("Time step: "));
 		panel.add(timeStepTextField);
 		timeStepTextField.setColumns(6);
-		panel.add(new JLabel("<html><font size=2>Minutes</font></html>"));
+		panel.add(new JLabel("Minutes"));
 
 		// choose air mass
-		panel.add(new JLabel("Air Mass: "));
+		panel.add(new JLabel("Air mass: "));
 		airMassComboBox.setSelectedIndex(SolarRadiation.getInstance().getAirMassSelection() + 1);
 		panel.add(airMassComboBox);
-		panel.add(new JLabel("<html><font size=2>Dimensionless</font></html>"));
+		panel.add(new JLabel("Dimensionless"));
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

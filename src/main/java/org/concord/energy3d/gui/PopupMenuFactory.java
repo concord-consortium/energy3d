@@ -88,6 +88,7 @@ import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeCellNumbersCommand;
 import org.concord.energy3d.undo.ChangeCellNumbersForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeCellNumbersForSolarPanelOnRackCommand;
 import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
 import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
@@ -3484,14 +3485,14 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						if (container instanceof Rack) {
 							final List<HousePart> children = ((Rack) container).getChildren();
-							// final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
+							final ChangeCellNumbersForSolarPanelOnRackCommand c = new ChangeCellNumbersForSolarPanelOnRackCommand((Rack) container);
 							for (final HousePart x : children) {
 								if (x instanceof SolarPanel) {
 									((SolarPanel) x).setNumberOfCellsInX(nx);
 									((SolarPanel) x).setNumberOfCellsInY(ny);
 								}
 							}
-							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 					} else if (rb3.isSelected()) {
 						final ChangeFoundationSolarPanelCellNumbersCommand c = new ChangeFoundationSolarPanelCellNumbersCommand(foundation);
