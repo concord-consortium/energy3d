@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -41,6 +42,8 @@ class VisualizationSettingsDialog extends JDialog {
 		final Scene s = Scene.getInstance();
 		final JTextField solarPanelNxTextField = new JTextField(s.getSolarPanelNx() + "", 6);
 		final JTextField solarPanelNyTextField = new JTextField(s.getSolarPanelNy() + "", 6);
+		final JTextField rackNxTextField = new JTextField(s.getRackNx() + "", 6);
+		final JTextField rackNyTextField = new JTextField(s.getRackNy() + "", 6);
 		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
 		final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getAnnotationScale()));
@@ -53,12 +56,16 @@ class VisualizationSettingsDialog extends JDialog {
 				double heatVectorGridSize;
 				int solarPanelNx;
 				int solarPanelNy;
+				int rackNx;
+				int rackNy;
 				try {
 					cellSize = Double.parseDouble(cellSizeTextField.getText());
 					heatVectorLength = Double.parseDouble(heatVectorLengthTextField.getText());
 					heatVectorGridSize = Double.parseDouble(heatVectorGridSizeTextField.getText());
 					solarPanelNx = Integer.parseInt(solarPanelNxTextField.getText());
 					solarPanelNy = Integer.parseInt(solarPanelNyTextField.getText());
+					rackNx = Integer.parseInt(rackNxTextField.getText());
+					rackNy = Integer.parseInt(rackNyTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -81,13 +88,23 @@ class VisualizationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar panel grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if ((solarPanelNx & (solarPanelNx - 1)) != 0 || (solarPanelNy & (solarPanelNy - 1)) != 0) {
+				if (!Util.isPowerOfTwo(solarPanelNx) || !Util.isPowerOfTwo(solarPanelNy)) {
 					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar panel grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (rackNx < 2 || rackNy < 2) {
+					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar rack grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (!Util.isPowerOfTwo(rackNx) || !Util.isPowerOfTwo(rackNy)) {
+					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar rack grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				s.setSolarStep(cellSize);
 				s.setSolarPanelNx(solarPanelNx);
 				s.setSolarPanelNy(solarPanelNy);
+				s.setRackNx(rackNx);
+				s.setRackNy(rackNy);
 				s.setHeatVectorLength(heatVectorLength);
 				s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getAnnotationScale());
 				s.setEdited(true);
@@ -98,16 +115,25 @@ class VisualizationSettingsDialog extends JDialog {
 
 		/* Solar radiation heat maps */
 
-		JPanel panel = new JPanel(new GridLayout(2, 3, 8, 8));
-		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8), BorderFactory.createTitledBorder("Solar Radiation Heat Maps")));
+		JPanel panel = new JPanel(new GridLayout(3, 3, 8, 8));
+		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8), BorderFactory.createTitledBorder("<html><font size=2><b>Solar Radiation Heat Maps")));
 		box.add(panel);
 
 		// set number of grid points for creating a radiation heat map on a solar panel
 		panel.add(new JLabel(" Solar panels: "));
-		final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		p1.add(solarPanelNxTextField);
 		p1.add(new JLabel("  \u00D7  "));
 		p1.add(solarPanelNyTextField);
+		panel.add(p1);
+		panel.add(new JLabel("Must be power of 2"));
+
+		// set number of grid points for creating a radiation heat map on a solar rack
+		panel.add(new JLabel(" Solar panel racks: "));
+		p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		p1.add(rackNxTextField);
+		p1.add(new JLabel("  \u00D7  "));
+		p1.add(rackNyTextField);
 		panel.add(p1);
 		panel.add(new JLabel("Must be power of 2"));
 
@@ -119,7 +145,7 @@ class VisualizationSettingsDialog extends JDialog {
 		/* Heat flux arrows */
 
 		panel = new JPanel(new GridLayout(2, 3, 8, 8));
-		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 8, 8, 8), BorderFactory.createTitledBorder("Heat Flux Arrows")));
+		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 8, 8, 8), BorderFactory.createTitledBorder("<html><font size=2><b>Heat Flux Arrows")));
 		box.add(panel);
 
 		// set the heat arrow length

@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -40,26 +41,23 @@ class SimulationSettingsDialog extends JDialog {
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final Scene s = Scene.getInstance();
-		final JTextField rackNxTextField = new JTextField(s.getRackNx() + "", 6);
-		final JTextField rackNyTextField = new JTextField(s.getRackNy() + "", 6);
 		final JTextField mirrorNxTextField = new JTextField(s.getMirrorNx() + "", 6);
 		final JTextField mirrorNyTextField = new JTextField(s.getMirrorNy() + "", 6);
+		final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(Scene.getInstance().getRackCellSize()));
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
 
 		final ActionListener okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				int rackNx;
-				int rackNy;
 				int mirrorNx;
 				int mirrorNy;
+				double rackCellSize;
 				int timeStep;
 				try {
-					rackNx = Integer.parseInt(rackNxTextField.getText());
-					rackNy = Integer.parseInt(rackNyTextField.getText());
 					mirrorNx = Integer.parseInt(mirrorNxTextField.getText());
 					mirrorNy = Integer.parseInt(mirrorNyTextField.getText());
+					rackCellSize = Double.parseDouble(rackCellSizeTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
@@ -71,26 +69,21 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Time step must be in 5-60 seconds.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (rackNx < 2 || rackNy < 2) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of rack grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if ((rackNx & (rackNx - 1)) != 0 || (rackNy & (rackNy - 1)) != 0) {
-					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of rack grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+				if (rackCellSize < 0.5 || rackCellSize > 50) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "The grid cell size of a rack must be in 0.5-50 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (mirrorNx < 2 || mirrorNy < 2) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if ((mirrorNx & (mirrorNx - 1)) != 0 || (mirrorNy & (mirrorNy - 1)) != 0) {
+				if (!Util.isPowerOfTwo(mirrorNx) || !Util.isPowerOfTwo(mirrorNy)) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				s.setRackNx(rackNx);
-				s.setRackNy(rackNy);
 				s.setMirrorNx(mirrorNx);
 				s.setMirrorNy(mirrorNy);
+				s.setRackCellSize(rackCellSize);
 				s.setTimeStep(timeStep);
 				s.setEdited(true);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
@@ -99,23 +92,19 @@ class SimulationSettingsDialog extends JDialog {
 			}
 		};
 
-		// set number of grid points for a solar rack, used in both heat map generation and energy calculation
-		panel.add(new JLabel("Rack mesh: "));
-		JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-		p1.add(rackNxTextField);
-		p1.add(new JLabel("  \u00D7  "));
-		p1.add(rackNyTextField);
-		panel.add(p1);
-		panel.add(new JLabel("Must be power of 2"));
-
 		// set number of grid points for a mirror, used in both heat map generation and energy calculation
 		panel.add(new JLabel("Mirror mesh: "));
-		p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		p1.add(mirrorNxTextField);
 		p1.add(new JLabel("  \u00D7  "));
 		p1.add(mirrorNyTextField);
 		panel.add(p1);
 		panel.add(new JLabel("Must be power of 2"));
+
+		// set number of grid points for a solar rack, used in both heat map generation and energy calculation
+		panel.add(new JLabel("Rack grid cell: "));
+		panel.add(rackCellSizeTextField);
+		panel.add(new JLabel("Meters"));
 
 		// set the time step
 		panel.add(new JLabel("Time step: "));

@@ -79,6 +79,10 @@ public class Util {
 		return false;
 	}
 
+	public static boolean isPowerOfTwo(final int n) {
+		return (n & (n - 1)) == 0;
+	}
+
 	public static double toUsUValue(final double siUValue) {
 		return siUValue / 5.67826;
 	}

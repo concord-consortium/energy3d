@@ -731,7 +731,7 @@ public class Rack extends HousePart implements Trackable {
 			Scene.getInstance().remove(c, false);
 		}
 		if (monolithic) {
-			ensureFullSolarPanels();
+			ensureFullSolarPanels(false);
 			draw();
 		} else {
 			final Foundation foundation = getTopContainer();
@@ -874,9 +874,17 @@ public class Rack extends HousePart implements Trackable {
 		return sampleSolarPanel;
 	}
 
-	public void ensureFullSolarPanels() {
+	public void ensureFullSolarPanels(final boolean dragged) {
 		if (monolithic) {
-			if (editPointIndex > 0) { // the rack has been resized
+			boolean ok = false;
+			if (dragged) {
+				if (editPointIndex > 0) { // the rack has been resized
+					ok = true;
+				}
+			} else {
+				ok = true;
+			}
+			if (ok) {
 				final boolean portrait = !sampleSolarPanel.isRotated();
 				final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 				final double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
@@ -906,8 +914,11 @@ public class Rack extends HousePart implements Trackable {
 	}
 
 	public int getSolarPanelCount() {
-		final int[] n = getSolarPanelRowAndColumnNumbers();
-		return n[0] * n[1];
+		if (monolithic) {
+			final int[] n = getSolarPanelRowAndColumnNumbers();
+			return n[0] * n[1];
+		}
+		return 0;
 	}
 
 	public void drawSunBeam() {

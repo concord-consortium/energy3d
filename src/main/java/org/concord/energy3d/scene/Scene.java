@@ -146,11 +146,13 @@ public class Scene implements Serializable {
 	private int solarPanelNx = 4, solarPanelNy = 4;
 
 	// number of points in x and y directions when a solar rack is discretized into a grid (to meet the need of texture, these numbers must be power of 2)
-	// used in both radiation calculation and heat map visualization for racks
-	private int rackNx = 8, rackNy = 4;
+	// used in heat map visualization for solar panel racks (for radiation calculation, specify the size of the unit cell as follows)
+	private int rackNx = 8, rackNy = 8;
+
+	private double rackCellSize = 1; // by default, the cell is 1 x 1 meter
 
 	// number of points in x and y directions when a mirror is discretized into a grid (to meet the need of texture, these numbers must be power of 2)
-	// used in both radiation calculation and heat map visualization for mirrors
+	// used in both radiation calculation and heat map visualization for reflecting mirrors (which are closer to square, except parabolic troughs)
 	private int mirrorNx = 4, mirrorNy = 4;
 
 	// the step length of the discretized grid on any part that is not a plate
@@ -405,13 +407,16 @@ public class Scene implements Serializable {
 			rackNx = 8;
 		}
 		if (Util.isZero(rackNy)) {
-			rackNy = 4;
+			rackNy = 8;
 		}
 		if (Util.isZero(mirrorNx)) {
 			mirrorNx = 4;
 		}
 		if (Util.isZero(mirrorNy)) {
 			mirrorNy = 4;
+		}
+		if (Util.isZero(rackCellSize)) {
+			rackCellSize = 1;
 		}
 		if (Util.isZero(solarContrast)) {
 			solarContrast = 50;
@@ -2675,6 +2680,14 @@ public class Scene implements Serializable {
 
 	public int getRackNy() {
 		return rackNy;
+	}
+
+	public void setRackCellSize(final double rackCellSize) {
+		this.rackCellSize = rackCellSize;
+	}
+
+	public double getRackCellSize() {
+		return rackCellSize;
 	}
 
 	public void setMirrorNx(final int mirrorNx) {
