@@ -238,6 +238,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllRoofsMenuItem;
 	private JMenuItem removeAllFloorsMenuItem;
 	private JMenuItem removeAllSolarPanelsMenuItem;
+	private JMenuItem removeAllRacksMenuItem;
 	private JMenuItem removeAllMirrorsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
 	private JMenuItem removeAllWindowShuttersMenuItem;
@@ -2317,6 +2318,7 @@ public class MainFrame extends JFrame {
 			clearMenu.add(getRemoveAllWindowsMenuItem());
 			clearMenu.add(getRemoveAllWindowShuttersMenuItem());
 			clearMenu.add(getRemoveAllSolarPanelsMenuItem());
+			clearMenu.add(getRemoveAllRacksMenuItem());
 			clearMenu.add(getRemoveAllMirrorsMenuItem());
 			clearMenu.add(getRemoveAllTreesMenuItem());
 			clearMenu.add(getRemoveAllHumansMenuItem());
@@ -3283,6 +3285,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllSolarPanelsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllRacksMenuItem() {
+		if (removeAllRacksMenuItem == null) {
+			removeAllRacksMenuItem = new JMenuItem("Remove All Solar Panel Packs");
+			removeAllRacksMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllRacks();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+		}
+		return removeAllRacksMenuItem;
 	}
 
 	private JMenuItem getRemoveAllMirrorsMenuItem() {

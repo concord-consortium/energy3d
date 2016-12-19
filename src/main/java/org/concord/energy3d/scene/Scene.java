@@ -1397,6 +1397,39 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllRacks() {
+		final ArrayList<HousePart> racks = new ArrayList<HousePart>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Rack && !part.isFrozen() && part.getTopContainer() == foundation) {
+					racks.add(part);
+				}
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Rack && !part.isFrozen()) {
+					racks.add(part);
+				}
+			}
+		}
+		if (racks.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no rack to remove.", "No Rack", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + racks.size() + " solar panel racks" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+			return;
+		}
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(racks);
+		for (final HousePart part : racks) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
 	public void removeAllMirrors() {
 		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

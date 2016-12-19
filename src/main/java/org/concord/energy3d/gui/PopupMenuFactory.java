@@ -1919,6 +1919,28 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllSolarPanels);
 
+			final JMenuItem miRemoveAllRacks = new JMenuItem("Remove All Solar Panel Racks");
+			miRemoveAllRacks.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllRacks();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									Scene.getInstance().setEdited(true);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllRacks);
+
 			final JMenuItem miRemoveAllMirrors = new JMenuItem("Remove All Mirrors");
 			miRemoveAllMirrors.addActionListener(new ActionListener() {
 				@Override
