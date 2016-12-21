@@ -1342,31 +1342,30 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void turnOffCompute() {
-		if (SceneManager.getInstance().getSolarHeatMap()) {
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (SceneManager.getInstance().getSolarHeatMap()) {
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
-			});
-		}
-		int numberOfHouses = 0;
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen()) {
-				numberOfHouses++;
+				int numberOfHouses = 0;
+				for (final HousePart part : Scene.getInstance().getParts()) {
+					if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen()) {
+						numberOfHouses++;
+					}
+					if (numberOfHouses >= 2) {
+						break;
+					}
+				}
+				for (final HousePart part : Scene.getInstance().getParts()) {
+					if (part instanceof Foundation) {
+						((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+					}
+				}
+				SceneManager.getInstance().getSolarLand().setVisible(false);
+				Scene.getInstance().redrawAll();
 			}
-			if (numberOfHouses >= 2) {
-				break;
-			}
-		}
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {
-				((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
-			}
-		}
-
-		SceneManager.getInstance().getSolarLand().setVisible(false);
-		Scene.getInstance().redrawAll();
+		});
 	}
 
 	public void updateGraphs() {

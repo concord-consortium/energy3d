@@ -4197,6 +4197,7 @@ public class PopupMenuFactory {
 							final SetPartSizeCommand c = new SetPartSizeCommand(rack);
 							rack.setRackWidth(w);
 							rack.setRackHeight(h);
+							rack.ensureFullSolarPanels(false);
 							rack.draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
@@ -4354,8 +4355,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miAddSolarPanels = new JMenuItem("Add Solar Panel Array...");
-			miAddSolarPanels.addActionListener(new ActionListener() {
+			final JMenuItem miSolarPanelArray = new JMenuItem("Solar Panel Array...");
+			miSolarPanelArray.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -4368,7 +4369,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final SolarPanel solarPanel = rack.getSolarPanel();
-					final JPanel panel = new JPanel(new GridLayout(3, 2, 5, 5));
+					final JPanel panel = new JPanel(new GridLayout(7, 2, 5, 5));
 					panel.add(new JLabel("Monolithic:"));
 					final JComboBox<String> monolithicComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
 					monolithicComboBox.setSelectedIndex(rack.isMonolithic() ? 1 : 0);
@@ -4387,7 +4388,55 @@ public class PopupMenuFactory {
 					final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
 					orientationComboBox.setSelectedIndex(solarPanel.isRotated() ? 1 : 0);
 					panel.add(orientationComboBox);
+					panel.add(new JLabel("Solar Cell Efficiency (%):"));
+					final JTextField cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getCellEfficiency() * 100));
+					panel.add(cellEfficiencyField);
+					panel.add(new JLabel("Shade Tolerance:"));
+					final JComboBox<String> shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
+					shadeToleranceComboBox.setSelectedIndex(solarPanel.getShadeTolerance());
+					panel.add(shadeToleranceComboBox);
+					panel.add(new JLabel("Inverter Efficiency (%):"));
+					final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getInverterEfficiency() * 100));
+					panel.add(inverterEfficiencyField);
+					panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
+					final JTextField pmaxField = new JTextField(threeDecimalsFormat.format(solarPanel.getTemperatureCoefficientPmax()));
+					panel.add(pmaxField);
+
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						double cellEfficiency;
+						try {
+							cellEfficiency = Double.parseDouble(cellEfficiencyField.getText());
+							if (cellEfficiency < 10 || cellEfficiency > 30) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between 10% and 30%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						} catch (final NumberFormatException ex) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), cellEfficiencyField.getText() + " is an invalid value for solar cell efficiency!", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						double inverterEfficiency;
+						try {
+							inverterEfficiency = Double.parseDouble(inverterEfficiencyField.getText());
+							if (inverterEfficiency < 80 || inverterEfficiency >= 100) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than 80% and less than 100%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						} catch (final NumberFormatException ex) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), cellEfficiencyField.getText() + " is an invalid value for inverter efficiency!", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						double pmax;
+						try {
+							pmax = Double.parseDouble(pmaxField.getText());
+							if (pmax < -1 || pmax > 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						} catch (final NumberFormatException ex) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), cellEfficiencyField.getText() + " is an invalid value for temperature coefficient of Pmax!", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+
 						switch (sizeComboBox.getSelectedIndex()) {
 						case 0:
 							solarPanel.setPanelWidth(0.99);
@@ -4403,6 +4452,9 @@ public class PopupMenuFactory {
 							break;
 						}
 						solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
+						solarPanel.setCellEfficiency(cellEfficiency * 0.01);
+						solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
+						solarPanel.setShadeTolerance(shadeToleranceComboBox.getSelectedIndex());
 						SceneManager.getTaskManager().update(new Callable<Object>() {
 							@Override
 							public Object call() {
@@ -4696,12 +4748,12 @@ public class PopupMenuFactory {
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(trackerMenu);
 			popupMenuForRack.addSeparator();
+			popupMenuForRack.add(miSolarPanelArray);
 			popupMenuForRack.add(miTiltAngle);
 			popupMenuForRack.add(miAzimuth);
 			popupMenuForRack.add(miSize);
 			popupMenuForRack.add(miBaseHeight);
 			popupMenuForRack.add(miPoleSpacing);
-			popupMenuForRack.add(miAddSolarPanels);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(cbmiDrawSunBeam);
 

@@ -2118,9 +2118,11 @@ public class Scene implements Serializable {
 	public void setSizeForRacksOnFoundation(final Foundation foundation, final double width, final double height) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack && p.getTopContainer() == foundation) {
-				((Rack) p).setRackWidth(width);
-				((Rack) p).setRackHeight(height);
-				p.draw();
+				final Rack rack = (Rack) p;
+				rack.setRackWidth(width);
+				rack.setRackHeight(height);
+				rack.ensureFullSolarPanels(false);
+				rack.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
@@ -2129,9 +2131,11 @@ public class Scene implements Serializable {
 	public void setSizeForAllRacks(final double width, final double height) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
-				((Rack) p).setRackWidth(width);
-				((Rack) p).setRackHeight(height);
-				p.draw();
+				final Rack rack = (Rack) p;
+				rack.setRackWidth(width);
+				rack.setRackHeight(height);
+				rack.ensureFullSolarPanels(false);
+				rack.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
