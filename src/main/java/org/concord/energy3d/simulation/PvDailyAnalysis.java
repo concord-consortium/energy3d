@@ -31,6 +31,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -96,19 +97,29 @@ public class PvDailyAnalysis extends Analysis {
 			if (selectedPart != null) {
 				if (selectedPart instanceof SolarPanel) {
 					graph.addData("Solar", ((SolarPanel) selectedPart).getYieldNow());
+				} else if (selectedPart instanceof Rack) {
+					graph.addData("Solar", ((Rack) selectedPart).getYieldNow());
 				} else if (selectedPart instanceof Foundation) {
 					double output = 0;
 					for (final HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof SolarPanel && p.getTopContainer() == selectedPart) {
-							output += ((SolarPanel) p).getYieldNow();
+						if (p.getTopContainer() == selectedPart) {
+							if (p instanceof SolarPanel) {
+								output += ((SolarPanel) p).getYieldNow();
+							} else if (p instanceof Rack) {
+								output += ((Rack) p).getYieldNow();
+							}
 						}
 					}
 					graph.addData("Solar", output);
 				} else if (selectedPart.getTopContainer() instanceof Foundation) {
 					double output = 0;
 					for (final HousePart p : Scene.getInstance().getParts()) {
-						if (p instanceof SolarPanel && p.getTopContainer() == selectedPart.getTopContainer()) {
-							output += ((SolarPanel) p).getYieldNow();
+						if (p.getTopContainer() == selectedPart.getTopContainer()) {
+							if (p instanceof SolarPanel) {
+								output += ((SolarPanel) p).getYieldNow();
+							} else if (p instanceof Rack) {
+								output += ((Rack) p).getYieldNow();
+							}
 						}
 					}
 					graph.addData("Solar", output);
@@ -118,6 +129,8 @@ public class PvDailyAnalysis extends Analysis {
 				for (final HousePart p : Scene.getInstance().getParts()) {
 					if (p instanceof SolarPanel) {
 						output += ((SolarPanel) p).getYieldNow();
+					} else if (p instanceof Rack) {
+						output += ((Rack) p).getYieldNow();
 					}
 				}
 				graph.addData("Solar", output);
@@ -328,6 +341,8 @@ public class PvDailyAnalysis extends Analysis {
 		if (selectedPart != null) {
 			if (selectedPart instanceof SolarPanel) {
 				s += "\"Panel\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			} else if (selectedPart instanceof Rack) {
+				s += "\"Rack\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart instanceof Foundation) {
 				s += "\"Platform\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {

@@ -1140,6 +1140,8 @@ public class SolarRadiation {
 						child.setSolarPotentialToday(0);
 						if (child instanceof SolarPanel) {
 							((SolarPanel) child).setYieldToday(0);
+						} else if (child instanceof Rack) {
+							((Rack) child).setYieldToday(0);
 						}
 						for (int i = 0; i < n; i++) {
 							solarPotentialTotal += child.getSolarPotential()[i];
@@ -1155,6 +1157,12 @@ public class SolarRadiation {
 								final SolarPanel sp = (SolarPanel) child;
 								final double yield = sp.getSolarPotential()[i] * sp.getSystemEfficiency(outsideTemperature);
 								sp.setYieldToday(sp.getYieldToday() + yield);
+								photovoltaic[i] += yield;
+							} else if (child instanceof Rack) {
+								final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * Scene.getInstance().getTimeStep());
+								final Rack rack = (Rack) child;
+								final double yield = rack.getSolarPotential()[i] * rack.getSolarPanel().getSystemEfficiency(outsideTemperature);
+								rack.setYieldToday(rack.getYieldToday() + yield);
 								photovoltaic[i] += yield;
 							}
 						}
@@ -1228,6 +1236,8 @@ public class SolarRadiation {
 						child.setSolarPotentialNow(0);
 						if (child instanceof SolarPanel) {
 							((SolarPanel) child).setYieldNow(0);
+						} else if (child instanceof Rack) {
+							((Rack) child).setYieldNow(0);
 						}
 						for (int i = 0; i < n; i++) {
 							solarPotentialTotal += child.getSolarPotential()[t0 + i];
@@ -1243,6 +1253,13 @@ public class SolarRadiation {
 								final double yield = sp.getSolarPotential()[t0 + i] * sp.getSystemEfficiency(outsideTemperature);
 								photovoltaic[i] += yield;
 								sp.setYieldNow(sp.getYieldNow() + yield);
+							} else if (child instanceof Rack) {
+								final Rack rack = (Rack) child;
+								if (rack.isMonolithic()) {
+									final double yield = rack.getSolarPotential()[t0 + i] * rack.getSolarPanel().getSystemEfficiency(outsideTemperature);
+									photovoltaic[i] += yield;
+									rack.setYieldNow(rack.getYieldNow() + yield);
+								}
 							}
 						}
 					}

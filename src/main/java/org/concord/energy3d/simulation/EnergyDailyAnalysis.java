@@ -34,6 +34,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
@@ -147,6 +148,8 @@ public class EnergyDailyAnalysis extends Analysis {
 				graph.addData("Heat Gain", -sum);
 			} else if (selectedPart instanceof SolarPanel) {
 				graph.addData("Solar", ((SolarPanel) selectedPart).getYieldNow());
+			} else if (selectedPart instanceof Rack) {
+				graph.addData("Solar", ((Rack) selectedPart).getYieldNow());
 			}
 		}
 		graph.repaint();

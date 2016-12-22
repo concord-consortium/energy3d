@@ -75,6 +75,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.PartGroup;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
@@ -1992,7 +1993,7 @@ public class MainFrame extends JFrame {
 		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Mirror", "Window", "Wall", "Roof" });
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Rack", "Mirror", "Window", "Wall", "Roof" });
 		typeComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
@@ -2007,6 +2008,8 @@ public class MainFrame extends JFrame {
 					c = Roof.class;
 				} else if ("Solar Panel".equals(type)) {
 					c = SolarPanel.class;
+				} else if ("Rack".equals(type)) {
+					c = Rack.class;
 				} else if ("Mirror".equals(type)) {
 					c = Mirror.class;
 				}

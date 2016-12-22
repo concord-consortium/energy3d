@@ -44,6 +44,8 @@ public class Rack extends HousePart implements Trackable {
 	private transient Vector3 moveStartPoint;
 	private transient double layoutGap = 0.01;
 	private transient boolean allowAzimuthLargeRotation;
+	private transient double yieldNow; // solar output at current hour
+	private transient double yieldToday;
 	private ReadOnlyVector3 previousNormal;
 	private double rackWidth = 15;
 	private double rackHeight = 3;
@@ -975,6 +977,22 @@ public class Rack extends HousePart implements Trackable {
 
 	public boolean isDrawSunBeamVisible() {
 		return drawSunBeam;
+	}
+
+	public double getYieldNow() {
+		return yieldNow;
+	}
+
+	public void setYieldNow(final double yieldNow) {
+		this.yieldNow = yieldNow;
+	}
+
+	public double getYieldToday() {
+		return yieldToday;
+	}
+
+	public void setYieldToday(final double yieldToday) {
+		this.yieldToday = yieldToday;
 	}
 
 }

@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Graph;
@@ -118,12 +119,20 @@ public class PvStationDailyEnergyGraph extends JPanel {
 		}
 		graph.clearData();
 		final List<SolarPanel> panels = base.getSolarPanels();
-		if (!panels.isEmpty()) {
+		final List<Rack> racks = base.getRacks();
+		if (!panels.isEmpty() || !racks.isEmpty()) {
 			for (int i = 0; i < 24; i++) {
 				SolarRadiation.getInstance().computeEnergyAtHour(i);
 				double output = 0;
-				for (final SolarPanel sp : panels) {
-					output += sp.getYieldNow();
+				if (!panels.isEmpty()) {
+					for (final SolarPanel sp : panels) {
+						output += sp.getYieldNow();
+					}
+				}
+				if (!racks.isEmpty()) {
+					for (final Rack r : racks) {
+						output += r.getYieldNow();
+					}
 				}
 				graph.addData("Solar", output);
 			}

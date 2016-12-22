@@ -34,6 +34,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
@@ -125,6 +126,8 @@ public class GroupDailyAnalysis extends Analysis {
 					graph.addData("Heat Gain " + p.getId(), -sum);
 				} else if (p instanceof SolarPanel) {
 					graph.addData("Solar " + p.getId(), ((SolarPanel) p).getYieldNow());
+				} else if (p instanceof Rack) {
+					graph.addData("Solar " + p.getId(), ((Rack) p).getYieldNow());
 				} else if (p instanceof Mirror) {
 					final Mirror mirror = (Mirror) p;
 					final double solar = mirror.getSolarPotentialNow() * mirror.getSystemEfficiency();
@@ -382,6 +385,9 @@ public class GroupDailyAnalysis extends Analysis {
 			if (p instanceof SolarPanel) {
 				names.add("Solar " + p.getId());
 				type = "Solar Panel";
+			} else if (p instanceof Rack) {
+				names.add("Solar " + p.getId());
+				type = "Rack";
 			} else if (p instanceof Mirror) {
 				names.add("Solar " + p.getId());
 				type = "Mirror";
