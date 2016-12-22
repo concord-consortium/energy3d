@@ -10,6 +10,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
 import org.concord.energy3d.util.Util;
@@ -20,6 +21,7 @@ import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
@@ -27,6 +29,7 @@ import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.util.geom.BufferUtils;
@@ -44,6 +47,9 @@ public class SolarPanel extends HousePart implements Trackable {
 	private transient Mesh supportFrame;
 	private transient Line sunBeam;
 	private transient Line normalVector;
+	private transient Node angles;
+	private transient AngleAnnotation sunAngle;
+	private static double normalVectorLength = 5;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private double efficiency = 0.15; // a number in (0, 1)
@@ -140,9 +146,21 @@ public class SolarPanel extends HousePart implements Trackable {
 		normalVector.setStipplePattern((short) 0xffff);
 		normalVector.setModelBound(null);
 		Util.disablePickShadowLight(normalVector);
-		normalVector.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		normalVector.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		normalVector.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 1f));
 		root.attachChild(normalVector);
+
+		angles = new Node("Angles");
+		angles.getSceneHints().setAllPickingHints(false);
+		Util.disablePickShadowLight(angles);
+		root.attachChild(angles);
+
+		sunAngle = new AngleAnnotation(); // the angle between the sun beam and the normal vector
+		sunAngle.setColor(ColorRGBA.WHITE);
+		sunAngle.setLineWidth(1);
+		sunAngle.setFontSize(1);
+		sunAngle.setCustomRadius(normalVectorLength * 0.8);
+		angles.attachChild(sunAngle);
 
 		updateTextureAndColor();
 
@@ -388,12 +406,37 @@ public class SolarPanel extends HousePart implements Trackable {
 		final FloatBuffer normalVertices = normalVector.getMeshData().getVertexBuffer();
 		normalVertices.rewind();
 		r = o.clone(); // draw normal vector
-		r.addLocal(normal.multiply(5, null));
+		r.addLocal(normal.multiply(normalVectorLength, null));
 		normalVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		// TODO final Vector3 s = new Vector3(r);
-		// normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		// normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+
+		// draw arrows of the normal vector
+		final double arrowLength = 0.75;
+		final double arrowAngle = Math.toRadians(20);
+		final Matrix3 matrix = new Matrix3();
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final Vector3 v1 = new Vector3();
+		final Vector3 v2 = new Vector3();
+		BufferUtils.populateFromBuffer(v1, buf, 1);
+		BufferUtils.populateFromBuffer(v2, buf, 2);
+		Vector3 a = trans.applyForward(v1).subtract(trans.applyForward(v2), null).normalizeLocal();
+		a = a.crossLocal(normal);
+		Vector3 s = normal.clone();
+		s = matrix.fromAngleNormalAxis(arrowAngle, a).applyPost(s, null).multiplyLocal(arrowLength);
+		s = r.subtract(s, null);
+		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+		s = normal.clone();
+		s = matrix.fromAngleNormalAxis(-arrowAngle, a).applyPost(s, null).multiplyLocal(arrowLength);
+		s = r.subtract(s, null);
+		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+
+		// draw the angle between the sun beam and the normal vector
+		normal.cross(sunLocation, a);
+		sunAngle.setRange(o, o.add(sunLocation, null), o.add(normal, null), a);
+
 		normalVector.updateModelBound();
 		normalVector.setVisible(true);
 	}

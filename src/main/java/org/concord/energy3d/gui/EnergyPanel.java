@@ -57,6 +57,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -883,13 +884,13 @@ public class EnergyPanel extends JPanel {
 						public void run() {
 							String title = "Solar Panel (" + sp.getId() + ")";
 							switch (sp.getTracker()) {
-							case SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER:
+							case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
 								title += ", Tracker: HSAT";
 								break;
-							case SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER:
+							case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
 								title += ", Tracker: VSAT";
 								break;
-							case SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+							case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 								title += ", Tracker: AADAT";
 								break;
 							}
@@ -926,7 +927,18 @@ public class EnergyPanel extends JPanel {
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							final String title = "Rack (" + rack.getId() + ")";
+							String title = "Rack (" + rack.getId() + ")";
+							switch (rack.getTracker()) {
+							case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+								title += ", Tracker: HSAT";
+								break;
+							case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+								title += ", Tracker: VSAT";
+								break;
+							case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+								title += ", Tracker: AADAT";
+								break;
+							}
 							partPanelBorder.setTitle(title);
 							partProperty1Label.setText("  Size & Position:");
 							partProperty1TextField.setText(twoDecimals.format(rack.getRackWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(rack.getRackHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");

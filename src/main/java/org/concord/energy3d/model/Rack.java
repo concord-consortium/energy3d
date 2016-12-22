@@ -12,6 +12,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.Util;
@@ -41,6 +42,8 @@ public class Rack extends HousePart implements Trackable {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Node polesRoot;
+	private transient Node angles;
+	private transient AngleAnnotation sunAngle;
 	private transient Vector3 moveStartPoint;
 	private transient double layoutGap = 0.01;
 	private transient boolean allowAzimuthLargeRotation;
@@ -63,6 +66,7 @@ public class Rack extends HousePart implements Trackable {
 	private boolean drawSunBeam;
 	private transient Line sunBeam;
 	private transient Line normalVector;
+	private static double normalVectorLength = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 
 	public Rack() {
@@ -109,9 +113,21 @@ public class Rack extends HousePart implements Trackable {
 		normalVector.setStipplePattern((short) 0xffff);
 		normalVector.setModelBound(null);
 		Util.disablePickShadowLight(normalVector);
-		normalVector.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		normalVector.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		normalVector.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 1f));
 		root.attachChild(normalVector);
+
+		angles = new Node("Angles");
+		angles.getSceneHints().setAllPickingHints(false);
+		Util.disablePickShadowLight(angles);
+		root.attachChild(angles);
+
+		sunAngle = new AngleAnnotation(); // the angle between the sun beam and the normal vector
+		sunAngle.setColor(ColorRGBA.WHITE);
+		sunAngle.setLineWidth(1);
+		sunAngle.setFontSize(1);
+		sunAngle.setCustomRadius(normalVectorLength * 0.8);
+		angles.attachChild(sunAngle);
 
 		polesRoot = new Node("Poles Root");
 		root.attachChild(polesRoot);
@@ -802,6 +818,7 @@ public class Rack extends HousePart implements Trackable {
 	@Override
 	public void setTracker(final int tracker) {
 		this.trackerType = tracker;
+		sampleSolarPanel.setTracker(tracker);
 	}
 
 	@Override
@@ -934,7 +951,7 @@ public class Rack extends HousePart implements Trackable {
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 		Vector3 r = o.clone(); // draw sun vector
-		r.addLocal(sunLocation.multiply(1000000, null));
+		r.addLocal(sunLocation.multiply(10000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 		sunBeam.updateModelBound();
@@ -951,12 +968,37 @@ public class Rack extends HousePart implements Trackable {
 		final FloatBuffer normalVertices = normalVector.getMeshData().getVertexBuffer();
 		normalVertices.rewind();
 		r = o.clone(); // draw normal vector
-		r.addLocal(normal.multiply(5, null));
+		r.addLocal(normal.multiply(normalVectorLength, null));
 		normalVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		// TODO final Vector3 s = new Vector3(r);
-		// normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		// normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+
+		// draw arrows of the normal vector
+		final double arrowLength = 0.75;
+		final double arrowAngle = Math.toRadians(20);
+		final Matrix3 matrix = new Matrix3();
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final Vector3 v1 = new Vector3();
+		final Vector3 v2 = new Vector3();
+		BufferUtils.populateFromBuffer(v1, buf, 1);
+		BufferUtils.populateFromBuffer(v2, buf, 2);
+		Vector3 a = trans.applyForward(v1).subtract(trans.applyForward(v2), null).normalizeLocal();
+		a = a.crossLocal(normal);
+		Vector3 s = normal.clone();
+		s = matrix.fromAngleNormalAxis(arrowAngle, a).applyPost(s, null).multiplyLocal(arrowLength);
+		s = r.subtract(s, null);
+		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+		s = normal.clone();
+		s = matrix.fromAngleNormalAxis(-arrowAngle, a).applyPost(s, null).multiplyLocal(arrowLength);
+		s = r.subtract(s, null);
+		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
+
+		// draw the angle between the sun beam and the normal vector
+		normal.cross(sunLocation, a);
+		sunAngle.setRange(o, o.add(sunLocation, null), o.add(normal, null), a);
+
 		normalVector.updateModelBound();
 		normalVector.setVisible(true);
 	}
