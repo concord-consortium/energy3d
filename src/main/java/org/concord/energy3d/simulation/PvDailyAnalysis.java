@@ -146,7 +146,7 @@ public class PvDailyAnalysis extends Analysis {
 		int cost = -1;
 		String title = "Daily Yield of All Solar Panels";
 		if (selectedPart != null) {
-			if (selectedPart instanceof SolarPanel) {
+			if (selectedPart instanceof SolarPanel || selectedPart instanceof Rack) {
 				cost = Cost.getInstance().getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Daily Yield";

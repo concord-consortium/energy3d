@@ -929,7 +929,7 @@ public class Rack extends HousePart implements Trackable {
 			normalVector.setVisible(false);
 			return;
 		}
-		final Vector3 o = getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 o = getAbsPoint(0);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();

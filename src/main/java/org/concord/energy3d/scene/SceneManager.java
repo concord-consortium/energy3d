@@ -466,6 +466,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!night && rack.getTracker() != Trackable.NO_TRACKER) {
 							rack.draw();
 						}
+						if (rack.isDrawSunBeamVisible()) {
+							rack.drawSunBeam();
+						}
 					}
 				}
 			}

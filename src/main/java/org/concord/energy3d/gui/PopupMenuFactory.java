@@ -4756,6 +4756,29 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(cbmiDrawSunBeam);
+			popupMenuForRack.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
+						new PvDailyAnalysis().show();
+					}
+				}
+			});
+			popupMenuForRack.add(mi);
+
+			mi = new JMenuItem("Annual Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
+						new PvAnnualAnalysis().show();
+					}
+				}
+			});
+			popupMenuForRack.add(mi);
 
 		}
 
