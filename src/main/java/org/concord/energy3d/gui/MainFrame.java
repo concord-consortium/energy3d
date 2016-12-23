@@ -3507,8 +3507,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveEastMenuItem() {
 		if (moveEastMenuItem == null) {
-			moveEastMenuItem = new JMenuItem("Move East");
-			moveEastMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)); // use 0 to specify no modifier
+			moveEastMenuItem = new JMenuItem("Move East (Press 'E' Key)");
 			moveEastMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3530,8 +3529,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveWestMenuItem() {
 		if (moveWestMenuItem == null) {
-			moveWestMenuItem = new JMenuItem("Move West");
-			moveWestMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0)); // use 0 to specify no modifier
+			moveWestMenuItem = new JMenuItem("Move West (Press 'W' Key)");
 			moveWestMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3553,8 +3551,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveSouthMenuItem() {
 		if (moveSouthMenuItem == null) {
-			moveSouthMenuItem = new JMenuItem("Move South");
-			moveSouthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)); // use 0 to specify no modifier
+			moveSouthMenuItem = new JMenuItem("Move South (Press 'S' Key)");
 			moveSouthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3576,8 +3573,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveNorthMenuItem() {
 		if (moveNorthMenuItem == null) {
-			moveNorthMenuItem = new JMenuItem("Move North");
-			moveNorthMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)); // use 0 to specify no modifier
+			moveNorthMenuItem = new JMenuItem("Move North (Press 'N' Key)");
 			moveNorthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

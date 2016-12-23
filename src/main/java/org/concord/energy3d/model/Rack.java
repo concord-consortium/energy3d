@@ -684,6 +684,13 @@ public class Rack extends HousePart implements Trackable {
 		}
 	}
 
+	public void set(final Vector3 center, final double width, final double height) {
+		points.get(0).set(toRelative(center));
+		setRackWidth(width);
+		setRackHeight(height);
+		draw();
+	}
+
 	public double getPoleDistanceX() {
 		return poleDistanceX;
 	}

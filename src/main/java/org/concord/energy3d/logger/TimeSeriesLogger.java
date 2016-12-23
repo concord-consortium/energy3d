@@ -207,13 +207,13 @@ public class TimeSeriesLogger {
 						stateValue += ", \"Old Z Length\": " + c.getOldZLength() + ", \"New Z Length\": " + c.getNewZLength();
 						stateValue += "}";
 					}
-				} else if (lastEdit instanceof MoveBuildingCommand) {
-					final MoveBuildingCommand c = (MoveBuildingCommand) lastEdit;
-					final Foundation f = c.getFoundation();
+				} else if (lastEdit instanceof MovePartCommand) {
+					final MovePartCommand c = (MovePartCommand) lastEdit;
+					final HousePart p = c.getPart();
 					final Vector3 d = c.getDisplacement();
 					final String s = "\"(" + d.getX() + ", " + d.getY() + ")\"";
-					if (f != null) {
-						stateValue = "{\"Building\": " + f.getId() + ", \"Displacement\": " + s + "}";
+					if (p != null) {
+						stateValue = "{\"Part\": " + p.getId() + ", \"Displacement\": " + s + "}";
 					} else {
 						stateValue = "{\"Displacement\": " + s + "}";
 					}

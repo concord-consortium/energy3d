@@ -9,24 +9,28 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.math.Vector3;
 
-public class MoveBuildingCommand extends AbstractUndoableEdit {
+public class MovePartCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private final Foundation foundation;
+	private final HousePart part;
 	private final Vector3 displacement;
 
-	public MoveBuildingCommand(final Foundation foundation, final Vector3 displacement) {
-		this.foundation = foundation;
+	public MovePartCommand(final HousePart part, final Vector3 displacement) {
+		this.part = part;
 		this.displacement = displacement;
 	}
 
-	public Foundation getFoundation() {
-		return foundation;
+	public HousePart getPart() {
+		return part;
 	}
 
 	public Vector3 getDisplacement() {
@@ -48,18 +52,34 @@ public class MoveBuildingCommand extends AbstractUndoableEdit {
 	}
 
 	private void move(final Vector3 v) {
-		SceneManager.getInstance().setSelectedPart(foundation);
+		SceneManager.getInstance().setSelectedPart(part);
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				if (foundation != null) {
-					foundation.move(v, foundation.getGridSize());
-				} else {
-					for (HousePart p : Scene.getInstance().getParts()) {
+				if (part == null) {
+					for (final HousePart p : Scene.getInstance().getParts()) {
 						if (p instanceof Foundation) {
 							((Foundation) p).move(v, p.getGridSize());
 						}
 					}
+				} else if (part instanceof Foundation) {
+					((Foundation) part).move(v, part.getGridSize());
+				} else if (part instanceof Window) {
+					final Window w = (Window) part;
+					w.move(v);
+					w.draw();
+				} else if (part instanceof Mirror) {
+					final Mirror m = (Mirror) part;
+					m.move(v, part.getGridSize());
+					m.draw();
+				} else if (part instanceof SolarPanel) {
+					final SolarPanel s = (SolarPanel) part;
+					s.move(v, part.getGridSize());
+					s.draw();
+				} else if (part instanceof Rack) {
+					final Rack r = (Rack) part;
+					r.move(v, part.getGridSize());
+					r.draw();
 				}
 				return null;
 			}
@@ -68,7 +88,7 @@ public class MoveBuildingCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Move Building";
+		return "Move";
 	}
 
 }

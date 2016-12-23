@@ -61,7 +61,7 @@ import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
-import org.concord.energy3d.undo.MoveBuildingCommand;
+import org.concord.energy3d.undo.MovePartCommand;
 import org.concord.energy3d.undo.RackEditPartCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
@@ -1050,9 +1050,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void move(final Vector3 v) {
-		MoveBuildingCommand c = null;
+		final MovePartCommand c = new MovePartCommand(selectedPart, v);
 		if (selectedPart == null) {
-			c = new MoveBuildingCommand(null, v);
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
 					((Foundation) p).move(v, p.getGridSize());
@@ -1060,12 +1059,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 			Scene.getInstance().redrawAll();
 		} else if (selectedPart instanceof Foundation) {
-			c = new MoveBuildingCommand((Foundation) selectedPart, v);
 			final Foundation f = (Foundation) selectedPart;
 			f.move(v, selectedPart.getGridSize());
 			f.draw();
 			f.drawChildren();
-			SceneManager.getInstance().refresh();
 		} else if (selectedPart instanceof Window) {
 			final Window w = (Window) selectedPart;
 			w.move(v);
@@ -1083,9 +1080,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			r.move(v, selectedPart.getGridSize());
 			r.draw();
 		}
-		if (c != null) {
-			undoManager.addEdit(c);
-		}
+		undoManager.addEdit(c);
 		SceneManager.getInstance().refresh();
 		Scene.getInstance().setEdited(true);
 	}
