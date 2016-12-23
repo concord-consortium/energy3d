@@ -868,7 +868,7 @@ public class Rack extends HousePart implements Trackable {
 		getEditPointShape(i++).setTranslation(p3);
 		getEditPointShape(i++).setTranslation(p4);
 		super.updateEditShapes();
-		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, 1));
+		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, monolithic ? 0.15 : 1));
 	}
 
 	private Vector3 getVertex(final int i) {

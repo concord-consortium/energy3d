@@ -1296,18 +1296,19 @@ public class MainFrame extends JFrame {
 
 			final JMenu pvMenu = new JMenu("Photovoltatic Systems");
 			tutorialsMenu.add(pvMenu);
-			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
-			addModel(pvMenu, "Solar Trackers for Racks", "tutorials/solar-tracker-racks.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Arrays)", "tutorials/pv-fixed-arrays.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Arrays)", "tutorials/pv-hsat-arrays.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Rack Arrays)", "tutorials/pv-fixed-rack-arrays.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Rack Arrays)", "tutorials/pv-hsat-rack-arrays.ng3");
 			addModel(pvMenu, "Single Solar Rack", "tutorials/solar-single-rack.ng3");
 			addModel(pvMenu, "Single Solar Rack (Slow Full Model)", "tutorials/solar-single-rack-full.ng3");
 			addModel(pvMenu, "Multiple Solar Racks", "tutorials/solar-multiple-racks.ng3");
 			addModel(pvMenu, "Solar Rack Array", "tutorials/solar-rack-array.ng3");
 			addModel(pvMenu, "Solar Rack Array (Slow Full Model)", "tutorials/solar-rack-array-full.ng3");
 			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
+			pvMenu.addSeparator();
+			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
+			addModel(pvMenu, "Solar Trackers for Racks", "tutorials/solar-tracker-racks.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Arrays)", "tutorials/pv-fixed-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Arrays)", "tutorials/pv-hsat-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Rack Arrays)", "tutorials/pv-fixed-rack-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Rack Arrays)", "tutorials/pv-hsat-rack-arrays.ng3");
 
 			final JMenu cspMenu = new JMenu("Concentrated Solar Power Systems");
 			tutorialsMenu.add(cspMenu);

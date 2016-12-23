@@ -21,7 +21,7 @@ public class FoundationPolygon extends HousePart {
 	public FoundationPolygon(final Foundation foundation) {
 		super(1, 8, 0, true);
 		this.container = foundation;
-		final double h = foundation.getHeight() + 10;
+		final double h = foundation.getHeight() + 0.1;// put it a bit higher to ensure that the line floats above the foundation
 		points.get(0).set(0.1, 0.1, h);
 		points.get(1).set(0.9, 0.1, h);
 		points.get(2).set(0.9, 0.9, h);
