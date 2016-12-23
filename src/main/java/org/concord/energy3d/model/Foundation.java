@@ -143,7 +143,10 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		if (foundationPolygon == null) {
 			foundationPolygon = new FoundationPolygon(this);
+		} else {
+			foundationPolygon.draw();
 		}
+			
 		root.attachChild(foundationPolygon.getRoot());
 
 		sideMesh = new Mesh[4];
