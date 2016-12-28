@@ -146,7 +146,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		} else {
 			foundationPolygon.draw();
 		}
-			
+
 		root.attachChild(foundationPolygon.getRoot());
 
 		sideMesh = new Mesh[4];
@@ -1882,24 +1882,21 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			path.closePath();
 		}
-		double x, y, rackWidth, rows;
+		double rackWidth, rows;
+		final Vector3 center = new Vector3();
 		switch (rowAxis) {
 		case Trackable.EAST_WEST_AXIS:
-			x = (x0 + x1) * 0.5;
+			center.setX((x0 + x1) * 0.5);
 			rackWidth = a * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(b / h);
 			for (int r = 0; r < rows; r++) {
-				y = y0 + h * (r + 0.5);
+				center.setY(y0 + h * (r + 0.5));
 				final Rack rack = new Rack();
 				rack.setContainer(this);
 				rack.setSolarPanel(panel);
 				rack.setMonolithic(true);
-				final Vector3 v = rack.toRelative(new Vector3(x, y, 0));
-				rack.points.get(0).setX(v.getX());
-				rack.points.get(0).setY(v.getY());
+				rack.set(center, rackWidth, rackHeight);
 				rack.points.get(0).setZ(height);
-				rack.setRackWidth(rackWidth);
-				rack.setRackHeight(rackHeight);
 				rack.roundUpRackWidth();
 				rack.setRotationAxis(rowAxis);
 				Scene.getInstance().add(rack, false);
@@ -1909,21 +1906,17 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			break;
 		case Trackable.NORTH_SOUTH_AXIS:
-			y = (y0 + y1) * 0.5;
+			center.setY((y0 + y1) * 0.5);
 			rackWidth = b * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(a / h);
 			for (int r = 0; r < rows; r++) {
-				x = x0 + h * (r + 0.5);
+				center.setX(x0 + h * (r + 0.5));
 				final Rack rack = new Rack();
 				rack.setContainer(this);
 				rack.setSolarPanel(panel);
 				rack.setMonolithic(true);
-				final Vector3 v = rack.toRelative(new Vector3(x, y, 0));
-				rack.points.get(0).setX(v.getX());
-				rack.points.get(0).setY(v.getY());
+				rack.set(center, rackWidth, rackHeight);
 				rack.points.get(0).setZ(height);
-				rack.setRackWidth(rackWidth);
-				rack.setRackHeight(rackHeight);
 				rack.roundUpRackWidth();
 				rack.setRotationAxis(rowAxis);
 				Scene.getInstance().add(rack, false);

@@ -403,7 +403,6 @@ public abstract class HousePart implements Serializable {
 		if (container == null) {
 			return new Vector3(p);
 		}
-
 		final Vector3 p0 = container.getAbsPoint(0);
 		final Vector3 p1 = container.getAbsPoint(1);
 		final Vector3 p2 = container.getAbsPoint(2);

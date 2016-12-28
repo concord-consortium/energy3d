@@ -800,4 +800,17 @@ public class Util {
 		}
 	}
 
+	public static Point2D.Double segmentIntersects(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3, final double x4, final double y4) {
+		final double denom = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+		if (denom == 0.0) { // lines are parallel
+			return null;
+		}
+		final double ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
+		final double ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+		if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) { // get the intersection point
+			return new Point2D.Double(x1 + ua * (x2 - x1), y1 + ua * (y2 - y1));
+		}
+		return null;
+	}
+
 }
