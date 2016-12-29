@@ -805,10 +805,10 @@ public class Util {
 		if (denom == 0.0) { // lines are parallel
 			return null;
 		}
-		final double ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
-		final double ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
-		if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1) { // get the intersection point
-			return new Point2D.Double(x1 + ua * (x2 - x1), y1 + ua * (y2 - y1));
+		final double u = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denom;
+		final double v = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denom;
+		if (u >= 0 && u <= 1 && v >= 0 && v <= 1) { // get the intersection point
+			return new Point2D.Double(x1 + u * (x2 - x1), y1 + u * (y2 - y1));
 		}
 		return null;
 	}

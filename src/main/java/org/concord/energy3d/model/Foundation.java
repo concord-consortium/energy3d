@@ -1870,20 +1870,11 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double panelHeight = panel.isRotated() ? panel.getPanelWidth() : panel.getPanelHeight();
 		final double rackHeight = panelHeight * panelRowsPerRack;
 		final double h = (rackHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
-		Path2D.Double path = null;
-		if (foundationPolygon != null && foundationPolygon.isVisible()) {
-			path = new Path2D.Double();
-			final int n = foundationPolygon.points.size();
-			Vector3 v = foundationPolygon.getAbsPoint(0);
-			path.moveTo(v.getX(), v.getY());
-			for (int i = 1; i < n / 2; i++) { // use only the first half of the vertices from the polygon
-				v = foundationPolygon.getAbsPoint(i);
-				path.lineTo(v.getX(), v.getY());
-			}
-			path.closePath();
-		}
 		double rackWidth, rows;
 		final Vector3 center = new Vector3();
+		final Vector3 v1 = new Vector3();
+		final Vector3 v2 = new Vector3();
+		final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
 		switch (rowAxis) {
 		case Trackable.EAST_WEST_AXIS:
 			center.setX((x0 + x1) * 0.5);
@@ -1891,18 +1882,23 @@ public class Foundation extends HousePart implements Thermalizable {
 			rows = (int) Math.floor(b / h);
 			for (int r = 0; r < rows; r++) {
 				center.setY(y0 + h * (r + 0.5));
-				final Rack rack = new Rack();
-				rack.setContainer(this);
-				rack.setSolarPanel(panel);
-				rack.setMonolithic(true);
-				rack.set(center, rackWidth, rackHeight);
-				rack.points.get(0).setZ(height);
-				rack.roundUpRackWidth();
-				rack.setRotationAxis(rowAxis);
-				Scene.getInstance().add(rack, false);
-				rack.complete();
-				rack.setRelativeAzimuth(90);
-				rack.draw();
+				if (foundationPolygon != null && foundationPolygon.isVisible()) {
+					v1.set(x0, center.getY(), 0);
+					v2.set(x1, center.getY(), 0);
+					intersections.clear();
+					intersections.addAll(foundationPolygon.getIntersectingPoints(v1, v2));
+					final int n = intersections.size();
+					if (n >= 2) {
+						for (int i = 0; i < n; i += 2) {
+							final Point2D.Double pd1 = intersections.get(i);
+							final Point2D.Double pd2 = intersections.get(i + 1);
+							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
+							addRack(panel, rowAxis, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false).draw();
+						}
+					}
+				} else {
+					addRack(panel, rowAxis, center, rackWidth, rackHeight, false).draw();
+				}
 			}
 			break;
 		case Trackable.NORTH_SOUTH_AXIS:
@@ -1911,18 +1907,23 @@ public class Foundation extends HousePart implements Thermalizable {
 			rows = (int) Math.floor(a / h);
 			for (int r = 0; r < rows; r++) {
 				center.setX(x0 + h * (r + 0.5));
-				final Rack rack = new Rack();
-				rack.setContainer(this);
-				rack.setSolarPanel(panel);
-				rack.setMonolithic(true);
-				rack.set(center, rackWidth, rackHeight);
-				rack.points.get(0).setZ(height);
-				rack.roundUpRackWidth();
-				rack.setRotationAxis(rowAxis);
-				Scene.getInstance().add(rack, false);
-				rack.complete();
-				rack.setRelativeAzimuth(90);
-				rack.draw();
+				if (foundationPolygon != null && foundationPolygon.isVisible()) {
+					v1.set(center.getX(), y0, 0);
+					v2.set(center.getX(), y1, 0);
+					intersections.clear();
+					intersections.addAll(foundationPolygon.getIntersectingPoints(v1, v2));
+					final int n = intersections.size();
+					if (n >= 2) {
+						for (int i = 0; i < n; i += 2) {
+							final Point2D.Double pd1 = intersections.get(i);
+							final Point2D.Double pd2 = intersections.get(i + 1);
+							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
+							addRack(panel, rowAxis, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true).draw();
+						}
+					}
+				} else {
+					addRack(panel, rowAxis, center, rackWidth, rackHeight, true).draw();
+				}
 			}
 			break;
 		}
@@ -1937,6 +1938,23 @@ public class Foundation extends HousePart implements Thermalizable {
 				EnergyPanel.getInstance().updateProperties();
 			}
 		});
+	}
+
+	private Rack addRack(final SolarPanel panel, final int rowAxis, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
+		final Rack rack = new Rack();
+		rack.setContainer(this);
+		rack.setSolarPanel(panel);
+		rack.setMonolithic(true);
+		rack.set(center, rackWidth, rackHeight);
+		rack.points.get(0).setZ(height);
+		rack.roundUpRackWidth();
+		rack.setRotationAxis(rowAxis);
+		Scene.getInstance().add(rack, false);
+		rack.complete();
+		if (rotate90) {
+			rack.setRelativeAzimuth(90);
+		}
+		return rack;
 	}
 
 	public int getSupportingType() {

@@ -1,6 +1,9 @@
 package org.concord.energy3d.model;
 
+import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
@@ -140,6 +143,27 @@ public class FoundationPolygon extends HousePart {
 			}
 		}
 		super.complete();
+	}
+
+	public List<Point2D.Double> getIntersectingPoints(final Vector3 v1, final Vector3 v2) {
+		final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
+		final int n = points.size() / 2;
+		Vector3 p1, p2;
+		for (int i = 0; i < n - 1; i++) { // use only the first half of the vertices from the polygon
+			p1 = getAbsPoint(i);
+			p2 = getAbsPoint(i + 1);
+			final Point2D.Double pd = Util.segmentIntersects(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+			if (pd != null) {
+				intersections.add(pd);
+			}
+		}
+		p1 = getAbsPoint(n - 1);
+		p2 = getAbsPoint(0);
+		final Point2D.Double pd = Util.segmentIntersects(p1.getX(), p1.getY(), p2.getX(), p2.getY(), v1.getX(), v1.getY(), v2.getX(), v2.getY());
+		if (pd != null) {
+			intersections.add(pd);
+		}
+		return intersections;
 	}
 
 }
