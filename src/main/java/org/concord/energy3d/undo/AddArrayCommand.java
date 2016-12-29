@@ -16,13 +16,13 @@ public class AddArrayCommand extends AbstractUndoableEdit {
 	private final List<HousePart> oldArray;
 	private final List<HousePart> newArray;
 	private final HousePart parent;
-	private final Class<?> type;
+	private final Class<?>[] types;
 
-	public AddArrayCommand(final List<HousePart> parts, final HousePart parent, final Class<?> type) {
+	public AddArrayCommand(final List<HousePart> parts, final HousePart parent, final Class<?>[] types) {
 		oldArray = new ArrayList<HousePart>(parts);
 		newArray = new ArrayList<HousePart>();
 		this.parent = parent;
-		this.type = type;
+		this.types = types;
 	}
 
 	public HousePart getParent() {
@@ -33,16 +33,18 @@ public class AddArrayCommand extends AbstractUndoableEdit {
 		return oldArray;
 	}
 
-	public Class<?> getType() {
-		return type;
+	public Class<?>[] getTypes() {
+		return types;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
 		for (final HousePart c : parent.getChildren()) {
-			if (type.isInstance(c)) {
-				newArray.add(c);
+			for (final Class<?> type : types) {
+				if (type.isInstance(c)) {
+					newArray.add(c);
+				}
 			}
 		}
 		for (final HousePart p : newArray) {
@@ -68,7 +70,11 @@ public class AddArrayCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Add " + type.getSimpleName() + " Array";
+		String s = "";
+		for (final Class<?> c : types) {
+			s += c.getSimpleName() + " ";
+		}
+		return "Add " + s + "Array";
 	}
 
 }

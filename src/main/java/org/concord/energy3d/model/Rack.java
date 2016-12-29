@@ -750,7 +750,7 @@ public class Rack extends HousePart implements Trackable {
 
 	public void addSolarPanels() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeAllChildren(), this, SolarPanel.class);
+		final AddArrayCommand command = new AddArrayCommand(removeAllChildren(), this, new Class[] { SolarPanel.class });
 		final ArrayList<HousePart> c0 = new ArrayList<HousePart>(children);
 		for (final HousePart c : c0) { // make a copy to avoid concurrent modification
 			Scene.getInstance().remove(c, false);

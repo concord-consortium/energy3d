@@ -1289,7 +1289,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double sin30 = Math.sin(Math.toRadians(30));
 		final FloatBuffer arrowVertices = azimuthArrow.getMeshData().getVertexBuffer();
 		arrowVertices.clear();
-		final Vector3 v = getAbsPoint(0).subtractLocal(getAbsPoint(1)).normalizeLocal().multiplyLocal(10).negateLocal();
+		final Vector3 v = getAbsPoint(0).subtractLocal(getAbsPoint(1)).normalizeLocal().multiplyLocal(20).negateLocal();
 		final Vector3 p = getAbsPoint(1).addLocal(getAbsPoint(3)).multiplyLocal(0.5);
 		arrowVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		p.addLocal(v);
@@ -1427,6 +1427,20 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == this && clazz.isInstance(p)) {
 				count++;
+			}
+		}
+		return count;
+	}
+
+	public int countParts(final Class<?>[] clazz) {
+		int count = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.getTopContainer() == this) {
+				for (final Class<?> c : clazz) {
+					if (c.isInstance(p)) {
+						count++;
+					}
+				}
 			}
 		}
 		return count;
@@ -1604,7 +1618,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public int addCircularMirrorArrays(final MirrorCircularFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Mirror.class }), this, Mirror.class);
+		final Class<?>[] clazz = new Class[] { Mirror.class };
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
 		final double w = (layout.getMirrorWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getAnnotationScale();
@@ -1672,7 +1687,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public int addSpiralMirrorArrays(final MirrorSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Mirror.class }), this, Mirror.class);
+		final Class<?>[] clazz = new Class[] { Mirror.class };
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final double b = layout.getScalingFactor() * Math.max(layout.getMirrorWidth(), layout.getMirrorHeight()) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
@@ -1715,7 +1731,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public int addRectangularMirrorArrays(final MirrorRectangularFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Mirror.class }), this, Mirror.class);
+		final Class<?>[] clazz = new Class[] { Mirror.class };
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null);
@@ -1765,7 +1782,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void addSolarPanelArrays(final SolarPanel solarPanel, final double rowSpacing, final double colSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, SolarPanel.class);
+		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null);
@@ -1853,7 +1871,8 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void addSolarRackArrays(final SolarPanel panel, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, Rack.class);
+		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null);
@@ -1891,7 +1910,8 @@ public class Foundation extends HousePart implements Thermalizable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
-							addRack(panel, rowAxis, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false).draw();
+							final Rack rack = addRack(panel, rowAxis, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
+							rack.draw();
 						}
 					}
 				} else {
@@ -1916,7 +1936,8 @@ public class Foundation extends HousePart implements Thermalizable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
-							addRack(panel, rowAxis, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true).draw();
+							final Rack rack = addRack(panel, rowAxis, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
+							rack.draw();
 						}
 					}
 				} else {
