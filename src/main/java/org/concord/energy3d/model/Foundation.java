@@ -1568,11 +1568,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	private List<HousePart> removeChildrenOfClass(final Class<?> clazz) {
+	private List<HousePart> removeChildrenOfClass(final Class<?>[] clazz) {
 		final List<HousePart> removed = new ArrayList<HousePart>();
 		for (final HousePart c : children) {
-			if (clazz.isInstance(c)) {
-				removed.add(c);
+			for (final Class<?> z : clazz) {
+				if (z.isInstance(c)) {
+					removed.add(c);
+				}
 			}
 		}
 		for (final HousePart x : removed) {
@@ -1602,7 +1604,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public int addCircularMirrorArrays(final MirrorCircularFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Mirror.class }), this, Mirror.class);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
 		final double w = (layout.getMirrorWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getAnnotationScale();
@@ -1670,7 +1672,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public int addSpiralMirrorArrays(final MirrorSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Mirror.class }), this, Mirror.class);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final double b = layout.getScalingFactor() * Math.max(layout.getMirrorWidth(), layout.getMirrorHeight()) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
@@ -1713,7 +1715,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public int addRectangularMirrorArrays(final MirrorRectangularFieldLayout layout) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Mirror.class), this, Mirror.class);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Mirror.class }), this, Mirror.class);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null);
@@ -1761,9 +1763,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		return countParts(Mirror.class);
 	}
 
-	public void addSolarPanelArrays(final double panelWidth, final double panelHeight, final double rowSpacing, final double colSpacing, final int rowAxis) {
+	public void addSolarPanelArrays(final SolarPanel solarPanel, final double rowSpacing, final double colSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(SolarPanel.class), this, SolarPanel.class);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, SolarPanel.class);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null);
@@ -1773,8 +1775,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double b = p0.distance(getAbsPoint(1));
 		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
-		final double w = (panelWidth + colSpacing) / Scene.getInstance().getAnnotationScale();
-		final double h = (panelHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
+		final double w = (solarPanel.getPanelWidth() + colSpacing) / Scene.getInstance().getAnnotationScale();
+		final double h = (solarPanel.getPanelHeight() + rowSpacing) / Scene.getInstance().getAnnotationScale();
 		Path2D.Double path = null;
 		if (foundationPolygon != null && foundationPolygon.isVisible()) {
 			path = new Path2D.Double();
@@ -1798,14 +1800,12 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
-					final SolarPanel sp = new SolarPanel();
+					final SolarPanel sp = (SolarPanel) solarPanel.copy(false);
 					sp.setContainer(this);
 					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
 					sp.points.get(0).setX(v.getX());
 					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
-					sp.setPanelWidth(panelWidth);
-					sp.setPanelHeight(panelHeight);
 					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
@@ -1824,14 +1824,12 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
-					final SolarPanel sp = new SolarPanel();
+					final SolarPanel sp = (SolarPanel) solarPanel.copy(false);
 					sp.setContainer(this);
 					final Vector3 v = sp.toRelative(new Vector3(x, y, 0));
 					sp.points.get(0).setX(v.getX());
 					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
-					sp.setPanelWidth(panelWidth);
-					sp.setPanelHeight(panelHeight);
 					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
@@ -1855,7 +1853,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void addSolarRackArrays(final SolarPanel panel, final int panelRowsPerRack, final double rowSpacing, final int rowAxis) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(Rack.class), this, Rack.class);
+		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(new Class[] { Rack.class, SolarPanel.class }), this, Rack.class);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
 			rotate(az, null);
@@ -1943,7 +1941,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private Rack addRack(final SolarPanel panel, final int rowAxis, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
 		final Rack rack = new Rack();
 		rack.setContainer(this);
-		rack.setSolarPanel(panel);
+		rack.setSolarPanel((SolarPanel) panel.copy(false));
 		rack.setMonolithic(true);
 		rack.set(center, rackWidth, rackHeight);
 		rack.points.get(0).setZ(height);

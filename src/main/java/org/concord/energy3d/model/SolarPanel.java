@@ -40,6 +40,10 @@ public class SolarPanel extends HousePart implements Trackable {
 	public static final int PARTIAL_SHADE_TOLERANCE = 0;
 	public static final int HIGH_SHADE_TOLERANCE = 1;
 	public static final int NO_SHADE_TOLERANCE = 2;
+	public static final int MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE = 10;
+	public static final int MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE = 30;
+	public static final int MIN_INVERTER_EFFICIENCY_PERCENTAGE = 80;
+	public static final int MAX_INVERTER_EFFICIENCY_PERCENTAGE = 100;
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;

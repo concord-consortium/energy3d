@@ -22,6 +22,7 @@ import java.net.URI;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -420,7 +421,6 @@ public class Util {
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.NO_OPTION) {
 			return;
 		}
-
 		try {
 			final String receipt = sendError(header + "\n" + msg);
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), receipt, "Notice", JOptionPane.INFORMATION_MESSAGE);
@@ -430,8 +430,16 @@ public class Util {
 			final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clpbrd.setContents(new StringSelection(msg), null);
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
+		} finally {
+			// attempt to fix problems
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() {
+					Scene.getInstance().fixProblems(true);
+					return null;
+				}
+			});
 		}
-
 	}
 
 	public static String sendError(final String msg) throws Exception {
