@@ -1885,26 +1885,33 @@ public class Foundation extends HousePart implements Thermalizable {
 		final Vector3 p0 = getAbsPoint(0);
 		final double a = p0.distance(getAbsPoint(2));
 		final double b = p0.distance(getAbsPoint(1));
-		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
-		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
+		double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
+		double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
 		final double x1 = Math.max(Math.max(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
 		final double y1 = Math.max(Math.max(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
 		final double panelHeight = panel.isRotated() ? panel.getPanelWidth() : panel.getPanelHeight();
 		final double rackHeight = panelHeight * panelRowsPerRack;
+		final double halfHeight = 0.5 * rackHeight / Scene.getInstance().getAnnotationScale();
 		final double h = (rackHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
 		double rackWidth, rows;
 		final Vector3 center = new Vector3();
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
+		double[] bounds = null;
 		switch (rowAxis) {
 		case Trackable.EAST_WEST_AXIS:
 			center.setX((x0 + x1) * 0.5);
 			rackWidth = a * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(b / h);
 			for (int r = 0; r < rows; r++) {
-				center.setY(y0 + h * (r + 0.5));
 				if (foundationPolygon != null && foundationPolygon.isVisible()) {
+					if (bounds == null) {
+						bounds = foundationPolygon.getBounds();
+					}
+					x0 = Math.max(x0, bounds[0]);
+					y0 = Math.max(y0, bounds[2]);
+					center.setY(y0 + halfHeight + h * r);
 					v1.set(x0, center.getY(), 0);
 					v2.set(x1, center.getY(), 0);
 					intersections.clear();
@@ -1920,6 +1927,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						}
 					}
 				} else {
+					center.setY(y0 + h * (r + 0.5));
 					addRack(panel, tiltAngle, rowAxis, center, rackWidth, rackHeight, false).draw();
 				}
 			}
@@ -1929,8 +1937,13 @@ public class Foundation extends HousePart implements Thermalizable {
 			rackWidth = b * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(a / h);
 			for (int r = 0; r < rows; r++) {
-				center.setX(x0 + h * (r + 0.5));
 				if (foundationPolygon != null && foundationPolygon.isVisible()) {
+					if (bounds == null) {
+						bounds = foundationPolygon.getBounds();
+					}
+					x0 = Math.max(x0, bounds[0]);
+					y0 = Math.max(y0, bounds[2]);
+					center.setX(x0 + halfHeight + h * r);
 					v1.set(center.getX(), y0, 0);
 					v2.set(center.getX(), y1, 0);
 					intersections.clear();
@@ -1946,6 +1959,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						}
 					}
 				} else {
+					center.setX(x0 + h * (r + 0.5));
 					addRack(panel, tiltAngle, rowAxis, center, rackWidth, rackHeight, true).draw();
 				}
 			}

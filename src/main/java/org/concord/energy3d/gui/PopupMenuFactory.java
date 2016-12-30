@@ -2009,7 +2009,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
 
 						panel.add(new JLabel("Panel Size:"));
 						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
@@ -2039,6 +2039,10 @@ public class PopupMenuFactory {
 						final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
 						panel.add(pmaxField);
 
+						panel.add(new JLabel("Tile Angle (\u00B0):"));
+						final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
+						panel.add(tiltAngleField);
+
 						panel.add(new JLabel("Row Axis:"));
 						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
@@ -2060,11 +2064,14 @@ public class PopupMenuFactory {
 								try {
 									solarPanelArrayRowSpacing = Double.parseDouble(rowValue);
 									solarPanelArrayColSpacing = Double.parseDouble(colValue);
+									solarPanelTiltAngle = Double.parseDouble(tiltAngleField.getText());
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
 									solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
 									if (solarPanelArrayRowSpacing < 0 || solarPanelArrayColSpacing < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel row or column spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Rack tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
@@ -2101,6 +2108,7 @@ public class PopupMenuFactory {
 							solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
 							final SolarPanel sp = new SolarPanel();
 							sp.setRotated(solarPanelOrientation == 1);
+							sp.setTiltAngle(solarPanelTiltAngle);
 							sp.setPanelWidth(solarPanelWidth);
 							sp.setPanelHeight(solarPanelHeight);
 							sp.setShadeTolerance(solarPanelShadeTolerance);

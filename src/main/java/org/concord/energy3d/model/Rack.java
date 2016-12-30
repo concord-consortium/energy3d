@@ -409,18 +409,16 @@ public class Rack extends HousePart implements Trackable {
 			final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
 			switch (rotationAxis) {
 			case EAST_WEST_AXIS:
-				Vector3 p10 = p1.subtract(p0, null).normalizeLocal();
-				matrix.applyPost(p10, p10);
-				for (double u = poleDistanceY; u < rackHeight; u += poleDistanceY) {
-					final Vector3 position = p10.multiply((u - rackHeight / 2) / annotationScale, null).addLocal(center);
+				Vector3 pd = p1.subtract(p0, null).normalizeLocal();
+				for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+					final Vector3 position = pd.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
 					addPole(position, baseHeight, baseZ);
 				}
 				break;
 			case NORTH_SOUTH_AXIS:
-				p10 = p2.subtract(p0, null).normalizeLocal();
-				matrix.applyPost(p10, p10);
+				pd = p2.subtract(p0, null).normalizeLocal();
 				for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
-					final Vector3 position = p10.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
+					final Vector3 position = pd.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
 					addPole(position, baseHeight, baseZ);
 				}
 				break;

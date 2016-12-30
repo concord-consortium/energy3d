@@ -145,6 +145,30 @@ public class FoundationPolygon extends HousePart {
 		super.complete();
 	}
 
+	public double[] getBounds() {
+		double xmin = Double.MAX_VALUE;
+		double xmax = -Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		double ymax = -Double.MAX_VALUE;
+		final int n = points.size() / 2;
+		for (int i = 0; i < n; i++) { // use only the first half of the vertices from the polygon
+			final Vector3 p = getAbsPoint(i);
+			if (xmin > p.getX()) {
+				xmin = p.getX();
+			}
+			if (xmax < p.getX()) {
+				xmax = p.getX();
+			}
+			if (ymin > p.getY()) {
+				ymin = p.getY();
+			}
+			if (ymax < p.getY()) {
+				ymax = p.getY();
+			}
+		}
+		return new double[] { xmin, xmax, ymin, ymax };
+	}
+
 	public List<Point2D.Double> getIntersectingPoints(final Vector3 v1, final Vector3 v2) {
 		final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
 		final int n = points.size() / 2;
