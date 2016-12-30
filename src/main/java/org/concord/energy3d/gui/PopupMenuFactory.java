@@ -207,7 +207,9 @@ public class PopupMenuFactory {
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
 	private static int solarPanelOrientation = 0;
-	private static double solarPanelRackArrayRowSpacing = 5;
+	private static double solarPanelRackArrayInterRowSpacing = 5;
+	private static double solarPanelRackPoleSpacingX = 4;
+	private static double solarPanelRackPoleSpacingY = 2;
 	private static double solarPanelTiltAngle = 0;
 	private static double solarCellEfficiencyPercentage = 15;
 	private static double inverterEfficiencyPercentage = 95;
@@ -2048,11 +2050,11 @@ public class PopupMenuFactory {
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 						panel.add(rowAxisComboBox);
 
-						panel.add(new JLabel("Row Spacing:"));
+						panel.add(new JLabel("Row Spacing (m):"));
 						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelArrayRowSpacing));
 						panel.add(rowSpacingField);
 
-						panel.add(new JLabel("Column Spacing:"));
+						panel.add(new JLabel("Column Spacing (m):"));
 						final JTextField colSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelArrayColSpacing));
 						panel.add(colSpacingField);
 
@@ -2145,7 +2147,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(12, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Orientation:"));
 						final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
@@ -2193,22 +2195,36 @@ public class PopupMenuFactory {
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 						panel.add(rowAxisComboBox);
 
-						panel.add(new JLabel("Row Spacing:"));
-						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelRackArrayRowSpacing));
-						panel.add(rowSpacingField);
+						panel.add(new JLabel("Inter-Row Spacing (m):"));
+						final JTextField interrowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelRackArrayInterRowSpacing));
+						panel.add(interrowSpacingField);
+
+						panel.add(new JLabel("Pole Spacing X (m):"));
+						final JTextField poleSpacingXField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleSpacingX));
+						panel.add(poleSpacingXField);
+
+						panel.add(new JLabel("Pole Spacing Y (m):"));
+						final JTextField poleSpacingYField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleSpacingY));
+						panel.add(poleSpacingYField);
 
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Rack Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								try {
-									solarPanelRackArrayRowSpacing = Double.parseDouble(rowSpacingField.getText());
+									solarPanelRackArrayInterRowSpacing = Double.parseDouble(interrowSpacingField.getText());
 									solarPanelTiltAngle = Double.parseDouble(tiltAngleField.getText());
 									solarPanelRowsPerRack = Integer.parseInt(rowsPerRackField.getText());
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
 									solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
-									if (solarPanelRackArrayRowSpacing < 0) {
+									solarPanelRackPoleSpacingX = Double.parseDouble(poleSpacingXField.getText());
+									solarPanelRackPoleSpacingY = Double.parseDouble(poleSpacingYField.getText());
+									if (solarPanelRackArrayInterRowSpacing < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row rack spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelRackPoleSpacingX < 1 || solarPanelRackPoleSpacingX > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing X must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelRackPoleSpacingY < 1 || solarPanelRackPoleSpacingY > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing Y must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRowsPerRack <= 0 || solarPanelRowsPerRack > 10) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Illegal value for solar panel rows per rack.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
@@ -2259,7 +2275,7 @@ public class PopupMenuFactory {
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									f.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRowsPerRack, solarPanelRackArrayRowSpacing, solarPanelArrayRowAxis);
+									f.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRowsPerRack, solarPanelRackArrayInterRowSpacing, solarPanelArrayRowAxis, solarPanelRackPoleSpacingX, solarPanelRackPoleSpacingY);
 									return null;
 								}
 							});
@@ -3642,7 +3658,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					final Foundation foundation = sp.getTopContainer();
-					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -3800,7 +3816,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
 					final String title = "<html>Solar Cell Efficiency (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 24%.<br>So the highest efficiency you can choose is limited to 30%.<hr></html>";
+					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 24%.<br>So the highest efficiency you can choose is limited to " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.<hr></html>";
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -4248,10 +4264,10 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Width: "));
+					inputPanel.add(new JLabel("Width (m): "));
 					final JTextField widthField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth()));
 					inputPanel.add(widthField);
-					inputPanel.add(new JLabel("Height: "));
+					inputPanel.add(new JLabel("Height (m): "));
 					final JTextField heightField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight()));
 					inputPanel.add(heightField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -4327,7 +4343,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Rack rack = (Rack) selectedPart;
 					final Foundation foundation = rack.getTopContainer();
-					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -4390,10 +4406,10 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Distance X: "));
+					inputPanel.add(new JLabel("Distance X (m): "));
 					final JTextField dxField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceX()));
 					inputPanel.add(dxField);
-					inputPanel.add(new JLabel("Distance Y: "));
+					inputPanel.add(new JLabel("Distance Y (m): "));
 					final JTextField dyField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceY()));
 					inputPanel.add(dyField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -5260,7 +5276,7 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Mirror m = (Mirror) selectedPart;
 					final Foundation foundation = m.getTopContainer();
-					final String title = "<html>Base Height of " + partInfo + "</html>";
+					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
