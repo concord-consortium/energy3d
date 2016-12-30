@@ -208,6 +208,7 @@ public class PopupMenuFactory {
 	private static double solarPanelHeight = 1.96;
 	private static int solarPanelOrientation = 0;
 	private static double solarPanelRackArrayRowSpacing = 5;
+	private static double solarPanelTiltAngle = 0;
 	private static double solarCellEfficiencyPercentage = 15;
 	private static double inverterEfficiencyPercentage = 95;
 	private static int solarPanelShadeTolerance = SolarPanel.HIGH_SHADE_TOLERANCE;
@@ -2136,7 +2137,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Orientation:"));
 						final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
@@ -2171,6 +2172,10 @@ public class PopupMenuFactory {
 						final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
 						panel.add(pmaxField);
 
+						panel.add(new JLabel("Tile Angle (\u00B0):"));
+						final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
+						panel.add(tiltAngleField);
+
 						panel.add(new JLabel("Solar Panel Rows Per Rack:"));
 						final JTextField rowsPerRackField = new JTextField(threeDecimalsFormat.format(solarPanelRowsPerRack));
 						panel.add(rowsPerRackField);
@@ -2189,6 +2194,7 @@ public class PopupMenuFactory {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Rack Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								try {
 									solarPanelRackArrayRowSpacing = Double.parseDouble(rowSpacingField.getText());
+									solarPanelTiltAngle = Double.parseDouble(tiltAngleField.getText());
 									solarPanelRowsPerRack = Integer.parseInt(rowsPerRackField.getText());
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
@@ -2197,6 +2203,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row rack spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRowsPerRack <= 0 || solarPanelRowsPerRack > 10) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Illegal value for solar panel rows per rack.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Rack tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
@@ -2243,7 +2251,7 @@ public class PopupMenuFactory {
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									f.addSolarRackArrays(sp, solarPanelRowsPerRack, solarPanelRackArrayRowSpacing, solarPanelArrayRowAxis);
+									f.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRowsPerRack, solarPanelRackArrayRowSpacing, solarPanelArrayRowAxis);
 									return null;
 								}
 							});
@@ -4195,6 +4203,7 @@ public class PopupMenuFactory {
 								if (rb1.isSelected()) {
 									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
 									rack.setRelativeAzimuth(a);
+									rack.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);

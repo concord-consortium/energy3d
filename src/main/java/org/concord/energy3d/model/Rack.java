@@ -88,7 +88,7 @@ public class Rack extends HousePart implements Trackable {
 		surround.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
-		offset.setFactor(1);
+		offset.setFactor(0.2f); // set a smaller value than solar panel so that the texture doesn't show up on the underside
 		offset.setUnits(1);
 		surround.setRenderState(offset);
 		root.attachChild(surround);
@@ -379,55 +379,56 @@ public class Rack extends HousePart implements Trackable {
 				vDir.negateLocal();
 			}
 			final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
-			for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
-				for (double v = poleDistanceY; v < rackHeight; v += poleDistanceY) {
-					final double vFactor = (v - rackHeight / 2) / annotationScale;
-					final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
-					final double dz = tanTiltAngle * vFactor;
-
-					final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
-					pole.setRadius(0.6);
-					pole.setRenderState(offsetState);
-					pole.setHeight(baseHeight - dz - 0.1);
-					pole.setModelBound(new BoundingBox());
-					pole.updateModelBound();
-					position.setZ(baseZ + pole.getHeight() / 2);
-
-					pole.setTranslation(position);
-					polesRoot.attachChild(pole);
+			if (tanTiltAngle < 100) {
+				final double cosTiltAngle = Math.cos(Math.toRadians(tiltAngle));
+				final double poleDistanceYHorizontal = poleDistanceY * cosTiltAngle; // project to the horizontal direction
+				final double rackHeightHorizontal = rackHeight * cosTiltAngle;
+				for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+					for (double v = rackHeightHorizontal / 2; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
+						final double vFactor = (v - rackHeightHorizontal / 2) / annotationScale;
+						final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+						final double dz = tanTiltAngle * vFactor;
+						if (baseHeight > dz) {
+							addPole(position, baseHeight - dz, baseZ);
+						}
+					}
+					for (double v = rackHeightHorizontal / 2 - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
+						final double vFactor = (v - rackHeightHorizontal / 2) / annotationScale;
+						final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+						final double dz = tanTiltAngle * vFactor;
+						if (baseHeight > dz) {
+							addPole(position, baseHeight - dz, baseZ);
+						}
+					}
 				}
 			}
 			break;
 		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
 			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
-			final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
-			// final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
-			final Vector3 p10 = p1.subtract(p0, null).normalizeLocal();
-			matrix.applyPost(p10, p10);
-			for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
-				final Vector3 position = p10.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
-				final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
-				pole.setRadius(1);
-				pole.setRenderState(offsetState);
-				pole.setHeight(baseHeight - 0.1);
-				pole.setModelBound(new BoundingBox());
-				pole.updateModelBound();
-				position.setZ(baseZ + pole.getHeight() / 2);
-				pole.setTranslation(position);
-				polesRoot.attachChild(pole);
+			final Vector3 p1 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
+			final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
+			switch (rotationAxis) {
+			case EAST_WEST_AXIS:
+				Vector3 p10 = p1.subtract(p0, null).normalizeLocal();
+				matrix.applyPost(p10, p10);
+				for (double u = poleDistanceY; u < rackHeight; u += poleDistanceY) {
+					final Vector3 position = p10.multiply((u - rackHeight / 2) / annotationScale, null).addLocal(center);
+					addPole(position, baseHeight, baseZ);
+				}
+				break;
+			case NORTH_SOUTH_AXIS:
+				p10 = p2.subtract(p0, null).normalizeLocal();
+				matrix.applyPost(p10, p10);
+				for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+					final Vector3 position = p10.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
+					addPole(position, baseHeight, baseZ);
+				}
+				break;
 			}
 			break;
 		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-			final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
-			pole.setRadius(1);
-			pole.setRenderState(offsetState);
-			pole.setHeight(baseHeight - 0.1);
-			pole.setModelBound(new BoundingBox());
-			pole.updateModelBound();
-			pole.setHeight(baseHeight - 0.5 * pole.getRadius());
-			pole.setTranslation(getAbsPoint(0).addLocal(0, 0, pole.getHeight() / 2 - baseHeight));
-			polesRoot.attachChild(pole);
+			addPole(getAbsPoint(0), baseHeight, baseZ);
 			break;
 		}
 		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
@@ -440,6 +441,18 @@ public class Rack extends HousePart implements Trackable {
 		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
 		root.updateGeometricState(0);
 		drawChildren();
+	}
+
+	private void addPole(final Vector3 position, final double poleHeight, final double baseZ) {
+		final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
+		pole.setRadius(0.6);
+		pole.setRenderState(offsetState);
+		pole.setHeight(poleHeight - 0.5 * pole.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the rack
+		pole.setModelBound(new BoundingBox());
+		pole.updateModelBound();
+		position.setZ(baseZ + pole.getHeight() / 2);
+		pole.setTranslation(position);
+		polesRoot.attachChild(pole);
 	}
 
 	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
