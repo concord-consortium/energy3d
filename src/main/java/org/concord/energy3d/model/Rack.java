@@ -50,8 +50,8 @@ public class Rack extends HousePart implements Trackable {
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private ReadOnlyVector3 previousNormal;
-	private double rackWidth = 15;
-	private double rackHeight = 3;
+	private double rackWidth = 5.94; // 6x2 0.99x1.65 solar panels by default
+	private double rackHeight = 3.3;
 	private double relativeAzimuth = 0;
 	private double tiltAngle = 0;
 	private double baseHeight = 15;
@@ -59,7 +59,7 @@ public class Rack extends HousePart implements Trackable {
 	private double poleDistanceY = 2;
 	private int trackerType = NO_TRACKER;
 	private int rotationAxis;
-	private boolean monolithic; // true if the whole rack is covered by solar panels
+	private boolean monolithic = true; // true if the whole rack is covered by solar panels
 	private SolarPanel sampleSolarPanel;
 	private transient Vector3 oldRackCenter;
 	private transient double oldRackWidth, oldRackHeight;
@@ -368,6 +368,7 @@ public class Rack extends HousePart implements Trackable {
 		polesRoot.detachAllChildren();
 		final Vector3 center = getAbsPoint(0);
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(relativeAzimuth));
+		final double halfRackWidth = rackWidth * 0.5;
 		switch (trackerType) {
 		case Trackable.NO_TRACKER:
 			final HousePart container = getContainerRelative();
@@ -383,18 +384,37 @@ public class Rack extends HousePart implements Trackable {
 				final double cosTiltAngle = Math.cos(Math.toRadians(tiltAngle));
 				final double poleDistanceYHorizontal = poleDistanceY * cosTiltAngle; // project to the horizontal direction
 				final double rackHeightHorizontal = rackHeight * cosTiltAngle;
-				for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
-					for (double v = rackHeightHorizontal / 2; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
-						final double vFactor = (v - rackHeightHorizontal / 2) / annotationScale;
-						final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+				final double halfRackHeightHorizontal = 0.5 * rackHeightHorizontal;
+				for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
+					for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
+						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 						final double dz = tanTiltAngle * vFactor;
 						if (baseHeight > dz) {
 							addPole(position, baseHeight - dz, baseZ);
 						}
 					}
-					for (double v = rackHeightHorizontal / 2 - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
-						final double vFactor = (v - rackHeightHorizontal / 2) / annotationScale;
-						final Vector3 position = uDir.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+					for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
+						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+						final double dz = tanTiltAngle * vFactor;
+						if (baseHeight > dz) {
+							addPole(position, baseHeight - dz, baseZ);
+						}
+					}
+				}
+				for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
+					for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
+						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+						final double dz = tanTiltAngle * vFactor;
+						if (baseHeight > dz) {
+							addPole(position, baseHeight - dz, baseZ);
+						}
+					}
+					for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
+						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
 						final double dz = tanTiltAngle * vFactor;
 						if (baseHeight > dz) {
 							addPole(position, baseHeight - dz, baseZ);
@@ -410,15 +430,23 @@ public class Rack extends HousePart implements Trackable {
 			switch (rotationAxis) {
 			case EAST_WEST_AXIS:
 				Vector3 pd = p1.subtract(p0, null).normalizeLocal();
-				for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
-					final Vector3 position = pd.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
+				for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
+					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
+					addPole(position, baseHeight, baseZ);
+				}
+				for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
+					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
 					addPole(position, baseHeight, baseZ);
 				}
 				break;
 			case NORTH_SOUTH_AXIS:
 				pd = p2.subtract(p0, null).normalizeLocal();
-				for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
-					final Vector3 position = pd.multiply((u - rackWidth / 2) / annotationScale, null).addLocal(center);
+				for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
+					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
+					addPole(position, baseHeight, baseZ);
+				}
+				for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
+					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
 					addPole(position, baseHeight, baseZ);
 				}
 				break;

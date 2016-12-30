@@ -2808,8 +2808,8 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
 						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
-						if (f.countParts(SolarPanel.class) <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						if (f.countParts(new Class[] { SolarPanel.class, Rack.class }) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 						final PvDailyAnalysis a = new PvDailyAnalysis();
@@ -2829,8 +2829,8 @@ public class PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
-						if (f.countParts(SolarPanel.class) <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						if (f.countParts(new Class[] { SolarPanel.class, Rack.class }) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 						final PvAnnualAnalysis a = new PvAnnualAnalysis();
@@ -2851,7 +2851,7 @@ public class PopupMenuFactory {
 					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
 						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
 						if (f.countParts(Mirror.class) <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 						final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
@@ -2872,7 +2872,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						if (f.countParts(Mirror.class) <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 						new MirrorAnnualAnalysis().show();
@@ -4473,8 +4473,8 @@ public class PopupMenuFactory {
 					final SolarPanel solarPanel = rack.getSolarPanel();
 					final JPanel panel = new JPanel(new GridLayout(7, 2, 5, 5));
 					panel.add(new JLabel("Monolithic:"));
-					final JComboBox<String> monolithicComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
-					monolithicComboBox.setSelectedIndex(rack.isMonolithic() ? 1 : 0);
+					final JComboBox<String> monolithicComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
+					monolithicComboBox.setSelectedIndex(rack.isMonolithic() ? 0 : 1);
 					panel.add(monolithicComboBox);
 					panel.add(new JLabel("Panel Size:"));
 					final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
@@ -4561,7 +4561,7 @@ public class PopupMenuFactory {
 						SceneManager.getTaskManager().update(new Callable<Object>() {
 							@Override
 							public Object call() {
-								rack.setMonolithic(monolithicComboBox.getSelectedIndex() == 1);
+								rack.setMonolithic(monolithicComboBox.getSelectedIndex() == 0);
 								rack.addSolarPanels();
 								return null;
 							}

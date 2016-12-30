@@ -2540,21 +2540,13 @@ public class Scene implements Serializable {
 		return solarContrast;
 	}
 
-	public int getNumberOfSolarPanels() {
+	public int countParts(final Class<?>[] clazz) {
 		int count = 0;
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel) {
-				count++;
-			}
-		}
-		return count;
-	}
-
-	public int getNumberOfMirrors() {
-		int count = 0;
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror) {
-				count++;
+			for (final Class<?> c : clazz) {
+				if (c.isInstance(p)) {
+					count++;
+				}
 			}
 		}
 		return count;
