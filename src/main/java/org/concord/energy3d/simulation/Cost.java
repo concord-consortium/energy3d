@@ -163,7 +163,7 @@ public class Cost {
 		}
 		if (part instanceof Rack) {
 			final Rack rack = (Rack) part;
-			return getPartCost(rack.getSolarPanel()) * rack.getSolarPanelCount();
+			return getPartCost(rack.getSolarPanel()) * rack.getNumberOfSolarPanels();
 		}
 		if (part instanceof Tree) {
 			final Tree tree = (Tree) part;

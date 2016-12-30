@@ -231,14 +231,21 @@ public class PvAnnualAnalysis extends Analysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Annual Yield of All Solar Panels";
+		String title = "Annual Yield of All Solar Panels (" + Scene.getInstance().getNumberOfSolarPanels() + " Solar Panels)";
 		if (selectedPart != null) {
-			if (selectedPart instanceof SolarPanel || selectedPart instanceof Rack) {
+			if (selectedPart instanceof SolarPanel) {
 				cost = Cost.getInstance().getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield";
-			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
-				title = "Annual Yield on Selected Foundation";
+			} else if (selectedPart instanceof Rack) {
+				final Rack rack = (Rack) selectedPart;
+				cost = Cost.getInstance().getPartCost(rack.getSolarPanel()) * rack.getNumberOfSolarPanels();
+				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+				title = "Annual Yield (" + rack.getNumberOfSolarPanels() + " Solar Panels)";
+			} else if (selectedPart instanceof Foundation) {
+				title = "Annual Yield on Selected Foundation (" + ((Foundation) selectedPart).getNumberOfSolarPanels() + " Solar Panels)";
+			} else if (selectedPart.getTopContainer() != null) {
+				title = "Annual Yield on Selected Foundation (" + selectedPart.getTopContainer().getNumberOfSolarPanels() + " Solar Panels)";
 			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);

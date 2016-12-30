@@ -10,6 +10,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.simulation.Cost;
@@ -107,13 +108,20 @@ public class PvStationInfoPanel extends JPanel {
 		final List<Rack> racks = foundation.getRacks();
 		if (!racks.isEmpty()) {
 			for (final Rack r : racks) {
-				countSolarPanels += r.getSolarPanelCount();
+				countSolarPanels += r.getNumberOfSolarPanels();
 				cost += Cost.getInstance().getPartCost(r);
 				panelArea += r.getArea();
 			}
 		}
 		countBar.setValue(countSolarPanels);
-		landAreaBar.setValue((float) foundation.getArea() / countSolarPanels);
+		float landArea;
+		final FoundationPolygon polygon = foundation.getPolygon();
+		if (polygon != null && polygon.isVisible()) {
+			landArea = (float) polygon.getArea();
+		} else {
+			landArea = (float) foundation.getArea();
+		}
+		landAreaBar.setValue(landArea / countSolarPanels);
 		costBar.setValue(Math.round(cost));
 		panelAreaBar.setValue((float) panelArea);
 	}

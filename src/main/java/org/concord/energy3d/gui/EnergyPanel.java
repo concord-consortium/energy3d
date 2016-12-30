@@ -50,6 +50,7 @@ import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
@@ -923,7 +924,7 @@ public class EnergyPanel extends JPanel {
 						a -= 360;
 					}
 					final double az = a;
-					final int n = rack.isMonolithic() ? rack.getSolarPanelCount() : rack.getChildren().size();
+					final int n = rack.isMonolithic() ? rack.getNumberOfSolarPanels() : rack.getChildren().size();
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -1029,6 +1030,13 @@ public class EnergyPanel extends JPanel {
 					final double ly = v.distance(v1);
 					final double lz = foundation.getHeight();
 					final double az = foundation.getAzimuth();
+					final String landArea;
+					final FoundationPolygon polygon = foundation.getPolygon();
+					if (polygon != null && polygon.isVisible()) {
+						landArea = " (inset:" + oneDecimal.format(polygon.getArea()) + ")";
+					} else {
+						landArea = "";
+					}
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -1036,7 +1044,7 @@ public class EnergyPanel extends JPanel {
 							partProperty1Label.setText("  Size:");
 							partProperty2Label.setText("  Position:");
 							partProperty3Label.setText("  Azimuth:");
-							partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + "\u00d7" + (twoDecimals.format(lz * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
+							partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + "\u00d7" + (twoDecimals.format(lz * scale)) + "m\u2248" + oneDecimal.format(lx * ly * scale * scale) + landArea + " m\u00B2");
 							partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
 							partProperty3TextField.setText(noDecimal.format(az) + "\u00B0");
 							partProperty1TextField.setToolTipText("The length and width of the foundation");
@@ -1203,15 +1211,31 @@ public class EnergyPanel extends JPanel {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					partPanelBorder.setTitle("Part");
-					partProperty1Label.setText("  -");
+					final int numberOfSolarPanels = Scene.getInstance().getNumberOfSolarPanels();
+					if (numberOfSolarPanels > 0) {
+						partPanelBorder.setTitle("Solar Panels");
+						partProperty1Label.setText("  Total Number:");
+						partProperty1TextField.setText("" + numberOfSolarPanels);
+						partProperty1TextField.setToolTipText("Total number of solar panels");
+					} else {
+						final int numberOfMirrors = Scene.getInstance().countParts(new Class[] { Mirror.class });
+						if (numberOfMirrors > 0) {
+							partPanelBorder.setTitle("Mirrors");
+							partProperty1Label.setText("  Total Number:");
+							partProperty1TextField.setText("" + numberOfMirrors);
+							partProperty1TextField.setToolTipText("Total number of mirrors");
+						} else {
+							partPanelBorder.setTitle("Part");
+							partProperty1Label.setText("  -");
+							partProperty1TextField.setText("");
+							partProperty1TextField.setToolTipText(null);
+						}
+					}
 					partProperty2Label.setText("  -");
-					partProperty3Label.setText("  -");
-					partProperty1TextField.setText("");
 					partProperty2TextField.setText("");
-					partProperty3TextField.setText("");
-					partProperty1TextField.setToolTipText(null);
 					partProperty2TextField.setToolTipText(null);
+					partProperty3Label.setText("  -");
+					partProperty3TextField.setText("");
 					partProperty3TextField.setToolTipText(null);
 				}
 			});

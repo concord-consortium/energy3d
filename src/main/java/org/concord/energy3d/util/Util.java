@@ -764,6 +764,19 @@ public class Util {
 		return area;
 	}
 
+	public static double getAreaOf2DPolygon(final double[] x, final double[] y) {
+		if (x.length != y.length) {
+			throw new IllegalArgumentException("x and y must have the same length");
+		}
+		float area = 0;
+		final int n = x.length;
+		for (int i = 0; i < n - 1; i++) {
+			area += x[i] * y[i + 1] - x[i + 1] * y[i];
+		}
+		area += x[n - 1] * y[0] - x[0] * y[n - 1];
+		return Math.abs(area) * 0.5f;
+	}
+
 	/**
 	 * Approximately calculate the center of a mesh using the averange of all the triangle vertices
 	 */

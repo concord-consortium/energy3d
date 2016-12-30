@@ -2552,6 +2552,19 @@ public class Scene implements Serializable {
 		return count;
 	}
 
+	public int getNumberOfSolarPanels() {
+		int count = 0;
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				count++;
+			} else if (p instanceof Rack) {
+				count += ((Rack) p).getNumberOfSolarPanels();
+			}
+		}
+		return count;
+
+	}
+
 	// XIE: This needs to be called for trees to change texture when the month changes
 	public void setTreeLeaves() {
 		SceneManager.getTaskManager().update(new Callable<Object>() {

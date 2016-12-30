@@ -978,7 +978,7 @@ public class Rack extends HousePart implements Trackable {
 		return new int[] { nw, nh };
 	}
 
-	public int getSolarPanelCount() {
+	public int getNumberOfSolarPanels() {
 		if (monolithic) {
 			final int[] n = getSolarPanelRowAndColumnNumbers();
 			return n[0] * n[1];

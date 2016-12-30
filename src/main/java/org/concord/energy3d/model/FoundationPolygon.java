@@ -5,6 +5,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
@@ -88,7 +89,16 @@ public class FoundationPolygon extends HousePart {
 
 	@Override
 	protected void computeArea() {
-
+		final int n = points.size() / 2;
+		final double[] x = new double[n];
+		final double[] y = new double[n];
+		for (int i = 0; i < n; i++) {
+			final Vector3 v = getAbsPoint(i);
+			x[i] = v.getX();
+			y[i] = v.getY();
+		}
+		final double scale = Scene.getInstance().getAnnotationScale();
+		area = Util.getAreaOf2DPolygon(x, y) * scale * scale;
 	}
 
 	@Override
