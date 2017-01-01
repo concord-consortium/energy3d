@@ -3507,7 +3507,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveEastMenuItem() {
 		if (moveEastMenuItem == null) {
-			moveEastMenuItem = new JMenuItem("Move East (Press 'E' Key)");
+			moveEastMenuItem = new JMenuItem("Move East (or Press 'E' Key)");
 			moveEastMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3529,7 +3529,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveWestMenuItem() {
 		if (moveWestMenuItem == null) {
-			moveWestMenuItem = new JMenuItem("Move West (Press 'W' Key)");
+			moveWestMenuItem = new JMenuItem("Move West (or Press 'W' Key)");
 			moveWestMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3551,7 +3551,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveSouthMenuItem() {
 		if (moveSouthMenuItem == null) {
-			moveSouthMenuItem = new JMenuItem("Move South (Press 'S' Key)");
+			moveSouthMenuItem = new JMenuItem("Move South (or Press 'S' Key)");
 			moveSouthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3573,7 +3573,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMoveNorthMenuItem() {
 		if (moveNorthMenuItem == null) {
-			moveNorthMenuItem = new JMenuItem("Move North (Press 'N' Key)");
+			moveNorthMenuItem = new JMenuItem("Move North (or Press 'N' Key)");
 			moveNorthMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

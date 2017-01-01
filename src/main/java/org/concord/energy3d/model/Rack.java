@@ -66,6 +66,7 @@ public class Rack extends HousePart implements Trackable {
 	private boolean drawSunBeam;
 	private transient Line sunBeam;
 	private transient Line normalVector;
+	private transient Line solarPanelOutlines;
 	private static double normalVectorLength = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 
@@ -128,6 +129,15 @@ public class Rack extends HousePart implements Trackable {
 		sunAngle.setFontSize(1);
 		sunAngle.setCustomRadius(normalVectorLength * 0.8);
 		angles.attachChild(sunAngle);
+
+		solarPanelOutlines = new Line("Solar Panel Outlines");
+		solarPanelOutlines.setLineWidth(0.01f);
+		solarPanelOutlines.setStipplePattern((short) 0xffff);
+		solarPanelOutlines.setModelBound(null);
+		Util.disablePickShadowLight(solarPanelOutlines);
+		solarPanelOutlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10000));
+		solarPanelOutlines.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
+		root.attachChild(solarPanelOutlines);
 
 		polesRoot = new Node("Poles Root");
 		root.attachChild(polesRoot);
@@ -318,6 +328,7 @@ public class Rack extends HousePart implements Trackable {
 		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
 		surround.updateModelBound();
 
+		final boolean heatMap = SceneManager.getInstance().getSolarHeatMap();
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
@@ -326,8 +337,8 @@ public class Rack extends HousePart implements Trackable {
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
 		// when the heat map is on, use a single texture from the radiation calculation, don't repeat
-		final float spw = SceneManager.getInstance().getSolarHeatMap() ? 1 : (monolithic ? (float) (rackWidth / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth())) : 1);
-		final float sph = SceneManager.getInstance().getSolarHeatMap() ? 1 : (monolithic ? (float) (rackHeight / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight())) : 1);
+		final float spw = heatMap ? 1 : (monolithic ? (float) (rackWidth / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth())) : 1);
+		final float sph = heatMap ? 1 : (monolithic ? (float) (rackHeight / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight())) : 1);
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(spw).put(0);
@@ -461,6 +472,10 @@ public class Rack extends HousePart implements Trackable {
 
 		if (drawSunBeam) {
 			drawSunBeam();
+		}
+
+		if (heatMap) {
+			drawSolarPanelOutlines();
 		}
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
@@ -1047,6 +1062,42 @@ public class Rack extends HousePart implements Trackable {
 
 		normalVector.updateModelBound();
 		normalVector.setVisible(true);
+	}
+
+	// solar panels would vanish in the single heat map texture without drawing these lines
+	private void drawSolarPanelOutlines() {
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final Vector3 p0 = trans.applyForward(new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5))); // (0, 0)
+		final Vector3 p1 = trans.applyForward(new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8))); // (1, 0)
+		final Vector3 p2 = trans.applyForward(new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2))); // (0, 1)
+		final boolean portrait = !sampleSolarPanel.isRotated();
+		double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
+		double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
+		final int nw = (int) Math.round(rackWidth / a);
+		final int nh = (int) Math.round(rackHeight / b);
+		a /= Scene.getInstance().getAnnotationScale();
+		b /= Scene.getInstance().getAnnotationScale();
+		final FloatBuffer vertices = solarPanelOutlines.getMeshData().getVertexBuffer();
+		vertices.rewind();
+		final Vector3 u = p1.subtract(p0, null).normalizeLocal().multiplyLocal(b);
+		final Vector3 v = p2.subtract(p0, null).normalizeLocal().multiplyLocal(a);
+		for (int i = 1; i < nw; i++) {
+			final Vector3 vi = v.multiply(i, null);
+			Vector3 p = p0.add(vi, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = p1.add(vi, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+		for (int i = 1; i < nh; i++) {
+			final Vector3 ui = u.multiply(i, null);
+			Vector3 p = p0.add(ui, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = p2.add(ui, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+		solarPanelOutlines.updateModelBound();
+		solarPanelOutlines.setVisible(true);
 	}
 
 	@Override
