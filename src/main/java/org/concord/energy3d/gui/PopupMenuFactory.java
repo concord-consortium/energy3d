@@ -125,6 +125,7 @@ import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelColorCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTemperatrureCoeffientPmaxForAllCommand;
 import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
@@ -207,6 +208,7 @@ public class PopupMenuFactory {
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
 	private static int solarPanelOrientation = 0;
+	private static int solarPanelColorOption = SolarPanel.COLOR_OPTION_BLUE;
 	private static double solarPanelRackArrayInterRowSpacing = 5;
 	private static double solarPanelRackPoleSpacingX = 4;
 	private static double solarPanelRackPoleSpacingY = 2;
@@ -2011,7 +2013,12 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
+
+						panel.add(new JLabel("Solar Panel Color:"));
+						final JComboBox<String> colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+						colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
+						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Panel Size:"));
 						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
@@ -2108,8 +2115,10 @@ public class PopupMenuFactory {
 							}
 							solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
 							solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
+							solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
 							final SolarPanel sp = new SolarPanel();
 							sp.setRotated(solarPanelOrientation == 1);
+							sp.setColorOption(solarPanelColorOption);
 							sp.setTiltAngle(solarPanelTiltAngle);
 							sp.setPanelWidth(solarPanelWidth);
 							sp.setPanelHeight(solarPanelHeight);
@@ -2147,12 +2156,17 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(12, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(13, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Orientation:"));
 						final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
 						orientationComboBox.setSelectedIndex(solarPanelOrientation);
 						panel.add(orientationComboBox);
+
+						panel.add(new JLabel("Solar Panel Color:"));
+						final JComboBox<String> colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+						colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
+						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Solar Panel Size:"));
 						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
@@ -2248,6 +2262,7 @@ public class PopupMenuFactory {
 						}
 						if (ok) {
 							solarPanelOrientation = orientationComboBox.getSelectedIndex();
+							solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
 							solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
 							switch (sizeComboBox.getSelectedIndex()) {
 							case 0:
@@ -2266,6 +2281,7 @@ public class PopupMenuFactory {
 							solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
 							final SolarPanel sp = new SolarPanel();
 							sp.setRotated(solarPanelOrientation == 1);
+							sp.setColorOption(solarPanelColorOption);
 							sp.setPanelWidth(solarPanelWidth);
 							sp.setPanelHeight(solarPanelHeight);
 							sp.setShadeTolerance(solarPanelShadeTolerance);
@@ -3312,6 +3328,51 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu colorOptionMenu = new JMenu("Color Options");
+			final ButtonGroup colorOptionGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiBlue = new JRadioButtonMenuItem("Blue", true);
+			rbmiBlue.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (rbmiBlue.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (!(selectedPart instanceof SolarPanel)) {
+							return;
+						}
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final ChangeSolarPanelColorCommand c = new ChangeSolarPanelColorCommand(s);
+						s.setColorOption(SolarPanel.COLOR_OPTION_BLUE);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						s.draw();
+						updateAfterEdit();
+					}
+				}
+			});
+			colorOptionMenu.add(rbmiBlue);
+			colorOptionGroup.add(rbmiBlue);
+
+			final JRadioButtonMenuItem rbmiBlack = new JRadioButtonMenuItem("Black");
+			rbmiBlack.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (rbmiBlack.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (!(selectedPart instanceof SolarPanel)) {
+							return;
+						}
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final ChangeSolarPanelColorCommand c = new ChangeSolarPanelColorCommand(s);
+						s.setColorOption(SolarPanel.COLOR_OPTION_BLACK);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						s.draw();
+						updateAfterEdit();
+					}
+				}
+			});
+			colorOptionMenu.add(rbmiBlack);
+			colorOptionGroup.add(rbmiBlack);
+
 			final JMenu orientationMenu = new JMenu("Orientation");
 			final ButtonGroup orientationGroup = new ButtonGroup();
 
@@ -3754,6 +3815,8 @@ public class PopupMenuFactory {
 					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
 					Util.selectSilently(rbmiLandscape, sp.isRotated());
 					Util.selectSilently(rbmiPortrait, !sp.isRotated());
+					Util.selectSilently(rbmiBlue, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLUE);
+					Util.selectSilently(rbmiBlack, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLACK);
 					switch (sp.getTracker()) {
 					case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 						Util.selectSilently(miAltazimuthDualAxisTracker, true);
@@ -4024,6 +4087,7 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miCells);
 			popupMenuForSolarPanel.add(miBaseHeight);
+			popupMenuForSolarPanel.add(colorOptionMenu);
 			popupMenuForSolarPanel.add(orientationMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
@@ -4487,7 +4551,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final SolarPanel solarPanel = rack.getSolarPanel();
-					final JPanel panel = new JPanel(new GridLayout(7, 2, 5, 5));
+					final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
 					panel.add(new JLabel("Monolithic:"));
 					final JComboBox<String> monolithicComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
 					monolithicComboBox.setSelectedIndex(rack.isMonolithic() ? 0 : 1);
@@ -4506,6 +4570,10 @@ public class PopupMenuFactory {
 					final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
 					orientationComboBox.setSelectedIndex(solarPanel.isRotated() ? 1 : 0);
 					panel.add(orientationComboBox);
+					panel.add(new JLabel("Color:"));
+					final JComboBox<String> colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+					colorOptionComboBox.setSelectedIndex(solarPanel.getColorOption());
+					panel.add(colorOptionComboBox);
 					panel.add(new JLabel("Solar Cell Efficiency (%):"));
 					final JTextField cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getCellEfficiency() * 100));
 					panel.add(cellEfficiencyField);
@@ -4570,6 +4638,7 @@ public class PopupMenuFactory {
 							break;
 						}
 						solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
+						solarPanel.setColorOption(colorOptionComboBox.getSelectedIndex());
 						solarPanel.setCellEfficiency(cellEfficiency * 0.01);
 						solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
 						solarPanel.setTemperatureCoefficientPmax(pmax * 0.01);

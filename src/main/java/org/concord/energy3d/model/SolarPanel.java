@@ -44,6 +44,8 @@ public class SolarPanel extends HousePart implements Trackable {
 	public static final int MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE = 30;
 	public static final int MIN_INVERTER_EFFICIENCY_PERCENTAGE = 80;
 	public static final int MAX_INVERTER_EFFICIENCY_PERCENTAGE = 100;
+	public static final int COLOR_OPTION_BLUE = 0;
+	public static final int COLOR_OPTION_BLACK = 1;
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -61,6 +63,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
+	private int colorOption = COLOR_OPTION_BLUE;
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double tiltAngle;
@@ -474,7 +477,12 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	@Override
 	protected String getTextureFileName() {
-		return rotated ? "solarpanel-rotated.png" : "solarpanel.png";
+		switch (colorOption) {
+		case COLOR_OPTION_BLACK:
+			return rotated ? "solarpanel-black-landscape.png" : "solarpanel-black-portrait.png";
+		default:
+			return rotated ? "solarpanel-blue-landscape.png" : "solarpanel-blue-portrait.png";
+		}
 	}
 
 	@Override
@@ -840,6 +848,14 @@ public class SolarPanel extends HousePart implements Trackable {
 			oldNeighbors.addAll(newNeighbors);
 		} while (!newNeighbors.isEmpty());
 		return row;
+	}
+
+	public void setColorOption(final int colorOption) {
+		this.colorOption = colorOption;
+	}
+
+	public int getColorOption() {
+		return colorOption;
 	}
 
 	@Override

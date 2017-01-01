@@ -542,7 +542,12 @@ public class Rack extends HousePart implements Trackable {
 	@Override
 	protected String getTextureFileName() {
 		if (monolithic) {
-			return sampleSolarPanel.isRotated() ? "solarpanel-rotated.png" : "solarpanel.png";
+			switch (sampleSolarPanel.getColorOption()) {
+			case SolarPanel.COLOR_OPTION_BLACK:
+				return sampleSolarPanel.isRotated() ? "solarpanel-black-landscape.png" : "solarpanel-black-portrait.png";
+			default:
+				return sampleSolarPanel.isRotated() ? "solarpanel-blue-landscape.png" : "solarpanel-blue-portrait.png";
+			}
 		}
 		return "";
 	}
