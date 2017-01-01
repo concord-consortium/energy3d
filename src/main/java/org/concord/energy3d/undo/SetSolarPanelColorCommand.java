@@ -6,14 +6,14 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeSolarPanelColorCommand extends AbstractUndoableEdit {
+public class SetSolarPanelColorCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;
 	private int newValue;
 	private final SolarPanel solarPanel;
 
-	public ChangeSolarPanelColorCommand(final SolarPanel solarPanel) {
+	public SetSolarPanelColorCommand(final SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
 		oldValue = solarPanel.getColorOption();
 	}

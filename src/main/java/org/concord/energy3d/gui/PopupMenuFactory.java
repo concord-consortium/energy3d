@@ -125,7 +125,7 @@ import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelColorCommand;
+import org.concord.energy3d.undo.SetSolarPanelColorCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTemperatrureCoeffientPmaxForAllCommand;
 import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
@@ -146,11 +146,13 @@ import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
+import org.concord.energy3d.undo.SetAllSolarPanelColorCommand;
 import org.concord.energy3d.undo.SetAllSolarTrackersCommand;
 import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
 import org.concord.energy3d.undo.SetFoundationRackPoleSpacingCommand;
 import org.concord.energy3d.undo.SetFoundationRackSizeCommand;
 import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
+import org.concord.energy3d.undo.SetFoundationSolarPanelColorCommand;
 import org.concord.energy3d.undo.SetFoundationSolarTrackersCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetPoleSpacingForAllRacksCommand;
@@ -1295,7 +1297,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = w.getTopContainer();
 										final ChangeFoundationWallThicknessCommand c = new ChangeFoundationWallThicknessCommand(foundation);
-										Scene.getInstance().setThicknessOfWallsOnFoundation(foundation, val);
+										foundation.setThicknessOfWalls(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										final ChangeThicknessForAllWallsCommand c = new ChangeThicknessForAllWallsCommand(w);
@@ -1365,7 +1367,7 @@ public class PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										final Foundation foundation = w.getTopContainer();
 										final ChangeFoundationWallHeightCommand c = new ChangeFoundationWallHeightCommand(foundation);
-										Scene.getInstance().setHeightOfWallsOnFoundation(foundation, val);
+										foundation.setHeightOfWalls(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb4.isSelected()) {
 										final ChangeHeightForAllWallsCommand c = new ChangeHeightForAllWallsCommand(w);
@@ -2005,11 +2007,11 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						int n = f.countParts(SolarPanel.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 						n = f.countParts(Rack.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panel racks on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panel racks on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 
@@ -2148,11 +2150,11 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						int n = f.countParts(Rack.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panel racks on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panel racks on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 						n = f.countParts(SolarPanel.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 
@@ -2312,7 +2314,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
@@ -2410,7 +2412,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 						final JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
@@ -2482,7 +2484,7 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this platform must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
@@ -2998,7 +3000,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -3021,7 +3023,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
-						Scene.getInstance().setShadeToleranceForSolarPanelsOnFoundation(foundation, SolarPanel.HIGH_SHADE_TOLERANCE);
+						foundation.setShadeToleranceForSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
@@ -3047,7 +3049,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -3070,7 +3072,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
-						Scene.getInstance().setShadeToleranceForSolarPanelsOnFoundation(foundation, SolarPanel.PARTIAL_SHADE_TOLERANCE);
+						foundation.setShadeToleranceForSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
@@ -3096,7 +3098,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -3119,7 +3121,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
-						Scene.getInstance().setShadeToleranceForSolarPanelsOnFoundation(foundation, SolarPanel.NO_SHADE_TOLERANCE);
+						foundation.setShadeToleranceForSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
@@ -3147,7 +3149,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -3170,7 +3172,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
-						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, Trackable.NO_TRACKER);
+						foundation.setTrackerForSolarPanels(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
@@ -3196,7 +3198,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -3219,7 +3221,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
-						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						foundation.setTrackerForSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
@@ -3245,7 +3247,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -3268,7 +3270,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
-						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+						foundation.setTrackerForSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
@@ -3294,7 +3296,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -3317,7 +3319,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
-						Scene.getInstance().setTrackerForSolarPanelsOnFoundation(foundation, SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+						foundation.setTrackerForSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
@@ -3341,10 +3343,41 @@ public class PopupMenuFactory {
 							return;
 						}
 						final SolarPanel s = (SolarPanel) selectedPart;
-						final ChangeSolarPanelColorCommand c = new ChangeSolarPanelColorCommand(s);
-						s.setColorOption(SolarPanel.COLOR_OPTION_BLUE);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-						s.draw();
+						final String partInfo = s.toString().substring(0, s.toString().indexOf(')') + 1);
+						final JPanel panel = new JPanel();
+						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+						final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+						final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
+						final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+						panel.add(rb1);
+						panel.add(rb2);
+						panel.add(rb3);
+						final ButtonGroup bg = new ButtonGroup();
+						bg.add(rb1);
+						bg.add(rb2);
+						bg.add(rb3);
+						final String title = "<html>Set color to blue for " + partInfo + "</html>";
+						final String footnote = "<html><hr><font size=2>Color has no effect in energy generation.<hr></html>";
+						final Object[] params = { title, footnote, panel };
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set Color to Blue", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+							return;
+						}
+						if (rb1.isSelected()) {
+							final SetSolarPanelColorCommand c = new SetSolarPanelColorCommand(s);
+							s.setColorOption(SolarPanel.COLOR_OPTION_BLUE);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							s.draw();
+						} else if (rb2.isSelected()) {
+							final Foundation foundation = s.getTopContainer();
+							final SetFoundationSolarPanelColorCommand c = new SetFoundationSolarPanelColorCommand(foundation);
+							foundation.setColorForSolarPanels(SolarPanel.COLOR_OPTION_BLUE);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							final SetAllSolarPanelColorCommand c = new SetAllSolarPanelColorCommand();
+							Scene.getInstance().setColorOptionForAllSolarPanels(SolarPanel.COLOR_OPTION_BLUE);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						updateAfterEdit();
 					}
 				}
@@ -3362,10 +3395,41 @@ public class PopupMenuFactory {
 							return;
 						}
 						final SolarPanel s = (SolarPanel) selectedPart;
-						final ChangeSolarPanelColorCommand c = new ChangeSolarPanelColorCommand(s);
-						s.setColorOption(SolarPanel.COLOR_OPTION_BLACK);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-						s.draw();
+						final String partInfo = s.toString().substring(0, s.toString().indexOf(')') + 1);
+						final JPanel panel = new JPanel();
+						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+						final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+						final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
+						final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+						panel.add(rb1);
+						panel.add(rb2);
+						panel.add(rb3);
+						final ButtonGroup bg = new ButtonGroup();
+						bg.add(rb1);
+						bg.add(rb2);
+						bg.add(rb3);
+						final String title = "<html>Set color to black for " + partInfo + "</html>";
+						final String footnote = "<html><hr><font size=2>Color has no effect in energy generation.<hr></html>";
+						final Object[] params = { title, footnote, panel };
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set Color to Black", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+							return;
+						}
+						if (rb1.isSelected()) {
+							final SetSolarPanelColorCommand c = new SetSolarPanelColorCommand(s);
+							s.setColorOption(SolarPanel.COLOR_OPTION_BLACK);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							s.draw();
+						} else if (rb2.isSelected()) {
+							final Foundation foundation = s.getTopContainer();
+							final SetFoundationSolarPanelColorCommand c = new SetFoundationSolarPanelColorCommand(foundation);
+							foundation.setColorForSolarPanels(SolarPanel.COLOR_OPTION_BLACK);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							final SetAllSolarPanelColorCommand c = new SetAllSolarPanelColorCommand();
+							Scene.getInstance().setColorOptionForAllSolarPanels(SolarPanel.COLOR_OPTION_BLACK);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						updateAfterEdit();
 					}
 				}
@@ -3477,7 +3541,7 @@ public class PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										final Foundation foundation = sp.getTopContainer();
 										final ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
-										Scene.getInstance().setTiltAngleForSolarPanelsOnFoundation(foundation, val);
+										foundation.setTiltAngleForSolarPanels(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb4.isSelected()) {
 										final ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
@@ -3545,7 +3609,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationSolarPanelAzimuthCommand c = new ChangeFoundationSolarPanelAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForSolarPanelsOnFoundation(foundation, a);
+									foundation.setAzimuthForSolarPanels(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									final ChangeAzimuthForAllSolarPanelsCommand c = new ChangeAzimuthForAllSolarPanelsCommand();
@@ -3696,7 +3760,7 @@ public class PopupMenuFactory {
 						}
 					} else if (rb3.isSelected()) {
 						final ChangeFoundationSolarPanelCellNumbersCommand c = new ChangeFoundationSolarPanelCellNumbersCommand(foundation);
-						Scene.getInstance().setCellNumbersForSolarPanelsOnFoundation(foundation, nx, ny);
+						foundation.setCellNumbersForSolarPanels(nx, ny);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb4.isSelected()) {
 						final ChangeCellNumbersForAllSolarPanelsCommand c = new ChangeCellNumbersForAllSolarPanelsCommand();
@@ -3759,7 +3823,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									final ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
-									Scene.getInstance().setBaseHeightForSolarPanelsOnFoundation(foundation, val);
+									foundation.setBaseHeightForSolarPanels(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb4.isSelected()) {
 									final ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
@@ -3911,7 +3975,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
 										final ChangeFoundationSolarCellEfficiencyCommand c = new ChangeFoundationSolarCellEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarCellEfficiencyOnFoundation(foundation, val * 0.01);
+										foundation.setSolarCellEfficiency(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										final ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
@@ -3972,7 +4036,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
 										final ChangeFoundationInverterEfficiencyCommand c = new ChangeFoundationInverterEfficiencyCommand(foundation);
-										Scene.getInstance().setSolarPanelInverterEfficiencyOnFoundation(foundation, val * 0.01);
+										foundation.setSolarPanelInverterEfficiency(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										final ChangeInverterEfficiencyForAllCommand c = new ChangeInverterEfficiencyForAllCommand();
@@ -4033,7 +4097,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
 										final ChangeFoundationTemperatureCoefficientPmaxCommand c = new ChangeFoundationTemperatureCoefficientPmaxCommand(foundation);
-										Scene.getInstance().setTemperatureCoefficientPmaxOnFoundation(foundation, val * 0.01);
+										foundation.setTemperatureCoefficientPmax(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										final ChangeTemperatrureCoeffientPmaxForAllCommand c = new ChangeTemperatrureCoeffientPmaxForAllCommand();
@@ -4227,7 +4291,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = rack.getTopContainer();
 										final ChangeFoundationRackTiltAngleCommand c = new ChangeFoundationRackTiltAngleCommand(foundation);
-										Scene.getInstance().setTiltAngleForRacksOnFoundation(foundation, val);
+										foundation.setTiltAngleForRacks(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										final ChangeTiltAngleForAllRacksCommand c = new ChangeTiltAngleForAllRacksCommand();
@@ -4295,7 +4359,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForRacksOnFoundation(foundation, a);
+									foundation.setAzimuthForRacks(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
@@ -4339,7 +4403,7 @@ public class PopupMenuFactory {
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Racks");
 					scopePanel.add(rb1);
 					scopePanel.add(rb2);
@@ -4384,7 +4448,7 @@ public class PopupMenuFactory {
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
 							final SetFoundationRackSizeCommand c = new SetFoundationRackSizeCommand(foundation);
-							Scene.getInstance().setSizeForRacksOnFoundation(foundation, w, h);
+							foundation.setSizeForRacks(w, h);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
 							final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
@@ -4437,7 +4501,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationRackBaseHeightCommand c = new ChangeFoundationRackBaseHeightCommand(foundation);
-									Scene.getInstance().setBaseHeightForRacksOnFoundation(foundation, val);
+									foundation.setBaseHeightForRacks(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									final ChangeBaseHeightForAllRacksCommand c = new ChangeBaseHeightForAllRacksCommand();
@@ -4481,7 +4545,7 @@ public class PopupMenuFactory {
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Racks");
 					scopePanel.add(rb1);
 					scopePanel.add(rb2);
@@ -4525,7 +4589,7 @@ public class PopupMenuFactory {
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
 							final SetFoundationRackPoleSpacingCommand c = new SetFoundationRackPoleSpacingCommand(foundation);
-							Scene.getInstance().setPoleSpacingForRacksOnFoundation(foundation, dx, dy);
+							foundation.setPoleSpacingForRacks(dx, dy);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
 							final SetPoleSpacingForAllRacksCommand c = new SetPoleSpacingForAllRacksCommand();
@@ -4673,7 +4737,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Racks");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -4696,7 +4760,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
-						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.NO_TRACKER);
+						foundation.setTrackerForRacks(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
@@ -4722,7 +4786,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Racks");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -4745,7 +4809,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
-						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+						foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
@@ -4771,7 +4835,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Racks");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -4794,7 +4858,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
-						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+						foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
@@ -4820,7 +4884,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Racks");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -4843,7 +4907,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
-						Scene.getInstance().setTrackerForRacksOnFoundation(foundation, Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+						foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
@@ -5007,7 +5071,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Mirrors");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -5016,8 +5080,8 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final String title = "<html>Set the ID of the platform of the target tower for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will focus on the top of the target platform.<hr></html>";
+					final String title = "<html>Set the ID of the foundation of the target tower for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will focus on the top of the target foundation.<hr></html>";
 					final Object[] params = { title, footnote, panel };
 					while (true) {
 						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getHeliostatTarget() == null ? "" : m.getHeliostatTarget().getId());
@@ -5031,11 +5095,11 @@ public class PopupMenuFactory {
 								} else {
 									final HousePart p = Scene.getInstance().getPart(id);
 									if (p instanceof Foundation) {
-										final Foundation f = (Foundation) p;
+										final Foundation target = (Foundation) p;
 										if (rb1.isSelected()) {
 											final Foundation oldTarget = m.getHeliostatTarget();
 											final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-											m.setHeliostatTarget(f);
+											m.setHeliostatTarget(target);
 											m.draw();
 											if (oldTarget != null) {
 												oldTarget.drawSolarReceiver();
@@ -5044,14 +5108,14 @@ public class PopupMenuFactory {
 										} else if (rb2.isSelected()) {
 											final Foundation foundation = m.getTopContainer();
 											final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-											Scene.getInstance().setTargetForMirrorsOnFoundation(foundation, f);
+											foundation.setTargetForMirrors(target);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else if (rb3.isSelected()) {
 											final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-											Scene.getInstance().setTargetForAllMirrors(f);
+											Scene.getInstance().setTargetForAllMirrors(target);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
-										f.drawSolarReceiver();
+										target.drawSolarReceiver();
 										updateAfterEdit();
 									} else {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -5080,7 +5144,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Mirrors");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -5106,7 +5170,7 @@ public class PopupMenuFactory {
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = m.getTopContainer();
 						final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-						Scene.getInstance().setTargetForMirrorsOnFoundation(foundation, null);
+						foundation.setTargetForMirrors(null);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
 						final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
@@ -5133,7 +5197,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Mirrors");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -5166,7 +5230,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = m.getTopContainer();
 										final ChangeFoundationMirrorTiltAngleCommand c = new ChangeFoundationMirrorTiltAngleCommand(foundation);
-										Scene.getInstance().setZenithAngleForMirrorsOfFoundation(foundation, val);
+										foundation.setZenithAngleForMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										final ChangeTiltAngleForAllMirrorsCommand c = new ChangeTiltAngleForAllMirrorsCommand();
@@ -5202,7 +5266,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Mirrors");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -5234,7 +5298,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
-									Scene.getInstance().setAzimuthForMirrorsOnFoundation(foundation, a);
+									foundation.setAzimuthForMirrors(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									final ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
@@ -5278,7 +5342,7 @@ public class PopupMenuFactory {
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Mirrors");
 					scopePanel.add(rb1);
 					scopePanel.add(rb2);
@@ -5322,7 +5386,7 @@ public class PopupMenuFactory {
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
 							final SetFoundationMirrorSizeCommand c = new SetFoundationMirrorSizeCommand(foundation);
-							Scene.getInstance().setSizeForMirrorsOnFoundation(foundation, w, h);
+							foundation.setSizeForMirrors(w, h);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
 							final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
@@ -5375,7 +5439,7 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
-									Scene.getInstance().setBaseHeightForMirrorsOnFoundation(foundation, val);
+									foundation.setBaseHeightForMirrors(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								} else if (rb3.isSelected()) {
 									final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
@@ -5430,7 +5494,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Platform");
+					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Mirrors");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -5457,7 +5521,7 @@ public class PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = m.getTopContainer();
 										final ChangeFoundationMirrorReflectivityCommand c = new ChangeFoundationMirrorReflectivityCommand(foundation);
-										Scene.getInstance().setReflectivityForMirrorsOnFoundation(foundation, val * 0.01);
+										foundation.setReflectivityForMirrors(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
 										final ChangeReflectivityForAllMirrorsCommand c = new ChangeReflectivityForAllMirrorsCommand();

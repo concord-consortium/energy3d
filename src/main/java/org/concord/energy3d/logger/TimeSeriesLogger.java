@@ -428,6 +428,20 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"New Value\": " + sp.isRotated() + "}";
 				}
 
+				else if (lastEdit instanceof SetSolarPanelColorCommand) {
+					final SetSolarPanelColorCommand c = (SetSolarPanelColorCommand) lastEdit;
+					final SolarPanel sp = c.getSolarPanel();
+					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getColorOption() + "}";
+				} else if (lastEdit instanceof SetFoundationSolarPanelColorCommand) {
+					final SetFoundationSolarPanelColorCommand c = (SetFoundationSolarPanelColorCommand) lastEdit;
+					final Foundation f = c.getFoundation();
+					final List<SolarPanel> solarPanels = f.getSolarPanels();
+					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getColorOption()) + "}";
+				} else if (lastEdit instanceof SetAllSolarPanelColorCommand) {
+					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
+					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getColorOption()) + "}";
+				}
+
 				else if (lastEdit instanceof ChangeSolarCellEfficiencyCommand) {
 					final ChangeSolarCellEfficiencyCommand c = (ChangeSolarCellEfficiencyCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();

@@ -2058,4 +2058,263 @@ public class Foundation extends HousePart implements Thermalizable {
 		return foundationPoly.contains(x, y);
 	}
 
+	// change properties of all the solar panels on this foundation
+
+	public void setCellNumbersForSolarPanels(final int nx, final int ny) {
+		for (final HousePart p : Scene.getInstance().getParts()) { // don't just call children as a solar panel may not be a direct offspring of the foundation
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				final SolarPanel s = (SolarPanel) p;
+				s.setNumberOfCellsInX(nx);
+				s.setNumberOfCellsInY(ny);
+				s.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAzimuthForSolarPanels(final double angle) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTiltAngleForSolarPanels(final double angle) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setTiltAngle(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForSolarPanels(final double baseHeight) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSolarCellEfficiency(final double eff) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setCellEfficiency(eff);
+			}
+		}
+	}
+
+	public void setTemperatureCoefficientPmax(final double tcPmax) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setTemperatureCoefficientPmax(tcPmax);
+			}
+		}
+	}
+
+	public void setSolarPanelInverterEfficiency(final double eff) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setInverterEfficiency(eff);
+			}
+		}
+	}
+
+	public void setShadeToleranceForSolarPanels(final int cellWiring) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setShadeTolerance(cellWiring);
+			}
+		}
+	}
+
+	public void setTrackerForSolarPanels(final int tracker) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this && !(p.getContainer() instanceof Rack)) { // no tracker for solar panels on racks as they use rack trackers
+				((SolarPanel) p).setTracker(tracker);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setColorForSolarPanels(final int colorOption) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setColorOption(colorOption);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all the solar panel racks on this foundation
+
+	public void setTiltAngleForRacks(final double angle) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).setTiltAngle(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAzimuthForRacks(final double angle) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForRacks(final double baseHeight) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForRacks(final double width, final double height) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				final Rack rack = (Rack) p;
+				rack.setRackWidth(width);
+				rack.setRackHeight(height);
+				rack.ensureFullSolarPanels(false);
+				rack.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setPoleSpacingForRacks(final double dx, final double dy) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).setPoleDistanceX(dx);
+				((Rack) p).setPoleDistanceY(dy);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTrackerForRacks(final int tracker) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).setTracker(tracker);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all the mirrors on this foundation
+
+	public void setZenithAngleForMirrors(final double angle) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this) {
+				((Mirror) p).setTiltAngle(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAzimuthForMirrors(final double angle) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this) {
+				((Mirror) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setReflectivityForMirrors(final double reflectivity) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this) {
+				((Mirror) p).setReflectivity(reflectivity);
+			}
+		}
+	}
+
+	public void setBaseHeightForMirrors(final double baseHeight) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this) {
+				((Mirror) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setTargetForMirrors(final Foundation target) {
+		final List<Foundation> oldTargets = new ArrayList<Foundation>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this) {
+				final Mirror m = (Mirror) p;
+				final Foundation t = m.getHeliostatTarget();
+				if (t != null && !oldTargets.contains(t)) {
+					oldTargets.add(t);
+				}
+				m.setHeliostatTarget(target);
+				p.draw();
+			}
+		}
+		if (target != null) {
+			target.drawSolarReceiver();
+		}
+		if (!oldTargets.isEmpty()) {
+			for (final Foundation t : oldTargets) {
+				t.drawSolarReceiver();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForMirrors(final double width, final double height) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror && p.getTopContainer() == this) {
+				((Mirror) p).setMirrorWidth(width);
+				((Mirror) p).setMirrorHeight(height);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all walls on this foundation
+
+	public void setThicknessOfWalls(final double thickness) {
+		for (final HousePart p : children) {
+			if (p instanceof Wall) {
+				((Wall) p).setThickness(thickness);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setHeightOfWalls(final double height) {
+		for (final HousePart p : children) {
+			if (p instanceof Wall) {
+				((Wall) p).setHeight(height, true);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 }

@@ -1877,18 +1877,6 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setCellNumbersForSolarPanelsOnFoundation(final Foundation foundation, final int nx, final int ny) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				final SolarPanel s = (SolarPanel) p;
-				s.setNumberOfCellsInX(nx);
-				s.setNumberOfCellsInY(ny);
-				s.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setCellNumbersForAllSolarPanels(final int nx, final int ny) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
@@ -1901,30 +1889,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setTiltAngleForSolarPanelsOnFoundation(final Foundation foundation, final double angle) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setTiltAngle(angle);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setTiltAngleForAllSolarPanels(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setTiltAngle(angle);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setAzimuthForSolarPanelsOnFoundation(final Foundation foundation, final double angle) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setRelativeAzimuth(angle);
 				p.draw();
 			}
 		}
@@ -1941,30 +1909,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForSolarPanelsOnFoundation(final Foundation foundation, final double baseHeight) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setBaseHeight(baseHeight);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setBaseHeightForAllSolarPanels(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setBaseHeight(baseHeight);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setTrackerForSolarPanelsOnFoundation(final Foundation foundation, final int tracker) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation && !(p.getContainer() instanceof Rack)) { // no tracker for solar panels on racks as they use rack trackers
-				((SolarPanel) p).setTracker(tracker);
 				p.draw();
 			}
 		}
@@ -1981,26 +1929,20 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setShadeToleranceForSolarPanelsOnFoundation(final Foundation foundation, final int cellWiring) {
+	public void setColorOptionForAllSolarPanels(final int colorOption) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setShadeTolerance(cellWiring);
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setColorOption(colorOption);
+				p.draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setShadeToleranceForAllSolarPanels(final int cellWiring) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setShadeTolerance(cellWiring);
-			}
-		}
-	}
-
-	public void setSolarCellEfficiencyOnFoundation(final Foundation foundation, final double eff) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setCellEfficiency(eff);
 			}
 		}
 	}
@@ -2013,26 +1955,10 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setTemperatureCoefficientPmaxOnFoundation(final Foundation foundation, final double tcPmax) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setTemperatureCoefficientPmax(tcPmax);
-			}
-		}
-	}
-
 	public void setTemperatureCoefficientPmaxForAll(final double tcPmax) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setTemperatureCoefficientPmax(tcPmax);
-			}
-		}
-	}
-
-	public void setSolarPanelInverterEfficiencyOnFoundation(final Foundation foundation, final double eff) {
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel && p.getTopContainer() == foundation) {
-				((SolarPanel) p).setInverterEfficiency(eff);
 			}
 		}
 	}
@@ -2055,30 +1981,10 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setTiltAngleForRacksOnFoundation(final Foundation foundation, final double angle) {
-		for (final HousePart p : parts) {
-			if (p instanceof Rack && p.getTopContainer() == foundation) {
-				((Rack) p).setTiltAngle(angle);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setTiltAngleForAllRacks(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
 				((Rack) p).setTiltAngle(angle);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setAzimuthForRacksOnFoundation(final Foundation foundation, final double angle) {
-		for (final HousePart p : parts) {
-			if (p instanceof Rack && p.getTopContainer() == foundation) {
-				((Rack) p).setRelativeAzimuth(angle);
 				p.draw();
 			}
 		}
@@ -2095,34 +2001,11 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForRacksOnFoundation(final Foundation foundation, final double baseHeight) {
-		for (final HousePart p : parts) {
-			if (p instanceof Rack && p.getTopContainer() == foundation) {
-				((Rack) p).setBaseHeight(baseHeight);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setBaseHeightForAllRacks(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
 				((Rack) p).setBaseHeight(baseHeight);
 				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setSizeForRacksOnFoundation(final Foundation foundation, final double width, final double height) {
-		for (final HousePart p : parts) {
-			if (p instanceof Rack && p.getTopContainer() == foundation) {
-				final Rack rack = (Rack) p;
-				rack.setRackWidth(width);
-				rack.setRackHeight(height);
-				rack.ensureFullSolarPanels(false);
-				rack.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
@@ -2141,32 +2024,11 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setPoleSpacingForRacksOnFoundation(final Foundation foundation, final double dx, final double dy) {
-		for (final HousePart p : parts) {
-			if (p instanceof Rack && p.getTopContainer() == foundation) {
-				((Rack) p).setPoleDistanceX(dx);
-				((Rack) p).setPoleDistanceY(dy);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setPoleSpacingForAllRacks(final double dx, final double dy) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
 				((Rack) p).setPoleDistanceX(dx);
 				((Rack) p).setPoleDistanceY(dy);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setTrackerForRacksOnFoundation(final Foundation foundation, final int tracker) {
-		for (final HousePart p : parts) {
-			if (p instanceof Rack && p.getTopContainer() == foundation) {
-				((Rack) p).setTracker(tracker);
 				p.draw();
 			}
 		}
@@ -2193,30 +2055,10 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setZenithAngleForMirrorsOfFoundation(final Foundation foundation, final double angle) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setTiltAngle(angle);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setTiltAngleForAllMirrors(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setTiltAngle(angle);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setAzimuthForMirrorsOnFoundation(final Foundation foundation, final double angle) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setRelativeAzimuth(angle);
 				p.draw();
 			}
 		}
@@ -2233,44 +2075,12 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setReflectivityForMirrorsOnFoundation(final Foundation foundation, final double reflectivity) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setReflectivity(reflectivity);
-			}
-		}
-	}
-
 	public void setReflectivityForAllMirrors(final double reflectivity) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setReflectivity(reflectivity);
 			}
 		}
-	}
-
-	public void setTargetForMirrorsOnFoundation(final Foundation foundation, final Foundation target) {
-		final List<Foundation> oldTargets = new ArrayList<Foundation>();
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				final Mirror m = (Mirror) p;
-				final Foundation t = m.getHeliostatTarget();
-				if (t != null && !oldTargets.contains(t)) {
-					oldTargets.add(t);
-				}
-				m.setHeliostatTarget(target);
-				p.draw();
-			}
-		}
-		if (target != null) {
-			target.drawSolarReceiver();
-		}
-		if (!oldTargets.isEmpty()) {
-			for (final Foundation t : oldTargets) {
-				t.drawSolarReceiver();
-			}
-		}
-		SceneManager.getInstance().refresh();
 	}
 
 	public void setTargetForAllMirrors(final Foundation target) {
@@ -2297,31 +2107,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForMirrorsOnFoundation(final Foundation foundation, final double baseHeight) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setBaseHeight(baseHeight);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setBaseHeightForAllMirrors(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setBaseHeight(baseHeight);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setSizeForMirrorsOnFoundation(final Foundation foundation, final double width, final double height) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror && p.getTopContainer() == foundation) {
-				((Mirror) p).setMirrorWidth(width);
-				((Mirror) p).setMirrorHeight(height);
 				p.draw();
 			}
 		}
@@ -2333,16 +2122,6 @@ public class Scene implements Serializable {
 			if (p instanceof Mirror) {
 				((Mirror) p).setMirrorWidth(width);
 				((Mirror) p).setMirrorHeight(height);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setThicknessOfWallsOnFoundation(final Foundation foundation, final double thickness) {
-		for (final HousePart p : parts) {
-			if (p instanceof Wall && p.getTopContainer() == foundation) {
-				((Wall) p).setThickness(thickness);
 				p.draw();
 			}
 		}
@@ -2367,16 +2146,6 @@ public class Scene implements Serializable {
 				currentWall.draw();
 			}
 		});
-		SceneManager.getInstance().refresh();
-	}
-
-	public void setHeightOfWallsOnFoundation(final Foundation foundation, final double height) {
-		for (final HousePart p : parts) {
-			if (p instanceof Wall && p.getTopContainer() == foundation) {
-				((Wall) p).setHeight(height, true);
-				p.draw();
-			}
-		}
 		SceneManager.getInstance().refresh();
 	}
 
