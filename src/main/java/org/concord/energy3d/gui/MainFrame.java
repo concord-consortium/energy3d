@@ -1287,7 +1287,11 @@ public class MainFrame extends JFrame {
 
 			final JMenu buildingBasicsMenu = new JMenu("Building Science Basics");
 			tutorialsMenu.add(buildingBasicsMenu);
-			addModel(buildingBasicsMenu, "Insulation Values", "tutorials/building-science-insulation.ng3");
+			addModel(buildingBasicsMenu, "Two Houses with Different Roof Insulations", "tutorials/building-roof-insulation.ng3");
+			addModel(buildingBasicsMenu, "Two Houses with Different Window SHGCs", "tutorials/building-window-shgc.ng3");
+			addModel(buildingBasicsMenu, "Two Houses with Different Orientations", "tutorials/building-orientation.ng3");
+			addModel(buildingBasicsMenu, "Two Houses with Different Thermostat Settings", "tutorials/building-thermostat.ng3");
+			addModel(buildingBasicsMenu, "Passive Cooling with Trees", "tutorials/building-tree-passive-cooling.ng3");
 
 			final JMenu solarBasicsMenu = new JMenu("Solar Science Basics");
 			tutorialsMenu.add(solarBasicsMenu);
