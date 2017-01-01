@@ -136,7 +136,7 @@ public class Rack extends HousePart implements Trackable {
 		solarPanelOutlines.setModelBound(null);
 		Util.disablePickShadowLight(solarPanelOutlines);
 		solarPanelOutlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10000));
-		solarPanelOutlines.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
+		solarPanelOutlines.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
 		root.attachChild(solarPanelOutlines);
 
 		polesRoot = new Node("Poles Root");
@@ -1082,18 +1082,19 @@ public class Rack extends HousePart implements Trackable {
 		vertices.rewind();
 		final Vector3 u = p1.subtract(p0, null).normalizeLocal().multiplyLocal(b);
 		final Vector3 v = p2.subtract(p0, null).normalizeLocal().multiplyLocal(a);
+		Vector3 p, q;
 		for (int i = 1; i < nw; i++) {
-			final Vector3 vi = v.multiply(i, null);
-			Vector3 p = p0.add(vi, null);
+			q = v.multiply(i, null);
+			p = p0.add(q, null);
 			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = p1.add(vi, null);
+			p = p1.add(q, null);
 			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		for (int i = 1; i < nh; i++) {
-			final Vector3 ui = u.multiply(i, null);
-			Vector3 p = p0.add(ui, null);
+			q = u.multiply(i, null);
+			p = p0.add(q, null);
 			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = p2.add(ui, null);
+			p = p2.add(q, null);
 			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
 		solarPanelOutlines.updateModelBound();

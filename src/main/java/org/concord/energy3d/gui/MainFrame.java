@@ -1285,14 +1285,18 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			final JMenu basicsMenu = new JMenu("Solar Science Basics");
-			tutorialsMenu.add(basicsMenu);
-			addModel(basicsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
-			addModel(basicsMenu, "Solar Box", "tutorials/solar-box.ng3");
-			addModel(basicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
-			addModel(basicsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
-			addModel(basicsMenu, "Solar Panel Azimuthal Angles", "tutorials/solar-panel-azimuth-angle.ng3");
-			addModel(basicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
+			final JMenu buildingBasicsMenu = new JMenu("Building Science Basics");
+			tutorialsMenu.add(buildingBasicsMenu);
+			addModel(buildingBasicsMenu, "Insulation Values", "tutorials/building-science-insulation.ng3");
+
+			final JMenu solarBasicsMenu = new JMenu("Solar Science Basics");
+			tutorialsMenu.add(solarBasicsMenu);
+			addModel(solarBasicsMenu, "Solar Angles", "tutorials/solar-angles.ng3");
+			addModel(solarBasicsMenu, "Solar Box", "tutorials/solar-box.ng3");
+			addModel(solarBasicsMenu, "Solar Irradiance Heat Map", "tutorials/solar-heat-map.ng3");
+			addModel(solarBasicsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
+			addModel(solarBasicsMenu, "Solar Panel Azimuthal Angles", "tutorials/solar-panel-azimuth-angle.ng3");
+			addModel(solarBasicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
 
 			final JMenu pvMenu = new JMenu("Photovoltatic Systems");
 			tutorialsMenu.add(pvMenu);
