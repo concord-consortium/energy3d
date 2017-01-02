@@ -231,9 +231,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem propertiesMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
-	private JMenu templatesMenu;
-	private JMenu exampleTemplatesMenu;
-	private JMenu otherTemplatesMenu;
+	private JMenu examplesMenu;
 	private JMenu tutorialsMenu;
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
@@ -1200,9 +1198,9 @@ public class MainFrame extends JFrame {
 	}
 
 	private JMenu getTemplatesMenu() {
-		if (templatesMenu == null) {
-			templatesMenu = new JMenu("Templates");
-			templatesMenu.addMenuListener(new MenuListener() {
+		if (examplesMenu == null) {
+			examplesMenu = new JMenu("Examples");
+			examplesMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -1217,42 +1215,54 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
-			addModel(templatesMenu, "Apartment 1", "templates/apartment-template-1.ng3");
-			addModel(templatesMenu, "Apartment 2", "templates/apartment-template-2.ng3");
-			addModel(templatesMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
-			addModel(templatesMenu, "Bungalow", "templates/bungalow-template.ng3");
-			addModel(templatesMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
-			addModel(templatesMenu, "Cape Cod", "templates/cape-cod-template.ng3");
-			addModel(templatesMenu, "Colonial", "templates/colonial-template.ng3");
-			addModel(templatesMenu, "Combination Roof", "templates/combination-roof-template.ng3");
-			addModel(templatesMenu, "Cross Gabled Roof", "templates/cross-gabled-template.ng3");
-			addModel(templatesMenu, "Cross Hipped Roof", "templates/cross-hipped-template.ng3");
-			addModel(templatesMenu, "Dutch Colonial", "templates/gambrel-template.ng3");
-			addModel(templatesMenu, "Flat Roof", "templates/flat-roof-template.ng3");
-			addModel(templatesMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
-			addModel(templatesMenu, "Gablet Roof", "templates/gablet-template.ng3");
-			addModel(templatesMenu, "Hip Roof", "templates/hip-roof-template.ng3");
-			addModel(templatesMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
-			addModel(templatesMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
-			addModel(templatesMenu, "Mansard", "templates/mansard-template.ng3");
-			addModel(templatesMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
-			addModel(templatesMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
-			addModel(templatesMenu, "Shed Roof", "templates/shed-roof-template.ng3");
-			templatesMenu.addSeparator();
-			exampleTemplatesMenu = new JMenu("Examples");
-			templatesMenu.add(exampleTemplatesMenu);
-			addModel(exampleTemplatesMenu, "Cape Cod with Front Porch", "templates/example-cape-cod-front-porch.ng3");
-			addModel(exampleTemplatesMenu, "Cape Cod with Garage", "templates/example-cape-cod-attached-garage.ng3");
-			addModel(exampleTemplatesMenu, "Dutch Colonial with Front Porch", "templates/example-dutch-colonial.ng3");
-			addModel(exampleTemplatesMenu, "Federal", "templates/example-federal.ng3");
-			otherTemplatesMenu = new JMenu("Others");
-			templatesMenu.add(otherTemplatesMenu);
-			addModel(otherTemplatesMenu, "Dome", "templates/dome-template.ng3");
-			addModel(otherTemplatesMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
-			addModel(otherTemplatesMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
-			addModel(otherTemplatesMenu, "Stadium", "templates/stadium-template.ng3");
+			final JMenu simpleMenu = new JMenu("Simple Buildings");
+			examplesMenu.add(simpleMenu);
+			addModel(simpleMenu, "Apartment 1", "templates/apartment-template-1.ng3");
+			addModel(simpleMenu, "Apartment 2", "templates/apartment-template-2.ng3");
+			addModel(simpleMenu, "Box Gabled Roof", "templates/box-gabled-template.ng3");
+			addModel(simpleMenu, "Bungalow", "templates/bungalow-template.ng3");
+			addModel(simpleMenu, "Butterfly Roof", "templates/butterfly-template.ng3");
+			addModel(simpleMenu, "Cape Cod", "templates/cape-cod-template.ng3");
+			addModel(simpleMenu, "Colonial", "templates/colonial-template.ng3");
+			addModel(simpleMenu, "Combination Roof", "templates/combination-roof-template.ng3");
+			addModel(simpleMenu, "Cross Gabled Roof", "templates/cross-gabled-template.ng3");
+			addModel(simpleMenu, "Cross Hipped Roof", "templates/cross-hipped-template.ng3");
+			addModel(simpleMenu, "Dutch Colonial", "templates/gambrel-template.ng3");
+			addModel(simpleMenu, "Flat Roof", "templates/flat-roof-template.ng3");
+			addModel(simpleMenu, "Gable & Valley Roof", "templates/gable-valley-template.ng3");
+			addModel(simpleMenu, "Gablet Roof", "templates/gablet-template.ng3");
+			addModel(simpleMenu, "Hip Roof", "templates/hip-roof-template.ng3");
+			addModel(simpleMenu, "Hip & Valley Roof", "templates/hip-valley-template.ng3");
+			addModel(simpleMenu, "M-Shaped Roof", "templates/m-shaped-template.ng3");
+			addModel(simpleMenu, "Mansard", "templates/mansard-template.ng3");
+			addModel(simpleMenu, "Saltbox 1", "templates/saltbox-template-1.ng3");
+			addModel(simpleMenu, "Saltbox 2", "templates/saltbox-template-2.ng3");
+			addModel(simpleMenu, "Shed Roof", "templates/shed-roof-template.ng3");
+			final JMenu complexMenu = new JMenu("Complex Buildings");
+			examplesMenu.add(complexMenu);
+			addModel(complexMenu, "Cape Cod with Front Porch", "templates/example-cape-cod-front-porch.ng3");
+			addModel(complexMenu, "Cape Cod with Garage", "templates/example-cape-cod-attached-garage.ng3");
+			addModel(complexMenu, "Colonial with Fence", "templates/example-colonial-fence.ng3");
+			addModel(complexMenu, "Colonial with Front Porch", "templates/example-colonial-front-porch.ng3");
+			addModel(complexMenu, "L-Shaped Colonial", "templates/example-colonial-l-shaped.ng3");
+			addModel(complexMenu, "Dutch Colonial with Front Porch", "templates/example-dutch-colonial.ng3");
+			addModel(complexMenu, "Federal", "templates/example-federal.ng3");
+			addModel(complexMenu, "Victorian", "templates/example-victorian.ng3");
+			addModel(complexMenu, "Shingle", "templates/example-shingle.ng3");
+			final JMenu pvSolarMenu = new JMenu("Photovoltaic Systems");
+			pvSolarMenu.setEnabled(false);
+			examplesMenu.add(pvSolarMenu);
+			final JMenu cspSolarMenu = new JMenu("Concentrated Solar Power Systems");
+			cspSolarMenu.setEnabled(false);
+			examplesMenu.add(cspSolarMenu);
+			final JMenu miscMenu = new JMenu("Miscellaneous");
+			examplesMenu.add(miscMenu);
+			addModel(miscMenu, "Dome", "templates/dome-template.ng3");
+			addModel(miscMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
+			addModel(miscMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
+			addModel(miscMenu, "Stadium", "templates/stadium-template.ng3");
 		}
-		return templatesMenu;
+		return examplesMenu;
 	}
 
 	private void addModel(final JMenu menu, final String type, final String url) {
@@ -1302,7 +1312,7 @@ public class MainFrame extends JFrame {
 			addModel(solarBasicsMenu, "Solar Panel Azimuthal Angles", "tutorials/solar-panel-azimuth-angle.ng3");
 			addModel(solarBasicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
 
-			final JMenu pvMenu = new JMenu("Photovoltatic Systems");
+			final JMenu pvMenu = new JMenu("Photovoltaic Solar Power");
 			tutorialsMenu.add(pvMenu);
 			addModel(pvMenu, "Single Solar Rack", "tutorials/solar-single-rack.ng3");
 			addModel(pvMenu, "Single Solar Rack (Slow Full Model)", "tutorials/solar-single-rack-full.ng3");
@@ -1318,7 +1328,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Rack Arrays)", "tutorials/pv-fixed-rack-arrays.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Rack Arrays)", "tutorials/pv-hsat-rack-arrays.ng3");
 
-			final JMenu cspMenu = new JMenu("Concentrated Solar Power Systems");
+			final JMenu cspMenu = new JMenu("Concentrated Solar Power");
 			tutorialsMenu.add(cspMenu);
 			addModel(cspMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
 			addModel(cspMenu, "Cosine Efficiency", "tutorials/csp-cosine-efficiency.ng3");
