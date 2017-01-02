@@ -899,7 +899,7 @@ public class MainFrame extends JFrame {
 		} else {
 			if (Scene.isTemplate()) {
 				final String s = Scene.getURL().toString();
-				setTitle("Energy3D V" + MainApplication.VERSION + " - TEMPLATE: " + s.substring(s.lastIndexOf("/") + 1).replaceAll("%20", " ") + star);
+				setTitle("Energy3D V" + MainApplication.VERSION + " - @ " + s.substring(s.lastIndexOf("/") + 1).replaceAll("%20", " ") + star);
 			} else {
 				setTitle("Energy3D V" + MainApplication.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
 			}
@@ -1325,6 +1325,7 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Shadowing and Blocking", "tutorials/csp-shadowing-blocking.ng3");
 			addModel(cspMenu, "Shadowing and Blocking (Reduced Mirror Height)", "tutorials/csp-shadowing-blocking-less.ng3");
 			addModel(cspMenu, "Shadowing and Blocking (Increased Radial Spacing)", "tutorials/csp-shadowing-blocking-even-less.ng3");
+			addModel(cspMenu, "Fermat Spiral Layout of Heliostats", "tutorials/csp-spiral-layout.ng3");
 
 		}
 		return tutorialsMenu;
