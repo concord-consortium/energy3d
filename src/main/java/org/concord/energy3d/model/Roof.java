@@ -1358,7 +1358,6 @@ public abstract class Roof extends HousePart implements Thermalizable {
 			heatFlux.getMeshData().updateVertexCount();
 			heatFlux.updateModelBound();
 		}
-
 		updateHeatFluxVisibility();
 	}
 

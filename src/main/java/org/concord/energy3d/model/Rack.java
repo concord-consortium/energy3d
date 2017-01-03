@@ -45,7 +45,7 @@ public class Rack extends HousePart implements Trackable {
 	private transient Node angles;
 	private transient AngleAnnotation sunAngle;
 	private transient Vector3 moveStartPoint;
-	private transient double layoutGap = 0.01;
+	private transient double copyLayoutGap = 1;
 	private transient boolean allowAzimuthLargeRotation;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
@@ -77,6 +77,11 @@ public class Rack extends HousePart implements Trackable {
 	@Override
 	protected void init() {
 		super.init();
+
+		if (Util.isZero(copyLayoutGap)) { // FIXME: Why is a transient member evaluated to zero?
+			copyLayoutGap = 1;
+		}
+
 		mesh = new Mesh("Rack");
 		mesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
@@ -182,41 +187,45 @@ public class Rack extends HousePart implements Trackable {
 			if (editPointIndex % 2 == 0) {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
-				final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
-				final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
-				if (rw > pw) {
-					final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
-					getEditPointShape(editPointIndex).setTranslation(p);
-					points.get(0).set(newCenter);
-					setRackWidth(Math.max(rw, pw));
-					if (outOfBound()) {
-						if (oldRackCenter != null) {
-							points.get(0).set(oldRackCenter);
+				if (p != null) {
+					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
+					if (rw > pw) {
+						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
+						getEditPointShape(editPointIndex).setTranslation(p);
+						points.get(0).set(newCenter);
+						setRackWidth(Math.max(rw, pw));
+						if (outOfBound()) {
+							if (oldRackCenter != null) {
+								points.get(0).set(oldRackCenter);
+							}
+							setRackWidth(oldRackWidth);
+						} else {
+							oldRackCenter = points.get(0).clone();
+							oldRackWidth = rackWidth;
 						}
-						setRackWidth(oldRackWidth);
-					} else {
-						oldRackCenter = points.get(0).clone();
-						oldRackWidth = rackWidth;
 					}
 				}
 			} else {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
-				final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
-				final double ph = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
-				if (rh > ph) {
-					final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
-					getEditPointShape(editPointIndex).setTranslation(p);
-					points.get(0).set(newCenter);
-					setRackHeight(Math.max(rh, ph));
-					if (outOfBound()) {
-						if (oldRackCenter != null) {
-							points.get(0).set(oldRackCenter);
+				if (p != null) {
+					final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double ph = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
+					if (rh > ph) {
+						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
+						getEditPointShape(editPointIndex).setTranslation(p);
+						points.get(0).set(newCenter);
+						setRackHeight(Math.max(rh, ph));
+						if (outOfBound()) {
+							if (oldRackCenter != null) {
+								points.get(0).set(oldRackCenter);
+							}
+							setRackHeight(oldRackHeight);
+						} else {
+							oldRackCenter = points.get(0).clone();
+							oldRackHeight = rackHeight;
 						}
-						setRackHeight(oldRackHeight);
-					} else {
-						oldRackCenter = points.get(0).clone();
-						oldRackHeight = rackHeight;
 					}
 				}
 			}
@@ -243,6 +252,20 @@ public class Rack extends HousePart implements Trackable {
 					return true;
 				}
 			}
+		} else if (container instanceof Roof) {
+			final Roof roof = (Roof) container;
+			final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
+			boolean init = true;
+			for (int i = 0; i < n; i++) {
+				final Vector3 a = getVertex(i);
+				if (!roof.insideWalls(a.getX(), a.getY(), init)) {
+					return true;
+				}
+				if (init) {
+					init = false;
+				}
+			}
+
 		}
 		return false;
 	}
@@ -476,6 +499,8 @@ public class Rack extends HousePart implements Trackable {
 
 		if (heatMap) {
 			drawSolarPanelOutlines();
+		} else {
+			solarPanelOutlines.setVisible(false);
 		}
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
@@ -591,14 +616,14 @@ public class Rack extends HousePart implements Trackable {
 		return true;
 	}
 
-	private double overlap() {
-		final double w1 = rackWidth / Scene.getInstance().getAnnotationScale();
+	private double copyOverlap() { // copy only in the direction of rack height
+		final double w1 = rackHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof Rack) {
 					final Rack s2 = (Rack) p;
-					final double w2 = s2.rackWidth / Scene.getInstance().getAnnotationScale();
+					final double w2 = s2.rackHeight / Scene.getInstance().getAnnotationScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -615,35 +640,46 @@ public class Rack extends HousePart implements Trackable {
 		if (check) {
 			normal = container.getNormal();
 			if (container instanceof Foundation) {
-				final Vector3 p0 = container.getAbsPoint(0);
-				final Vector3 p1 = container.getAbsPoint(1);
-				final Vector3 p2 = container.getAbsPoint(2);
-				final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
-				final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-				final double length = (1 + layoutGap) * rackWidth / Scene.getInstance().getAnnotationScale();
-				final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
-				final double tx = length / p0.distance(p2);
-				final double ty = length / p0.distance(p1);
-				final double lx = s * v.getX() * tx;
-				final double ly = s * v.getY() * ty;
-				final double newX = points.get(0).getX() + lx;
-				if (newX > 1 - tx || newX < tx) {
+				if (!isPositionLegal(c, (Foundation) container, false)) {
 					return null;
 				}
-				final double newY = points.get(0).getY() + ly;
-				if (newY > 1 - ty || newY < ty) {
-					return null;
-				}
-				c.points.get(0).setX(newX);
-				c.points.get(0).setY(newY);
-				final double o = c.overlap();
-				if (o >= 0) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			} else if (container instanceof Roof) {
+				if (!isPositionLegal(c, container.getTopContainer(), !Util.isZero(container.getHeight()))) {
 					return null;
 				}
 			}
 		}
 		return c;
+	}
+
+	private boolean isPositionLegal(final Rack rack, final Foundation foundation, final boolean nonFlatRoof) {
+		final Vector3 p0 = foundation.getAbsPoint(0);
+		final Vector3 p1 = foundation.getAbsPoint(1);
+		final Vector3 p2 = foundation.getAbsPoint(2);
+		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
+		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
+		final double length = (1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackHeight / Scene.getInstance().getAnnotationScale();
+		final double s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+		final double tx = length / p0.distance(p2);
+		final double ty = length / p0.distance(p1);
+		final double lx = s * v.getX() * tx;
+		final double ly = s * v.getY() * ty;
+		final double newX = points.get(0).getX() + lx;
+		if (newX > 1 - tx || newX < tx) {
+			return false;
+		}
+		final double newY = points.get(0).getY() + ly;
+		if (newY > 1 - ty || newY < ty) {
+			return false;
+		}
+		rack.points.get(0).setX(newX);
+		rack.points.get(0).setY(newY);
+		final double o = rack.copyOverlap();
+		if (o >= 0) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 
 	public void setRackWidth(final double rackWidth) {
@@ -810,10 +846,6 @@ public class Rack extends HousePart implements Trackable {
 	public void addSolarPanels() {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeAllChildren(), this, new Class[] { SolarPanel.class });
-		final ArrayList<HousePart> c0 = new ArrayList<HousePart>(children);
-		for (final HousePart c : c0) { // make a copy to avoid concurrent modification
-			Scene.getInstance().remove(c, false);
-		}
 		if (monolithic) {
 			ensureFullSolarPanels(false);
 			draw();
@@ -861,7 +893,9 @@ public class Rack extends HousePart implements Trackable {
 			setRelativeAzimuth(azRack);
 			Scene.getInstance().redrawAll();
 		}
-		SceneManager.getInstance().getUndoManager().addEdit(command);
+		if (!command.getOldArray().isEmpty()) {
+			SceneManager.getInstance().getUndoManager().addEdit(command);
+		}
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {

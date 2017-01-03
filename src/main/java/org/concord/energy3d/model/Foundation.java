@@ -2061,7 +2061,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	// change properties of all the solar panels on this foundation
 
 	public void setCellNumbersForSolarPanels(final int nx, final int ny) {
-		for (final HousePart p : Scene.getInstance().getParts()) { // don't just call children as a solar panel may not be a direct offspring of the foundation
+		for (final HousePart p : Scene.getInstance().getParts()) { // don't just call children as a solar panel may not be a direct offspring of the foundation (e.g., it can be a child of a roof or wall)
 			if (p instanceof SolarPanel && p.getTopContainer() == this) {
 				final SolarPanel s = (SolarPanel) p;
 				s.setNumberOfCellsInX(nx);
@@ -2157,7 +2157,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	// change properties of all the solar panel racks on this foundation
 
 	public void setTiltAngleForRacks(final double angle) {
-		for (final HousePart p : Scene.getInstance().getParts()) {
+		for (final HousePart p : Scene.getInstance().getParts()) { // don't just call children as a solar panel may not be a direct offspring of the foundation (e.g., it can be a child of a roof)
 			if (p instanceof Rack && p.getTopContainer() == this) {
 				((Rack) p).setTiltAngle(angle);
 				p.draw();
@@ -2189,11 +2189,11 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void setSizeForRacks(final double width, final double height) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
-				final Rack rack = (Rack) p;
-				rack.setRackWidth(width);
-				rack.setRackHeight(height);
-				rack.ensureFullSolarPanels(false);
-				rack.draw();
+				final Rack r = (Rack) p;
+				r.setRackWidth(width);
+				r.setRackHeight(height);
+				r.ensureFullSolarPanels(false);
+				r.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
@@ -2202,9 +2202,10 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void setPoleSpacingForRacks(final double dx, final double dy) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
-				((Rack) p).setPoleDistanceX(dx);
-				((Rack) p).setPoleDistanceY(dy);
-				p.draw();
+				final Rack r = (Rack) p;
+				r.setPoleDistanceX(dx);
+				r.setPoleDistanceY(dy);
+				r.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
@@ -2223,8 +2224,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	// change properties of all the mirrors on this foundation
 
 	public void setZenithAngleForMirrors(final double angle) {
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this) {
+		for (final HousePart p : children) {
+			if (p instanceof Mirror) {
 				((Mirror) p).setTiltAngle(angle);
 				p.draw();
 			}
@@ -2233,8 +2234,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void setAzimuthForMirrors(final double angle) {
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this) {
+		for (final HousePart p : children) {
+			if (p instanceof Mirror) {
 				((Mirror) p).setRelativeAzimuth(angle);
 				p.draw();
 			}
@@ -2243,16 +2244,16 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void setReflectivityForMirrors(final double reflectivity) {
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this) {
+		for (final HousePart p : children) {
+			if (p instanceof Mirror) {
 				((Mirror) p).setReflectivity(reflectivity);
 			}
 		}
 	}
 
 	public void setBaseHeightForMirrors(final double baseHeight) {
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this) {
+		for (final HousePart p : children) {
+			if (p instanceof Mirror) {
 				((Mirror) p).setBaseHeight(baseHeight);
 				p.draw();
 			}
@@ -2262,15 +2263,15 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void setTargetForMirrors(final Foundation target) {
 		final List<Foundation> oldTargets = new ArrayList<Foundation>();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this) {
+		for (final HousePart p : children) {
+			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
 				final Foundation t = m.getHeliostatTarget();
 				if (t != null && !oldTargets.contains(t)) {
 					oldTargets.add(t);
 				}
 				m.setHeliostatTarget(target);
-				p.draw();
+				m.draw();
 			}
 		}
 		if (target != null) {
@@ -2285,11 +2286,12 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void setSizeForMirrors(final double width, final double height) {
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this) {
-				((Mirror) p).setMirrorWidth(width);
-				((Mirror) p).setMirrorHeight(height);
-				p.draw();
+		for (final HousePart p : children) {
+			if (p instanceof Mirror) {
+				final Mirror m = (Mirror) p;
+				m.setMirrorWidth(width);
+				m.setMirrorHeight(height);
+				m.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();

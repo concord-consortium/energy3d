@@ -125,7 +125,6 @@ import org.concord.energy3d.undo.ChangeShutterColorCommand;
 import org.concord.energy3d.undo.ChangeShutterLengthCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
-import org.concord.energy3d.undo.SetSolarPanelColorCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTemperatrureCoeffientPmaxForAllCommand;
 import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
@@ -161,6 +160,8 @@ import org.concord.energy3d.undo.SetShadeToleranceCommand;
 import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
+import org.concord.energy3d.undo.SetSolarPanelArrayOnRackCommand;
+import org.concord.energy3d.undo.SetSolarPanelColorCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
 import org.concord.energy3d.undo.ShowBorderLineCommand;
 import org.concord.energy3d.util.Config;
@@ -4687,6 +4688,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
+						final SetSolarPanelArrayOnRackCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackCommand(rack) : null;
 						switch (sizeComboBox.getSelectedIndex()) {
 						case 0:
 							solarPanel.setPanelWidth(0.99);
@@ -4712,6 +4714,9 @@ public class PopupMenuFactory {
 							public Object call() {
 								rack.setMonolithic(monolithicComboBox.getSelectedIndex() == 0);
 								rack.addSolarPanels();
+								if (command != null) {
+									SceneManager.getInstance().getUndoManager().addEdit(command);
+								}
 								return null;
 							}
 						});
