@@ -738,6 +738,10 @@ public class SolarRadiation {
 			rack.draw();
 		}
 
+		if (!rack.isMonolithic()) {
+			return;
+		}
+
 		final ReadOnlyVector3 normal = rack.getNormal();
 		if (normal == null) {
 			throw new RuntimeException("Normal is null");

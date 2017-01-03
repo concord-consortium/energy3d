@@ -897,7 +897,7 @@ public class MainFrame extends JFrame {
 		} else {
 			if (Scene.isTemplate()) {
 				final String s = Scene.getURL().toString();
-				setTitle("Energy3D V" + MainApplication.VERSION + " - @ " + s.substring(s.lastIndexOf("/") + 1).replaceAll("%20", " ") + star);
+				setTitle("Energy3D V" + MainApplication.VERSION + " - @" + s.substring(s.lastIndexOf("/") + 1).replaceAll("%20", " ") + star);
 			} else {
 				setTitle("Energy3D V" + MainApplication.VERSION + " - " + new File(Scene.getURL().getFile()).toString().replaceAll("%20", " ") + star);
 			}
@@ -1319,6 +1319,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Multiple Solar Racks", "tutorials/solar-multiple-racks.ng3");
 			addModel(pvMenu, "Solar Rack Array", "tutorials/solar-rack-array.ng3");
 			addModel(pvMenu, "Solar Rack Array (Slow Full Model)", "tutorials/solar-rack-array-full.ng3");
+			addModel(pvMenu, "Rooftop Solar System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
@@ -1335,7 +1336,7 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Shadowing and Blocking", "tutorials/csp-shadowing-blocking.ng3");
 			addModel(cspMenu, "Shadowing and Blocking (Reduced Mirror Height)", "tutorials/csp-shadowing-blocking-less.ng3");
 			addModel(cspMenu, "Shadowing and Blocking (Increased Radial Spacing)", "tutorials/csp-shadowing-blocking-even-less.ng3");
-			addModel(cspMenu, "Fermat Spiral Layout of Heliostats", "tutorials/csp-spiral-layout.ng3");
+			addModel(cspMenu, "Fermat Spiral Layout of Heliostats (Sunflower Pattern)", "tutorials/csp-spiral-layout.ng3");
 
 		}
 		return tutorialsMenu;

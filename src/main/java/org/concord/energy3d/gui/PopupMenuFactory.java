@@ -4650,7 +4650,7 @@ public class PopupMenuFactory {
 					final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getInverterEfficiency() * 100));
 					panel.add(inverterEfficiencyField);
 					panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
-					final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanel.getTemperatureCoefficientPmax()));
+					final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanel.getTemperatureCoefficientPmax() * 100));
 					panel.add(pmaxField);
 
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
