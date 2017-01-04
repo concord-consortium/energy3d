@@ -71,102 +71,7 @@ import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
-import org.concord.energy3d.undo.ChangeAtmosphericDustLossCommand;
-import org.concord.energy3d.undo.ChangeAzimuthCommand;
-import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeAzimuthForAllRacksCommand;
-import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeBackgroundAlbedoCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllRacksCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForSolarPanelRowCommand;
-import org.concord.energy3d.undo.ChangeBuildingColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingShutterColorCommand;
-import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
-import org.concord.energy3d.undo.ChangeBuildingWindowShgcCommand;
-import org.concord.energy3d.undo.ChangeCellNumbersCommand;
-import org.concord.energy3d.undo.ChangeCellNumbersForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeCellNumbersForSolarPanelOnRackCommand;
-import org.concord.energy3d.undo.ChangeContainerShutterColorCommand;
-import org.concord.energy3d.undo.ChangeContainerWindowColorCommand;
-import org.concord.energy3d.undo.ChangeContainerWindowShgcCommand;
-import org.concord.energy3d.undo.ChangeFoundationHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorReflectivityCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationRackAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationRackBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarCellEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelCellNumbersCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationTemperatureCoefficientPmaxCommand;
-import org.concord.energy3d.undo.ChangeFoundationWallHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationWallThicknessCommand;
-import org.concord.energy3d.undo.ChangeGroundThermalDiffusivityCommand;
-import org.concord.energy3d.undo.ChangeHeightForAllWallsCommand;
-import org.concord.energy3d.undo.ChangeHeightForConnectedWallsCommand;
-import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
-import org.concord.energy3d.undo.ChangeMirrorReflectivityCommand;
-import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
-import org.concord.energy3d.undo.ChangePartColorCommand;
-import org.concord.energy3d.undo.ChangePartUValueCommand;
-import org.concord.energy3d.undo.ChangeReflectivityForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
-import org.concord.energy3d.undo.ChangeShutterColorCommand;
-import org.concord.energy3d.undo.ChangeShutterLengthCommand;
-import org.concord.energy3d.undo.ChangeSolarCellEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeSolarCellEfficiencyForAllCommand;
-import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeTemperatrureCoeffientPmaxForAllCommand;
-import org.concord.energy3d.undo.ChangeTemperatureCoefficientPmaxCommand;
-import org.concord.energy3d.undo.ChangeThemeCommand;
-import org.concord.energy3d.undo.ChangeThicknessForAllWallsCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.ChangeTiltAngleForSolarPanelRowCommand;
-import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
-import org.concord.energy3d.undo.ChangeWallHeightCommand;
-import org.concord.energy3d.undo.ChangeWallThicknessCommand;
-import org.concord.energy3d.undo.ChangeWallTypeCommand;
-import org.concord.energy3d.undo.ChangeWindowShgcCommand;
-import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
-import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
-import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
-import org.concord.energy3d.undo.DeleteUtilityBillCommand;
-import org.concord.energy3d.undo.LockPartCommand;
-import org.concord.energy3d.undo.RotateSolarPanelCommand;
-import org.concord.energy3d.undo.SetColorForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.SetColorForSolarPanelsOnFoundationCommand;
-import org.concord.energy3d.undo.SetPartSizeCommand;
-import org.concord.energy3d.undo.SetPoleSpacingForAllRacksCommand;
-import org.concord.energy3d.undo.SetPoleSpacingForRacksOnFoundationCommand;
-import org.concord.energy3d.undo.SetRackPoleSpacingCommand;
-import org.concord.energy3d.undo.SetShadeToleranceCommand;
-import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
-import org.concord.energy3d.undo.SetShadeToleranceForSolarPanelsOnFoundationCommand;
-import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
-import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
-import org.concord.energy3d.undo.SetSizeForMirrorsOnFoundationCommand;
-import org.concord.energy3d.undo.SetSizeForRacksOnFoundationCommand;
-import org.concord.energy3d.undo.SetSolarPanelArrayOnRackCommand;
-import org.concord.energy3d.undo.SetSolarPanelColorCommand;
-import org.concord.energy3d.undo.SetSolarPanelSizeForAllRacksCommand;
-import org.concord.energy3d.undo.SetSolarPanelSizeForRacksOnFoundationCommand;
-import org.concord.energy3d.undo.SetSolarTrackerCommand;
-import org.concord.energy3d.undo.SetSolarTrackersForAllCommand;
-import org.concord.energy3d.undo.SetSolarTrackersOnFoundationCommand;
-import org.concord.energy3d.undo.ShowBorderLineCommand;
+import org.concord.energy3d.undo.*;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -3334,7 +3239,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenu colorOptionMenu = new JMenu("Color Options");
+			final JMenu colorOptionMenu = new JMenu("Color");
 			final ButtonGroup colorOptionGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem rbmiBlue = new JRadioButtonMenuItem("Blue", true);
@@ -4728,7 +4633,10 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu solarPanelMenu = new JMenu("Solar Panel Properties");
+
 			final JMenuItem miSolarPanelSize = new JMenuItem("Size...");
+			solarPanelMenu.add(miSolarPanelSize);
 			miSolarPanelSize.addActionListener(new ActionListener() {
 
 				private double w = 0.99;
@@ -4788,7 +4696,7 @@ public class PopupMenuFactory {
 					bg.add(rb2);
 					bg.add(rb3);
 					gui.add(scopePanel, BorderLayout.CENTER);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Solar Panel Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
 					if (rb1.isSelected()) {
@@ -4805,6 +4713,115 @@ public class PopupMenuFactory {
 					} else if (rb3.isSelected()) {
 						final SetSolarPanelSizeForAllRacksCommand c = new SetSolarPanelSizeForAllRacksCommand();
 						Scene.getInstance().setSolarPanelSizeForAllRacks(w, h);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					updateAfterEdit();
+				}
+			});
+
+			final JMenuItem miSolarPanelOrientation = new JMenuItem("Orientation...");
+			solarPanelMenu.add(miSolarPanelOrientation);
+			miSolarPanelOrientation.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Choose Solar Panel Orientation for " + partInfo));
+					final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
+					orientationComboBox.setSelectedIndex(s.isRotated() ? 1 : 0);
+					gui.add(orientationComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.CENTER);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Solar Panel Orientation", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					if (rb1.isSelected()) {
+						final RotateSolarPanelsOnRackCommand c = new RotateSolarPanelsOnRackCommand(r);
+						s.setRotated(orientationComboBox.getSelectedIndex() == 1);
+						r.ensureFullSolarPanels(false);
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						final RotateSolarPanelsForRacksOnFoundationCommand c = new RotateSolarPanelsForRacksOnFoundationCommand(foundation);
+						foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						final RotateSolarPanelsOnAllRacksCommand c = new RotateSolarPanelsOnAllRacksCommand();
+						Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					updateAfterEdit();
+				}
+			});
+
+			final JMenuItem miSolarPanelColor = new JMenuItem("Color...");
+			solarPanelMenu.add(miSolarPanelColor);
+			miSolarPanelColor.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Choose Solar Panel Color for " + partInfo));
+					final JComboBox<String> colorComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+					colorComboBox.setSelectedIndex(s.getColorOption());
+					gui.add(colorComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.CENTER);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Solar Panel Color", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					if (rb1.isSelected()) {
+						final SetColorForSolarPanelsOnRackCommand c = new SetColorForSolarPanelsOnRackCommand(r);
+						s.setColorOption(colorComboBox.getSelectedIndex());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						final SetSolarPanelColorForRacksOnFoundationCommand c = new SetSolarPanelColorForRacksOnFoundationCommand(foundation);
+						foundation.setSolarPanelColorForRacks(colorComboBox.getSelectedIndex());
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						final SetSolarPanelColorForAllRacksCommand c = new SetSolarPanelColorForAllRacksCommand();
+						Scene.getInstance().setSolarPanelColorForAllRacks(colorComboBox.getSelectedIndex());
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
 					updateAfterEdit();
@@ -5085,9 +5102,6 @@ public class PopupMenuFactory {
 				}
 
 			});
-
-			final JMenu solarPanelMenu = new JMenu("Solar Panel Properties");
-			solarPanelMenu.add(miSolarPanelSize);
 
 			popupMenuForRack.add(miPaste);
 			popupMenuForRack.add(miClear);

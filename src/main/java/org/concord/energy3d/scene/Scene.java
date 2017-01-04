@@ -2037,6 +2037,29 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSolarPanelColorForAllRacks(final int colorOption) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				final Rack rack = (Rack) p;
+				rack.getSolarPanel().setColorOption(colorOption);
+				rack.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void rotateSolarPanelsOnAllRacks(final boolean rotated) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				final Rack rack = (Rack) p;
+				rack.getSolarPanel().setRotated(rotated);
+				rack.ensureFullSolarPanels(false);
+				rack.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setPoleSpacingForAllRacks(final double dx, final double dy) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
