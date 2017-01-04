@@ -2223,15 +2223,36 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSolarPanelShadeToleranceForRacks(final int tolerance) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).getSolarPanel().setShadeTolerance(tolerance);
+			}
+		}
+	}
+
 	public void setSolarCellEfficiencyForRacks(final double eff) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
-				final Rack r = (Rack) p;
-				r.getSolarPanel().setCellEfficiency(eff);
-				r.draw();
+				((Rack) p).getSolarPanel().setCellEfficiency(eff);
 			}
 		}
-		SceneManager.getInstance().refresh();
+	}
+
+	public void setInverterEfficiencyForRacks(final double eff) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).getSolarPanel().setInverterEfficiency(eff);
+			}
+		}
+	}
+
+	public void setTemperatureCoefficientPmaxForRacks(final double pmax) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).getSolarPanel().setTemperatureCoefficientPmax(pmax);
+			}
+		}
 	}
 
 	public void rotateSolarPanelsOnRacks(final boolean rotated) {

@@ -6,14 +6,14 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeTemperatureCoefficientPmaxCommand extends AbstractUndoableEdit {
+public class SetTemperatureCoefficientPmaxCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;
 	private double newValue;
 	private final SolarPanel solarPanel;
 
-	public ChangeTemperatureCoefficientPmaxCommand(final SolarPanel solarPanel) {
+	public SetTemperatureCoefficientPmaxCommand(final SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
 		oldValue = solarPanel.getTemperatureCoefficientPmax();
 	}

@@ -2048,15 +2048,36 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSolarPanelShadeToleranceForAllRacks(final int tolerance) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).getSolarPanel().setShadeTolerance(tolerance);
+			}
+		}
+	}
+
 	public void setSolarCellEfficiencyForAllRacks(final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
-				final Rack rack = (Rack) p;
-				rack.getSolarPanel().setCellEfficiency(eff);
-				rack.draw();
+				((Rack) p).getSolarPanel().setCellEfficiency(eff);
 			}
 		}
-		SceneManager.getInstance().refresh();
+	}
+
+	public void setInverterEfficiencyForAllRacks(final double eff) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).getSolarPanel().setInverterEfficiency(eff);
+			}
+		}
+	}
+
+	public void setTemperatureCoefficientPmaxForAllRacks(final double pmax) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).getSolarPanel().setTemperatureCoefficientPmax(pmax);
+			}
+		}
 	}
 
 	public void rotateSolarPanelsOnAllRacks(final boolean rotated) {

@@ -3849,9 +3849,8 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof SolarPanel)) {
 						return;
 					}
-					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Solar Cell Efficiency (%) of " + partInfo + "</html>";
+					final String title = "<html>Solar Cell Efficiency (%) of " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "</html>";
 					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 24%.<br>So the highest efficiency you can choose is limited to " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.<hr></html>";
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -4000,16 +3999,16 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final ChangeTemperatureCoefficientPmaxCommand c = new ChangeTemperatureCoefficientPmaxCommand(solarPanel);
+										final SetTemperatureCoefficientPmaxCommand c = new SetTemperatureCoefficientPmaxCommand(solarPanel);
 										solarPanel.setTemperatureCoefficientPmax(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										final ChangeFoundationTemperatureCoefficientPmaxCommand c = new ChangeFoundationTemperatureCoefficientPmaxCommand(foundation);
+										final SetFoundationTemperatureCoefficientPmaxCommand c = new SetFoundationTemperatureCoefficientPmaxCommand(foundation);
 										foundation.setTemperatureCoefficientPmax(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									} else if (rb3.isSelected()) {
-										final ChangeTemperatrureCoeffientPmaxForAllCommand c = new ChangeTemperatrureCoeffientPmaxForAllCommand();
+										final SetTemperatrureCoeffientPmaxForAllCommand c = new SetTemperatrureCoeffientPmaxForAllCommand();
 										Scene.getInstance().setTemperatureCoefficientPmaxForAll(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
@@ -4841,9 +4840,9 @@ public class PopupMenuFactory {
 					final Rack r = (Rack) selectedPart;
 					final Foundation foundation = r.getTopContainer();
 					final SolarPanel s = r.getSolarPanel();
-					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final String title = "Set Solar Cell Efficiency (%) for " + r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 24%.<br>So the highest efficiency you can choose is limited to " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
-					gui.setBorder(BorderFactory.createTitledBorder("Set Solar Cell Efficiency (%) for " + partInfo));
 					final JTextField cellEfficiencyField = new JTextField(threeDecimalsFormat.format(s.getCellEfficiency() * 100));
 					gui.add(cellEfficiencyField, BorderLayout.NORTH);
 					final JPanel scopePanel = new JPanel();
@@ -4862,7 +4861,7 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.CENTER);
 					boolean ok = false;
 					while (true) {
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Solar Cell Efficiency", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), new Object[] { title, footnote, gui }, "Solar Cell Efficiency", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 							try {
 								solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 								if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
@@ -4880,7 +4879,7 @@ public class PopupMenuFactory {
 					}
 					if (ok) {
 						if (rb1.isSelected()) {
-							final SetCellEfficiencyForSolarPanelsOnRackCommand c = new SetCellEfficiencyForSolarPanelsOnRackCommand(r);
+							final SetSolarCellEfficiencyForRackCommand c = new SetSolarCellEfficiencyForRackCommand(r);
 							s.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
@@ -4894,6 +4893,197 @@ public class PopupMenuFactory {
 						}
 						updateAfterEdit();
 					}
+				}
+			});
+
+			final JMenuItem miInverterEfficiency = new JMenuItem("Inverter Efficiency...");
+			solarPanelMenu.add(miInverterEfficiency);
+			miInverterEfficiency.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String title = "Set Inverter Efficiency (%) for " + r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final String footnote = "<html><hr><font size=2>The efficiency of a micro inverter for converting electricity from DC to AC is typically 95%.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(s.getInverterEfficiency() * 100));
+					gui.add(inverterEfficiencyField, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.CENTER);
+					boolean ok = false;
+					while (true) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), new Object[] { title, footnote, gui }, "Inverter Efficiency", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							try {
+								inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
+								if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage > SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be between " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									ok = true;
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						} else {
+							break;
+						}
+					}
+					if (ok) {
+						if (rb1.isSelected()) {
+							final SetInverterEfficiencyForRackCommand c = new SetInverterEfficiencyForRackCommand(r);
+							s.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb2.isSelected()) {
+							final SetInverterEfficiencyForRacksOnFoundationCommand c = new SetInverterEfficiencyForRacksOnFoundationCommand(foundation);
+							foundation.setInverterEfficiencyForRacks(inverterEfficiencyPercentage * 0.01);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							final SetInverterEfficiencyForAllRacksCommand c = new SetInverterEfficiencyForAllRacksCommand();
+							Scene.getInstance().setInverterEfficiencyForAllRacks(inverterEfficiencyPercentage * 0.01);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						updateAfterEdit();
+					}
+				}
+			});
+
+			final JMenuItem miPmax = new JMenuItem("Temperature Coefficient of Pmax...");
+			solarPanelMenu.add(miPmax);
+			miPmax.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String title = "<html>Set Temperature Coefficienct of Pmax (%/&deg;C) for " + r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final String footnote = "<html><hr><font size=2>Increased temperature reduces solar cell efficiency.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					final JTextField pmaxField = new JTextField(threeDecimalsFormat.format(s.getTemperatureCoefficientPmax() * 100));
+					gui.add(pmaxField, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.CENTER);
+					boolean ok = false;
+					while (true) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), new Object[] { title, footnote, gui }, "Temperature Coefficient of Pmax", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							try {
+								solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
+								if (solarPanelTemperatureCoefficientPmaxPercentage < -1 || solarPanelTemperatureCoefficientPmaxPercentage > 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1 and 0", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									ok = true;
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						} else {
+							break;
+						}
+					}
+					if (ok) {
+						if (rb1.isSelected()) {
+							final SetTemperatureCoefficientPmaxForRackCommand c = new SetTemperatureCoefficientPmaxForRackCommand(r);
+							s.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb2.isSelected()) {
+							final SetTemperatureCoefficientPmaxForRacksOnFoundationCommand c = new SetTemperatureCoefficientPmaxForRacksOnFoundationCommand(foundation);
+							foundation.setTemperatureCoefficientPmaxForRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							final SetTemperatureCoefficientPmaxForAllRacksCommand c = new SetTemperatureCoefficientPmaxForAllRacksCommand();
+							Scene.getInstance().setTemperatureCoefficientPmaxForAllRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						updateAfterEdit();
+					}
+				}
+			});
+
+			final JMenuItem miSolarPanelShadeTolerance = new JMenuItem("Shade Tolerance...");
+			solarPanelMenu.add(miSolarPanelShadeTolerance);
+			miSolarPanelShadeTolerance.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String title = "Set Solar Panel Shade Tolerance for " + r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final String footnote = "<html><hr><font size=2>Use bypass diodes to direct current under shading conditions.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					final JComboBox<String> toleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
+					toleranceComboBox.setSelectedIndex(s.getShadeTolerance());
+					gui.add(toleranceComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.CENTER);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), new Object[] { title, footnote, gui }, "Solar Panel Shade Tolerance", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					if (rb1.isSelected()) {
+						final SetShadeToleranceForSolarPanelsOnRackCommand c = new SetShadeToleranceForSolarPanelsOnRackCommand(r);
+						s.setShadeTolerance(toleranceComboBox.getSelectedIndex());
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						final SetSolarPanelShadeToleranceForRacksOnFoundationCommand c = new SetSolarPanelShadeToleranceForRacksOnFoundationCommand(foundation);
+						foundation.setSolarPanelShadeToleranceForRacks(toleranceComboBox.getSelectedIndex());
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						final SetSolarPanelShadeToleranceForAllRacksCommand c = new SetSolarPanelShadeToleranceForAllRacksCommand();
+						Scene.getInstance().setSolarPanelShadeToleranceForAllRacks(toleranceComboBox.getSelectedIndex());
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					updateAfterEdit();
 				}
 			});
 

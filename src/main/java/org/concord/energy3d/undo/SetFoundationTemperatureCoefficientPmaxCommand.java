@@ -9,7 +9,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeFoundationTemperatureCoefficientPmaxCommand extends AbstractUndoableEdit {
+public class SetFoundationTemperatureCoefficientPmaxCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
@@ -17,7 +17,7 @@ public class ChangeFoundationTemperatureCoefficientPmaxCommand extends AbstractU
 	private final Foundation foundation;
 	private final List<SolarPanel> panels;
 
-	public ChangeFoundationTemperatureCoefficientPmaxCommand(final Foundation foundation) {
+	public SetFoundationTemperatureCoefficientPmaxCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		panels = foundation.getSolarPanels();
 		final int n = panels.size();
