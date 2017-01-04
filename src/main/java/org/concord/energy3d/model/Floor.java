@@ -130,7 +130,7 @@ public class Floor extends HousePart {
 	}
 
 	private void addPointToPolygon(final ArrayList<PolygonPoint> poly, final ReadOnlyVector3 p) {
-		final PolygonPoint polygonPoint = new PolygonPoint(p.getX(), p.getY(), p.getZ());
+		final PolygonPoint polygonPoint = new PolygonPoint(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
 		if (!poly.contains(polygonPoint))
 			poly.add(polygonPoint);
 	}
