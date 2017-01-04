@@ -6,40 +6,43 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetAllSolarTrackersCommand extends AbstractUndoableEdit {
+public class SetSolarTrackersOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;
 	private int[] newValues;
-	private final List<SolarPanel> panels;
-	private List<Rack> racks;
+	private final Foundation foundation;
+	private final List<SolarPanel> solarPanels;
+	private final List<Rack> racks;
 	private final Trackable tracker;
 
-	public SetAllSolarTrackersCommand(final Trackable tracker) {
+	public SetSolarTrackersOnFoundationCommand(final Foundation foundation, final Trackable tracker) {
+		this.foundation = foundation;
+		int n = 0;
 		if (tracker instanceof SolarPanel) {
-			panels = Scene.getInstance().getAllSolarPanels();
-			final int n = panels.size();
+			solarPanels = foundation.getSolarPanels();
+			n = solarPanels.size();
 			oldValues = new int[n];
 			for (int i = 0; i < n; i++) {
-				oldValues[i] = panels.get(i).getTracker();
+				oldValues[i] = solarPanels.get(i).getTracker();
 			}
 			racks = null;
 		} else if (tracker instanceof Rack) {
-			racks = Scene.getInstance().getAllRacks();
-			final int n = racks.size();
+			racks = foundation.getRacks();
+			n = racks.size();
 			oldValues = new int[n];
 			for (int i = 0; i < n; i++) {
 				oldValues[i] = racks.get(i).getTracker();
 			}
-			panels = null;
+			solarPanels = null;
 		} else {
-			panels = null;
+			solarPanels = null;
 			racks = null;
 			oldValues = null;
 		}
@@ -50,17 +53,21 @@ public class SetAllSolarTrackersCommand extends AbstractUndoableEdit {
 		return tracker;
 	}
 
+	public Foundation getFoundation() {
+		return foundation;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		if (panels != null) {
-			final int n = panels.size();
+		if (solarPanels != null) {
+			final int n = solarPanels.size();
 			newValues = new int[n];
 			for (int i = 0; i < n; i++) {
-				final SolarPanel p = panels.get(i);
-				newValues[i] = p.getTracker();
-				p.setTracker(oldValues[i]);
-				p.draw();
+				final SolarPanel s = solarPanels.get(i);
+				newValues[i] = s.getTracker();
+				s.setTracker(oldValues[i]);
+				s.draw();
 			}
 		} else if (racks != null) {
 			final int n = racks.size();
@@ -78,12 +85,12 @@ public class SetAllSolarTrackersCommand extends AbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		if (panels != null) {
-			final int n = panels.size();
+		if (solarPanels != null) {
+			final int n = solarPanels.size();
 			for (int i = 0; i < n; i++) {
-				final SolarPanel p = panels.get(i);
-				p.setTracker(newValues[i]);
-				p.draw();
+				final SolarPanel s = solarPanels.get(i);
+				s.setTracker(newValues[i]);
+				s.draw();
 			}
 		} else if (racks != null) {
 			final int n = racks.size();
@@ -98,31 +105,30 @@ public class SetAllSolarTrackersCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		if (panels != null) {
-			switch (panels.get(0).getTracker()) {
+		if (solarPanels != null) {
+			switch (solarPanels.get(0).getTracker()) {
 			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-				return "Enable Dual-Axis Tracker for All Solar Panels";
+				return "Enable Dual-Axis Tracker for All Solar Panels on Selected Foundation";
 			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-				return "Enable Horizontal Single-Axis Tracker for All Solar Panels";
+				return "Enable Horizontal Single-Axis Tracker for All Solar Panels on Selected Foundation";
 			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-				return "Enable Vertical Single-Axis Tracker for All Solar Panels";
+				return "Enable Vertical Single-Axis Tracker for All Solar Panels on Selected Foundation";
 			default:
-				return "Disable Tracker for All Solar Panels";
+				return "Disable Tracker for All Solar Panels on Selected Foundation";
 			}
 		} else if (racks != null) {
 			switch (racks.get(0).getTracker()) {
 			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-				return "Enable Dual-Axis Tracker for All Racks";
+				return "Enable Dual-Axis Tracker for All Racks on Selected Foundation";
 			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-				return "Enable Horizontal Single-Axis Tracker for All Racks";
+				return "Enable Horizontal Single-Axis Tracker for All Racks on Selected Foundation";
 			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-				return "Enable Vertical Single-Axis Tracker for All Racks";
+				return "Enable Vertical Single-Axis Tracker for All Racks on Selected Foundation";
 			default:
-				return "Disable Tracker for All Racks";
+				return "Disable Tracker for All Racks on Selected Foundation";
 			}
-		} else {
-			return "Change Trackers";
 		}
+		return "Change Tracker on Selected Foundation";
 	}
 
 }

@@ -10,26 +10,26 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetFoundationRackPoleSpacingCommand extends AbstractUndoableEdit {
+public class SetSizeForRacksOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private final double[] oldDxs;
-	private double[] newDxs;
-	private final double[] oldDys;
-	private double[] newDys;
+	private final double[] oldWidths;
+	private double[] newWidths;
+	private final double[] oldHeights;
+	private double[] newHeights;
 	private final Foundation foundation;
 	private final List<Rack> racks;
 
-	public SetFoundationRackPoleSpacingCommand(final Foundation foundation) {
+	public SetSizeForRacksOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		racks = foundation.getRacks();
 		final int n = racks.size();
-		oldDxs = new double[n];
-		oldDys = new double[n];
+		oldWidths = new double[n];
+		oldHeights = new double[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
-			oldDxs[i] = r.getPoleDistanceX();
-			oldDys[i] = r.getPoleDistanceY();
+			oldWidths[i] = r.getRackWidth();
+			oldHeights[i] = r.getRackHeight();
 		}
 	}
 
@@ -41,14 +41,14 @@ public class SetFoundationRackPoleSpacingCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		final int n = racks.size();
-		newDxs = new double[n];
-		newDys = new double[n];
+		newWidths = new double[n];
+		newHeights = new double[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
-			newDxs[i] = r.getPoleDistanceX();
-			newDys[i] = r.getPoleDistanceY();
-			r.setPoleDistanceX(oldDxs[i]);
-			r.setPoleDistanceY(oldDys[i]);
+			newWidths[i] = r.getRackWidth();
+			newHeights[i] = r.getRackHeight();
+			r.setRackWidth(oldWidths[i]);
+			r.setRackHeight(oldHeights[i]);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -60,8 +60,8 @@ public class SetFoundationRackPoleSpacingCommand extends AbstractUndoableEdit {
 		final int n = racks.size();
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
-			r.setPoleDistanceX(newDxs[i]);
-			r.setPoleDistanceY(newDys[i]);
+			r.setRackWidth(newWidths[i]);
+			r.setRackHeight(newHeights[i]);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -69,7 +69,7 @@ public class SetFoundationRackPoleSpacingCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Set Pole Spacing for All Racks on Selected Foundation";
+		return "Set Size for All Racks on Selected Foundation";
 	}
 
 }

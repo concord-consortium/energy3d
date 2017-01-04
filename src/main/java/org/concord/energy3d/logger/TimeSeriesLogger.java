@@ -432,12 +432,12 @@ public class TimeSeriesLogger {
 					final SetSolarPanelColorCommand c = (SetSolarPanelColorCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getColorOption() + "}";
-				} else if (lastEdit instanceof SetFoundationSolarPanelColorCommand) {
-					final SetFoundationSolarPanelColorCommand c = (SetFoundationSolarPanelColorCommand) lastEdit;
+				} else if (lastEdit instanceof SetColorForSolarPanelsOnFoundationCommand) {
+					final SetColorForSolarPanelsOnFoundationCommand c = (SetColorForSolarPanelsOnFoundationCommand) lastEdit;
 					final Foundation f = c.getFoundation();
 					final List<SolarPanel> solarPanels = f.getSolarPanels();
 					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getColorOption()) + "}";
-				} else if (lastEdit instanceof SetAllSolarPanelColorCommand) {
+				} else if (lastEdit instanceof SetColorForAllSolarPanelsCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getColorOption()) + "}";
 				}
@@ -485,8 +485,8 @@ public class TimeSeriesLogger {
 					final SetShadeToleranceCommand c = (SetShadeToleranceCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getShadeTolerance() + "}";
-				} else if (lastEdit instanceof SetFoundationShadeToleranceCommand) {
-					final SetFoundationShadeToleranceCommand c = (SetFoundationShadeToleranceCommand) lastEdit;
+				} else if (lastEdit instanceof SetShadeToleranceForSolarPanelsOnFoundationCommand) {
+					final SetShadeToleranceForSolarPanelsOnFoundationCommand c = (SetShadeToleranceForSolarPanelsOnFoundationCommand) lastEdit;
 					final Foundation f = c.getFoundation();
 					final List<SolarPanel> solarPanels = f.getSolarPanels();
 					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getShadeTolerance()) + "}";
@@ -524,8 +524,18 @@ public class TimeSeriesLogger {
 
 				/* rack properties */
 
-				else if (lastEdit instanceof SetFoundationRackSizeCommand) {
-					final Foundation f = ((SetFoundationRackSizeCommand) lastEdit).getFoundation();
+				else if (lastEdit instanceof ChooseSolarPanelSizeForRackCommand) {
+					final ChooseSolarPanelSizeForRackCommand c = (ChooseSolarPanelSizeForRackCommand) lastEdit;
+					final Rack rack = c.getRack();
+					stateValue = "{\"Building\": " + rack.getTopContainer().getId() + ", \"ID\": " + rack.getId();
+					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + rack.getSolarPanel().getPanelWidth();
+					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + rack.getSolarPanel().getPanelHeight() + "}";
+				} else if (lastEdit instanceof SetSolarPanelSizeForRacksOnFoundationCommand) {
+					final Foundation f = ((SetSolarPanelSizeForRacksOnFoundationCommand) lastEdit).getFoundation();
+					final List<Rack> racks = f.getRacks();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (racks.isEmpty() ? -1 : racks.get(0).getSolarPanel().getPanelWidth()) + ", \"New Height\": " + (racks.isEmpty() ? -1 : racks.get(0).getSolarPanel().getPanelHeight()) + "}";
+				} else if (lastEdit instanceof SetSizeForRacksOnFoundationCommand) {
+					final Foundation f = ((SetSizeForRacksOnFoundationCommand) lastEdit).getFoundation();
 					final List<Rack> racks = f.getRacks();
 					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (racks.isEmpty() ? -1 : racks.get(0).getRackWidth()) + ", \"New Height\": " + (racks.isEmpty() ? -1 : racks.get(0).getRackHeight()) + "}";
 				} else if (lastEdit instanceof SetSizeForAllRacksCommand) {
@@ -572,8 +582,8 @@ public class TimeSeriesLogger {
 						cid = ((HousePart) tracker).getId();
 					}
 					stateValue = "{\"Building\": " + bid + ", \"ID\": " + cid + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + tracker.getTracker() + "}";
-				} else if (lastEdit instanceof SetFoundationSolarTrackersCommand) {
-					final SetFoundationSolarTrackersCommand c = (SetFoundationSolarTrackersCommand) lastEdit;
+				} else if (lastEdit instanceof SetSolarTrackersOnFoundationCommand) {
+					final SetSolarTrackersOnFoundationCommand c = (SetSolarTrackersOnFoundationCommand) lastEdit;
 					final Foundation f = c.getFoundation();
 					final Trackable tracker = c.getTracker();
 					if (tracker instanceof SolarPanel) {
@@ -583,8 +593,8 @@ public class TimeSeriesLogger {
 						final List<Rack> racks = f.getRacks();
 						stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getTracker()) + "}";
 					}
-				} else if (lastEdit instanceof SetAllSolarTrackersCommand) {
-					final SetAllSolarTrackersCommand c = (SetAllSolarTrackersCommand) lastEdit;
+				} else if (lastEdit instanceof SetSolarTrackersForAllCommand) {
+					final SetSolarTrackersForAllCommand c = (SetSolarTrackersForAllCommand) lastEdit;
 					final Trackable tracker = c.getTracker();
 					if (tracker instanceof SolarPanel) {
 						final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
@@ -597,8 +607,8 @@ public class TimeSeriesLogger {
 
 				/* mirror properties */
 
-				else if (lastEdit instanceof SetFoundationMirrorSizeCommand) {
-					final Foundation f = ((SetFoundationMirrorSizeCommand) lastEdit).getFoundation();
+				else if (lastEdit instanceof SetSizeForMirrorsOnFoundationCommand) {
+					final Foundation f = ((SetSizeForMirrorsOnFoundationCommand) lastEdit).getFoundation();
 					final List<Mirror> mirrors = f.getMirrors();
 					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
 				} else if (lastEdit instanceof SetSizeForAllMirrorsCommand) {

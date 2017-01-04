@@ -9,11 +9,13 @@ import org.concord.energy3d.model.SolarPanel;
 public class ChooseSolarPanelSizeCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double oldWidth, newWidth;
-	private double oldHeight, newHeight;
-	private SolarPanel solarPanel;
+	private final double oldWidth;
+	private double newWidth;
+	private final double oldHeight;
+	private double newHeight;
+	private final SolarPanel solarPanel;
 
-	public ChooseSolarPanelSizeCommand(SolarPanel solarPanel) {
+	public ChooseSolarPanelSizeCommand(final SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
 		oldWidth = solarPanel.getPanelWidth();
 		oldHeight = solarPanel.getPanelHeight();

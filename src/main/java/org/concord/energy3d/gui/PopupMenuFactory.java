@@ -142,27 +142,30 @@ import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.undo.ChangeWindowShgcCommand;
 import org.concord.energy3d.undo.ChangeWindowShuttersCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeCommand;
+import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.LockPartCommand;
 import org.concord.energy3d.undo.RotateSolarPanelCommand;
-import org.concord.energy3d.undo.SetAllSolarPanelColorCommand;
-import org.concord.energy3d.undo.SetAllSolarTrackersCommand;
-import org.concord.energy3d.undo.SetFoundationMirrorSizeCommand;
-import org.concord.energy3d.undo.SetFoundationRackPoleSpacingCommand;
-import org.concord.energy3d.undo.SetFoundationRackSizeCommand;
-import org.concord.energy3d.undo.SetFoundationShadeToleranceCommand;
-import org.concord.energy3d.undo.SetFoundationSolarPanelColorCommand;
-import org.concord.energy3d.undo.SetFoundationSolarTrackersCommand;
+import org.concord.energy3d.undo.SetColorForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.SetColorForSolarPanelsOnFoundationCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetPoleSpacingForAllRacksCommand;
+import org.concord.energy3d.undo.SetPoleSpacingForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetRackPoleSpacingCommand;
 import org.concord.energy3d.undo.SetShadeToleranceCommand;
 import org.concord.energy3d.undo.SetShadeToleranceForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.SetShadeToleranceForSolarPanelsOnFoundationCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
+import org.concord.energy3d.undo.SetSizeForMirrorsOnFoundationCommand;
+import org.concord.energy3d.undo.SetSizeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelArrayOnRackCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorCommand;
+import org.concord.energy3d.undo.SetSolarPanelSizeForAllRacksCommand;
+import org.concord.energy3d.undo.SetSolarPanelSizeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarTrackerCommand;
+import org.concord.energy3d.undo.SetSolarTrackersForAllCommand;
+import org.concord.energy3d.undo.SetSolarTrackersOnFoundationCommand;
 import org.concord.energy3d.undo.ShowBorderLineCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
@@ -3023,7 +3026,7 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
+						final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
 						foundation.setShadeToleranceForSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
@@ -3072,7 +3075,7 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
+						final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
 						foundation.setShadeToleranceForSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
@@ -3121,7 +3124,7 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationShadeToleranceCommand c = new SetFoundationShadeToleranceCommand(foundation);
+						final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
 						foundation.setShadeToleranceForSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
@@ -3172,11 +3175,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
 						foundation.setTrackerForSolarPanels(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3221,11 +3224,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
 						foundation.setTrackerForSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3270,11 +3273,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
 						foundation.setTrackerForSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3319,11 +3322,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = sp.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, sp);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
 						foundation.setTrackerForSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(sp);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
 						Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3371,11 +3374,11 @@ public class PopupMenuFactory {
 							s.draw();
 						} else if (rb2.isSelected()) {
 							final Foundation foundation = s.getTopContainer();
-							final SetFoundationSolarPanelColorCommand c = new SetFoundationSolarPanelColorCommand(foundation);
+							final SetColorForSolarPanelsOnFoundationCommand c = new SetColorForSolarPanelsOnFoundationCommand(foundation);
 							foundation.setColorForSolarPanels(SolarPanel.COLOR_OPTION_BLUE);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
-							final SetAllSolarPanelColorCommand c = new SetAllSolarPanelColorCommand();
+							final SetColorForAllSolarPanelsCommand c = new SetColorForAllSolarPanelsCommand();
 							Scene.getInstance().setColorOptionForAllSolarPanels(SolarPanel.COLOR_OPTION_BLUE);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
@@ -3423,11 +3426,11 @@ public class PopupMenuFactory {
 							s.draw();
 						} else if (rb2.isSelected()) {
 							final Foundation foundation = s.getTopContainer();
-							final SetFoundationSolarPanelColorCommand c = new SetFoundationSolarPanelColorCommand(foundation);
+							final SetColorForSolarPanelsOnFoundationCommand c = new SetColorForSolarPanelsOnFoundationCommand(foundation);
 							foundation.setColorForSolarPanels(SolarPanel.COLOR_OPTION_BLACK);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
-							final SetAllSolarPanelColorCommand c = new SetAllSolarPanelColorCommand();
+							final SetColorForAllSolarPanelsCommand c = new SetColorForAllSolarPanelsCommand();
 							Scene.getInstance().setColorOptionForAllSolarPanels(SolarPanel.COLOR_OPTION_BLACK);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
@@ -4378,8 +4381,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miSize = new JMenuItem("Size...");
-			miSize.addActionListener(new ActionListener() {
+			final JMenuItem miRackSize = new JMenuItem("Size...");
+			miRackSize.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -4448,7 +4451,7 @@ public class PopupMenuFactory {
 							rack.draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
-							final SetFoundationRackSizeCommand c = new SetFoundationRackSizeCommand(foundation);
+							final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
 							foundation.setSizeForRacks(w, h);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
@@ -4589,7 +4592,7 @@ public class PopupMenuFactory {
 							rack.draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
-							final SetFoundationRackPoleSpacingCommand c = new SetFoundationRackPoleSpacingCommand(foundation);
+							final SetPoleSpacingForRacksOnFoundationCommand c = new SetPoleSpacingForRacksOnFoundationCommand(foundation);
 							foundation.setPoleSpacingForRacks(dx, dy);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
@@ -4725,6 +4728,89 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miSolarPanelSize = new JMenuItem("Size...");
+			miSolarPanelSize.addActionListener(new ActionListener() {
+
+				private double w = 0.99;
+				private double h = 1.65;
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Choose Solar Panel Size for " + partInfo));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
+					if (Util.isZero(s.getPanelHeight() - 1.65)) {
+						typeComboBox.setSelectedIndex(0);
+					} else if (Util.isZero(s.getPanelHeight() - 1.55)) {
+						typeComboBox.setSelectedIndex(1);
+					} else if (Util.isZero(s.getPanelHeight() - 1.96)) {
+						typeComboBox.setSelectedIndex(2);
+					}
+					typeComboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+							switch (typeComboBox.getSelectedIndex()) {
+							case 0:
+								w = 0.99;
+								h = 1.65;
+								break;
+							case 1:
+								w = 1.04;
+								h = 1.55;
+								break;
+							case 2:
+								w = 0.99;
+								h = 1.96;
+								break;
+							}
+						}
+					});
+					gui.add(typeComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.CENTER);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					if (rb1.isSelected()) {
+						final ChooseSolarPanelSizeForRackCommand c = new ChooseSolarPanelSizeForRackCommand(r);
+						s.setPanelWidth(w);
+						s.setPanelHeight(h);
+						r.ensureFullSolarPanels(false);
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						final SetSolarPanelSizeForRacksOnFoundationCommand c = new SetSolarPanelSizeForRacksOnFoundationCommand(foundation);
+						foundation.setSolarPanelSizeForRacks(w, h);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						final SetSolarPanelSizeForAllRacksCommand c = new SetSolarPanelSizeForAllRacksCommand();
+						Scene.getInstance().setSolarPanelSizeForAllRacks(w, h);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					updateAfterEdit();
+				}
+			});
+
 			final ButtonGroup trackerButtonGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem miNoTracker = new JRadioButtonMenuItem("No Tracker...", true);
@@ -4764,11 +4850,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -4813,11 +4899,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -4862,11 +4948,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -4911,11 +4997,11 @@ public class PopupMenuFactory {
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetFoundationSolarTrackersCommand c = new SetFoundationSolarTrackersCommand(foundation, rack);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else if (rb3.isSelected()) {
-						final SetAllSolarTrackersCommand c = new SetAllSolarTrackersCommand(rack);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -5000,15 +5086,20 @@ public class PopupMenuFactory {
 
 			});
 
+			final JMenu solarPanelMenu = new JMenu("Solar Panel Properties");
+			solarPanelMenu.add(miSolarPanelSize);
+
 			popupMenuForRack.add(miPaste);
 			popupMenuForRack.add(miClear);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(trackerMenu);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miSolarPanelArray);
+			popupMenuForRack.add(solarPanelMenu);
+			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miTiltAngle);
 			popupMenuForRack.add(miAzimuth);
-			popupMenuForRack.add(miSize);
+			popupMenuForRack.add(miRackSize);
 			popupMenuForRack.add(miBaseHeight);
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.addSeparator();
@@ -5390,7 +5481,7 @@ public class PopupMenuFactory {
 							m.draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
-							final SetFoundationMirrorSizeCommand c = new SetFoundationMirrorSizeCommand(foundation);
+							final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
 							foundation.setSizeForMirrors(w, h);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {

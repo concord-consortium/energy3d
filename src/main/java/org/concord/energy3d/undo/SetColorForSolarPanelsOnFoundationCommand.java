@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetFoundationSolarPanelColorCommand extends AbstractUndoableEdit {
+public class SetColorForSolarPanelsOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;
@@ -18,7 +18,7 @@ public class SetFoundationSolarPanelColorCommand extends AbstractUndoableEdit {
 	private final Foundation foundation;
 	private final List<SolarPanel> solarPanels;
 
-	public SetFoundationSolarPanelColorCommand(final Foundation foundation) {
+	public SetColorForSolarPanelsOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		solarPanels = foundation.getSolarPanels();
 		final int n = solarPanels.size();

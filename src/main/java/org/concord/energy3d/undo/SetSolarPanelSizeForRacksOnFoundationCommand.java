@@ -8,9 +8,10 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetFoundationRackSizeCommand extends AbstractUndoableEdit {
+public class SetSolarPanelSizeForRacksOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths;
@@ -20,16 +21,16 @@ public class SetFoundationRackSizeCommand extends AbstractUndoableEdit {
 	private final Foundation foundation;
 	private final List<Rack> racks;
 
-	public SetFoundationRackSizeCommand(final Foundation foundation) {
+	public SetSolarPanelSizeForRacksOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		racks = foundation.getRacks();
 		final int n = racks.size();
 		oldWidths = new double[n];
 		oldHeights = new double[n];
 		for (int i = 0; i < n; i++) {
-			final Rack r = racks.get(i);
-			oldWidths[i] = r.getRackWidth();
-			oldHeights[i] = r.getRackHeight();
+			final SolarPanel s = racks.get(i).getSolarPanel();
+			oldWidths[i] = s.getPanelWidth();
+			oldHeights[i] = s.getPanelHeight();
 		}
 	}
 
@@ -45,10 +46,12 @@ public class SetFoundationRackSizeCommand extends AbstractUndoableEdit {
 		newHeights = new double[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
-			newWidths[i] = r.getRackWidth();
-			newHeights[i] = r.getRackHeight();
-			r.setRackWidth(oldWidths[i]);
-			r.setRackHeight(oldHeights[i]);
+			final SolarPanel s = r.getSolarPanel();
+			newWidths[i] = s.getPanelWidth();
+			newHeights[i] = s.getPanelHeight();
+			s.setPanelWidth(oldWidths[i]);
+			s.setPanelHeight(oldHeights[i]);
+			r.ensureFullSolarPanels(false);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -60,8 +63,10 @@ public class SetFoundationRackSizeCommand extends AbstractUndoableEdit {
 		final int n = racks.size();
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
-			r.setRackWidth(newWidths[i]);
-			r.setRackHeight(newHeights[i]);
+			final SolarPanel s = r.getSolarPanel();
+			s.setPanelWidth(newWidths[i]);
+			s.setPanelHeight(newHeights[i]);
+			r.ensureFullSolarPanels(false);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -69,7 +74,7 @@ public class SetFoundationRackSizeCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Set Size for All Racks on Selected Foundation";
+		return "Set Solar Panel Size for All Racks on Selected Foundation";
 	}
 
 }

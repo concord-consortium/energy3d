@@ -10,14 +10,14 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetAllSolarPanelColorCommand extends AbstractUndoableEdit {
+public class SetColorForAllSolarPanelsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;
 	private int[] newValues;
 	private final List<SolarPanel> panels;
 
-	public SetAllSolarPanelColorCommand() {
+	public SetColorForAllSolarPanelsCommand() {
 		panels = Scene.getInstance().getAllSolarPanels();
 		final int n = panels.size();
 		oldValues = new int[n];

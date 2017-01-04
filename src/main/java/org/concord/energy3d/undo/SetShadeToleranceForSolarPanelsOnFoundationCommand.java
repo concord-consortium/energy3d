@@ -9,7 +9,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 
-public class SetFoundationShadeToleranceCommand extends AbstractUndoableEdit {
+public class SetShadeToleranceForSolarPanelsOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;
@@ -17,7 +17,7 @@ public class SetFoundationShadeToleranceCommand extends AbstractUndoableEdit {
 	private final Foundation foundation;
 	private final List<SolarPanel> solarPanels;
 
-	public SetFoundationShadeToleranceCommand(final Foundation foundation) {
+	public SetShadeToleranceForSolarPanelsOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		solarPanels = foundation.getSolarPanels();
 		final int n = solarPanels.size();

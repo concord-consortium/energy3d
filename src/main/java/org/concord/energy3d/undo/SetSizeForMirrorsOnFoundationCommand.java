@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetFoundationMirrorSizeCommand extends AbstractUndoableEdit {
+public class SetSizeForMirrorsOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths;
@@ -20,7 +20,7 @@ public class SetFoundationMirrorSizeCommand extends AbstractUndoableEdit {
 	private final Foundation foundation;
 	private final List<Mirror> mirrors;
 
-	public SetFoundationMirrorSizeCommand(final Foundation foundation) {
+	public SetSizeForMirrorsOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		mirrors = foundation.getMirrors();
 		final int n = mirrors.size();

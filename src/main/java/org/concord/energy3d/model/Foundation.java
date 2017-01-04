@@ -2199,6 +2199,19 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSolarPanelSizeForRacks(final double width, final double height) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				final Rack r = (Rack) p;
+				r.getSolarPanel().setPanelWidth(width);
+				r.getSolarPanel().setPanelHeight(height);
+				r.ensureFullSolarPanels(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setPoleSpacingForRacks(final double dx, final double dy) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
