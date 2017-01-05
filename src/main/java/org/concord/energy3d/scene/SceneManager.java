@@ -318,7 +318,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		solarLand.updateWorldBound(true);
 		solarLand.setVisible(false);
 		groundImageLand = new Quad("Map Land");
-		resizeGroundImageLand(1);
+		initGroundImageLand(1);
 		groundImageLand.setModelBound(new BoundingBox());
 		groundImageLand.updateModelBound();
 		groundImageLand.updateWorldBound(true);
@@ -1667,8 +1667,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return groundImageLand;
 	}
 
+	// The image that Google Maps API returns is 640x640. That image needs to be rescaled in such a way that one meter wall in a Google Map is exactly same length as one meter in Energy3D.
+	// I had to use trial and error to find the correct scale factor, which is roughly 68.75.
+	private void initGroundImageLand(final double scale) {
+		final double d = 68.75 / 0.2 * scale; // 0.2 is the obsolete annotation scale by default, can't call Scene.getAnnotationScale() yet
+		groundImageLand.resize(d, d);
+		groundImageLand.updateModelBound();
+		groundImageLand.updateWorldBound(true);
+	}
+
 	public void resizeGroundImageLand(final double scale) {
-		final double d = 68.75 / 0.2 * scale;
+		final double d = 68.75 / Scene.getInstance().getAnnotationScale() * scale;
 		groundImageLand.resize(d, d);
 		groundImageLand.updateModelBound();
 		groundImageLand.updateWorldBound(true);

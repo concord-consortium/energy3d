@@ -11,10 +11,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -73,6 +75,7 @@ import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.*;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -385,6 +388,7 @@ public class PopupMenuFactory {
 			});
 
 			final JMenuItem miClearImage = new JMenuItem("Clear Image");
+			final JMenuItem miRescaleImage = new JMenuItem("Rescale Image...");
 			final JCheckBoxMenuItem miShowImage = new JCheckBoxMenuItem("Show Image");
 
 			final JMenu groundImageMenu = new JMenu("Ground Image");
@@ -410,7 +414,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miUseEarthView = new JMenuItem("Use Image from Earth View");
+			final JMenuItem miUseEarthView = new JMenuItem("Use Image from Earth View...");
 			miUseEarthView.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -419,13 +423,55 @@ public class PopupMenuFactory {
 			});
 			groundImageMenu.add(miUseEarthView);
 
-			final JMenuItem miUseImageFile = new JMenuItem("Use Image from File");
+			final JMenuItem miUseImageFile = new JMenuItem("Use Image from File...");
 			miUseImageFile.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					final File file = FileChooser.getInstance().showDialog(".png", MainFrame.pngFilter, false);
+					if (file == null) {
+						return;
+					}
+					try {
+						Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
+						Scene.getInstance().setGroundImageEarthView(false);
+					} catch (final Throwable t) {
+						t.printStackTrace();
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					Scene.getInstance().setEdited(true);
 				}
 			});
 			groundImageMenu.add(miUseImageFile);
+			groundImageMenu.addSeparator();
+
+			miRescaleImage.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String title = "Scale the ground image";
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGroundImageScale());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The scaling factor must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									// final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
+									Scene.getInstance().setGroundImageScale(val);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+					Scene.getInstance().setEdited(true);
+				}
+			});
+			groundImageMenu.add(miRescaleImage);
 
 			miClearImage.addActionListener(new ActionListener() {
 				@Override

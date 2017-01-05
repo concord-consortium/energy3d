@@ -129,10 +129,10 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
-	private final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
-	private final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
-	private final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
-	private final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
+	private static final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
+	private static final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
+	private static final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
+	static final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 	private final JColorChooser colorChooser;
 	private int fileMenuItemCount;
 
@@ -256,6 +256,7 @@ public class MainFrame extends JFrame {
 	private JMenu groundImageMenu;
 	private JMenuItem useImageFileMenuItem;
 	private JMenuItem useEarthViewMenuItem;
+	private JMenuItem rescaleGroundImageMenuItem;
 	private JMenuItem clearGroundImageMenuItem;
 	private JCheckBoxMenuItem showGroundImageMenuItem;
 
@@ -1489,12 +1490,14 @@ public class MainFrame extends JFrame {
 				public void menuCanceled(final MenuEvent e) {
 					showGroundImageMenuItem.setEnabled(true);
 					clearGroundImageMenuItem.setEnabled(true);
+					rescaleGroundImageMenuItem.setEnabled(true);
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
 					showGroundImageMenuItem.setEnabled(true);
 					clearGroundImageMenuItem.setEnabled(true);
+					rescaleGroundImageMenuItem.setEnabled(true);
 					SceneManager.getInstance().refresh();
 				}
 
@@ -1503,12 +1506,15 @@ public class MainFrame extends JFrame {
 					final boolean hasGroundImage = Scene.getInstance().isGroundImageEnabled();
 					showGroundImageMenuItem.setEnabled(hasGroundImage);
 					clearGroundImageMenuItem.setEnabled(hasGroundImage);
+					rescaleGroundImageMenuItem.setEnabled(hasGroundImage && !Scene.getInstance().isGroundImageEarthView());
 					Util.selectSilently(showGroundImageMenuItem, SceneManager.getInstance().getGroundImageLand().isVisible());
 				}
 			});
 
 			groundImageMenu.add(getUseEarthViewMenuItem());
 			groundImageMenu.add(getUseImageFileMenuItem());
+			groundImageMenu.addSeparator();
+			groundImageMenu.add(getRescaleGroundImageMenuItem());
 			groundImageMenu.add(getClearGroundImageMenuItem());
 			groundImageMenu.add(getShowGroundImageMenuItem());
 
@@ -1519,7 +1525,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getUseEarthViewMenuItem() {
 		if (useEarthViewMenuItem == null) {
-			useEarthViewMenuItem = new JMenuItem("Use Image from Earth View");
+			useEarthViewMenuItem = new JMenuItem("Use Image from Earth View...");
 			useEarthViewMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1532,14 +1538,60 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getUseImageFileMenuItem() {
 		if (useImageFileMenuItem == null) {
-			useImageFileMenuItem = new JMenuItem("Use Image from File");
+			useImageFileMenuItem = new JMenuItem("Use Image from File...");
 			useImageFileMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					final File file = FileChooser.getInstance().showDialog(".png", pngFilter, false);
+					if (file == null) {
+						return;
+					}
+					try {
+						Scene.getInstance().setGroundImage(ImageIO.read(file), 1);
+						Scene.getInstance().setGroundImageEarthView(false);
+					} catch (final Throwable t) {
+						t.printStackTrace();
+						JOptionPane.showMessageDialog(MainFrame.this, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
+					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
 		return useImageFileMenuItem;
+	}
+
+	private JMenuItem getRescaleGroundImageMenuItem() {
+		if (rescaleGroundImageMenuItem == null) {
+			rescaleGroundImageMenuItem = new JMenuItem("Rescale Image...");
+			rescaleGroundImageMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String title = "Scale the ground image";
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getGroundImageScale());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The scaling factor must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									// final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
+									Scene.getInstance().setGroundImageScale(val);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+					Scene.getInstance().setEdited(true);
+				}
+			});
+		}
+		return rescaleGroundImageMenuItem;
 	}
 
 	private JMenuItem getClearGroundImageMenuItem() {

@@ -166,6 +166,7 @@ public class MapDialog extends JDialog {
 				final BufferedImage mapImage = getGoogleMapImage(true);
 				if (mapImage != null) {
 					Scene.getInstance().setGroundImage(mapImage, getScale());
+					Scene.getInstance().setGroundImageEarthView(true);
 					Scene.getInstance().setEdited(true);
 					setVisible(false);
 				}
@@ -252,7 +253,7 @@ public class MapDialog extends JDialog {
 		} else if (zoom == 20) {
 			scale = 1;
 		} else {
-			scale = (Math.pow(2, 20 - zoom));
+			scale = Math.pow(2, 20 - zoom);
 		}
 		return scale;
 	}

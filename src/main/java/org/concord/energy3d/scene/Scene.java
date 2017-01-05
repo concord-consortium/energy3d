@@ -135,6 +135,7 @@ public class Scene implements Serializable {
 	private boolean onlySolarAnalysis;
 	private double groundImageScale = 1;
 	private boolean hideGroundImage;
+	private boolean groundImageIsEarthView;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -2610,6 +2611,17 @@ public class Scene implements Serializable {
 		applyGroundImage();
 	}
 
+	public void setGroundImageScale(final double groundImageScale) {
+		if (isGroundImageEnabled()) {
+			this.groundImageScale = groundImageScale;
+			applyGroundImage();
+		}
+	}
+
+	public double getGroundImageScale() {
+		return groundImageScale;
+	}
+
 	public boolean isGroundImageEnabled() {
 		return groundImage != null;
 	}
@@ -2621,7 +2633,6 @@ public class Scene implements Serializable {
 			mesh.setVisible(false);
 			setFoundationsVisible(true);
 		} else {
-			System.out.println("\n****" + groundImageScale);
 			SceneManager.getInstance().resizeGroundImageLand(groundImageScale);
 			final Texture2D texture = new Texture2D();
 			texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
@@ -2632,6 +2643,14 @@ public class Scene implements Serializable {
 			mesh.setVisible(!hideGroundImage);
 			setFoundationsVisible(false);
 		}
+	}
+
+	public void setGroundImageEarthView(final boolean groundImageIsEarthView) {
+		this.groundImageIsEarthView = groundImageIsEarthView;
+	}
+
+	public boolean isGroundImageEarthView() {
+		return groundImageIsEarthView;
 	}
 
 	private void setFoundationsVisible(final boolean visible) {
