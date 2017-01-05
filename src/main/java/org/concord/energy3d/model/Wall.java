@@ -851,23 +851,27 @@ public class Wall extends HousePart implements Thermalizable {
 
 		if (!isFrozen()) {
 			Vector3 direction = null;
-			ReadOnlyVector3 previousStretchPoint = polygon.get(3);
+			Vector3 previousStretchPoint = polygon.get(3);
 
 			for (double d = length - STRETCH_ROOF_STEP; d > STRETCH_ROOF_STEP; d -= STRETCH_ROOF_STEP) {
 				final Vector3 p = dir.multiply(d, null).addLocal(o);
 				final double findRoofIntersection = findRoofIntersection(p);
 
-				final ReadOnlyVector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
+				final Vector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
 				final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
 
 				if (direction == null) {
 					direction = currentDirection;
 				} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
 					direction = null;
-					p.setZ(findRoofIntersection);
-					polygon.add(p);
+					polygon.add(previousStretchPoint);
+					polygon.add(currentStretchPoint);
 				}
 				previousStretchPoint = currentStretchPoint;
+			}
+			
+			if (!polygon.get(polygon.size() - 1).equals(previousStretchPoint)) {
+				polygon.add(previousStretchPoint);
 			}
 		}
 	}
