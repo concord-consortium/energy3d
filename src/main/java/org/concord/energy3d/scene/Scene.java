@@ -88,8 +88,8 @@ public class Scene implements Serializable {
 	private static boolean drawAnnotationsInside = false;
 	private static boolean isSaving;
 	private transient boolean edited = false;
-	private transient BufferedImage mapImage;
-	private transient boolean avoidSavingMapImage;
+	private transient BufferedImage groundImage;
+	private transient boolean avoidSavingGroundImage;
 	private final List<HousePart> parts = new ArrayList<HousePart>();
 	private final Calendar calendar = Calendar.getInstance();
 	private TextureMode textureMode = TextureMode.Full;
@@ -134,7 +134,7 @@ public class Scene implements Serializable {
 	private boolean disallowFoundationOverlap;
 	private boolean dashedlineOnRoofs = true;
 	private boolean onlySolarAnalysis;
-	private boolean hideMap;
+	private boolean hideGroundImage;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -281,7 +281,7 @@ public class Scene implements Serializable {
 			instance.cleanup();
 			loadCameraLocation();
 		}
-		instance.applyMap();
+		instance.applyGroundImage();
 		SceneManager.getInstance().hideAllEditPoints();
 		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 		if (cameraControl != null) {
@@ -687,7 +687,7 @@ public class Scene implements Serializable {
 			public Object call() throws Exception {
 				try {
 					if (logger) {
-						instance.storeMapImageData();
+						instance.storeGroundImageData();
 					}
 					if (notifyUndoManager) {
 						instance.cleanup();
@@ -718,7 +718,7 @@ public class Scene implements Serializable {
 						SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
 					}
 					if (logger) {
-						instance.restoreMapImageData();
+						instance.restoreGroundImageData();
 					}
 					System.out.println("done");
 				} catch (final Throwable e) {
@@ -2601,30 +2601,31 @@ public class Scene implements Serializable {
 		return timeStep;
 	}
 
-	public void setMap(final BufferedImage mapImage, final double mapScale) {
-		this.mapImage = mapImage;
-		this.mapScale = mapScale;
-		applyMap();
+	public void setGroundImage(final BufferedImage groundImage, final double groundImageScale) {
+		this.groundImage = groundImage;
+		this.mapScale = groundImageScale;
+		applyGroundImage();
 	}
 
-	public boolean isMapEnabled() {
-		return mapImage != null;
+	public boolean isGroundImageEnabled() {
+		return groundImage != null;
 	}
 
-	private void applyMap() {
-		if (mapImage == null) {
-			SceneManager.getInstance().getMapLand().setVisible(false);
+	private void applyGroundImage() {
+		if (groundImage == null) {
+			SceneManager.getInstance().getGroundImageLand().setVisible(false);
 			setFoundationsVisible(true);
 		} else {
-			SceneManager.getInstance().resizeMapLand(mapScale);
+			// System.out.println("\n****" + mapScale);
+			SceneManager.getInstance().resizeGroundImageLand(mapScale);
 			final Texture2D texture = new Texture2D();
 			texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
-			texture.setImage(AWTImageLoader.makeArdor3dImage(mapImage, true));
+			texture.setImage(AWTImageLoader.makeArdor3dImage(groundImage, true));
 			final TextureState textureState = new TextureState();
 			textureState.setTexture(texture);
-			final Mesh mesh = SceneManager.getInstance().getMapLand();
+			final Mesh mesh = SceneManager.getInstance().getGroundImageLand();
 			mesh.setRenderState(textureState);
-			mesh.setVisible(!hideMap);
+			mesh.setVisible(!hideGroundImage);
 			setFoundationsVisible(false);
 		}
 	}
@@ -2638,34 +2639,34 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setShowMap(final boolean showMap) {
-		hideMap = !showMap;
+	public void setShowGroundImage(final boolean showGroundImage) {
+		hideGroundImage = !showGroundImage;
 	}
 
-	public boolean getShowMap() {
-		return !hideMap;
-	}
-
-	/** used by SnapshotLogger */
-	private void storeMapImageData() {
-		avoidSavingMapImage = true;
+	public boolean getShowGroundImage() {
+		return !hideGroundImage;
 	}
 
 	/** used by SnapshotLogger */
-	private void restoreMapImageData() {
-		avoidSavingMapImage = false;
+	private void storeGroundImageData() {
+		avoidSavingGroundImage = true;
+	}
+
+	/** used by SnapshotLogger */
+	private void restoreGroundImageData() {
+		avoidSavingGroundImage = false;
 	}
 
 	private void writeObject(final ObjectOutputStream out) throws IOException {
 		out.defaultWriteObject();
-		if (mapImage != null && !avoidSavingMapImage) {
-			ImageIO.write(mapImage, "jpg", out);
+		if (groundImage != null && !avoidSavingGroundImage) {
+			ImageIO.write(groundImage, "jpg", out);
 		}
 	}
 
 	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		mapImage = ImageIO.read(in);
+		groundImage = ImageIO.read(in);
 	}
 
 	public static boolean isSaving() {

@@ -399,7 +399,7 @@ public class PopupMenuFactory {
 			miClearLocation.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setMap(null, 1);
+					Scene.getInstance().setGroundImage(null, 1);
 					Scene.getInstance().setEdited(true);
 				}
 			});

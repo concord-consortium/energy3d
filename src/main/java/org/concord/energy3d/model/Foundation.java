@@ -844,7 +844,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void drawTopMesh() {
-		mesh.setVisible(!Scene.getInstance().isMapEnabled());
+		mesh.setVisible(!Scene.getInstance().isGroundImageEnabled());
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		ReadOnlyVector3 p;

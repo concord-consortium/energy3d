@@ -257,6 +257,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem setGeoLocationMenuItem;
 	private JMenuItem clearGeoLocationMenuItem;
 	private JCheckBoxMenuItem showMapMenuItem;
+	private JMenu groundImageMenu;
+	private JMenuItem setGroundImageMenuItem;
+	private JMenuItem clearGroundImageMenuItem;
+	private JCheckBoxMenuItem showGroundImageMenuItem;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -1392,6 +1396,7 @@ public class MainFrame extends JFrame {
 			viewMenu.addSeparator();
 			viewMenu.add(getTextureMenu());
 			viewMenu.add(getThemeMenu());
+			viewMenu.add(getGroundImageMenu());
 			viewMenu.add(getGeoLocationMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
@@ -1479,7 +1484,79 @@ public class MainFrame extends JFrame {
 
 	}
 
-	public JMenu getGeoLocationMenu() {
+	private JMenu getGroundImageMenu() {
+
+		if (groundImageMenu == null) {
+			groundImageMenu = new JMenu("Ground Image");
+			groundImageMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					Util.selectSilently(showMapMenuItem, SceneManager.getInstance().getGroundImageLand().isVisible());
+				}
+			});
+
+			groundImageMenu.add(getSetGroundImageMenuItem());
+			groundImageMenu.add(getClearGroundImageMenuItem());
+			groundImageMenu.add(getShowGroundImageMenuItem());
+
+		}
+		return groundImageMenu;
+
+	}
+
+	private JMenuItem getSetGroundImageMenuItem() {
+		if (setGroundImageMenuItem == null) {
+			setGroundImageMenuItem = new JMenuItem("Set Image");
+			setGroundImageMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+				}
+			});
+		}
+		return setGroundImageMenuItem;
+	}
+
+	private JMenuItem getClearGroundImageMenuItem() {
+		if (clearGroundImageMenuItem == null) {
+			clearGroundImageMenuItem = new JMenuItem("Clear Image");
+			clearGroundImageMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Scene.getInstance().setGroundImage(null, 1);
+					Scene.getInstance().setEdited(true);
+				}
+			});
+		}
+		return clearGroundImageMenuItem;
+	}
+
+	private JCheckBoxMenuItem getShowGroundImageMenuItem() {
+		if (showGroundImageMenuItem == null) {
+			showGroundImageMenuItem = new JCheckBoxMenuItem("Show Image");
+			showGroundImageMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final boolean b = showGroundImageMenuItem.isSelected();
+					SceneManager.getInstance().getGroundImageLand().setVisible(b);
+					Scene.getInstance().setShowGroundImage(b);
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAll();
+				}
+			});
+		}
+		return showGroundImageMenuItem;
+	}
+
+	private JMenu getGeoLocationMenu() {
 
 		if (geoLocationMenu == null) {
 			geoLocationMenu = new JMenu("Geo-Location");
@@ -1495,7 +1572,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(showMapMenuItem, SceneManager.getInstance().getMapLand().isVisible());
+					Util.selectSilently(showMapMenuItem, SceneManager.getInstance().getGroundImageLand().isVisible());
 				}
 			});
 
@@ -1508,7 +1585,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	public JMenuItem getSetGeoLocationMenuItem() {
+	private JMenuItem getSetGeoLocationMenuItem() {
 		if (setGeoLocationMenuItem == null) {
 			setGeoLocationMenuItem = new JMenuItem("Set Location");
 			setGeoLocationMenuItem.addActionListener(new ActionListener() {
@@ -1521,13 +1598,13 @@ public class MainFrame extends JFrame {
 		return setGeoLocationMenuItem;
 	}
 
-	public JMenuItem getClearGeoLocationMenuItem() {
+	private JMenuItem getClearGeoLocationMenuItem() {
 		if (clearGeoLocationMenuItem == null) {
 			clearGeoLocationMenuItem = new JMenuItem("Clear Location");
 			clearGeoLocationMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setMap(null, 1);
+					Scene.getInstance().setGroundImage(null, 1);
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -1543,8 +1620,8 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(final ItemEvent e) {
 					// final ShowSolarLandCommand c = new ShowSolarLandCommand();
 					final boolean b = showMapMenuItem.isSelected();
-					SceneManager.getInstance().getMapLand().setVisible(b);
-					Scene.getInstance().setShowMap(b);
+					SceneManager.getInstance().getGroundImageLand().setVisible(b);
+					Scene.getInstance().setShowGroundImage(b);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 					// SceneManager.getInstance().getUndoManager().addEdit(c);

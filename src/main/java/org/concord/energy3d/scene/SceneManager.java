@@ -170,7 +170,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Mesh land;
 	private final Mesh collisionLand;
 	private final Mesh solarLand;
-	private final Quad mapLand;
+	private final Quad groundImageLand;
 	private final Mesh gridsMesh;
 	private final Spatial axes;
 	private final LightState lightState = new LightState();
@@ -317,18 +317,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		solarLand.updateModelBound();
 		solarLand.updateWorldBound(true);
 		solarLand.setVisible(false);
-		mapLand = new Quad("Map Land");
-		resizeMapLand(1);
-		mapLand.setModelBound(new BoundingBox());
-		mapLand.updateModelBound();
-		mapLand.updateWorldBound(true);
-		mapLand.setVisible(false);
+		groundImageLand = new Quad("Map Land");
+		resizeGroundImageLand(1);
+		groundImageLand.setModelBound(new BoundingBox());
+		groundImageLand.updateModelBound();
+		groundImageLand.updateWorldBound(true);
+		groundImageLand.setVisible(false);
 		backgroundRoot.getSceneHints().setAllPickingHints(false);
 		backgroundRoot.attachChild(sky);
 		backgroundRoot.attachChild(land);
 		backgroundRoot.attachChild(collisionLand);
 		backgroundRoot.attachChild(solarLand);
-		backgroundRoot.attachChild(mapLand);
+		backgroundRoot.attachChild(groundImageLand);
 		backgroundRoot.attachChild(gridsMesh);
 		backgroundRoot.attachChild(axes);
 		root.attachChild(backgroundRoot);
@@ -345,7 +345,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		shadowPass.setUseObjectCullFace(true);
 		shadowPass.add(land);
 		shadowPass.add(solarLand);
-		shadowPass.add(mapLand);
+		shadowPass.add(groundImageLand);
 		shadowPass.add(Scene.getOriginalHouseRoot());
 		shadowPass.addOccluder(Scene.getOriginalHouseRoot());
 		shadowPass.addOccluder(Scene.getNotReceivingShadowRoot());
@@ -1663,15 +1663,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return solarLand;
 	}
 
-	public Mesh getMapLand() {
-		return mapLand;
+	public Mesh getGroundImageLand() {
+		return groundImageLand;
 	}
 
-	public void resizeMapLand(final double scale) {
+	public void resizeGroundImageLand(final double scale) {
 		final double d = 68.75 / 0.2 * scale;
-		mapLand.resize(d, d);
-		mapLand.updateModelBound();
-		mapLand.updateWorldBound(true);
+		groundImageLand.resize(d, d);
+		groundImageLand.updateModelBound();
+		groundImageLand.updateWorldBound(true);
 	}
 
 	public boolean isHeliodonVisible() {

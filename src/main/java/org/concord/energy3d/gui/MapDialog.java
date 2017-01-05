@@ -1,5 +1,6 @@
 package org.concord.energy3d.gui;
 
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -163,7 +164,7 @@ public class MapDialog extends JDialog {
 				}
 				final BufferedImage mapImage = getGoogleMapImage(true);
 				if (mapImage != null) {
-					Scene.getInstance().setMap(mapImage, getScale());
+					Scene.getInstance().setGroundImage(mapImage, getScale());
 					Scene.getInstance().setEdited(true);
 					setVisible(false);
 				}
@@ -188,7 +189,7 @@ public class MapDialog extends JDialog {
 		final BufferedImage mapImage = getGoogleMapImage(false);
 		if (mapImage != null) {
 			final int w = this.getContentPane().getPreferredSize().width;
-			mapLabel.setIcon(new ImageIcon(mapImage.getScaledInstance(w, w, java.awt.Image.SCALE_DEFAULT)));
+			mapLabel.setIcon(new ImageIcon(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT)));
 		}
 	}
 

@@ -948,16 +948,16 @@ public class EnergyPanel extends JPanel {
 							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the rack");
 							partProperty2TextField.setToolTipText("The angles of the rack");
 							partProperty3Label.setText("  Solar Panels:");
+							final SolarPanel sp = rack.getSolarPanel();
+							final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
 							if (energyViewShown) {
-								final SolarPanel sp = rack.getSolarPanel();
-								final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
 								partProperty3Label.setText("  Efficiency & Yield:");
 								partProperty3TextField.setText(eff + ", " + twoDecimals.format(rack.getSolarPotentialToday() * sp.getSystemEfficiency(25)) + " kWh"); // TODO: more accurate system efficiency should consider hourly temperature fluctuations
 								partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel array on the rack");
 							} else {
 								if (rack.isMonolithic()) {
 									final int[] rnc = rack.getSolarPanelRowAndColumnNumbers();
-									partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + rack.getSolarPanel().getPanelWidth() + "\u00D7" + rack.getSolarPanel().getPanelHeight() + " m");
+									partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + rack.getSolarPanel().getPanelWidth() + "\u00D7" + rack.getSolarPanel().getPanelHeight() + " m, " + eff);
 								} else {
 									partProperty3TextField.setText("" + n);
 								}
