@@ -117,7 +117,6 @@ public class Scene implements Serializable {
 	private int theme;
 	private double annotationScale = 0.2;
 	private double heatVectorLength = 2000;
-	private double mapScale;
 	private double heatFluxGridSize = 2;
 	private boolean isAnnotationsVisible = true;
 	private boolean studentMode;
@@ -134,6 +133,7 @@ public class Scene implements Serializable {
 	private boolean disallowFoundationOverlap;
 	private boolean dashedlineOnRoofs = true;
 	private boolean onlySolarAnalysis;
+	private double groundImageScale = 1;
 	private boolean hideGroundImage;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
@@ -280,6 +280,9 @@ public class Scene implements Serializable {
 			instance.upgradeSceneToNewVersion();
 			instance.cleanup();
 			loadCameraLocation();
+		}
+		if (Util.isZero(instance.groundImageScale)) {
+			instance.groundImageScale = 1;
 		}
 		instance.applyGroundImage();
 		SceneManager.getInstance().hideAllEditPoints();
@@ -2603,7 +2606,7 @@ public class Scene implements Serializable {
 
 	public void setGroundImage(final BufferedImage groundImage, final double groundImageScale) {
 		this.groundImage = groundImage;
-		this.mapScale = groundImageScale;
+		this.groundImageScale = groundImageScale;
 		applyGroundImage();
 	}
 
@@ -2612,18 +2615,19 @@ public class Scene implements Serializable {
 	}
 
 	private void applyGroundImage() {
+		final Mesh mesh = SceneManager.getInstance().getGroundImageLand();
 		if (groundImage == null) {
-			SceneManager.getInstance().getGroundImageLand().setVisible(false);
+			mesh.setRenderState(new TextureState()); // set a dummy texture in case the mesh holds the original buffered image and causes memory leak
+			mesh.setVisible(false);
 			setFoundationsVisible(true);
 		} else {
-			// System.out.println("\n****" + mapScale);
-			SceneManager.getInstance().resizeGroundImageLand(mapScale);
+			System.out.println("\n****" + groundImageScale);
+			SceneManager.getInstance().resizeGroundImageLand(groundImageScale);
 			final Texture2D texture = new Texture2D();
 			texture.setTextureKey(TextureKey.getRTTKey(MinificationFilter.NearestNeighborNoMipMaps));
 			texture.setImage(AWTImageLoader.makeArdor3dImage(groundImage, true));
 			final TextureState textureState = new TextureState();
 			textureState.setTexture(texture);
-			final Mesh mesh = SceneManager.getInstance().getGroundImageLand();
 			mesh.setRenderState(textureState);
 			mesh.setVisible(!hideGroundImage);
 			setFoundationsVisible(false);

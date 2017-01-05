@@ -384,26 +384,69 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenu geoLocationMenu = new JMenu("Geo-Location");
+			final JMenuItem miClearImage = new JMenuItem("Clear Image");
+			final JCheckBoxMenuItem miShowImage = new JCheckBoxMenuItem("Show Image");
 
-			final JMenuItem miSetLocation = new JMenuItem("Set Location");
-			miSetLocation.addActionListener(new ActionListener() {
+			final JMenu groundImageMenu = new JMenu("Ground Image");
+			groundImageMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					miShowImage.setEnabled(true);
+					miClearImage.setEnabled(true);
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					miShowImage.setEnabled(true);
+					miClearImage.setEnabled(true);
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					final boolean hasGroundImage = Scene.getInstance().isGroundImageEnabled();
+					miShowImage.setEnabled(hasGroundImage);
+					miClearImage.setEnabled(hasGroundImage);
+					Util.selectSilently(miShowImage, SceneManager.getInstance().getGroundImageLand().isVisible());
+				}
+			});
+
+			final JMenuItem miUseEarthView = new JMenuItem("Use Image from Earth View");
+			miUseEarthView.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					MapDialog.showDialog();
 				}
 			});
-			geoLocationMenu.add(miSetLocation);
+			groundImageMenu.add(miUseEarthView);
 
-			final JMenuItem miClearLocation = new JMenuItem("Clear Location");
-			miClearLocation.addActionListener(new ActionListener() {
+			final JMenuItem miUseImageFile = new JMenuItem("Use Image from File");
+			miUseImageFile.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+				}
+			});
+			groundImageMenu.add(miUseImageFile);
+
+			miClearImage.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Scene.getInstance().setGroundImage(null, 1);
 					Scene.getInstance().setEdited(true);
 				}
 			});
-			geoLocationMenu.add(miClearLocation);
+			groundImageMenu.add(miClearImage);
+
+			miShowImage.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final boolean b = miShowImage.isSelected();
+					SceneManager.getInstance().getGroundImageLand().setVisible(b);
+					Scene.getInstance().setShowGroundImage(b);
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAll();
+				}
+			});
+			groundImageMenu.add(miShowImage);
 
 			popupMenuForLand = new JPopupMenu();
 			popupMenuForLand.setInvoker(MainPanel.getInstance().getCanvasPanel());
@@ -435,7 +478,7 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miImport);
 			popupMenuForLand.add(miImportPrefabMenu);
 			popupMenuForLand.addSeparator();
-			popupMenuForLand.add(geoLocationMenu);
+			popupMenuForLand.add(groundImageMenu);
 			popupMenuForLand.add(colorAction);
 			popupMenuForLand.add(miAlbedo);
 			popupMenuForLand.add(miThermalDiffusivity);

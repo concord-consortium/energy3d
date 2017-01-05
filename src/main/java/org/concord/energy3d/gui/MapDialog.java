@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
@@ -42,7 +43,7 @@ public class MapDialog extends JDialog {
 	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA");
 	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.00001));
 	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.00001));
-	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(2, zoomMin, zoomMax, 1));
+	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
 	private final JLabel mapLabel = new JLabel();
 	private static MapDialog instance;
 	private boolean lock = false;
@@ -73,7 +74,7 @@ public class MapDialog extends JDialog {
 		longitudeSpinner.setEditor(lngEditor);
 		mapLabel.setAlignmentX(0.5f);
 		final Point point = new Point();
-		mapLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+		mapLabel.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(final MouseEvent e) {
 				point.setLocation(e.getPoint());

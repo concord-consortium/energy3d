@@ -253,12 +253,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem rotate180MenuItem;
 	private JMenuItem rotate90CwMenuItem;
 	private JMenuItem rotate90CcwMenuItem;
-	private JMenu geoLocationMenu;
-	private JMenuItem setGeoLocationMenuItem;
-	private JMenuItem clearGeoLocationMenuItem;
-	private JCheckBoxMenuItem showMapMenuItem;
 	private JMenu groundImageMenu;
-	private JMenuItem setGroundImageMenuItem;
+	private JMenuItem useImageFileMenuItem;
+	private JMenuItem useEarthViewMenuItem;
 	private JMenuItem clearGroundImageMenuItem;
 	private JCheckBoxMenuItem showGroundImageMenuItem;
 
@@ -1397,7 +1394,6 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getTextureMenu());
 			viewMenu.add(getThemeMenu());
 			viewMenu.add(getGroundImageMenu());
-			viewMenu.add(getGeoLocationMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(solarHeatMapMenu);
@@ -1491,20 +1487,28 @@ public class MainFrame extends JFrame {
 			groundImageMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
+					showGroundImageMenuItem.setEnabled(true);
+					clearGroundImageMenuItem.setEnabled(true);
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
+					showGroundImageMenuItem.setEnabled(true);
+					clearGroundImageMenuItem.setEnabled(true);
 					SceneManager.getInstance().refresh();
 				}
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(showMapMenuItem, SceneManager.getInstance().getGroundImageLand().isVisible());
+					final boolean hasGroundImage = Scene.getInstance().isGroundImageEnabled();
+					showGroundImageMenuItem.setEnabled(hasGroundImage);
+					clearGroundImageMenuItem.setEnabled(hasGroundImage);
+					Util.selectSilently(showGroundImageMenuItem, SceneManager.getInstance().getGroundImageLand().isVisible());
 				}
 			});
 
-			groundImageMenu.add(getSetGroundImageMenuItem());
+			groundImageMenu.add(getUseEarthViewMenuItem());
+			groundImageMenu.add(getUseImageFileMenuItem());
 			groundImageMenu.add(getClearGroundImageMenuItem());
 			groundImageMenu.add(getShowGroundImageMenuItem());
 
@@ -1513,16 +1517,29 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private JMenuItem getSetGroundImageMenuItem() {
-		if (setGroundImageMenuItem == null) {
-			setGroundImageMenuItem = new JMenuItem("Set Image");
-			setGroundImageMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getUseEarthViewMenuItem() {
+		if (useEarthViewMenuItem == null) {
+			useEarthViewMenuItem = new JMenuItem("Use Image from Earth View");
+			useEarthViewMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MapDialog.showDialog();
+				}
+			});
+		}
+		return useEarthViewMenuItem;
+	}
+
+	private JMenuItem getUseImageFileMenuItem() {
+		if (useImageFileMenuItem == null) {
+			useImageFileMenuItem = new JMenuItem("Use Image from File");
+			useImageFileMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 				}
 			});
 		}
-		return setGroundImageMenuItem;
+		return useImageFileMenuItem;
 	}
 
 	private JMenuItem getClearGroundImageMenuItem() {
@@ -1554,81 +1571,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return showGroundImageMenuItem;
-	}
-
-	private JMenu getGeoLocationMenu() {
-
-		if (geoLocationMenu == null) {
-			geoLocationMenu = new JMenu("Geo-Location");
-			geoLocationMenu.addMenuListener(new MenuListener() {
-				@Override
-				public void menuCanceled(final MenuEvent e) {
-				}
-
-				@Override
-				public void menuDeselected(final MenuEvent e) {
-					SceneManager.getInstance().refresh();
-				}
-
-				@Override
-				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(showMapMenuItem, SceneManager.getInstance().getGroundImageLand().isVisible());
-				}
-			});
-
-			geoLocationMenu.add(getSetGeoLocationMenuItem());
-			geoLocationMenu.add(getClearGeoLocationMenuItem());
-			geoLocationMenu.add(getShowMapMenuItem());
-
-		}
-		return geoLocationMenu;
-
-	}
-
-	private JMenuItem getSetGeoLocationMenuItem() {
-		if (setGeoLocationMenuItem == null) {
-			setGeoLocationMenuItem = new JMenuItem("Set Location");
-			setGeoLocationMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					MapDialog.showDialog();
-				}
-			});
-		}
-		return setGeoLocationMenuItem;
-	}
-
-	private JMenuItem getClearGeoLocationMenuItem() {
-		if (clearGeoLocationMenuItem == null) {
-			clearGeoLocationMenuItem = new JMenuItem("Clear Location");
-			clearGeoLocationMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setGroundImage(null, 1);
-					Scene.getInstance().setEdited(true);
-				}
-			});
-		}
-		return clearGeoLocationMenuItem;
-	}
-
-	private JCheckBoxMenuItem getShowMapMenuItem() {
-		if (showMapMenuItem == null) {
-			showMapMenuItem = new JCheckBoxMenuItem("Show Map");
-			showMapMenuItem.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					// final ShowSolarLandCommand c = new ShowSolarLandCommand();
-					final boolean b = showMapMenuItem.isSelected();
-					SceneManager.getInstance().getGroundImageLand().setVisible(b);
-					Scene.getInstance().setShowGroundImage(b);
-					Scene.getInstance().setEdited(true);
-					Scene.getInstance().redrawAll();
-					// SceneManager.getInstance().getUndoManager().addEdit(c);
-				}
-			});
-		}
-		return showMapMenuItem;
 	}
 
 	public JCheckBoxMenuItem getAxesMenuItem() {
