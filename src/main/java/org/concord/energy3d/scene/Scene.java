@@ -136,6 +136,7 @@ public class Scene implements Serializable {
 	private double groundImageScale = 1;
 	private boolean hideGroundImage;
 	private boolean groundImageIsEarthView;
+	private boolean groundImageLightColored; // a parameter that user can choose to improve the contrast of edit points etc. (i.e., no white on white)
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -2668,6 +2669,14 @@ public class Scene implements Serializable {
 
 	public boolean getShowGroundImage() {
 		return !hideGroundImage;
+	}
+
+	public void setGroundImageLightColored(final boolean groundImageLightColored) {
+		this.groundImageLightColored = groundImageLightColored;
+	}
+
+	public boolean isGroundImageLightColored() {
+		return groundImageLightColored;
 	}
 
 	/** used by SnapshotLogger */

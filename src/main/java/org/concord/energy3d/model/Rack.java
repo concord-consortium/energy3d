@@ -24,6 +24,7 @@ import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.OffsetState;
@@ -967,6 +968,10 @@ public class Rack extends HousePart implements Trackable {
 		getEditPointShape(i++).setTranslation(p2);
 		getEditPointShape(i++).setTranslation(p3);
 		getEditPointShape(i++).setTranslation(p4);
+		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE;
+		for (i = 1; i < 5; i++) {
+			getEditPointShape(i).setDefaultColor(c);
+		}
 		super.updateEditShapes();
 		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, monolithic ? 0.15 : 1));
 	}

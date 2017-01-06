@@ -1446,12 +1446,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		final double Z = 0.1;
 		txt = new BMText("N", "N", FontManager.getInstance().getAnnotationFont(), Align.South);
+		txt.setTextColor(ColorRGBA.BLACK);
 		txt.setAutoRotate(false);
 		txt.setTranslation(2, 0.0, Z);
 		txt.setRotation(new Matrix3().fromAngles(0.0, MathUtils.HALF_PI, -MathUtils.HALF_PI));
 		compass.attachChild(txt);
 
 		txt = new BMText("S", "S", FontManager.getInstance().getAnnotationFont(), Align.South);
+		txt.setTextColor(ColorRGBA.BLACK);
 		txt.setAutoRotate(false);
 		txt.setTranslation(-2, -0.0, Z);
 		txt.setRotation(new Matrix3().fromAngles(0.0, -MathUtils.HALF_PI, MathUtils.HALF_PI));

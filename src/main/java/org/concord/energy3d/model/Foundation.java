@@ -27,6 +27,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
@@ -1510,6 +1511,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		updateHandle(points.get(9), u.negateLocal());
 		updateHandle(points.get(10), v);
 		updateHandle(points.get(11), v.negateLocal());
+		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE;
+		for (int i = 0; i < 8; i++) {
+			getEditPointShape(i).setDefaultColor(c);
+		}
 		if (pointsRoot.getNumberOfChildren() > 8) {
 			for (int i = 8; i < 12; i++) {
 				getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);

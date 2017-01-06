@@ -31,7 +31,7 @@ class PropertiesDialog extends JDialog {
 		setTitle("Properties - " + Scene.getInstance().getParts().size() + " parts");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(5, 2, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(6, 2, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -52,6 +52,8 @@ class PropertiesDialog extends JDialog {
 		if (Scene.getInstance().getOnlySolarAnalysis()) {
 			onlySolarAnalysisComboBox.setSelectedIndex(1);
 		}
+		final JComboBox<String> groundImageColorationComboBox = new JComboBox<String>(new String[] { "Dark Colored", "Light Colored" });
+		groundImageColorationComboBox.setSelectedIndex(Scene.getInstance().isGroundImageLightColored() ? 1 : 0);
 
 		final ActionListener okListener = new ActionListener() {
 			@Override
@@ -68,6 +70,7 @@ class PropertiesDialog extends JDialog {
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
+				Scene.getInstance().setGroundImageLightColored(groundImageColorationComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().updateWeatherData();
 				EnergyPanel.getInstance().update();
@@ -94,6 +97,10 @@ class PropertiesDialog extends JDialog {
 		// restrict to only solar analysis
 		panel.add(new JLabel("Only Solar Analysis: "));
 		panel.add(onlySolarAnalysisComboBox);
+
+		// ground image color
+		panel.add(new JLabel("Ground Image Coloration: "));
+		panel.add(groundImageColorationComboBox);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

@@ -874,130 +874,136 @@ public class EnergyPanel extends JPanel {
 				final SolarPanel sp = (SolarPanel) selectedPart;
 				if (sp.isDrawable()) {
 					final Foundation f = sp.getTopContainer();
-					double a = sp.getRelativeAzimuth() + f.getAzimuth();
-					if (a >= 360) {
-						a -= 360;
-					}
-					final double az = a;
-					final boolean flat = (sp.getContainer() instanceof Roof && Util.isZero(sp.getContainer().getHeight())) || (sp.getContainer() instanceof Foundation);
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							String title = "Solar Panel (" + sp.getId() + ")";
-							switch (sp.getTracker()) {
-							case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-								title += ", Tracker: HSAT";
-								break;
-							case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-								title += ", Tracker: VSAT";
-								break;
-							case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-								title += ", Tracker: AADAT";
-								break;
-							}
-							partPanelBorder.setTitle(title);
-							partProperty1Label.setText("  Size & Position:");
-							partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
-							partProperty2Label.setText("  Angles:");
-							partProperty2TextField.setText(flat ? "tilt: " + oneDecimal.format(sp.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0" : " --- ");
-							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
-							partProperty2TextField.setToolTipText("The angles of the solar panel");
-							final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
-							if (energyViewShown) {
-								partProperty3Label.setText("  Efficiency & Yield:");
-								partProperty3TextField.setText(eff + ", " + twoDecimals.format(sp.getSolarPotentialToday() * sp.getSystemEfficiency(25)) + " kWh"); // TODO: more accurate system efficiency should consider hourly temperature fluctuations
-								partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel");
-							} else {
-								partProperty3Label.setText("  Efficiency:");
-								partProperty3TextField.setText(eff);
-								partProperty3TextField.setToolTipText("The solar cell efficiency of the solar panel");
-							}
+					if (f != null) {
+						double a = sp.getRelativeAzimuth() + f.getAzimuth();
+						if (a >= 360) {
+							a -= 360;
 						}
-					});
+						final double az = a;
+						final boolean flat = (sp.getContainer() instanceof Roof && Util.isZero(sp.getContainer().getHeight())) || (sp.getContainer() instanceof Foundation);
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								String title = "Solar Panel (" + sp.getId() + ")";
+								switch (sp.getTracker()) {
+								case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+									title += ", Tracker: HSAT";
+									break;
+								case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+									title += ", Tracker: VSAT";
+									break;
+								case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+									title += ", Tracker: AADAT";
+									break;
+								}
+								partPanelBorder.setTitle(title);
+								partProperty1Label.setText("  Size & Position:");
+								partProperty1TextField.setText(twoDecimals.format(sp.getPanelWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(sp.getPanelHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+								partProperty2Label.setText("  Angles:");
+								partProperty2TextField.setText(flat ? "tilt: " + oneDecimal.format(sp.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0" : " --- ");
+								partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
+								partProperty2TextField.setToolTipText("The angles of the solar panel");
+								final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
+								if (energyViewShown) {
+									partProperty3Label.setText("  Efficiency & Yield:");
+									partProperty3TextField.setText(eff + ", " + twoDecimals.format(sp.getSolarPotentialToday() * sp.getSystemEfficiency(25)) + " kWh"); // TODO: more accurate system efficiency should consider hourly temperature fluctuations
+									partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel");
+								} else {
+									partProperty3Label.setText("  Efficiency:");
+									partProperty3TextField.setText(eff);
+									partProperty3TextField.setToolTipText("The solar cell efficiency of the solar panel");
+								}
+							}
+						});
+					}
 				}
 			} else if (selectedPart instanceof Rack) {
 				final Rack rack = (Rack) selectedPart;
 				if (rack.isDrawable()) {
 					final Foundation f = rack.getTopContainer();
-					double a = rack.getRelativeAzimuth() + f.getAzimuth();
-					if (a >= 360) {
-						a -= 360;
-					}
-					final double az = a;
-					final int n = rack.isMonolithic() ? rack.getNumberOfSolarPanels() : rack.getChildren().size();
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							String title = "Rack (" + rack.getId() + ")";
-							switch (rack.getTracker()) {
-							case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-								title += ", Tracker: HSAT";
-								break;
-							case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-								title += ", Tracker: VSAT";
-								break;
-							case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-								title += ", Tracker: AADAT";
-								break;
-							}
-							partPanelBorder.setTitle(title);
-							partProperty1Label.setText("  Size & Position:");
-							partProperty1TextField.setText(twoDecimals.format(rack.getRackWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(rack.getRackHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
-							partProperty2Label.setText("  Angles:");
-							partProperty2TextField.setText("tilt: " + oneDecimal.format(rack.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0");
-							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the rack");
-							partProperty2TextField.setToolTipText("The angles of the rack");
-							partProperty3Label.setText("  Solar Panels:");
-							final SolarPanel sp = rack.getSolarPanel();
-							final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
-							if (energyViewShown) {
-								partProperty3Label.setText("  Efficiency & Yield:");
-								partProperty3TextField.setText(eff + ", " + twoDecimals.format(rack.getSolarPotentialToday() * sp.getSystemEfficiency(25)) + " kWh"); // TODO: more accurate system efficiency should consider hourly temperature fluctuations
-								partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel array on the rack");
-							} else {
-								if (rack.isMonolithic()) {
-									final int[] rnc = rack.getSolarPanelRowAndColumnNumbers();
-									partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + rack.getSolarPanel().getPanelWidth() + "\u00D7" + rack.getSolarPanel().getPanelHeight() + " m, " + eff);
-								} else {
-									partProperty3TextField.setText("" + n);
-								}
-								partProperty3TextField.setToolTipText("Number of solar panels on this rack");
-							}
+					if (f != null) {
+						double a = rack.getRelativeAzimuth() + f.getAzimuth();
+						if (a >= 360) {
+							a -= 360;
 						}
-					});
+						final double az = a;
+						final int n = rack.isMonolithic() ? rack.getNumberOfSolarPanels() : rack.getChildren().size();
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								String title = "Rack (" + rack.getId() + ")";
+								switch (rack.getTracker()) {
+								case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+									title += ", Tracker: HSAT";
+									break;
+								case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+									title += ", Tracker: VSAT";
+									break;
+								case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+									title += ", Tracker: AADAT";
+									break;
+								}
+								partPanelBorder.setTitle(title);
+								partProperty1Label.setText("  Size & Position:");
+								partProperty1TextField.setText(twoDecimals.format(rack.getRackWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(rack.getRackHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+								partProperty2Label.setText("  Angles:");
+								partProperty2TextField.setText("tilt: " + oneDecimal.format(rack.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0");
+								partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the rack");
+								partProperty2TextField.setToolTipText("The angles of the rack");
+								partProperty3Label.setText("  Solar Panels:");
+								final SolarPanel sp = rack.getSolarPanel();
+								final String eff = oneDecimal.format(sp.getCellEfficiency() * 100) + "%";
+								if (energyViewShown) {
+									partProperty3Label.setText("  Efficiency & Yield:");
+									partProperty3TextField.setText(eff + ", " + twoDecimals.format(rack.getSolarPotentialToday() * sp.getSystemEfficiency(25)) + " kWh"); // TODO: more accurate system efficiency should consider hourly temperature fluctuations
+									partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel array on the rack");
+								} else {
+									if (rack.isMonolithic()) {
+										final int[] rnc = rack.getSolarPanelRowAndColumnNumbers();
+										partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + rack.getSolarPanel().getPanelWidth() + "\u00D7" + rack.getSolarPanel().getPanelHeight() + " m, " + eff);
+									} else {
+										partProperty3TextField.setText("" + n);
+									}
+									partProperty3TextField.setToolTipText("Number of solar panels on this rack");
+								}
+							}
+						});
+					}
 				}
 			} else if (selectedPart instanceof Mirror) {
 				final Mirror m = (Mirror) selectedPart;
 				if (m.isDrawable()) {
 					final Foundation f = m.getTopContainer();
-					double a = m.getRelativeAzimuth() + f.getAzimuth();
-					if (a >= 360) {
-						a -= 360;
-					}
-					final double az = a;
-					final boolean flat = m.getContainer() instanceof Foundation;
-					EventQueue.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							partPanelBorder.setTitle("Mirror (" + m.getId() + ")");
-							partProperty1Label.setText("  Size & Position:");
-							partProperty1TextField.setText(twoDecimals.format(m.getMirrorWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(m.getMirrorHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
-							partProperty2Label.setText("  Angles:");
-							partProperty2TextField.setText(flat ? "tilt: " + oneDecimal.format(m.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0" : " --- ");
-							partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
-							partProperty2TextField.setToolTipText("The angles of the solar panel");
-							final String reflectivity = oneDecimal.format(m.getReflectivity() * 100) + "%";
-							if (energyViewShown) {
-								partProperty3Label.setText("  Reflectivity & Yield:");
-								partProperty3TextField.setText(reflectivity + ", " + twoDecimals.format(m.getSolarPotentialToday() * m.getReflectivity()) + " kWh");
-								partProperty3TextField.setToolTipText("The reflectivity and yield of this mirror");
-							} else {
-								partProperty3Label.setText("  Reflectivity:");
-								partProperty3TextField.setText(reflectivity);
-								partProperty3TextField.setToolTipText("The reflectivity of this mirror");
-							}
+					if (f != null) {
+						double a = m.getRelativeAzimuth() + f.getAzimuth();
+						if (a >= 360) {
+							a -= 360;
 						}
-					});
+						final double az = a;
+						final boolean flat = m.getContainer() instanceof Foundation;
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								partPanelBorder.setTitle("Mirror (" + m.getId() + ")");
+								partProperty1Label.setText("  Size & Position:");
+								partProperty1TextField.setText(twoDecimals.format(m.getMirrorWidth() * meterToFoot) + "\u00d7" + twoDecimals.format(m.getMirrorHeight() * meterToFoot) + " m, (" + oneDecimal.format(v.getX() * scale) + ", " + oneDecimal.format(v.getY() * scale) + ", " + oneDecimal.format(v.getZ() * scale) + ") m");
+								partProperty2Label.setText("  Angles:");
+								partProperty2TextField.setText(flat ? "tilt: " + oneDecimal.format(m.getTiltAngle()) + "\u00B0, azimuth: " + oneDecimal.format(az) + "\u00B0" : " --- ");
+								partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
+								partProperty2TextField.setToolTipText("The angles of the solar panel");
+								final String reflectivity = oneDecimal.format(m.getReflectivity() * 100) + "%";
+								if (energyViewShown) {
+									partProperty3Label.setText("  Reflectivity & Yield:");
+									partProperty3TextField.setText(reflectivity + ", " + twoDecimals.format(m.getSolarPotentialToday() * m.getReflectivity()) + " kWh");
+									partProperty3TextField.setToolTipText("The reflectivity and yield of this mirror");
+								} else {
+									partProperty3Label.setText("  Reflectivity:");
+									partProperty3TextField.setText(reflectivity);
+									partProperty3TextField.setToolTipText("The reflectivity of this mirror");
+								}
+							}
+						});
+					}
 				}
 			} else if (selectedPart instanceof Sensor) {
 				final Sensor sensor = (Sensor) selectedPart;
