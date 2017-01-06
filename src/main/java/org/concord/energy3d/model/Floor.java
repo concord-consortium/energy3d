@@ -73,6 +73,9 @@ public class Floor extends HousePart {
 		if (container != null) {
 			final ReadOnlyVector3 base = getCenter();
 			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
+			if (p == null) {
+				return;
+			}
 			snapToGrid(p, base, getGridSize());
 			final double zMin = container.getAbsPoint(0).getZ() + 0.01;
 			final double zmax = container.getAbsPoint(1).getZ();
@@ -88,15 +91,17 @@ public class Floor extends HousePart {
 	}
 
 	private PolygonWithHoles makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
-		for (final PolygonPoint p : wallUpperPoints)
+		for (final PolygonPoint p : wallUpperPoints) {
 			p.set(p.getX(), p.getY(), height);
+		}
 		return new PolygonWithHoles(wallUpperPoints);
 	}
 
 	@Override
 	protected void drawMesh() {
-		if (container != null)
+		if (container != null) {
 			wallUpperPoints = exploreWallNeighbors((Wall) container);
+		}
 		if (!isDrawable()) {
 			mesh.getSceneHints().setCullHint(CullHint.Always);
 			return;
@@ -116,8 +121,9 @@ public class Floor extends HousePart {
 			@Override
 			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
 				int pointIndex = 0;
-				if (next != null)
+				if (next != null) {
 					pointIndex = next.getSnapPointIndexOf(currentWall);
+				}
 				pointIndex = pointIndex + 1;
 				final ReadOnlyVector3 p1 = currentWall.getAbsPoint(pointIndex == 1 ? 3 : 1);
 				final ReadOnlyVector3 p2 = currentWall.getAbsPoint(pointIndex);
@@ -131,14 +137,16 @@ public class Floor extends HousePart {
 
 	private void addPointToPolygon(final ArrayList<PolygonPoint> poly, final ReadOnlyVector3 p) {
 		final PolygonPoint polygonPoint = new PolygonPoint(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
-		if (!poly.contains(polygonPoint))
+		if (!poly.contains(polygonPoint)) {
 			poly.add(polygonPoint);
+		}
 	}
 
 	@Override
 	public void drawAnnotations() {
-		if (container == null)
+		if (container == null) {
 			return;
+		}
 		int annotCounter = 0;
 
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
@@ -153,8 +161,9 @@ public class Floor extends HousePart {
 	}
 
 	protected void drawOutline() {
-		if (container == null)
+		if (container == null) {
 			return;
+		}
 
 		final ArrayList<ReadOnlyVector3> convexHull = MeshLib.computeOutline(mesh.getMeshData().getVertexBuffer());
 		final int totalVertices = convexHull.size();
