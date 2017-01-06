@@ -77,7 +77,7 @@ public class Floor extends HousePart {
 				return;
 			}
 			snapToGrid(p, base, getGridSize());
-			final double zMin = container.getAbsPoint(0).getZ() + 0.01;
+			final double zMin = container.getAbsPoint(0).getZ() + 0.5;
 			final double zmax = container.getAbsPoint(1).getZ();
 			height = Math.min(zmax, Math.max(zMin, p.getZ()));
 		}
