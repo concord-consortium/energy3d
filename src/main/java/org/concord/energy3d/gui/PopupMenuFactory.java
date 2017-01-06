@@ -274,7 +274,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miRemoveAllBuildings = new JMenuItem("Remove All Buildings");
+			final JMenuItem miRemoveAllBuildings = new JMenuItem("Remove All Foundations");
 			miRemoveAllBuildings.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

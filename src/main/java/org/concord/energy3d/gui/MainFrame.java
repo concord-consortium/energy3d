@@ -234,6 +234,7 @@ public class MainFrame extends JFrame {
 	private JMenu examplesMenu;
 	private JMenu tutorialsMenu;
 	private JCheckBoxMenuItem autoRecomputeEnergyMenuItem;
+	private JMenuItem removeAllFoundationsMenuItem;
 	private JMenuItem removeAllRoofsMenuItem;
 	private JMenuItem removeAllFloorsMenuItem;
 	private JMenuItem removeAllSolarPanelsMenuItem;
@@ -1338,6 +1339,7 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Shadowing and Blocking", "tutorials/csp-shadowing-blocking.ng3");
 			addModel(cspMenu, "Shadowing and Blocking (Reduced Mirror Height)", "tutorials/csp-shadowing-blocking-less.ng3");
 			addModel(cspMenu, "Shadowing and Blocking (Increased Radial Spacing)", "tutorials/csp-shadowing-blocking-even-less.ng3");
+			addModel(cspMenu, "The Effect of Solar Tower Height", "tutorials/csp-tower-height.ng3");
 			addModel(cspMenu, "Fermat Spiral Layout of Heliostats (Sunflower Pattern)", "tutorials/csp-spiral-layout.ng3");
 
 		}
@@ -2413,6 +2415,7 @@ public class MainFrame extends JFrame {
 			});
 
 			final JMenu clearMenu = new JMenu("Clear");
+			clearMenu.add(getRemoveAllFoundationsMenuItem());
 			clearMenu.add(getRemoveAllWindowsMenuItem());
 			clearMenu.add(getRemoveAllWindowShuttersMenuItem());
 			clearMenu.add(getRemoveAllSolarPanelsMenuItem());
@@ -3483,6 +3486,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllWindowShuttersMenuItem;
+	}
+
+	private JMenuItem getRemoveAllFoundationsMenuItem() {
+		if (removeAllFoundationsMenuItem == null) {
+			removeAllFoundationsMenuItem = new JMenuItem("Remove All Foundations");
+			removeAllFoundationsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllFoundations();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+		}
+		return removeAllFoundationsMenuItem;
 	}
 
 	private JMenuItem getRemoveAllTreesMenuItem() {
