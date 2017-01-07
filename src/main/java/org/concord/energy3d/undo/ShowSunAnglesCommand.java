@@ -4,15 +4,16 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.Heliodon;
 
-public class ShowAxesCommand extends AbstractUndoableEdit {
+public class ShowSunAnglesCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue, newValue;
 
-	public ShowAxesCommand() {
-		oldValue = SceneManager.getInstance().areAxesVisible();
+	public ShowSunAnglesCommand() {
+		oldValue = Scene.getInstance().areSunAnglesVisible();
 		newValue = !oldValue;
 	}
 
@@ -23,18 +24,20 @@ public class ShowAxesCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		SceneManager.getInstance().setAxesVisible(oldValue);
+		Scene.getInstance().setSunAnglesVisible(oldValue);
+		Heliodon.getInstance().drawSunTriangle();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		SceneManager.getInstance().setAxesVisible(newValue);
+		Scene.getInstance().setSunAnglesVisible(newValue);
+		Heliodon.getInstance().drawSunTriangle();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Show Axes";
+		return "Show Sun Angles";
 	}
 
 }

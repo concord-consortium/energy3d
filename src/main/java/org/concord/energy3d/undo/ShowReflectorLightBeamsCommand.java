@@ -4,15 +4,15 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.scene.Scene;
 
-public class ShowAxesCommand extends AbstractUndoableEdit {
+public class ShowReflectorLightBeamsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue, newValue;
 
-	public ShowAxesCommand() {
-		oldValue = SceneManager.getInstance().areAxesVisible();
+	public ShowReflectorLightBeamsCommand() {
+		oldValue = Scene.getInstance().areLightBeamsVisible();
 		newValue = !oldValue;
 	}
 
@@ -23,18 +23,20 @@ public class ShowAxesCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		SceneManager.getInstance().setAxesVisible(oldValue);
+		Scene.getInstance().setLightBeamsVisible(oldValue);
+		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		SceneManager.getInstance().setAxesVisible(newValue);
+		Scene.getInstance().setLightBeamsVisible(newValue);
+		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Show Axes";
+		return "Show Reflector Light Beams";
 	}
 
 }

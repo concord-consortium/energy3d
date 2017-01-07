@@ -111,7 +111,9 @@ import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
+import org.concord.energy3d.undo.ShowReflectorLightBeamsCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
+import org.concord.energy3d.undo.ShowSunAnglesCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.undo.ZoomCommand;
 import org.concord.energy3d.util.ClipImage;
@@ -1373,6 +1375,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(showSolarLandMenuItem, Scene.getInstance().getSolarMapForLand());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
+					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					MainPanel.getInstance().defaultTool();
 				}
 			});
@@ -1649,11 +1652,11 @@ public class MainFrame extends JFrame {
 			sunAnglesMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					// final ShowAxesCommand c = new ShowAxesCommand();
+					final ShowSunAnglesCommand c = new ShowSunAnglesCommand();
 					Scene.getInstance().setSunAnglesVisible(sunAnglesMenuItem.isSelected());
 					Heliodon.getInstance().drawSunTriangle();
 					Scene.getInstance().setEdited(true);
-					// SceneManager.getInstance().getUndoManager().addEdit(c);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}
@@ -1666,11 +1669,11 @@ public class MainFrame extends JFrame {
 			lightBeamsMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					// final ShowAxesCommand c = new ShowAxesCommand();
+					final ShowReflectorLightBeamsCommand c = new ShowReflectorLightBeamsCommand();
 					Scene.getInstance().setLightBeamsVisible(lightBeamsMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
-					// SceneManager.getInstance().getUndoManager().addEdit(c);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 		}

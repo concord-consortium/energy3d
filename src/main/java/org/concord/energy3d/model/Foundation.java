@@ -1148,6 +1148,16 @@ public class Foundation extends HousePart implements Thermalizable {
 			movePoints.add(p.clone());
 		}
 		move(v, movePoints);
+		if (solarReceiver.isVisible()) { // when the foundation with a solar receiver moves, update the mirrors that link with it
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof Mirror) {
+					final Mirror m = (Mirror) x;
+					if (m.getHeliostatTarget() == this) {
+						m.draw();
+					}
+				}
+			}
+		}
 	}
 
 	public double getBoundingHeight() {
