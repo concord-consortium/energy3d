@@ -5437,12 +5437,14 @@ public class PopupMenuFactory {
 						miTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);
 						miBaseHeight.setEnabled(true);
+						miPoleSpacing.setEnabled(true);
 						if (rack.getContainer() instanceof Roof) {
 							final Roof roof = (Roof) rack.getContainer();
 							if (roof.getHeight() > 0) {
 								miTiltAngle.setEnabled(false);
 								miAzimuth.setEnabled(false);
 								miBaseHeight.setEnabled(false);
+								miPoleSpacing.setEnabled(false);
 							}
 						}
 					}

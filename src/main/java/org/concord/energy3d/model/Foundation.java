@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.awt.EventQueue;
+import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.nio.FloatBuffer;
@@ -2400,6 +2401,26 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	public boolean overlap(final Foundation another) {
+		final Area a = getPathArea();
+		a.intersect(another.getPathArea());
+		return !a.isEmpty();
+	}
+
+	private Area getPathArea() {
+		final Path2D.Double path = new Path2D.Double();
+		Vector3 p = points.get(0);
+		path.moveTo(p.getX(), p.getY());
+		p = points.get(1);
+		path.lineTo(p.getX(), p.getY());
+		p = points.get(3);
+		path.lineTo(p.getX(), p.getY());
+		p = points.get(2);
+		path.lineTo(p.getX(), p.getY());
+		path.closePath();
+		return new Area(path);
 	}
 
 }

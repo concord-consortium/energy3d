@@ -137,6 +137,7 @@ public class Scene implements Serializable {
 	private boolean hideGroundImage;
 	private boolean groundImageIsEarthView;
 	private boolean groundImageLightColored; // a parameter that user can choose to improve the contrast of edit points etc. (i.e., no white on white)
+	private transient List<List<Foundation>> foundationGroups;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -2703,6 +2704,31 @@ public class Scene implements Serializable {
 
 	public static boolean isSaving() {
 		return isSaving;
+	}
+
+	/** put overlapping foundations into a group */
+	public void groupFoundations() {
+		if (foundationGroups == null) {
+			foundationGroups = new ArrayList<List<Foundation>>();
+		} else {
+			foundationGroups.clear();
+		}
+		final List<Foundation> foundations = new ArrayList<Foundation>();
+		for (final HousePart p : parts) {
+			if (p instanceof Foundation) {
+				foundations.add((Foundation) p);
+			}
+		}
+		final int n = foundations.size();
+		if (n > 1) {
+			for (int i = 0; i < n - 1; i++) {
+				final Foundation fi = foundations.get(i);
+				for (int j = i + 1; j < n; j++) {
+					final Foundation fj = foundations.get(j);
+					System.out.println("*********" + fi.overlap(fj));
+				}
+			}
+		}
 	}
 
 }
