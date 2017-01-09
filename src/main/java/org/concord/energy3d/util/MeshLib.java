@@ -69,16 +69,18 @@ public class MeshLib {
 			final Vector3 p1 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 			final Vector3 p2 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 			final Vector3 p3 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-			if (p1.getZ() == 0 || p2.getZ() == 0 || p3.getZ() == 0)
+			if (p1.getZ() == 0 || p2.getZ() == 0 || p3.getZ() == 0) {
 				continue;
+			}
 			p2.subtract(p1, v1);
 			p3.subtract(p1, v2);
 			v1.cross(v2, normal);
 			normal.normalizeLocal();
 
 			final Vector3 firstNormal = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
-			if (Double.isNaN(firstNormal.length()))
+			if (Double.isNaN(firstNormal.length())) {
 				continue;
+			}
 
 			final GroupData group = new GroupData();
 			group.key.set(normal);
@@ -101,11 +103,13 @@ public class MeshLib {
 			int numOfShared = 0;
 			for (int k = 0; k < 3; k++) {
 				final ReadOnlyVector3 p = group.vertices.get(j + k);
-				if (p.equals(p1) || p.equals(p2) || p.equals(p3))
+				if (p.equals(p1) || p.equals(p2) || p.equals(p3)) {
 					numOfShared++;
+				}
 			}
-			if (numOfShared > 1)
+			if (numOfShared > 1) {
 				foundEdgeInCommon = true;
+			}
 		}
 		return foundEdgeInCommon;
 	}
@@ -118,7 +122,7 @@ public class MeshLib {
 				final GroupData group1 = groups.get(i);
 				for (int j = i + 1; j < groups.size(); j++) {
 					final GroupData group2 = groups.get(j);
-					if (group1.key.dot(group2.key) > 0.99) {
+					if (isSameDirection(group1.key, group2.key)) {
 						for (int w = 0; w < group2.vertices.size(); w += 3) {
 							final ReadOnlyVector3 p1 = group2.vertices.get(w);
 							final ReadOnlyVector3 p2 = group2.vertices.get(w + 1);
@@ -138,9 +142,14 @@ public class MeshLib {
 		}
 	}
 
+	public static boolean isSameDirection(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
+		return a.dot(b) > 0.99;
+	}
+
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
-		if (groups.size() != root.getNumberOfChildren())
+		if (groups.size() != root.getNumberOfChildren()) {
 			root.detachAllChildren();
+		}
 
 		int meshIndex = 0;
 		for (final GroupData group : groups) {
@@ -204,8 +213,9 @@ public class MeshLib {
 			CollisionTreeManager.getInstance().removeCollisionTree(meshWithHoles);
 
 			final Vector3 normal = new Vector3();
-			for (final ReadOnlyVector3 v : group.normals)
+			for (final ReadOnlyVector3 v : group.normals) {
 				normal.addLocal(v);
+			}
 			normal.normalizeLocal();
 			node.setUserData(normal);
 
@@ -284,10 +294,12 @@ public class MeshLib {
 					final double lineScaleU = Util.projectPointOnLineScale(p2, o2, ou2);
 					final double lineScaleV = Util.projectPointOnLineScale(p2, o2, ov2);
 
-					if (lineScaleU < minLineScaleU)
+					if (lineScaleU < minLineScaleU) {
 						minLineScaleU = lineScaleU;
-					if (lineScaleV < minLineScaleV)
+					}
+					if (lineScaleV < minLineScaleV) {
 						minLineScaleV = lineScaleV;
+					}
 				}
 				o2.addLocal(new Vector2(u.getX(), u.getY()).multiplyLocal(minLineScaleU));
 				o2.addLocal(new Vector2(v.getX(), v.getY()).multiplyLocal(minLineScaleV));
@@ -296,8 +308,9 @@ public class MeshLib {
 
 				roofPart.updateWorldBound(true);
 				for (final Window window : windows) {
-					if (holes.get(window) == null)
+					if (holes.get(window) == null) {
 						continue;
+					}
 					final List<PolygonPoint> holePolygon = new ArrayList<PolygonPoint>();
 					boolean outside = false;
 					for (final ReadOnlyVector3 holePoint : holes.get(window)) {
@@ -347,10 +360,11 @@ public class MeshLib {
 				}
 				final LineSegment3 line = new LineSegment3(p1, p2);
 				final Boolean pastVisit = visitMap.get(line);
-				if (pastVisit == null)
+				if (pastVisit == null) {
 					visitMap.put(line, true);
-				else
+				} else {
 					visitMap.put(line, false);
+				}
 			}
 		}
 
@@ -382,13 +396,15 @@ public class MeshLib {
 					break;
 				}
 			}
-			if (!foundSomething)
+			if (!foundSomething) {
 				break;
+			}
 		}
 
 		// remove last point if duplicated of first point
-		if (Util.isEqual(sortedOutlinePoints.get(0), sortedOutlinePoints.get(sortedOutlinePoints.size() - 1)))
+		if (Util.isEqual(sortedOutlinePoints.get(0), sortedOutlinePoints.get(sortedOutlinePoints.size() - 1))) {
 			sortedOutlinePoints.remove(sortedOutlinePoints.size() - 1);
+		}
 
 		// for (int i = 0; i < sortedOutlinePoints.size(); i++) {
 		// final ReadOnlyVector3 p1 = sortedOutlinePoints.get(i);
@@ -410,12 +426,16 @@ public class MeshLib {
 
 	public static void fillMeshWithPolygon(final Mesh mesh, final PolygonWithHoles polygon, final CoordinateTransform fromXY, final boolean generateNormals, final TPoint o, final TPoint u, final TPoint v, final boolean isWall) {
 		/* round all points */
-		for (final Point p : polygon.getPoints())
+		for (final Point p : polygon.getPoints()) {
 			p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
-		if (polygon.getHoles() != null)
-			for (final Polygon hole : polygon.getHoles())
-				for (final Point p : hole.getPoints())
+		}
+		if (polygon.getHoles() != null) {
+			for (final Polygon hole : polygon.getHoles()) {
+				for (final Point p : hole.getPoints()) {
 					p.set(Util.round(p.getX()), Util.round(p.getY()), Util.round(p.getZ()));
+				}
+			}
+		}
 
 		/* remove holes that collide with polygon or other holes */
 		if (polygon.getHoles() != null) {
@@ -423,28 +443,32 @@ public class MeshLib {
 			final Path2D polygonPath = Util.makePath2D(polygon.getPoints());
 			final Map<Polygon, Object> skipHoles = new HashMap<Polygon, Object>();
 			for (final Polygon hole : polygon.getHoles()) {
-				for (final Point p : hole.getPoints())
+				for (final Point p : hole.getPoints()) {
 					if (!polygonPath.contains(new Point2D.Double(p.getX(), p.getY()))) {
 						skipHoles.put(hole, null);
 						break;
 					}
+				}
 			}
 			// ensure holes don't collide with each other
 			for (int i = 0; i < polygon.getHoles().size(); i++) {
 				final Polygon hole1 = polygon.getHoles().get(i);
-				if (skipHoles.containsKey(hole1))
+				if (skipHoles.containsKey(hole1)) {
 					continue;
+				}
 				for (int j = i + 1; j < polygon.getHoles().size(); j++) {
 					final Polygon hole2 = polygon.getHoles().get(j);
-					if (skipHoles.containsKey(hole2))
+					if (skipHoles.containsKey(hole2)) {
 						continue;
+					}
 					boolean found = false;
-					for (final Point p : hole2.getPoints())
+					for (final Point p : hole2.getPoints()) {
 						if (Util.insidePolygon(p, hole1.getPoints())) {
 							skipHoles.put(hole2, null);
 							found = true;
 							break;
 						}
+					}
 					if (!found) {
 						final int n1 = hole1.getPoints().size();
 						for (int i1 = 0; i1 < n1; i1++) {
@@ -463,42 +487,51 @@ public class MeshLib {
 									break;
 								}
 							}
-							if (found)
+							if (found) {
 								break;
+							}
 						}
 					}
 				}
 			}
-			for (final Polygon hole : skipHoles.keySet())
+			for (final Polygon hole : skipHoles.keySet()) {
 				polygon.getHoles().remove(hole);
+			}
 		}
 
 		try {
 			Poly2Tri.triangulate(polygon);
-			if (fromXY == null)
+			if (fromXY == null) {
 				ArdorMeshMapper.updateTriangleMesh(mesh, polygon);
-			else
+			} else {
 				ArdorMeshMapper.updateTriangleMesh(mesh, polygon, fromXY);
+			}
 
 			if (generateNormals) {
-				if (fromXY == null)
+				if (fromXY == null) {
 					ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles());
-				else
+				} else {
 					ArdorMeshMapper.updateFaceNormals(mesh, polygon.getTriangles(), fromXY);
+				}
 			}
-			if (o != null)
+			if (o != null) {
 				ArdorMeshMapper.updateTextureCoordinates(mesh, polygon.getTriangles(), 1.0, o, u, v);
+			}
 			mesh.getMeshData().updateVertexCount();
 			mesh.updateModelBound();
 		} catch (final RuntimeException e) {
 			System.err.println("Points:");
-			for (final Point p : polygon.getPoints())
+			for (final Point p : polygon.getPoints()) {
 				System.err.println(p);
+			}
 			System.err.println("Holes:");
-			if (polygon.getHoles() != null)
-				for (final Polygon hole : polygon.getHoles())
-					for (final Point p : hole.getPoints())
+			if (polygon.getHoles() != null) {
+				for (final Polygon hole : polygon.getHoles()) {
+					for (final Point p : hole.getPoints()) {
 						System.err.println(p);
+					}
+				}
+			}
 			throw e;
 		}
 	}

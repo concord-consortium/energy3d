@@ -11,6 +11,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Annotation;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -73,28 +74,35 @@ public class Window extends HousePart implements Thermalizable {
 		label1 = Annotation.makeNewLabel(1);
 		super.init();
 
-		if (Util.isZero(uValue))
+		if (Util.isZero(uValue)) {
 			uValue = 2;
-		if (Util.isZero(solarHeatGainCoefficient))
+		}
+		if (Util.isZero(solarHeatGainCoefficient)) {
 			solarHeatGainCoefficient = 0.5;
-		else if (solarHeatGainCoefficient > 1) // backward compatibility, SHGC used to range from 0 to 100
+		} else if (solarHeatGainCoefficient > 1) {
 			solarHeatGainCoefficient *= 0.01;
-		if (Util.isZero(volumetricHeatCapacity))
+		}
+		if (Util.isZero(volumetricHeatCapacity)) {
 			volumetricHeatCapacity = 0.5;
-		if (Util.isZero(shutterLength))
+		}
+		if (Util.isZero(shutterLength)) {
 			shutterLength = 0.5;
-		if (glassColor == null)
+		}
+		if (glassColor == null) {
 			setColor(new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f));
-		if (shutterColor == null)
+		}
+		if (shutterColor == null) {
 			shutterColor = ColorRGBA.DARK_GRAY;
+		}
 
 		mesh = new Mesh("Window");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.setModelBound(new BoundingBox());
 		mesh.getSceneHints().setAllPickingHints(false);
-		if (glassColor == null)
+		if (glassColor == null) {
 			glassColor = new ColorRGBA(0.3f, 0.3f, 0.5f, 0.5f);
+		}
 		mesh.setDefaultColor(glassColor);
 		final BlendState blend = new BlendState();
 		blend.setBlendEnabled(true);
@@ -157,10 +165,11 @@ public class Window extends HousePart implements Thermalizable {
 	public void setPreviewPoint(final int x, final int y) {
 		int index = editPointIndex;
 		if (index == -1) {
-			if (isFirstPointInserted())
+			if (isFirstPointInserted()) {
 				index = 3;
-			else
+			} else {
 				index = 0;
+			}
 		}
 		final PickedHousePart pick = pickContainer(x, y, new Class[] { Wall.class, Roof.class });
 		Vector3 p = points.get(index);
@@ -172,22 +181,26 @@ public class Window extends HousePart implements Thermalizable {
 				toAbsolute(p);
 				p = enforceContraints(p);
 			}
-		} else
+		} else {
 			return;
+		}
 
 		final ArrayList<Vector3> orgPoints = new ArrayList<Vector3>(points.size());
-		for (final Vector3 v : points)
+		for (final Vector3 v : points) {
 			orgPoints.add(v.clone());
+		}
 
 		points.get(index).set(p);
 
-		if (container instanceof Roof)
+		if (container instanceof Roof) {
 			computeNormalAndKeepOnRoof();
+		}
 
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
-			if (container instanceof Roof)
+			if (container instanceof Roof) {
 				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
+			}
 		} else if (container instanceof Wall) {
 			if (index == 0 || index == 3) {
 				points.get(1).set(points.get(0).getX(), 0, points.get(3).getZ());
@@ -197,7 +210,7 @@ public class Window extends HousePart implements Thermalizable {
 				points.get(3).set(points.get(2).getX(), 0, points.get(1).getZ());
 			}
 		} else {
-			final boolean isFlat = Vector3.UNIT_Z.equals(normal);
+			final boolean isFlat = MeshLib.isSameDirection(Vector3.UNIT_Z, normal);
 			final ReadOnlyVector3 u = isFlat ? Vector3.UNIT_X : Vector3.UNIT_Z.cross(normal, null);
 			final ReadOnlyVector3 v = isFlat ? Vector3.UNIT_Y : normal.cross(u, null);
 			if (index == 0 || index == 3) {
@@ -213,12 +226,14 @@ public class Window extends HousePart implements Thermalizable {
 			}
 		}
 
-		if (isFirstPointInserted())
+		if (isFirstPointInserted()) {
 			if (container instanceof Wall && !((Wall) container).fits(this)) {
-				for (int i = 0; i < points.size(); i++)
+				for (int i = 0; i < points.size(); i++) {
 					points.get(i).set(orgPoints.get(i));
+				}
 				return;
 			}
+		}
 
 		if (container != null) {
 			draw();
@@ -229,8 +244,9 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	protected void drawMesh() {
-		if (points.size() < 4)
+		if (points.size() < 4) {
 			return;
+		}
 
 		mesh.setVisible(container instanceof Roof);
 
@@ -254,16 +270,18 @@ public class Window extends HousePart implements Thermalizable {
 			}
 		} else {
 			meshOffset = normal.multiply(-0.6, null);
-			if (drawBars)
+			if (drawBars) {
 				barsOffset = normal.multiply(-0.5, null);
-			else
+			} else {
 				barsOffset = null;
+			}
 		}
 
 		fillRectangleBuffer(mesh.getMeshData().getVertexBuffer(), meshOffset);
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
-		for (int i = 0; i < 6; i += 1)
+		for (int i = 0; i < 6; i += 1) {
 			BufferUtils.setInBuffer(normal.negate(null), normalBuffer, i);
+		}
 
 		fillRectangleBuffer(collisionMesh.getMeshData().getVertexBuffer(), normal.multiply(0.1, null));
 
@@ -272,9 +290,9 @@ public class Window extends HousePart implements Thermalizable {
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(collisionMesh);
 
-		if (!drawBars)
+		if (!drawBars) {
 			bars.getSceneHints().setCullHint(CullHint.Always);
-		else {
+		} else {
 			bars.getSceneHints().setCullHint(CullHint.Inherit);
 			final double divisionLength = 3.0 + style * 3.0;
 			FloatBuffer barsVertices = bars.getMeshData().getVertexBuffer();
@@ -344,8 +362,9 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	private void drawShutter(final Mesh shutter, final Mesh shutterOutline) {
-		if (!(container instanceof Wall))
+		if (!(container instanceof Wall)) {
 			return;
+		}
 		shutter.setDefaultColor(shutterColor);
 		final FloatBuffer shutterVertexBuffer = shutter.getMeshData().getVertexBuffer();
 		final FloatBuffer shutterNormalBuffer = shutter.getMeshData().getNormalBuffer();
@@ -374,8 +393,9 @@ public class Window extends HousePart implements Thermalizable {
 		shutterVertexBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 		shutterVertexBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
 		shutterVertexBuffer.put(p4.getXf()).put(p4.getYf()).put(p4.getZf());
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++) {
 			shutterNormalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 		shutterVertexBuffer.limit(shutterVertexBuffer.position());
 		shutterNormalBuffer.limit(shutterNormalBuffer.position());
 		shutter.getMeshData().updateVertexCount();
@@ -403,8 +423,9 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public void drawAnnotations() {
-		if (points.size() < 4)
+		if (points.size() < 4) {
 			return;
+		}
 		int annotCounter = 0;
 
 		Vector3 p0 = getAbsPoint(0);
@@ -436,8 +457,9 @@ public class Window extends HousePart implements Thermalizable {
 			final ReadOnlyVector3 v02 = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null);
 			final boolean reversedFace = v02.normalize(null).crossLocal(container.getNormal()).dot(Vector3.NEG_UNIT_Z) < 0.0;
 			double xy = cornerXY.length();
-			if (reversedFace)
+			if (reversedFace) {
 				xy = v02.length() - xy;
+			}
 			label1.setText("(" + Math.round(Scene.getInstance().getAnnotationScale() * 10 * xy) / 10.0 + ", " + Math.round(Scene.getInstance().getAnnotationScale() * 10.0 * (p0.getZ() - container.getAbsPoint(0).getZ())) / 10.0 + ")");
 			label1.setTranslation(p0);
 			label1.setRotation(new Matrix3().fromAngles(0, 0, -Util.angleBetween(v02.normalize(null).multiplyLocal(reversedFace ? -1 : 1), Vector3.UNIT_X, Vector3.UNIT_Z)));
@@ -477,16 +499,19 @@ public class Window extends HousePart implements Thermalizable {
 	@Override
 	public void setAnnotationsVisible(final boolean visible) {
 		super.setAnnotationsVisible(visible);
-		if (label1 != null)
+		if (label1 != null) {
 			label1.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+		}
 	}
 
 	private Vector3 enforceContraints(final ReadOnlyVector3 p) {
-		if (container == null)
+		if (container == null) {
 			return new Vector3(p);
+		}
 		double wallx = container.getAbsPoint(2).subtract(container.getAbsPoint(0), null).length();
-		if (Util.isZero(wallx))
+		if (Util.isZero(wallx)) {
 			wallx = MathUtils.ZERO_TOLERANCE;
+		}
 		final double margin = 0.2 / wallx;
 		double x = Math.max(p.getX(), margin);
 		x = Math.min(x, 1 - margin);
@@ -498,8 +523,9 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	public void hideBars() {
-		if (bars != null)
+		if (bars != null) {
 			bars.getSceneHints().setCullHint(CullHint.Always);
+		}
 	}
 
 	@Override
@@ -530,8 +556,9 @@ public class Window extends HousePart implements Thermalizable {
 		final Vector3 d_snap_rel = p_rel.subtract(houseMoveStartPoints.get(0), null);
 		points.get(0).set(p_rel);
 
-		for (int i = 1; i < 4; i++)
+		for (int i = 1; i < 4; i++) {
 			points.get(i).set(houseMoveStartPoints.get(i).add(d_snap_rel, null));
+		}
 
 		draw();
 		container.draw();
@@ -540,8 +567,9 @@ public class Window extends HousePart implements Thermalizable {
 	public void move(final Vector3 v) {
 		v.multiplyLocal(getGridSize());
 		final ArrayList<Vector3> movePoints = new ArrayList<Vector3>(points.size());
-		for (final Vector3 p : points)
+		for (final Vector3 p : points) {
 			movePoints.add(p.clone());
+		}
 		move(v, movePoints);
 	}
 
@@ -571,8 +599,9 @@ public class Window extends HousePart implements Thermalizable {
 			final double C = 100.0;
 			final double annotationScale = Scene.getInstance().getAnnotationScale();
 			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
-		} else
+		} else {
 			area = 0.0;
+		}
 	}
 
 	public void moveTo(final HousePart target) {
@@ -610,8 +639,9 @@ public class Window extends HousePart implements Thermalizable {
 			if (p != this && p.getContainer() == container) {
 				if (p instanceof Window) {
 					final double w2 = p.getAbsPoint(0).distance(p.getAbsPoint(2));
-					if (p.getAbsCenter().distance(center) < (w1 + w2) * 0.55)
+					if (p.getAbsCenter().distance(center) < (w1 + w2) * 0.55) {
 						return true;
+					}
 				}
 			}
 		}
@@ -628,8 +658,9 @@ public class Window extends HousePart implements Thermalizable {
 				final int n = c.getPoints().size();
 				for (int i = 0; i < n; i++) {
 					final double newX = points.get(i).getX() + shift;
-					if (newX > 1 - shift / 20 || newX < shift / 20) // reject it if out of range
+					if (newX > 1 - shift / 20 || newX < shift / 20) {
 						return null;
+					}
 				}
 				for (int i = 0; i < n; i++) {
 					c.points.get(i).setX(points.get(i).getX() + shift);
@@ -646,8 +677,9 @@ public class Window extends HousePart implements Thermalizable {
 				}
 				final Vector3 d = normal.cross(Vector3.UNIT_Z, null);
 				d.normalizeLocal();
-				if (Util.isZero(d.length()))
+				if (Util.isZero(d.length())) {
 					d.set(1, 0, 0);
+				}
 				final Vector3 d0 = d.clone();
 				final double shift = getAbsPoint(0).distance(getAbsPoint(2)) + 0.01; // give it a small gap
 				d.multiplyLocal(shift);
@@ -685,8 +717,9 @@ public class Window extends HousePart implements Thermalizable {
 	@Override
 	public void setColor(final ReadOnlyColorRGBA color) {
 		glassColor = color;
-		if (mesh != null)
+		if (mesh != null) {
 			mesh.setDefaultColor(glassColor);
+		}
 	}
 
 	@Override
@@ -744,39 +777,47 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isDrawable() {
-		if (container == null)
+		if (container == null) {
 			return true;
-		if (!super.isDrawable())
+		}
+		if (!super.isDrawable()) {
 			return false;
-		if (!container.fits(this))
+		}
+		if (!container.fits(this)) {
 			return false;
+		}
 
 		computeNormalAndKeepOnRoof(); // in case roof changes and has different roof part #s
 		final boolean isRoof = container instanceof Roof;
 		final Rectangle2D thisWindow = makeRectangle(this, isRoof);
-		for (final HousePart part : container.getChildren())
+		for (final HousePart part : container.getChildren()) {
 			if (part != this && part instanceof Window && (!isRoof || part.containerRoofIndex == this.containerRoofIndex)) {
 				final Rectangle2D otherWindow = makeRectangle((Window) part, isRoof);
-				if (thisWindow.intersects(otherWindow))
+				if (thisWindow.intersects(otherWindow)) {
 					return false;
+				}
 			}
+		}
 		return true;
 	}
 
 	private Rectangle2D makeRectangle(final Window window, final boolean isRoof) {
 		final ReadOnlyTransform transform;
-		if (isRoof)
+		if (isRoof) {
 			transform = ((Roof) container).getRoofPartsRoot().getChild(window.containerRoofIndex).getWorldTransform();
-		else
+		} else {
 			transform = null;
+		}
 		Rectangle2D thisWindow = null;
 		for (int i = 0; i < window.points.size(); i++) {
 			final Vector3 p = window.points.get(i);
-			if (isRoof)
+			if (isRoof) {
 				transform.applyInverse(p);
+			}
 			final double y = isRoof ? p.getY() : p.getZ();
-			if (thisWindow == null)
+			if (thisWindow == null) {
 				thisWindow = new Rectangle2D.Double(p.getX(), y, 0, 0);
+			}
 			thisWindow.add(p.getX(), y);
 		}
 		return thisWindow;
@@ -784,8 +825,9 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public boolean isValid() {
-		if (!super.isValid())
+		if (!super.isValid()) {
 			return false;
+		}
 		return super.isDrawable();
 	}
 

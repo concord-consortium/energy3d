@@ -229,25 +229,22 @@ public class Util {
 		return closest;
 	}
 
-	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 p21, final ReadOnlyVector3 p3, final ReadOnlyVector3 p43) {
+	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final ReadOnlyVector3 p2, final ReadOnlyVector3 v2) {
 		final double EPS = 0.0001;
-		Vector3 p13;
+		Vector3 p12;
 		double d1343, d4321, d1321, d4343, d2121;
 		double numer, denom;
 
-		p13 = p1.subtract(p3, null);
-		if (Math.abs(p43.getX()) < EPS && Math.abs(p43.getY()) < EPS && Math.abs(p43.getZ()) < EPS) {
-			return null;
-		}
-		if (Math.abs(p21.length()) < EPS) {
+		p12 = p1.subtract(p2, null);
+		if (Math.abs(v1.length()) < EPS || Math.abs(v2.length()) < EPS) {
 			return null;
 		}
 
-		d1343 = p13.getX() * p43.getX() + p13.getY() * p43.getY() + p13.getZ() * p43.getZ();
-		d4321 = p43.getX() * p21.getX() + p43.getY() * p21.getY() + p43.getZ() * p21.getZ();
-		d1321 = p13.getX() * p21.getX() + p13.getY() * p21.getY() + p13.getZ() * p21.getZ();
-		d4343 = p43.getX() * p43.getX() + p43.getY() * p43.getY() + p43.getZ() * p43.getZ();
-		d2121 = p21.getX() * p21.getX() + p21.getY() * p21.getY() + p21.getZ() * p21.getZ();
+		d1343 = p12.getX() * v2.getX() + p12.getY() * v2.getY() + p12.getZ() * v2.getZ();
+		d4321 = v2.getX() * v1.getX() + v2.getY() * v1.getY() + v2.getZ() * v1.getZ();
+		d1321 = p12.getX() * v1.getX() + p12.getY() * v1.getY() + p12.getZ() * v1.getZ();
+		d4343 = v2.getX() * v2.getX() + v2.getY() * v2.getY() + v2.getZ() * v2.getZ();
+		d2121 = v1.getX() * v1.getX() + v1.getY() * v1.getY() + v1.getZ() * v1.getZ();
 
 		denom = d2121 * d4343 - d4321 * d4321;
 		if (Math.abs(denom) < EPS) {
@@ -256,7 +253,7 @@ public class Util {
 		numer = d1343 * d4321 - d1321 * d4343;
 
 		final double mua = numer / denom;
-		final Vector3 pa = new Vector3(p1.getX() + mua * p21.getX(), p1.getY() + mua * p21.getY(), p1.getZ() + mua * p21.getZ());
+		final Vector3 pa = new Vector3(p1.getX() + mua * v1.getX(), p1.getY() + mua * v1.getY(), p1.getZ() + mua * v1.getZ());
 
 		return pa;
 	}
