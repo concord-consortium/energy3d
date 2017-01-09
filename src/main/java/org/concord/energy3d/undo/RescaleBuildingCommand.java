@@ -1,21 +1,24 @@
 package org.concord.energy3d.undo;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 public class RescaleBuildingCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double oldXLength, newXLength;
-	private double oldYLength, newYLength;
-	private double oldZLength, newZLength;
-	private Foundation foundation;
+	private final double oldXLength, newXLength;
+	private final double oldYLength, newYLength;
+	private final double oldZLength, newZLength;
+	private final Foundation foundation;
 
-	public RescaleBuildingCommand(Foundation foundation, double oldXLength, double newXLength, double oldYLength, double newYLength, double oldZLength, double newZLength) {
+	public RescaleBuildingCommand(final Foundation foundation, final double oldXLength, final double newXLength, final double oldYLength, final double newYLength, final double oldZLength, final double newZLength) {
 		this.foundation = foundation;
 		this.oldXLength = oldXLength;
 		this.newXLength = newXLength;
@@ -56,18 +59,36 @@ public class RescaleBuildingCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		foundation.rescale(oldXLength / newXLength, oldYLength / newYLength, oldZLength / newZLength);
-		foundation.draw();
-		foundation.drawChildren();
+		if (foundation.isGroupMaster()) {
+			final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
+			for (final Foundation f : g) {
+				f.rescale(oldXLength / newXLength, oldYLength / newYLength, oldZLength / newZLength);
+				f.draw();
+				f.drawChildren();
+			}
+		} else {
+			foundation.rescale(oldXLength / newXLength, oldYLength / newYLength, oldZLength / newZLength);
+			foundation.draw();
+			foundation.drawChildren();
+		}
 		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		foundation.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);
-		foundation.draw();
-		foundation.drawChildren();
+		if (foundation.isGroupMaster()) {
+			final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
+			for (final Foundation f : g) {
+				f.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);
+				f.draw();
+				f.drawChildren();
+			}
+		} else {
+			foundation.rescale(newXLength / oldXLength, newYLength / oldYLength, newZLength / oldZLength);
+			foundation.draw();
+			foundation.drawChildren();
+		}
 		SceneManager.getInstance().refresh();
 	}
 

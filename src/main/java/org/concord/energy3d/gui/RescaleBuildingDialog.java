@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.swing.JButton;
@@ -46,7 +47,7 @@ class RescaleBuildingDialog extends JDialog {
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
-		ActionListener okListener = new ActionListener() {
+		final ActionListener okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				double oldX = 1;
@@ -54,7 +55,7 @@ class RescaleBuildingDialog extends JDialog {
 				if (t != null && !t.trim().equals("")) {
 					try {
 						oldX = Double.parseDouble(t);
-					} catch (NumberFormatException ex) {
+					} catch (final NumberFormatException ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current length in X-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -69,7 +70,7 @@ class RescaleBuildingDialog extends JDialog {
 				if (t != null && !t.trim().equals("")) {
 					try {
 						newX = Double.parseDouble(t);
-					} catch (NumberFormatException ex) {
+					} catch (final NumberFormatException ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new length in X-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -84,7 +85,7 @@ class RescaleBuildingDialog extends JDialog {
 				if (t != null && !t.trim().equals("")) {
 					try {
 						oldY = Double.parseDouble(t);
-					} catch (NumberFormatException ex) {
+					} catch (final NumberFormatException ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current length in Y-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -99,7 +100,7 @@ class RescaleBuildingDialog extends JDialog {
 				if (t != null && !t.trim().equals("")) {
 					try {
 						newY = Double.parseDouble(t);
-					} catch (NumberFormatException ex) {
+					} catch (final NumberFormatException ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new length in Y-direction: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -114,7 +115,7 @@ class RescaleBuildingDialog extends JDialog {
 				if (t != null && !t.trim().equals("")) {
 					try {
 						oldZ = Double.parseDouble(t);
-					} catch (NumberFormatException ex) {
+					} catch (final NumberFormatException ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for current height: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -129,7 +130,7 @@ class RescaleBuildingDialog extends JDialog {
 				if (t != null && !t.trim().equals("")) {
 					try {
 						newZ = Double.parseDouble(t);
-					} catch (NumberFormatException ex) {
+					} catch (final NumberFormatException ex) {
 						ex.printStackTrace();
 						JOptionPane.showMessageDialog(RescaleBuildingDialog.this, "Invalid input for new height: " + ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -145,9 +146,18 @@ class RescaleBuildingDialog extends JDialog {
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() {
-						foundation.rescale(scaleX, scaleY, scaleZ);
-						foundation.draw();
-						foundation.drawChildren();
+						if (foundation.isGroupMaster()) {
+							final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
+							for (final Foundation f : g) {
+								f.rescale(scaleX, scaleY, scaleZ);
+								f.draw();
+								f.drawChildren();
+							}
+						} else {
+							foundation.rescale(scaleX, scaleY, scaleZ);
+							foundation.draw();
+							foundation.drawChildren();
+						}
 						return null;
 					}
 				});

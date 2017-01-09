@@ -1548,11 +1548,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
 								final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(objectMoveStartPoint.multiply(1, 1, 0, null));
 								if (foundation.isGroupMaster()) {
-									// foundation.move(d, objectMovePoints);
 									final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
 									for (final Foundation f : g) {
 										final ArrayList<Vector3> movePoints = objectGroupMovePoints.get(f);
-										f.move(d, movePoints);
+										if (movePoints != null) { // just in case this foundation's move point hasn't been included yet
+											f.move(d, movePoints);
+										}
 									}
 								} else {
 									foundation.move(d, objectMovePoints);
