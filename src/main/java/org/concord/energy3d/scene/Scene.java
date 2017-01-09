@@ -52,6 +52,7 @@ import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
 import org.concord.energy3d.undo.SaveCommand;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Pair;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 
@@ -2721,14 +2722,88 @@ public class Scene implements Serializable {
 		}
 		final int n = foundations.size();
 		if (n > 1) {
+			int count = 0;
+			final List<Pair> pairs = new ArrayList<Pair>();
 			for (int i = 0; i < n - 1; i++) {
 				final Foundation fi = foundations.get(i);
 				for (int j = i + 1; j < n; j++) {
 					final Foundation fj = foundations.get(j);
-					System.out.println("*********" + fi.overlap(fj));
+					if (fi.overlap(fj)) {
+						final Pair p = new Pair(i, j);
+						if (!pairs.contains(p)) {
+							pairs.add(p);
+						}
+					}
 				}
 			}
+
+			int m = pairs.size();
+			while (m > 0) {
+				Pair p = pairs.get(0);
+				final List<Integer> list = new ArrayList<Integer>();
+				list.add(p.i());
+				list.add(p.j());
+				pairs.remove(p);
+				m = pairs.size();
+				if (m > 0) {
+					final List<Pair> toRemove = new ArrayList<Pair>();
+					for (int x = 0; x < m; x++) {
+						p = pairs.get(x);
+						final int i = p.i();
+						final int j = p.j();
+						if (list.contains(i) && list.contains(j)) {
+							if (!toRemove.contains(p)) {
+								toRemove.add(p);
+							}
+						} else if (!list.contains(i) && list.contains(j)) {
+							list.add(i);
+							if (!toRemove.contains(p)) {
+								toRemove.add(p);
+							}
+						} else if (!list.contains(j) && list.contains(i)) {
+							list.add(j);
+							if (!toRemove.contains(p)) {
+								toRemove.add(p);
+							}
+						}
+					}
+					if (!toRemove.isEmpty()) {
+						pairs.removeAll(toRemove);
+					}
+				}
+
+				final List<Foundation> group = new ArrayList<Foundation>();
+				for (final Integer a : list) {
+					group.add(foundations.get(a));
+				}
+				foundationGroups.add(group);
+				count += group.size();
+
+				m = pairs.size();
+
+			}
+
+			if (count < foundations.size()) {
+				for (final Foundation f : foundations) {
+					boolean linked = false;
+					for (final List<Foundation> g : foundationGroups) {
+						if (g.contains(f)) {
+							linked = true;
+							break;
+						}
+					}
+					if (!linked) {
+						final List<Foundation> g = new ArrayList<Foundation>();
+						g.add(f);
+						foundationGroups.add(g);
+					}
+				}
+			}
+			// System.out.println("###" + foundationGroups.size() + "," + (foundations.size() - count));
+		} else {
+			foundationGroups.add(foundations);
 		}
+
 	}
 
 }
