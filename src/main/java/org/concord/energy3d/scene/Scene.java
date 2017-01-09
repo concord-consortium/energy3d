@@ -693,41 +693,7 @@ public class Scene implements Serializable {
 			@Override
 			public Object call() throws Exception {
 				try {
-					if (logger) {
-						instance.storeGroundImageData();
-					}
-					if (notifyUndoManager) {
-						instance.cleanup();
-					}
-					// save camera to file
-					if (SceneManager.getInstance().getViewMode() == ViewMode.NORMAL) {
-						saveCameraLocation();
-					}
-
-					instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
-					instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
-					instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
-					instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
-					instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
-					instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
-					instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
-
-					if (setAsCurrentFile) {
-						Scene.url = url;
-					}
-					System.out.print("Saving " + url + "...");
-					final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
-					out.writeObject(instance);
-					out.close();
-
-					if (notifyUndoManager) {
-						SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
-					}
-					if (logger) {
-						instance.restoreGroundImageData();
-					}
-					System.out.println("done");
+					realSave(url, setAsCurrentFile, notifyUndoManager, logger);
 				} catch (final Throwable e) {
 					Util.reportError(e);
 				} finally {
@@ -736,6 +702,55 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
+	}
+
+	public static void saveOutsideTaskManager(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) {
+		isSaving = true;
+		try {
+			realSave(url, setAsCurrentFile, notifyUndoManager, logger);
+		} catch (final Throwable e) {
+			e.printStackTrace();
+		} finally {
+			isSaving = false;
+		}
+	}
+
+	private static void realSave(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) throws Exception {
+		if (logger) {
+			instance.storeGroundImageData();
+		}
+		if (notifyUndoManager) {
+			instance.cleanup();
+		}
+		// save camera to file
+		if (SceneManager.getInstance().getViewMode() == ViewMode.NORMAL) {
+			saveCameraLocation();
+		}
+
+		instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
+		instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
+		instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
+		instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
+		instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		instance.isHeliodonVisible = Heliodon.getInstance().isVisible();
+		instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
+		instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
+
+		if (setAsCurrentFile) {
+			Scene.url = url;
+		}
+		System.out.print("Saving " + url + "...");
+		final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(url.toURI().getPath()));
+		out.writeObject(instance);
+		out.close();
+
+		if (notifyUndoManager) {
+			SceneManager.getInstance().getUndoManager().addEdit(new SaveCommand());
+		}
+		if (logger) {
+			instance.restoreGroundImageData();
+		}
+		System.out.println("done");
 	}
 
 	public static void saveCameraLocation() {
@@ -1115,7 +1130,7 @@ public class Scene implements Serializable {
 		return url;
 	}
 
-	public static boolean isTemplate() {
+	public static boolean isInternalFile() {
 		if (Config.isEclipse()) {
 			return url != null && url.toString().indexOf("/energy3d/target/classes") != -1;
 		}

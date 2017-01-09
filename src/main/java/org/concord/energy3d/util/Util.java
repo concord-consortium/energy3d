@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
@@ -44,6 +45,7 @@ import javax.swing.text.JTextComponent;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.geometry.primitives.Point;
@@ -67,9 +69,10 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 
 public class Util {
 
-	/**
-	 * platform-independent check for Windows' equivalent of right click of mouse button. This can be used as an alternative as MouseEvent.isPopupTrigger(), which requires checking within both mousePressed() and mouseReleased() methods.
-	 */
+	// This is called by DesignReplay to suppress the error dialog when we replay a design process
+	public static boolean suppressReportError = false;
+
+	/** platform-independent check for Windows' equivalent of right click of mouse button. This can be used as an alternative as MouseEvent.isPopupTrigger(), which requires checking within both mousePressed() and mouseReleased() methods. */
 	public static boolean isRightClick(final MouseEvent e) {
 		if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
 			return true;
@@ -104,7 +107,7 @@ public class Util {
 		return 2 * bounds.asType(Type.Sphere).getRadius();
 	}
 
-	/* require that a and b are normalized */
+	/** require that a and b are normalized */
 	public static double angleBetween(final ReadOnlyVector3 a, final ReadOnlyVector3 b, final ReadOnlyVector3 n) {
 		return Math.atan2(b.dot(n.cross(a, null)), b.dot(a));
 	}
@@ -164,37 +167,7 @@ public class Util {
 	}
 
 	public static boolean insidePolygon(final Point p, final List<? extends Point> polygon) {
-		final Path2D path = makePath2D(polygon);
-
-		return path.contains(new Point2D.Double(p.getX(), p.getY()));
-
-		// int counter = 0;
-		// double xinters;
-		// Point p1, p2;
-		//
-		// final int n = polygon.size();
-		// p1 = polygon.get(0);
-		// for (int i = 1; i <= n; i++) {
-		// p2 = polygon.get(i % n);
-		// if (p.getY() > Math.min(p1.getY(), p2.getY())) {
-		// if (p.getY() <= Math.max(p1.getY(), p2.getY())) {
-		// if (p.getX() <= Math.max(p1.getX(), p2.getX())) {
-		// if (p1.getY() != p2.getY()) {
-		// xinters = (p.getY() - p1.getY()) * (p2.getX() - p1.getX()) /
-		// (p2.getY() - p1.getY()) + p1.getX();
-		// if (p1.getX() == p2.getX() || p.getX() <= xinters)
-		// counter++;
-		// }
-		// }
-		// }
-		// }
-		// p1 = p2;
-		// }
-		//
-		// if (counter % 2 == 0)
-		// return false;
-		// else
-		// return true;
+		return makePath2D(polygon).contains(new Point2D.Double(p.getX(), p.getY()));
 	}
 
 	public static Path2D makePath2D(final List<? extends Point> polygon) {
@@ -212,9 +185,7 @@ public class Util {
 		return Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0);
 	}
 
-	/*
-	 * A function to check whether point P(x, y) lies inside the triangle formed by A(x1, y1), B(x2, y2) and C(x3, y3)
-	 */
+	/** A function to check whether point P(x, y) lies inside the triangle formed by A(x1, y1), B(x2, y2) and C(x3, y3) */
 	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3) {
 		final double A = area(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
 		final double A1 = area(p.getX(), p.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
@@ -278,13 +249,9 @@ public class Util {
 		return t;
 	}
 
-	/*
-	 * This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis
-	 */
+	/** This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis */
 	public static Vector3 projectPointOnLine(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final boolean limitToLineSegment) {
-		// return projectPointOnLine(new Vector2(point.getX(), point.getY()),
-		// new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()),
-		// false);
+		// return projectPointOnLine(new Vector2(point.getX(), point.getY()), new Vector2(p1.getX(), p1.getY()), new Vector2(p2.getX(), p2.getY()), false);
 		final double t = projectPointOnLineScale(point, p1, p2);
 		if (limitToLineSegment && t < 0.0) {
 			return p1.clone();
@@ -295,9 +262,7 @@ public class Util {
 		}
 	}
 
-	/*
-	 * This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis
-	 */
+	/** This is automatically evaluated as either 2D projection on xy plane or 1D projection on z axis */
 	public static double projectPointOnLineScale(final ReadOnlyVector3 point, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2) {
 		final boolean isHorizontal = Util.isZero(p2.subtract(p1, null).normalizeLocal().getZ());
 		if (isHorizontal) {
@@ -394,9 +359,6 @@ public class Util {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
 	}
 
-	// This is called by DesignReplay to suppress the error dialog when we replay a design process
-	public static boolean suppressReportError = false;
-
 	public static void reportError(final Throwable e) {
 		reportError(e, "");
 	}
@@ -446,9 +408,16 @@ public class Util {
 		multipart.addFormField("os_version", System.getProperty("os.version"));
 		multipart.addFormField("energy3d_version", MainApplication.VERSION);
 		multipart.addFormField("error_message", msg);
-		if (Scene.getURL() != null && !Scene.isTemplate()) {
-			multipart.addFormField("model_name", getFileName(Scene.getURL().getFile()));
-			multipart.addFilePart("model", new File(Scene.getURL().toURI()));
+		if (!Scene.isInternalFile()) {
+			final URL url = Scene.getURL();
+			if (url != null) {
+				multipart.addFilePart("model_lastsaved", new File(url.toURI()));
+			}
+			final File file = SnapshotLogger.getInstance().getLatestSnapshot();
+			if (file != null) {
+				multipart.addFilePart("model_snapshot", file);
+			}
+			multipart.addFilePart("model_current", SnapshotLogger.getInstance().saveSnapshot("error"));
 		}
 		return multipart.finish();
 	}

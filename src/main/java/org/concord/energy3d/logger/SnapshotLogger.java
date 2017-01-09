@@ -1,7 +1,9 @@
 package org.concord.energy3d.logger;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -56,7 +58,7 @@ public class SnapshotLogger {
 					}
 					if (noteEdited || sceneEdited) {
 						try {
-							saveSnapshot(LoggerUtil.getLogFolder());
+							saveSnapshot();
 						} catch (final Exception e) {
 							e.printStackTrace();
 							Util.reportError(e);
@@ -71,10 +73,35 @@ public class SnapshotLogger {
 		t.start();
 	}
 
-	private static void saveSnapshot(final File dir) throws Exception {
+	private void saveSnapshot() throws Exception {
 		final Date date = Calendar.getInstance().getTime();
-		final String filename = dir + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss").format(date) + ".ng3";
+		final String filename = LoggerUtil.getLogFolder() + File.separator + new SimpleDateFormat("yyyy-MM-dd  HH-mm-ss").format(date) + ".ng3";
 		Scene.save(new File(filename).toURI().toURL(), false, false, true);
+	}
+
+	public File saveSnapshot(final String name) throws Exception {
+		final File file = File.createTempFile(name, ".ng3");
+		Scene.saveOutsideTaskManager(file.toURI().toURL(), false, false, true);
+		return file;
+	}
+
+	public File getLatestSnapshot() {
+		final File[] files = getLogFolder().listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(final File dir, final String name) {
+				return name.endsWith(".ng3");
+			}
+		});
+		final int n = files.length;
+		if (n > 0) {
+			Arrays.sort(files);
+			for (int i = n - 1; i >= 0; i--) {
+				if (files[i].length() > 0) {
+					return files[i];
+				}
+			}
+		}
+		return null;
 	}
 
 }

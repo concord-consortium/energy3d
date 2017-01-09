@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -490,7 +489,7 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 
 					enableMenuItems(true);
-					saveMenuItem.setEnabled(!Scene.isTemplate()); // cannot overwrite a template
+					saveMenuItem.setEnabled(!Scene.isInternalFile()); // cannot overwrite a template
 
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
@@ -726,40 +725,27 @@ public class MainFrame extends JFrame {
 			recoveryMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final File[] files = SnapshotLogger.getLogFolder().listFiles(new FilenameFilter() {
-						@Override
-						public boolean accept(final File dir, final String name) {
-							return name.endsWith(".ng3");
-						}
-					});
-					final int n = files.length;
-					if (n > 0) {
-						Arrays.sort(files);
-						for (int i = n - 1; i >= 0; i--) {
-							if (files[i].length() > 0) {
-								final File f = files[i];
-								SceneManager.getTaskManager().update(new Callable<Object>() {
-									@Override
-									public Object call() {
-										try {
-											Scene.open(f.toURI().toURL());
-											EventQueue.invokeLater(new Runnable() {
-												@Override
-												public void run() {
-													updateTitleBar();
-													JOptionPane.showMessageDialog(MainFrame.instance, "<html>Please overwrite the file you wish to restore with the recovered file.</html>", "File Recovery", JOptionPane.INFORMATION_MESSAGE);
-													saveasMenuItem.doClick();
-												}
-											});
-										} catch (final Throwable err) {
-											Util.reportError(err, "Recovery error");
+					final File f = SnapshotLogger.getInstance().getLatestSnapshot();
+					if (f != null) {
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() {
+								try {
+									Scene.open(f.toURI().toURL());
+									EventQueue.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											updateTitleBar();
+											JOptionPane.showMessageDialog(MainFrame.instance, "<html>Please overwrite the file you wish to restore with the recovered file.</html>", "File Recovery", JOptionPane.INFORMATION_MESSAGE);
+											saveasMenuItem.doClick();
 										}
-										return null;
-									}
-								});
-								break;
+									});
+								} catch (final Throwable err) {
+									Util.reportError(err, "Recovery error");
+								}
+								return null;
 							}
-						}
+						});
 					}
 				}
 			});
@@ -900,7 +886,7 @@ public class MainFrame extends JFrame {
 		if (Scene.getURL() == null) {
 			setTitle("Energy3D V" + MainApplication.VERSION + star);
 		} else {
-			if (Scene.isTemplate()) {
+			if (Scene.isInternalFile()) {
 				final String s = Scene.getURL().toString();
 				setTitle("Energy3D V" + MainApplication.VERSION + " - @" + s.substring(s.lastIndexOf("/") + 1).replaceAll("%20", " ") + star);
 			} else {
@@ -3133,7 +3119,7 @@ public class MainFrame extends JFrame {
 		try {
 			final URL url = Scene.getURL();
 			if (url != null) {
-				if (Scene.isTemplate()) {
+				if (Scene.isInternalFile()) {
 					saveFile();
 				} else {
 					Scene.save(url, false);
