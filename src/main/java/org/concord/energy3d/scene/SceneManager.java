@@ -1060,9 +1060,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Scene.getInstance().redrawAll();
 		} else if (selectedPart instanceof Foundation) {
 			final Foundation f = (Foundation) selectedPart;
-			f.move(v, selectedPart.getGridSize());
-			f.draw();
-			f.drawChildren();
+			if (f.isGroupMaster()) {
+				final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
+				for (final Foundation x : g) {
+					x.move(v, selectedPart.getGridSize());
+				}
+			} else {
+				f.move(v, selectedPart.getGridSize());
+			}
 		} else if (selectedPart instanceof Window) {
 			final Window w = (Window) selectedPart;
 			w.move(v);
@@ -1540,7 +1545,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								final Vector3 pickPoint = pick.getPoint().clone();
 								// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
 								final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-								foundation.move(d, houseMovePoints);
+								if (foundation.isGroupMaster()) {
+									foundation.move(d, houseMovePoints);
+									// final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
+									// for (final Foundation f : g) {
+									// f.move(d, houseMovePoints);
+									// }
+								} else {
+									foundation.move(d, houseMovePoints);
+								}
 							}
 						}
 					} else if (selectedPart instanceof Tree) {

@@ -2707,10 +2707,10 @@ public class Scene implements Serializable {
 		return isSaving;
 	}
 
-	public List<Foundation> getFoundationGroup(final Foundation owner) {
+	public List<Foundation> getFoundationGroup(final Foundation master) {
 		groupFoundations();
 		for (final List<Foundation> g : foundationGroups) {
-			if (g.contains(owner)) {
+			if (g.contains(master)) {
 				return g;
 			}
 		}

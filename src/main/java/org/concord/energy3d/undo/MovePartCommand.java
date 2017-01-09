@@ -1,5 +1,6 @@
 package org.concord.energy3d.undo;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -63,7 +64,15 @@ public class MovePartCommand extends AbstractUndoableEdit {
 						}
 					}
 				} else if (part instanceof Foundation) {
-					((Foundation) part).move(v, part.getGridSize());
+					final Foundation f = (Foundation) part;
+					if (f.isGroupMaster()) {
+						final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
+						for (final Foundation x : g) {
+							x.move(v, part.getGridSize());
+						}
+					} else {
+						f.move(v, part.getGridSize());
+					}
 				} else if (part instanceof Window) {
 					final Window w = (Window) part;
 					w.move(v);

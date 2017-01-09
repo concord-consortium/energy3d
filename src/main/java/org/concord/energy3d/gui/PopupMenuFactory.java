@@ -1788,19 +1788,6 @@ public class PopupMenuFactory {
 
 		if (popupMenuForFoundation == null) {
 
-			final JMenuItem miGroupMaster = new JCheckBoxMenuItem("Group Master");
-			miGroupMaster.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation) {
-						SceneManager.getInstance().getUndoManager().addEdit(new SetGroupMasterCommand((Foundation) selectedPart));
-						((Foundation) selectedPart).setGroupMaster(miGroupMaster.isSelected());
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
-
 			final JMenuItem miPaste = new JMenuItem("Paste");
 			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			miPaste.addActionListener(new ActionListener() {
@@ -2628,6 +2615,19 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miGroupMaster = new JCheckBoxMenuItem("Group Master");
+			miGroupMaster.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						SceneManager.getInstance().getUndoManager().addEdit(new SetGroupMasterCommand((Foundation) selectedPart));
+						((Foundation) selectedPart).setGroupMaster(miGroupMaster.isSelected());
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+
 			final JCheckBoxMenuItem miBorderLine = new JCheckBoxMenuItem("Border Line");
 			miBorderLine.addItemListener(new ItemListener() {
 				@Override
@@ -2796,7 +2796,6 @@ public class PopupMenuFactory {
 
 			popupMenuForFoundation.add(miPaste);
 			popupMenuForFoundation.add(miCopy);
-			popupMenuForFoundation.add(miGroupMaster);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miHeight);
 			popupMenuForFoundation.add(miRescale);
@@ -2804,6 +2803,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.add(layoutMenu);
 			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miGroupMaster);
 			popupMenuForFoundation.add(miBorderLine);
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
