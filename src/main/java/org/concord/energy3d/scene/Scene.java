@@ -2707,8 +2707,18 @@ public class Scene implements Serializable {
 		return isSaving;
 	}
 
-	/** put overlapping foundations into a group */
-	public void groupFoundations() {
+	public List<Foundation> getFoundationGroup(final Foundation owner) {
+		groupFoundations();
+		for (final List<Foundation> g : foundationGroups) {
+			if (g.contains(owner)) {
+				return g;
+			}
+		}
+		return null;
+	}
+
+	/* put overlapping foundations into separate groups */
+	private void groupFoundations() {
 		if (foundationGroups == null) {
 			foundationGroups = new ArrayList<List<Foundation>>();
 		} else {

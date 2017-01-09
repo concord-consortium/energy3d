@@ -1049,7 +1049,6 @@ public class MainPanel extends JPanel {
 
 				@Override
 				public void mousePressed(final MouseEvent e) {
-					Scene.getInstance().groupFoundations();
 					energyViewButton.setSelected(false);
 					mousePressed = true;
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

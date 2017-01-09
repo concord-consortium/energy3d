@@ -2095,12 +2095,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
 	public void rotateBuilding(final double angle, final boolean redraw) {
-		System.out.println("rotateBuilding()");
 		if (selectedPart != null) {
+			Foundation f;
 			if (selectedPart instanceof Foundation) {
-				((Foundation) selectedPart).rotate(angle, null);
+				f = (Foundation) selectedPart;
 			} else {
-				selectedPart.getTopContainer().rotate(angle, null);
+				f = selectedPart.getTopContainer();
+			}
+			if (f.isGroupMaster()) {
+				final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
+				final Vector3 center = f.toRelative(f.getCenter().clone());
+				for (final Foundation x : g) {
+					x.rotate(angle, center);
+				}
+			} else {
+				f.rotate(angle, null);
 			}
 			if (redraw) {
 				Scene.getInstance().redrawAll();
@@ -2110,7 +2119,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
 	public void rotateAllBuildings(final double angle) {
-		System.out.println("rotateBuildings()");
 		final Vector3 origin = new Vector3();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {

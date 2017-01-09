@@ -80,8 +80,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient double heatingToday;
 	private transient double coolingToday;
 	private transient double totalEnergyToday;
-	private transient boolean resizeHouseMode = false;
-	private transient boolean useOrgPoints = false;
+	private transient boolean resizeHouseMode;
+	private transient boolean useOrgPoints;
 	private Thermostat thermostat = new Thermostat();
 	private UtilityBill utilityBill;
 	private FoundationPolygon foundationPolygon;
@@ -89,7 +89,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.568; // default is R10 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private double childGridSize = 2.5;
-	private boolean lockEdit = false;
+	private boolean lockEdit;
+	private boolean groupMaster;
 
 	static {
 		format.setGroupingUsed(true);
@@ -1072,7 +1073,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	@Override
-	protected ReadOnlyVector3 getCenter() {
+	public ReadOnlyVector3 getCenter() {
 		return super.getCenter().multiply(new Vector3(1, 1, 0), null);
 	}
 
@@ -2401,6 +2402,14 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	public void setGroupMaster(final boolean groupMaster) {
+		this.groupMaster = groupMaster;
+	}
+
+	public boolean isGroupMaster() {
+		return groupMaster;
 	}
 
 	public boolean overlap(final Foundation another) {

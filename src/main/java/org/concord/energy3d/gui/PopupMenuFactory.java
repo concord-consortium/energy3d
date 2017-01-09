@@ -1788,6 +1788,19 @@ public class PopupMenuFactory {
 
 		if (popupMenuForFoundation == null) {
 
+			final JMenuItem miGroupMaster = new JCheckBoxMenuItem("Group Master");
+			miGroupMaster.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						SceneManager.getInstance().getUndoManager().addEdit(new SetGroupMasterCommand((Foundation) selectedPart));
+						((Foundation) selectedPart).setGroupMaster(miGroupMaster.isSelected());
+						Scene.getInstance().setEdited(true);
+					}
+				}
+			});
+
 			final JMenuItem miPaste = new JMenuItem("Paste");
 			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			miPaste.addActionListener(new ActionListener() {
@@ -1804,8 +1817,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miCopyBuilding = new JMenuItem("Copy Building");
-			miCopyBuilding.addActionListener(new ActionListener() {
+			final JMenuItem miCopy = new JMenuItem("Copy");
+			miCopy.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2771,6 +2784,7 @@ public class PopupMenuFactory {
 							miThermostat.setEnabled(true);
 						}
 						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
+						Util.selectSilently(miGroupMaster, f.isGroupMaster());
 						Util.selectSilently(miLock, f.isFrozen());
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
 						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
@@ -2781,7 +2795,8 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForFoundation.add(miPaste);
-			popupMenuForFoundation.add(miCopyBuilding);
+			popupMenuForFoundation.add(miCopy);
+			popupMenuForFoundation.add(miGroupMaster);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miHeight);
 			popupMenuForFoundation.add(miRescale);
