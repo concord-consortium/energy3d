@@ -19,6 +19,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -189,8 +190,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private MouseState lastSelectedEditPointMouseState;
 	private MouseState pasteMouseState;
 	private Node newImport;
-	private Vector3 houseMoveStartPoint;
-	private ArrayList<Vector3> houseMovePoints;
+	private Vector3 objectMoveStartPoint;
+	private ArrayList<Vector3> objectMovePoints;
+	private Map<Foundation, ArrayList<Vector3>> objectGroupMovePoints;
 	private double refreshTime = -1;
 	private int refreshCount = 0;
 	private boolean mouseControlEnabled = true;
@@ -1536,7 +1538,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (selectedPart != null) {
 				if (!selectedPart.isDrawCompleted()) {
 					selectedPart.setPreviewPoint(x, y);
-				} else if (houseMoveStartPoint != null) {
+				} else if (objectMoveStartPoint != null) {
 					if ((operation == Operation.RESIZE || selectedPart instanceof Foundation)) {
 						final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 						if (pick != null) {
@@ -1544,29 +1546,30 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								final Foundation foundation = (Foundation) selectedPart;
 								final Vector3 pickPoint = pick.getPoint().clone();
 								// if (!foundation.insideBuilding(pickPoint.getX(), pickPoint.getY(), true)) { // only move the building when clicking outside
-								final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
+								final Vector3 d = pickPoint.multiply(1, 1, 0, null).subtractLocal(objectMoveStartPoint.multiply(1, 1, 0, null));
 								if (foundation.isGroupMaster()) {
-									foundation.move(d, houseMovePoints);
-									// final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
-									// for (final Foundation f : g) {
-									// f.move(d, houseMovePoints);
-									// }
+									// foundation.move(d, objectMovePoints);
+									final List<Foundation> g = Scene.getInstance().getFoundationGroup(foundation);
+									for (final Foundation f : g) {
+										final ArrayList<Vector3> movePoints = objectGroupMovePoints.get(f);
+										f.move(d, movePoints);
+									}
 								} else {
-									foundation.move(d, houseMovePoints);
+									foundation.move(d, objectMovePoints);
 								}
 							}
 						}
 					} else if (selectedPart instanceof Tree) {
 						final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);
 						if (pick != null) {
-							final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(houseMoveStartPoint.multiply(1, 1, 0, null));
-							((Tree) selectedPart).move(d, houseMovePoints);
+							final Vector3 d = pick.getPoint().multiply(1, 1, 0, null).subtractLocal(objectMoveStartPoint.multiply(1, 1, 0, null));
+							((Tree) selectedPart).move(d, objectMovePoints);
 						}
 					} else if (selectedPart instanceof Window) {
 						final PickedHousePart pick = SelectUtil.pickPart(x, y, selectedPart.getContainer());
 						if (pick != null) {
-							final Vector3 d = pick.getPoint().subtract(houseMoveStartPoint, null);
-							((Window) selectedPart).move(d, houseMovePoints);
+							final Vector3 d = pick.getPoint().subtract(objectMoveStartPoint, null);
+							((Window) selectedPart).move(d, objectMovePoints);
 						}
 					}
 				}
@@ -1810,12 +1813,36 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							}
 							if (selectedPart instanceof Window || selectedPart instanceof Tree || (selectedPart instanceof Foundation && pick.getIndex() != -1)) {
 								cameraControl.setLeftMouseButtonEnabled(false);
-								houseMoveStartPoint = pickedPart.getPoint().clone();
-								collisionLand.setTranslation(0, 0, houseMoveStartPoint.getZ());
+								objectMoveStartPoint = pickedPart.getPoint().clone();
+								collisionLand.setTranslation(0, 0, objectMoveStartPoint.getZ());
 								final ArrayList<Vector3> points = selectedPart.getPoints();
-								houseMovePoints = new ArrayList<Vector3>(points.size());
+								if (objectMovePoints == null) {
+									objectMovePoints = new ArrayList<Vector3>();
+								} else {
+									objectMovePoints.clear();
+								}
 								for (final Vector3 p : points) {
-									houseMovePoints.add(p.clone());
+									objectMovePoints.add(p.clone());
+								}
+								if (selectedPart instanceof Foundation) {
+									final Foundation f = (Foundation) selectedPart;
+									if (f.isGroupMaster()) {
+										final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
+										if (!g.isEmpty()) {
+											if (objectGroupMovePoints == null) {
+												objectGroupMovePoints = new HashMap<Foundation, ArrayList<Vector3>>();
+											} else {
+												objectGroupMovePoints.clear();
+											}
+											for (final Foundation a : g) {
+												final ArrayList<Vector3> b = new ArrayList<Vector3>();
+												objectGroupMovePoints.put(a, b);
+												for (final Vector3 p : a.getPoints()) {
+													b.add(p.clone());
+												}
+											}
+										}
+									}
 								}
 							}
 
@@ -1880,7 +1907,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						selectedPart.setGridsVisible(false);
 					}
 					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
-						if (selectedPart != null && (!selectedPart.isDrawCompleted() || houseMoveStartPoint != null)) {
+						if (selectedPart != null && (!selectedPart.isDrawCompleted() || objectMoveStartPoint != null)) {
 							if (selectedPart.isDrawable()) {
 								selectedPart.complete();
 								if (editPartCommand != null && editPartCommand.isReallyEdited()) {
@@ -1903,8 +1930,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!zoomLock) {
 							cameraControl.setLeftMouseButtonEnabled(true);
 						}
-						houseMoveStartPoint = null;
-						houseMovePoints = null;
+						objectMoveStartPoint = null;
+						if (objectMovePoints != null) {
+							objectMovePoints.clear();
+						}
+						if (objectGroupMovePoints != null) {
+							objectGroupMovePoints.clear();
+						}
 						if (cameraChanged) {
 							TimeSeriesLogger.getInstance().logCamera(zoomLock ? "Zoom" : "Rotate");
 							cameraChanged = false;

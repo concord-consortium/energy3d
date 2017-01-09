@@ -1115,17 +1115,17 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
+	public void move(final Vector3 d, final ArrayList<Vector3> movePoints) {
 		if (lockEdit) {
 			return;
 		}
-		final List<Vector3> orgPoints = new ArrayList<Vector3>(houseMovePoints.size());
+		final List<Vector3> orgPoints = new ArrayList<Vector3>(movePoints.size());
 		for (int i = 0; i < points.size(); i++) {
 			orgPoints.add(points.get(i));
 		}
 
 		for (int i = 0; i < points.size(); i++) {
-			final Vector3 newP = houseMovePoints.get(i).add(d, null);
+			final Vector3 newP = movePoints.get(i).add(d, null);
 			points.set(i, newP);
 			if (i == points.size() - 1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
 				for (int j = 0; j < points.size(); j++) {
