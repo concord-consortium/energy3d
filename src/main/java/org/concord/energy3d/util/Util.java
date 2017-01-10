@@ -411,7 +411,10 @@ public class Util {
 		if (!Scene.isInternalFile()) {
 			final URL url = Scene.getURL();
 			if (url != null) {
-				multipart.addFilePart("model_lastsaved", new File(url.toURI()));
+				final File f = new File(url.toURI());
+				if (f.exists()) {
+					multipart.addFilePart("model_lastsaved", f);
+				}
 			}
 			final File file = SnapshotLogger.getInstance().getLatestSnapshot();
 			if (file != null) {

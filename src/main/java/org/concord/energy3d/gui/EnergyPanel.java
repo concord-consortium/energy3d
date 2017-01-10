@@ -29,6 +29,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -130,8 +131,8 @@ public class EnergyPanel extends JPanel {
 	private BuildingInfoPanel buildingInfoPanel;
 	private PvStationInfoPanel pvStationInfoPanel;
 	private CspStationInfoPanel cspStationInfoPanel;
-	private JTabbedPane buildingTabbedPane, pvStationTabbedPane, cspStationTabbedPane;
-	private JPanel buildingPanel, pvStationPanel, cspStationPanel;
+	private JTabbedPane buildingTabbedPane, pvStationTabbedPane, cspStationTabbedPane, instructionTabbedPane;
+	private JPanel buildingPanel, pvStationPanel, cspStationPanel, instructionPanel;
 	private boolean disableDateSpinner;
 
 	public static EnergyPanel getInstance() {
@@ -476,7 +477,6 @@ public class EnergyPanel extends JPanel {
 
 		buildingPanel = new JPanel();
 		buildingPanel.setBorder(createTitledBorder("Building", true));
-		dataPanel.add(buildingPanel);
 		buildingPanel.setLayout(new BoxLayout(buildingPanel, BoxLayout.Y_AXIS));
 
 		thermostatPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0)); // thermostat for the selected building
@@ -541,6 +541,29 @@ public class EnergyPanel extends JPanel {
 		buildingPanel.setMaximumSize(new Dimension(buildingPanel.getMaximumSize().width, buildingPanel.getPreferredSize().height));
 
 		dataPanel.add(Box.createVerticalGlue());
+
+		// instruction panel
+
+		instructionPanel = new JPanel();
+		instructionPanel.setBorder(createTitledBorder("Instruction", true));
+		instructionPanel.setLayout(new BoxLayout(instructionPanel, BoxLayout.Y_AXIS));
+		dataPanel.add(instructionPanel);
+
+		instructionTabbedPane = new JTabbedPane();
+		instructionTabbedPane.setFont(new Font(instructionTabbedPane.getFont().getName(), Font.PLAIN, instructionTabbedPane.getFont().getSize() - 1));
+		instructionPanel.add(instructionTabbedPane);
+
+		final JEditorPane instructionSheet1 = new JEditorPane();
+		instructionSheet1.setContentType("text/html");
+		instructionSheet1.setEditable(false);
+		instructionSheet1.setToolTipText("Double-click to edit the text");
+		instructionTabbedPane.add(new JScrollPane(instructionSheet1), "Sheet 1");
+
+		final JEditorPane instructionSheet2 = new JEditorPane();
+		instructionSheet2.setContentType("text/html");
+		instructionSheet2.setEditable(false);
+		instructionSheet2.setToolTipText("Double-click to edit the text");
+		instructionTabbedPane.add(new JScrollPane(instructionSheet2), "Sheet 2");
 
 		// heat map slider and progress bar
 
@@ -1267,6 +1290,7 @@ public class EnergyPanel extends JPanel {
 				if (selectedFoundation != null) {
 					switch (selectedFoundation.getSupportingType()) {
 					case Foundation.BUILDING:
+						dataPanel.remove(instructionPanel);
 						dataPanel.remove(pvStationPanel);
 						dataPanel.remove(cspStationPanel);
 						dataPanel.add(buildingPanel, 2);
@@ -1288,25 +1312,32 @@ public class EnergyPanel extends JPanel {
 						((TitledBorder) buildingPanel.getBorder()).setTitle("Building #" + s2.substring(i1 + 1, i2));
 						break;
 					case Foundation.PV_STATION:
+						dataPanel.remove(instructionPanel);
 						dataPanel.remove(buildingPanel);
 						dataPanel.remove(cspStationPanel);
 						dataPanel.add(pvStationPanel, 2);
 						pvStationInfoPanel.update(selectedFoundation);
 						break;
 					case Foundation.CSP_STATION:
+						dataPanel.remove(instructionPanel);
 						dataPanel.remove(buildingPanel);
 						dataPanel.remove(pvStationPanel);
 						dataPanel.add(cspStationPanel, 2);
 						cspStationInfoPanel.update(selectedFoundation);
+						break;
+					case -1:
+						dataPanel.remove(instructionPanel);
+						dataPanel.remove(buildingPanel);
+						dataPanel.remove(pvStationPanel);
+						dataPanel.remove(cspStationPanel);
 						break;
 					}
 				} else {
 					dataPanel.remove(buildingPanel);
 					dataPanel.remove(pvStationPanel);
 					dataPanel.remove(cspStationPanel);
+					dataPanel.add(instructionPanel, 2);
 				}
-				buildingInfoPanel.repaint();
-				buildingPanel.repaint();
 				dataPanel.validate();
 				dataPanel.repaint();
 			}
