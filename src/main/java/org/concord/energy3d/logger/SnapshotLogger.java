@@ -81,7 +81,7 @@ public class SnapshotLogger {
 
 	public File saveSnapshot(final String name) throws Exception {
 		final File file = File.createTempFile(name, ".ng3");
-		Scene.saveOutsideTaskManager(file.toURI().toURL(), false, false, true);
+		Scene.saveOutsideTaskManager(file.toURI().toURL(), false, false, false);
 		return file;
 	}
 
