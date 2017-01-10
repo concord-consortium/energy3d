@@ -35,9 +35,12 @@ class InstructionSheetDialog extends JDialog {
 
 		getContentPane().setLayout(new BorderLayout());
 		final JTextArea textArea = new JTextArea(sheet.getText());
-		textArea.setPreferredSize(new Dimension(500, 300));
-		textArea.setBorder(new EmptyBorder(15, 15, 15, 15));
-		getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
+		textArea.setLineWrap(true);
+		textArea.setBorder(new EmptyBorder(10, 10, 10, 10));
+		final JScrollPane scroller = new JScrollPane(textArea);
+		scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroller.setPreferredSize(new Dimension(800, 400));
+		getContentPane().add(scroller, BorderLayout.CENTER);
 
 		final JCheckBox htmlCheckBox = new JCheckBox("Use HTML");
 
@@ -67,7 +70,7 @@ class InstructionSheetDialog extends JDialog {
 				if (htmlCheckBox.isSelected()) {
 					final JEditorPane tmp = new JEditorPane();
 					tmp.setContentType("text/html");
-					tmp.setText(sheet.getText());
+					tmp.setText(textArea.getText());
 					textArea.setText(tmp.getText());
 				} else {
 					final HtmlToText parser = new HtmlToText();

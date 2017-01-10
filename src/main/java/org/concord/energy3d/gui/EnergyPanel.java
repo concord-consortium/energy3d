@@ -572,7 +572,9 @@ public class EnergyPanel extends JPanel {
 					}
 				}
 			});
-			instructionTabbedPane.add(new JScrollPane(instructionSheets[i]), "Sheet " + (i + 1));
+			final JScrollPane scroller = new JScrollPane(instructionSheets[i]);
+			scroller.setPreferredSize(new Dimension(200, 300)); // somehow setting a preferred size of the scroller triggers the line wrapping of JEditorPane
+			instructionTabbedPane.add(scroller, "Sheet " + (i + 1));
 		}
 
 		// heat map slider and progress bar
