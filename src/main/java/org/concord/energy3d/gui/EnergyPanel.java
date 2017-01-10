@@ -14,6 +14,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -133,6 +135,7 @@ public class EnergyPanel extends JPanel {
 	private CspStationInfoPanel cspStationInfoPanel;
 	private JTabbedPane buildingTabbedPane, pvStationTabbedPane, cspStationTabbedPane, instructionTabbedPane;
 	private JPanel buildingPanel, pvStationPanel, cspStationPanel, instructionPanel;
+	private final JEditorPane[] instructionSheets = new JEditorPane[3];
 	private boolean disableDateSpinner;
 
 	public static EnergyPanel getInstance() {
@@ -553,17 +556,24 @@ public class EnergyPanel extends JPanel {
 		instructionTabbedPane.setFont(new Font(instructionTabbedPane.getFont().getName(), Font.PLAIN, instructionTabbedPane.getFont().getSize() - 1));
 		instructionPanel.add(instructionTabbedPane);
 
-		final JEditorPane instructionSheet1 = new JEditorPane();
-		instructionSheet1.setContentType("text/html");
-		instructionSheet1.setEditable(false);
-		instructionSheet1.setToolTipText("Double-click to edit the text");
-		instructionTabbedPane.add(new JScrollPane(instructionSheet1), "Sheet 1");
-
-		final JEditorPane instructionSheet2 = new JEditorPane();
-		instructionSheet2.setContentType("text/html");
-		instructionSheet2.setEditable(false);
-		instructionSheet2.setToolTipText("Double-click to edit the text");
-		instructionTabbedPane.add(new JScrollPane(instructionSheet2), "Sheet 2");
+		for (int i = 0; i < instructionSheets.length; i++) {
+			instructionSheets[i] = new JEditorPane();
+			instructionSheets[i].setContentType("text/plain");
+			instructionSheets[i].setEditable(false);
+			instructionSheets[i].setToolTipText("Double-click to edit the text");
+			final int i2 = i;
+			instructionSheets[i].addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(final MouseEvent e) {
+					if (!Scene.getInstance().isStudentMode()) {
+						if (e.getClickCount() >= 2) {
+							new InstructionSheetDialog(instructionSheets[i2], "Sheet " + (i2 + 1), i2).setVisible(true);
+						}
+					}
+				}
+			});
+			instructionTabbedPane.add(new JScrollPane(instructionSheets[i]), "Sheet " + (i + 1));
+		}
 
 		// heat map slider and progress bar
 
@@ -1337,6 +1347,11 @@ public class EnergyPanel extends JPanel {
 					dataPanel.remove(pvStationPanel);
 					dataPanel.remove(cspStationPanel);
 					dataPanel.add(instructionPanel, 2);
+					for (int i = 0; i < instructionSheets.length; i++) {
+						final String contentType = Scene.getInstance().getInstructionSheetTextType(i);
+						instructionSheets[i].setContentType(contentType == null ? "text/plain" : contentType);
+						instructionSheets[i].setText(Scene.getInstance().getInstructionSheetText(i));
+					}
 				}
 				dataPanel.validate();
 				dataPanel.repaint();

@@ -139,6 +139,8 @@ public class Scene implements Serializable {
 	private boolean groundImageIsEarthView;
 	private boolean groundImageLightColored; // a parameter that user can choose to improve the contrast of edit points etc. (i.e., no white on white)
 	private transient List<List<Foundation>> foundationGroups;
+	private String[] instructionSheetText;
+	private String[] instructionSheetTextType;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -2829,6 +2831,44 @@ public class Scene implements Serializable {
 			foundationGroups.add(foundations);
 		}
 
+	}
+
+	public void setInstructionSheetText(final int i, final String text) {
+		if (instructionSheetText == null) {
+			instructionSheetText = new String[3];
+		}
+		if (i < instructionSheetText.length) {
+			instructionSheetText[i] = text;
+		}
+	}
+
+	public String getInstructionSheetText(final int i) {
+		if (instructionSheetText == null) {
+			return null;
+		}
+		if (i >= instructionSheetText.length) {
+			return null;
+		}
+		return instructionSheetText[i];
+	}
+
+	public void setInstructionSheetTextType(final int i, final String type) {
+		if (instructionSheetTextType == null) {
+			instructionSheetTextType = new String[3];
+		}
+		if (i < instructionSheetTextType.length) {
+			instructionSheetTextType[i] = type;
+		}
+	}
+
+	public String getInstructionSheetTextType(final int i) {
+		if (instructionSheetTextType == null) {
+			return null;
+		}
+		if (i >= instructionSheetTextType.length) {
+			return null;
+		}
+		return instructionSheetTextType[i];
 	}
 
 }
