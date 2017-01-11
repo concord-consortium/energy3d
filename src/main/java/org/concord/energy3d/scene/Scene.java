@@ -206,6 +206,7 @@ public class Scene implements Serializable {
 			public void run() {
 				EnergyPanel.getInstance().update();
 				EnergyPanel.getInstance().clearAllGraphs();
+				EnergyPanel.getInstance().selectInstructionSheet(0);
 			}
 		});
 	}
@@ -218,6 +219,7 @@ public class Scene implements Serializable {
 				final EnergyPanel e = EnergyPanel.getInstance();
 				e.update();
 				e.clearAllGraphs();
+				e.selectInstructionSheet(0);
 				if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view
 					MainFrame.getInstance().getTopViewCheckBoxMenuItem().setSelected(false);
 					SceneManager.getInstance().resetCamera(ViewMode.NORMAL);

@@ -14,8 +14,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -31,7 +29,6 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -135,7 +132,7 @@ public class EnergyPanel extends JPanel {
 	private CspStationInfoPanel cspStationInfoPanel;
 	private JTabbedPane buildingTabbedPane, pvStationTabbedPane, cspStationTabbedPane, instructionTabbedPane;
 	private JPanel buildingPanel, pvStationPanel, cspStationPanel, instructionPanel;
-	private final JEditorPane[] instructionSheets = new JEditorPane[3];
+	private final MyEditorPane[] instructionSheets = new MyEditorPane[3];
 	private boolean disableDateSpinner;
 
 	public static EnergyPanel getInstance() {
@@ -548,7 +545,7 @@ public class EnergyPanel extends JPanel {
 		// instruction panel
 
 		instructionPanel = new JPanel();
-		instructionPanel.setBorder(createTitledBorder("Instruction", true));
+		instructionPanel.setBorder(createTitledBorder("Instruction & Documentation", true));
 		instructionPanel.setLayout(new BoxLayout(instructionPanel, BoxLayout.Y_AXIS));
 		dataPanel.add(instructionPanel);
 
@@ -557,22 +554,9 @@ public class EnergyPanel extends JPanel {
 		instructionPanel.add(instructionTabbedPane);
 
 		for (int i = 0; i < instructionSheets.length; i++) {
-			instructionSheets[i] = new JEditorPane();
+			instructionSheets[i] = new MyEditorPane(i);
 			instructionSheets[i].setContentType("text/plain");
-			instructionSheets[i].setEditable(false);
-			instructionSheets[i].setToolTipText("Double-click to edit the text");
-			final int i2 = i;
-			instructionSheets[i].addMouseListener(new MouseAdapter() {
-				@Override
-				public void mouseClicked(final MouseEvent e) {
-					if (!Scene.getInstance().isStudentMode()) {
-						if (e.getClickCount() >= 2) {
-							new InstructionSheetDialog(instructionSheets[i2], "Sheet " + (i2 + 1), i2).setVisible(true);
-						}
-					}
-				}
-			});
-			final JScrollPane scroller = new JScrollPane(instructionSheets[i]);
+			final JScrollPane scroller = new JScrollPane(instructionSheets[i].getEditorPane());
 			scroller.setPreferredSize(new Dimension(200, 300)); // somehow setting a preferred size of the scroller triggers the line wrapping of JEditorPane
 			instructionTabbedPane.add(scroller, "Sheet " + (i + 1));
 		}
@@ -804,6 +788,12 @@ public class EnergyPanel extends JPanel {
 		buildingDailyEnergyGraph.removeGraph();
 		pvStationDailyEnergyGraph.removeGraph();
 		cspStationDailyEnergyGraph.removeGraph();
+	}
+
+	public void selectInstructionSheet(final int i) {
+		if (i >= 0 && i < instructionSheets.length) {
+			instructionTabbedPane.setSelectedIndex(i);
+		}
 	}
 
 	public void progress(final int percentage) {
