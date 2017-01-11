@@ -1288,6 +1288,7 @@ public class MainFrame extends JFrame {
 
 			final JMenu buildingBasicsMenu = new JMenu("Building Science Basics");
 			tutorialsMenu.add(buildingBasicsMenu);
+			addModel(buildingBasicsMenu, "Two Houses of Different Sizes", "tutorials/building-size.ng3");
 			addModel(buildingBasicsMenu, "Two Houses with Different Roof Insulations", "tutorials/building-roof-insulation.ng3");
 			addModel(buildingBasicsMenu, "Two Houses with Different Window SHGCs", "tutorials/building-window-shgc.ng3");
 			addModel(buildingBasicsMenu, "Two Houses with Different Orientations", "tutorials/building-orientation.ng3");
