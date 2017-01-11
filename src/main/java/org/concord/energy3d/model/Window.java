@@ -879,4 +879,24 @@ public class Window extends HousePart implements Thermalizable {
 		return shutterLength;
 	}
 
+	public void setWindowWidth(final double width) {
+		final Vector3 a = toRelativeVector(getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(width / Scene.getInstance().getAnnotationScale()));
+		points.get(2).set(points.get(0).add(a, null));
+		points.get(3).set(points.get(1).add(a, null));
+	}
+
+	public double getWindowWidth() {
+		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getAnnotationScale();
+	}
+
+	public void setWindowHeight(final double height) {
+		final Vector3 a = toRelativeVector(getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(height / Scene.getInstance().getAnnotationScale()));
+		points.get(1).set(points.get(0).add(a, null));
+		points.get(3).set(points.get(2).add(a, null));
+	}
+
+	public double getWindowHeight() {
+		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
+	}
+
 }

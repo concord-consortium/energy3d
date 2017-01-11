@@ -1805,4 +1805,12 @@ public class Wall extends HousePart implements Thermalizable {
 		return wallThickness;
 	}
 
+	public double getWallWidth() {
+		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getAnnotationScale();
+	}
+
+	public double getWallHeight() {
+		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
+	}
+
 }

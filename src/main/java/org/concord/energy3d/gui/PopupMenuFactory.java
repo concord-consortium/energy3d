@@ -1172,7 +1172,100 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miSize = new JMenuItem("Size...");
+			miSize.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Window)) {
+						return;
+					}
+					final Window window = (Window) selectedPart;
+					final HousePart container = window.getContainer();
+					final Foundation foundation = window.getTopContainer();
+					final String partInfo = window.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Width (m): "));
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(window.getWindowWidth()));
+					inputPanel.add(widthField);
+					inputPanel.add(new JLabel("Height (m): "));
+					final JTextField heightField = new JTextField(threeDecimalsFormat.format(window.getWindowHeight()));
+					inputPanel.add(heightField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Window", true);
+					final JRadioButton rb2 = new JRadioButton("All Windows on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Windows");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					gui.add(scopePanel, BorderLayout.NORTH);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					double wmax = 10;
+					if (container instanceof Wall) {
+						wmax = ((Wall) container).getWallWidth() * 0.99;
+					}
+					double hmax = 10;
+					if (container instanceof Wall) {
+						hmax = ((Wall) container).getWallHeight() * 0.99;
+					}
+					double w = 0, h = 0;
+					boolean ok = true;
+					try {
+						w = Double.parseDouble(widthField.getText());
+						if (w < 0.1 || w > wmax) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 0.1 and " + (int) wmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
+						}
+					} catch (final NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
+					}
+					try {
+						h = Double.parseDouble(heightField.getText());
+						if (h < 0.1 || h > hmax) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0.1 and " + (int) hmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+							ok = false;
+						}
+					} catch (final NumberFormatException x) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						ok = false;
+					}
+					if (ok) {
+						if (rb1.isSelected()) {
+							final SetPartSizeCommand c = new SetPartSizeCommand(window);
+							window.setWindowWidth(w);
+							window.setWindowHeight(h);
+							window.draw();
+							window.getContainer().draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb2.isSelected()) {
+							// final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
+							foundation.setSizeForRacks(w, h);
+							// SceneManager.getInstance().getUndoManager().addEdit(c);
+						} else if (rb3.isSelected()) {
+							// final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
+							Scene.getInstance().setSizeForAllRacks(w, h);
+							// SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						updateAfterEdit();
+					}
+				}
+			});
+
 			popupMenuForWindow.addSeparator();
+			popupMenuForWindow.add(miSize);
 			popupMenuForWindow.add(miTint);
 			popupMenuForWindow.add(createInsulationMenuItem(true));
 			popupMenuForWindow.add(miShgc);

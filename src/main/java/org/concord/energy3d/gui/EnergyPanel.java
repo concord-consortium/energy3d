@@ -1116,13 +1116,13 @@ public class EnergyPanel extends JPanel {
 			} else if (selectedPart instanceof Window) {
 				final Window window = (Window) selectedPart;
 				if (window.isDrawable()) {
-					final double lx = v.distance(window.getAbsPoint(2));
-					final double ly = v.distance(window.getAbsPoint(1));
+					final double lx = window.getWindowWidth();
+					final double ly = window.getWindowHeight();
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
 							partProperty1Label.setText("  Size:");
-							partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + " m \u2248 " + twoDecimals.format(lx * ly * scale * scale) + " m\u00B2");
+							partProperty1TextField.setText(twoDecimals.format(lx) + "\u00d7" + (twoDecimals.format(ly)) + " m \u2248 " + twoDecimals.format(lx * ly) + " m\u00B2");
 							partProperty2Label.setText("  U-value:");
 							partProperty2TextField.setText(twoDecimals.format(Util.toUsUValue(window.getUValue())) + " (US system)");
 							partProperty1TextField.setToolTipText("The width and height of the window");

@@ -82,6 +82,12 @@ public class Rack extends HousePart implements Trackable {
 		if (Util.isZero(copyLayoutGap)) { // FIXME: Why is a transient member evaluated to zero?
 			copyLayoutGap = 1;
 		}
+		if (Util.isZero(rackWidth)) {
+			rackWidth = 5.94;
+		}
+		if (Util.isZero(rackHeight)) {
+			rackHeight = 3.3;
+		}
 
 		mesh = new Mesh("Rack");
 		mesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
@@ -1012,8 +1018,14 @@ public class Rack extends HousePart implements Trackable {
 				final boolean portrait = !sampleSolarPanel.isRotated();
 				final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 				final double b = portrait ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
-				final int nw = (int) Math.round(rackWidth / a);
-				final int nh = (int) Math.round(rackHeight / b);
+				int nw = (int) Math.round(rackWidth / a);
+				int nh = (int) Math.round(rackHeight / b);
+				if (nw <= 0) {
+					nw = 1;
+				}
+				if (nh <= 0) {
+					nh = 1;
+				}
 				setRackWidth(nw * a);
 				setRackHeight(nh * b);
 				drawMesh();
@@ -1024,7 +1036,10 @@ public class Rack extends HousePart implements Trackable {
 	void roundUpRackWidth() {
 		final boolean portrait = !sampleSolarPanel.isRotated();
 		final double a = portrait ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
-		final int nw = (int) Math.round(rackWidth / a);
+		int nw = (int) Math.round(rackWidth / a);
+		if (nw <= 0) {
+			nw = 1;
+		}
 		setRackWidth(nw * a);
 	}
 

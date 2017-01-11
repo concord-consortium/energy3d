@@ -2018,6 +2018,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		rack.set(center, rackWidth, rackHeight);
 		rack.points.get(0).setZ(height);
 		rack.roundUpRackWidth();
+		// rack.roundUpRackHeight();
 		rack.setTiltAngle(tiltAngle);
 		rack.setRotationAxis(rowAxis);
 		rack.setPoleDistanceX(poleDistanceX);

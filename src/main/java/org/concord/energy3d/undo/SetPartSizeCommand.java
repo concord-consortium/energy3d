@@ -7,6 +7,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.Window;
 
 public class SetPartSizeCommand extends AbstractUndoableEdit {
 
@@ -25,6 +26,10 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			final Rack r = (Rack) part;
 			oldWidth = r.getRackWidth();
 			oldHeight = r.getRackHeight();
+		} else if (part instanceof Window) {
+			final Window w = (Window) part;
+			oldWidth = w.getWindowWidth();
+			oldHeight = w.getWindowHeight();
 		}
 	}
 
@@ -55,6 +60,13 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			newHeight = r.getRackHeight();
 			r.setRackWidth(oldWidth);
 			r.setRackHeight(oldHeight);
+		} else if (part instanceof Window) {
+			final Window w = (Window) part;
+			newWidth = w.getWindowWidth();
+			newHeight = w.getWindowHeight();
+			w.setWindowWidth(oldWidth);
+			w.setWindowHeight(oldHeight);
+			w.getContainer().draw();
 		}
 		part.draw();
 	}
@@ -70,6 +82,11 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			final Rack r = (Rack) part;
 			r.setRackWidth(newWidth);
 			r.setRackHeight(newHeight);
+		} else if (part instanceof Window) {
+			final Window w = (Window) part;
+			w.setWindowWidth(newWidth);
+			w.setWindowHeight(newHeight);
+			w.getContainer().draw();
 		}
 		part.draw();
 	}
@@ -81,6 +98,9 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 		}
 		if (part instanceof Rack) {
 			return "Set Size for Selected Rack";
+		}
+		if (part instanceof Window) {
+			return "Set Size for Selected Window";
 		}
 		return "Set Size";
 	}
