@@ -1773,6 +1773,18 @@ public class Scene implements Serializable {
 		}
 	}
 
+	public void setWindowSizeInContainer(final HousePart container, final double width, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof Window && p.getContainer() == container) {
+				final Window w = (Window) p;
+				w.setWindowWidth(width);
+				w.setWindowHeight(height);
+				w.draw();
+				w.getContainer().draw();
+			}
+		}
+	}
+
 	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
 		if (part instanceof Foundation) {
 			return;

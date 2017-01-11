@@ -1199,8 +1199,8 @@ public class PopupMenuFactory {
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Window", true);
-					final JRadioButton rb2 = new JRadioButton("All Windows on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Windows");
+					final JRadioButton rb2 = new JRadioButton("All Windows on this " + (window.getContainer() instanceof Wall ? "Wall" : "Roof"));
+					final JRadioButton rb3 = new JRadioButton("All Windows of this Building");
 					scopePanel.add(rb1);
 					scopePanel.add(rb2);
 					scopePanel.add(rb3);
@@ -1251,13 +1251,13 @@ public class PopupMenuFactory {
 							window.getContainer().draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
-							// final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
-							foundation.setSizeForRacks(w, h);
-							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							final ChangeContainerWindowSizeCommand c = new ChangeContainerWindowSizeCommand(window.getContainer());
+							Scene.getInstance().setWindowSizeInContainer(window.getContainer(), w, h);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
-							// final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
-							Scene.getInstance().setSizeForAllRacks(w, h);
-							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							final SetSizeForWindowsOnFoundationCommand c = new SetSizeForWindowsOnFoundationCommand(foundation);
+							foundation.setSizeForWindows(w, h);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 						updateAfterEdit();
 					}

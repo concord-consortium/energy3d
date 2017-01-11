@@ -1435,6 +1435,16 @@ public class Foundation extends HousePart implements Thermalizable {
 		return roofs;
 	}
 
+	public List<Window> getWindows() {
+		final List<Window> list = new ArrayList<Window>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Window && p.getTopContainer() == this) {
+				list.add((Window) p);
+			}
+		}
+		return list;
+	}
+
 	public int countParts(final Class<?> clazz) {
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -2400,6 +2410,21 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (p instanceof Wall) {
 				((Wall) p).setHeight(height, true);
 				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all windows on this foundation
+
+	public void setSizeForWindows(final double width, final double height) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Window && p.getTopContainer() == this) {
+				final Window w = (Window) p;
+				w.setWindowWidth(width);
+				w.setWindowHeight(height);
+				w.draw();
+				w.getContainer().draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
