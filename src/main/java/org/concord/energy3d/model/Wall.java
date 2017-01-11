@@ -162,8 +162,8 @@ public class Wall extends HousePart implements Thermalizable {
 
 		windowsSurroundMesh = new Mesh("Wall (Windows Surround)");
 		windowsSurroundMesh.getMeshData().setIndexMode(IndexMode.Quads);
-		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1000));
-		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1000));
+		windowsSurroundMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
+		windowsSurroundMesh.getMeshData().setNormalBuffer(BufferUtils.createVector3Buffer(1));
 		windowsSurroundMesh.setDefaultColor(ColorRGBA.GRAY);
 		windowsSurroundMesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 		windowsSurroundMesh.setRenderState(offsetState);
@@ -869,7 +869,7 @@ public class Wall extends HousePart implements Thermalizable {
 				}
 				previousStretchPoint = currentStretchPoint;
 			}
-			
+
 			if (!polygon.get(polygon.size() - 1).equals(previousStretchPoint)) {
 				polygon.add(previousStretchPoint);
 			}
@@ -1089,12 +1089,26 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	private void drawWindowsSurroundMesh(final Vector3 thickness) {
-		final FloatBuffer vertexBuffer = windowsSurroundMesh.getMeshData().getVertexBuffer();
-		final FloatBuffer normalBuffer = windowsSurroundMesh.getMeshData().getNormalBuffer();
-		vertexBuffer.rewind();
-		normalBuffer.rewind();
-		vertexBuffer.limit(vertexBuffer.capacity());
-		normalBuffer.limit(vertexBuffer.capacity());
+		int numOfWindows = 0;
+		for (final HousePart child : children) {
+			if (child instanceof Window) {
+				numOfWindows++;
+			}
+		}
+		final int bufferSize = numOfWindows == 0 ? 1 : (numOfWindows * 4 * 4 * 3);
+		FloatBuffer vertexBuffer = windowsSurroundMesh.getMeshData().getVertexBuffer();
+		FloatBuffer normalBuffer = windowsSurroundMesh.getMeshData().getNormalBuffer();
+		if (vertexBuffer.capacity() != bufferSize) {
+			vertexBuffer = BufferUtils.createFloatBuffer(bufferSize);
+			normalBuffer = BufferUtils.createFloatBuffer(bufferSize);
+			windowsSurroundMesh.getMeshData().setVertexBuffer(vertexBuffer);
+			windowsSurroundMesh.getMeshData().setNormalBuffer(normalBuffer);
+		} else {
+			vertexBuffer.rewind();
+			normalBuffer.rewind();
+			vertexBuffer.limit(vertexBuffer.capacity());
+			normalBuffer.limit(vertexBuffer.capacity());
+		}
 		final int[] order1 = new int[] { 0, 1, 3, 2, 0 };
 		final int[] order2 = new int[] { 2, 3, 1, 0, 2 };
 		final Vector3 sideNormal = thickness.cross(0, 0, 1, null).normalizeLocal();
@@ -1144,8 +1158,6 @@ public class Wall extends HousePart implements Thermalizable {
 				}
 			}
 		}
-		final int pos = vertexBuffer.position();
-		vertexBuffer.limit(pos != 0 ? pos : 1);
 
 		windowsSurroundMesh.getMeshData().updateVertexCount();
 		windowsSurroundMesh.updateModelBound();
