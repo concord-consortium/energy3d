@@ -45,6 +45,7 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultCaret;
 
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
@@ -793,6 +794,7 @@ public class EnergyPanel extends JPanel {
 	public void selectInstructionSheet(final int i) {
 		if (i >= 0 && i < instructionSheets.length) {
 			instructionTabbedPane.setSelectedIndex(i);
+			((DefaultCaret) instructionSheets[i].getEditorPane().getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		}
 	}
 
