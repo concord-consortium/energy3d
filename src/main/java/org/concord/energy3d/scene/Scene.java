@@ -299,20 +299,6 @@ public class Scene implements Serializable {
 			cameraControl.reset();
 		}
 
-		int count = 0;
-		Foundation first = null;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation && !p.isFrozen()) {
-				if (count == 0) {
-					first = (Foundation) p;
-				}
-				count++;
-			}
-		}
-		if (count == 1) {
-			SceneManager.getInstance().setSelectedPart(first);
-		}
-
 		instance.init();
 
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
