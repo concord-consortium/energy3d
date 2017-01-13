@@ -147,7 +147,7 @@ public class Rack extends HousePart implements Trackable {
 		solarPanelOutlines.setStipplePattern((short) 0xffff);
 		solarPanelOutlines.setModelBound(null);
 		Util.disablePickShadowLight(solarPanelOutlines);
-		solarPanelOutlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(10000));
+		solarPanelOutlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
 		solarPanelOutlines.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
 		root.attachChild(solarPanelOutlines);
 
@@ -1137,8 +1137,15 @@ public class Rack extends HousePart implements Trackable {
 		final int nh = (int) Math.round(rackHeight / b);
 		a /= Scene.getInstance().getAnnotationScale();
 		b /= Scene.getInstance().getAnnotationScale();
-		final FloatBuffer vertices = solarPanelOutlines.getMeshData().getVertexBuffer();
-		vertices.rewind();
+		final int bufferSize = (nw + nh - 2) * 6;
+		FloatBuffer vertices = solarPanelOutlines.getMeshData().getVertexBuffer();
+		if (vertices.capacity() != bufferSize) {
+			vertices = BufferUtils.createFloatBuffer(bufferSize);
+			solarPanelOutlines.getMeshData().setVertexBuffer(vertices);
+		} else {
+			vertices.rewind();
+			vertices.limit(vertices.capacity());
+		}
 		final Vector3 u = p1.subtract(p0, null).normalizeLocal().multiplyLocal(b);
 		final Vector3 v = p2.subtract(p0, null).normalizeLocal().multiplyLocal(a);
 		Vector3 p, q;
