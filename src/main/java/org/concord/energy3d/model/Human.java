@@ -1,8 +1,8 @@
 package org.concord.energy3d.model;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -33,7 +33,7 @@ public class Human extends HousePart {
 		this(humanType, 0);
 	}
 
-	public Human(final int humanType, double feetHeight) {
+	public Human(final int humanType, final double feetHeight) {
 		super(1, 1, 1);
 		this.humanType = humanType;
 		this.feetHeight = feetHeight;
@@ -101,18 +101,17 @@ public class Human extends HousePart {
 	}
 
 	/** TODO: Called when we want this person to stand at a certain height */
-	public void translate(double w, double h, double z) {
+	public void translate(final double w, final double h, final double z) {
 		mesh.setTranslation(0, w / 2, h / 2 + z);
 	}
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final int index = 0;
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
 		if (pick != null) {
 			final Vector3 p = pick.getPoint().clone();
-			snapToGrid(p, getAbsPoint(index), getGridSize());
-			points.get(index).set(toRelative(p));
+			snapToGrid(p, getAbsPoint(0), getGridSize());
+			points.get(0).set(toRelative(p));
 			root.getSceneHints().setCullHint(CullHint.Never);
 		}
 		draw();
@@ -204,12 +203,14 @@ public class Human extends HousePart {
 		area = 0.0;
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return true;
 	}
 
-	public HousePart copy(boolean check) {
-		Human c = (Human) super.copy(false);
+	@Override
+	public HousePart copy(final boolean check) {
+		final Human c = (Human) super.copy(false);
 		c.points.get(0).setX(points.get(0).getX() + 2); // shift the position of the copy
 		return c;
 	}

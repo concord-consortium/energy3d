@@ -1598,7 +1598,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
 				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
-				if (pick.getIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+				if (pick.getIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
 					canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 				}
 			}
@@ -2173,6 +2173,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					final ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 					solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(angle));
 					solarPanel.draw();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				} else if (selectedPart instanceof Rack) {
+					final Rack rack = (Rack) selectedPart;
+					final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
+					rack.setRelativeAzimuth(rack.getRelativeAzimuth() + Math.toDegrees(angle));
+					rack.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				} else if (selectedPart instanceof Mirror) {
 					final Mirror mirror = (Mirror) selectedPart;

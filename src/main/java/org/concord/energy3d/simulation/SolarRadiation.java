@@ -217,7 +217,7 @@ public class SolarRadiation {
 							final List<Mesh> contentMeshes = foundation.getImportRadiationMeshes();
 							if (contentMeshes != null && !contentMeshes.isEmpty()) {
 								for (final Mesh m : contentMeshes) {
-									// final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
+									// TODO: final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
 									// computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, normal);
 								}
 							}

@@ -2533,6 +2533,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				for (final Node node : importNodes) {
 					root.detachChild(node);
 				}
+				importNodes.clear();
 				importPositions.clear();
 				importFiles.clear();
 			}

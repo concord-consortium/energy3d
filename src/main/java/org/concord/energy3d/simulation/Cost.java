@@ -341,6 +341,8 @@ public class Cost {
 						doorSum += getPartCost(p);
 					} else if (p instanceof SolarPanel) {
 						solarPanelSum += getPartCost(p);
+					} else if (p instanceof Rack) {
+						solarPanelSum += getPartCost(p);
 					}
 				}
 				if (count <= 1) {

@@ -1792,7 +1792,7 @@ public class MainFrame extends JFrame {
 						return;
 					}
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Foundation) {
+					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
 						new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
 					} else {
 						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
@@ -1839,7 +1839,7 @@ public class MainFrame extends JFrame {
 						return;
 					}
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Foundation) {
+					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
 						new EnergyDailyAnalysis().show("Daily Energy for Selected Part");
 					} else {
 						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);

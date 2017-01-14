@@ -23,6 +23,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
@@ -45,10 +46,10 @@ public class ConstructionCostGraph extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private PieChart pie;
-	private Box buttonPanel;
-	private JPanel budgetPanel;
-	private ColorBar budgetBar;
-	private JPopupMenu popupMenu;
+	private final Box buttonPanel;
+	private final JPanel budgetPanel;
+	private final ColorBar budgetBar;
+	private final JPopupMenu popupMenu;
 	private final DecimalFormat noDecimals = new DecimalFormat();
 	private Foundation building;
 	private int wallSum;
@@ -74,13 +75,13 @@ public class ConstructionCostGraph extends JPanel {
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
 		buttonPanel.setBackground(Color.WHITE);
 		buttonPanel.add(Box.createVerticalGlue());
-		JButton button = new JButton("Show");
+		final JButton button = new JButton("Show");
 		button.setAlignmentX(CENTER_ALIGNMENT);
 		button.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				SceneManager.getInstance().autoSelectBuilding(true);
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
 					addGraph((Foundation) selectedPart);
 					EnergyPanel.getInstance().validate();
@@ -94,22 +95,22 @@ public class ConstructionCostGraph extends JPanel {
 		popupMenu.addPopupMenuListener(new PopupMenuListener() {
 
 			@Override
-			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 			}
 
 			@Override
-			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
 			}
 
 			@Override
-			public void popupMenuCanceled(PopupMenuEvent e) {
+			public void popupMenuCanceled(final PopupMenuEvent e) {
 			}
 
 		});
 		JMenuItem mi = new JMenuItem("View Itemized Cost...");
 		mi.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				Cost.getInstance().showItemizedCost();
 			}
 		});
@@ -117,7 +118,7 @@ public class ConstructionCostGraph extends JPanel {
 		mi = new JMenuItem("Copy Image");
 		mi.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				new ClipImage().copyImageToClipboard(ConstructionCostGraph.this);
 			}
 		});
@@ -126,9 +127,10 @@ public class ConstructionCostGraph extends JPanel {
 
 	private void calculateCost() {
 		int countBuildings = 0;
-		for (HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation)
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Foundation) {
 				countBuildings++;
+			}
 		}
 		wallSum = 0;
 		floorSum = 0;
@@ -140,22 +142,26 @@ public class ConstructionCostGraph extends JPanel {
 		foundationSum = Cost.getInstance().getPartCost(building);
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == building) {
-				if (p instanceof Wall)
+				if (p instanceof Wall) {
 					wallSum += Cost.getInstance().getPartCost(p);
-				else if (p instanceof Floor)
+				} else if (p instanceof Floor) {
 					floorSum += Cost.getInstance().getPartCost(p);
-				else if (p instanceof Window)
+				} else if (p instanceof Window) {
 					windowSum += Cost.getInstance().getPartCost(p);
-				else if (p instanceof Roof)
+				} else if (p instanceof Roof) {
 					roofSum += Cost.getInstance().getPartCost(p);
-				else if (p instanceof Door)
+				} else if (p instanceof Door) {
 					doorSum += Cost.getInstance().getPartCost(p);
-				else if (p instanceof SolarPanel)
+				} else if (p instanceof SolarPanel) {
 					solarPanelSum += Cost.getInstance().getPartCost(p);
+				} else if (p instanceof Rack) {
+					solarPanelSum += Cost.getInstance().getPartCost(p);
+				}
 			}
 			if (countBuildings <= 1) {
-				if (p instanceof Tree && !p.isFrozen())
+				if (p instanceof Tree && !p.isFrozen()) {
 					treeSum += Cost.getInstance().getPartCost(p);
+				}
 			}
 		}
 		totalCost = wallSum + windowSum + roofSum + doorSum + solarPanelSum + treeSum + foundationSum + floorSum;
@@ -177,7 +183,7 @@ public class ConstructionCostGraph extends JPanel {
 			budgetBar.setMaximum(specs.getMaximumBudget());
 			budgetBar.setValue(totalCost);
 			budgetBar.repaint();
-			String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
+			final String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
 			budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 			budgetPanel.repaint();
 		}
@@ -187,7 +193,7 @@ public class ConstructionCostGraph extends JPanel {
 		return building;
 	}
 
-	public void addGraph(Foundation building) {
+	public void addGraph(final Foundation building) {
 
 		removeAll();
 
@@ -206,7 +212,8 @@ public class ConstructionCostGraph extends JPanel {
 		pie.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - budgetPanel.getHeight() - 5));
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		pie.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() >= 2) {
 					Cost.getInstance().showGraph();
 				} else {
