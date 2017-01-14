@@ -135,27 +135,36 @@ public class SolarRadiation {
 				if (rack.isMonolithic()) {
 					final Spatial s = part.getRadiationCollisionSpatial();
 					collidables.add(s);
-					collidablesToParts.put(s, part);
+					collidablesToParts.put(s, rack);
 				}
 			} else if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
 				for (int i = 0; i < 4; i++) {
 					final Spatial s = foundation.getRadiationCollisionSpatial(i);
 					collidables.add(s);
-					collidablesToParts.put(s, part);
+					collidablesToParts.put(s, foundation);
+				}
+				final List<Mesh> contentMeshes = foundation.getImportRadiationMeshes();
+				if (contentMeshes != null && !contentMeshes.isEmpty()) {
+					for (final Mesh m : contentMeshes) {
+						collidables.add(m);
+						collidablesToParts.put(m, foundation);
+					}
 				}
 			} else if (part instanceof Wall) {
-				if (((Wall) part).getType() == Wall.SOLID_WALL) {
+				final Wall wall = (Wall) part;
+				if (wall.getType() == Wall.SOLID_WALL) {
 					final Spatial s = part.getRadiationCollisionSpatial();
 					collidables.add(s);
-					collidablesToParts.put(s, part);
+					collidablesToParts.put(s, wall);
 				}
 			} else if (part instanceof Roof) {
-				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+				final Roof roof = (Roof) part;
+				for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
 					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 						final Spatial s = ((Node) roofPart).getChild(6);
 						collidables.add(s);
-						collidablesToParts.put(s, part);
+						collidablesToParts.put(s, roof);
 					}
 				}
 			}
@@ -204,6 +213,13 @@ public class SolarRadiation {
 								final Mesh radiationMesh = foundation.getRadiationMesh(i);
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
+							}
+							final List<Mesh> contentMeshes = foundation.getImportRadiationMeshes();
+							if (contentMeshes != null && !contentMeshes.isEmpty()) {
+								for (final Mesh m : contentMeshes) {
+									// final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
+									// computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, normal);
+								}
 							}
 						} else if (part instanceof Roof) {
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {

@@ -2114,6 +2114,32 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(removeAllFloorsMenuItem);
 
+			final JMenuItem miRemoveAllImports = new JMenuItem("Remove All Imports");
+			miRemoveAllImports.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (selectedPart instanceof Foundation) {
+								final Foundation f = (Foundation) selectedPart;
+								f.removeAllImports();
+								EventQueue.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+										Scene.getInstance().setEdited(true);
+									}
+								});
+							}
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllImports);
+
 			final JMenu layoutMenu = new JMenu("Layout");
 
 			final JMenuItem miSolarPanelArrays = new JMenuItem("Solar Panel Arrays...");

@@ -813,7 +813,8 @@ public class Util {
 					getMeshes((Node) c, meshes);
 				} else {
 					if (c instanceof Mesh) {
-						meshes.add((Mesh) c);
+						final Mesh m = (Mesh) c;
+						meshes.add(m);
 					}
 				}
 			}

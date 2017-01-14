@@ -401,7 +401,7 @@ public abstract class HousePart implements Serializable {
 	public Vector3 toRelative(final ReadOnlyVector3 p) {
 		final HousePart container = getContainerRelative();
 		if (container == null) {
-			return new Vector3(p);
+			return p.clone();
 		}
 		final Vector3 p0 = container.getAbsPoint(0);
 		final Vector3 p1 = container.getAbsPoint(1);
@@ -421,6 +421,9 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public Vector3 toRelativeVector(final ReadOnlyVector3 v) {
+		if (getContainerRelative() == null) { // a foundation does not have a container, return a clone of itself
+			return v.clone();
+		}
 		return toRelative(v.add(getContainerRelative().getAbsPoint(0), null));
 	}
 

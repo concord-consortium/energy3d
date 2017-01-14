@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
@@ -96,9 +96,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
-	private transient List<Node> content;
-	private List<ReadOnlyVector3> contentPositions;
-	private List<URL> contentFiles;
+	private transient List<Node> importNodes;
+	private List<Vector3> importPositions;
+	private List<URL> importFiles;
 
 	static {
 		format.setGroupingUsed(true);
@@ -226,9 +226,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		// for (int i = 8; i < points.size(); i++)
 		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
 
-		if (contentFiles != null) {
+		if (importFiles != null) {
 			try {
-				for (final URL url : contentFiles) {
+				for (final URL url : importFiles) {
 					importCollada(url, true);
 				}
 			} catch (final Throwable t) {
@@ -685,15 +685,15 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateHandles();
 			drawSolarReceiver();
 			foundationPolygon.draw();
-			if (content != null) {
-				final int n = content.size();
+			if (importNodes != null) {
+				final int n = importNodes.size();
 				if (n > 0) {
 					final Vector3 c = getAbsCenter();
-					final double az = Math.toRadians(getAzimuth());
-					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -az);
+					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 					for (int i = 0; i < n; i++) {
-						content.get(i).setTranslation(toAbsolute(c.add(contentPositions.get(i), null)));
-						content.get(i).setRotation(matrix);
+						final Vector3 vi = matrix.applyPost(importPositions.get(i), null);
+						importNodes.get(i).setTranslation(c.add(vi, null));
+						importNodes.get(i).setRotation(matrix);
 					}
 				}
 			}
@@ -2488,27 +2488,54 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	public void importCollada(final URL file, final boolean init) throws IOException {
-		if (content == null) {
-			content = new ArrayList<Node>();
+	public List<Mesh> getImportRadiationMeshes() {
+		if (importNodes == null || importNodes.isEmpty()) {
+			return null;
 		}
-		if (contentPositions == null) {
-			contentPositions = new ArrayList<ReadOnlyVector3>();
+		final List<Mesh> meshes = new ArrayList<Mesh>();
+		for (final Node node : importNodes) {
+			Util.getMeshes(node, meshes);
 		}
-		if (contentFiles == null) {
-			contentFiles = new ArrayList<URL>();
+		return meshes;
+	}
+
+	public void importCollada(final URL file, final boolean init) throws Exception {
+		if (importNodes == null) {
+			importNodes = new ArrayList<Node>();
 		}
-		final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
-		node.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-		content.add(node);
-		root.attachChild(node);
-		if (!init) {
-			final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
-			if (position != null) {
-				node.setTranslation(position);
+		if (importPositions == null) {
+			importPositions = new ArrayList<Vector3>();
+		}
+		if (importFiles == null) {
+			importFiles = new ArrayList<URL>();
+		}
+		if (new File(file.toURI()).exists()) {
+			final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
+			node.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+			importNodes.add(node);
+			root.attachChild(node);
+			if (!init) {
+				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
+				if (position != null) {
+					node.setTranslation(position);
+				}
+				importPositions.add(node.getTranslation().subtract(getAbsCenter(), null));
+				importFiles.add(file);
 			}
-			contentPositions.add(node.getTranslation().subtract(getAbsCenter(), null));
-			contentFiles.add(file);
+		} else {
+			importFiles.remove(file);
+		}
+	}
+
+	public void removeAllImports() {
+		if (importNodes != null) {
+			if (!importNodes.isEmpty()) {
+				for (final Node node : importNodes) {
+					root.detachChild(node);
+				}
+				importPositions.clear();
+				importFiles.clear();
+			}
 		}
 	}
 
