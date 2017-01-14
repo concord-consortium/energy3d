@@ -2610,7 +2610,7 @@ public class MainFrame extends JFrame {
 			return;
 		}
 		try {
-			SceneManager.getInstance().newImport(file.toURI().toURL());
+			SceneManager.getInstance().importCollada(file.toURI().toURL());
 		} catch (final Throwable err) {
 			err.printStackTrace();
 			JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
