@@ -216,6 +216,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miInfo = new JMenuItem("Land");
 			miInfo.setEnabled(false);
+			miInfo.setOpaque(true);
+			miInfo.setBackground(Color.GRAY);
+			miInfo.setForeground(Color.WHITE);
 
 			final JMenuItem miPaste = new JMenuItem("Paste");
 			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
@@ -515,7 +518,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForLand.add(miInfo);
-			popupMenuForLand.addSeparator();
+			// popupMenuForLand.addSeparator();
 			popupMenuForLand.add(miPaste);
 			popupMenuForLand.add(miRemoveAllTrees);
 			popupMenuForLand.add(miRemoveAllHumans);
@@ -541,6 +544,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miInfo = new JMenuItem("Sky");
 			miInfo.setEnabled(false);
+			miInfo.setOpaque(true);
+			miInfo.setBackground(Color.GRAY);
+			miInfo.setForeground(Color.WHITE);
 
 			final JCheckBoxMenuItem miHeliodon = new JCheckBoxMenuItem("Heliodon");
 			miHeliodon.addItemListener(new ItemListener() {
@@ -673,7 +679,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForSky.add(miInfo);
-			popupMenuForSky.addSeparator();
+			// popupMenuForSky.addSeparator();
 			popupMenuForSky.add(miDustLoss);
 			popupMenuForSky.add(miHeliodon);
 			popupMenuForSky.add(themeMenu);
@@ -690,6 +696,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miInfo = new JMenuItem("Floor");
 			miInfo.setEnabled(false);
+			miInfo.setOpaque(true);
+			miInfo.setBackground(Color.GRAY);
+			miInfo.setForeground(Color.WHITE);
 
 			popupMenuForFloor = new JPopupMenu();
 			popupMenuForFloor.setInvoker(MainPanel.getInstance().getCanvasPanel());
@@ -716,7 +725,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForFloor.add(miInfo);
-			popupMenuForFloor.addSeparator();
+			// popupMenuForFloor.addSeparator();
 			popupMenuForFloor.add(colorAction);
 
 		}
@@ -1881,6 +1890,21 @@ public class PopupMenuFactory {
 
 		if (popupMenuForFoundation == null) {
 
+			final JMenuItem miImportCollada = new JMenuItem("Import Collada...");
+			miImportCollada.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
+					if (file != null) {
+						try {
+							SceneManager.getInstance().importCollada(file.toURI().toURL());
+						} catch (final Throwable t) {
+							Util.reportError(t);
+						}
+					}
+				}
+			});
+
 			final JMenuItem miPaste = new JMenuItem("Paste");
 			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			miPaste.addActionListener(new ActionListener() {
@@ -2890,6 +2914,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miPaste);
 			popupMenuForFoundation.add(miCopy);
 			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miImportCollada);
 			popupMenuForFoundation.add(miHeight);
 			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(rotateMenu);
@@ -6497,6 +6522,9 @@ public class PopupMenuFactory {
 
 		final JMenuItem miInfo = new JMenuItem();
 		miInfo.setEnabled(false);
+		miInfo.setOpaque(true);
+		miInfo.setBackground(Color.GRAY);
+		miInfo.setForeground(Color.WHITE);
 
 		final JPopupMenu popupMenu = new JPopupMenu();
 		popupMenu.setInvoker(MainPanel.getInstance().getCanvasPanel());
@@ -6539,7 +6567,7 @@ public class PopupMenuFactory {
 		});
 
 		popupMenu.add(miInfo);
-		popupMenu.addSeparator();
+		// popupMenu.addSeparator();
 		popupMenu.add(miCut);
 
 		if (hasCopyMenu) {

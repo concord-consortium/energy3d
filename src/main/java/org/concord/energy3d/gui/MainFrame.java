@@ -131,8 +131,8 @@ public class MainFrame extends JFrame {
 	private static final MainFrame instance = new MainFrame();
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
 	private static final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
-	private static final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
 	private static final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
+	static final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
 	static final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
 	private final JColorChooser colorChooser;
 	private int fileMenuItemCount;
@@ -223,7 +223,6 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem grasslandMenuItem;
 	private JRadioButtonMenuItem forestMenuItem;
 	private final ButtonGroup themeButtonGroup = new ButtonGroup();
-	private JMenuItem importColladaMenuItem;
 	private JMenuItem exportImageMenuItem;
 	private JMenuItem copyImageMenuItem;
 	private JMenuItem exportLogMenuItem;
@@ -468,7 +467,6 @@ public class MainFrame extends JFrame {
 					replayLastFolderMenuItem.setEnabled(b);
 					replayControlsMenu.setEnabled(b);
 					analyzeFolderMenuItem.setEnabled(b);
-					importColladaMenuItem.setEnabled(b);
 					saveMenuItem.setEnabled(b);
 				}
 
@@ -570,7 +568,6 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getExportImageMenuItem());
 			addItemToFileMenu(getExportLogMenuItem());
 			addItemToFileMenu(getImportMenuItem());
-			addItemToFileMenu(getImportColladaMenuItem());
 			addItemToFileMenu(new JSeparator());
 
 			addItemToFileMenu(getReplayFolderMenuItem());
@@ -2604,19 +2601,6 @@ public class MainFrame extends JFrame {
 		});
 	}
 
-	private void importColladaFile() {
-		final File file = FileChooser.getInstance().showDialog(".dae", daeFilter, false);
-		if (file == null) {
-			return;
-		}
-		try {
-			SceneManager.getInstance().importCollada(file.toURI().toURL());
-		} catch (final Throwable err) {
-			err.printStackTrace();
-			JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
 	private JMenuItem getPageSetupMenuItem() {
 		if (pageSetupMenuItem == null) {
 			pageSetupMenuItem = new JMenuItem("Page Setup...");
@@ -3137,19 +3121,6 @@ public class MainFrame extends JFrame {
 			err.printStackTrace();
 			JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
-	}
-
-	private JMenuItem getImportColladaMenuItem() {
-		if (importColladaMenuItem == null) {
-			importColladaMenuItem = new JMenuItem("Import Collada...");
-			importColladaMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					importColladaFile();
-				}
-			});
-		}
-		return importColladaMenuItem;
 	}
 
 	private JMenuItem getExportLogMenuItem() {

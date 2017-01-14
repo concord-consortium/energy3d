@@ -60,6 +60,7 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.LightCombineMode;
 import com.ardor3d.scenegraph.hint.PickingHint;
@@ -801,6 +802,22 @@ public class Util {
 			return new Point2D.Double(x1 + u * (x2 - x1), y1 + u * (y2 - y1));
 		}
 		return null;
+	}
+
+	/** traverse the node to obtain all the meshes */
+	public static void getMeshes(final Node node, final List<Mesh> meshes) {
+		final List<Spatial> children = node.getChildren();
+		if (!children.isEmpty()) {
+			for (final Spatial c : children) {
+				if (c instanceof Node) {
+					getMeshes((Node) c, meshes);
+				} else {
+					if (c instanceof Mesh) {
+						meshes.add((Mesh) c);
+					}
+				}
+			}
+		}
 	}
 
 }

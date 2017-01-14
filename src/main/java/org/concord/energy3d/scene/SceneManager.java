@@ -51,7 +51,6 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.ShedRoof;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Structure;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
@@ -2055,24 +2054,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 	}
 
-	public void importCollada(final URL file) throws IOException {
-		final ResourceSource source = new URLResourceSource(file);
-		final ColladaImporter colladaImporter = new ColladaImporter();
-		Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
-		Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
-		final ColladaStorage storage = colladaImporter.load(source);
-		final Node content = storage.getScene();
-		final Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
-		if (position != null) {
-			content.setTranslation(position);
-		}
-		content.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-		// Scene.getOriginalHouseRoot().attachChild(content);
-		final Structure structure = new Structure();
-		structure.getRoot().attachChild(content);
-		Scene.getInstance().add(structure, false);
-	}
-
 	public Camera getCamera() {
 		return canvas.getCanvasRenderer().getCamera();
 	}
@@ -2347,6 +2328,24 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public BasicPassManager getPassManager() {
 		return passManager;
+	}
+
+	public void importCollada(final URL file) throws IOException {
+		if (selectedPart instanceof Foundation) {
+			final Foundation foundation = (Foundation) selectedPart;
+			final ResourceSource source = new URLResourceSource(file);
+			final ColladaImporter colladaImporter = new ColladaImporter();
+			Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
+			Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
+			final ColladaStorage storage = colladaImporter.load(source);
+			final Node content = storage.getScene();
+			final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
+			if (position != null) {
+				content.setTranslation(position);
+			}
+			content.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+			foundation.attachContent(content);
+		}
 	}
 
 }

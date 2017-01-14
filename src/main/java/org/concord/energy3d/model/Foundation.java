@@ -34,6 +34,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
+import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.hint.SceneHints;
@@ -91,6 +92,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
+	private transient List<Node> content;
+	private List<ReadOnlyVector3> contentPositions;
 
 	static {
 		format.setGroupingUsed(true);
@@ -667,6 +670,14 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateHandles();
 			drawSolarReceiver();
 			foundationPolygon.draw();
+			if (content != null) {
+				final int n = content.size();
+				if (n > 0) {
+					for (int i = 0; i < n; i++) {
+						content.get(i).setTranslation(getAbsCenter().add(contentPositions.get(i), null));
+					}
+				}
+			}
 		}
 	}
 
@@ -2456,6 +2467,20 @@ public class Foundation extends HousePart implements Thermalizable {
 		path.lineTo(p.getX(), p.getY());
 		path.closePath();
 		return new Area(path);
+	}
+
+	public void attachContent(final Node node) {
+		if (content == null) {
+			content = new ArrayList<Node>();
+		}
+		if (contentPositions == null) {
+			contentPositions = new ArrayList<ReadOnlyVector3>();
+		}
+		if (!content.contains(node)) {
+			content.add(node);
+			root.attachChild(node);
+			contentPositions.add(node.getTranslation().subtract(getAbsCenter(), null));
+		}
 	}
 
 }
