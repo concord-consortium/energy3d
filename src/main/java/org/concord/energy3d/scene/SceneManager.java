@@ -14,7 +14,6 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -153,7 +152,6 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.ResourceLocatorTool;
 import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
-import com.ardor3d.util.resource.URLResourceSource;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
 	public static final int SKY_RADIUS = 10000;
@@ -2213,7 +2211,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
-	Vector3 getPickedLocationOnFoundation() {
+	public Vector3 getPickedLocationOnFoundation() {
 		if (pasteMouseState != null) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Foundation) {
@@ -2328,24 +2326,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public BasicPassManager getPassManager() {
 		return passManager;
-	}
-
-	public void importCollada(final URL file) throws IOException {
-		if (selectedPart instanceof Foundation) {
-			final Foundation foundation = (Foundation) selectedPart;
-			final ResourceSource source = new URLResourceSource(file);
-			final ColladaImporter colladaImporter = new ColladaImporter();
-			Logger.getLogger(ColladaAnimUtils.class.getName()).setLevel(Level.SEVERE);
-			Logger.getLogger(ColladaMaterialUtils.class.getName()).setLevel(Level.SEVERE);
-			final ColladaStorage storage = colladaImporter.load(source);
-			final Node content = storage.getScene();
-			final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
-			if (position != null) {
-				content.setTranslation(position);
-			}
-			content.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-			foundation.attachContent(content);
-		}
 	}
 
 }

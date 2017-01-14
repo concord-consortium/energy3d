@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
+import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
@@ -43,6 +46,7 @@ import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
+import com.ardor3d.util.resource.URLResourceSource;
 
 public class Foundation extends HousePart implements Thermalizable {
 	private static final long serialVersionUID = 1L;
@@ -94,6 +98,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean groupMaster;
 	private transient List<Node> content;
 	private List<ReadOnlyVector3> contentPositions;
+	private List<URL> contentFiles;
 
 	static {
 		format.setGroupingUsed(true);
@@ -220,6 +225,16 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		// for (int i = 8; i < points.size(); i++)
 		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+
+		if (contentFiles != null) {
+			try {
+				for (final URL url : contentFiles) {
+					importCollada(url, true);
+				}
+			} catch (final Throwable t) {
+				Util.reportError(t);
+			}
+		}
 
 	}
 
@@ -673,8 +688,12 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (content != null) {
 				final int n = content.size();
 				if (n > 0) {
+					final Vector3 c = getAbsCenter();
+					final double az = Math.toRadians(getAzimuth());
+					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -az);
 					for (int i = 0; i < n; i++) {
-						content.get(i).setTranslation(getAbsCenter().add(contentPositions.get(i), null));
+						content.get(i).setTranslation(toAbsolute(c.add(contentPositions.get(i), null)));
+						content.get(i).setRotation(matrix);
 					}
 				}
 			}
@@ -2469,17 +2488,27 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	public void attachContent(final Node node) {
+	public void importCollada(final URL file, final boolean init) throws IOException {
 		if (content == null) {
 			content = new ArrayList<Node>();
 		}
 		if (contentPositions == null) {
 			contentPositions = new ArrayList<ReadOnlyVector3>();
 		}
-		if (!content.contains(node)) {
-			content.add(node);
-			root.attachChild(node);
+		if (contentFiles == null) {
+			contentFiles = new ArrayList<URL>();
+		}
+		final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
+		node.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+		content.add(node);
+		root.attachChild(node);
+		if (!init) {
+			final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
+			if (position != null) {
+				node.setTranslation(position);
+			}
 			contentPositions.add(node.getTranslation().subtract(getAbsCenter(), null));
+			contentFiles.add(file);
 		}
 	}
 

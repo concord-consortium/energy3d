@@ -1894,12 +1894,15 @@ public class PopupMenuFactory {
 			miImportCollada.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
-					if (file != null) {
-						try {
-							SceneManager.getInstance().importCollada(file.toURI().toURL());
-						} catch (final Throwable t) {
-							Util.reportError(t);
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
+						if (file != null) {
+							try {
+								((Foundation) selectedPart).importCollada(file.toURI().toURL(), false);
+							} catch (final Throwable t) {
+								Util.reportError(t);
+							}
 						}
 					}
 				}
