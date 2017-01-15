@@ -144,9 +144,9 @@ public class SolarRadiation {
 					collidables.add(s);
 					collidablesToParts.put(s, foundation);
 				}
-				final List<Mesh> contentMeshes = foundation.getImportRadiationMeshes();
-				if (contentMeshes != null && !contentMeshes.isEmpty()) {
-					for (final Mesh m : contentMeshes) {
+				final List<Mesh> importedMeshes = foundation.getImportedMeshes();
+				if (importedMeshes != null && !importedMeshes.isEmpty()) {
+					for (final Mesh m : importedMeshes) {
 						collidables.add(m);
 						collidablesToParts.put(m, foundation);
 					}
@@ -214,9 +214,9 @@ public class SolarRadiation {
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
-							final List<Mesh> contentMeshes = foundation.getImportRadiationMeshes();
-							if (contentMeshes != null && !contentMeshes.isEmpty()) {
-								for (final Mesh m : contentMeshes) {
+							final List<Mesh> importedMeshes = foundation.getImportedMeshes();
+							if (importedMeshes != null && !importedMeshes.isEmpty()) {
+								for (final Mesh m : importedMeshes) {
 									// TODO: final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
 									// computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, normal);
 								}

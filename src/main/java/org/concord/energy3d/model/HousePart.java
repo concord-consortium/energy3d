@@ -98,7 +98,7 @@ public abstract class HousePart implements Serializable {
 
 	protected final ArrayList<Vector3> points;
 	protected final ArrayList<HousePart> children = new ArrayList<HousePart>();
-	protected HousePart container = null;
+	protected HousePart container;
 	protected double height;
 	protected long id;
 	protected int editPointIndex = -1;

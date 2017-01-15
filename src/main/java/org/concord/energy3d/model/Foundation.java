@@ -96,9 +96,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
-	private transient List<Node> importNodes;
-	private List<Vector3> importPositions;
-	private List<URL> importFiles;
+	private transient List<Node> importedNodes;
+	private List<Vector3> importedPositions;
+	private List<URL> importedFiles;
 
 	static {
 		format.setGroupingUsed(true);
@@ -226,9 +226,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		// for (int i = 8; i < points.size(); i++)
 		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
 
-		if (importFiles != null) {
+		if (importedFiles != null) {
 			try {
-				for (final URL url : importFiles) {
+				for (final URL url : importedFiles) {
 					importCollada(url, true);
 				}
 			} catch (final Throwable t) {
@@ -685,15 +685,15 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateHandles();
 			drawSolarReceiver();
 			foundationPolygon.draw();
-			if (importNodes != null) {
-				final int n = importNodes.size();
+			if (importedNodes != null) {
+				final int n = importedNodes.size();
 				if (n > 0) {
 					final Vector3 c = getAbsCenter();
 					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 					for (int i = 0; i < n; i++) {
-						final Vector3 vi = matrix.applyPost(importPositions.get(i), null);
-						importNodes.get(i).setTranslation(c.add(vi, null));
-						importNodes.get(i).setRotation(matrix);
+						final Vector3 vi = matrix.applyPost(importedPositions.get(i), null);
+						importedNodes.get(i).setTranslation(c.add(vi, null));
+						importedNodes.get(i).setRotation(matrix);
 					}
 				}
 			}
@@ -2488,54 +2488,60 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	public List<Mesh> getImportRadiationMeshes() {
-		if (importNodes == null || importNodes.isEmpty()) {
+	public List<Mesh> getImportedMeshes() {
+		if (importedNodes == null || importedNodes.isEmpty()) {
 			return null;
 		}
 		final List<Mesh> meshes = new ArrayList<Mesh>();
-		for (final Node node : importNodes) {
+		for (final Node node : importedNodes) {
 			Util.getMeshes(node, meshes);
 		}
 		return meshes;
 	}
 
 	public void importCollada(final URL file, final boolean init) throws Exception {
-		if (importNodes == null) {
-			importNodes = new ArrayList<Node>();
+		if (importedNodes == null) {
+			importedNodes = new ArrayList<Node>();
 		}
-		if (importPositions == null) {
-			importPositions = new ArrayList<Vector3>();
+		if (importedPositions == null) {
+			importedPositions = new ArrayList<Vector3>();
 		}
-		if (importFiles == null) {
-			importFiles = new ArrayList<URL>();
+		if (importedFiles == null) {
+			importedFiles = new ArrayList<URL>();
 		}
 		if (new File(file.toURI()).exists()) {
 			final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
 			node.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-			importNodes.add(node);
+			importedNodes.add(node);
 			root.attachChild(node);
+			final List<Mesh> meshes = getImportedMeshes();
+			if (meshes != null && !meshes.isEmpty()) {
+				for (final Mesh m : meshes) {
+					m.setUserData(new UserData(this));
+				}
+			}
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
 				if (position != null) {
 					node.setTranslation(position);
 				}
-				importPositions.add(node.getTranslation().subtract(getAbsCenter(), null));
-				importFiles.add(file);
+				importedPositions.add(node.getTranslation().subtract(getAbsCenter(), null));
+				importedFiles.add(file);
 			}
 		} else {
-			importFiles.remove(file);
+			importedFiles.remove(file);
 		}
 	}
 
 	public void removeAllImports() {
-		if (importNodes != null) {
-			if (!importNodes.isEmpty()) {
-				for (final Node node : importNodes) {
+		if (importedNodes != null) {
+			if (!importedNodes.isEmpty()) {
+				for (final Node node : importedNodes) {
 					root.detachChild(node);
 				}
-				importNodes.clear();
-				importPositions.clear();
-				importFiles.clear();
+				importedNodes.clear();
+				importedPositions.clear();
+				importedFiles.clear();
 			}
 		}
 	}

@@ -67,7 +67,6 @@ public class SelectUtil {
 	public static PickedHousePart pickPart(final int x, final int y, final Class<?>[] typesOfHousePart) {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
-
 		for (final Class<?> typeOfHousePart : typesOfHousePart) {
 			if (typeOfHousePart == null) {
 				PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
@@ -80,7 +79,6 @@ public class SelectUtil {
 				}
 			}
 		}
-
 		return getPickResult(pickRay);
 	}
 
