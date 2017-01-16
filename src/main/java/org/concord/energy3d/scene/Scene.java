@@ -1475,6 +1475,39 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllWalls() {
+		final ArrayList<HousePart> walls = new ArrayList<HousePart>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Wall && !part.isFrozen() && part.getTopContainer() == foundation) {
+					walls.add(part);
+				}
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Wall && !part.isFrozen()) {
+					walls.add(part);
+				}
+			}
+		}
+		if (walls.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no wall to remove.", "No Wall", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + walls.size() + " walls" + (selectedPart != null ? " of the selected building" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+			return;
+		}
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(walls);
+		for (final HousePart part : walls) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
 	public void removeAllWindows() {
 		final ArrayList<HousePart> windows = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
