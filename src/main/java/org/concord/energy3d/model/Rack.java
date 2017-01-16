@@ -70,6 +70,8 @@ public class Rack extends HousePart implements Trackable {
 	private transient Line solarPanelOutlines;
 	private static double normalVectorLength = 5;
 	private static transient BloomRenderPass bloomRenderPass;
+	private transient double baseZ;
+	private transient boolean isBaseZ;
 
 	public Rack() {
 		super(1, 1, 0);
@@ -172,9 +174,11 @@ public class Rack extends HousePart implements Trackable {
 			initSolarPanelsForMove();
 		}
 		if (editPointIndex <= 0) {
+			isBaseZ = true;
 			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class });
 			if (picked != null) {
 				final Vector3 p = picked.getPoint().clone();
+				isBaseZ = Util.isEqual(p.getZ(), baseZ);
 				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 				points.get(0).set(toRelative(p));
 			}
@@ -343,14 +347,8 @@ public class Rack extends HousePart implements Trackable {
 		}
 		allowAzimuthLargeRotation = false;
 
-		final double baseZ;
-		if (this.container instanceof Foundation) {
-			baseZ = this.container.getHeight();
-		} else {
-			baseZ = this.container.getPoints().get(0).getZ();
-		}
-
-		if (onFlatSurface) {
+		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
+		if (onFlatSurface && isBaseZ) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
 

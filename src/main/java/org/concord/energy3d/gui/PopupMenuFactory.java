@@ -1982,6 +1982,28 @@ public class PopupMenuFactory {
 
 			final JMenu clearMenu = new JMenu("Clear");
 
+			final JMenuItem miRemoveAllWalls = new JMenuItem("Remove All Walls");
+			miRemoveAllWalls.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllWalls();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									Scene.getInstance().setEdited(true);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllWalls);
+
 			final JMenuItem miRemoveAllWindows = new JMenuItem("Remove All Windows");
 			miRemoveAllWindows.addActionListener(new ActionListener() {
 				@Override

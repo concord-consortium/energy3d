@@ -2517,7 +2517,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			final List<Mesh> meshes = getImportedMeshes();
 			if (meshes != null && !meshes.isEmpty()) {
 				for (final Mesh m : meshes) {
-					m.setUserData(new UserData(this));
+					m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
 				}
 			}
 			if (!init) {
