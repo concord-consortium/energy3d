@@ -69,7 +69,7 @@ public class SolarRadiation {
 	public final static int AIR_MASS_SPHERE_MODEL = 1;
 
 	private static SolarRadiation instance = new SolarRadiation();
-	private final Map<Mesh, MeshData> onMesh = new HashMap<Mesh, MeshData>();
+	private final Map<Mesh, MeshDataStore> onMesh = new HashMap<Mesh, MeshDataStore>();
 	private final List<Spatial> collidables = new ArrayList<Spatial>();
 	private final Map<Spatial, HousePart> collidablesToParts = new HashMap<Spatial, HousePart>();
 	private long maxValue;
@@ -77,7 +77,7 @@ public class SolarRadiation {
 	private double peakRadiation;
 	private static double[][] cellOutputs; // temporarily hold the intermediate calculated solar radiation on the solar cells of a solar panel or rack
 
-	private class MeshData {
+	private class MeshDataStore { // renamed this to avoid name conflict with MeshData
 		public Vector3 p0;
 		public Vector3 p1;
 		public Vector3 p2;
@@ -113,12 +113,12 @@ public class SolarRadiation {
 	}
 
 	public double[] getSolarPotential(final Mesh mesh) {
-		final MeshData md = onMesh.get(mesh);
+		final MeshDataStore md = onMesh.get(mesh);
 		return md == null ? null : md.solarPotential;
 	}
 
 	public double[] getHeatLoss(final Mesh mesh) {
-		final MeshData md = onMesh.get(mesh);
+		final MeshDataStore md = onMesh.get(mesh);
 		return md == null ? null : md.heatLoss;
 	}
 
@@ -214,11 +214,10 @@ public class SolarRadiation {
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
-							final List<Mesh> importedMeshes = foundation.getImportedMeshes();
-							if (importedMeshes != null && !importedMeshes.isEmpty()) {
-								for (final Mesh m : importedMeshes) {
-									// TODO: final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
-									// computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, normal);
+							final List<Mesh> constructedMeshes = foundation.getConstructedMeshes();
+							if (constructedMeshes != null && !constructedMeshes.isEmpty()) {
+								for (final Mesh m : constructedMeshes) {
+									computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, ((UserData) m.getUserData()).getNormal());
 								}
 							}
 						} else if (part instanceof Roof) {
@@ -251,7 +250,9 @@ public class SolarRadiation {
 		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
 		Heliodon.getInstance().getCalendar().set(Calendar.HOUR_OF_DAY, hourOfDay);
 		Heliodon.getInstance().getCalendar().set(Calendar.MINUTE, minuteOfHour);
-		for (final HousePart part : Scene.getInstance().getParts()) {
+		for (
+
+		final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Mirror) {
 				final Mirror m = (Mirror) part;
 				if (m.getHeliostatTarget() != null) {
@@ -279,9 +280,9 @@ public class SolarRadiation {
 		final double step = Scene.getInstance().getSolarStep() * 4;
 		final int rows = (int) (256 / step);
 		final int cols = rows;
-		MeshData data = onMesh.get(SceneManager.getInstance().getSolarLand());
+		MeshDataStore data = onMesh.get(SceneManager.getInstance().getSolarLand());
 		if (data == null) {
-			data = new MeshData();
+			data = new MeshDataStore();
 			data.dailySolarIntensity = new double[rows][cols];
 			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
 		}
@@ -314,7 +315,7 @@ public class SolarRadiation {
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 
-		MeshData data = onMesh.get(drawMesh);
+		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
 			data = initMeshTextureData(drawMesh, collisionMesh, normal, !(housePart instanceof Window));
 		}
@@ -409,7 +410,7 @@ public class SolarRadiation {
 
 		final Mesh drawMesh = mirror.getRadiationMesh();
 		final Mesh collisionMesh = (Mesh) mirror.getRadiationCollisionSpatial();
-		MeshData data = onMesh.get(drawMesh);
+		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
 		}
@@ -525,7 +526,7 @@ public class SolarRadiation {
 
 		final Mesh drawMesh = sensor.getRadiationMesh();
 		final Mesh collisionMesh = (Mesh) sensor.getRadiationCollisionSpatial();
-		MeshData data = onMesh.get(drawMesh);
+		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
 		}
@@ -602,7 +603,7 @@ public class SolarRadiation {
 
 		final Mesh drawMesh = panel.getRadiationMesh();
 		final Mesh collisionMesh = (Mesh) panel.getRadiationCollisionSpatial();
-		MeshData data = onMesh.get(drawMesh);
+		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
 		}
@@ -768,7 +769,7 @@ public class SolarRadiation {
 
 		final Mesh drawMesh = rack.getRadiationMesh();
 		final Mesh collisionMesh = (Mesh) rack.getRadiationCollisionSpatial();
-		MeshData data = onMesh.get(drawMesh);
+		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
 			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
 		}
@@ -917,8 +918,8 @@ public class SolarRadiation {
 		initMeshTextureData(drawMesh, collisionMesh, normal, true);
 	}
 
-	private MeshData initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean updateTexture) {
-		final MeshData data = new MeshData();
+	private MeshDataStore initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean updateTexture) {
+		final MeshDataStore data = new MeshDataStore();
 		if (normal == null) { // TODO: Temporarily allow the program to move forward behind this point
 			return data;
 		}
@@ -1010,8 +1011,8 @@ public class SolarRadiation {
 		return data;
 	}
 
-	private MeshData initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final int rows, final int cols) {
-		final MeshData data = new MeshData();
+	private MeshDataStore initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final int rows, final int cols) {
+		final MeshDataStore data = new MeshDataStore();
 		data.rows = rows;
 		data.cols = cols;
 		if (data.dailySolarIntensity == null) {
@@ -1022,7 +1023,7 @@ public class SolarRadiation {
 	}
 
 	private void updateTextureCoords(final Mesh drawMesh) {
-		final MeshData data = onMesh.get(drawMesh);
+		final MeshDataStore data = onMesh.get(drawMesh);
 		final ReadOnlyVector3 o = data.p0;
 		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * Scene.getInstance().getSolarStep(), null);
 		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);

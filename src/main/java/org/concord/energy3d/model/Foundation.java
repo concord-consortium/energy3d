@@ -96,7 +96,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
-	private transient List<Node> importedNodes;
+	private transient List<Node> importedNodes, constructedNodes;
+	private transient List<Mesh> importedMeshes, constructedMeshes;
 	private List<Vector3> importedPositions;
 	private List<URL> importedFiles;
 
@@ -694,6 +695,18 @@ public class Foundation extends HousePart implements Thermalizable {
 						final Vector3 vi = matrix.applyPost(importedPositions.get(i), null);
 						importedNodes.get(i).setTranslation(c.add(vi, null));
 						importedNodes.get(i).setRotation(matrix);
+					}
+				}
+			}
+			if (constructedNodes != null) {
+				final int n = constructedNodes.size();
+				if (n > 0) {
+					final Vector3 c = getAbsCenter();
+					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
+					for (int i = 0; i < n; i++) {
+						final Vector3 vi = matrix.applyPost(importedPositions.get(i), null);
+						constructedNodes.get(i).setTranslation(c.add(vi, null));
+						constructedNodes.get(i).setRotation(matrix);
 					}
 				}
 			}
@@ -2488,20 +2501,77 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	public List<Mesh> getImportedMeshes() {
+	private void constructImportedMeshes() {
 		if (importedNodes == null || importedNodes.isEmpty()) {
-			return null;
+			importedMeshes = null;
+			constructedMeshes = null;
+			return;
 		}
-		final List<Mesh> meshes = new ArrayList<Mesh>();
+		if (importedMeshes == null) {
+			importedMeshes = new ArrayList<Mesh>();
+		} else {
+			importedMeshes.clear();
+		}
+		if (constructedMeshes == null) {
+			constructedMeshes = new ArrayList<Mesh>();
+		} else {
+			constructedMeshes.clear();
+		}
 		for (final Node node : importedNodes) {
-			Util.getMeshes(node, meshes);
+			Util.getMeshes(node, importedMeshes);
 		}
-		return meshes;
+		for (final Mesh m : importedMeshes) {
+			m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
+			final MeshData md = m.getMeshData();
+			switch (md.getIndexMode(0)) {
+			case Triangles:
+				final FloatBuffer vertexBuffer = md.getVertexBuffer();
+				final FloatBuffer normalBuffer = md.getNormalBuffer();
+				final int n = (int) Math.round(vertexBuffer.limit() / 9.0);
+				for (int i = 0; i < n; i++) {
+					final Mesh mesh = new Mesh("Triangle");
+					final FloatBuffer vb = BufferUtils.createFloatBuffer(9);
+					final int j = i * 9;
+					vb.put(vertexBuffer.get(j)).put(vertexBuffer.get(j + 1)).put(vertexBuffer.get(j + 2));
+					vb.put(vertexBuffer.get(j + 3)).put(vertexBuffer.get(j + 4)).put(vertexBuffer.get(j + 5));
+					vb.put(vertexBuffer.get(j + 6)).put(vertexBuffer.get(j + 7)).put(vertexBuffer.get(j + 8));
+					mesh.getMeshData().setVertexBuffer(vb);
+					final FloatBuffer nb = BufferUtils.createFloatBuffer(9);
+					nb.put(normalBuffer.get(j)).put(normalBuffer.get(j + 1)).put(normalBuffer.get(j + 2));
+					nb.put(normalBuffer.get(j + 3)).put(normalBuffer.get(j + 4)).put(normalBuffer.get(j + 5));
+					nb.put(normalBuffer.get(j + 6)).put(normalBuffer.get(j + 7)).put(normalBuffer.get(j + 8));
+					mesh.getMeshData().setNormalBuffer(nb);
+					mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(3), 0);
+					final UserData userData = new UserData(this);
+					userData.setNormal(new Vector3(nb.get(0), nb.get(1), nb.get(2)));
+					mesh.setUserData(userData);
+					mesh.setRenderState(offsetState);
+					mesh.getMeshData().setIndexMode(md.getIndexMode(0));
+					constructedMeshes.add(mesh);
+				}
+				break;
+			case Quads:
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	public List<Mesh> getImportedMeshes() {
+		return importedMeshes;
+	}
+
+	public List<Mesh> getConstructedMeshes() {
+		return constructedMeshes;
 	}
 
 	public void importCollada(final URL file, final boolean init) throws Exception {
 		if (importedNodes == null) {
 			importedNodes = new ArrayList<Node>();
+		}
+		if (constructedNodes == null) {
+			constructedNodes = new ArrayList<Node>();
 		}
 		if (importedPositions == null) {
 			importedPositions = new ArrayList<Vector3>();
@@ -2513,12 +2583,24 @@ public class Foundation extends HousePart implements Thermalizable {
 			final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
 			node.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 			importedNodes.add(node);
-			root.attachChild(node);
-			final List<Mesh> meshes = getImportedMeshes();
-			if (meshes != null && !meshes.isEmpty()) {
-				for (final Mesh m : meshes) {
-					m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
+			// root.attachChild(node);
+			constructImportedMeshes();
+			if (constructedMeshes != null && !constructedMeshes.isEmpty()) {
+				final Node newNode = new Node("Constructed Mesh");
+				constructedNodes.add(newNode);
+				for (final Mesh m : constructedMeshes) {
+					newNode.attachChild(m);
+					final MeshData md = m.getMeshData();
+					switch (md.getIndexMode(0)) {
+					case Triangles:
+						// System.out.println("****" + md.getIndexMode(0) + "," + md.getNormalBuffer().limit());
+						break;
+					default:
+						break;
+					}
 				}
+				newNode.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+				root.attachChild(newNode);
 			}
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
@@ -2540,8 +2622,10 @@ public class Foundation extends HousePart implements Thermalizable {
 					root.detachChild(node);
 				}
 				importedNodes.clear();
+				constructedNodes.clear();
 				importedPositions.clear();
 				importedFiles.clear();
+				importedMeshes.clear();
 			}
 		}
 	}

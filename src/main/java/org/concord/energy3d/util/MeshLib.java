@@ -56,7 +56,7 @@ public class MeshLib {
 		createMeshes(root, groups);
 	}
 
-	public static ArrayList<GroupData> extractGroups(final Mesh mesh) {
+	private static ArrayList<GroupData> extractGroups(final Mesh mesh) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		vertexBuffer.rewind();
