@@ -579,7 +579,16 @@ public class Scene implements Serializable {
 				}
 			} else if (!parts.contains(p.getContainer())) { // remove parts whose container doesn't exist in the scene
 				toBeRemoved.add(p);
-			} else if (p instanceof Wall) { // remove walls that are at the same position
+			}
+		}
+		for (final HousePart p : toBeRemoved) {
+			remove(p, false);
+		}
+
+		// remove walls that are at the same position
+		toBeRemoved.clear();
+		for (final HousePart p : parts) {
+			if (p instanceof Wall) { // remove walls that are at the same position
 				if (((Wall) p).isAtSamePlaceAsAnotherPart()) {
 					toBeRemoved.add(p);
 				}
