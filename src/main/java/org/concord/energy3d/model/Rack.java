@@ -594,7 +594,7 @@ public class Rack extends HousePart implements Trackable {
 
 	@Override
 	public double getGridSize() {
-		return Math.min(rackWidth, rackHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 25.0 : 5.0);
+		return Math.min(rackWidth, rackHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
 	}
 
 	@Override

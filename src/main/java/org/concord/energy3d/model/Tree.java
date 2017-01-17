@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.SelectUtil;
 
@@ -182,8 +182,9 @@ public class Tree extends HousePart {
 		collisionRoot = new Node("Tree Collision Root");
 		collisionRoot.attachChild(crown);
 		collisionRoot.attachChild(trunk);
-		if (points.size() > 0)
+		if (points.size() > 0) {
 			collisionRoot.setTranslation(getAbsPoint(0));
+		}
 		collisionRoot.updateWorldTransform(true);
 		collisionRoot.updateWorldBound(true);
 		collisionRoot.getSceneHints().setCullHint(showPolygons ? CullHint.Never : CullHint.Always);
@@ -196,6 +197,7 @@ public class Tree extends HousePart {
 
 	}
 
+	@Override
 	public double getHeight() {
 		return treeHeight;
 	}
@@ -204,7 +206,7 @@ public class Tree extends HousePart {
 		return treeWidth;
 	}
 
-	public void setShowPolygons(boolean showPolygons) {
+	public void setShowPolygons(final boolean showPolygons) {
 		this.showPolygons = showPolygons;
 		collisionRoot.getSceneHints().setCullHint(showPolygons ? CullHint.Never : CullHint.Always);
 	}
@@ -215,12 +217,11 @@ public class Tree extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		final int index = 0;
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
 		if (pick != null) {
 			final Vector3 p = pick.getPoint().clone();
-			snapToGrid(p, getAbsPoint(index), getGridSize());
-			points.get(index).set(toRelative(p));
+			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
+			points.get(0).set(toRelative(p));
 			root.getSceneHints().setCullHint(CullHint.Never);
 		}
 		draw();
@@ -229,7 +230,7 @@ public class Tree extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return SceneManager.getInstance().isFineGrid() ? 1 : 5;
+		return SceneManager.getInstance().isFineGrid() ? 0.2 : 1;
 	}
 
 	@Override
@@ -277,10 +278,11 @@ public class Tree extends HousePart {
 	}
 
 	private boolean isShedded() {
-		if (treeType == PINE)
+		if (treeType == PINE) {
 			return false;
-		Calendar c = Heliodon.getInstance().getCalendar();
-		int year = c.get(Calendar.YEAR);
+		}
+		final Calendar c = Heliodon.getInstance().getCalendar();
+		final int year = c.get(Calendar.YEAR);
 		if (Heliodon.getInstance().getLatitude() > 0) {
 			leaf_grow_northern_hemisphere.set(Calendar.YEAR, year); // make sure that the year is the same
 			leaf_shed_northern_hemisphere.set(Calendar.YEAR, year);
@@ -299,9 +301,9 @@ public class Tree extends HousePart {
 
 	@Override
 	public Spatial getCollisionSpatial() {
-		if (showPolygons)
+		if (showPolygons) {
 			return getRadiationCollisionSpatial();
-		else {
+		} else {
 			crown.removeFromParent();
 			collisionRoot.updateWorldBound(true);
 			return collisionRoot;
@@ -310,10 +312,11 @@ public class Tree extends HousePart {
 
 	@Override
 	public Spatial getRadiationCollisionSpatial() {
-		if (isShedded())
+		if (isShedded()) {
 			crown.removeFromParent();
-		else
+		} else {
 			collisionRoot.attachChild(crown);
+		}
 		collisionRoot.updateWorldTransform(true);
 		collisionRoot.updateWorldBound(true);
 		return collisionRoot;
@@ -352,18 +355,20 @@ public class Tree extends HousePart {
 		area = 0.0;
 	}
 
-	public void move(Vector3 d, ArrayList<Vector3> houseMovePoints) {
+	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
 		final Vector3 newP = houseMovePoints.get(0).add(d, null);
 		points.set(0, newP);
 		draw();
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return true;
 	}
 
-	public HousePart copy(boolean check) {
-		Tree c = (Tree) super.copy(false);
+	@Override
+	public HousePart copy(final boolean check) {
+		final Tree c = (Tree) super.copy(false);
 		c.points.get(0).setX(points.get(0).getX() + 10); // shift the position of the copy
 		return c;
 	}

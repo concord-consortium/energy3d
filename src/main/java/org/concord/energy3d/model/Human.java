@@ -110,7 +110,7 @@ public class Human extends HousePart {
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
 		if (pick != null) {
 			final Vector3 p = pick.getPoint().clone();
-			snapToGrid(p, getAbsPoint(0), getGridSize());
+			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 			points.get(0).set(toRelative(p));
 			root.getSceneHints().setCullHint(CullHint.Never);
 		}
@@ -120,7 +120,7 @@ public class Human extends HousePart {
 
 	@Override
 	public double getGridSize() {
-		return SceneManager.getInstance().isFineGrid() ? 1 : 5;
+		return SceneManager.getInstance().isFineGrid() ? 0.2 : 1;
 	}
 
 	@Override
