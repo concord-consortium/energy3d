@@ -1783,7 +1783,7 @@ public class Wall extends HousePart implements Thermalizable {
 			return false;
 		}
 		final double minLength = 0.2;
-		return points.size() >= 4 && getAbsPoint(0).distance(getAbsPoint(2)) >= minLength && getAbsPoint(0).distance(getAbsPoint(1)) >= minLength;
+		return points.size() >= 4 && getAbsPoint(0).multiplyLocal(1, 1, 0).distance(getAbsPoint(2).multiplyLocal(1, 1, 0)) >= minLength && getAbsPoint(0).distance(getAbsPoint(1)) >= minLength;
 	}
 
 	public static void setDefaultThickess(final double thickness) {
