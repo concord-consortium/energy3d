@@ -96,10 +96,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
-	private transient List<Node> importedNodes, constructedNodes;
-	private transient List<Mesh> importedMeshes, constructedMeshes;
-	private List<Vector3> importedPositions;
-	private List<URL> importedFiles;
+	private List<Vector3> nodePositions; // data structures for imported file
+	private List<URL> nodeFiles;
+	private transient List<Node> oldNodes, newNodes;
 
 	static {
 		format.setGroupingUsed(true);
@@ -227,10 +226,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		// for (int i = 8; i < points.size(); i++)
 		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
 
-		if (importedFiles != null) {
+		if (nodeFiles != null) {
 			try {
-				for (final URL url : importedFiles) {
-					importCollada(url, true);
+				for (final URL url : nodeFiles) {
+					importCollada(url, true, true);
 				}
 			} catch (final Throwable t) {
 				Util.reportError(t);
@@ -686,27 +685,35 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateHandles();
 			drawSolarReceiver();
 			foundationPolygon.draw();
-			if (importedNodes != null) {
-				final int n = importedNodes.size();
+			if (oldNodes != null) {
+				final int n = oldNodes.size();
 				if (n > 0) {
+					Node ni;
 					final Vector3 c = getAbsCenter();
 					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 					for (int i = 0; i < n; i++) {
-						final Vector3 vi = matrix.applyPost(importedPositions.get(i), null);
-						importedNodes.get(i).setTranslation(c.add(vi, null));
-						importedNodes.get(i).setRotation(matrix);
+						ni = oldNodes.get(i);
+						if (root.getChildren().contains(ni)) {
+							final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
+							ni.setTranslation(c.add(vi, null));
+							ni.setRotation(matrix);
+						}
 					}
 				}
 			}
-			if (constructedNodes != null) {
-				final int n = constructedNodes.size();
+			if (newNodes != null) {
+				final int n = newNodes.size();
 				if (n > 0) {
+					Node ni;
 					final Vector3 c = getAbsCenter();
 					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 					for (int i = 0; i < n; i++) {
-						final Vector3 vi = matrix.applyPost(importedPositions.get(i), null);
-						constructedNodes.get(i).setTranslation(c.add(vi, null));
-						constructedNodes.get(i).setRotation(matrix);
+						ni = newNodes.get(i);
+						if (root.getChildren().contains(ni)) {
+							final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
+							ni.setTranslation(c.add(vi, null));
+							ni.setRotation(matrix);
+						}
 					}
 				}
 			}
@@ -2501,26 +2508,11 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	private void constructImportedMeshes() {
-		if (importedNodes == null || importedNodes.isEmpty()) {
-			importedMeshes = null;
-			constructedMeshes = null;
-			return;
-		}
-		if (importedMeshes == null) {
-			importedMeshes = new ArrayList<Mesh>();
-		} else {
-			importedMeshes.clear();
-		}
-		if (constructedMeshes == null) {
-			constructedMeshes = new ArrayList<Mesh>();
-		} else {
-			constructedMeshes.clear();
-		}
-		for (final Node node : importedNodes) {
-			Util.getMeshes(node, importedMeshes);
-		}
-		for (final Mesh m : importedMeshes) {
+	private Node translateNode(final Node oldNode) {
+		final Node newNode = new Node();
+		final List<Mesh> oldMeshes = new ArrayList<Mesh>();
+		Util.getMeshes(oldNode, oldMeshes);
+		for (final Mesh m : oldMeshes) {
 			m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
 			final MeshData md = m.getMeshData();
 			switch (md.getIndexMode(0)) {
@@ -2536,97 +2528,119 @@ public class Foundation extends HousePart implements Thermalizable {
 					vb.put(vertexBuffer.get(j + 3)).put(vertexBuffer.get(j + 4)).put(vertexBuffer.get(j + 5));
 					vb.put(vertexBuffer.get(j + 6)).put(vertexBuffer.get(j + 7)).put(vertexBuffer.get(j + 8));
 					mesh.getMeshData().setVertexBuffer(vb);
-					final FloatBuffer nb = BufferUtils.createFloatBuffer(9);
-					nb.put(normalBuffer.get(j)).put(normalBuffer.get(j + 1)).put(normalBuffer.get(j + 2));
-					nb.put(normalBuffer.get(j + 3)).put(normalBuffer.get(j + 4)).put(normalBuffer.get(j + 5));
-					nb.put(normalBuffer.get(j + 6)).put(normalBuffer.get(j + 7)).put(normalBuffer.get(j + 8));
-					mesh.getMeshData().setNormalBuffer(nb);
-					mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(3), 0);
 					final UserData userData = new UserData(this);
-					userData.setNormal(new Vector3(nb.get(0), nb.get(1), nb.get(2)));
+					if (normalBuffer != null) {
+						final FloatBuffer nb = BufferUtils.createFloatBuffer(9);
+						nb.put(normalBuffer.get(j)).put(normalBuffer.get(j + 1)).put(normalBuffer.get(j + 2));
+						nb.put(normalBuffer.get(j + 3)).put(normalBuffer.get(j + 4)).put(normalBuffer.get(j + 5));
+						nb.put(normalBuffer.get(j + 6)).put(normalBuffer.get(j + 7)).put(normalBuffer.get(j + 8));
+						mesh.getMeshData().setNormalBuffer(nb);
+						userData.setNormal(new Vector3(nb.get(0), nb.get(1), nb.get(2)));
+					}
 					mesh.setUserData(userData);
+					mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(3), 0);
 					mesh.setRenderState(offsetState);
 					mesh.getMeshData().setIndexMode(md.getIndexMode(0));
-					constructedMeshes.add(mesh);
+					mesh.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+					mesh.updateModelBound();
+					newNode.attachChild(mesh);
 				}
 				break;
-			case Quads:
+			case Lines:
 				break;
 			default:
+				System.out.println("*******" + md.getIndexMode(0));
 				break;
+			}
+		}
+		return newNode;
+	}
+
+	public List<Node> getNewNodes() {
+		return newNodes;
+	}
+
+	public void setNodes(final boolean original) {
+		if (original) {
+			if (newNodes != null) {
+				for (final Node n : newNodes) {
+					root.detachChild(n);
+				}
+			}
+			if (oldNodes != null) {
+				for (final Node n : oldNodes) {
+					root.attachChild(n);
+				}
+			}
+		} else {
+			if (oldNodes != null) {
+				for (final Node n : oldNodes) {
+					root.detachChild(n);
+				}
+			}
+			if (newNodes != null) {
+				for (final Node n : newNodes) {
+					root.attachChild(n);
+				}
 			}
 		}
 	}
 
-	public List<Mesh> getImportedMeshes() {
-		return importedMeshes;
-	}
-
-	public List<Mesh> getConstructedMeshes() {
-		return constructedMeshes;
-	}
-
-	public void importCollada(final URL file, final boolean init) throws Exception {
-		if (importedNodes == null) {
-			importedNodes = new ArrayList<Node>();
+	public void importCollada(final URL file, final boolean init, final boolean construct) throws Exception {
+		if (oldNodes == null) {
+			oldNodes = new ArrayList<Node>();
 		}
-		if (constructedNodes == null) {
-			constructedNodes = new ArrayList<Node>();
+		if (newNodes == null) {
+			newNodes = new ArrayList<Node>();
 		}
-		if (importedPositions == null) {
-			importedPositions = new ArrayList<Vector3>();
+		if (nodePositions == null) {
+			nodePositions = new ArrayList<Vector3>();
 		}
-		if (importedFiles == null) {
-			importedFiles = new ArrayList<URL>();
+		if (nodeFiles == null) {
+			nodeFiles = new ArrayList<URL>();
 		}
 		if (new File(file.toURI()).exists()) {
 			final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
 			node.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-			importedNodes.add(node);
-			// root.attachChild(node);
-			constructImportedMeshes();
-			if (constructedMeshes != null && !constructedMeshes.isEmpty()) {
-				final Node newNode = new Node("Constructed Mesh");
-				constructedNodes.add(newNode);
-				for (final Mesh m : constructedMeshes) {
-					newNode.attachChild(m);
-					final MeshData md = m.getMeshData();
-					switch (md.getIndexMode(0)) {
-					case Triangles:
-						// System.out.println("****" + md.getIndexMode(0) + "," + md.getNormalBuffer().limit());
-						break;
-					default:
-						break;
-					}
-				}
-				newNode.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-				root.attachChild(newNode);
-			}
+			oldNodes.add(node);
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
 				if (position != null) {
 					node.setTranslation(position);
 				}
-				importedPositions.add(node.getTranslation().subtract(getAbsCenter(), null));
-				importedFiles.add(file);
+				nodePositions.add(node.getTranslation().subtract(getAbsCenter(), null));
+				nodeFiles.add(file);
+			}
+			if (construct) {
+				final Node n2 = translateNode(node);
+				newNodes.add(n2);
+				root.attachChild(n2);
+			} else {
+				root.attachChild(node);
 			}
 		} else {
-			importedFiles.remove(file);
+			nodeFiles.remove(file);
 		}
 	}
 
 	public void removeAllImports() {
-		if (importedNodes != null) {
-			if (!importedNodes.isEmpty()) {
-				for (final Node node : importedNodes) {
-					root.detachChild(node);
-				}
-				importedNodes.clear();
-				constructedNodes.clear();
-				importedPositions.clear();
-				importedFiles.clear();
-				importedMeshes.clear();
+		if (oldNodes != null) {
+			for (final Node node : oldNodes) {
+				root.detachChild(node);
 			}
+			oldNodes.clear();
+		}
+		if (newNodes != null) {
+			for (final Node node : newNodes) {
+				root.detachChild(node);
+			}
+			newNodes.clear();
+		}
+		if (nodePositions != null) {
+			nodePositions.clear();
+		}
+		if (nodeFiles != null) {
+			nodeFiles.clear();
 		}
 	}
 
