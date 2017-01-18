@@ -749,6 +749,18 @@ public class Scene implements Serializable {
 		if (logger) {
 			instance.restoreGroundImageData();
 		}
+
+		if (!logger) {
+			try {
+				System.out.print("Opening..." + url + "...");
+				final ObjectInputStream in = new ObjectInputStream(url.openStream());
+				in.readObject();
+				in.close();
+			} catch (final Throwable e) {
+				instance.setEdited(true);
+				Util.reportError(e, "Save Verification Error: " + url + " : ");
+			}
+		}
 		System.out.println("done");
 	}
 
