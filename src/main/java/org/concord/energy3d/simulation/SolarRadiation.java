@@ -144,9 +144,9 @@ public class SolarRadiation {
 					collidables.add(s);
 					collidablesToParts.put(s, foundation);
 				}
-				final List<Node> newNodes = foundation.getImportedNodes();
-				if (newNodes != null) {
-					for (final Node node : newNodes) {
+				final List<Node> importedNodes = foundation.getImportedNodes();
+				if (importedNodes != null) {
+					for (final Node node : importedNodes) {
 						for (final Spatial s : node.getChildren()) {
 							collidables.add(s);
 							collidablesToParts.put(s, foundation);
@@ -216,12 +216,12 @@ public class SolarRadiation {
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
-							final List<Node> newNodes = foundation.getImportedNodes();
-							if (newNodes != null) {
-								for (final Node node : newNodes) {
+							final List<Node> importedNodes = foundation.getImportedNodes();
+							if (importedNodes != null) {
+								for (final Node node : importedNodes) {
 									for (final Spatial s : node.getChildren()) {
 										final Mesh m = (Mesh) s;
-										computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, (Vector3) m.getUserData());
+										computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, ((UserData) m.getUserData()).getNormal());
 									}
 								}
 							}
@@ -1122,9 +1122,9 @@ public class SolarRadiation {
 				for (int i = 0; i < 5; i++) {
 					applyTexture(foundation.getRadiationMesh(i));
 				}
-				final List<Node> newNodes = foundation.getImportedNodes();
-				if (newNodes != null) {
-					for (final Node node : newNodes) {
+				final List<Node> importedNodes = foundation.getImportedNodes();
+				if (importedNodes != null) {
+					for (final Node node : importedNodes) {
 						for (final Spatial s : node.getChildren()) {
 							applyTexture((Mesh) s);
 						}

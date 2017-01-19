@@ -1899,7 +1899,7 @@ public class PopupMenuFactory {
 						final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
 						if (file != null) {
 							try {
-								((Foundation) selectedPart).importCollada(file.toURI().toURL(), false, false);
+								((Foundation) selectedPart).importCollada(file.toURI().toURL(), false);
 							} catch (final Throwable t) {
 								Util.reportError(t);
 							}

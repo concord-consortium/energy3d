@@ -27,9 +27,13 @@ public class TriangleMeshLib {
 
 	private static ArrayList<GroupData> extractGroups(final Mesh mesh) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		vertexBuffer.rewind();
-		normalBuffer.rewind();
+		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
+		if (normalBuffer == null) {
+			normalBuffer = BufferUtils.createFloatBuffer(vertexBuffer.limit());
+		} else {
+			normalBuffer.rewind();
+		}
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final Vector3 normal = new Vector3();

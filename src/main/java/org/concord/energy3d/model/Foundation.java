@@ -104,6 +104,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private List<URL> importedNodeFiles;
 	private transient List<Node> oldImportedNodes, newImportedNodes;
 	private ReadOnlyColorRGBA defaultImportColor = ColorRGBA.WHITE;
+	private boolean importDecomposed;
 
 	static {
 		format.setGroupingUsed(true);
@@ -237,7 +238,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (importedNodeFiles != null) {
 			try {
 				for (final URL url : importedNodeFiles) {
-					importCollada(url, true, true);
+					importCollada(url, true);
 				}
 			} catch (final Throwable t) {
 				Util.reportError(t);
@@ -2531,11 +2532,12 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	/** @return the imported nodes for solar simulation. Each node contains a list of meshes reconstructed from those contained in oldImportedNodes. */
 	public List<Node> getImportedNodes() {
-		return newImportedNodes;
+		return importDecomposed ? newImportedNodes : oldImportedNodes;
 	}
 
 	/** Toggle between the original imported nodes and the constructed nodes */
 	public void toggleImportedNodes(final boolean original) {
+		importDecomposed = !original;
 		if (original) {
 			if (newImportedNodes != null) {
 				for (final Node n : newImportedNodes) {
@@ -2559,9 +2561,11 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
+		draw();
 	}
 
-	public void importCollada(final URL file, final boolean init, final boolean construct) throws Exception {
+	public void importCollada(final URL file, final boolean init) throws Exception {
+		importDecomposed = false;
 		if (oldImportedNodes == null) {
 			oldImportedNodes = new ArrayList<Node>();
 		}
@@ -2578,6 +2582,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 			final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
 			node.setScale(scale);
+			root.attachChild(node);
 			oldImportedNodes.add(node);
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
@@ -2587,47 +2592,47 @@ public class Foundation extends HousePart implements Thermalizable {
 				importedNodePositions.add(node.getTranslation().subtract(getAbsCenter(), null));
 				importedNodeFiles.add(file);
 			}
-			if (construct) {
-				final Node n2 = new Node(node.getName() + " (reconstructed)");
-				final List<Mesh> meshes = new ArrayList<Mesh>();
-				Util.getMeshes(node, meshes);
-				boolean warn = false;
-				String warnInfo = null;
-				for (final Mesh m : meshes) {
-					final MeshData md = m.getMeshData();
-					switch (md.getIndexMode(0)) {
-					case Triangles:
-						final Node n1 = new Node();
-						TriangleMeshLib.groupByPlanner(m, n1);
-						if (n1 != null && n1.getNumberOfChildren() > 0) {
-							final List<Spatial> children = new ArrayList<Spatial>();
-							for (final Spatial s : n1.getChildren()) {
-								children.add(s);
-							}
-							n1.detachAllChildren();
-							for (final Spatial s : children) {
-								n2.attachChild(s);
-							}
+			// now construct a new node that holds the meshes for simulation
+			final Node n2 = new Node(node.getName() + " (reconstructed)");
+			final List<Mesh> meshes = new ArrayList<Mesh>();
+			Util.getMeshes(node, meshes);
+			boolean warn = false;
+			String warnInfo = null;
+			for (final Mesh m : meshes) {
+				m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
+				final MeshData md = m.getMeshData();
+				switch (md.getIndexMode(0)) {
+				case Triangles:
+					final Node n1 = new Node();
+					TriangleMeshLib.groupByPlanner(m, n1);
+					if (n1 != null && n1.getNumberOfChildren() > 0) {
+						final List<Spatial> children = new ArrayList<Spatial>();
+						for (final Spatial s : n1.getChildren()) {
+							children.add(s);
 						}
-						break;
-					case Lines:
-						break;
-					default:
-						warn = true;
-						warnInfo = md.getIndexMode(0).name();
-						break;
+						n1.detachAllChildren();
+						for (final Spatial s : children) {
+							final UserData ud = new UserData(this);
+							ud.setNormal((Vector3) s.getUserData());
+							s.setUserData(ud);
+							n2.attachChild(s);
+						}
 					}
+					break;
+				case Lines:
+					break;
+				default:
+					warn = true;
+					warnInfo = md.getIndexMode(0).name();
+					break;
 				}
-				if (warn) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Non-triangular mesh " + warnInfo + " is found.", "Warning", JOptionPane.WARNING_MESSAGE);
-				}
-				if (n2.getNumberOfChildren() > 0) {
-					newImportedNodes.add(n2);
-					n2.setScale(scale);
-					root.attachChild(n2);
-				}
-			} else {
-				root.attachChild(node);
+			}
+			if (warn) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Non-triangular mesh " + warnInfo + " is found.", "Warning", JOptionPane.WARNING_MESSAGE);
+			}
+			if (n2.getNumberOfChildren() > 0) {
+				newImportedNodes.add(n2);
+				n2.setScale(scale);
 			}
 		} else {
 			importedNodeFiles.remove(file);

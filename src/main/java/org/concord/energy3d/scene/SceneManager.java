@@ -2071,6 +2071,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setSolarHeatMap(final boolean solarHeatMap) {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				for (final Foundation foundation : Scene.getInstance().getAllFoundations()) {
+					foundation.toggleImportedNodes(!solarHeatMap);
+				}
+				return null;
+			}
+		});
 		setSolarHeatMapWithoutUpdate(solarHeatMap);
 		EnergyPanel.getInstance().clearAlreadyRendered();
 		EnergyPanel.getInstance().clearRadiationHeatMap();

@@ -2784,6 +2784,16 @@ public class Scene implements Serializable {
 		return isSaving;
 	}
 
+	public List<Foundation> getAllFoundations() {
+		final List<Foundation> list = new ArrayList<Foundation>();
+		for (final HousePart p : parts) {
+			if (p instanceof Foundation) {
+				list.add((Foundation) p);
+			}
+		}
+		return list;
+	}
+
 	public List<Foundation> getFoundationGroup(final Foundation master) {
 		groupFoundations();
 		for (final List<Foundation> g : foundationGroups) {
