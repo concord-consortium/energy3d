@@ -11,7 +11,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -2526,11 +2529,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	public List<Node> getNewNodes() {
+	/** @return the imported nodes for solar simulation. Each node contains a list of meshes reconstructed from those contained in oldImportedNodes. */
+	public List<Node> getImportedNodes() {
 		return newImportedNodes;
 	}
 
-	public void setNodes(final boolean original) {
+	/** Toggle between the original imported nodes and the constructed nodes */
+	public void toggleImportedNodes(final boolean original) {
 		if (original) {
 			if (newImportedNodes != null) {
 				for (final Node n : newImportedNodes) {
@@ -2586,6 +2591,8 @@ public class Foundation extends HousePart implements Thermalizable {
 				final Node n2 = new Node(node.getName() + " (reconstructed)");
 				final List<Mesh> meshes = new ArrayList<Mesh>();
 				Util.getMeshes(node, meshes);
+				boolean warn = false;
+				String warnInfo = null;
 				for (final Mesh m : meshes) {
 					final MeshData md = m.getMeshData();
 					switch (md.getIndexMode(0)) {
@@ -2602,9 +2609,17 @@ public class Foundation extends HousePart implements Thermalizable {
 								n2.attachChild(s);
 							}
 						}
+						break;
+					case Lines:
+						break;
 					default:
+						warn = true;
+						warnInfo = md.getIndexMode(0).name();
 						break;
 					}
+				}
+				if (warn) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Non-triangular mesh " + warnInfo + " is found.", "Warning", JOptionPane.WARNING_MESSAGE);
 				}
 				if (n2.getNumberOfChildren() > 0) {
 					newImportedNodes.add(n2);
@@ -2620,6 +2635,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void removeAllImports() {
+		if (oldImportedNodes == null || oldImportedNodes.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no imported structure to remove.", "No Imported Structure", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		final int count = oldImportedNodes.size();
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + count + " imported structures?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+			return;
+		}
 		if (oldImportedNodes != null) {
 			for (final Node n : oldImportedNodes) {
 				root.detachChild(n);
