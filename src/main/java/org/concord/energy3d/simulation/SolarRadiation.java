@@ -144,7 +144,7 @@ public class SolarRadiation {
 					collidables.add(s);
 					collidablesToParts.put(s, foundation);
 				}
-				final List<Node> newNodes = foundation.getNewNodes();
+				final List<Node> newNodes = foundation.getImportedNodes();
 				if (newNodes != null) {
 					for (final Node node : newNodes) {
 						for (final Spatial s : node.getChildren()) {
@@ -216,7 +216,7 @@ public class SolarRadiation {
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
-							final List<Node> newNodes = foundation.getNewNodes();
+							final List<Node> newNodes = foundation.getImportedNodes();
 							if (newNodes != null) {
 								for (final Node node : newNodes) {
 									for (final Spatial s : node.getChildren()) {
@@ -348,8 +348,8 @@ public class SolarRadiation {
 		}
 
 		for (int col = 0; col < data.cols; col++) {
-			final ReadOnlyVector3 pU = data.u.multiply((col + 0.5) * solarStep, null).addLocal(data.p0);
-			final double w = (col == data.cols - 1) ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
+			final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
+			final ReadOnlyVector3 pU = data.u.multiply(col * solarStep + 0.5 * w, null).addLocal(data.p0);
 			for (int row = 0; row < data.rows; row++) {
 				if (EnergyPanel.getInstance().isCancelled()) {
 					throw new CancellationException();
@@ -357,8 +357,8 @@ public class SolarRadiation {
 				if (data.dailySolarIntensity[row][col] == -1) {
 					continue;
 				}
-				final ReadOnlyVector3 p = data.v.multiply((row + 0.5) * solarStep, null).addLocal(pU).add(offset, null);
-				final double h = (row == data.rows - 1) ? data.p1.distance(data.p0) - row * solarStep : solarStep;
+				final double h = row == data.rows - 1 ? data.p1.distance(data.p0) - row * solarStep : solarStep;
+				final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU).add(offset, null);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
@@ -1122,7 +1122,7 @@ public class SolarRadiation {
 				for (int i = 0; i < 5; i++) {
 					applyTexture(foundation.getRadiationMesh(i));
 				}
-				final List<Node> newNodes = foundation.getNewNodes();
+				final List<Node> newNodes = foundation.getImportedNodes();
 				if (newNodes != null) {
 					for (final Node node : newNodes) {
 						for (final Spatial s : node.getChildren()) {
