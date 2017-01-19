@@ -347,6 +347,12 @@ public class Scene implements Serializable {
 
 		final EnergyPanel energyPanel = EnergyPanel.getInstance();
 		if (calendar != null) {
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);
+			if (url == null && Heliodon.getInstance().isNightTime()) {
+				calendar.set(Calendar.HOUR_OF_DAY, 12);
+				calendar.set(Calendar.MINUTE, 0);
+			}
 			final Date time = calendar.getTime();
 			Heliodon.getInstance().setDate(time);
 			Heliodon.getInstance().setTime(time);
