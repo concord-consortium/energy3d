@@ -493,13 +493,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} catch (final Throwable t) {
 			t.printStackTrace();
 		}
-		try {
-			if (!Heliodon.getInstance().isNightTime()) {
-				shadowPass.renderPass(renderer);
+		if (shadowPass.isEnabled() && !Heliodon.getInstance().isNightTime()) {
+			final Camera camera = SceneManager.getInstance().getCamera();
+			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
+				final double distance = 4 * camera.getLocation().length();
+				System.out.println(distance);
+				shadowPass.setMaxShadowDistance(distance);
+			} else {
+				shadowPass.setMaxShadowDistance(2000);
 			}
-		} catch (final Throwable e) {
-			e.printStackTrace();
-			if (shadowPass.isEnabled()) {
+			try {
+				shadowPass.renderPass(renderer);
+			} catch (final Throwable e) {
+				e.printStackTrace();
 				shadowPass.setEnabled(false);
 			}
 		}
