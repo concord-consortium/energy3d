@@ -216,12 +216,15 @@ public class SolarRadiation {
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
-							// final List<Mesh> constructedMeshes = foundation.getConstructedMeshes();
-							// if (constructedMeshes != null && !constructedMeshes.isEmpty()) {
-							// for (final Mesh m : constructedMeshes) {
-							// computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, ((UserData) m.getUserData()).getNormal());
-							// }
-							// }
+							final List<Node> newNodes = foundation.getNewNodes();
+							if (newNodes != null) {
+								for (final Node node : newNodes) {
+									for (final Spatial s : node.getChildren()) {
+										final Mesh m = (Mesh) s;
+										computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, (Vector3) m.getUserData());
+									}
+								}
+							}
 						} else if (part instanceof Roof) {
 							for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
 								if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
@@ -252,9 +255,7 @@ public class SolarRadiation {
 		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
 		Heliodon.getInstance().getCalendar().set(Calendar.HOUR_OF_DAY, hourOfDay);
 		Heliodon.getInstance().getCalendar().set(Calendar.MINUTE, minuteOfHour);
-		for (
-
-		final HousePart part : Scene.getInstance().getParts()) {
+		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Mirror) {
 				final Mirror m = (Mirror) part;
 				if (m.getHeliostatTarget() != null) {
@@ -1117,8 +1118,17 @@ public class SolarRadiation {
 			if (part instanceof Wall || part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror || part instanceof Sensor) {
 				applyTexture(part.getRadiationMesh());
 			} else if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
 				for (int i = 0; i < 5; i++) {
-					applyTexture(((Foundation) part).getRadiationMesh(i));
+					applyTexture(foundation.getRadiationMesh(i));
+				}
+				final List<Node> newNodes = foundation.getNewNodes();
+				if (newNodes != null) {
+					for (final Node node : newNodes) {
+						for (final Spatial s : node.getChildren()) {
+							applyTexture((Mesh) s);
+						}
+					}
 				}
 			} else if (part instanceof Roof) {
 				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {

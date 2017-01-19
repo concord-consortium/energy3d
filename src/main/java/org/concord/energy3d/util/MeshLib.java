@@ -45,18 +45,19 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class MeshLib {
-	private static class GroupData {
+
+	static class GroupData {
 		final Vector3 key = new Vector3();
 		final ArrayList<ReadOnlyVector3> vertices = new ArrayList<ReadOnlyVector3>();
 		final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
 	}
 
-	public static void groupByPlanner(final Mesh mesh, final Node root) {
-		final ArrayList<GroupData> groups = extractGroups(mesh);
+	public static void groupByPlanner(final Mesh mesh, final Node root, final boolean checkZeroZ) {
+		final ArrayList<GroupData> groups = extractGroups(mesh, checkZeroZ);
 		createMeshes(root, groups);
 	}
 
-	private static ArrayList<GroupData> extractGroups(final Mesh mesh) {
+	private static ArrayList<GroupData> extractGroups(final Mesh mesh, final boolean checkZeroZ) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		vertexBuffer.rewind();
@@ -69,7 +70,7 @@ public class MeshLib {
 			final Vector3 p1 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 			final Vector3 p2 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
 			final Vector3 p3 = new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get());
-			if (p1.getZ() == 0 || p2.getZ() == 0 || p3.getZ() == 0) {
+			if (checkZeroZ && (p1.getZ() == 0 || p2.getZ() == 0 || p3.getZ() == 0)) {
 				continue;
 			}
 			p2.subtract(p1, v1);

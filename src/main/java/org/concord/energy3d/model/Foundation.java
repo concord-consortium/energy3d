@@ -20,6 +20,7 @@ import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.FontManager;
+import org.concord.energy3d.util.MeshLib2;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.Util;
 
@@ -99,6 +100,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private List<Vector3> nodePositions; // data structures for imported file
 	private List<URL> nodeFiles;
 	private transient List<Node> oldNodes, newNodes;
+	private ReadOnlyColorRGBA defaultImportColor = ColorRGBA.WHITE;
 
 	static {
 		format.setGroupingUsed(true);
@@ -215,6 +217,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		solarReceiver.setVisible(false);
 		root.attachChild(solarReceiver);
 
+		if (defaultImportColor == null) {
+			defaultImportColor = ColorRGBA.WHITE;
+		}
 		updateTextureAndColor();
 
 		if (points.size() == 8) {
@@ -685,38 +690,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateHandles();
 			drawSolarReceiver();
 			foundationPolygon.draw();
-			if (oldNodes != null) {
-				final int n = oldNodes.size();
-				if (n > 0) {
-					Node ni;
-					final Vector3 c = getAbsCenter();
-					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
-					for (int i = 0; i < n; i++) {
-						ni = oldNodes.get(i);
-						if (root.getChildren().contains(ni)) {
-							final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
-							ni.setTranslation(c.add(vi, null));
-							ni.setRotation(matrix);
-						}
-					}
-				}
-			}
-			if (newNodes != null) {
-				final int n = newNodes.size();
-				if (n > 0) {
-					Node ni;
-					final Vector3 c = getAbsCenter();
-					final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
-					for (int i = 0; i < n; i++) {
-						ni = newNodes.get(i);
-						if (root.getChildren().contains(ni)) {
-							final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
-							ni.setTranslation(c.add(vi, null));
-							ni.setRotation(matrix);
-						}
-					}
-				}
-			}
+			drawImports();
 		}
 	}
 
@@ -1144,6 +1118,50 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
 		}
 		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
+		if (oldNodes != null) {
+			final int n = oldNodes.size();
+			if (n > 0) {
+				Node ni;
+				final Vector3 c = getAbsCenter();
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
+				for (int i = 0; i < n; i++) {
+					ni = oldNodes.get(i);
+					if (root.getChildren().contains(ni)) {
+						final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
+						ni.setTranslation(c.add(vi, null));
+						ni.setRotation(matrix);
+						for (final Spatial s : ni.getChildren()) {
+							if (s instanceof Mesh) {
+								final Mesh m = (Mesh) s;
+								updateTextureAndColor(m, defaultImportColor);
+							}
+						}
+					}
+				}
+			}
+		}
+		if (newNodes != null) {
+			final int n = newNodes.size();
+			if (n > 0) {
+				Node ni;
+				final Vector3 c = getAbsCenter();
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
+				for (int i = 0; i < n; i++) {
+					ni = newNodes.get(i);
+					if (root.getChildren().contains(ni)) {
+						final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
+						ni.setTranslation(c.add(vi, null));
+						ni.setRotation(matrix);
+						for (final Spatial s : ni.getChildren()) {
+							if (s instanceof Mesh) {
+								final Mesh m = (Mesh) s;
+								updateTextureAndColor(m, defaultImportColor);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	public void showBuildingLabel(final boolean b) {
@@ -2508,10 +2526,11 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	private Node translateNode(final Node oldNode) {
+	private Node convertNode(final Node oldNode) {
 		final Node newNode = new Node();
 		final List<Mesh> oldMeshes = new ArrayList<Mesh>();
 		Util.getMeshes(oldNode, oldMeshes);
+		final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 		for (final Mesh m : oldMeshes) {
 			m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
 			final MeshData md = m.getMeshData();
@@ -2519,6 +2538,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			case Triangles:
 				final FloatBuffer vertexBuffer = md.getVertexBuffer();
 				final FloatBuffer normalBuffer = md.getNormalBuffer();
+				final FloatBuffer colorBuffer = md.getColorBuffer();
 				final int n = (int) Math.round(vertexBuffer.limit() / 9.0);
 				for (int i = 0; i < n; i++) {
 					final Mesh mesh = new Mesh("Triangle");
@@ -2538,11 +2558,17 @@ public class Foundation extends HousePart implements Thermalizable {
 						userData.setNormal(new Vector3(nb.get(0), nb.get(1), nb.get(2)));
 					}
 					mesh.setUserData(userData);
+					if (colorBuffer != null) {
+						final FloatBuffer cb = BufferUtils.createFloatBuffer(9);
+						cb.put(colorBuffer.get(j)).put(colorBuffer.get(j + 1)).put(colorBuffer.get(j + 2));
+						cb.put(colorBuffer.get(j + 3)).put(colorBuffer.get(j + 4)).put(colorBuffer.get(j + 5));
+						cb.put(colorBuffer.get(j + 6)).put(colorBuffer.get(j + 7)).put(colorBuffer.get(j + 8));
+						mesh.getMeshData().setColorBuffer(cb);
+					}
 					mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(3), 0);
 					mesh.setRenderState(offsetState);
 					mesh.getMeshData().setIndexMode(md.getIndexMode(0));
-					mesh.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-					mesh.updateModelBound();
+					mesh.setScale(scale);
 					newNode.attachChild(mesh);
 				}
 				break;
@@ -2600,8 +2626,9 @@ public class Foundation extends HousePart implements Thermalizable {
 			nodeFiles = new ArrayList<URL>();
 		}
 		if (new File(file.toURI()).exists()) {
+			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 			final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
-			node.setScale(Scene.getInstance().getAnnotationScale() * 0.633); // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
+			node.setScale(scale);
 			oldNodes.add(node);
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
@@ -2612,9 +2639,20 @@ public class Foundation extends HousePart implements Thermalizable {
 				nodeFiles.add(file);
 			}
 			if (construct) {
-				final Node n2 = translateNode(node);
-				newNodes.add(n2);
-				root.attachChild(n2);
+				// final Node n2 = convertNode(node);
+				final List<Mesh> meshes = new ArrayList<Mesh>();
+				Util.getMeshes(node, meshes);
+				for (final Mesh m : meshes) {
+					final Node n1 = new Node();
+					MeshLib2.groupByPlanner(m, n1, false);
+					System.out.println("----" + m.getMeshData().getVertexCount() + "," + n1.getChildren().size());
+					if (n1 != null) {
+						n1.setScale(scale);
+						n1.updateGeometricState(0);
+						root.attachChild(n1);
+						newNodes.add(n1);
+					}
+				}
 			} else {
 				root.attachChild(node);
 			}
@@ -2625,14 +2663,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void removeAllImports() {
 		if (oldNodes != null) {
-			for (final Node node : oldNodes) {
-				root.detachChild(node);
+			for (final Node n : oldNodes) {
+				root.detachChild(n);
 			}
 			oldNodes.clear();
 		}
 		if (newNodes != null) {
-			for (final Node node : newNodes) {
-				root.detachChild(node);
+			for (final Node n : newNodes) {
+				root.detachChild(n);
 			}
 			newNodes.clear();
 		}
@@ -2641,6 +2679,53 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (nodeFiles != null) {
 			nodeFiles.clear();
+		}
+	}
+
+	private void drawImports() {
+		if (oldNodes != null) {
+			final int n = oldNodes.size();
+			if (n > 0) {
+				Node ni;
+				final Vector3 c = getAbsCenter();
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
+				for (int i = 0; i < n; i++) {
+					ni = oldNodes.get(i);
+					if (root.getChildren().contains(ni)) {
+						final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
+						ni.setTranslation(c.add(vi, null));
+						ni.setRotation(matrix);
+						for (final Spatial s : ni.getChildren()) {
+							if (s instanceof Mesh) {
+								final Mesh m = (Mesh) s;
+								m.updateModelBound();
+							}
+						}
+					}
+				}
+			}
+		}
+		if (newNodes != null) {
+			final int n = newNodes.size();
+			if (n > 0) {
+				Node ni;
+				final Vector3 c = getAbsCenter();
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
+				for (int i = 0; i < n; i++) {
+					ni = newNodes.get(i);
+					if (root.getChildren().contains(ni)) {
+						final Vector3 vi = matrix.applyPost(nodePositions.get(i), null);
+						ni.setTranslation(c.add(vi, null));
+						ni.setRotation(matrix);
+						for (final Spatial s : ni.getChildren()) {
+							if (s instanceof Mesh) {
+								final Mesh m = (Mesh) s;
+								m.updateModelBound();
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
