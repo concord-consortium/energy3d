@@ -104,6 +104,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private List<URL> importedNodeFiles;
 	private transient List<Node> oldImportedNodes, newImportedNodes;
 	private ReadOnlyColorRGBA defaultImportColor = ColorRGBA.WHITE;
+	private boolean importDecomposed;
 
 	static {
 		format.setGroupingUsed(true);
@@ -2531,11 +2532,12 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	/** @return the imported nodes for solar simulation. Each node contains a list of meshes reconstructed from those contained in oldImportedNodes. */
 	public List<Node> getImportedNodes() {
-		return newImportedNodes;
+		return importDecomposed ? newImportedNodes : oldImportedNodes;
 	}
 
 	/** Toggle between the original imported nodes and the constructed nodes */
 	public void toggleImportedNodes(final boolean original) {
+		importDecomposed = !original;
 		if (original) {
 			if (newImportedNodes != null) {
 				for (final Node n : newImportedNodes) {
@@ -2559,6 +2561,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
+		draw();
 	}
 
 	public void importCollada(final URL file, final boolean init, final boolean construct) throws Exception {
@@ -2594,6 +2597,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				boolean warn = false;
 				String warnInfo = null;
 				for (final Mesh m : meshes) {
+					m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
 					final MeshData md = m.getMeshData();
 					switch (md.getIndexMode(0)) {
 					case Triangles:
@@ -2606,6 +2610,9 @@ public class Foundation extends HousePart implements Thermalizable {
 							}
 							n1.detachAllChildren();
 							for (final Spatial s : children) {
+								final UserData ud = new UserData(this);
+								ud.setNormal((Vector3) s.getUserData());
+								s.setUserData(ud);
 								n2.attachChild(s);
 							}
 						}
@@ -2624,11 +2631,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				if (n2.getNumberOfChildren() > 0) {
 					newImportedNodes.add(n2);
 					n2.setScale(scale);
-					root.attachChild(n2);
 				}
-			} else {
-				root.attachChild(node);
 			}
+			root.attachChild(node);
 		} else {
 			importedNodeFiles.remove(file);
 		}
