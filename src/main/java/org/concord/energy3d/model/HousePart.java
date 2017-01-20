@@ -295,8 +295,13 @@ public abstract class HousePart implements Serializable {
 		firstPointInserted = true;
 		drawCompleted = true;
 		orgHeight = height;
-		if (isDrawable()) {
-			computeArea();
+		try {
+			if (isDrawable()) {
+				computeArea();
+			}
+		} catch (final Exception e) {
+			// It's normal to get exception when cleaning up incomplete windows
+			e.printStackTrace();
 		}
 	}
 

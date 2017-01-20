@@ -173,7 +173,7 @@ public class Window extends HousePart implements Thermalizable {
 		}
 		final PickedHousePart pick = pickContainer(x, y, new Class[] { Wall.class, Roof.class });
 		Vector3 p = points.get(index);
-		if (pick != null) {
+		if (pick != null && !(pick.getUserData().getHousePart() instanceof Roof && isNormalHorizontal(pick))) {
 			p.set(pick.getPoint());
 			snapToGrid(p, getAbsPoint(index), getGridSize(), false);
 			p = toRelative(p);
@@ -240,6 +240,10 @@ public class Window extends HousePart implements Thermalizable {
 			setEditPointsVisible(true);
 			container.draw();
 		}
+	}
+
+	private boolean isNormalHorizontal(final PickedHousePart pick) {
+		return Math.abs(((ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData()).getZ()) < 0.1;
 	}
 
 	@Override
