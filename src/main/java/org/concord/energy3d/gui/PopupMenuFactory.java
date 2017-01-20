@@ -369,7 +369,7 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final JPanel gui = new JPanel(new BorderLayout());
-					final String title = "<html>Increase of diffusive radiation due to snow reflection<br>(a dimensionless parameter within [0, 0.2])</html>";
+					final String title = "<html>Increase of indirect solar radiation due to snow reflection<br>(a dimensionless parameter within [0, 0.2])</html>";
 					gui.add(new JLabel(title), BorderLayout.NORTH);
 					final JPanel inputPanel = new JPanel(new SpringLayout());
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -4649,12 +4649,12 @@ public class PopupMenuFactory {
 					final JPanel inputPanel = new JPanel(new SpringLayout());
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					JLabel label = new JLabel("Width (m):", JLabel.TRAILING);
+					JLabel label = new JLabel("Width (m): ", JLabel.TRAILING);
 					inputPanel.add(label);
 					final JTextField widthField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth()));
 					label.setLabelFor(widthField);
 					inputPanel.add(widthField);
-					label = new JLabel("Height (m):", JLabel.TRAILING);
+					label = new JLabel("Height (m): ", JLabel.TRAILING);
 					inputPanel.add(label);
 					final JTextField heightField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight()));
 					label.setLabelFor(heightField);

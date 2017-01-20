@@ -56,6 +56,11 @@ public class Ground implements Serializable {
 	}
 
 	public double getAdjustedAlbedo(final int month) {
+		if (snowReflectionFactors == null) {
+			snowReflectionFactors = new double[12];
+			Arrays.fill(snowReflectionFactors, 0);
+			return albedo;
+		}
 		return Math.max(1, albedo * (1 + snowReflectionFactors[month]));
 	}
 
