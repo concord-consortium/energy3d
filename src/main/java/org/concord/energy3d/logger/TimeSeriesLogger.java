@@ -258,7 +258,20 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getGround().getThermalDiffusivity() + "}";
 				} else if (lastEdit instanceof ChangeAtmosphericDustLossCommand) {
 					final ChangeAtmosphericDustLossCommand c = (ChangeAtmosphericDustLossCommand) lastEdit;
-					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getAtmosphere().getDustLoss() + "}";
+					final double[] oldValues = c.getOldValue();
+					String oldValueString = "\"";
+					for (final double x : oldValues) {
+						oldValueString += x + " ";
+					}
+					oldValueString.trim();
+					oldValueString += "\"";
+					String newValueString = "\"";
+					for (int i = 0; i < 12; i++) {
+						newValueString += Scene.getInstance().getAtmosphere().getDustLoss(i) + " ";
+					}
+					newValueString.trim();
+					newValueString += "\"";
+					stateValue = "{\"Old Value\": " + oldValueString + ", \"New Value\": " + newValueString + "}";
 				} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
 					final ChangeSolarHeatMapColorContrastCommand c = (ChangeSolarHeatMapColorContrastCommand) lastEdit;
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getSolarHeatMapColorContrast() + "}";

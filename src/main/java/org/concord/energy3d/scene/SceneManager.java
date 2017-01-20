@@ -497,7 +497,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Camera camera = SceneManager.getInstance().getCamera();
 			if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
 				final double distance = 4 * camera.getLocation().length();
-				System.out.println(distance);
 				shadowPass.setMaxShadowDistance(distance);
 			} else {
 				shadowPass.setMaxShadowDistance(2000);

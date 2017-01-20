@@ -31,6 +31,7 @@ import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
+import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
@@ -2580,7 +2581,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (new File(file.toURI()).exists()) {
 			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-			final Node node = new ColladaImporter().load(new URLResourceSource(file)).getScene();
+			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(file));
+			// final AssetData asset = storage.getAssetData();
+			// System.out.println("***" + asset.getUnitName() + "," + asset.getUnitMeter());
+			final Node node = storage.getScene();
 			node.setScale(scale);
 			root.attachChild(node);
 			oldImportedNodes.add(node);

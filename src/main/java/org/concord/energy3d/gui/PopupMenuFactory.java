@@ -36,6 +36,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SpringLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.MenuEvent;
@@ -65,6 +66,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.AnnualGraph;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
@@ -76,6 +78,7 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.*;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
+import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -630,30 +633,51 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miDustLoss = new JMenuItem("Dust...");
+			final JMenuItem miDustLoss = new JMenuItem("Dust & Pollen...");
 			miDustLoss.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String title = "<html>Loss of productivity due to atmospheric dust<br>(dimensionless [0, 1])</html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final String title = "<html>Loss of productivity due to atmospheric dust and pollen<br>(a dimensionless parameter within [0, 1])</html>";
+					gui.add(new JLabel(title), BorderLayout.NORTH);
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					final JTextField[] fields = new JTextField[12];
+					for (int i = 0; i < 12; i++) {
+						final JLabel l = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i] + ": ", JLabel.TRAILING);
+						inputPanel.add(l);
+						fields[i] = new JTextField(threeDecimalsFormat.format(Scene.getInstance().getAtmosphere().getDustLoss(i)), 5);
+						l.setLabelFor(fields[i]);
+						inputPanel.add(fields[i]);
+					}
+					SpringUtilities.makeCompactGrid(inputPanel, 12, 2, 6, 6, 6, 6);
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getAtmosphere().getDustLoss());
-						if (newValue == null) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Dust and pollen loss", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 							break;
-						} else {
+						}
+						boolean pass = true;
+						final double[] val = new double[12];
+						for (int i = 0; i < 12; i++) {
 							try {
-								final double val = Double.parseDouble(newValue);
-								if (val < 0 || val > 1) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dust loss value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									final ChangeAtmosphericDustLossCommand c = new ChangeAtmosphericDustLossCommand();
-									Scene.getInstance().getAtmosphere().setDustLoss(val);
-									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									break;
+								val[i] = Double.parseDouble(fields[i].getText());
+								if (val[i] < 0 || val[i] > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dust and pollen loss value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									pass = false;
 								}
 							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), fields[i].getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								pass = false;
 							}
+						}
+						if (pass) {
+							final ChangeAtmosphericDustLossCommand c = new ChangeAtmosphericDustLossCommand();
+							for (int i = 0; i < 12; i++) {
+								Scene.getInstance().getAtmosphere().setDustLoss(val[i], i);
+							}
+							updateAfterEdit();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							break;
 						}
 					}
 				}

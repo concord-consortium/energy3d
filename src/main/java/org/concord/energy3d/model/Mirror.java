@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -487,7 +488,7 @@ public class Mirror extends HousePart {
 		}
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
-			e *= 1 - atm.getDustLoss();
+			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
 		}
 		return e;
 	}

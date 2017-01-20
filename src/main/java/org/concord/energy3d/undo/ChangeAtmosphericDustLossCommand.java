@@ -9,28 +9,34 @@ import org.concord.energy3d.scene.Scene;
 public class ChangeAtmosphericDustLossCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private final double oldValue;
-	private double newValue;
+	private final double[] oldValue = new double[12];
+	private final double[] newValue = new double[12];
 
 	public ChangeAtmosphericDustLossCommand() {
-		oldValue = Scene.getInstance().getAtmosphere().getDustLoss();
+		for (int i = 0; i < 12; i++) {
+			oldValue[i] = Scene.getInstance().getAtmosphere().getDustLoss(i);
+		}
 	}
 
-	public double getOldValue() {
+	public double[] getOldValue() {
 		return oldValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = Scene.getInstance().getAtmosphere().getDustLoss();
-		Scene.getInstance().getAtmosphere().setDustLoss(oldValue);
+		for (int i = 0; i < 12; i++) {
+			newValue[i] = Scene.getInstance().getAtmosphere().getDustLoss(i);
+			Scene.getInstance().getAtmosphere().setDustLoss(oldValue[i], i);
+		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().getAtmosphere().setDustLoss(newValue);
+		for (int i = 0; i < 12; i++) {
+			Scene.getInstance().getAtmosphere().setDustLoss(newValue[i], i);
+		}
 	}
 
 	@Override

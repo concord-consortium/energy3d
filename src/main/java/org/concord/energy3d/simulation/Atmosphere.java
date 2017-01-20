@@ -1,8 +1,11 @@
 package org.concord.energy3d.simulation;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
+ * This class models the atmosphere.
+ * 
  * @author Charles Xie
  *
  */
@@ -10,17 +13,28 @@ public class Atmosphere implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private double dustLoss = 0.05;
+	private double[] dustLosses = new double[12];
 
-	public void setDustLoss(final double dustLoss) {
-		this.dustLoss = dustLoss;
+	public Atmosphere() {
+		Arrays.fill(dustLosses, 0.05);
 	}
 
-	public double getDustLoss() {
-		return dustLoss;
+	public void setDustLoss(final double loss, final int i) {
+		if (dustLosses == null) {
+			dustLosses = new double[12];
+		}
+		dustLosses[i] = loss;
 	}
 
-	// Vittitoe-Biggs formula for atmospheric transmittance of light (s must be in km)
+	public double getDustLoss(final int i) {
+		if (dustLosses == null) {
+			dustLosses = new double[12];
+			Arrays.fill(dustLosses, 0.05);
+		}
+		return dustLosses[i];
+	}
+
+	/** Vittitoe-Biggs formula for atmospheric transmittance of light (s must be in km) */
 	public static double getTransmittance(final double s, final boolean haze) {
 		if (haze) {
 			return 0.98707 - 0.2748 * s + 0.03394 * s * s;

@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -818,7 +819,7 @@ public class SolarPanel extends HousePart implements Trackable {
 		double e = efficiency * inverterEfficiency;
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
-			e *= 1 - atm.getDustLoss();
+			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
 		}
 		return e * (1 + temperatureCoefficientPmax * (temperature - 25));
 	}
