@@ -290,7 +290,7 @@ public class SolarRadiation {
 			onMesh.put(SceneManager.getInstance().getSolarLand(), data);
 		}
 		final Vector3 p = new Vector3();
-		final double absorption = 1 - Scene.getInstance().getGround().getAlbedo();
+		final double absorption = 1 - Scene.getInstance().getGround().getAdjustedAlbedo(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
 		for (int col = 0; col < cols; col++) {
 			p.setX((col - cols / 2) * step + step / 2.0);
 			for (int row = 0; row < rows; row++) {
@@ -1102,11 +1102,12 @@ public class SolarRadiation {
 		final double viewFactorWithSky = 0.5 * (1 + cos);
 		final double viewFactorWithGround = 0.5 * (1 - cos);
 		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
+			final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
 			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
-				result += ASHRAE_C[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)] * viewFactorWithSky * peakRadiation;
+				result += ASHRAE_C[month] * viewFactorWithSky * peakRadiation;
 			}
 			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
-				result += Scene.getInstance().getGround().getAlbedo() * viewFactorWithGround * peakRadiation;
+				result += Scene.getInstance().getGround().getAdjustedAlbedo(month) * viewFactorWithGround * peakRadiation;
 			}
 		}
 		return result;

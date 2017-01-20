@@ -271,7 +271,23 @@ public class TimeSeriesLogger {
 					}
 					newValueString.trim();
 					newValueString += "\"";
-					stateValue = "{\"Old Value\": " + oldValueString + ", \"New Value\": " + newValueString + "}";
+					stateValue = "{\"Old Values\": " + oldValueString + ", \"New Values\": " + newValueString + "}";
+				} else if (lastEdit instanceof ChangeSnowReflectionFactorCommand) {
+					final ChangeSnowReflectionFactorCommand c = (ChangeSnowReflectionFactorCommand) lastEdit;
+					final double[] oldValues = c.getOldValue();
+					String oldValueString = "\"";
+					for (final double x : oldValues) {
+						oldValueString += x + " ";
+					}
+					oldValueString.trim();
+					oldValueString += "\"";
+					String newValueString = "\"";
+					for (int i = 0; i < 12; i++) {
+						newValueString += Scene.getInstance().getGround().getSnowReflectionFactor(i) + " ";
+					}
+					newValueString.trim();
+					newValueString += "\"";
+					stateValue = "{\"Old Values\": " + oldValueString + ", \"New Values\": " + newValueString + "}";
 				} else if (lastEdit instanceof ChangeSolarHeatMapColorContrastCommand) {
 					final ChangeSolarHeatMapColorContrastCommand c = (ChangeSolarHeatMapColorContrastCommand) lastEdit;
 					stateValue = "{\"Old Value\": " + c.getOldValue() + ", \"New Value\": " + Scene.getInstance().getSolarHeatMapColorContrast() + "}";

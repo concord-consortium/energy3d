@@ -364,6 +364,56 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miSnowReflection = new JMenuItem("Snow Reflection...");
+			miSnowReflection.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final JPanel gui = new JPanel(new BorderLayout());
+					final String title = "<html>Increase of diffusive radiation due to snow reflection<br>(a dimensionless parameter within [0, 0.2])</html>";
+					gui.add(new JLabel(title), BorderLayout.NORTH);
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					final JTextField[] fields = new JTextField[12];
+					for (int i = 0; i < 12; i++) {
+						final JLabel l = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i] + ": ", JLabel.TRAILING);
+						inputPanel.add(l);
+						fields[i] = new JTextField(threeDecimalsFormat.format(Scene.getInstance().getGround().getSnowReflectionFactor(i)), 5);
+						l.setLabelFor(fields[i]);
+						inputPanel.add(fields[i]);
+					}
+					SpringUtilities.makeCompactGrid(inputPanel, 12, 2, 6, 6, 6, 6);
+					while (true) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Snow reflection factor", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+							break;
+						}
+						boolean pass = true;
+						final double[] val = new double[12];
+						for (int i = 0; i < 12; i++) {
+							try {
+								val[i] = Double.parseDouble(fields[i].getText());
+								if (val[i] < 0 || val[i] > 0.2) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Snow reflection factor must be in 0-0.2.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									pass = false;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), fields[i].getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								pass = false;
+							}
+						}
+						if (pass) {
+							final ChangeSnowReflectionFactorCommand c = new ChangeSnowReflectionFactorCommand();
+							for (int i = 0; i < 12; i++) {
+								Scene.getInstance().getGround().setSnowReflectionFactor(val[i], i);
+							}
+							updateAfterEdit();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							break;
+						}
+					}
+				}
+			});
+
 			final JMenuItem miThermalDiffusivity = new JMenuItem("Ground Thermal Diffusivity...");
 			miThermalDiffusivity.addActionListener(new ActionListener() {
 				@Override
@@ -533,6 +583,7 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(groundImageMenu);
 			popupMenuForLand.add(colorAction);
 			popupMenuForLand.add(miAlbedo);
+			popupMenuForLand.add(miSnowReflection);
 			popupMenuForLand.add(miThermalDiffusivity);
 
 		}
@@ -4595,15 +4646,20 @@ public class PopupMenuFactory {
 					final Foundation foundation = rack.getTopContainer();
 					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
-					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Width (m): "));
-					final JTextField widthField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth()));
-					inputPanel.add(widthField);
-					inputPanel.add(new JLabel("Height (m): "));
-					final JTextField heightField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight()));
-					inputPanel.add(heightField);
+					final JPanel inputPanel = new JPanel(new SpringLayout());
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					JLabel label = new JLabel("Width (m):", JLabel.TRAILING);
+					inputPanel.add(label);
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth()));
+					label.setLabelFor(widthField);
+					inputPanel.add(widthField);
+					label = new JLabel("Height (m):", JLabel.TRAILING);
+					inputPanel.add(label);
+					final JTextField heightField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight()));
+					label.setLabelFor(heightField);
+					inputPanel.add(heightField);
+					SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
