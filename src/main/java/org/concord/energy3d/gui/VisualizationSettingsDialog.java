@@ -44,7 +44,7 @@ class VisualizationSettingsDialog extends JDialog {
 		final JTextField solarPanelNyTextField = new JTextField(s.getSolarPanelNy() + "", 6);
 		final JTextField rackNxTextField = new JTextField(s.getRackNx() + "", 6);
 		final JTextField rackNyTextField = new JTextField(s.getRackNy() + "", 6);
-		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep()));
+		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep() * Scene.getInstance().getAnnotationScale()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
 		final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getAnnotationScale()));
 
@@ -72,8 +72,8 @@ class VisualizationSettingsDialog extends JDialog {
 					return;
 				}
 				// range check
-				if (cellSize < 0.1 || cellSize > 50) {
-					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Cell size must be in 0.1-50 (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (cellSize < 0.01 || cellSize > 20) {
+					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Cell size must be in 0.01-20 meters (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (heatVectorLength < 1000) {
@@ -100,7 +100,7 @@ class VisualizationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Number of solar rack grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				s.setSolarStep(cellSize);
+				s.setSolarStep(cellSize / Scene.getInstance().getAnnotationScale());
 				s.setSolarPanelNx(solarPanelNx);
 				s.setSolarPanelNy(solarPanelNy);
 				s.setRackNx(rackNx);
@@ -140,7 +140,7 @@ class VisualizationSettingsDialog extends JDialog {
 		// set the grid size ("solar step")
 		panel.add(new JLabel(" Cell size for others: "));
 		panel.add(cellSizeTextField);
-		panel.add(new JLabel("Internal unit"));
+		panel.add(new JLabel("Meter"));
 
 		/* Heat flux arrows */
 

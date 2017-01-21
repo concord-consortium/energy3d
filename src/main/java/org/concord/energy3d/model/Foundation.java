@@ -37,6 +37,7 @@ import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
@@ -2603,6 +2604,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			boolean warn = false;
 			String warnInfo = null;
 			for (final Mesh m : meshes) {
+				final ReadOnlyTransform t = m.getWorldTransform();
 				m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
 				final MeshData md = m.getMeshData();
 				switch (md.getIndexMode(0)) {
@@ -2619,6 +2621,7 @@ public class Foundation extends HousePart implements Thermalizable {
 							final UserData ud = new UserData(this);
 							ud.setNormal((Vector3) s.getUserData());
 							s.setUserData(ud);
+							s.setTransform(t);
 							n2.attachChild(s);
 						}
 					}
@@ -2637,6 +2640,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (n2.getNumberOfChildren() > 0) {
 				newImportedNodes.add(n2);
 				n2.setScale(scale);
+				// root.attachChild(n2);
 			}
 		} else {
 			importedNodeFiles.remove(file);
