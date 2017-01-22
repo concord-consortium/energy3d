@@ -83,6 +83,8 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 
 /**
  * Pop-up menus for customizing individual elements.
@@ -117,6 +119,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForSensor;
 	private static JPopupMenu popupMenuForLand;
 	private static JPopupMenu popupMenuForSky;
+	private static JPopupMenu popupMenuForMesh;
 
 	// cached values
 	private static double solarPanelArrayRowSpacing = 1;
@@ -138,6 +141,7 @@ public class PopupMenuFactory {
 	private static MirrorRectangularFieldLayout mirrorRectangularFieldLayout = new MirrorRectangularFieldLayout();
 	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
 	private static MirrorSpiralFieldLayout mirrorSpiralFieldLayout = new MirrorSpiralFieldLayout();
+	private static Mesh selectedMesh;
 
 	private static Action colorAction = new AbstractAction("Color...") {
 		private static final long serialVersionUID = 1L;
@@ -6374,6 +6378,68 @@ public class PopupMenuFactory {
 			popupMenuForHuman = createPopupMenu(true, true, null);
 		}
 		return popupMenuForHuman;
+
+	}
+
+	public static JPopupMenu getPopupMenu(final Mesh mesh) {
+
+		selectedMesh = mesh;
+
+		if (popupMenuForMesh == null) {
+
+			final JMenuItem miInfo = new JMenuItem("Mesh");
+			miInfo.setEnabled(false);
+			miInfo.setOpaque(true);
+			miInfo.setBackground(Color.GRAY);
+			miInfo.setForeground(Color.WHITE);
+
+			popupMenuForMesh = new JPopupMenu();
+			popupMenuForMesh.setInvoker(MainPanel.getInstance().getCanvasPanel());
+			popupMenuForMesh.addPopupMenuListener(new PopupMenuListener() {
+
+				@Override
+				public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation && selectedMesh != null) {
+						String s = selectedMesh.toString();
+						s = s.substring(0, s.indexOf('(')).trim();
+						miInfo.setText(s + " (" + selectedMesh.getMeshData().getVertexCount() + ")");
+					}
+				}
+
+				@Override
+				public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+				}
+
+				@Override
+				public void popupMenuCanceled(final PopupMenuEvent e) {
+				}
+
+			});
+
+			final JMenuItem miCut = new JMenuItem("Delete");
+			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCut.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation && selectedMesh != null) {
+						final Foundation foundation = (Foundation) selectedPart;
+						final List<Node> importedNodes = foundation.getImportedNodes();
+						if (importedNodes != null) {
+							selectedMesh.getParent().detachChild(selectedMesh);
+							foundation.setMeshBoundingBoxVisible(false);
+							foundation.draw();
+						}
+					}
+				}
+			});
+
+			popupMenuForMesh.add(miInfo);
+			popupMenuForMesh.add(miCut);
+		}
+
+		return popupMenuForMesh;
 
 	}
 

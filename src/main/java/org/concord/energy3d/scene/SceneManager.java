@@ -1728,9 +1728,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 						final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
 						selectedPart = pick == null ? null : pick.getHousePart();
-						if (e.isAltDown()) {
-							if (selectedPart instanceof SolarPanel && selectedPart.getContainer() instanceof Rack) { // special case
-								selectedPart = selectedPart.getContainer();
+						Mesh selectedMesh = null;
+						if (selectedPart instanceof Foundation) {
+							final Foundation foundation = (Foundation) selectedPart;
+							final List<Node> importedNodes = foundation.getImportedNodes();
+							if (importedNodes != null) {
+								selectedMesh = foundation.pickMesh(x, y);
+							}
+						} else {
+							if (e.isAltDown()) {
+								if (selectedPart instanceof SolarPanel && selectedPart.getContainer() instanceof Rack) { // special case (may remove later)
+									selectedPart = selectedPart.getContainer();
+								}
 							}
 						}
 						System.out.println("Right-clicked on: (" + mouseState.getX() + ", " + mouseState.getY() + ") " + pick);
@@ -1748,7 +1757,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						EnergyPanel.getInstance().updateGraphs();
 						EnergyPanel.getInstance().updateProperties();
 						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-						PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
+						if (selectedMesh == null) {
+							PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
+						} else {
+							PopupMenuFactory.getPopupMenu(selectedMesh).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
+						}
 					}
 				} catch (final Throwable t) {
 					t.printStackTrace();
