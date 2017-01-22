@@ -98,7 +98,7 @@ public class MeshLib {
 		return groups;
 	}
 
-	private static boolean hasCommonEdge(final GroupData group, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
+	static boolean hasCommonEdge(final GroupData group, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
 		boolean foundEdgeInCommon = false;
 		for (int j = 0; j < group.vertices.size() && !foundEdgeInCommon; j += 3) {
 			int numOfShared = 0;
@@ -115,7 +115,7 @@ public class MeshLib {
 		return foundEdgeInCommon;
 	}
 
-	private static void combineGroups(final ArrayList<GroupData> groups) {
+	static void combineGroups(final ArrayList<GroupData> groups) {
 		boolean changed = true;
 		while (changed) {
 			changed = false;

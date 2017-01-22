@@ -63,53 +63,8 @@ public class TriangleMeshLib {
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 		}
-		combineGroups(groups);
+		MeshLib.combineGroups(groups);
 		return groups;
-	}
-
-	private static boolean hasCommonEdge(final GroupData group, final ReadOnlyVector3 p1, final ReadOnlyVector3 p2, final ReadOnlyVector3 p3) {
-		boolean foundEdgeInCommon = false;
-		for (int j = 0; j < group.vertices.size() && !foundEdgeInCommon; j += 3) {
-			int numOfShared = 0;
-			for (int k = 0; k < 3; k++) {
-				final ReadOnlyVector3 p = group.vertices.get(j + k);
-				if (p.equals(p1) || p.equals(p2) || p.equals(p3)) {
-					numOfShared++;
-				}
-			}
-			if (numOfShared > 1) {
-				foundEdgeInCommon = true;
-			}
-		}
-		return foundEdgeInCommon;
-	}
-
-	private static void combineGroups(final ArrayList<GroupData> groups) {
-		boolean changed = true;
-		while (changed) {
-			changed = false;
-			for (int i = 0; i < groups.size(); i++) {
-				final GroupData group1 = groups.get(i);
-				for (int j = i + 1; j < groups.size(); j++) {
-					final GroupData group2 = groups.get(j);
-					if (MeshLib.isSameDirection(group1.key, group2.key)) {
-						for (int w = 0; w < group2.vertices.size(); w += 3) {
-							final ReadOnlyVector3 p1 = group2.vertices.get(w);
-							final ReadOnlyVector3 p2 = group2.vertices.get(w + 1);
-							final ReadOnlyVector3 p3 = group2.vertices.get(w + 2);
-							if (hasCommonEdge(group1, p1, p2, p3)) {
-								group1.vertices.addAll(group2.vertices);
-								group1.normals.addAll(group2.normals);
-								groups.remove(group2);
-								j--;
-								changed = true;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 
 	private static void createMeshes(final Node root, final ArrayList<GroupData> groups) {

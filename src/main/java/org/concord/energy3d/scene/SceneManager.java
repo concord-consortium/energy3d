@@ -1799,7 +1799,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									((Foundation) previousSelectedPart).updateAzimuthArrowVisibility(false);
 								}
 								if (selectedPart instanceof Foundation) {
-									((Foundation) selectedPart).drawAzimuthArrow();
+									final Foundation foundation = (Foundation) selectedPart;
+									foundation.drawAzimuthArrow();
+									foundation.pickMesh(mouseState.getX(), mouseState.getY());
 								}
 								if (selectedPart != null) {
 									final Foundation foundationOfSelectedPart = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();

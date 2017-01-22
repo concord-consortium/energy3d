@@ -1973,11 +1973,18 @@ public class PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
 						if (file != null) {
-							try {
-								((Foundation) selectedPart).importCollada(file.toURI().toURL(), false);
-							} catch (final Throwable t) {
-								Util.reportError(t);
-							}
+							EnergyPanel.getInstance().clearRadiationHeatMap();
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									try {
+										((Foundation) selectedPart).importCollada(file.toURI().toURL(), false);
+									} catch (final Throwable t) {
+										Util.reportError(t);
+									}
+									return null;
+								}
+							});
 						}
 					}
 				}

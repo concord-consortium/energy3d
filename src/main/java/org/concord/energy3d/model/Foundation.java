@@ -32,8 +32,13 @@ import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
+import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.Pickable;
+import com.ardor3d.intersection.PickingUtil;
+import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -2587,7 +2592,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			// System.out.println("***" + asset.getUnitName() + "," + asset.getUnitMeter());
 			final Node node = storage.getScene();
 			node.setScale(scale);
-			root.attachChild(node);
+			// root.attachChild(node);
 			oldImportedNodes.add(node);
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
@@ -2640,7 +2645,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (n2.getNumberOfChildren() > 0) {
 				newImportedNodes.add(n2);
 				n2.setScale(scale);
-				// root.attachChild(n2);
+				root.attachChild(n2); // for testing meshes
 			}
 		} else {
 			importedNodeFiles.remove(file);
@@ -2674,6 +2679,35 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (importedNodeFiles != null) {
 			importedNodeFiles.clear();
 		}
+	}
+
+	public void pickMesh(final int x, final int y) {
+		if (newImportedNodes != null) {
+			final PickResults pickResults = new PrimitivePickResults();
+			pickResults.setCheckDistance(true);
+			final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
+			for (final Node node : newImportedNodes) {
+				for (final Spatial s : node.getChildren()) {
+					if (s instanceof Mesh) {
+						final Mesh m = (Mesh) s;
+						PickingUtil.findPick(m, pickRay, pickResults, false);
+					}
+				}
+			}
+			if (pickResults.getNumber() > 0) {
+				final Pickable pickable = pickResults.getPickData(0).getTarget();
+				if (pickable instanceof Mesh) {
+					setMeshHighlighted((Mesh) pickable);
+				}
+			}
+		}
+	}
+
+	private void setMeshHighlighted(final Mesh mesh) {
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final int pointCount = vertexBuffer.limit() / 3;
+		System.out.println("***" + pointCount);
+		drawImports();
 	}
 
 	private void drawImports() {

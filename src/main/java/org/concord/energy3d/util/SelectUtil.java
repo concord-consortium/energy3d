@@ -58,6 +58,10 @@ public class SelectUtil {
 		return getPickResult(pickRay);
 	}
 
+	public static int getPickResultsNumber() {
+		return pickResults.getNumber();
+	}
+
 	public static PickedHousePart pickPart(final int x, final int y, final Mesh mesh) {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
@@ -125,7 +129,7 @@ public class SelectUtil {
 			final PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint, pick.getIntersectionRecord().getIntersectionNormal(0));
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();
 			if (userData != null && userData.getHousePart() instanceof Window) {
-				polyDist_i -= 0.2; // give more priority to window (specially skylight)
+				polyDist_i -= 0.2; // give more priority to window (especially skylight)
 			}
 			double pointDist_i = Double.MAX_VALUE;
 			if (userData != null && polyDist_i - polyDist < 0.1) {
