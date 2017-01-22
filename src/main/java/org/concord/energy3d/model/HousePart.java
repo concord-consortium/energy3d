@@ -23,7 +23,6 @@ import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.bounding.BoundingBox;
-import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.image.Image;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
@@ -613,20 +612,8 @@ public abstract class HousePart implements Serializable {
 		flattenCenter.set(center);
 	}
 
-	protected ReadOnlyVector3 computeOrientedBoundingBox(final Mesh mesh) {
-		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-		buf.rewind();
-		final FloatBuffer newbuf = BufferUtils.createFloatBuffer(buf.limit());
-		while (buf.hasRemaining()) {
-			final Vector3 v = new Vector3(buf.get(), buf.get(), buf.get());
-			mesh.getWorldTransform().applyForward(v);
-			newbuf.put(v.getXf()).put(v.getYf()).put(v.getZf());
-		}
-		final OrientedBoundingBox boundingBox = new OrientedBoundingBox();
-		boundingBox.computeFromPoints(newbuf);
-		boundingBox.transform(mesh.getWorldTransform().invert(null), mesh.getModelBound());
-		mesh.updateWorldBound(true);
-		return boundingBox.getCenter();
+	protected static ReadOnlyVector3 computeOrientedBoundingBox(final Mesh mesh) {
+		return Util.getOrientedBoundingBox(mesh).getCenter();
 	}
 
 	protected ReadOnlyVector3 getCenter() {

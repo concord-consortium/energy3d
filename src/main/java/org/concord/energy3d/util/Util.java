@@ -52,6 +52,7 @@ import org.poly2tri.geometry.primitives.Point;
 
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.BoundingVolume.Type;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
@@ -67,6 +68,7 @@ import com.ardor3d.scenegraph.hint.PickingHint;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.AutoFade;
 import com.ardor3d.ui.text.BMText.AutoScale;
+import com.ardor3d.util.geom.BufferUtils;
 
 public class Util {
 
@@ -818,6 +820,22 @@ public class Util {
 				}
 			}
 		}
+	}
+
+	public static OrientedBoundingBox getOrientedBoundingBox(final Mesh mesh) {
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		buf.rewind();
+		final FloatBuffer newbuf = BufferUtils.createFloatBuffer(buf.limit());
+		while (buf.hasRemaining()) {
+			final Vector3 v = new Vector3(buf.get(), buf.get(), buf.get());
+			mesh.getWorldTransform().applyForward(v);
+			newbuf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+		}
+		final OrientedBoundingBox boundingBox = new OrientedBoundingBox();
+		boundingBox.computeFromPoints(newbuf);
+		boundingBox.transform(mesh.getWorldTransform().invert(null), mesh.getModelBound());
+		mesh.updateWorldBound(true);
+		return boundingBox;
 	}
 
 }

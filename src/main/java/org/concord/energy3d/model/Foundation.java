@@ -29,6 +29,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
@@ -112,6 +113,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient List<Node> oldImportedNodes, newImportedNodes;
 	private ReadOnlyColorRGBA defaultImportColor = ColorRGBA.WHITE;
 	private boolean importDecomposed;
+	private transient Line meshWireframe;
+	private transient Line meshBoundingBoxWireframe;
 
 	static {
 		format.setGroupingUsed(true);
@@ -227,6 +230,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		solarReceiver.setModelBound(new BoundingBox());
 		solarReceiver.setVisible(false);
 		root.attachChild(solarReceiver);
+
+		meshWireframe = new Line("Mesh Wireframe");
+		meshWireframe.setLineWidth(0.01f);
+		meshWireframe.setStipplePattern((short) 0xffff);
+		meshWireframe.setModelBound(null);
+		Util.disablePickShadowLight(meshWireframe);
+		meshWireframe.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
+		meshWireframe.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
+		root.attachChild(meshWireframe);
+
+		meshBoundingBoxWireframe = new Line("Mesh Bounding Box Wireframe");
+		meshBoundingBoxWireframe.setLineWidth(0.01f);
+		meshBoundingBoxWireframe.setStipplePattern((short) 0xf0f0);
+		meshBoundingBoxWireframe.setModelBound(null);
+		Util.disablePickShadowLight(meshBoundingBoxWireframe);
+		meshBoundingBoxWireframe.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
+		meshBoundingBoxWireframe.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
+		root.attachChild(meshBoundingBoxWireframe);
 
 		if (defaultImportColor == null) {
 			defaultImportColor = ColorRGBA.WHITE;
@@ -2681,7 +2702,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
+	private transient Mesh previousSelectedMesh;
+
 	public void pickMesh(final int x, final int y) {
+		if (previousSelectedMesh != null) {
+			updateTextureAndColor();
+		}
 		if (newImportedNodes != null) {
 			final PickResults pickResults = new PrimitivePickResults();
 			pickResults.setCheckDistance(true);
@@ -2697,17 +2723,172 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (pickResults.getNumber() > 0) {
 				final Pickable pickable = pickResults.getPickData(0).getTarget();
 				if (pickable instanceof Mesh) {
-					setMeshHighlighted((Mesh) pickable);
+					final Mesh m = (Mesh) pickable;
+					// drawMeshWireframe(m);
+					drawMeshBoundingBox(m);
+					previousSelectedMesh = m;
 				}
 			}
 		}
 	}
 
-	private void setMeshHighlighted(final Mesh mesh) {
-		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		final int pointCount = vertexBuffer.limit() / 3;
-		System.out.println("***" + pointCount);
-		drawImports();
+	private void drawMeshBoundingBox(final Mesh m) {
+		final FloatBuffer wireVertexBuffer = meshBoundingBoxWireframe.getMeshData().getVertexBuffer();
+		wireVertexBuffer.rewind();
+		final OrientedBoundingBox box = Util.getOrientedBoundingBox(m);
+		final ReadOnlyVector3 center = box.getCenter();
+		final ReadOnlyVector3 extent = box.getExtent();
+		final ReadOnlyVector3 vx = box.getXAxis().multiply(extent.getX(), null);
+		final ReadOnlyVector3 vy = box.getYAxis().multiply(extent.getY(), null);
+		final ReadOnlyVector3 vz = box.getZAxis().multiply(extent.getZ(), null);
+		double x, y, z;
+
+		// #1: (1, 1, 1) to (-1, 1, 1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #2: (1, 1, 1) to (1, -1, 1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #3: (1, 1, 1) to (1, 1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #4: (-1, -1, -1) to (1, -1, -1)
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #5: (-1, -1, -1) to (-1, 1, -1)
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #6: (-1, -1, -1) to (-1, -1, 1)
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #7: (-1, 1, 1) to (-1, -1, 1)
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #8: (-1, 1, 1) to (-1, 1, -1)
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #9: (1, -1, 1) to (-1, -1, 1)
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #10: (1, -1, 1) to (1, -1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #11: (1, 1, -1) to (-1, 1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		// #12: (1, 1, -1) to (1, -1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
+
+		meshBoundingBoxWireframe.updateModelBound();
+		meshBoundingBoxWireframe.setVisible(true);
+	}
+
+	void drawMeshWireframe(final Mesh m) {
+		final FloatBuffer meshVertexBuffer = m.getMeshData().getVertexBuffer();
+		meshVertexBuffer.rewind();
+		final int n = meshVertexBuffer.limit();
+		FloatBuffer wireVertexBuffer = meshWireframe.getMeshData().getVertexBuffer();
+		if (wireVertexBuffer.capacity() != n) {
+			wireVertexBuffer = BufferUtils.createFloatBuffer(n);
+			meshWireframe.getMeshData().setVertexBuffer(wireVertexBuffer);
+		} else {
+			wireVertexBuffer.rewind();
+			wireVertexBuffer.limit(wireVertexBuffer.capacity());
+		}
+		final ReadOnlyTransform trans = m.getWorldTransform();
+		Vector3 p;
+		for (int i = 0; i < n - 6; i += 6) {
+			p = trans.applyForward(new Vector3(meshVertexBuffer.get(), meshVertexBuffer.get(), meshVertexBuffer.get()));
+			wireVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = trans.applyForward(new Vector3(meshVertexBuffer.get(), meshVertexBuffer.get(), meshVertexBuffer.get()));
+			wireVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+		meshWireframe.updateModelBound();
+		meshWireframe.setVisible(true);
 	}
 
 	private void drawImports() {
