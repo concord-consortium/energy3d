@@ -1728,16 +1728,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final PickedHousePart pickedHousePart = SelectUtil.selectHousePart(mouseState.getX(), mouseState.getY(), true);
 						final UserData pick = pickedHousePart == null ? null : pickedHousePart.getUserData();
 						selectedPart = pick == null ? null : pick.getHousePart();
-						Mesh selectedMesh = null;
 						if (selectedPart instanceof Foundation) {
 							final Foundation foundation = (Foundation) selectedPart;
-							final List<Node> importedNodes = foundation.getImportedNodes();
-							if (importedNodes != null) {
-								selectedMesh = foundation.pickMesh(x, y);
+							if (foundation.getImportedNodes() != null) { // if this foundation contains any imported node, pick a mesh
+								foundation.pickMesh(x, y);
 							}
 						} else {
 							if (e.isAltDown()) {
-								if (selectedPart instanceof SolarPanel && selectedPart.getContainer() instanceof Rack) { // special case (may remove later)
+								if (selectedPart instanceof SolarPanel && selectedPart.getContainer() instanceof Rack) { // special case (to be removed later)
 									selectedPart = selectedPart.getContainer();
 								}
 							}
@@ -1757,11 +1755,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						EnergyPanel.getInstance().updateGraphs();
 						EnergyPanel.getInstance().updateProperties();
 						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-						if (selectedMesh == null) {
-							PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
-						} else {
-							PopupMenuFactory.getPopupMenu(selectedMesh).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
-						}
+						PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 					}
 				} catch (final Throwable t) {
 					t.printStackTrace();

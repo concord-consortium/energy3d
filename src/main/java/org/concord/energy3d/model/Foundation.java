@@ -115,6 +115,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean importDecomposed;
 	private transient Line meshWireframe;
 	private transient Line meshBoundingBoxWireframe;
+	private transient Mesh selectedMesh;
 
 	static {
 		format.setGroupingUsed(true);
@@ -2702,8 +2703,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	public Mesh pickMesh(final int x, final int y) {
-		Mesh m = null;
+	public void pickMesh(final int x, final int y) {
+		selectedMesh = null;
 		if (newImportedNodes != null) {
 			final PickResults pickResults = new PrimitivePickResults();
 			pickResults.setCheckDistance(true);
@@ -2718,15 +2719,18 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (pickResults.getNumber() > 0) {
 				final Pickable pickable = pickResults.getPickData(0).getTarget();
 				if (pickable instanceof Mesh) {
-					m = (Mesh) pickable;
+					selectedMesh = (Mesh) pickable;
 					// drawMeshWireframe(m);
-					drawMeshBoundingBox(m);
+					drawMeshBoundingBox(selectedMesh);
 				}
 			} else {
 				meshBoundingBoxWireframe.setVisible(false);
 			}
 		}
-		return m;
+	}
+
+	public Mesh getSelectedMesh() {
+		return selectedMesh;
 	}
 
 	public void setMeshBoundingBoxVisible(final boolean b) {

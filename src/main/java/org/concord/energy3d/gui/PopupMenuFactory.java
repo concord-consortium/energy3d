@@ -84,7 +84,6 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
 
 /**
  * Pop-up menus for customizing individual elements.
@@ -141,7 +140,6 @@ public class PopupMenuFactory {
 	private static MirrorRectangularFieldLayout mirrorRectangularFieldLayout = new MirrorRectangularFieldLayout();
 	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
 	private static MirrorSpiralFieldLayout mirrorSpiralFieldLayout = new MirrorSpiralFieldLayout();
-	private static Mesh selectedMesh;
 
 	private static Action colorAction = new AbstractAction("Color...") {
 		private static final long serialVersionUID = 1L;
@@ -173,6 +171,10 @@ public class PopupMenuFactory {
 			return getPopupMenuForFloor();
 		}
 		if (selectedPart instanceof Foundation) {
+			final Foundation f = (Foundation) selectedPart;
+			if (f.getSelectedMesh() != null) {
+				return getPopupMenuForMesh();
+			}
 			return getPopupMenuForFoundation();
 		}
 		if (selectedPart instanceof SolarPanel) {
@@ -6381,9 +6383,7 @@ public class PopupMenuFactory {
 
 	}
 
-	public static JPopupMenu getPopupMenu(final Mesh mesh) {
-
-		selectedMesh = mesh;
+	private static JPopupMenu getPopupMenuForMesh() {
 
 		if (popupMenuForMesh == null) {
 
@@ -6400,10 +6400,14 @@ public class PopupMenuFactory {
 				@Override
 				public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation && selectedMesh != null) {
-						String s = selectedMesh.toString();
-						s = s.substring(0, s.indexOf('(')).trim();
-						miInfo.setText(s + " (" + selectedMesh.getMeshData().getVertexCount() + ")");
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							String s = m.toString();
+							s = s.substring(0, s.indexOf('(')).trim();
+							miInfo.setText(s + " (" + m.getMeshData().getVertexCount() + ")");
+						}
 					}
 				}
 
@@ -6423,13 +6427,61 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation && selectedMesh != null) {
-						final Foundation foundation = (Foundation) selectedPart;
-						final List<Node> importedNodes = foundation.getImportedNodes();
-						if (importedNodes != null) {
-							selectedMesh.getParent().detachChild(selectedMesh);
-							foundation.setMeshBoundingBoxVisible(false);
-							foundation.draw();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							m.getParent().detachChild(m);
+							f.setMeshBoundingBoxVisible(false);
+							f.draw();
+							updateAfterEdit();
+						}
+					}
+				}
+			});
+
+			final JMenuItem miProperties = new JMenuItem("Properties...");
+			miProperties.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							final JPanel gui = new JPanel(new BorderLayout());
+							final String title = "<html>Mesh properties</html>";
+							gui.add(new JLabel(title), BorderLayout.NORTH);
+							final JPanel propertiesPanel = new JPanel(new SpringLayout());
+							propertiesPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+							gui.add(propertiesPanel, BorderLayout.CENTER);
+
+							// index mode
+							JLabel label = new JLabel("Index Mode: ", JLabel.TRAILING);
+							propertiesPanel.add(label);
+							JTextField textField = new JTextField(m.getMeshData().getIndexMode(0) + "", 5);
+							textField.setEditable(false);
+							label.setLabelFor(textField);
+							propertiesPanel.add(textField);
+
+							// vertex count
+							label = new JLabel("Vertex Count: ", JLabel.TRAILING);
+							propertiesPanel.add(label);
+							textField = new JTextField(m.getMeshData().getVertexCount() + "", 5);
+							textField.setEditable(false);
+							label.setLabelFor(textField);
+							propertiesPanel.add(textField);
+
+							// color
+							label = new JLabel("Default Color: ", JLabel.TRAILING);
+							propertiesPanel.add(label);
+							textField = new JTextField(m.getDefaultColor() + "", 5);
+							textField.setEditable(false);
+							label.setLabelFor(textField);
+							propertiesPanel.add(textField);
+
+							SpringUtilities.makeCompactGrid(propertiesPanel, 3, 2, 6, 6, 6, 6);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), gui, "Mesh Properties", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
 				}
@@ -6437,6 +6489,8 @@ public class PopupMenuFactory {
 
 			popupMenuForMesh.add(miInfo);
 			popupMenuForMesh.add(miCut);
+			popupMenuForMesh.add(miProperties);
+
 		}
 
 		return popupMenuForMesh;
@@ -6646,9 +6700,7 @@ public class PopupMenuFactory {
 
 				}
 
-				while (true)
-
-				{
+				while (true) {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						final String newValue = siField.getText();
 						try {
