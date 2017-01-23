@@ -46,6 +46,8 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
@@ -1188,7 +1190,10 @@ public class Foundation extends HousePart implements Thermalizable {
 						for (final Spatial s : ni.getChildren()) {
 							if (s instanceof Mesh) {
 								final Mesh m = (Mesh) s;
-								// updateTextureAndColor(m, defaultImportColor);
+								final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
+								if (ts == null || ts.getTexture() == null) {
+									updateTextureAndColor(m, defaultImportColor);
+								}
 							}
 						}
 					}

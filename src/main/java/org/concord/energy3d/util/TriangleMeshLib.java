@@ -68,7 +68,9 @@ public class TriangleMeshLib {
 			final GroupData group = new GroupData();
 			group.key.set(normal);
 			groups.add(group);
-			group.textureImage = textureState.getTexture().getImage();
+			if (textureState != null && textureState.getTexture() != null) {
+				group.textureImage = textureState.getTexture().getImage();
+			}
 
 			group.vertices.add(p1);
 			group.vertices.add(p2);
@@ -113,11 +115,12 @@ public class TriangleMeshLib {
 			for (final ReadOnlyVector2 v : group.textures) {
 				textureBuffer.put(v.getXf()).put(v.getYf());
 			}
-			final Texture texture = TextureManager.loadFromImage(group.textureImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
-			final TextureState ts = new TextureState();
-			ts.setTexture(texture);
-			mesh.setRenderState(ts);
-
+			if (group.textureImage != null) {
+				final Texture texture = TextureManager.loadFromImage(group.textureImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
+				final TextureState ts = new TextureState();
+				ts.setTexture(texture);
+				mesh.setRenderState(ts);
+			}
 			mesh.updateModelBound();
 		}
 		return results;
