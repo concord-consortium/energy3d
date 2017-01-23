@@ -59,6 +59,7 @@ import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
+import org.concord.energy3d.undo.DeleteMeshCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MovePartCommand;
@@ -2029,30 +2030,40 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			taskManager.update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					final RemovePartCommand command = new RemovePartCommand(selectedPart);
-					if (selectedPart instanceof Wall) { // undo/redo a gable roof
-						final Roof roof = ((Wall) selectedPart).getRoof();
-						if (roof != null) {
-							final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
-							if (roof.getGableEditPointToWallMap() != null) {
-								gableInfo.add(roof.getGableEditPointToWallMap());
-							}
-							command.setGableInfo(gableInfo);
-						}
-					} else if (selectedPart instanceof Foundation) { // undo/redo all the gable roofs
-						final List<Roof> roofs = ((Foundation) selectedPart).getRoofs();
-						if (!roofs.isEmpty()) {
-							final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
-							for (final Roof r : roofs) {
-								if (r.getGableEditPointToWallMap() != null) {
-									gableInfo.add(r.getGableEditPointToWallMap());
+					if (selectedPart instanceof Foundation && ((Foundation) selectedPart).getSelectedMesh() != null) { // a mesh is selected, instead of a part
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
+						m.getParent().detachChild(m);
+						f.setMeshBoundingBoxVisible(false);
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else {
+						final RemovePartCommand c = new RemovePartCommand(selectedPart);
+						if (selectedPart instanceof Wall) { // undo/redo a gable roof
+							final Roof roof = ((Wall) selectedPart).getRoof();
+							if (roof != null) {
+								final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
+								if (roof.getGableEditPointToWallMap() != null) {
+									gableInfo.add(roof.getGableEditPointToWallMap());
 								}
+								c.setGableInfo(gableInfo);
 							}
-							command.setGableInfo(gableInfo);
+						} else if (selectedPart instanceof Foundation) { // undo/redo all the gable roofs
+							final List<Roof> roofs = ((Foundation) selectedPart).getRoofs();
+							if (!roofs.isEmpty()) {
+								final List<Map<Integer, List<Wall>>> gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
+								for (final Roof r : roofs) {
+									if (r.getGableEditPointToWallMap() != null) {
+										gableInfo.add(r.getGableEditPointToWallMap());
+									}
+								}
+								c.setGableInfo(gableInfo);
+							}
 						}
+						undoManager.addEdit(c);
+						Scene.getInstance().remove(selectedPart, true);
 					}
-					undoManager.addEdit(command);
-					Scene.getInstance().remove(selectedPart, true);
 					selectedPart = null;
 					EventQueue.invokeLater(new Runnable() {
 						@Override

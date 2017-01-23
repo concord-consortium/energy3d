@@ -84,6 +84,7 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 
 /**
  * Pop-up menus for customizing individual elements.
@@ -6421,9 +6422,9 @@ public class PopupMenuFactory {
 
 			});
 
-			final JMenuItem miCut = new JMenuItem("Delete");
-			miCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
-			miCut.addActionListener(new ActionListener() {
+			final JMenuItem miDeleteMesh = new JMenuItem("Delete Mesh");
+			miDeleteMesh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miDeleteMesh.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6431,17 +6432,52 @@ public class PopupMenuFactory {
 						final Foundation f = (Foundation) selectedPart;
 						final Mesh m = f.getSelectedMesh();
 						if (m != null) {
-							m.getParent().detachChild(m);
-							f.setMeshBoundingBoxVisible(false);
-							f.draw();
-							updateAfterEdit();
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
+									m.getParent().detachChild(m);
+									f.setMeshBoundingBoxVisible(false);
+									f.draw();
+									updateAfterEdit();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									return null;
+								}
+							});
 						}
 					}
 				}
 			});
 
-			final JMenuItem miProperties = new JMenuItem("Properties...");
-			miProperties.addActionListener(new ActionListener() {
+			final JMenuItem miDeleteNode = new JMenuItem("Delete Node");
+			miDeleteNode.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									final Node n = m.getParent();
+									final DeleteNodeCommand c = new DeleteNodeCommand(n, f);
+									n.getParent().detachChild(n);
+									f.setMeshBoundingBoxVisible(false);
+									f.draw();
+									updateAfterEdit();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									return null;
+								}
+							});
+						}
+					}
+				}
+			});
+
+			final JMenuItem miMeshProperties = new JMenuItem("Mesh Properties...");
+			miMeshProperties.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6450,7 +6486,7 @@ public class PopupMenuFactory {
 						final Mesh m = f.getSelectedMesh();
 						if (m != null) {
 							final JPanel gui = new JPanel(new BorderLayout());
-							final String title = "<html>Mesh properties</html>";
+							final String title = "<html>A mesh is a basic unit (e.g., a triangle or a line)<br>of geometry of a structure.</html>";
 							gui.add(new JLabel(title), BorderLayout.NORTH);
 							final JPanel propertiesPanel = new JPanel(new SpringLayout());
 							propertiesPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -6475,7 +6511,7 @@ public class PopupMenuFactory {
 							// color
 							label = new JLabel("Default Color: ", JLabel.TRAILING);
 							propertiesPanel.add(label);
-							textField = new JTextField(m.getDefaultColor() + "", 5);
+							textField = new JTextField(m.getDefaultColor().asHexRRGGBBAA(), 5);
 							textField.setEditable(false);
 							label.setLabelFor(textField);
 							propertiesPanel.add(textField);
@@ -6487,9 +6523,54 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miNodeProperties = new JMenuItem("Node Properties...");
+			miNodeProperties.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							final Node n = m.getParent();
+							if (n != null) {
+								final JPanel gui = new JPanel(new BorderLayout());
+								final String title = "<html>A node contains a set of meshes that represent<br>the geometry of the structure.</html>";
+								gui.add(new JLabel(title), BorderLayout.NORTH);
+								final JPanel propertiesPanel = new JPanel(new SpringLayout());
+								propertiesPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+								gui.add(propertiesPanel, BorderLayout.CENTER);
+
+								// name
+								JLabel label = new JLabel("Name: ", JLabel.TRAILING);
+								propertiesPanel.add(label);
+								JTextField textField = new JTextField(n.getName(), 5);
+								textField.setEditable(false);
+								label.setLabelFor(textField);
+								propertiesPanel.add(textField);
+
+								// children count
+								label = new JLabel("Children: ", JLabel.TRAILING);
+								propertiesPanel.add(label);
+								textField = new JTextField(n.getNumberOfChildren() + "", 5);
+								textField.setEditable(false);
+								label.setLabelFor(textField);
+								propertiesPanel.add(textField);
+
+								SpringUtilities.makeCompactGrid(propertiesPanel, 2, 2, 6, 6, 6, 6);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), gui, "Node Properties", JOptionPane.INFORMATION_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForMesh.add(miInfo);
-			popupMenuForMesh.add(miCut);
-			popupMenuForMesh.add(miProperties);
+			popupMenuForMesh.add(miDeleteMesh);
+			popupMenuForMesh.add(miDeleteNode);
+			popupMenuForMesh.addSeparator();
+			popupMenuForMesh.add(miMeshProperties);
+			popupMenuForMesh.add(miNodeProperties);
 
 		}
 
