@@ -11,18 +11,24 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.MeshLib.GroupData;
 
 import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.image.Texture;
+import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.RenderState.StateType;
+import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.MeshData;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.util.TextureManager;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class TriangleMeshLib {
 
-	public static void groupByPlanner(final Mesh mesh, final Node root) {
-		final ArrayList<GroupData> groups = extractGroups(mesh);
-		createMeshes(root, groups);
+	public static List<Mesh> groupByPlanar(final Mesh mesh) {
+		return createMeshes(extractGroups(mesh));
 	}
 
 	private static ArrayList<GroupData> extractGroups(final Mesh mesh) {
@@ -33,6 +39,13 @@ public class TriangleMeshLib {
 			normalBuffer = BufferUtils.createFloatBuffer(vertexBuffer.limit());
 		} else {
 			normalBuffer.rewind();
+		}
+		final TextureState textureState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
+		FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+		if (textureBuffer == null) {
+			textureBuffer = BufferUtils.createFloatBuffer(vertexBuffer.limit());
+		} else {
+			textureBuffer.rewind();
 		}
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
@@ -55,6 +68,7 @@ public class TriangleMeshLib {
 			final GroupData group = new GroupData();
 			group.key.set(normal);
 			groups.add(group);
+			group.textureImage = textureState.getTexture().getImage();
 
 			group.vertices.add(p1);
 			group.vertices.add(p2);
@@ -62,21 +76,21 @@ public class TriangleMeshLib {
 			group.normals.add(firstNormal);
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
+			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 		}
 		MeshLib.combineGroups(groups);
 		return groups;
 	}
 
-	private static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
-		if (groups.size() != root.getNumberOfChildren()) {
-			root.detachAllChildren();
-		}
-
+	private static List<Mesh> createMeshes(final ArrayList<GroupData> groups) {
+		final List<Mesh> results = new ArrayList<Mesh>();
 		int meshIndex = 0;
 		for (final GroupData group : groups) {
-			final Mesh mesh = new Mesh("Mesh #" + meshIndex);
+			final Mesh mesh = new Mesh("Mesh #" + meshIndex++);
 			mesh.setModelBound(new BoundingBox());
-			root.attachChild(mesh);
+			results.add(mesh);
 
 			final Vector3 normal = new Vector3();
 			for (final ReadOnlyVector3 v : group.normals) {
@@ -85,22 +99,31 @@ public class TriangleMeshLib {
 			normal.normalizeLocal();
 			mesh.setUserData(normal);
 
-			final FloatBuffer buf = BufferUtils.createVector3Buffer(group.vertices.size());
-			mesh.getMeshData().setVertexBuffer(buf);
-			final FloatBuffer textureBuffer = BufferUtils.createVector3Buffer(group.vertices.size());
-			mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+			final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(group.vertices.size());
+			mesh.getMeshData().setVertexBuffer(vertexBuffer);
 			final Vector3 center = new Vector3();
 			for (final ReadOnlyVector3 v : group.vertices) {
-				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+				vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
 				center.addLocal(v);
 			}
 			center.multiplyLocal(1.0 / group.vertices.size());
 
+			final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(group.textures.size());
+			mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+			for (final ReadOnlyVector2 v : group.textures) {
+				textureBuffer.put(v.getXf()).put(v.getYf());
+			}
+			final Texture texture = TextureManager.loadFromImage(group.textureImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
+			final TextureState ts = new TextureState();
+			ts.setTexture(texture);
+			mesh.setRenderState(ts);
+
 			mesh.updateModelBound();
-			meshIndex++;
 		}
+		return results;
 	}
 
+	// remove this in the future
 	static Node convertNode(final Foundation foundation, final Node oldNode) {
 		final Node newNode = new Node();
 		final List<Mesh> oldMeshes = new ArrayList<Mesh>();

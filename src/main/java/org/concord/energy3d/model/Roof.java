@@ -218,7 +218,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		final PolygonWithHoles polygon = makePolygon(wallUpperPoints);
 		applySteinerPoint(polygon);
 		MeshLib.fillMeshWithPolygon(mesh, polygon, null, true, null, null, null, false);
-		MeshLib.groupByPlanner(mesh, roofPartsRoot);
+		MeshLib.groupByPlanar(mesh, roofPartsRoot);
 		hideGableRoofParts();
 		int roofPartIndex = 0;
 		for (final Spatial child : roofPartsRoot.getChildren()) {

@@ -25,6 +25,7 @@ import org.poly2tri.triangulation.tools.ardor3d.ArdorMeshMapper;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.image.Image;
 import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
@@ -33,6 +34,7 @@ import com.ardor3d.math.LineSegment3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
+import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -50,9 +52,11 @@ public class MeshLib {
 		final Vector3 key = new Vector3();
 		final ArrayList<ReadOnlyVector3> vertices = new ArrayList<ReadOnlyVector3>();
 		final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
+		final ArrayList<ReadOnlyVector2> textures = new ArrayList<ReadOnlyVector2>();
+		Image textureImage;
 	}
 
-	public static void groupByPlanner(final Mesh mesh, final Node root) {
+	public static void groupByPlanar(final Mesh mesh, final Node root) {
 		final ArrayList<GroupData> groups = extractGroups(mesh);
 		createMeshes(root, groups);
 	}
@@ -131,6 +135,7 @@ public class MeshLib {
 							if (hasCommonEdge(group1, p1, p2, p3)) {
 								group1.vertices.addAll(group2.vertices);
 								group1.normals.addAll(group2.normals);
+								group1.textures.addAll(group2.textures);
 								groups.remove(group2);
 								j--;
 								changed = true;

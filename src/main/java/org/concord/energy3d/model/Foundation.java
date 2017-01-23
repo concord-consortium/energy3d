@@ -1188,7 +1188,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						for (final Spatial s : ni.getChildren()) {
 							if (s instanceof Mesh) {
 								final Mesh m = (Mesh) s;
-								updateTextureAndColor(m, defaultImportColor);
+								// updateTextureAndColor(m, defaultImportColor);
 							}
 						}
 					}
@@ -2614,7 +2614,6 @@ public class Foundation extends HousePart implements Thermalizable {
 			// System.out.println("***" + asset.getUnitName() + "," + asset.getUnitMeter());
 			final Node node = storage.getScene();
 			node.setScale(scale);
-			// root.attachChild(node);
 			oldImportedNodes.add(node);
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
@@ -2628,7 +2627,6 @@ public class Foundation extends HousePart implements Thermalizable {
 			final Node n2 = new Node(node.getName() + " (reconstructed)");
 			final List<Mesh> meshes = new ArrayList<Mesh>();
 			Util.getMeshes(node, meshes);
-			boolean warn = false;
 			String warnInfo = null;
 			for (final Mesh m : meshes) {
 				final ReadOnlyTransform t = m.getWorldTransform();
@@ -2636,19 +2634,14 @@ public class Foundation extends HousePart implements Thermalizable {
 				final MeshData md = m.getMeshData();
 				switch (md.getIndexMode(0)) {
 				case Triangles:
-					final Node n1 = new Node();
-					TriangleMeshLib.groupByPlanner(m, n1);
-					if (n1 != null && n1.getNumberOfChildren() > 0) {
-						final List<Spatial> children = new ArrayList<Spatial>();
-						for (final Spatial s : n1.getChildren()) {
-							children.add(s);
-						}
-						n1.detachAllChildren();
-						for (final Spatial s : children) {
+					final List<Mesh> children = TriangleMeshLib.groupByPlanar(m);
+					if (!children.isEmpty()) {
+						for (final Mesh s : children) {
 							final UserData ud = new UserData(this);
 							ud.setNormal((Vector3) s.getUserData());
 							s.setUserData(ud);
 							s.setTransform(t);
+							// s.updateModelBound();
 							n2.attachChild(s);
 						}
 					}
@@ -2656,12 +2649,11 @@ public class Foundation extends HousePart implements Thermalizable {
 				case Lines:
 					break;
 				default:
-					warn = true;
 					warnInfo = md.getIndexMode(0).name();
 					break;
 				}
 			}
-			if (warn) {
+			if (warnInfo != null) {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Non-triangular mesh " + warnInfo + " is found.", "Warning", JOptionPane.WARNING_MESSAGE);
 			}
 			if (n2.getNumberOfChildren() > 0) {
@@ -2669,6 +2661,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				n2.setScale(scale);
 				root.attachChild(n2); // for testing meshes
 			}
+			// root.attachChild(node);
 		} else {
 			importedNodeFiles.remove(file);
 		}
