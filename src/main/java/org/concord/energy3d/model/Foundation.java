@@ -1164,15 +1164,23 @@ public class Foundation extends HousePart implements Thermalizable {
 						final Vector3 vi = matrix.applyPost(importedNodePositions.get(i), null);
 						ni.setTranslation(c.add(vi, null));
 						ni.setRotation(matrix);
-						for (final Spatial s : ni.getChildren()) {
-							if (s instanceof Mesh) {
-								final Mesh m = (Mesh) s;
-								final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
-								if (ts == null || ts.getTexture() == null) {
-									updateTextureAndColor(m, defaultImportColor);
-								} else {
+						if (!SceneManager.getInstance().getSolarHeatMap()) {
+							for (final Spatial s : ni.getChildren()) {
+								if (s instanceof Mesh) {
+									final Mesh m = (Mesh) s;
 									final UserData ud = (UserData) m.getUserData();
-									m.setRenderState(ud.getRenderState());
+									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
+									if (ts == null || ts.getTexture() == null) {
+										updateTextureAndColor(m, defaultImportColor);
+									} else {
+										if (ud.getTextureBuffer() == null) {
+											// m.clearRenderState(StateType.Texture);
+											// updateTextureAndColor(m, defaultImportColor);
+										} else {
+											m.getMeshData().setTextureBuffer(ud.getTextureBuffer(), 0);
+											m.setRenderState(ud.getRenderState());
+										}
+									}
 								}
 							}
 						}
@@ -2597,6 +2605,7 @@ public class Foundation extends HousePart implements Thermalizable {
 							final UserData ud = new UserData(this);
 							ud.setRenderState(s.getLocalRenderState(StateType.Texture));
 							ud.setNormal((Vector3) s.getUserData());
+							ud.setTextureBuffer(s.getMeshData().getTextureBuffer(0));
 							s.setUserData(ud);
 							s.setTransform(t);
 							newNode.attachChild(s);

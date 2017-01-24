@@ -1031,17 +1031,19 @@ public class SolarRadiation {
 		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * Scene.getInstance().getSolarStep(), null);
 		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
-		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
 		vertexBuffer.rewind();
-		textureBuffer.rewind();
-		while (vertexBuffer.hasRemaining()) {
-			final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
-			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
-			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
-			if (uP != null && vP != null) {
-				final float uScale = (float) (uP.distance(o) / u.length());
-				final float vScale = (float) (vP.distance(o) / v.length());
-				textureBuffer.put(uScale).put(vScale);
+		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
+		if (textureBuffer != null) {
+			textureBuffer.rewind();
+			while (vertexBuffer.hasRemaining()) {
+				final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
+				final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
+				final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
+				if (uP != null && vP != null) {
+					final float uScale = (float) (uP.distance(o) / u.length());
+					final float vScale = (float) (vP.distance(o) / v.length());
+					textureBuffer.put(uScale).put(vScale);
+				}
 			}
 		}
 	}

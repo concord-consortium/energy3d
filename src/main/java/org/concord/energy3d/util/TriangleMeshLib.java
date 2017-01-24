@@ -41,12 +41,7 @@ public class TriangleMeshLib {
 			normalBuffer.rewind();
 		}
 		final TextureState textureState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
-		FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
-		if (textureBuffer == null) {
-			textureBuffer = BufferUtils.createFloatBuffer(vertexBuffer.limit());
-		} else {
-			textureBuffer.rewind();
-		}
+		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final Vector3 normal = new Vector3();
@@ -78,9 +73,12 @@ public class TriangleMeshLib {
 			group.normals.add(firstNormal);
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
-			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
-			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+			if (textureBuffer != null) {
+				textureBuffer.rewind();
+				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
+				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+			}
 		}
 		MeshLib.combineGroups(groups);
 		return groups;
@@ -110,16 +108,18 @@ public class TriangleMeshLib {
 			}
 			center.multiplyLocal(1.0 / group.vertices.size());
 
-			final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(group.textures.size());
-			mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
-			for (final ReadOnlyVector2 v : group.textures) {
-				textureBuffer.put(v.getXf()).put(v.getYf());
-			}
-			if (group.textureImage != null) {
-				final Texture texture = TextureManager.loadFromImage(group.textureImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
-				final TextureState ts = new TextureState();
-				ts.setTexture(texture);
-				mesh.setRenderState(ts);
+			if (!group.textures.isEmpty()) {
+				final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(group.textures.size());
+				mesh.getMeshData().setTextureBuffer(textureBuffer, 0);
+				for (final ReadOnlyVector2 v : group.textures) {
+					textureBuffer.put(v.getXf()).put(v.getYf());
+				}
+				if (group.textureImage != null) {
+					final Texture texture = TextureManager.loadFromImage(group.textureImage, Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat);
+					final TextureState ts = new TextureState();
+					ts.setTexture(texture);
+					mesh.setRenderState(ts);
+				}
 			}
 			mesh.updateModelBound();
 		}
