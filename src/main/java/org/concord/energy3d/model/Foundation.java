@@ -112,9 +112,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean groupMaster;
 	private List<Vector3> importedNodePositions; // data structures for imported file
 	private List<URL> importedNodeFiles;
-	private transient List<Node> oldImportedNodes, newImportedNodes;
+	private transient List<Node> importedNodes;
 	private ReadOnlyColorRGBA defaultImportColor = ColorRGBA.WHITE;
-	private boolean importDecomposed;
 	private transient Line meshWireframe;
 	private transient Line meshBoundingBoxWireframe;
 	private transient Mesh selectedMesh;
@@ -1153,36 +1152,14 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
 		}
 		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
-		if (oldImportedNodes != null) {
-			final int n = oldImportedNodes.size();
+		if (importedNodes != null) {
+			final int n = importedNodes.size();
 			if (n > 0) {
 				Node ni;
 				final Vector3 c = getAbsCenter();
 				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 				for (int i = 0; i < n; i++) {
-					ni = oldImportedNodes.get(i);
-					if (root.getChildren().contains(ni)) {
-						final Vector3 vi = matrix.applyPost(importedNodePositions.get(i), null);
-						ni.setTranslation(c.add(vi, null));
-						ni.setRotation(matrix);
-						for (final Spatial s : ni.getChildren()) {
-							if (s instanceof Mesh) {
-								final Mesh m = (Mesh) s;
-								updateTextureAndColor(m, defaultImportColor);
-							}
-						}
-					}
-				}
-			}
-		}
-		if (newImportedNodes != null) {
-			final int n = newImportedNodes.size();
-			if (n > 0) {
-				Node ni;
-				final Vector3 c = getAbsCenter();
-				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
-				for (int i = 0; i < n; i++) {
-					ni = newImportedNodes.get(i);
+					ni = importedNodes.get(i);
 					if (root.getChildren().contains(ni)) {
 						final Vector3 vi = matrix.applyPost(importedNodePositions.get(i), null);
 						ni.setTranslation(c.add(vi, null));
@@ -1193,6 +1170,9 @@ public class Foundation extends HousePart implements Thermalizable {
 								final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
 								if (ts == null || ts.getTexture() == null) {
 									updateTextureAndColor(m, defaultImportColor);
+								} else {
+									final UserData ud = (UserData) m.getUserData();
+									m.setRenderState(ud.getRenderState());
 								}
 							}
 						}
@@ -2566,45 +2546,12 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	/** @return the imported nodes for solar simulation. Each node contains a list of meshes reconstructed from those contained in oldImportedNodes. */
 	public List<Node> getImportedNodes() {
-		return importDecomposed ? newImportedNodes : oldImportedNodes;
-	}
-
-	/** Toggle between the original imported nodes and the constructed nodes */
-	public void toggleImportedNodes(final boolean original) {
-		importDecomposed = !original;
-		if (original) {
-			if (newImportedNodes != null) {
-				for (final Node n : newImportedNodes) {
-					root.detachChild(n);
-				}
-			}
-			if (oldImportedNodes != null) {
-				for (final Node n : oldImportedNodes) {
-					root.attachChild(n);
-				}
-			}
-		} else {
-			if (oldImportedNodes != null) {
-				for (final Node n : oldImportedNodes) {
-					root.detachChild(n);
-				}
-			}
-			if (newImportedNodes != null) {
-				for (final Node n : newImportedNodes) {
-					root.attachChild(n);
-				}
-			}
-		}
-		draw();
+		return importedNodes;
 	}
 
 	public void importCollada(final URL file, final boolean init) throws Exception {
-		importDecomposed = false;
-		if (oldImportedNodes == null) {
-			oldImportedNodes = new ArrayList<Node>();
-		}
-		if (newImportedNodes == null) {
-			newImportedNodes = new ArrayList<Node>();
+		if (importedNodes == null) {
+			importedNodes = new ArrayList<Node>();
 		}
 		if (importedNodePositions == null) {
 			importedNodePositions = new ArrayList<Vector3>();
@@ -2617,37 +2564,35 @@ public class Foundation extends HousePart implements Thermalizable {
 			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(file));
 			// final AssetData asset = storage.getAssetData();
 			// System.out.println("***" + asset.getUnitName() + "," + asset.getUnitMeter());
-			final Node node = storage.getScene();
-			node.setScale(scale);
-			oldImportedNodes.add(node);
+			final Node originalNode = storage.getScene();
+			originalNode.setScale(scale);
 			if (!init) {
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
 				if (position != null) {
-					node.setTranslation(position);
+					originalNode.setTranslation(position);
 				}
-				importedNodePositions.add(node.getTranslation().subtract(getAbsCenter(), null));
+				importedNodePositions.add(originalNode.getTranslation().subtract(getAbsCenter(), null));
 				importedNodeFiles.add(file);
 			}
-			// now construct a new node that holds the meshes for simulation
-			final Node n2 = new Node(node.getName() + " (reconstructed)");
+			// now construct a new node that is a parent of all planar meshes
+			final Node newNode = new Node(originalNode.getName());
 			final List<Mesh> meshes = new ArrayList<Mesh>();
-			Util.getMeshes(node, meshes);
+			Util.getMeshes(originalNode, meshes);
 			String warnInfo = null;
 			for (final Mesh m : meshes) {
 				final ReadOnlyTransform t = m.getWorldTransform();
-				m.setUserData(new UserData(this)); // an imported mesh doesn't necessarily have the same normal vector (e.g., a cube could be a whole mesh in collada)
 				final MeshData md = m.getMeshData();
 				switch (md.getIndexMode(0)) {
 				case Triangles:
-					final List<Mesh> children = TriangleMeshLib.groupByPlanar(m);
+					final List<Mesh> children = TriangleMeshLib.getPlanarMeshes(m);
 					if (!children.isEmpty()) {
 						for (final Mesh s : children) {
 							final UserData ud = new UserData(this);
+							ud.setRenderState(s.getLocalRenderState(StateType.Texture));
 							ud.setNormal((Vector3) s.getUserData());
 							s.setUserData(ud);
 							s.setTransform(t);
-							// s.updateModelBound();
-							n2.attachChild(s);
+							newNode.attachChild(s);
 						}
 					}
 					break;
@@ -2661,37 +2606,30 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (warnInfo != null) {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Non-triangular mesh " + warnInfo + " is found.", "Warning", JOptionPane.WARNING_MESSAGE);
 			}
-			if (n2.getNumberOfChildren() > 0) {
-				newImportedNodes.add(n2);
-				n2.setScale(scale);
-				root.attachChild(n2); // for testing meshes
+			if (newNode.getNumberOfChildren() > 0) {
+				importedNodes.add(newNode);
+				newNode.setScale(scale);
+				root.attachChild(newNode);
 			}
-			// root.attachChild(node);
 		} else {
 			importedNodeFiles.remove(file);
 		}
 	}
 
 	public void removeAllImports() {
-		if (oldImportedNodes == null || oldImportedNodes.isEmpty()) {
+		if (importedNodes == null || importedNodes.isEmpty()) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no imported structure to remove.", "No Imported Structure", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		final int count = oldImportedNodes.size();
+		final int count = importedNodes.size();
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + count + " imported structures?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
 		}
-		if (oldImportedNodes != null) {
-			for (final Node n : oldImportedNodes) {
+		if (importedNodes != null) {
+			for (final Node n : importedNodes) {
 				root.detachChild(n);
 			}
-			oldImportedNodes.clear();
-		}
-		if (newImportedNodes != null) {
-			for (final Node n : newImportedNodes) {
-				root.detachChild(n);
-			}
-			newImportedNodes.clear();
+			importedNodes.clear();
 		}
 		if (importedNodePositions != null) {
 			importedNodePositions.clear();
@@ -2703,11 +2641,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void pickMesh(final int x, final int y) {
 		selectedMesh = null;
-		if (newImportedNodes != null) {
+		if (importedNodes != null) {
 			final PickResults pickResults = new PrimitivePickResults();
 			pickResults.setCheckDistance(true);
 			final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
-			for (final Node node : newImportedNodes) {
+			for (final Node node : importedNodes) {
 				for (final Spatial s : node.getChildren()) {
 					if (s instanceof Mesh) {
 						PickingUtil.findPick(s, pickRay, pickResults, false);
@@ -2895,36 +2833,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	private void drawImports() {
-		if (oldImportedNodes != null) {
-			final int n = oldImportedNodes.size();
+		if (importedNodes != null) {
+			final int n = importedNodes.size();
 			if (n > 0) {
 				Node ni;
 				final Vector3 c = getAbsCenter();
 				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 				for (int i = 0; i < n; i++) {
-					ni = oldImportedNodes.get(i);
-					if (root.getChildren().contains(ni)) {
-						final Vector3 vi = matrix.applyPost(importedNodePositions.get(i), null);
-						ni.setTranslation(c.add(vi, null));
-						ni.setRotation(matrix);
-						for (final Spatial s : ni.getChildren()) {
-							if (s instanceof Mesh) {
-								final Mesh m = (Mesh) s;
-								m.updateModelBound();
-							}
-						}
-					}
-				}
-			}
-		}
-		if (newImportedNodes != null) {
-			final int n = newImportedNodes.size();
-			if (n > 0) {
-				Node ni;
-				final Vector3 c = getAbsCenter();
-				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
-				for (int i = 0; i < n; i++) {
-					ni = newImportedNodes.get(i);
+					ni = importedNodes.get(i);
 					if (root.getChildren().contains(ni)) {
 						final Vector3 vi = matrix.applyPost(importedNodePositions.get(i), null);
 						ni.setTranslation(c.add(vi, null));

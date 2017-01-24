@@ -27,11 +27,11 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class TriangleMeshLib {
 
-	public static List<Mesh> groupByPlanar(final Mesh mesh) {
-		return createMeshes(extractGroups(mesh));
+	public static List<Mesh> getPlanarMeshes(final Mesh mesh) {
+		return createMeshes(findGroups(mesh));
 	}
 
-	private static ArrayList<GroupData> extractGroups(final Mesh mesh) {
+	private static ArrayList<GroupData> findGroups(final Mesh mesh) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();

@@ -1340,7 +1340,13 @@ public class SolarRadiation {
 		final double[][] solarData = onMesh.get(mesh).dailySolarIntensity;
 		fillBlanksWithNeighboringValues(solarData);
 		final int rows = solarData.length;
+		if (rows == 0) {
+			return;
+		}
 		final int cols = solarData[0].length;
+		if (cols == 0) {
+			return;
+		}
 		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
@@ -1361,7 +1367,13 @@ public class SolarRadiation {
 
 	private void fillBlanksWithNeighboringValues(final double[][] solarData) {
 		final int rows = solarData.length;
+		if (rows == 0) {
+			return;
+		}
 		final int cols = solarData[0].length;
+		if (cols == 0) {
+			return;
+		}
 		for (int repeat = 0; repeat < 2; repeat++) {
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
