@@ -1,10 +1,13 @@
 package org.concord.energy3d.model;
 
+import java.nio.FloatBuffer;
+
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.util.geom.BufferUtils;
 
 public class UserData {
 	private final HousePart housePart;
@@ -13,6 +16,7 @@ public class UserData {
 	private Vector3 printCenter = new Vector3();
 	private ReadOnlyVector3 normal;
 	private RenderState renderState;
+	private FloatBuffer textureBuffer;
 
 	public UserData(final HousePart housePart) {
 		this(housePart, -1, false);
@@ -63,6 +67,17 @@ public class UserData {
 
 	public void setRenderState(final RenderState renderState) {
 		this.renderState = renderState;
+	}
+
+	public FloatBuffer getTextureBuffer() {
+		if (textureBuffer == null) {
+			return null;
+		}
+		return BufferUtils.clone(textureBuffer);
+	}
+
+	public void setTextureBuffer(final FloatBuffer textureBuffer) {
+		this.textureBuffer = textureBuffer;
 	}
 
 }

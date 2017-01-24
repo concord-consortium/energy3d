@@ -1250,6 +1250,9 @@ public class EnergyPanel extends JPanel {
 						partProperty1Label.setText("  Total Number:");
 						partProperty1TextField.setText("" + numberOfSolarPanels);
 						partProperty1TextField.setToolTipText("Total number of solar panels");
+						partProperty2Label.setText("  -");
+						partProperty2TextField.setText("");
+						partProperty2TextField.setToolTipText(null);
 					} else {
 						final int numberOfMirrors = Scene.getInstance().countParts(new Class[] { Mirror.class });
 						if (numberOfMirrors > 0) {
@@ -1257,16 +1260,30 @@ public class EnergyPanel extends JPanel {
 							partProperty1Label.setText("  Total Number:");
 							partProperty1TextField.setText("" + numberOfMirrors);
 							partProperty1TextField.setToolTipText("Total number of mirrors");
+							partProperty2Label.setText("  -");
+							partProperty2TextField.setText("");
+							partProperty2TextField.setToolTipText(null);
 						} else {
-							partPanelBorder.setTitle("Part");
-							partProperty1Label.setText("  -");
-							partProperty1TextField.setText("");
-							partProperty1TextField.setToolTipText(null);
+							final int numberOfNodes = Scene.getInstance().countNodes();
+							if (numberOfNodes > 0) {
+								partPanelBorder.setTitle("Structures");
+								partProperty1Label.setText("  Total Nodes:");
+								partProperty1TextField.setText("" + numberOfNodes);
+								partProperty1TextField.setToolTipText("Total number of structure nodes");
+								partProperty2Label.setText("  Total Meshes:");
+								partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
+								partProperty2TextField.setToolTipText("Total number of structure meshes");
+							} else {
+								partPanelBorder.setTitle("Part");
+								partProperty1Label.setText("  -");
+								partProperty1TextField.setText("");
+								partProperty1TextField.setToolTipText(null);
+								partProperty2Label.setText("  -");
+								partProperty2TextField.setText("");
+								partProperty2TextField.setToolTipText(null);
+							}
 						}
 					}
-					partProperty2Label.setText("  -");
-					partProperty2TextField.setText("");
-					partProperty2TextField.setToolTipText(null);
 					partProperty3Label.setText("  -");
 					partProperty3TextField.setText("");
 					partProperty3TextField.setToolTipText(null);

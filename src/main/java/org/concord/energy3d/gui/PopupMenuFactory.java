@@ -81,6 +81,7 @@ import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
@@ -6394,6 +6395,27 @@ public class PopupMenuFactory {
 			miInfo.setBackground(Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
+			final JMenuItem miBottomOnGround = new JMenuItem("Align Node Bottom with Ground Level");
+			miBottomOnGround.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							final Node n = m.getParent();
+							if (n != null) {
+								final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
+								final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
+								f.translateImportedNode(n, 0, 0, -zBottom);
+								f.draw();
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForMesh = new JPopupMenu();
 			popupMenuForMesh.setInvoker(MainPanel.getInstance().getCanvasPanel());
 			popupMenuForMesh.addPopupMenuListener(new PopupMenuListener() {
@@ -6408,16 +6430,21 @@ public class PopupMenuFactory {
 							String s = m.toString();
 							s = s.substring(0, s.indexOf('(')).trim();
 							miInfo.setText(s + " (" + m.getMeshData().getVertexCount() + ")");
+							final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(m.getParent());
+							final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
+							miBottomOnGround.setEnabled(!Util.isZero(zBottom));
 						}
 					}
 				}
 
 				@Override
 				public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+					miBottomOnGround.setEnabled(true);
 				}
 
 				@Override
 				public void popupMenuCanceled(final PopupMenuEvent e) {
+					miBottomOnGround.setEnabled(true);
 				}
 
 			});
@@ -6568,6 +6595,8 @@ public class PopupMenuFactory {
 			popupMenuForMesh.add(miInfo);
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.add(miDeleteNode);
+			popupMenuForMesh.addSeparator();
+			popupMenuForMesh.add(miBottomOnGround);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miMeshProperties);
 			popupMenuForMesh.add(miNodeProperties);

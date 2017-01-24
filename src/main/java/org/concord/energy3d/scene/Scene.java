@@ -2473,6 +2473,30 @@ public class Scene implements Serializable {
 		return count;
 	}
 
+	public int countNodes() {
+		int count = 0;
+		final List<Foundation> foundations = getAllFoundations();
+		for (final Foundation f : foundations) {
+			if (f.getImportedNodes() != null) {
+				count += f.getImportedNodes().size();
+			}
+		}
+		return count;
+	}
+
+	public int countMeshes() {
+		int count = 0;
+		final List<Foundation> foundations = getAllFoundations();
+		for (final Foundation f : foundations) {
+			if (f.getImportedNodes() != null) {
+				for (final Node n : f.getImportedNodes()) {
+					count += n.getNumberOfChildren();
+				}
+			}
+		}
+		return count;
+	}
+
 	public int getNumberOfSolarPanels() {
 		int count = 0;
 		for (final HousePart p : parts) {
