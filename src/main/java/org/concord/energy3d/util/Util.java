@@ -838,4 +838,15 @@ public class Util {
 		return boundingBox;
 	}
 
+	public static OrientedBoundingBox getOrientedBoundingBox(final Node node) {
+		final OrientedBoundingBox box = new OrientedBoundingBox();
+		for (final Spatial s : node.getChildren()) {
+			if (s instanceof Mesh) {
+				final Mesh m = (Mesh) s;
+				box.mergeLocal(getOrientedBoundingBox(m));
+			}
+		}
+		return box;
+	}
+
 }

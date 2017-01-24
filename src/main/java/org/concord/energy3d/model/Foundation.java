@@ -2549,6 +2549,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		return importedNodes;
 	}
 
+	public void translateImportedNode(final Node n, final double x, final double y, final double z) {
+		final int i = importedNodes.indexOf(n);
+		if (i >= 0 && i < importedNodes.size()) {
+			importedNodePositions.get(i).addLocal(x, y, z);
+		}
+	}
+
 	public void importCollada(final URL file, final boolean init) throws Exception {
 		if (importedNodes == null) {
 			importedNodes = new ArrayList<Node>();
