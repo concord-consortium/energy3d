@@ -159,6 +159,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance().getCanvasPanel());
 	private static final double MOVE_SPEED = 5;
+	private static boolean executeAllTask = true;
 	private final Canvas canvas;
 	private final FrameHandler frameHandler;
 	private final LogicalLayer logicalLayer;
@@ -411,7 +412,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void update(final ReadOnlyTimer timer) {
 		final double tpf = timer.getTimePerFrame();
 		passManager.updatePasses(tpf);
-		taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(true);
+		taskManager.getQueue(GameTaskQueue.UPDATE).setExecuteMultiple(executeAllTask);
 		taskManager.getQueue(GameTaskQueue.UPDATE).execute(canvas.getCanvasRenderer().getRenderer());
 
 		if (operationFlag) {
@@ -2357,6 +2358,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public BasicPassManager getPassManager() {
 		return passManager;
+	}
+
+	public static void setExecuteAllTask(final boolean executeAllTask) {
+		SceneManager.executeAllTask = executeAllTask;
 	}
 
 }

@@ -62,6 +62,7 @@ public class EnergyAngularAnalysis extends Analysis {
 	}
 
 	private void runAnalysis(final JDialog parent) {
+		onStart();
 		for (int i = 0; i < nRotation; i++) {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override

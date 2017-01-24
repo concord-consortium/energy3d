@@ -79,6 +79,7 @@ public abstract class Analysis {
 		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);
 		EnergyPanel.getInstance().disableDateSpinner(false);
+		SceneManager.setExecuteAllTask(true);
 	}
 
 	void onStart() {
@@ -89,6 +90,7 @@ public abstract class Analysis {
 		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
 		SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
 		graph.clearData();
+		SceneManager.setExecuteAllTask(false);
 	}
 
 	static boolean isBuildingComplete(final Foundation foundation) {
