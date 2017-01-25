@@ -430,6 +430,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
 				final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
+				if (closestPoint == null) {
+					return;
+				}
 				final Vector3 currentPoint = getAbsPoint(index);
 				snapToGrid(closestPoint, currentPoint, getGridSize());
 				if (closestPoint.getZ() < height + getGridSize()) {

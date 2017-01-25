@@ -3,8 +3,8 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.Scene.TextureMode;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -32,10 +32,12 @@ public class Door extends HousePart implements Thermalizable {
 	protected void init() {
 		super.init();
 
-		if (Util.isZero(uValue))
+		if (Util.isZero(uValue)) {
 			uValue = 2;
-		if (Util.isZero(volumetricHeatCapacity))
+		}
+		if (Util.isZero(volumetricHeatCapacity)) {
 			volumetricHeatCapacity = 0.5;
+		}
 
 		mesh = new Mesh("Door");
 		mesh.getMeshData().setIndexMode(IndexMode.TriangleStrip);
@@ -68,12 +70,16 @@ public class Door extends HousePart implements Thermalizable {
 				final Vector3 wallFirstPoint = container.getAbsPoint(0);
 				final Vector3 wallx = container.getAbsPoint(2).subtract(wallFirstPoint, null);
 				p = Util.closestPoint(wallFirstPoint, wallx, x, y);
+				if (p == null) {
+					return;
+				}
 				snapToGrid(p, getAbsPoint(editPointIndex == -1 ? points.size() - 2 : editPointIndex), getGridSize(), false);
 
 				final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
 				points.set(index, toRelative(p));
-				if (editPointIndex != -1)
+				if (editPointIndex != -1) {
 					height = getAbsPoint(editPointIndex == 0 ? 2 : 0).subtract(getAbsPoint(editPointIndex == 0 ? 3 : 1), null).length();
+				}
 				p.setZ(p.getZ() + height);
 				points.set(index + 1, toRelative(p));
 			}
@@ -82,6 +88,9 @@ public class Door extends HousePart implements Thermalizable {
 			final Vector3 base = points.get(lower);
 			final Vector3 absoluteBase = toAbsolute(base);
 			final Vector3 p = Util.closestPoint(absoluteBase, Vector3.UNIT_Z, x, y);
+			if (p == null) {
+				return;
+			}
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(getGridSize(), p.getZ() - absoluteBase.getZ());
 
@@ -107,8 +116,9 @@ public class Door extends HousePart implements Thermalizable {
 
 	@Override
 	protected void drawMesh() {
-		if (points.size() < 4)
+		if (points.size() < 4) {
 			return;
+		}
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
@@ -120,8 +130,9 @@ public class Door extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 normal = getAbsPoint(2).subtract(getAbsPoint(0), null).crossLocal(getAbsPoint(1).subtract(getAbsPoint(0), null)).normalizeLocal().negateLocal();
 		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
 		normalBuffer.rewind();
-		for (int i = 0; i < points.size(); i++)
+		for (int i = 0; i < points.size(); i++) {
 			normalBuffer.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
+		}
 
 		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		textureBuffer.rewind();
@@ -176,34 +187,41 @@ public class Door extends HousePart implements Thermalizable {
 			final double C = 100.0;
 			final double annotationScale = Scene.getInstance().getAnnotationScale();
 			area = Math.round(Math.round(p2.subtract(p0, null).length() * annotationScale * C) / C * Math.round(p1.subtract(p0, null).length() * annotationScale * C) / C * C) / C;
-		} else
+		} else {
 			area = 0.0;
+		}
 	}
 
+	@Override
 	public boolean isCopyable() {
 		return false;
 	}
 
+	@Override
 	public void setUValue(final double uValue) {
 		this.uValue = uValue;
 	}
 
+	@Override
 	public double getUValue() {
 		return uValue;
 	}
 
+	@Override
 	public void setVolumetricHeatCapacity(final double volumetricHeatCapacity) {
 		this.volumetricHeatCapacity = volumetricHeatCapacity;
 	}
 
+	@Override
 	public double getVolumetricHeatCapacity() {
 		return volumetricHeatCapacity;
 	}
 
 	@Override
 	public boolean isValid() {
-		if (!super.isValid())
+		if (!super.isValid()) {
 			return false;
+		}
 		return super.isDrawable();
 	}
 

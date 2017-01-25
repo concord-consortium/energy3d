@@ -262,6 +262,9 @@ public class Wall extends HousePart implements Thermalizable {
 			final int lower = (editPointIndex == 1) ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
 			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
+			if (closestPoint == null) {
+				return;
+			}
 			snapToGrid(closestPoint, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(getGridSize(), closestPoint.getZ() - base.getZ());
 			userDefaultWallHeight = height;
