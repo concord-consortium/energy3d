@@ -840,17 +840,42 @@ public class Util {
 	}
 
 	public static OrientedBoundingBox getOrientedBoundingBox(final Node node) {
-		final OrientedBoundingBox box = new OrientedBoundingBox();
+		int count = 0;
 		for (final Spatial s : node.getChildren()) {
 			if (s instanceof Mesh) {
 				final Mesh m = (Mesh) s;
-				box.mergeLocal(getOrientedBoundingBox(m));
+				count += m.getMeshData().getVertexBuffer().limit();
 			}
 		}
-		return box;
+		final FloatBuffer newbuf = BufferUtils.createFloatBuffer(count);
+		for (final Spatial s : node.getChildren()) {
+			if (s instanceof Mesh) {
+				final Mesh m = (Mesh) s;
+				final FloatBuffer buf = m.getMeshData().getVertexBuffer();
+				buf.rewind();
+				while (buf.hasRemaining()) {
+					final Vector3 v = new Vector3(buf.get(), buf.get(), buf.get());
+					m.getWorldTransform().applyForward(v);
+					newbuf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+				}
+			}
+		}
+		final OrientedBoundingBox boundingBox = new OrientedBoundingBox();
+		boundingBox.computeFromPoints(newbuf);
+		boundingBox.transform(node.getWorldTransform().invert(null), node.getWorldBound());
+		node.updateWorldBound(true);
+		return boundingBox;
 	}
 
-	public static void drawMeshBoundingBox(final Mesh mesh, final Line boundingBox) {
+	public static void drawBoundingBox(final Spatial spatial, final Line boundingBox) {
+		OrientedBoundingBox box = null;
+		if (spatial instanceof Mesh) {
+			box = getOrientedBoundingBox((Mesh) spatial);
+		} else if (spatial instanceof Node) {
+			box = getOrientedBoundingBox((Node) spatial);
+		} else {
+			return;
+		}
 		FloatBuffer buf = boundingBox.getMeshData().getVertexBuffer();
 		if (buf == null || buf.capacity() != 24) {
 			buf = BufferUtils.createVector3Buffer(24);
@@ -859,7 +884,6 @@ public class Util {
 			buf.rewind();
 			buf.limit(buf.capacity());
 		}
-		final OrientedBoundingBox box = getOrientedBoundingBox(mesh);
 		final ReadOnlyVector3 center = box.getCenter();
 		final ReadOnlyVector3 extent = box.getExtent();
 		final ReadOnlyVector3 vx = box.getXAxis().multiply(extent.getX(), null);

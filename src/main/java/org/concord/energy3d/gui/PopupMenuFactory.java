@@ -2237,6 +2237,7 @@ public class PopupMenuFactory {
 							if (selectedPart instanceof Foundation) {
 								final Foundation f = (Foundation) selectedPart;
 								f.removeAllImports();
+								f.setMeshSelectionVisible(false);
 								EventQueue.invokeLater(new Runnable() {
 									@Override
 									public void run() {
@@ -6495,9 +6496,7 @@ public class PopupMenuFactory {
 								public Object call() throws Exception {
 									final Node n = m.getParent();
 									final DeleteNodeCommand c = new DeleteNodeCommand(n, f);
-									n.getParent().detachChild(n);
-									f.setMeshSelectionVisible(false);
-									f.draw();
+									f.deleteNode(n);
 									updateAfterEdit();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									return null;

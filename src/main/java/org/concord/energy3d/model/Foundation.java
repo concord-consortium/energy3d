@@ -115,6 +115,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Mesh selectedMesh;
 	private transient Line selectedMeshOutline;
+	private transient Line selectedNodeBoundingBox;
 
 	static {
 		format.setGroupingUsed(true);
@@ -239,6 +240,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		selectedMeshOutline.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
 		selectedMeshOutline.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
 		root.attachChild(selectedMeshOutline);
+
+		selectedNodeBoundingBox = new Line("Bounding Box of Selected Mesh");
+		selectedNodeBoundingBox.setLineWidth(0.01f);
+		selectedNodeBoundingBox.setStipplePattern((short) 0xf0f0);
+		selectedNodeBoundingBox.setModelBound(null);
+		Util.disablePickShadowLight(selectedNodeBoundingBox);
+		selectedNodeBoundingBox.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
+		selectedNodeBoundingBox.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 1f));
+		root.attachChild(selectedNodeBoundingBox);
 
 		updateTextureAndColor();
 
@@ -2549,6 +2559,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		return importedNodes;
 	}
 
+	public void deleteNode(final Node n) {
+		n.getParent().detachChild(n);
+		final int i = importedNodes.indexOf(n);
+		importedNodes.remove(n);
+		importedNodeStates.remove(i);
+		setMeshSelectionVisible(false);
+		draw();
+	}
+
 	public NodeState getNodeState(final Node n) {
 		return importedNodeStates.get(importedNodes.indexOf(n));
 	}
@@ -2667,10 +2686,10 @@ public class Foundation extends HousePart implements Thermalizable {
 				final Pickable pickable = pickResults.getPickData(0).getTarget();
 				if (pickable instanceof Mesh) {
 					selectedMesh = (Mesh) pickable;
-					drawMeshOutline(selectedMesh);
+					drawMeshSelection(selectedMesh);
 				}
 			} else {
-				selectedMeshOutline.setVisible(false);
+				setMeshSelectionVisible(false);
 			}
 		}
 	}
@@ -2681,9 +2700,10 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void setMeshSelectionVisible(final boolean b) {
 		selectedMeshOutline.setVisible(b);
+		selectedNodeBoundingBox.setVisible(b);
 	}
 
-	private void drawMeshOutline(final Mesh m) {
+	private void drawMeshSelection(final Mesh m) {
 		final List<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(m.getMeshData().getVertexBuffer());
 		if (outlinePoints == null || outlinePoints.isEmpty()) {
 			return;
@@ -2707,6 +2727,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		selectedMeshOutline.setTransform(m.getWorldTransform());
 		selectedMeshOutline.updateModelBound();
 		selectedMeshOutline.setVisible(true);
+		Util.drawBoundingBox(m.getParent(), selectedNodeBoundingBox);
 	}
 
 	private void drawImports() {

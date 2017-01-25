@@ -522,7 +522,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			frames++;
 			final long t = (System.nanoTime() - framesStartTime) / 1000000000;
 			if (t != 0) {
-				System.out.println(frames / t);
+				System.out.println("FPS = " + frames / t);
 			}
 		}
 		return true;
