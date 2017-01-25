@@ -1171,11 +1171,12 @@ public class Foundation extends HousePart implements Thermalizable {
 									final UserData ud = (UserData) m.getUserData();
 									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
 									if (ts == null || ts.getTexture() == null) {
-										updateTextureAndColor(m, defaultImportColor);
+										m.clearRenderState(StateType.Texture);
+										m.setDefaultColor(defaultImportColor);
 									} else {
 										if (ud.getTextureBuffer() == null) {
-											// m.clearRenderState(StateType.Texture);
-											// updateTextureAndColor(m, defaultImportColor);
+											m.clearRenderState(StateType.Texture);
+											m.setDefaultColor(defaultImportColor);
 										} else {
 											m.getMeshData().setTextureBuffer(ud.getTextureBuffer(), 0);
 											m.setRenderState(ud.getRenderState());
@@ -2600,11 +2601,12 @@ public class Foundation extends HousePart implements Thermalizable {
 				switch (md.getIndexMode(0)) {
 				case Triangles:
 					final List<Mesh> children = TriangleMeshLib.getPlanarMeshes(m);
+					// final List<Mesh> children = new ArrayList<Mesh>(); children.add(m);
 					if (!children.isEmpty()) {
 						for (final Mesh s : children) {
 							final UserData ud = new UserData(this);
-							ud.setRenderState(s.getLocalRenderState(StateType.Texture));
 							ud.setNormal((Vector3) s.getUserData());
+							ud.setRenderState(s.getLocalRenderState(StateType.Texture));
 							ud.setTextureBuffer(s.getMeshData().getTextureBuffer(0));
 							s.setUserData(ud);
 							s.setTransform(t);

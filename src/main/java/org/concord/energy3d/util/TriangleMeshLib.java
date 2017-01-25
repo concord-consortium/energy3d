@@ -42,6 +42,9 @@ public class TriangleMeshLib {
 		}
 		final TextureState textureState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
 		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+		if (textureBuffer != null) {
+			textureBuffer.rewind();
+		}
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		final Vector3 normal = new Vector3();
@@ -74,7 +77,6 @@ public class TriangleMeshLib {
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			if (textureBuffer != null) {
-				textureBuffer.rewind();
 				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
 				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
