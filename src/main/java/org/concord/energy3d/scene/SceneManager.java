@@ -176,8 +176,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Spatial axes;
 	private final LightState lightState = new LightState();
 	private final UndoManager undoManager = new UndoManager();
-	private HousePart selectedPart = null;
-	private HousePart hoveredPart = null;
+	private HousePart selectedPart;
+	private HousePart hoveredPart;
 	private Operation operation = Operation.SELECT;
 	private CameraControl cameraControl;
 	private ViewMode viewMode = ViewMode.NORMAL;
@@ -193,19 +193,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private ArrayList<Vector3> objectMovePoints;
 	private Map<Foundation, ArrayList<Vector3>> objectGroupMovePoints;
 	private double refreshTime = -1;
-	private int refreshCount = 0;
+	private int refreshCount;
 	private boolean mouseControlEnabled = true;
-	private boolean rotAnim = false;
+	private boolean rotAnim;
 	private boolean heliodonControl;
 	private boolean sunAnim;
-	private boolean operationStick = false;
-	private boolean operationFlag = false;
+	private boolean operationStick;
+	private boolean operationFlag;
 	private boolean refresh = true;
-	private boolean zoomLock = false;
-	private boolean solarHeatMap = false;
+	private boolean zoomLock;
+	private boolean solarHeatMap;
 	private boolean heatFluxDaily = true;
-	private boolean showBuildingLabels = false;
-	private boolean showHeatFlux = false;
+	private boolean showBuildingLabels;
+	private boolean showHeatFlux;
 	private boolean cameraChanged;
 	private boolean fineGrid;
 	private long frames;
@@ -1871,6 +1871,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
 											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
 										}
+										foundationOfPreviousSelectedPart.setMeshBoundingBoxVisible(false);
 									}
 								}
 							}

@@ -6429,7 +6429,12 @@ public class PopupMenuFactory {
 						if (m != null) {
 							String s = m.toString();
 							s = s.substring(0, s.indexOf('(')).trim();
-							miInfo.setText(s + " (" + m.getMeshData().getVertexCount() + ")");
+							final int indexOfNode = f.getImportedNodes().indexOf(m.getParent());
+							String name = f.getNodeState(m.getParent()).getName();
+							if (name == null) {
+								name = "Undefined";
+							}
+							miInfo.setText(s + " (" + m.getMeshData().getVertexCount() + " Vertices), Node #" + indexOfNode + " (" + name + ")");
 							final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(m.getParent());
 							final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
 							miBottomOnGround.setEnabled(!Util.isZero(zBottom));
@@ -6571,21 +6576,29 @@ public class PopupMenuFactory {
 								// name
 								JLabel label = new JLabel("Name: ", JLabel.TRAILING);
 								propertiesPanel.add(label);
-								JTextField textField = new JTextField(n.getName(), 5);
-								textField.setEditable(false);
-								label.setLabelFor(textField);
-								propertiesPanel.add(textField);
+								final JTextField nameField = new JTextField(f.getNodeState(n).getName(), 5);
+								label.setLabelFor(nameField);
+								propertiesPanel.add(nameField);
 
 								// children count
 								label = new JLabel("Children: ", JLabel.TRAILING);
 								propertiesPanel.add(label);
-								textField = new JTextField(n.getNumberOfChildren() + "", 5);
+								final JTextField textField = new JTextField(n.getNumberOfChildren() + "", 5);
 								textField.setEditable(false);
 								label.setLabelFor(textField);
 								propertiesPanel.add(textField);
 
 								SpringUtilities.makeCompactGrid(propertiesPanel, 2, 2, 6, 6, 6, 6);
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), gui, "Node Properties", JOptionPane.INFORMATION_MESSAGE);
+
+								if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Node Properties", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+									final String nodeName = nameField.getText();
+									if (nodeName != null && !nodeName.trim().equals("")) {
+										n.setName(nodeName);
+										f.getNodeState(n).setName(nodeName);
+									} else {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Node must have a name!", "Name Error", JOptionPane.ERROR_MESSAGE);
+									}
+								}
 							}
 						}
 					}

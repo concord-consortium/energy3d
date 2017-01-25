@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.FloatBuffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -110,10 +111,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
-	private List<Vector3> importedNodePositions; // data structures for imported file
-	private List<URL> importedNodeFiles;
-	private transient List<Node> importedNodes;
-	private ReadOnlyColorRGBA defaultImportColor = ColorRGBA.WHITE;
+	private List<NodeState> importedNodeStates; // for now, save only the node states
+	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Line meshWireframe;
 	private transient Line meshBoundingBoxWireframe;
 	private transient Mesh selectedMesh;
@@ -251,9 +250,6 @@ public class Foundation extends HousePart implements Thermalizable {
 		meshBoundingBoxWireframe.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
 		root.attachChild(meshBoundingBoxWireframe);
 
-		if (defaultImportColor == null) {
-			defaultImportColor = ColorRGBA.WHITE;
-		}
 		updateTextureAndColor();
 
 		if (points.size() == 8) {
@@ -262,13 +258,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 		}
 
-		// for (int i = 8; i < points.size(); i++)
-		// getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
-
-		if (importedNodeFiles != null) {
+		if (importedNodeStates != null) {
 			try {
-				for (final URL url : importedNodeFiles) {
-					importCollada(url, true);
+				for (final NodeState s : importedNodeStates) {
+					importCollada(s.getSourceURL(), true);
 				}
 			} catch (final Throwable t) {
 				Util.reportError(t);
@@ -1156,12 +1149,14 @@ public class Foundation extends HousePart implements Thermalizable {
 			final int n = importedNodes.size();
 			if (n > 0) {
 				Node ni;
+				NodeState nis;
 				final Vector3 c = getAbsCenter();
 				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
+					nis = importedNodeStates.get(i);
 					if (root.getChildren().contains(ni)) {
-						final Vector3 vi = matrix.applyPost(importedNodePositions.get(i), null);
+						final Vector3 vi = matrix.applyPost(nis.getPosition(), null);
 						ni.setTranslation(c.add(vi, null));
 						ni.setRotation(matrix);
 						if (!SceneManager.getInstance().getSolarHeatMap()) {
@@ -1172,11 +1167,11 @@ public class Foundation extends HousePart implements Thermalizable {
 									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
 									if (ts == null || ts.getTexture() == null) {
 										m.clearRenderState(StateType.Texture);
-										m.setDefaultColor(defaultImportColor);
+										m.setDefaultColor(nis.getDefaultColor());
 									} else {
 										if (ud.getTextureBuffer() == null) {
 											m.clearRenderState(StateType.Texture);
-											m.setDefaultColor(defaultImportColor);
+											m.setDefaultColor(nis.getDefaultColor());
 										} else {
 											m.getMeshData().setTextureBuffer(ud.getTextureBuffer(), 0);
 											m.setRenderState(ud.getRenderState());
@@ -2558,22 +2553,20 @@ public class Foundation extends HousePart implements Thermalizable {
 		return importedNodes;
 	}
 
+	public NodeState getNodeState(final Node n) {
+		return importedNodeStates.get(importedNodes.indexOf(n));
+	}
+
 	public void translateImportedNode(final Node n, final double x, final double y, final double z) {
-		final int i = importedNodes.indexOf(n);
-		if (i >= 0 && i < importedNodes.size()) {
-			importedNodePositions.get(i).addLocal(x, y, z);
-		}
+		getNodeState(n).getPosition().addLocal(x, y, z);
 	}
 
 	public void importCollada(final URL file, final boolean init) throws Exception {
 		if (importedNodes == null) {
 			importedNodes = new ArrayList<Node>();
 		}
-		if (importedNodePositions == null) {
-			importedNodePositions = new ArrayList<Vector3>();
-		}
-		if (importedNodeFiles == null) {
-			importedNodeFiles = new ArrayList<URL>();
+		if (importedNodeStates == null) {
+			importedNodeStates = new ArrayList<NodeState>();
 		}
 		if (new File(file.toURI()).exists()) {
 			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
@@ -2583,12 +2576,14 @@ public class Foundation extends HousePart implements Thermalizable {
 			final Node originalNode = storage.getScene();
 			originalNode.setScale(scale);
 			if (!init) {
+				final NodeState ns = new NodeState();
+				importedNodeStates.add(ns);
 				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
 				if (position != null) {
 					originalNode.setTranslation(position);
 				}
-				importedNodePositions.add(originalNode.getTranslation().subtract(getAbsCenter(), null));
-				importedNodeFiles.add(file);
+				ns.setPosition(originalNode.getTranslation().subtract(getAbsCenter(), null));
+				ns.setSourceURL(file);
 			}
 			// now construct a new node that is a parent of all planar meshes
 			final Node newNode = new Node(originalNode.getName());
@@ -2630,7 +2625,12 @@ public class Foundation extends HousePart implements Thermalizable {
 				root.attachChild(newNode);
 			}
 		} else {
-			importedNodeFiles.remove(file);
+			// get rid of the dead nodes no longer linked to files
+			for (final Iterator<NodeState> it = importedNodeStates.iterator(); it.hasNext();) {
+				if (file.equals(it.next().getSourceURL())) {
+					it.remove();
+				}
+			}
 		}
 	}
 
@@ -2649,11 +2649,8 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			importedNodes.clear();
 		}
-		if (importedNodePositions != null) {
-			importedNodePositions.clear();
-		}
-		if (importedNodeFiles != null) {
-			importedNodeFiles.clear();
+		if (importedNodeStates != null) {
+			importedNodeStates.clear();
 		}
 	}
 
@@ -2860,7 +2857,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
 					if (root.getChildren().contains(ni)) {
-						final Vector3 vi = matrix.applyPost(importedNodePositions.get(i), null);
+						final Vector3 vi = matrix.applyPost(importedNodeStates.get(i).getPosition(), null);
 						ni.setTranslation(c.add(vi, null));
 						ni.setRotation(matrix);
 						for (final Spatial s : ni.getChildren()) {
