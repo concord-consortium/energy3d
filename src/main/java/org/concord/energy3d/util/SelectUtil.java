@@ -1,7 +1,5 @@
 package org.concord.energy3d.util;
 
-import java.util.List;
-
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.PickedHousePart;
@@ -21,8 +19,6 @@ import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
-import com.ardor3d.scenegraph.Spatial;
 
 public class SelectUtil {
 	private static final PickResults pickResults = new PrimitivePickResults();
@@ -44,14 +40,6 @@ public class SelectUtil {
 				if (housePart instanceof Foundation) {
 					final Foundation foundation = (Foundation) housePart;
 					PickingUtil.findPick(foundation.getPolygon().getEditPointsRoot(), pickRay, pickResults, false);
-					final List<Node> importedNodes = foundation.getImportedNodes();
-					if (importedNodes != null) {
-						for (final Node node : importedNodes) {
-							for (final Spatial s : node.getChildren()) {
-								PickingUtil.findPick(s, pickRay, pickResults, false);
-							}
-						}
-					}
 				}
 			}
 		}

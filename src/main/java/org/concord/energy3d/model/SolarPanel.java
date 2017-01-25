@@ -77,6 +77,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	private int numberOfCellsInY = 10;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
+	private transient ReadOnlyVector3 pickedNormal;
 
 	public SolarPanel() {
 		super(1, 1, 0);
@@ -181,6 +182,9 @@ public class SolarPanel extends HousePart implements Trackable {
 			final Vector3 p = picked.getPoint().clone();
 			snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 			points.get(0).set(toRelative(p));
+			pickedNormal = picked.getUserData().getNormal();
+		} else {
+			pickedNormal = null;
 		}
 		if (container != null) {
 			draw();
@@ -222,6 +226,9 @@ public class SolarPanel extends HousePart implements Trackable {
 				return true;
 			}
 		} else if (container instanceof Foundation) {
+			if (pickedNormal != null) {
+				return Util.isEqual(pickedNormal, Vector3.UNIT_Z);
+			}
 			return true;
 		}
 		return false;
@@ -234,7 +241,7 @@ public class SolarPanel extends HousePart implements Trackable {
 			return;
 		}
 
-		normal = computeNormalAndKeepOnRoof();
+		normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
 		updateEditShapes();
 
 		final double annotationScaleFactor = 0.5 / Scene.getInstance().getAnnotationScale();
@@ -547,7 +554,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	public HousePart copy(final boolean check) {
 		final SolarPanel c = (SolarPanel) super.copy(false);
 		if (check) {
-			normal = c.computeNormalAndKeepOnRoof();
+			// normal = c.computeNormalAndKeepOnSurface();
 			final double annotationScale = Scene.getInstance().getAnnotationScale();
 			if (container instanceof Roof || container instanceof Rack) {
 				if (normal == null) {

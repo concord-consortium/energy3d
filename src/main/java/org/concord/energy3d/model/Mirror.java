@@ -137,7 +137,7 @@ public class Mirror extends HousePart {
 			return;
 		}
 
-		normal = computeNormalAndKeepOnRoof();
+		normal = computeNormalAndKeepOnSurface();
 		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();

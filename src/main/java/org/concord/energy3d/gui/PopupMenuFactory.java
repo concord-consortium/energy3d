@@ -2226,8 +2226,8 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(removeAllFloorsMenuItem);
 
-			final JMenuItem miRemoveAllImports = new JMenuItem("Remove All Imports");
-			miRemoveAllImports.addActionListener(new ActionListener() {
+			final JMenuItem miRemoveAllImportedNodes = new JMenuItem("Remove All Nodes");
+			miRemoveAllImportedNodes.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -2251,7 +2251,7 @@ public class PopupMenuFactory {
 					});
 				}
 			});
-			clearMenu.add(miRemoveAllImports);
+			clearMenu.add(miRemoveAllImportedNodes);
 
 			final JMenu layoutMenu = new JMenu("Layout");
 
@@ -6408,7 +6408,7 @@ public class PopupMenuFactory {
 							final Node n = m.getParent();
 							if (n != null) {
 								final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
-								final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
+								final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ() - f.getHeight();
 								f.translateImportedNode(n, 0, 0, -zBottom);
 								f.draw();
 							}
@@ -6438,7 +6438,7 @@ public class PopupMenuFactory {
 							miInfo.setText(s + " (" + m.getMeshData().getVertexCount() + " Vertices), Node #" + indexOfNode + " (" + name + ")");
 							final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(m.getParent());
 							final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
-							miBottomOnGround.setEnabled(!Util.isZero(zBottom));
+							miBottomOnGround.setEnabled(!Util.isZero(zBottom - f.getHeight()));
 						}
 					}
 				}

@@ -289,7 +289,7 @@ public class Rack extends HousePart implements Trackable {
 
 		final boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
-		normal = computeNormalAndKeepOnRoof();
+		normal = computeNormalAndKeepOnSurface();
 
 		final double dotE = 0.9999;
 		switch (trackerType) {

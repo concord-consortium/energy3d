@@ -193,7 +193,7 @@ public class Window extends HousePart implements Thermalizable {
 		points.get(index).set(p);
 
 		if (container instanceof Roof) {
-			computeNormalAndKeepOnRoof();
+			computeNormalAndKeepOnSurface();
 		}
 
 		if (!isFirstPointInserted()) {
@@ -254,7 +254,7 @@ public class Window extends HousePart implements Thermalizable {
 
 		mesh.setVisible(container instanceof Roof);
 
-		normal = computeNormalAndKeepOnRoof();
+		normal = computeNormalAndKeepOnSurface();
 		final boolean isDrawable = isDrawable();
 		setHighlight(!isDrawable);
 		updateEditShapes();
@@ -791,7 +791,7 @@ public class Window extends HousePart implements Thermalizable {
 			return false;
 		}
 
-		computeNormalAndKeepOnRoof(); // in case roof changes and has different roof part #s
+		computeNormalAndKeepOnSurface(); // in case roof changes and has different roof part #s
 		final boolean isRoof = container instanceof Roof;
 		final Rectangle2D thisWindow = makeRectangle(this, isRoof);
 		for (final HousePart part : container.getChildren()) {
