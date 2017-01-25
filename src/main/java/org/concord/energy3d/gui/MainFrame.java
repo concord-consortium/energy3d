@@ -2582,7 +2582,7 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 		updateTitleBar();
-		FileChooser.getInstance().rememberFile(file.getPath());
+		FileChooser.getInstance().rememberFile(file.getAbsolutePath());
 	}
 
 	void importFile() {
