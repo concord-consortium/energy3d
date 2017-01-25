@@ -60,6 +60,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
@@ -847,6 +848,147 @@ public class Util {
 			}
 		}
 		return box;
+	}
+
+	public static void drawMeshBoundingBox(final Mesh mesh, final Line boundingBox) {
+		FloatBuffer buf = boundingBox.getMeshData().getVertexBuffer();
+		if (buf == null || buf.capacity() != 24) {
+			buf = BufferUtils.createVector3Buffer(24);
+			boundingBox.getMeshData().setVertexBuffer(buf);
+		} else {
+			buf.rewind();
+			buf.limit(buf.capacity());
+		}
+		final OrientedBoundingBox box = getOrientedBoundingBox(mesh);
+		final ReadOnlyVector3 center = box.getCenter();
+		final ReadOnlyVector3 extent = box.getExtent();
+		final ReadOnlyVector3 vx = box.getXAxis().multiply(extent.getX(), null);
+		final ReadOnlyVector3 vy = box.getYAxis().multiply(extent.getY(), null);
+		final ReadOnlyVector3 vz = box.getZAxis().multiply(extent.getZ(), null);
+		double x, y, z;
+
+		// #1: (1, 1, 1) to (-1, 1, 1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #2: (1, 1, 1) to (1, -1, 1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #3: (1, 1, 1) to (1, 1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #4: (-1, -1, -1) to (1, -1, -1)
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #5: (-1, -1, -1) to (-1, 1, -1)
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #6: (-1, -1, -1) to (-1, -1, 1)
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #7: (-1, 1, 1) to (-1, -1, 1)
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #8: (-1, 1, 1) to (-1, 1, -1)
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #9: (1, -1, 1) to (-1, -1, 1)
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #10: (1, -1, 1) to (1, -1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() + vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #11: (1, 1, -1) to (-1, 1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		// #12: (1, 1, -1) to (1, -1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		z = center.getZ() - vz.getZ();
+		buf.put((float) x).put((float) y).put((float) z);
+
+		boundingBox.updateModelBound();
+		boundingBox.setVisible(true);
 	}
 
 }

@@ -6469,7 +6469,7 @@ public class PopupMenuFactory {
 								public Object call() throws Exception {
 									final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
 									m.getParent().detachChild(m);
-									f.setMeshBoundingBoxVisible(false);
+									f.setMeshSelectionVisible(false);
 									f.draw();
 									updateAfterEdit();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -6496,7 +6496,7 @@ public class PopupMenuFactory {
 									final Node n = m.getParent();
 									final DeleteNodeCommand c = new DeleteNodeCommand(n, f);
 									n.getParent().detachChild(n);
-									f.setMeshBoundingBoxVisible(false);
+									f.setMeshSelectionVisible(false);
 									f.draw();
 									updateAfterEdit();
 									SceneManager.getInstance().getUndoManager().addEdit(c);

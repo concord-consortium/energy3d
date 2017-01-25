@@ -1871,7 +1871,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
 											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
 										}
-										foundationOfPreviousSelectedPart.setMeshBoundingBoxVisible(false);
+										foundationOfPreviousSelectedPart.setMeshSelectionVisible(false);
 									}
 								}
 							}
@@ -2037,7 +2037,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final Mesh m = f.getSelectedMesh();
 						final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
 						m.getParent().detachChild(m);
-						f.setMeshBoundingBoxVisible(false);
+						f.setMeshSelectionVisible(false);
 						f.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else {

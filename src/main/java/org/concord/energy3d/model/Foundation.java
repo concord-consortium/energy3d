@@ -24,13 +24,13 @@ import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.FontManager;
+import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
 import org.concord.energy3d.util.TriangleMeshLib;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
-import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
@@ -113,9 +113,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean groupMaster;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
-	private transient Line meshWireframe;
-	private transient Line meshBoundingBoxWireframe;
 	private transient Mesh selectedMesh;
+	private transient Line selectedMeshOutline;
 
 	static {
 		format.setGroupingUsed(true);
@@ -232,23 +231,14 @@ public class Foundation extends HousePart implements Thermalizable {
 		solarReceiver.setVisible(false);
 		root.attachChild(solarReceiver);
 
-		meshWireframe = new Line("Mesh Wireframe");
-		meshWireframe.setLineWidth(0.01f);
-		meshWireframe.setStipplePattern((short) 0xffff);
-		meshWireframe.setModelBound(null);
-		Util.disablePickShadowLight(meshWireframe);
-		meshWireframe.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
-		meshWireframe.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
-		root.attachChild(meshWireframe);
-
-		meshBoundingBoxWireframe = new Line("Mesh Bounding Box Wireframe");
-		meshBoundingBoxWireframe.setLineWidth(0.01f);
-		meshBoundingBoxWireframe.setStipplePattern((short) 0xf0f0);
-		meshBoundingBoxWireframe.setModelBound(null);
-		Util.disablePickShadowLight(meshBoundingBoxWireframe);
-		meshBoundingBoxWireframe.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(24));
-		meshBoundingBoxWireframe.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
-		root.attachChild(meshBoundingBoxWireframe);
+		selectedMeshOutline = new Line("Outline of Selected Mesh");
+		selectedMeshOutline.setLineWidth(2f);
+		selectedMeshOutline.setStipplePattern((short) 0xf0f0);
+		selectedMeshOutline.setModelBound(null);
+		Util.disablePickShadowLight(selectedMeshOutline);
+		selectedMeshOutline.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
+		selectedMeshOutline.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
+		root.attachChild(selectedMeshOutline);
 
 		updateTextureAndColor();
 
@@ -1162,6 +1152,9 @@ public class Foundation extends HousePart implements Thermalizable {
 						if (!SceneManager.getInstance().getSolarHeatMap()) {
 							for (final Spatial s : ni.getChildren()) {
 								if (s instanceof Mesh) {
+									if (s instanceof Line) {
+										continue;
+									}
 									final Mesh m = (Mesh) s;
 									final UserData ud = (UserData) m.getUserData();
 									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
@@ -2671,11 +2664,10 @@ public class Foundation extends HousePart implements Thermalizable {
 				final Pickable pickable = pickResults.getPickData(0).getTarget();
 				if (pickable instanceof Mesh) {
 					selectedMesh = (Mesh) pickable;
-					// drawMeshWireframe(m);
-					drawMeshBoundingBox(selectedMesh);
+					drawMeshOutline(selectedMesh);
 				}
 			} else {
-				meshBoundingBoxWireframe.setVisible(false);
+				selectedMeshOutline.setVisible(false);
 			}
 		}
 	}
@@ -2684,167 +2676,34 @@ public class Foundation extends HousePart implements Thermalizable {
 		return selectedMesh;
 	}
 
-	public void setMeshBoundingBoxVisible(final boolean b) {
-		meshBoundingBoxWireframe.setVisible(b);
+	public void setMeshSelectionVisible(final boolean b) {
+		selectedMeshOutline.setVisible(b);
 	}
 
-	private void drawMeshBoundingBox(final Mesh m) {
-		final FloatBuffer wireVertexBuffer = meshBoundingBoxWireframe.getMeshData().getVertexBuffer();
-		wireVertexBuffer.rewind();
-		final OrientedBoundingBox box = Util.getOrientedBoundingBox(m);
-		final ReadOnlyVector3 center = box.getCenter();
-		final ReadOnlyVector3 extent = box.getExtent();
-		final ReadOnlyVector3 vx = box.getXAxis().multiply(extent.getX(), null);
-		final ReadOnlyVector3 vy = box.getYAxis().multiply(extent.getY(), null);
-		final ReadOnlyVector3 vz = box.getZAxis().multiply(extent.getZ(), null);
-		double x, y, z;
-
-		// #1: (1, 1, 1) to (-1, 1, 1)
-		x = center.getX() + vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() - vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #2: (1, 1, 1) to (1, -1, 1)
-		x = center.getX() + vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() + vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #3: (1, 1, 1) to (1, 1, -1)
-		x = center.getX() + vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() + vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #4: (-1, -1, -1) to (1, -1, -1)
-		x = center.getX() - vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() + vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #5: (-1, -1, -1) to (-1, 1, -1)
-		x = center.getX() - vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() - vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #6: (-1, -1, -1) to (-1, -1, 1)
-		x = center.getX() - vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() - vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #7: (-1, 1, 1) to (-1, -1, 1)
-		x = center.getX() - vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() - vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #8: (-1, 1, 1) to (-1, 1, -1)
-		x = center.getX() - vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() - vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #9: (1, -1, 1) to (-1, -1, 1)
-		x = center.getX() + vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() - vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #10: (1, -1, 1) to (1, -1, -1)
-		x = center.getX() + vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() + vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() + vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #11: (1, 1, -1) to (-1, 1, -1)
-		x = center.getX() + vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() - vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		// #12: (1, 1, -1) to (1, -1, -1)
-		x = center.getX() + vx.getX();
-		y = center.getY() + vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-		x = center.getX() + vx.getX();
-		y = center.getY() - vy.getY();
-		z = center.getZ() - vz.getZ();
-		wireVertexBuffer.put((float) x).put((float) y).put((float) z);
-
-		meshBoundingBoxWireframe.updateModelBound();
-		meshBoundingBoxWireframe.setVisible(true);
-	}
-
-	void drawMeshWireframe(final Mesh m) {
-		final FloatBuffer meshVertexBuffer = m.getMeshData().getVertexBuffer();
-		meshVertexBuffer.rewind();
-		final int n = meshVertexBuffer.limit();
-		FloatBuffer wireVertexBuffer = meshWireframe.getMeshData().getVertexBuffer();
-		if (wireVertexBuffer.capacity() != n) {
-			wireVertexBuffer = BufferUtils.createFloatBuffer(n);
-			meshWireframe.getMeshData().setVertexBuffer(wireVertexBuffer);
+	private void drawMeshOutline(final Mesh m) {
+		final List<ReadOnlyVector3> outlinePoints = MeshLib.computeOutline(m.getMeshData().getVertexBuffer());
+		if (outlinePoints == null || outlinePoints.isEmpty()) {
+			return;
+		}
+		final int n = outlinePoints.size();
+		FloatBuffer outlineVertexBuffer = selectedMeshOutline.getMeshData().getVertexBuffer();
+		if (outlineVertexBuffer.capacity() != n * 6) {
+			outlineVertexBuffer = BufferUtils.createFloatBuffer(n * 6);
+			selectedMeshOutline.getMeshData().setVertexBuffer(outlineVertexBuffer);
 		} else {
-			wireVertexBuffer.rewind();
-			wireVertexBuffer.limit(wireVertexBuffer.capacity());
+			outlineVertexBuffer.rewind();
+			outlineVertexBuffer.limit(outlineVertexBuffer.capacity());
 		}
-		final ReadOnlyTransform trans = m.getWorldTransform();
-		Vector3 p;
-		for (int i = 0; i < n - 6; i += 6) {
-			p = trans.applyForward(new Vector3(meshVertexBuffer.get(), meshVertexBuffer.get(), meshVertexBuffer.get()));
-			wireVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = trans.applyForward(new Vector3(meshVertexBuffer.get(), meshVertexBuffer.get(), meshVertexBuffer.get()));
-			wireVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		ReadOnlyVector3 p;
+		for (int i = 0; i < n; i++) {
+			p = outlinePoints.get(i);
+			outlineVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = outlinePoints.get((i + 1) % n);
+			outlineVertexBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
-		meshWireframe.updateModelBound();
-		meshWireframe.setVisible(true);
+		selectedMeshOutline.setTransform(m.getWorldTransform());
+		selectedMeshOutline.updateModelBound();
+		selectedMeshOutline.setVisible(true);
 	}
 
 	private void drawImports() {
