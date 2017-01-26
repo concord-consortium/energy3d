@@ -6417,6 +6417,29 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miPaste = new JMenuItem("Paste");
+			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miPaste.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (selectedPart instanceof Foundation) {
+								final Foundation f = (Foundation) selectedPart;
+								final Mesh m = f.getSelectedMesh();
+								if (m != null) {
+									Scene.getInstance().pasteToPickedLocationOnMesh(m);
+									Scene.getInstance().setEdited(true);
+								}
+							}
+							return null;
+						}
+					});
+				}
+			});
+
 			popupMenuForMesh = new JPopupMenu();
 			popupMenuForMesh.setInvoker(MainPanel.getInstance().getCanvasPanel());
 			popupMenuForMesh.addPopupMenuListener(new PopupMenuListener() {
@@ -6439,6 +6462,8 @@ public class PopupMenuFactory {
 							final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(m.getParent());
 							final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
 							miBottomOnGround.setEnabled(!Util.isZero(zBottom - f.getHeight()));
+							final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
+							miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Rack);
 						}
 					}
 				}
@@ -6605,6 +6630,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForMesh.add(miInfo);
+			popupMenuForMesh.add(miPaste);
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.add(miDeleteNode);
 			popupMenuForMesh.addSeparator();

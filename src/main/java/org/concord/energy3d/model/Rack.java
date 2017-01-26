@@ -181,6 +181,9 @@ public class Rack extends HousePart implements Trackable {
 				isBaseZ = Util.isEqual(p.getZ(), baseZ);
 				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 				points.get(0).set(toRelative(p));
+				pickedNormal = picked.getUserData().getNormal();
+			} else {
+				pickedNormal = null;
 			}
 			if (outOfBound()) {
 				if (oldRackCenter != null) {
@@ -287,9 +290,10 @@ public class Rack extends HousePart implements Trackable {
 			return;
 		}
 
-		final boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
-		normal = computeNormalAndKeepOnSurface();
+		normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
+
+		final boolean onFlatSurface = onFlatSurface();
 
 		final double dotE = 0.9999;
 		switch (trackerType) {
@@ -915,6 +919,9 @@ public class Rack extends HousePart implements Trackable {
 				return true;
 			}
 		} else if (container instanceof Foundation) {
+			if (pickedNormal != null) {
+				return Util.isEqual(pickedNormal, Vector3.UNIT_Z);
+			}
 			return true;
 		}
 		return false;

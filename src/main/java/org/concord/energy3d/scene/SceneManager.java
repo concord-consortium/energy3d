@@ -2300,6 +2300,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
+	Vector3 getPickedLocationOnMesh(final Mesh mesh) {
+		if (pasteMouseState != null) {
+			final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), mesh);
+			if (pick != null) {
+				return pick.getPoint().clone();
+			}
+			pasteMouseState = null;
+		}
+		return null;
+	}
+
 	public void computeEnergyView(final boolean b) {
 		setHeatFluxDaily(true);
 		setSolarHeatMap(b);

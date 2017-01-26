@@ -1114,6 +1114,43 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
+	public void pasteToPickedLocationOnMesh(final Mesh mesh) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
+		if (copyBuffer == null) {
+			return;
+		}
+		if (copyBuffer instanceof Foundation) {
+			return;
+		}
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (!(selectedPart instanceof Foundation)) {
+			return;
+		}
+		final HousePart c = copyBuffer.copy(false);
+		if (c == null) {
+			return;
+		}
+		Vector3 position = SceneManager.getInstance().getPickedLocationOnMesh(mesh);
+		if (position == null) {
+			return;
+		}
+		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
+		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+		position = position.subtractLocal(center);
+		final int n = c.getPoints().size();
+		for (int i = 0; i < n; i++) {
+			final Vector3 v = c.getPoints().get(i);
+			v.addLocal(position);
+		}
+		if (c instanceof Rack) {
+			((Rack) c).moveSolarPanels(position);
+			setIdOfChildren(c);
+		}
+		add(c, true);
+		copyBuffer = c;
+		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+	}
+
 	public List<HousePart> getParts() {
 		return parts;
 	}
