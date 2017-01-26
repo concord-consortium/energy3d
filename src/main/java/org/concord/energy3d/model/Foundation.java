@@ -2568,6 +2568,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		draw();
 	}
 
+	public void addNode(final Node n, final NodeState ns) {
+		root.attachChild(n);
+		importedNodes.add(n);
+		importedNodeStates.add(ns);
+		draw();
+	}
+
 	public NodeState getNodeState(final Node n) {
 		return importedNodeStates.get(importedNodes.indexOf(n));
 	}

@@ -410,7 +410,7 @@ public class EnergyPanel extends JPanel {
 
 		// pv station panel
 		pvStationPanel = new JPanel();
-		pvStationPanel.setBorder(createTitledBorder("Photovoltaic Power Station", true));
+		pvStationPanel.setBorder(createTitledBorder("Photovoltaic System", true));
 		pvStationPanel.setLayout(new BoxLayout(pvStationPanel, BoxLayout.Y_AXIS));
 
 		pvStationTabbedPane = new JTabbedPane();
@@ -443,7 +443,7 @@ public class EnergyPanel extends JPanel {
 
 		// csp station panel
 		cspStationPanel = new JPanel();
-		cspStationPanel.setBorder(createTitledBorder("Concentrated Solar Power Station", true));
+		cspStationPanel.setBorder(createTitledBorder("Concentrated Solar Power System", true));
 		cspStationPanel.setLayout(new BoxLayout(cspStationPanel, BoxLayout.Y_AXIS));
 
 		cspStationTabbedPane = new JTabbedPane();
@@ -596,10 +596,13 @@ public class EnergyPanel extends JPanel {
 
 	}
 
+	private long computingStartMillis;
+
 	public void compute(final UpdateRadiation updateRadiation) {
 		if (!computeEnabled) {
 			return;
 		}
+		computingStartMillis = System.currentTimeMillis();
 		updateWeatherData(); // TODO: There got to be a better way to do this
 		((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
@@ -698,6 +701,7 @@ public class EnergyPanel extends JPanel {
 					updateWeatherData();
 					updateProperties();
 					progressBar.setValue(100);
+					progressBar.setString("100% (" + oneDecimal.format((System.currentTimeMillis() - computingStartMillis) * 0.001) + " seconds)");
 				}
 			});
 
@@ -804,6 +808,8 @@ public class EnergyPanel extends JPanel {
 			progressBar.setStringPainted(false);
 		} else {
 			progressBar.setValue(percentage);
+			final double t = (System.currentTimeMillis() - computingStartMillis) * 0.001;
+			progressBar.setString(Math.min(100, percentage) + "% (" + oneDecimal.format(t) + " seconds)");
 			progressBar.setStringPainted(true);
 		}
 	}
