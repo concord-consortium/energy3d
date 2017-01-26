@@ -7,6 +7,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.concord.energy3d.scene.Scene;
@@ -108,6 +109,7 @@ public abstract class HousePart implements Serializable {
 	private boolean freeze;
 
 	transient Line heatFlux;
+	transient ReadOnlyVector3 pickedNormal;
 
 	private static Map<String, Texture> cachedGrayTextures = new HashMap<String, Texture>();
 
@@ -1262,6 +1264,38 @@ public abstract class HousePart implements Serializable {
 				}
 			}
 			return (ReadOnlyVector3) roof.getRoofPartsRoot().getChild(containerRoofIndex).getUserData();
+		} else if (container instanceof Foundation) {
+			final Foundation foundation = (Foundation) container;
+			final List<Node> nodes = foundation.getImportedNodes();
+			if (nodes != null) {
+				final Map<Vector3, ReadOnlyVector3> intersections = new HashMap<Vector3, ReadOnlyVector3>();
+				for (final Node n : nodes) {
+					for (final Spatial s : n.getChildren()) {
+						if (s instanceof Mesh) {
+							final Mesh m = (Mesh) s;
+							final PickResults pickResults = new PrimitivePickResults();
+							PickingUtil.findPick(m, new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.UNIT_Z), pickResults, false);
+							if (pickResults.getNumber() > 0) {
+								intersections.put(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0), ((UserData) m.getUserData()).getNormal());
+							}
+						}
+					}
+				}
+				if (!intersections.isEmpty()) {
+					double zmax = -Double.MAX_VALUE;
+					ReadOnlyVector3 normal = null;
+					for (final Vector3 v : intersections.keySet()) {
+						if (v.getZ() > zmax) {
+							zmax = v.getZ();
+							normal = intersections.get(v);
+						}
+					}
+					if (normal != null) {
+						pickedNormal = normal;
+						return normal;
+					}
+				}
+			}
 		}
 
 		return container.getNormal();

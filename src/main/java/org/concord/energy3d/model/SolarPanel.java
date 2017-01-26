@@ -77,7 +77,6 @@ public class SolarPanel extends HousePart implements Trackable {
 	private int numberOfCellsInY = 10;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
-	private transient ReadOnlyVector3 pickedNormal;
 
 	public SolarPanel() {
 		super(1, 1, 0);
@@ -399,7 +398,7 @@ public class SolarPanel extends HousePart implements Trackable {
 			normalVector.setVisible(false);
 			return;
 		}
-		final Vector3 o = container instanceof Rack ? getAbsPoint(0) : getAbsPoint(0).addLocal(0, 0, baseHeight);
+		final Vector3 o = (!onFlatSurface() || container instanceof Rack) ? getAbsPoint(0) : getAbsPoint(0).addLocal(0, 0, baseHeight);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
