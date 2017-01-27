@@ -10,6 +10,8 @@
 
 package org.concord.energy3d.scene;
 
+import com.ardor3d.bounding.BoundingBox;
+import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.Key;
@@ -128,8 +130,9 @@ public abstract class CameraControl {
 
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (!enabled || !mouseEnabled)
+				if (!enabled || !mouseEnabled) {
 					return;
+				}
 				final MouseState mouse = inputStates.getCurrent().getMouseState();
 				if (mouse.getDx() != 0 || mouse.getDy() != 0) {
 					if (!firstPing) {
@@ -148,12 +151,7 @@ public abstract class CameraControl {
 							SceneManager.getInstance().getCameraNode().updateFromCamera();
 							Scene.getInstance().updateEditShapes();
 						} else if (middle || left && leftButtonAction == ButtonAction.ZOOM || right && rightButtonAction == ButtonAction.ZOOM) {
-							int dy = inputStates.getCurrent().getMouseState().getDy();
-							if (dy < -4)
-								dy = -4;
-							if (dy > 4)
-								dy = 4;
-							zoom(source, tpf, -dy / 1.0);
+							zoom(source, tpf, -inputStates.getCurrent().getMouseState().getDy() * getMaxExtent() / 100);
 						}
 					} else {
 						firstPing = false;
@@ -168,9 +166,27 @@ public abstract class CameraControl {
 		layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel());
+				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel() * getMaxExtent() / 50);
 			}
 		}));
+	}
+
+	private static double getMaxExtent() {
+		double maxExtent = 1;
+		final BoundingVolume volume = Scene.getRoot().getWorldBound();
+		if (volume instanceof BoundingBox) {
+			final BoundingBox box = (BoundingBox) volume;
+			if (box.getXExtent() > maxExtent) {
+				maxExtent = box.getXExtent();
+			}
+			if (box.getYExtent() > maxExtent) {
+				maxExtent = box.getYExtent();
+			}
+			if (box.getZExtent() > maxExtent) {
+				maxExtent = box.getZExtent();
+			}
+		}
+		return maxExtent;
 	}
 
 	public InputTrigger getKeyTrigger() {
@@ -219,12 +235,14 @@ public abstract class CameraControl {
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
 			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * (_moveSpeed * 10) * 2 * tpf).addLocal(camera.getLocation());
-			if (loc.length() > SceneManager.SKY_RADIUS)
+			if (loc.length() > SceneManager.SKY_RADIUS) {
 				return;
+			}
 			camera.setLocation(loc);
 
-			if (this instanceof OrbitControl)
+			if (this instanceof OrbitControl) {
 				((OrbitControl) this).computeNewFrontDistance();
+			}
 		}
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
 		Scene.getInstance().updateEditShapes();
@@ -236,10 +254,11 @@ public abstract class CameraControl {
 		final double zoomInDistance = isPrintPreview ? 50 : 20;
 		final double zoomDistance;
 		final boolean zoomOut = Camera.getCurrentCamera().getLocation().distance(clickedPoint) < zoomInDistance + 1;
-		if (zoomOut)
+		if (zoomOut) {
 			zoomDistance = 100.0;
-		else
+		} else {
 			zoomDistance = zoomInDistance;
+		}
 
 		orgCameraDirection = new Vector3(Camera.getCurrentCamera().getDirection());
 		orgCameraLocation = new Vector3(Camera.getCurrentCamera().getLocation());
@@ -248,10 +267,11 @@ public abstract class CameraControl {
 		} else {
 			newCameraDirection = clickedPoint.subtract(Camera.getCurrentCamera().getLocation(), null).normalizeLocal();
 		}
-		if (isPrintPreview && zoomOut)
+		if (isPrintPreview && zoomOut) {
 			newCameraLocation = PrintController.getInstance().getZoomAllCameraLocation();
-		else
+		} else {
 			newCameraLocation = clickedPoint.subtract(newCameraDirection.multiply(zoomDistance, null), null);
+		}
 		animationTime = SceneManager.getInstance().getTimer().getTimeInSeconds();
 	}
 
@@ -269,8 +289,9 @@ public abstract class CameraControl {
 		Camera.getCurrentCamera().lookAt(currentLocation.add(currentDirection, null), Vector3.UNIT_Z);
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
 		Scene.getInstance().updateEditShapes();
-		if (t > animationDuration)
+		if (t > animationDuration) {
 			animationTime = -1;
+		}
 	}
 
 	public ButtonAction getRightButtonAction() {
