@@ -83,6 +83,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -1985,10 +1986,16 @@ public class PopupMenuFactory {
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() throws Exception {
+									boolean success = true;
+									final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
 									try {
-										((Foundation) selectedPart).importCollada(file.toURI().toURL(), false);
+										((Foundation) selectedPart).importCollada(file.toURI().toURL(), position);
 									} catch (final Throwable t) {
 										Util.reportError(t);
+										success = false;
+									}
+									if (success) {
+										SceneManager.getInstance().getUndoManager().addEdit(new AddNodeCommand((Foundation) selectedPart));
 									}
 									return null;
 								}
@@ -3049,7 +3056,8 @@ public class PopupMenuFactory {
 						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
-					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Mirror || copyBuffer instanceof Rack);
+					final Node copyNode = Scene.getInstance().getCopyNode();
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Mirror || copyBuffer instanceof Rack || copyNode != null);
 				}
 			});
 
@@ -6417,6 +6425,29 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miCopyNode = new JMenuItem("Copy Node");
+			miCopyNode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCopyNode.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (selectedPart instanceof Foundation) {
+								final Foundation f = (Foundation) selectedPart;
+								final Mesh m = f.getSelectedMesh();
+								if (m != null) {
+									final Node n = m.getParent();
+									Scene.getInstance().setCopyNode(n, f.getNodeState(n));
+								}
+							}
+							return null;
+						}
+					});
+				}
+			});
+
 			final JMenuItem miPaste = new JMenuItem("Paste");
 			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			miPaste.addActionListener(new ActionListener() {
@@ -6481,7 +6512,6 @@ public class PopupMenuFactory {
 			});
 
 			final JMenuItem miDeleteMesh = new JMenuItem("Delete Mesh");
-			miDeleteMesh.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			miDeleteMesh.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -6507,8 +6537,9 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miDeleteNode = new JMenuItem("Delete Node");
-			miDeleteNode.addActionListener(new ActionListener() {
+			final JMenuItem miCutNode = new JMenuItem("Cut Node");
+			miCutNode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
+			miCutNode.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6520,6 +6551,7 @@ public class PopupMenuFactory {
 								@Override
 								public Object call() throws Exception {
 									final Node n = m.getParent();
+									Scene.getInstance().setCopyNode(n, f.getNodeState(n));
 									final DeleteNodeCommand c = new DeleteNodeCommand(n, f);
 									f.deleteNode(n);
 									updateAfterEdit();
@@ -6630,9 +6662,11 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForMesh.add(miInfo);
+			popupMenuForMesh.add(miCutNode);
 			popupMenuForMesh.add(miPaste);
+			popupMenuForMesh.add(miCopyNode);
+			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miDeleteMesh);
-			popupMenuForMesh.add(miDeleteNode);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miBottomOnGround);
 			popupMenuForMesh.addSeparator();

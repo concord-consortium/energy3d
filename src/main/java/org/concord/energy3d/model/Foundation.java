@@ -261,7 +261,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (importedNodeStates != null) {
 			try {
 				for (final NodeState s : importedNodeStates) {
-					importCollada(s.getSourceURL(), true);
+					importCollada(s.getSourceURL(), null);
 				}
 			} catch (final Throwable t) {
 				Util.reportError(t);
@@ -1215,27 +1215,33 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (lockEdit) {
 			return;
 		}
-		final List<Vector3> orgPoints = new ArrayList<Vector3>(movePoints.size());
-		for (int i = 0; i < points.size(); i++) {
-			orgPoints.add(points.get(i));
-		}
-
-		for (int i = 0; i < points.size(); i++) {
-			final Vector3 newP = movePoints.get(i).add(d, null);
-			points.set(i, newP);
-			if (i == points.size() - 1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
-				for (int j = 0; j < points.size(); j++) {
-					points.set(j, orgPoints.get(j));
-				}
-				return;
+		if (selectedMesh != null) { // if a mesh is selected, move the parent node
+			translateImportedNode(selectedMesh.getParent(), d.getX(), d.getY(), d.getZ());
+			drawImports();
+			draw();
+			drawMeshSelection(selectedMesh);
+		} else {
+			final List<Vector3> orgPoints = new ArrayList<Vector3>(movePoints.size());
+			for (int i = 0; i < points.size(); i++) {
+				orgPoints.add(points.get(i));
 			}
+			for (int i = 0; i < points.size(); i++) {
+				final Vector3 newP = movePoints.get(i).add(d, null);
+				points.set(i, newP);
+				if (i == points.size() - 1 && ensureDistanceFromOtherFoundations(newP, i) != newP) {
+					for (int j = 0; j < points.size(); j++) {
+						points.set(j, orgPoints.get(j));
+					}
+					return;
+				}
+			}
+			if (SceneManager.getInstance().getSelectedPart() == this) {
+				drawAzimuthArrow();
+			}
+			draw();
+			drawChildren();
+			updateHandlesOfAllFoudations();
 		}
-		if (SceneManager.getInstance().getSelectedPart() == this) {
-			drawAzimuthArrow();
-		}
-		draw();
-		drawChildren();
-		updateHandlesOfAllFoudations();
 	}
 
 	public void move(final Vector3 v, final double steplength) {
@@ -2554,7 +2560,6 @@ public class Foundation extends HousePart implements Thermalizable {
 		return new Area(path);
 	}
 
-	/** @return the imported nodes for solar simulation. Each node contains a list of meshes reconstructed from those contained in oldImportedNodes. */
 	public List<Node> getImportedNodes() {
 		return importedNodes;
 	}
@@ -2583,7 +2588,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		getNodeState(n).getPosition().addLocal(x, y, z);
 	}
 
-	public void importCollada(final URL file, final boolean init) throws Exception {
+	public Node importCollada(final URL file, final Vector3 position) throws Exception {
 		if (importedNodes == null) {
 			importedNodes = new ArrayList<Node>();
 		}
@@ -2597,13 +2602,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			// System.out.println("***" + asset.getUnitName() + "," + asset.getUnitMeter());
 			final Node originalNode = storage.getScene();
 			originalNode.setScale(scale);
-			if (!init) {
+			if (position != null) { // when position is null, the node uses the position saved in the associated NodeState object
 				final NodeState ns = new NodeState();
 				importedNodeStates.add(ns);
-				final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
-				if (position != null) {
-					originalNode.setTranslation(position);
-				}
+				originalNode.setTranslation(position);
 				ns.setPosition(originalNode.getTranslation().subtract(getAbsCenter(), null));
 				ns.setSourceURL(file);
 			}
@@ -2645,6 +2647,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				importedNodes.add(newNode);
 				newNode.setScale(scale);
 				root.attachChild(newNode);
+				return newNode;
 			}
 		} else {
 			// get rid of the dead nodes no longer linked to files
@@ -2654,6 +2657,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
+		return null;
 	}
 
 	public void removeAllImports() {

@@ -23,7 +23,15 @@ public class NodeState implements Serializable {
 	private String name;
 
 	public NodeState() {
+	}
 
+	public NodeState makeCopy() {
+		final NodeState copy = new NodeState();
+		copy.position = position.clone();
+		copy.defaultColor = defaultColor.clone();
+		copy.sourceURL = sourceURL;
+		copy.name = name;
+		return copy;
 	}
 
 	public void setName(final String name) {

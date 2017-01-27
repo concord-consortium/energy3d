@@ -29,6 +29,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.NodeState;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -78,17 +79,17 @@ public class Scene implements Serializable {
 	public static final int FOREST_THEME = 3;
 
 	private static final long serialVersionUID = 1L;
-	private static final Node root = new Node("House Root");
-	private static final Node originalHouseRoot = new Node("Original House Root");
-	private static final Node notReceivingShadowRoot = new Node("Trees Root");
+	private static final Node root = new Node("Model Root");
+	private static final Node originalHouseRoot = new Node("Original Model Root");
+	private static final Node notReceivingShadowRoot = new Node("No-Shadow Root");
 	private static final int currentVersion = 1;
 	private static Scene instance;
-	private static URL url = null;
-	private static boolean redrawAll = false;
-	private static boolean drawThickness = false;
-	private static boolean drawAnnotationsInside = false;
+	private static URL url;
+	private static boolean redrawAll;
+	private static boolean drawThickness;
+	private static boolean drawAnnotationsInside;
 	private static boolean isSaving;
-	private transient boolean edited = false;
+	private transient boolean edited;
 	private transient BufferedImage groundImage;
 	private transient boolean avoidSavingGroundImage;
 	private final List<HousePart> parts = new ArrayList<HousePart>();
@@ -106,7 +107,9 @@ public class Scene implements Serializable {
 	private Ground ground = new Ground();
 	private Atmosphere atmosphere = new Atmosphere();
 	private DesignSpecs designSpecs = new DesignSpecs();
-	private HousePart copyBuffer, originalCopy;
+	private transient HousePart copyBuffer, originalCopy;
+	private transient Node copyNode;
+	private transient NodeState copyNodeState;
 	private UtilityBill utilityBill;
 	private String projectName;
 	private String city;
@@ -843,14 +846,33 @@ public class Scene implements Serializable {
 		}
 	}
 
+	public void setCopyNode(final Node n, final NodeState ns) {
+		if (n != null) {
+			copyNode = n.makeCopy(false);
+			copyNodeState = ns.makeCopy();
+		} else {
+			copyNode = null;
+			copyNodeState = null;
+		}
+		copyBuffer = null;
+	}
+
+	public Node getCopyNode() {
+		return copyNode;
+	}
+
+	public NodeState getCopyNodeState() {
+		return copyNodeState;
+	}
+
 	public void setCopyBuffer(final HousePart p) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		// exclude the following types of house parts
-		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) {
+		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) { // exclude these types
 			return;
 		}
 		copyBuffer = p;
 		originalCopy = p;
+		copyNode = null;
 	}
 
 	public HousePart getCopyBuffer() {
@@ -1085,33 +1107,52 @@ public class Scene implements Serializable {
 		if (!(selectedPart instanceof Foundation)) {
 			return;
 		}
-		if (copyBuffer == null) {
-			return;
+		final Foundation foundation = (Foundation) selectedPart;
+		if (copyNode != null) {
+			final Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
+			if (position == null) {
+				return;
+			}
+			copyNodeState.setPosition(position);
+			Node newNode = null;
+			try {
+				newNode = foundation.importCollada(copyNodeState.getSourceURL(), position);
+			} catch (final Throwable t) {
+				t.printStackTrace();
+			}
+			if (newNode != null) { // copy the attributes that aren't copied by import
+				final NodeState s = foundation.getNodeState(newNode);
+				s.setDefaultColor(copyNodeState.getDefaultColor());
+				s.setName(copyNodeState.getName());
+			}
+		} else {
+			if (copyBuffer != null) {
+				final HousePart c = copyBuffer.copy(false);
+				if (c == null) {
+					return;
+				}
+				Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
+				if (position == null) {
+					return;
+				}
+				c.setContainer(foundation); // move to this foundation
+				position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
+				final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+				position = position.subtractLocal(center);
+				final int n = c.getPoints().size();
+				for (int i = 0; i < n; i++) {
+					final Vector3 v = c.getPoints().get(i);
+					v.addLocal(position);
+				}
+				if (c instanceof Rack) {
+					((Rack) c).moveSolarPanels(position);
+					setIdOfChildren(c);
+				}
+				add(c, true);
+				copyBuffer = c;
+				SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+			}
 		}
-		final HousePart c = copyBuffer.copy(false);
-		if (c == null) {
-			return;
-		}
-		Vector3 position = SceneManager.getInstance().getPickedLocationOnFoundation();
-		if (position == null) {
-			return;
-		}
-		c.setContainer(selectedPart); // move to this foundation
-		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
-		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
-		position = position.subtractLocal(center);
-		final int n = c.getPoints().size();
-		for (int i = 0; i < n; i++) {
-			final Vector3 v = c.getPoints().get(i);
-			v.addLocal(position);
-		}
-		if (c instanceof Rack) {
-			((Rack) c).moveSolarPanels(position);
-			setIdOfChildren(c);
-		}
-		add(c, true);
-		copyBuffer = c;
-		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
 	public void pasteToPickedLocationOnMesh(final Mesh mesh) {
