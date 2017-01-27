@@ -565,7 +565,7 @@ public class EnergyPanel extends JPanel {
 		// heat map slider and progress bar
 
 		heatMapPanel = new JPanel(new BorderLayout());
-		heatMapPanel.setBorder(createTitledBorder("Heat Map Contrast", true));
+		heatMapPanel.setBorder(createTitledBorder("Solar Radiation Heat Map Contrast", true));
 
 		colorMapSlider = new MySlider();
 		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar heat map.</html>");
@@ -580,11 +580,19 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				if (!colorMapSlider.getValueIsAdjusting()) {
+					((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					final ChangeSolarHeatMapColorContrastCommand c = new ChangeSolarHeatMapColorContrastCommand();
 					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
-					// compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					SolarRadiation.getInstance().updateTexture();
-					Scene.getInstance().redrawAll();
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							// compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+							SolarRadiation.getInstance().updateTexture();
+							SceneManager.getInstance().refresh();
+							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+							return null;
+						}
+					});
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
