@@ -609,7 +609,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().setHeliodonVisible(heliodonButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 					disableSunAnim();
-					Scene.getInstance().setEdited(true, false);
+					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
@@ -691,7 +691,7 @@ public class MainPanel extends JPanel {
 					final ShowAnnotationCommand c = new ShowAnnotationCommand();
 					Scene.getInstance().setAnnotationsVisible(annotationButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-					Scene.getInstance().setEdited(true, false);
+					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
@@ -833,7 +833,7 @@ public class MainPanel extends JPanel {
 			noteTextArea.getDocument().addDocumentListener(new DocumentListener() {
 
 				private void updateEditFlag() {
-					Scene.getInstance().setEdited(true, false);
+					Scene.getInstance().setEdited(true);
 					MainFrame.getInstance().updateTitleBar();
 				}
 

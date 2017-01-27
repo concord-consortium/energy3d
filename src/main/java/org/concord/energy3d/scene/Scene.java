@@ -2405,10 +2405,6 @@ public class Scene implements Serializable {
 	}
 
 	public void setEdited(final boolean edited) {
-		setEdited(edited, true);
-	}
-
-	public void setEdited(final boolean edited, final boolean recomputeEnergy) {
 		if (edited) {
 			SnapshotLogger.getInstance().setSceneEdited(true);
 		}

@@ -91,11 +91,11 @@ public class EnergyPanel extends JPanel {
 	private final DecimalFormat noDecimal = new DecimalFormat();
 	private final DecimalFormat oneDecimal = new DecimalFormat();
 	private final DecimalFormat twoDecimals = new DecimalFormat();
-	private static boolean autoRecomputeEnergy = false;
+	private static boolean autoRecomputeEnergy;
 	private boolean computeRequest;
 	private boolean computing;
 	private boolean cancel;
-	private boolean alreadyRenderedHeatmap = false;
+	private boolean alreadyRenderedHeatmap;
 	private boolean computeEnabled = true;
 
 	public enum UpdateRadiation {
@@ -582,8 +582,10 @@ public class EnergyPanel extends JPanel {
 				if (!colorMapSlider.getValueIsAdjusting()) {
 					final ChangeSolarHeatMapColorContrastCommand c = new ChangeSolarHeatMapColorContrastCommand();
 					Scene.getInstance().setSolarHeatMapColorContrast(colorMapSlider.getValue());
-					compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-					Scene.getInstance().setEdited(true, false);
+					// compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
+					SolarRadiation.getInstance().updateTexture();
+					Scene.getInstance().redrawAll();
+					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			}
@@ -812,6 +814,7 @@ public class EnergyPanel extends JPanel {
 			progressBar.setString(Math.min(100, percentage) + "% (" + oneDecimal.format(t) + " seconds)");
 			progressBar.setStringPainted(true);
 		}
+		progressBar.repaint();
 	}
 
 	public void setCity(final String city) {

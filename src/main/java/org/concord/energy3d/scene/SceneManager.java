@@ -155,7 +155,7 @@ import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
-	public static final int SKY_RADIUS = 10000;
+	public static final int SKY_RADIUS = 1000000;
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance().getCanvasPanel());
 	private static final double MOVE_SPEED = 5;

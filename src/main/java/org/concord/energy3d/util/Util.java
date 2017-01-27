@@ -87,6 +87,19 @@ public class Util {
 		return false;
 	}
 
+	public static double[][] cloneArray(final double[][] src) {
+		final int length = src.length;
+		final double[][] target = new double[length][src[0].length];
+		for (int i = 0; i < length; i++) {
+			System.arraycopy(src[i], 0, target[i], 0, src[i].length);
+		}
+		return target;
+	}
+
+	public static int roundToPowerOfTwo(final int n) {
+		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
+	}
+
 	public static boolean isPowerOfTwo(final int n) {
 		return (n & (n - 1)) == 0;
 	}

@@ -101,7 +101,6 @@ public class SolarRadiation {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			part.setSolarPotential(new double[MINUTES_OF_DAY / Scene.getInstance().getTimeStep()]);
 		}
-		maxValue = 1;
 		computeToday();
 		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
@@ -197,7 +196,7 @@ public class SolarRadiation {
 		totalSteps -= 2;
 		final double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
-		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
+		for (int minute = 0; minute < MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
@@ -245,12 +244,11 @@ public class SolarRadiation {
 					}
 				}
 				computeOnLand(dayLength, directionTowardSun);
-				EnergyPanel.getInstance().progress(100 * step / totalSteps);
+				EnergyPanel.getInstance().progress((int) Math.round(100.0 * step / totalSteps));
 				step++;
 			}
-			maxValue++;
 		}
-		maxValue *= 1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast();
+		maxValue = Math.round((MINUTES_OF_DAY / timeStep + 1.0) * (1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast()));
 
 		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
 		Heliodon.getInstance().getCalendar().set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -917,73 +915,70 @@ public class SolarRadiation {
 	public void initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 		if (onMesh.get(drawMesh) == null) {
 			drawMesh.setDefaultColor(ColorRGBA.BLACK);
+			initMeshTextureData(drawMesh, collisionMesh, normal, true);
 		}
-		initMeshTextureData(drawMesh, collisionMesh, normal, true);
 	}
 
 	private MeshDataStore initMeshTextureData(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final boolean updateTexture) {
 		final MeshDataStore data = new MeshDataStore();
-		if (normal == null) { // TODO: Temporarily allow the program to move forward behind this point
-			return data;
-		}
+		if (normal != null) {
 
-		final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
-		final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
+			final AnyToXYTransform toXY = new AnyToXYTransform(normal.getX(), normal.getY(), normal.getZ());
+			final XYToAnyTransform fromXY = new XYToAnyTransform(normal.getX(), normal.getY(), normal.getZ());
 
-		final FloatBuffer vertexBuffer = collisionMesh.getMeshData().getVertexBuffer();
-		vertexBuffer.rewind();
-		double minX, minY, maxX, maxY;
-		minX = minY = Double.POSITIVE_INFINITY;
-		maxX = maxY = Double.NEGATIVE_INFINITY;
-		double z = Double.NaN;
-		final List<ReadOnlyVector2> points = new ArrayList<ReadOnlyVector2>(vertexBuffer.limit() / 3);
-		while (vertexBuffer.hasRemaining()) {
-			final Vector3 pWorld = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
-			final Point p = new TPoint(pWorld.getX(), pWorld.getY(), pWorld.getZ());
-			toXY.transform(p);
-			if (p.getX() < minX) {
-				minX = p.getX();
+			final FloatBuffer vertexBuffer = collisionMesh.getMeshData().getVertexBuffer();
+			vertexBuffer.rewind();
+			double minX, minY, maxX, maxY;
+			minX = minY = Double.POSITIVE_INFINITY;
+			maxX = maxY = Double.NEGATIVE_INFINITY;
+			double z = Double.NaN;
+			final List<ReadOnlyVector2> points = new ArrayList<ReadOnlyVector2>(vertexBuffer.limit() / 3);
+			while (vertexBuffer.hasRemaining()) {
+				final Vector3 pWorld = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
+				final Point p = new TPoint(pWorld.getX(), pWorld.getY(), pWorld.getZ());
+				toXY.transform(p);
+				if (p.getX() < minX) {
+					minX = p.getX();
+				}
+				if (p.getX() > maxX) {
+					maxX = p.getX();
+				}
+				if (p.getY() < minY) {
+					minY = p.getY();
+				}
+				if (p.getY() > maxY) {
+					maxY = p.getY();
+				}
+				if (Double.isNaN(z)) {
+					z = p.getZ();
+				}
+				points.add(new Vector2(p.getX(), p.getY()));
 			}
-			if (p.getX() > maxX) {
-				maxX = p.getX();
-			}
-			if (p.getY() < minY) {
-				minY = p.getY();
-			}
-			if (p.getY() > maxY) {
-				maxY = p.getY();
-			}
-			if (Double.isNaN(z)) {
-				z = p.getZ();
-			}
-			points.add(new Vector2(p.getX(), p.getY()));
-		}
 
-		final Point tmp = new TPoint(minX, minY, z);
-		fromXY.transform(tmp);
-		data.p0 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
+			final Point tmp = new TPoint(minX, minY, z);
+			fromXY.transform(tmp);
+			data.p0 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
-		tmp.set(minX, maxY, z);
-		fromXY.transform(tmp);
-		data.p1 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
+			tmp.set(minX, maxY, z);
+			fromXY.transform(tmp);
+			data.p1 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
-		tmp.set(maxX, minY, z);
-		fromXY.transform(tmp);
-		data.p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
+			tmp.set(maxX, minY, z);
+			fromXY.transform(tmp);
+			data.p2 = new Vector3(tmp.getX(), tmp.getY(), tmp.getZ());
 
-		final double solarStep = Scene.getInstance().getSolarStep();
-		data.rows = Math.max(1, (int) Math.ceil(data.p1.subtract(data.p0, null).length() / solarStep));
-		data.cols = Math.max(1, (int) Math.ceil(data.p2.subtract(data.p0, null).length() / solarStep));
-		if (data.dailySolarIntensity == null) {
-			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
-		}
+			final double solarStep = Scene.getInstance().getSolarStep();
+			data.rows = Math.max(1, (int) Math.ceil(data.p1.subtract(data.p0, null).length() / solarStep));
+			data.cols = Math.max(1, (int) Math.ceil(data.p2.subtract(data.p0, null).length() / solarStep));
+			data.dailySolarIntensity = new double[Util.roundToPowerOfTwo(data.rows)][Util.roundToPowerOfTwo(data.cols)];
 
-		if (onMesh.get(drawMesh) == null) {
 			final ReadOnlyVector2 originXY = new Vector2(minX, minY);
 			final ReadOnlyVector2 uXY = new Vector2(maxX - minX, 0).normalizeLocal();
 			final ReadOnlyVector2 vXY = new Vector2(0, maxY - minY).normalizeLocal();
-			for (int row = 0; row < data.dailySolarIntensity.length; row++) {
-				for (int col = 0; col < data.dailySolarIntensity[0].length; col++) {
+			final int nrow = data.dailySolarIntensity.length;
+			final int ncol = data.dailySolarIntensity[0].length;
+			for (int row = 0; row < nrow; row++) {
+				for (int col = 0; col < ncol; col++) {
 					if (row >= data.rows || col >= data.cols) {
 						data.dailySolarIntensity[row][col] = -1;
 					} else {
@@ -1001,10 +996,13 @@ public class SolarRadiation {
 					}
 				}
 			}
+
+			data.u = data.p2.subtract(data.p0, null).normalizeLocal();
+			data.v = data.p1.subtract(data.p0, null).normalizeLocal();
+
 		}
 
-		data.u = data.p2.subtract(data.p0, null).normalizeLocal();
-		data.v = data.p1.subtract(data.p0, null).normalizeLocal();
+		// TODO: Temporarily allow the program to move forward behind this point even if normal is null
 
 		onMesh.put(drawMesh, data);
 
@@ -1018,9 +1016,7 @@ public class SolarRadiation {
 		final MeshDataStore data = new MeshDataStore();
 		data.rows = rows;
 		data.cols = cols;
-		if (data.dailySolarIntensity == null) {
-			data.dailySolarIntensity = new double[roundToPowerOfTwo(data.rows)][roundToPowerOfTwo(data.cols)];
-		}
+		data.dailySolarIntensity = new double[Util.roundToPowerOfTwo(data.rows)][Util.roundToPowerOfTwo(data.cols)];
 		onMesh.put(drawMesh, data);
 		return data;
 	}
@@ -1028,8 +1024,8 @@ public class SolarRadiation {
 	private void updateTextureCoords(final Mesh drawMesh) {
 		final MeshDataStore data = onMesh.get(drawMesh);
 		final ReadOnlyVector3 o = data.p0;
-		final ReadOnlyVector3 u = data.u.multiply(roundToPowerOfTwo(data.cols) * Scene.getInstance().getSolarStep(), null);
-		final ReadOnlyVector3 v = data.v.multiply(roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);
+		final ReadOnlyVector3 u = data.u.multiply(Util.roundToPowerOfTwo(data.cols) * Scene.getInstance().getSolarStep(), null);
+		final ReadOnlyVector3 v = data.v.multiply(Util.roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
@@ -1116,32 +1112,9 @@ public class SolarRadiation {
 	}
 
 	public void computeTotalEnergyForBuildings() {
-		applyTexture(SceneManager.getInstance().getSolarLand());
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Wall || part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror || part instanceof Sensor) {
-				applyTexture(part.getRadiationMesh());
-			} else if (part instanceof Foundation) {
-				final Foundation foundation = (Foundation) part;
-				for (int i = 0; i < 5; i++) {
-					applyTexture(foundation.getRadiationMesh(i));
-				}
-				final List<Node> importedNodes = foundation.getImportedNodes();
-				if (importedNodes != null) {
-					for (final Node node : importedNodes) {
-						for (final Spatial s : node.getChildren()) {
-							applyTexture((Mesh) s);
-						}
-					}
-				}
-			} else if (part instanceof Roof) {
-				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
-						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
-						applyTexture(mesh);
-					}
-				}
-			}
-			if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
+		updateTexture();
+		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
+			for (final HousePart part : Scene.getInstance().getParts()) {
 				part.drawHeatFlux();
 			}
 		}
@@ -1333,6 +1306,36 @@ public class SolarRadiation {
 
 	}
 
+	public void updateTexture() {
+		maxValue = Math.round((MINUTES_OF_DAY / Scene.getInstance().getTimeStep() + 1.0) * (1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast()));
+		applyTexture(SceneManager.getInstance().getSolarLand());
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Wall || part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror || part instanceof Sensor) {
+				applyTexture(part.getRadiationMesh());
+			} else if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
+				for (int i = 0; i < 5; i++) {
+					applyTexture(foundation.getRadiationMesh(i));
+				}
+				final List<Node> importedNodes = foundation.getImportedNodes();
+				if (importedNodes != null) {
+					for (final Node node : importedNodes) {
+						for (final Spatial s : node.getChildren()) {
+							applyTexture((Mesh) s);
+						}
+					}
+				}
+			} else if (part instanceof Roof) {
+				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
+						applyTexture(mesh);
+					}
+				}
+			}
+		}
+	}
+
 	private void applyTexture(final Mesh mesh) {
 		if (onMesh.get(mesh) == null) {
 			mesh.setDefaultColor(ColorRGBA.BLUE);
@@ -1413,12 +1416,7 @@ public class SolarRadiation {
 			}
 		}
 		final float scalar = Math.min(1.0f, (float) (value - valuePerColorRange * colorIndex) / valuePerColorRange);
-		final ColorRGBA color = new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
-		return color;
-	}
-
-	private static int roundToPowerOfTwo(final int n) {
-		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
+		return new ColorRGBA().lerpLocal(colors[colorIndex], colors[colorIndex + 1], scalar);
 	}
 
 	public void setAirMassSelection(final int selection) {
