@@ -1,6 +1,5 @@
 package org.concord.energy3d.simulation;
 
-import java.awt.EventQueue;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -1308,6 +1307,7 @@ public class SolarRadiation {
 	}
 
 	public void updateTextures() {
+		EnergyPanel.getInstance().setComputingStartMillis(System.currentTimeMillis());
 		maxValue = Math.round((MINUTES_OF_DAY / Scene.getInstance().getTimeStep() + 1.0) * (1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast()));
 		applyTexture(SceneManager.getInstance().getSolarLand());
 		final int totalMeshes = Scene.getInstance().getParts().size() + Scene.getInstance().countMeshes();
@@ -1325,14 +1325,7 @@ public class SolarRadiation {
 					for (final Node node : importedNodes) {
 						for (final Spatial s : node.getChildren()) {
 							applyTexture((Mesh) s);
-							countMesh++;
-							final int countMesh2 = countMesh;
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									EnergyPanel.getInstance().progress((int) Math.round(100.0 * countMesh2 / totalMeshes));
-								}
-							});
+							EnergyPanel.getInstance().progress((int) Math.round(100.0 * (countMesh++) / totalMeshes));
 						}
 					}
 				}
@@ -1346,12 +1339,7 @@ public class SolarRadiation {
 			}
 			countMesh++;
 		}
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				EnergyPanel.getInstance().progress(0);
-			}
-		});
+		EnergyPanel.getInstance().progress(0);
 	}
 
 	private void applyTexture(final Mesh mesh) {

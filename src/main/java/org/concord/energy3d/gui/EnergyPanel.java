@@ -140,6 +140,7 @@ public class EnergyPanel extends JPanel {
 	private JPanel buildingPanel, pvStationPanel, cspStationPanel, instructionPanel;
 	private final MyEditorPane[] instructionSheets = new MyEditorPane[3];
 	private boolean disableDateSpinner;
+	private long computingStartMillis;
 
 	public static EnergyPanel getInstance() {
 		return instance;
@@ -611,8 +612,6 @@ public class EnergyPanel extends JPanel {
 
 	}
 
-	private long computingStartMillis;
-
 	public void compute(final UpdateRadiation updateRadiation) {
 		if (!computeEnabled) {
 			return;
@@ -824,7 +823,14 @@ public class EnergyPanel extends JPanel {
 		} else {
 			progressBar.setValue(percentage);
 			final double t = (System.currentTimeMillis() - computingStartMillis) * 0.001;
-			progressBar.setString(Math.min(100, percentage) + "% (" + oneDecimal.format(t) + " seconds)");
+			final double remainingTime = t * (100.0 / percentage - 1.0);
+			String remainingTimeString;
+			if (remainingTime > 300) {
+				remainingTimeString = remainingTime < 0.1 ? "" : " down, " + oneDecimal.format(remainingTime / 60) + "m to go";
+			} else {
+				remainingTimeString = remainingTime < 0.1 ? "" : " down, " + oneDecimal.format(remainingTime) + "s to go";
+			}
+			progressBar.setString(Math.min(100, percentage) + "% (" + oneDecimal.format(t) + "s" + remainingTimeString + ")");
 			progressBar.setStringPainted(true);
 		}
 		progressBar.repaint();
@@ -1589,6 +1595,10 @@ public class EnergyPanel extends JPanel {
 
 	public void disableDateSpinner(final boolean b) {
 		disableDateSpinner = b;
+	}
+
+	public void setComputingStartMillis(final long t) {
+		computingStartMillis = t;
 	}
 
 }
