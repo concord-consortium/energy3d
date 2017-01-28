@@ -876,7 +876,7 @@ public class Util {
 		final OrientedBoundingBox boundingBox = new OrientedBoundingBox();
 		boundingBox.computeFromPoints(newbuf);
 		boundingBox.transform(node.getWorldTransform().invert(null), node.getWorldBound());
-		node.updateWorldBound(true);
+		// node.updateWorldBound(true);
 		return boundingBox;
 	}
 

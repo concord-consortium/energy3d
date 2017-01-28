@@ -83,8 +83,10 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
+import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 
@@ -6413,13 +6415,47 @@ public class PopupMenuFactory {
 						final Foundation f = (Foundation) selectedPart;
 						final Mesh m = f.getSelectedMesh();
 						if (m != null) {
-							final Node n = m.getParent();
-							if (n != null) {
-								final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
-								final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ() - f.getHeight();
-								f.translateImportedNode(n, 0, 0, -zBottom);
-								f.draw();
-							}
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									final Node n = m.getParent();
+									if (n != null) {
+										final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
+										final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ() - f.getHeight();
+										f.translateImportedNode(n, 0, 0, -zBottom);
+										f.draw();
+									}
+									return null;
+								}
+							});
+						}
+					}
+				}
+			});
+
+			final JMenuItem miCenterToOrigin = new JMenuItem("Move Node Center to Origin");
+			miCenterToOrigin.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									final Node n = m.getParent();
+									if (n != null) {
+										final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
+										final ReadOnlyVector3 center = boundingBox.getCenter();
+										f.translateImportedNode(n, -center.getX(), -center.getY(), 0);
+										f.setMeshSelectionVisible(false);
+										f.draw();
+									}
+									return null;
+								}
+							});
 						}
 					}
 				}
@@ -6491,8 +6527,10 @@ public class PopupMenuFactory {
 							}
 							miInfo.setText(s + " (" + m.getMeshData().getVertexCount() + " Vertices), Node #" + indexOfNode + " (" + name + ")");
 							final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(m.getParent());
-							final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
+							final ReadOnlyVector3 center = boundingBox.getCenter();
+							final double zBottom = center.getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
 							miBottomOnGround.setEnabled(!Util.isZero(zBottom - f.getHeight()));
+							miCenterToOrigin.setEnabled(!Util.isEqual(new Vector2(), new Vector2(center.getX(), center.getY())));
 							final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 							miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Rack);
 						}
@@ -6502,11 +6540,13 @@ public class PopupMenuFactory {
 				@Override
 				public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
 					miBottomOnGround.setEnabled(true);
+					miCenterToOrigin.setEnabled(true);
 				}
 
 				@Override
 				public void popupMenuCanceled(final PopupMenuEvent e) {
 					miBottomOnGround.setEnabled(true);
+					miCenterToOrigin.setEnabled(true);
 				}
 
 			});
@@ -6669,6 +6709,7 @@ public class PopupMenuFactory {
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miBottomOnGround);
+			popupMenuForMesh.add(miCenterToOrigin);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miMeshProperties);
 			popupMenuForMesh.add(miNodeProperties);

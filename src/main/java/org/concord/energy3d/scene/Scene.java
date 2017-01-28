@@ -1,5 +1,7 @@
 package org.concord.energy3d.scene;
 
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
@@ -255,6 +257,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void openNow(final URL file) throws Exception {
+		((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		if (PrintController.getInstance().isPrintPreview()) {
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
 			while (!PrintController.getInstance().isFinished()) {
@@ -316,6 +319,7 @@ public class Scene implements Serializable {
 				}
 				MainPanel.getInstance().getAnnotationButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
+				((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 

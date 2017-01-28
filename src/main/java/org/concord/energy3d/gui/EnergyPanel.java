@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -55,6 +56,7 @@ import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.NodeState;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -77,10 +79,13 @@ import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
 import org.concord.energy3d.util.Util;
 
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.Node;
 
 public class EnergyPanel extends JPanel {
 
@@ -565,10 +570,10 @@ public class EnergyPanel extends JPanel {
 		// heat map slider and progress bar
 
 		heatMapPanel = new JPanel(new BorderLayout());
-		heatMapPanel.setBorder(createTitledBorder("Solar Radiation Heat Map Contrast", true));
+		heatMapPanel.setBorder(createTitledBorder("Solar Irradiance Heat Map Contrast", true));
 
 		colorMapSlider = new MySlider();
-		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar heat map.</html>");
+		colorMapSlider.setToolTipText("<html>Increase or decrease the color contrast of the solar irradiance heat map.</html>");
 		colorMapSlider.setMinimum(15);
 		colorMapSlider.setMaximum(95);
 		colorMapSlider.setMinimumSize(colorMapSlider.getPreferredSize());
@@ -587,7 +592,7 @@ public class EnergyPanel extends JPanel {
 						@Override
 						public Object call() throws Exception {
 							// compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
-							SolarRadiation.getInstance().updateTexture();
+							SolarRadiation.getInstance().updateTextures();
 							SceneManager.getInstance().refresh();
 							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 							return null;
@@ -1087,19 +1092,55 @@ public class EnergyPanel extends JPanel {
 					} else {
 						landArea = "";
 					}
+					final Mesh selectedMesh;
+					final Node selectedNode;
+					final OrientedBoundingBox nodeBox;
+					final List<Node> nodes = foundation.getImportedNodes();
+					if (nodes != null) {
+						selectedMesh = foundation.getSelectedMesh();
+						if (selectedMesh != null) {
+							selectedNode = selectedMesh.getParent();
+							nodeBox = Util.getOrientedBoundingBox(selectedNode);
+						} else {
+							selectedNode = null;
+							nodeBox = null;
+						}
+					} else {
+						selectedMesh = null;
+						selectedNode = null;
+						nodeBox = null;
+					}
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
-							partProperty1Label.setText("  Size:");
-							partProperty2Label.setText("  Position:");
-							partProperty3Label.setText("  Azimuth:");
-							partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + "\u00d7" + (twoDecimals.format(lz * scale)) + "m\u2248" + oneDecimal.format(lx * ly * scale * scale) + landArea + " m\u00B2");
-							partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
-							partProperty3TextField.setText(noDecimal.format(az) + "\u00B0");
-							partProperty1TextField.setToolTipText("The length and width of the foundation");
-							partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the foundation");
-							partProperty3TextField.setToolTipText("The azimuth of the reference edge");
+							if (selectedNode != null) {
+								final double xbox = 2 * nodeBox.getExtent().getX() * scale;
+								final double ybox = 2 * nodeBox.getExtent().getY() * scale;
+								final double zbox = 2 * nodeBox.getExtent().getZ() * scale;
+								final NodeState ns = foundation.getNodeState(selectedNode);
+								final Vector3 position = ns.getPosition();
+								partPanelBorder.setTitle("Node (" + ns.getName() + ")");
+								partProperty1Label.setText("  Dimension:");
+								partProperty2Label.setText("  Position:");
+								partProperty3Label.setText("  File:");
+								partProperty1TextField.setText(twoDecimals.format(xbox) + "\u00d7" + (twoDecimals.format(ybox)) + "\u00d7" + (twoDecimals.format(zbox)) + "m");
+								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m");
+								partProperty3TextField.setText(Util.getFileName(ns.getSourceURL().getPath()));
+								partProperty1TextField.setToolTipText("The dimension of the bounding box of this node");
+								partProperty2TextField.setToolTipText("The (x, y) coordinate of the node center");
+								partProperty3TextField.setToolTipText("Node file: " + ns.getSourceURL().getFile());
+							} else {
+								partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
+								partProperty1Label.setText("  Size:");
+								partProperty2Label.setText("  Position:");
+								partProperty3Label.setText("  Azimuth:");
+								partProperty1TextField.setText(twoDecimals.format(lx * scale) + "\u00d7" + (twoDecimals.format(ly * scale)) + "\u00d7" + (twoDecimals.format(lz * scale)) + "m\u2248" + oneDecimal.format(lx * ly * scale * scale) + landArea + " m\u00B2");
+								partProperty2TextField.setText("(" + twoDecimals.format(cx * scale) + ", " + twoDecimals.format(cy * scale) + ") m");
+								partProperty3TextField.setText(noDecimal.format(az) + "\u00B0");
+								partProperty1TextField.setToolTipText("The length and width of the foundation");
+								partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the foundation");
+								partProperty3TextField.setToolTipText("The azimuth of the reference edge");
+							}
 						}
 					});
 				}
@@ -1270,6 +1311,9 @@ public class EnergyPanel extends JPanel {
 						partProperty2Label.setText("  -");
 						partProperty2TextField.setText("");
 						partProperty2TextField.setToolTipText(null);
+						partProperty3Label.setText("  -");
+						partProperty3TextField.setText("");
+						partProperty3TextField.setToolTipText(null);
 					} else {
 						final int numberOfMirrors = Scene.getInstance().countParts(new Class[] { Mirror.class });
 						if (numberOfMirrors > 0) {
@@ -1280,6 +1324,9 @@ public class EnergyPanel extends JPanel {
 							partProperty2Label.setText("  -");
 							partProperty2TextField.setText("");
 							partProperty2TextField.setToolTipText(null);
+							partProperty3Label.setText("  -");
+							partProperty3TextField.setText("");
+							partProperty3TextField.setToolTipText(null);
 						} else {
 							final int numberOfNodes = Scene.getInstance().countNodes();
 							if (numberOfNodes > 0) {
@@ -1290,6 +1337,9 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  Total Meshes:");
 								partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
 								partProperty2TextField.setToolTipText("Total number of structure meshes");
+								partProperty3Label.setText("  -");
+								partProperty3TextField.setText("");
+								partProperty3TextField.setToolTipText(null);
 							} else {
 								partPanelBorder.setTitle("Part");
 								partProperty1Label.setText("  -");
@@ -1298,12 +1348,12 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  -");
 								partProperty2TextField.setText("");
 								partProperty2TextField.setToolTipText(null);
+								partProperty3Label.setText("  -");
+								partProperty3TextField.setText("");
+								partProperty3TextField.setToolTipText(null);
 							}
 						}
 					}
-					partProperty3Label.setText("  -");
-					partProperty3TextField.setText("");
-					partProperty3TextField.setToolTipText(null);
 				}
 			});
 		}
