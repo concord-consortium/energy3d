@@ -2019,10 +2019,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void deleteCurrentHousePart() {
 		if (selectedPart instanceof Foundation) {
-			if (((Foundation) selectedPart).getLockEdit()) {
+			final Foundation foundation = (Foundation) selectedPart;
+			if (foundation.getLockEdit()) {
 				return;
 			}
-			if (!selectedPart.getChildren().isEmpty()) {
+			if (!foundation.getChildren().isEmpty() && foundation.getSelectedMesh() == null) {
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Deleting the platform also deletes the building on it. Are you sure?", "Confirmation", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 					return;
 				}
@@ -2037,7 +2038,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final Mesh m = f.getSelectedMesh();
 						final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
 						m.getParent().detachChild(m);
-						f.setMeshSelectionVisible(false);
+						f.clearSelectedMesh();
 						f.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else {

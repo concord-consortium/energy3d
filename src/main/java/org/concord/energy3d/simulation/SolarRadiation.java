@@ -220,7 +220,7 @@ public class SolarRadiation {
 								for (final Node node : importedNodes) {
 									for (final Spatial s : node.getChildren()) {
 										final Mesh m = (Mesh) s;
-										computeOnMesh(minute, dayLength, directionTowardSun, part, m, m, ((UserData) m.getUserData()).getNormal());
+										computeOnImportedMesh(minute, dayLength, directionTowardSun, foundation, m);
 									}
 								}
 							}
@@ -360,8 +360,12 @@ public class SolarRadiation {
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
+				final double scaledArea = w * h * scaleFactor;
 				if (dot > 0) {
 					for (final Spatial spatial : collidables) {
+						if (EnergyPanel.getInstance().isCancelled()) {
+							throw new CancellationException();
+						}
 						if (spatial != collisionMesh) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 							if (pickResults.getNumber() != 0) {
@@ -381,9 +385,75 @@ public class SolarRadiation {
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
 				if (data.solarPotential != null) {
-					data.solarPotential[minute / timeStep] += radiation * w * h * scaleFactor;
+					data.solarPotential[minute / timeStep] += radiation * scaledArea;
 				}
-				housePart.getSolarPotential()[minute / timeStep] += radiation * w * h * scaleFactor;
+				housePart.getSolarPotential()[minute / timeStep] += radiation * scaledArea;
+			}
+		}
+
+	}
+
+	// Similar to the above method, but remove some unnecessary calculations for performance improvement
+	private void computeOnImportedMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
+
+		final ReadOnlyVector3 normal = ((UserData) mesh.getUserData()).getNormal();
+		MeshDataStore data = onMesh.get(mesh);
+		if (data == null) {
+			data = initMeshTextureData(mesh, mesh, normal, true);
+		}
+
+		/* needed in order to prevent picking collision with neighboring wall at wall edge */
+		final double OFFSET = 0.1;
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+
+		calculatePeakRadiation(directionTowardSun, dayLength);
+		final double dot = normal.dot(directionTowardSun);
+		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
+		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
+
+		final int timeStep = Scene.getInstance().getTimeStep();
+		final double solarStep = Scene.getInstance().getSolarStep();
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
+		final float absorption = 1 - foundation.getAlbedo();
+
+		for (int col = 0; col < data.cols; col++) {
+			final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
+			final ReadOnlyVector3 pU = data.u.multiply(col * solarStep + 0.5 * w, null).addLocal(data.p0);
+			for (int row = 0; row < data.rows; row++) {
+				if (EnergyPanel.getInstance().isCancelled()) {
+					throw new CancellationException();
+				}
+				if (data.dailySolarIntensity[row][col] == -1) {
+					continue;
+				}
+				final double h = row == data.rows - 1 ? data.p1.distance(data.p0) - row * solarStep : solarStep;
+				final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU).add(offset, null);
+				final Ray3 pickRay = new Ray3(p, directionTowardSun);
+				final PickResults pickResults = new PrimitivePickResults();
+				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
+				final double scaledArea = w * h * scaleFactor;
+				if (dot > 0) {
+					for (final Spatial spatial : collidables) {
+						if (EnergyPanel.getInstance().isCancelled()) {
+							throw new CancellationException();
+						}
+						if (spatial != mesh) {
+							PickingUtil.findPick(spatial, pickRay, pickResults, false);
+							if (pickResults.getNumber() != 0) {
+								break;
+							}
+						}
+					}
+					if (pickResults.getNumber() == 0) {
+						radiation += directRadiation;
+					}
+				}
+				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
+				if (data.solarPotential != null) {
+					data.solarPotential[minute / timeStep] += radiation * scaledArea;
+				}
+				foundation.getSolarPotential()[minute / timeStep] += radiation * scaledArea;
 			}
 		}
 

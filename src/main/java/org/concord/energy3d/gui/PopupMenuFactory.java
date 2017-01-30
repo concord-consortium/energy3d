@@ -87,6 +87,7 @@ import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 
@@ -6639,13 +6640,21 @@ public class PopupMenuFactory {
 							// color
 							label = new JLabel("Default Color: ", JLabel.TRAILING);
 							propertiesPanel.add(label);
-							textField = new JTextField(m.getDefaultColor().asHexRRGGBBAA(), 5);
-							textField.setEditable(false);
-							label.setLabelFor(textField);
-							propertiesPanel.add(textField);
+							final JTextField colorField = new JTextField(Util.toString(m.getDefaultColor()), 5);
+							label.setLabelFor(colorField);
+							propertiesPanel.add(colorField);
 
 							SpringUtilities.makeCompactGrid(propertiesPanel, 3, 2, 6, 6, 6, 6);
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), gui, "Mesh Properties", JOptionPane.INFORMATION_MESSAGE);
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Mesh Properties", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+								final String colorCode = colorField.getText();
+								if (colorCode != null && !colorCode.trim().equals("")) {
+									m.clearRenderState(StateType.Texture);
+									m.setDefaultColor(new ColorRGBA(0, 0, 1, 1));
+									f.draw();
+								} else {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "A mesh must have a default color!", "Color Error", JOptionPane.ERROR_MESSAGE);
+								}
+							}
 						}
 					}
 				}

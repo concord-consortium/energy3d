@@ -1173,7 +1173,7 @@ public class Foundation extends HousePart implements Thermalizable {
 									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
 									if (ts == null || ts.getTexture() == null) {
 										m.clearRenderState(StateType.Texture);
-										m.setDefaultColor(nis.getDefaultColor());
+										// m.setDefaultColor(nis.getDefaultColor());
 									} else {
 										if (ud.getTextureBuffer() == null) {
 											m.clearRenderState(StateType.Texture);
@@ -2707,6 +2707,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public Mesh getSelectedMesh() {
 		return selectedMesh;
+	}
+
+	public void clearSelectedMesh() {
+		selectedMesh = null;
+		setMeshSelectionVisible(false);
 	}
 
 	public void setMeshSelectionVisible(final boolean b) {
