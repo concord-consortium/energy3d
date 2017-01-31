@@ -483,7 +483,7 @@ public class SolarRadiation {
 		final Mesh collisionMesh = (Mesh) mirror.getRadiationCollisionSpatial();
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
-			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -599,7 +599,7 @@ public class SolarRadiation {
 		final Mesh collisionMesh = (Mesh) sensor.getRadiationCollisionSpatial();
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
-			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -676,7 +676,7 @@ public class SolarRadiation {
 		final Mesh collisionMesh = (Mesh) panel.getRadiationCollisionSpatial();
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
-			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -842,7 +842,7 @@ public class SolarRadiation {
 		final Mesh collisionMesh = (Mesh) rack.getRadiationCollisionSpatial();
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
-			data = initMeshTextureDataPlate(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -1082,7 +1082,7 @@ public class SolarRadiation {
 		return data;
 	}
 
-	private MeshDataStore initMeshTextureDataPlate(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final int rows, final int cols) {
+	private MeshDataStore initMeshTextureDataOnRectangle(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final int rows, final int cols) {
 		final MeshDataStore data = new MeshDataStore();
 		data.rows = rows;
 		data.cols = cols;
@@ -1098,18 +1098,20 @@ public class SolarRadiation {
 		final ReadOnlyVector3 v = data.v.multiply(Util.roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
-		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
-		if (textureBuffer != null) {
+		FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
+		if (textureBuffer == null) {
+			textureBuffer = BufferUtils.createVector2Buffer(vertexBuffer.limit() / 3);
+		} else {
 			textureBuffer.rewind();
-			while (vertexBuffer.hasRemaining()) {
-				final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
-				final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
-				final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
-				if (uP != null && vP != null) {
-					final float uScale = (float) (uP.distance(o) / u.length());
-					final float vScale = (float) (vP.distance(o) / v.length());
-					textureBuffer.put(uScale).put(vScale);
-				}
+		}
+		while (vertexBuffer.hasRemaining()) {
+			final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
+			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
+			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
+			if (uP != null && vP != null) {
+				final float uScale = (float) (uP.distance(o) / u.length());
+				final float vScale = (float) (vP.distance(o) / v.length());
+				textureBuffer.put(uScale).put(vScale);
 			}
 		}
 	}

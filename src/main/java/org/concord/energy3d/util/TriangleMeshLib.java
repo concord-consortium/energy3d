@@ -41,9 +41,11 @@ public class TriangleMeshLib {
 			normalBuffer.rewind();
 		}
 		final TextureState textureState = (TextureState) mesh.getLocalRenderState(StateType.Texture);
-		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
+		FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		if (textureBuffer != null) {
 			textureBuffer.rewind();
+		} else {
+			textureBuffer = BufferUtils.createFloatBuffer(vertexBuffer.limit() / 3 * 2);
 		}
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();

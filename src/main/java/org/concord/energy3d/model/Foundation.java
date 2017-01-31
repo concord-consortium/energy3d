@@ -1153,15 +1153,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (n > 0) {
 				Node ni;
 				NodeState nis;
-				final Vector3 c = getAbsCenter();
-				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
 					nis = importedNodeStates.get(i);
 					if (root.getChildren().contains(ni)) {
-						final Vector3 vi = matrix.applyPost(nis.getPosition(), null);
-						ni.setTranslation(c.add(vi, null));
-						ni.setRotation(matrix);
 						if (!SceneManager.getInstance().getSolarHeatMap()) {
 							for (final Spatial s : ni.getChildren()) {
 								if (s instanceof Mesh) {
@@ -1173,7 +1168,7 @@ public class Foundation extends HousePart implements Thermalizable {
 									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
 									if (ts == null || ts.getTexture() == null) {
 										m.clearRenderState(StateType.Texture);
-										// m.setDefaultColor(nis.getDefaultColor());
+										m.setDefaultColor(nis.getDefaultColor());
 									} else {
 										if (ud.getTextureBuffer() == null) {
 											m.clearRenderState(StateType.Texture);
@@ -2569,7 +2564,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final int i = importedNodes.indexOf(n);
 		importedNodes.remove(n);
 		importedNodeStates.remove(i);
-		setMeshSelectionVisible(false);
+		clearSelectedMesh();
 		draw();
 	}
 
@@ -2620,7 +2615,8 @@ public class Foundation extends HousePart implements Thermalizable {
 				switch (md.getIndexMode(0)) {
 				case Triangles:
 					final List<Mesh> children = TriangleMeshLib.getPlanarMeshes(m);
-					// final List<Mesh> children = new ArrayList<Mesh>(); children.add(m);
+					// final List<Mesh> children = new ArrayList<Mesh>();
+					// children.add(m);
 					if (!children.isEmpty()) {
 						for (final Mesh s : children) {
 							final UserData ud = new UserData(this);
