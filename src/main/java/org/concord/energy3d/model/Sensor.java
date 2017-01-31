@@ -27,7 +27,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Sensor extends HousePart {
+public class Sensor extends HousePart implements Solar {
 
 	private static final long serialVersionUID = 1L;
 
@@ -96,8 +96,9 @@ public class Sensor extends HousePart {
 
 	@Override
 	protected void drawMesh() {
-		if (container == null)
+		if (container == null) {
 			return;
+		}
 
 		if (container instanceof Roof) {
 			final PickResults pickResults = new PrimitivePickResults();
@@ -111,8 +112,9 @@ public class Sensor extends HousePart {
 				final int roofPartIndex = userData.getIndex();
 				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
 			}
-		} else
+		} else {
 			normal = container.getNormal();
+		}
 		updateEditShapes();
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -157,10 +159,11 @@ public class Sensor extends HousePart {
 
 		mesh.setTranslation(getAbsPoint(0));
 		if (normal != null) { // FIXME: Sometimes normal is null
-			if (Util.isEqual(normal, Vector3.UNIT_Z))
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 				mesh.setRotation(new Matrix3());
-			else
+			} else {
 				mesh.setRotation(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+			}
 		}
 
 		surround.setTranslation(mesh.getTranslation());
@@ -180,10 +183,12 @@ public class Sensor extends HousePart {
 
 	@Override
 	public boolean isDrawable() {
-		if (container == null)
+		if (container == null) {
 			return true;
-		if (mesh.getWorldBound() == null)
+		}
+		if (mesh.getWorldBound() == null) {
 			return true;
+		}
 		final OrientedBoundingBox bound = (OrientedBoundingBox) mesh.getWorldBound().clone(null);
 		bound.setExtent(bound.getExtent().divide(1.1, null));
 		for (final HousePart child : container.getChildren()) {
@@ -248,7 +253,7 @@ public class Sensor extends HousePart {
 		return false;
 	}
 
-	public void setLightOff(boolean lightOff) {
+	public void setLightOff(final boolean lightOff) {
 		this.lightOff = lightOff;
 	}
 
@@ -256,7 +261,7 @@ public class Sensor extends HousePart {
 		return lightOff;
 	}
 
-	public void setHeatFluxOff(boolean heatFluxOff) {
+	public void setHeatFluxOff(final boolean heatFluxOff) {
 		this.heatFluxOff = heatFluxOff;
 	}
 

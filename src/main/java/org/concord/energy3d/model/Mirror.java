@@ -27,7 +27,7 @@ import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Mirror extends HousePart {
+public class Mirror extends HousePart implements Solar {
 
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;

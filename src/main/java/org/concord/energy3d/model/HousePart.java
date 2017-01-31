@@ -747,13 +747,14 @@ public abstract class HousePart implements Serializable {
 		if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
 			final TextureState ts = new TextureState();
 			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, isFrozen());
-			// texture.setWrap(WrapMode.Clamp);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {
 			if (SceneManager.getInstance().getSolarHeatMap()) {
-				if (isDrawable() && (this instanceof Foundation || this instanceof Wall || this instanceof Roof)) {
-					SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getNormal());
+				if (isDrawable()) {
+					if (this instanceof Foundation || this instanceof Wall || this instanceof Roof) {
+						SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getNormal());
+					}
 				}
 			} else if (isFrozen()) {
 				mesh.clearRenderState(StateType.Texture);

@@ -183,6 +183,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem solarAbsorptionHeatMapMenuItem;
 	private JCheckBoxMenuItem mirrorReflectionHeatMapMenuItem;
 	private JCheckBoxMenuItem showSolarLandMenuItem;
+	private JCheckBoxMenuItem onlySolarComponentsInSolarMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
 	private JCheckBoxMenuItem axesMenuItem;
 	private JCheckBoxMenuItem sunAnglesMenuItem;
@@ -1352,16 +1353,16 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					Util.selectSilently(showSolarLandMenuItem, Scene.getInstance().getSolarMapForLand());
+					Util.selectSilently(onlySolarComponentsInSolarMapMenuItem, Scene.getInstance().getOnlySolarComponentsInSolarMap());
 					Util.selectSilently(solarRadiationHeatMapMenuItem, SceneManager.getInstance().getSolarHeatMap());
 					Util.selectSilently(solarAbsorptionHeatMapMenuItem, Scene.getInstance().getOnlyAbsorptionInSolarMap());
 					Util.selectSilently(mirrorReflectionHeatMapMenuItem, Scene.getInstance().getOnlyReflectedEnergyInMirrorSolarMap());
-					Util.selectSilently(showSolarLandMenuItem, Scene.getInstance().getSolarMapForLand());
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
-					Util.selectSilently(showSolarLandMenuItem, Scene.getInstance().getSolarMapForLand());
 					Util.selectSilently(buildingLabelsMenuItem, SceneManager.getInstance().areBuildingLabelsVisible());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
@@ -1370,6 +1371,7 @@ public class MainFrame extends JFrame {
 			});
 
 			final JMenu solarHeatMapMenu = new JMenu("Solar Irradiance Heat Map Options");
+			solarHeatMapMenu.add(getOnlySolarComponentsInSolarMapMenuItem());
 			solarHeatMapMenu.add(getSolarAbsorptionHeatMapMenuItem());
 			solarHeatMapMenu.add(getMirrorReflectionHeatMapMenuItem());
 			solarHeatMapMenu.add(getShowSolarLandMenuItem());
@@ -2186,6 +2188,22 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return solarRadiationHeatMapMenuItem;
+	}
+
+	private JCheckBoxMenuItem getOnlySolarComponentsInSolarMapMenuItem() {
+		if (onlySolarComponentsInSolarMapMenuItem == null) {
+			onlySolarComponentsInSolarMapMenuItem = new JCheckBoxMenuItem("Show Only On Solar Components");
+			onlySolarComponentsInSolarMapMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final boolean b = onlySolarComponentsInSolarMapMenuItem.isSelected();
+					Scene.getInstance().setOnlySolarComponentsInSolarMap(b);
+					Scene.getInstance().setEdited(true);
+					Scene.getInstance().redrawAll();
+				}
+			});
+		}
+		return onlySolarComponentsInSolarMapMenuItem;
 	}
 
 	private JCheckBoxMenuItem getShowSolarLandMenuItem() {

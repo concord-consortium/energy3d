@@ -1148,35 +1148,31 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
 		}
 		updateTextureAndColor(mesh, getColor() == null ? Scene.getInstance().getFoundationColor() : getColor());
-		if (importedNodes != null) {
+		if (!SceneManager.getInstance().getSolarHeatMap() && importedNodes != null) {
 			final int n = importedNodes.size();
 			if (n > 0) {
 				Node ni;
-				// NodeState nis;
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
-					// nis = importedNodeStates.get(i);
 					if (root.getChildren().contains(ni)) {
-						if (!SceneManager.getInstance().getSolarHeatMap()) {
-							for (final Spatial s : ni.getChildren()) {
-								if (s instanceof Mesh) {
-									if (s instanceof Line) {
-										continue;
-									}
-									final Mesh m = (Mesh) s;
-									final UserData ud = (UserData) m.getUserData();
-									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
-									if (ts == null || ts.getTexture() == null) {
+						for (final Spatial s : ni.getChildren()) {
+							if (s instanceof Mesh) {
+								if (s instanceof Line) {
+									continue;
+								}
+								final Mesh m = (Mesh) s;
+								final UserData ud = (UserData) m.getUserData();
+								final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
+								if (ts == null || ts.getTexture() == null) {
+									m.clearRenderState(StateType.Texture);
+									// m.setDefaultColor(nis.getDefaultColor());
+								} else {
+									if (ud.getTextureBuffer() == null || Util.isZero(ud.getTextureBuffer())) {
 										m.clearRenderState(StateType.Texture);
 										// m.setDefaultColor(nis.getDefaultColor());
 									} else {
-										if (ud.getTextureBuffer() == null || Util.isZero(ud.getTextureBuffer())) {
-											m.clearRenderState(StateType.Texture);
-											// m.setDefaultColor(nis.getDefaultColor());
-										} else {
-											m.getMeshData().setTextureBuffer(ud.getTextureBuffer(), 0);
-											m.setRenderState(ud.getRenderState());
-										}
+										m.getMeshData().setTextureBuffer(ud.getTextureBuffer(), 0);
+										m.setRenderState(ud.getRenderState());
 									}
 								}
 							}

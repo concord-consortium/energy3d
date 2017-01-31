@@ -135,6 +135,7 @@ public class Scene implements Serializable {
 	private boolean alwaysComputeHeatFluxVectors;
 	private boolean fullEnergyInSolarMap = true;
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
+	private boolean onlySolarComponentsInSolarMap;
 	private boolean noSolarMapForLand;
 	private boolean disallowFoundationOverlap;
 	private boolean dashedlineOnRoofs = true;
@@ -2496,6 +2497,18 @@ public class Scene implements Serializable {
 		this.alwaysComputeHeatFluxVectors = alwaysComputeHeatFluxVectors;
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			part.updateHeatFluxVisibility();
+		}
+	}
+
+	public boolean getOnlySolarComponentsInSolarMap() {
+		return onlySolarComponentsInSolarMap;
+	}
+
+	public void setOnlySolarComponentsInSolarMap(final boolean onlySolarComponentsInSolarMap) {
+		this.onlySolarComponentsInSolarMap = onlySolarComponentsInSolarMap;
+		if (onlySolarComponentsInSolarMap) {
+			setSolarMapForLand(false);
+			SceneManager.getInstance().getSolarLand().setVisible(false);
 		}
 	}
 

@@ -17,6 +17,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
+import org.concord.energy3d.model.Solar;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
@@ -216,12 +217,14 @@ public class SolarRadiation {
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
 								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
-							final List<Node> importedNodes = foundation.getImportedNodes();
-							if (importedNodes != null) {
-								for (final Node node : importedNodes) {
-									for (final Spatial s : node.getChildren()) {
-										final Mesh m = (Mesh) s;
-										computeOnImportedMesh(minute, dayLength, directionTowardSun, foundation, m);
+							if (!Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
+								final List<Node> importedNodes = foundation.getImportedNodes();
+								if (importedNodes != null) {
+									for (final Node node : importedNodes) {
+										for (final Spatial s : node.getChildren()) {
+											final Mesh m = (Mesh) s;
+											computeOnImportedMesh(minute, dayLength, directionTowardSun, foundation, m);
+										}
 									}
 								}
 							}
@@ -316,6 +319,10 @@ public class SolarRadiation {
 
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+
+		if (Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
+			return;
+		}
 
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
@@ -1384,27 +1391,33 @@ public class SolarRadiation {
 		final int totalMeshes = Scene.getInstance().getParts().size() + Scene.getInstance().countMeshes();
 		int countMesh = 0;
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Wall || part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror || part instanceof Sensor) {
+			if (part instanceof Solar) {
 				applyTexture(part.getRadiationMesh());
-			} else if (part instanceof Foundation) {
-				final Foundation foundation = (Foundation) part;
-				for (int i = 0; i < 5; i++) {
-					applyTexture(foundation.getRadiationMesh(i));
-				}
-				final List<Node> importedNodes = foundation.getImportedNodes();
-				if (importedNodes != null) {
-					for (final Node node : importedNodes) {
-						for (final Spatial s : node.getChildren()) {
-							applyTexture((Mesh) s);
-							EnergyPanel.getInstance().progress((int) Math.round(100.0 * (countMesh++) / totalMeshes));
+			} else {
+				if (!Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
+					if (part instanceof Wall) {
+						applyTexture(part.getRadiationMesh());
+					} else if (part instanceof Foundation) {
+						final Foundation foundation = (Foundation) part;
+						for (int i = 0; i < 5; i++) {
+							applyTexture(foundation.getRadiationMesh(i));
 						}
-					}
-				}
-			} else if (part instanceof Roof) {
-				for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
-					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
-						final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
-						applyTexture(mesh);
+						final List<Node> importedNodes = foundation.getImportedNodes();
+						if (importedNodes != null) {
+							for (final Node node : importedNodes) {
+								for (final Spatial s : node.getChildren()) {
+									applyTexture((Mesh) s);
+									EnergyPanel.getInstance().progress((int) Math.round(100.0 * (countMesh++) / totalMeshes));
+								}
+							}
+						}
+					} else if (part instanceof Roof) {
+						for (final Spatial roofPart : ((Roof) part).getRoofPartsRoot().getChildren()) {
+							if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+								final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
+								applyTexture(mesh);
+							}
+						}
 					}
 				}
 			}
