@@ -1295,6 +1295,7 @@ public class MainFrame extends JFrame {
 			addModel(buildingBasicsMenu, "Two Houses with Different Orientations", "tutorials/building-orientation.ng3");
 			addModel(buildingBasicsMenu, "Two Houses with Different Thermostat Settings", "tutorials/building-thermostat.ng3");
 			buildingBasicsMenu.addSeparator();
+			addModel(buildingBasicsMenu, "Effect of Albedo", "tutorials/building-albedo.ng3");
 			addModel(buildingBasicsMenu, "Passive Heating with Windows", "tutorials/building-passive-heating.ng3");
 			addModel(buildingBasicsMenu, "Passive Cooling with Trees", "tutorials/building-tree-passive-cooling.ng3");
 
@@ -2198,6 +2199,7 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(final ItemEvent e) {
 					final boolean b = onlySolarComponentsInSolarMapMenuItem.isSelected();
 					Scene.getInstance().setOnlySolarComponentsInSolarMap(b);
+					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 				}

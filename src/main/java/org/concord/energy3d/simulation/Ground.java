@@ -61,7 +61,11 @@ public class Ground implements Serializable {
 			Arrays.fill(snowReflectionFactors, 0);
 			return albedo;
 		}
-		return Math.max(1, albedo * (1 + snowReflectionFactors[month]));
+		double a = albedo * (1 + snowReflectionFactors[month]);
+		if (a > 1) {
+			a = 1;
+		}
+		return a;
 	}
 
 	public void setThermalDiffusivity(final double thermalDiffusivity) {
