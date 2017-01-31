@@ -218,11 +218,7 @@ public class MeshLib {
 			CollisionTreeManager.getInstance().removeCollisionTree(mesh);
 			CollisionTreeManager.getInstance().removeCollisionTree(meshWithHoles);
 
-			final Vector3 normal = new Vector3();
-			for (final ReadOnlyVector3 v : group.normals) {
-				normal.addLocal(v);
-			}
-			normal.normalizeLocal();
+			final Vector3 normal = group.key;
 			node.setUserData(normal);
 
 			final FloatBuffer buf = BufferUtils.createVector3Buffer(group.vertices.size());

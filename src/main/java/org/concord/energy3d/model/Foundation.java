@@ -1152,10 +1152,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			final int n = importedNodes.size();
 			if (n > 0) {
 				Node ni;
-				NodeState nis;
+				// NodeState nis;
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
-					nis = importedNodeStates.get(i);
+					// nis = importedNodeStates.get(i);
 					if (root.getChildren().contains(ni)) {
 						if (!SceneManager.getInstance().getSolarHeatMap()) {
 							for (final Spatial s : ni.getChildren()) {
@@ -1168,11 +1168,11 @@ public class Foundation extends HousePart implements Thermalizable {
 									final TextureState ts = (TextureState) m.getLocalRenderState(StateType.Texture);
 									if (ts == null || ts.getTexture() == null) {
 										m.clearRenderState(StateType.Texture);
-										m.setDefaultColor(nis.getDefaultColor());
+										// m.setDefaultColor(nis.getDefaultColor());
 									} else {
 										if (ud.getTextureBuffer() == null || Util.isZero(ud.getTextureBuffer())) {
 											m.clearRenderState(StateType.Texture);
-											m.setDefaultColor(nis.getDefaultColor());
+											// m.setDefaultColor(nis.getDefaultColor());
 										} else {
 											m.getMeshData().setTextureBuffer(ud.getTextureBuffer(), 0);
 											m.setRenderState(ud.getRenderState());
@@ -2748,6 +2748,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (n > 0) {
 				Node ni;
 				final Vector3 c = getAbsCenter();
+				c.setZ(height); // the absolute center is lifted to the center of the bounding box that includes walls when there are
 				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);

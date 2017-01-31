@@ -127,6 +127,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForMesh;
 
 	// cached values
+	private static JColorChooser colorChooser = new JColorChooser();
 	private static double solarPanelArrayRowSpacing = 1;
 	private static double solarPanelArrayColSpacing = 0.5;
 	private static int solarPanelArrayRowAxis = 0;
@@ -6566,7 +6567,7 @@ public class PopupMenuFactory {
 								public Object call() throws Exception {
 									final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
 									m.getParent().detachChild(m);
-									f.setMeshSelectionVisible(false);
+									f.clearSelectedMesh();
 									f.draw();
 									updateAfterEdit();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -6640,20 +6641,17 @@ public class PopupMenuFactory {
 							// color
 							label = new JLabel("Default Color: ", JLabel.TRAILING);
 							propertiesPanel.add(label);
-							final JTextField colorField = new JTextField(Util.toString(m.getDefaultColor()), 5);
-							label.setLabelFor(colorField);
-							propertiesPanel.add(colorField);
+							final ReadOnlyColorRGBA rgb = m.getDefaultColor();
+							colorChooser.setColor(new Color(Math.round(rgb.getRed() * 255), Math.round(rgb.getGreen() * 255), Math.round(rgb.getBlue() * 255)));
+							label.setLabelFor(colorChooser);
+							propertiesPanel.add(colorChooser);
 
 							SpringUtilities.makeCompactGrid(propertiesPanel, 3, 2, 6, 6, 6, 6);
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Mesh Properties", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-								final String colorCode = colorField.getText();
-								if (colorCode != null && !colorCode.trim().equals("")) {
-									m.clearRenderState(StateType.Texture);
-									m.setDefaultColor(new ColorRGBA(0, 0, 1, 1));
-									f.draw();
-								} else {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "A mesh must have a default color!", "Color Error", JOptionPane.ERROR_MESSAGE);
-								}
+								final Color color = colorChooser.getColor();
+								m.clearRenderState(StateType.Texture);
+								m.setDefaultColor(new ColorRGBA(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1));
+								f.draw();
 							}
 						}
 					}

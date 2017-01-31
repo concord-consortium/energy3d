@@ -78,11 +78,9 @@ public class TriangleMeshLib {
 			group.normals.add(firstNormal);
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-			if (textureBuffer != null) {
-				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
-				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
-				group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
-			}
+			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
+			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
+			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 		}
 		MeshLib.combineGroups(groups);
 		return groups;
@@ -93,15 +91,9 @@ public class TriangleMeshLib {
 		int meshIndex = 0;
 		for (final GroupData group : groups) {
 			final Mesh mesh = new Mesh("Mesh #" + meshIndex++);
+			mesh.setUserData(group.key);
 			mesh.setModelBound(new BoundingBox());
 			results.add(mesh);
-
-			final Vector3 normal = new Vector3();
-			for (final ReadOnlyVector3 v : group.normals) {
-				normal.addLocal(v);
-			}
-			normal.normalizeLocal();
-			mesh.setUserData(normal);
 
 			final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(group.vertices.size());
 			mesh.getMeshData().setVertexBuffer(vertexBuffer);
