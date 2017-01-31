@@ -1170,7 +1170,7 @@ public class Foundation extends HousePart implements Thermalizable {
 										m.clearRenderState(StateType.Texture);
 										m.setDefaultColor(nis.getDefaultColor());
 									} else {
-										if (ud.getTextureBuffer() == null) {
+										if (ud.getTextureBuffer() == null || Util.isZero(ud.getTextureBuffer())) {
 											m.clearRenderState(StateType.Texture);
 											m.setDefaultColor(nis.getDefaultColor());
 										} else {

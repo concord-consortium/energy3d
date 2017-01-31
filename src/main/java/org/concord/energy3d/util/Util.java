@@ -352,6 +352,18 @@ public class Util {
 		Util.disablePickShadowLight(label);
 	}
 
+	/** @return true if all the elements are zero */
+	public static boolean isZero(final FloatBuffer buf) {
+		final boolean b = true;
+		buf.rewind();
+		while (buf.hasRemaining()) {
+			if (!Util.isZero(buf.get())) {
+				return false;
+			}
+		}
+		return b;
+	}
+
 	public static double round(final double x) {
 		return Math.round(x * 100.0) / 100.0;
 	}

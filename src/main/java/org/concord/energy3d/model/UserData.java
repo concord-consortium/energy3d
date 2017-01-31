@@ -73,11 +73,12 @@ public class UserData {
 		if (textureBuffer == null) {
 			return null;
 		}
-		return BufferUtils.clone(textureBuffer);
+		return BufferUtils.clone(textureBuffer); // must clone as the texture buffer will be modified later
 	}
 
 	public void setTextureBuffer(final FloatBuffer textureBuffer) {
-		this.textureBuffer = textureBuffer;
+		textureBuffer.rewind();
+		this.textureBuffer = BufferUtils.clone(textureBuffer); // must clone as the texture buffer will be modified later
 	}
 
 }

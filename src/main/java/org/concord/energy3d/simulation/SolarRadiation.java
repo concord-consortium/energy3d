@@ -196,6 +196,7 @@ public class SolarRadiation {
 		totalSteps -= 2;
 		final double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
+		// for (int minute = MINUTES_OF_DAY / 2; minute < MINUTES_OF_DAY / 2 + timeStep; minute += timeStep) { // test for 12 pm for comparison with shadow
 		for (int minute = 0; minute < MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
 			if (sunLocation.getZ() > 0) {
@@ -1098,20 +1099,18 @@ public class SolarRadiation {
 		final ReadOnlyVector3 v = data.v.multiply(Util.roundToPowerOfTwo(data.rows) * Scene.getInstance().getSolarStep(), null);
 		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
-		FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
-		if (textureBuffer == null) {
-			textureBuffer = BufferUtils.createVector2Buffer(vertexBuffer.limit() / 3);
-		} else {
+		final FloatBuffer textureBuffer = drawMesh.getMeshData().getTextureBuffer(0);
+		if (textureBuffer != null) {
 			textureBuffer.rewind();
-		}
-		while (vertexBuffer.hasRemaining()) {
-			final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
-			final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
-			final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
-			if (uP != null && vP != null) {
-				final float uScale = (float) (uP.distance(o) / u.length());
-				final float vScale = (float) (vP.distance(o) / v.length());
-				textureBuffer.put(uScale).put(vScale);
+			while (vertexBuffer.hasRemaining()) {
+				final ReadOnlyVector3 p = drawMesh.localToWorld(new Vector3(vertexBuffer.get(), vertexBuffer.get(), vertexBuffer.get()), null);
+				final Vector3 uP = Util.closestPoint(o, u, p, v.negate(null));
+				final Vector3 vP = Util.closestPoint(o, v, p, u.negate(null));
+				if (uP != null && vP != null) {
+					final float uScale = (float) (uP.distance(o) / u.length());
+					final float vScale = (float) (vP.distance(o) / v.length());
+					textureBuffer.put(uScale).put(vScale);
+				}
 			}
 		}
 	}
