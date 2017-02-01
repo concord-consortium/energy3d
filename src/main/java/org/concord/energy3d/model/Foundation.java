@@ -2770,7 +2770,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		Util.drawBoundingBox(m.getParent(), selectedNodeBoundingBox);
 	}
 
-	private void drawImports() {
+	public void drawImports() {
 		if (importedNodes != null) {
 			final int n = importedNodes.size();
 			if (n > 0) {

@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -49,6 +50,7 @@ import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
+import org.concord.energy3d.undo.AddNodeCommand;
 import org.concord.energy3d.undo.LockAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
@@ -466,7 +468,7 @@ public class Scene implements Serializable {
 		Scene.getInstance().updateEditShapes();
 	}
 
-	public static void importFile(final URL url) throws Exception {
+	public void importFile(final URL url) throws Exception {
 		if (PrintController.getInstance().isPrintPreview()) {
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
 			while (!PrintController.getInstance().isFinished()) {
@@ -532,13 +534,37 @@ public class Scene implements Serializable {
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
 			});
-
+			setEdited(true);
 		} else {
-
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "URL doesn't exist.", "Error", JOptionPane.ERROR_MESSAGE);
-
 		}
 
+	}
+
+	public void importCollada(final File file) throws Exception {
+		boolean success = true;
+		Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
+		if (position == null) {
+			position = new Vector3();
+		}
+		final Foundation foundation = new Foundation(10, 10);
+		for (final Vector3 p : foundation.getPoints()) {
+			p.addLocal(position);
+		}
+		Scene.getInstance().add(foundation, false);
+		try {
+			final Node n = foundation.importCollada(file.toURI().toURL(), position);
+			if (n != null) {
+				// automatically center the model at the center
+			}
+		} catch (final Throwable t) {
+			Util.reportError(t);
+			success = false;
+		}
+		if (success) {
+			SceneManager.getInstance().getUndoManager().addEdit(new AddNodeCommand(foundation));
+		}
+		setEdited(true);
 	}
 
 	/** This can be used by the user to fix problems that are caused by bugs based on our observations. This is different than cleanup() as the latter cannot be used to remove undrawables. */

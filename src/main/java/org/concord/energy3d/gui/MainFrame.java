@@ -101,7 +101,6 @@ import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
-import org.concord.energy3d.undo.AddNodeCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
@@ -208,7 +207,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem scaleToFitRadioButtonMenuItem;
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
 	private final ButtonGroup printSizeOptionBbuttonGroup = new ButtonGroup();
-	private JMenuItem importEnergy3DMenuItem, importColladaMenuItem;
+	private JMenuItem importMenuItem, importColladaMenuItem;
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem gridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
@@ -567,9 +566,8 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getSaveasMenuItem());
 			addItemToFileMenu(getRecoveryMenuItem());
 			addItemToFileMenu(new JSeparator());
-			addItemToFileMenu(getImportEnergy3DMenuItem());
+			addItemToFileMenu(getImportMenuItem());
 			addItemToFileMenu(getImportColladaMenuItem());
-			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getCopyImageMenuItem());
 			addItemToFileMenu(getExportImageMenuItem());
 			addItemToFileMenu(getExportLogMenuItem());
@@ -2613,7 +2611,7 @@ public class MainFrame extends JFrame {
 		FileChooser.getInstance().rememberFile(file.getAbsolutePath());
 	}
 
-	void importEnergy3DFile() {
+	void importFile() {
 		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, false);
 		if (file != null) {
 			EnergyPanel.getInstance().clearRadiationHeatMap();
@@ -2621,49 +2619,31 @@ public class MainFrame extends JFrame {
 				@Override
 				public Object call() throws Exception {
 					try {
-						Scene.importFile(file.toURI().toURL());
+						Scene.getInstance().importFile(file.toURI().toURL());
 					} catch (final Throwable err) {
 						Util.reportError(err);
 					}
 					return null;
 				}
 			});
-			Scene.getInstance().setEdited(true);
 		}
 	}
 
 	void importColladaFile() {
-		final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
+		final File file = FileChooser.getInstance().showDialog(".dae", daeFilter, false);
 		if (file != null) {
 			EnergyPanel.getInstance().clearRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					boolean success = true;
-					Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
-					if (position == null) {
-						position = new Vector3();
-					}
-					final Foundation foundation = new Foundation(80, 60);
-					final ArrayList<Vector3> movePoints = new ArrayList<Vector3>();
-					for (final Vector3 p : foundation.getPoints()) {
-						movePoints.add(p.clone());
-					}
-					foundation.move(position, movePoints);
-					Scene.getInstance().add(foundation, false);
 					try {
-						foundation.importCollada(file.toURI().toURL(), position);
-					} catch (final Throwable t) {
-						Util.reportError(t);
-						success = false;
-					}
-					if (success) {
-						SceneManager.getInstance().getUndoManager().addEdit(new AddNodeCommand(foundation));
+						Scene.getInstance().importCollada(file);
+					} catch (final Throwable err) {
+						Util.reportError(err);
 					}
 					return null;
 				}
 			});
-			Scene.getInstance().setEdited(true);
 		}
 	}
 
@@ -2709,18 +2689,18 @@ public class MainFrame extends JFrame {
 		return exactSizeRadioButtonMenuItem;
 	}
 
-	private JMenuItem getImportEnergy3DMenuItem() {
-		if (importEnergy3DMenuItem == null) {
-			importEnergy3DMenuItem = new JMenuItem("Import Energy3D...");
-			importEnergy3DMenuItem.setToolTipText("Import the content in an existing Energy3D file into the clicked location on the land as the center");
-			importEnergy3DMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getImportMenuItem() {
+		if (importMenuItem == null) {
+			importMenuItem = new JMenuItem("Import...");
+			importMenuItem.setToolTipText("Import the content in an existing Energy3D file into the clicked location on the land as the center");
+			importMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					importEnergy3DFile();
+					importFile();
 				}
 			});
 		}
-		return importEnergy3DMenuItem;
+		return importMenuItem;
 	}
 
 	private JMenuItem getImportColladaMenuItem() {

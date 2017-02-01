@@ -215,7 +215,7 @@ public class PopupMenuFactory {
 					@Override
 					public Object call() throws Exception {
 						try {
-							Scene.importFile(MainApplication.class.getResource(url));
+							Scene.getInstance().importFile(MainApplication.class.getResource(url));
 						} catch (final Throwable err) {
 							Util.reportError(err);
 						}
@@ -315,12 +315,12 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miImportEnergy3D = new JMenuItem("Import Energy3D...");
+			final JMenuItem miImportEnergy3D = new JMenuItem("Import...");
 			miImportEnergy3D.setToolTipText("Import the content in an existing Energy3D file into the clicked location on the land as the center");
 			miImportEnergy3D.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MainFrame.getInstance().importEnergy3DFile();
+					MainFrame.getInstance().importFile();
 				}
 			});
 
@@ -6418,8 +6418,8 @@ public class PopupMenuFactory {
 			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
-			final JMenuItem miBottomOnGround = new JMenuItem("Align Node Bottom with Ground Level");
-			miBottomOnGround.addActionListener(new ActionListener() {
+			final JMenuItem miAlignBottom = new JMenuItem("Align Node Bottom with Ground Level");
+			miAlignBottom.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6445,8 +6445,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miCenterToOrigin = new JMenuItem("Move Node Center to Origin");
-			miCenterToOrigin.addActionListener(new ActionListener() {
+			final JMenuItem miAlignCenter = new JMenuItem("Align Node Center with Foundation Center");
+			miAlignCenter.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6460,8 +6460,8 @@ public class PopupMenuFactory {
 									final Node n = m.getParent();
 									if (n != null) {
 										final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
-										final ReadOnlyVector3 center = boundingBox.getCenter();
-										f.translateImportedNode(n, -center.getX(), -center.getY(), 0);
+										final ReadOnlyVector3 shift = f.getAbsCenter().subtract(boundingBox.getCenter(), null);
+										f.translateImportedNode(n, shift.getX(), shift.getY(), 0);
 										f.setMeshSelectionVisible(false);
 										f.draw();
 									}
@@ -6541,8 +6541,9 @@ public class PopupMenuFactory {
 							final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(m.getParent());
 							final ReadOnlyVector3 center = boundingBox.getCenter();
 							final double zBottom = center.getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();
-							miBottomOnGround.setEnabled(!Util.isZero(zBottom - f.getHeight()));
-							miCenterToOrigin.setEnabled(!Util.isEqual(new Vector2(), new Vector2(center.getX(), center.getY())));
+							miAlignBottom.setEnabled(!Util.isZero(zBottom - f.getHeight()));
+							final Vector3 foundationCenter = f.getAbsCenter();
+							miAlignCenter.setEnabled(!Util.isEqual(new Vector2(foundationCenter.getX(), foundationCenter.getY()), new Vector2(center.getX(), center.getY())));
 							final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 							miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Rack);
 						}
@@ -6551,14 +6552,14 @@ public class PopupMenuFactory {
 
 				@Override
 				public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-					miBottomOnGround.setEnabled(true);
-					miCenterToOrigin.setEnabled(true);
+					miAlignBottom.setEnabled(true);
+					miAlignCenter.setEnabled(true);
 				}
 
 				@Override
 				public void popupMenuCanceled(final PopupMenuEvent e) {
-					miBottomOnGround.setEnabled(true);
-					miCenterToOrigin.setEnabled(true);
+					miAlignBottom.setEnabled(true);
+					miAlignCenter.setEnabled(true);
 				}
 
 			});
@@ -6733,8 +6734,8 @@ public class PopupMenuFactory {
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miBottomOnGround);
-			popupMenuForMesh.add(miCenterToOrigin);
+			popupMenuForMesh.add(miAlignBottom);
+			popupMenuForMesh.add(miAlignCenter);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miMeshProperties);
 			popupMenuForMesh.add(miNodeProperties);
