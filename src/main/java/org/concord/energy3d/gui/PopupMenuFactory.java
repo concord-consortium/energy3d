@@ -55,6 +55,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.MirrorCircularFieldLayout;
 import org.concord.energy3d.model.MirrorRectangularFieldLayout;
 import org.concord.energy3d.model.MirrorSpiralFieldLayout;
+import org.concord.energy3d.model.NodeState;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -6669,6 +6670,7 @@ public class PopupMenuFactory {
 						if (m != null) {
 							final Node n = m.getParent();
 							if (n != null) {
+								final NodeState ns = f.getNodeState(n);
 								final JPanel gui = new JPanel(new BorderLayout());
 								final String title = "<html>A node contains a set of meshes that represent<br>the geometry of the structure.</html>";
 								gui.add(new JLabel(title), BorderLayout.NORTH);
@@ -6679,9 +6681,16 @@ public class PopupMenuFactory {
 								// name
 								JLabel label = new JLabel("Name: ", JLabel.TRAILING);
 								propertiesPanel.add(label);
-								final JTextField nameField = new JTextField(f.getNodeState(n).getName(), 5);
+								final JTextField nameField = new JTextField(ns.getName(), 5);
 								label.setLabelFor(nameField);
 								propertiesPanel.add(nameField);
+
+								// name
+								label = new JLabel("File: ", JLabel.TRAILING);
+								propertiesPanel.add(label);
+								final JTextField fileField = new JTextField(Util.getFileName(ns.getSourceURL().getPath()), 5);
+								label.setLabelFor(fileField);
+								propertiesPanel.add(fileField);
 
 								// children count
 								label = new JLabel("Children: ", JLabel.TRAILING);
@@ -6691,7 +6700,7 @@ public class PopupMenuFactory {
 								label.setLabelFor(textField);
 								propertiesPanel.add(textField);
 
-								SpringUtilities.makeCompactGrid(propertiesPanel, 2, 2, 6, 6, 6, 6);
+								SpringUtilities.makeCompactGrid(propertiesPanel, 3, 2, 6, 6, 6, 6);
 
 								if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Node Properties", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 									final String nodeName = nameField.getText();

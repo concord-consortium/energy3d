@@ -563,6 +563,7 @@ public class EnergyPanel extends JPanel {
 		for (int i = 0; i < instructionSheets.length; i++) {
 			instructionSheets[i] = new MyEditorPane(i);
 			instructionSheets[i].setContentType("text/plain");
+			((DefaultCaret) instructionSheets[i].getEditorPane().getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 			final JScrollPane scroller = new JScrollPane(instructionSheets[i].getEditorPane());
 			scroller.setPreferredSize(new Dimension(200, 300)); // somehow setting a preferred size of the scroller triggers the line wrapping of JEditorPane
 			instructionTabbedPane.add(scroller, "Sheet " + (i + 1));
@@ -812,7 +813,6 @@ public class EnergyPanel extends JPanel {
 	public void selectInstructionSheet(final int i) {
 		if (i >= 0 && i < instructionSheets.length) {
 			instructionTabbedPane.setSelectedIndex(i);
-			((DefaultCaret) instructionSheets[i].getEditorPane().getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 		}
 	}
 
@@ -1100,41 +1100,48 @@ public class EnergyPanel extends JPanel {
 					}
 					final Mesh selectedMesh;
 					final Node selectedNode;
-					final OrientedBoundingBox nodeBox;
+					final OrientedBoundingBox nodeBox, meshBox;
 					final List<Node> nodes = foundation.getImportedNodes();
 					if (nodes != null) {
 						selectedMesh = foundation.getSelectedMesh();
 						if (selectedMesh != null) {
 							selectedNode = selectedMesh.getParent();
 							nodeBox = Util.getOrientedBoundingBox(selectedNode);
+							meshBox = Util.getOrientedBoundingBox(selectedMesh);
 						} else {
 							selectedNode = null;
 							nodeBox = null;
+							meshBox = null;
 						}
 					} else {
 						selectedMesh = null;
 						selectedNode = null;
 						nodeBox = null;
+						meshBox = null;
 					}
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
 							if (selectedNode != null) {
-								final double xbox = 2 * nodeBox.getExtent().getX() * scale;
-								final double ybox = 2 * nodeBox.getExtent().getY() * scale;
-								final double zbox = 2 * nodeBox.getExtent().getZ() * scale;
+								final double xNodeBox = 2 * nodeBox.getExtent().getX() * scale;
+								final double yNodeBox = 2 * nodeBox.getExtent().getY() * scale;
+								final double zNodeBox = 2 * nodeBox.getExtent().getZ() * scale;
+								final double xMeshBox = 2 * meshBox.getExtent().getX() * scale;
+								final double yMeshBox = 2 * meshBox.getExtent().getY() * scale;
+								final double zMeshBox = 2 * meshBox.getExtent().getZ() * scale;
+								final ReadOnlyVector3 meshBoxCenter = meshBox.getCenter();
 								final NodeState ns = foundation.getNodeState(selectedNode);
 								final Vector3 position = ns.getPosition();
-								partPanelBorder.setTitle("Node (" + ns.getName() + ")");
+								partPanelBorder.setTitle("Node (" + Util.getFileName(ns.getSourceURL().getPath()) + ")");
 								partProperty1Label.setText("  Dimension:");
 								partProperty2Label.setText("  Position:");
-								partProperty3Label.setText("  File:");
-								partProperty1TextField.setText(twoDecimals.format(xbox) + "\u00d7" + (twoDecimals.format(ybox)) + "\u00d7" + (twoDecimals.format(zbox)) + "m");
+								partProperty3Label.setText("  Mesh:");
+								partProperty1TextField.setText(twoDecimals.format(xNodeBox) + "\u00d7" + (twoDecimals.format(yNodeBox)) + "\u00d7" + (twoDecimals.format(zNodeBox)) + " m");
 								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m");
-								partProperty3TextField.setText(Util.getFileName(ns.getSourceURL().getPath()));
-								partProperty1TextField.setToolTipText("The dimension of the bounding box of this node");
+								partProperty3TextField.setText(twoDecimals.format(xMeshBox) + "\u00d7" + (twoDecimals.format(yMeshBox)) + "\u00d7" + (twoDecimals.format(zMeshBox)) + " m, " + "(" + twoDecimals.format(meshBoxCenter.getX() * scale) + ", " + twoDecimals.format(meshBoxCenter.getY() * scale) + ", " + twoDecimals.format(meshBoxCenter.getZ() * scale) + ") m");
+								partProperty1TextField.setToolTipText("The bounding size of this node (" + ns.getSourceURL().getFile() + ")");
 								partProperty2TextField.setToolTipText("The (x, y) coordinate of the node center");
-								partProperty3TextField.setToolTipText("Node file: " + ns.getSourceURL().getFile());
+								partProperty3TextField.setToolTipText("Info about the selected mesh");
 							} else {
 								partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 								partProperty1Label.setText("  Size:");

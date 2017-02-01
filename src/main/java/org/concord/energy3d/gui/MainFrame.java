@@ -1285,6 +1285,10 @@ public class MainFrame extends JFrame {
 				}
 			});
 
+			final JMenu uiBasicsMenu = new JMenu("User Interface Basics");
+			uiBasicsMenu.setEnabled(false);
+			tutorialsMenu.add(uiBasicsMenu);
+
 			final JMenu buildingBasicsMenu = new JMenu("Building Science Basics");
 			tutorialsMenu.add(buildingBasicsMenu);
 			addModel(buildingBasicsMenu, "Two Houses of Different Sizes", "tutorials/building-size.ng3");
@@ -1295,7 +1299,8 @@ public class MainFrame extends JFrame {
 			addModel(buildingBasicsMenu, "Two Houses with Different Orientations", "tutorials/building-orientation.ng3");
 			addModel(buildingBasicsMenu, "Two Houses with Different Thermostat Settings", "tutorials/building-thermostat.ng3");
 			buildingBasicsMenu.addSeparator();
-			addModel(buildingBasicsMenu, "Effect of Albedo", "tutorials/building-albedo.ng3");
+			addModel(buildingBasicsMenu, "Energy Use at Different Locations", "tutorials/building-location.ng3");
+			addModel(buildingBasicsMenu, "Effect of Environment Albedo", "tutorials/building-albedo.ng3");
 			addModel(buildingBasicsMenu, "Passive Heating with Windows", "tutorials/building-passive-heating.ng3");
 			addModel(buildingBasicsMenu, "Passive Cooling with Trees", "tutorials/building-tree-passive-cooling.ng3");
 

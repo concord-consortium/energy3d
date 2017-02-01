@@ -27,7 +27,7 @@ public class NodeState implements Serializable {
 
 	public NodeState makeCopy() {
 		final NodeState copy = new NodeState();
-		copy.position = position.clone();
+		copy.position = position != null ? position.clone() : null;
 		copy.defaultColor = defaultColor.clone();
 		copy.sourceURL = sourceURL;
 		copy.name = name;
