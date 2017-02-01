@@ -2610,7 +2610,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (sourceFile.exists()) {
 			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
-			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(file));
+			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(sourceFile.toURI().toURL()));
 			// final AssetData asset = storage.getAssetData();
 			// System.out.println("***" + asset.getUnitName() + "," + asset.getUnitMeter());
 			final Node originalNode = storage.getScene();
