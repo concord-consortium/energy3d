@@ -86,8 +86,8 @@ public class SolarRadiation {
 		public Vector3 v;
 		public int rows;
 		public int cols;
-		public double[][] dailySolarIntensity;
-		public double[] solarPotential;
+		public double[][] dailySolarIntensity; // store the solar energy intensity distribution on this mesh
+		public double[] solarPotential; // store the total solar energy that falls onto this mesh -- this applies to only roof meshes and imported meshes (other parts that have a single mesh uses its own array)
 		public double[] heatLoss;
 	}
 
@@ -424,6 +424,9 @@ public class SolarRadiation {
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		final float absorption = 1 - foundation.getAlbedo();
+		if (data.solarPotential == null) {
+			data.solarPotential = new double[MINUTES_OF_DAY / timeStep];
+		}
 
 		for (int col = 0; col < data.cols; col++) {
 			final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
@@ -461,7 +464,7 @@ public class SolarRadiation {
 				if (data.solarPotential != null) {
 					data.solarPotential[minute / timeStep] += radiation * scaledArea;
 				}
-				foundation.getSolarPotential()[minute / timeStep] += radiation * scaledArea;
+				foundation.getSolarPotential()[minute / timeStep] += radiation * scaledArea; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
 			}
 		}
 

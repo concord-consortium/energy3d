@@ -1135,7 +1135,7 @@ public class EnergyPanel extends JPanel {
 								partPanelBorder.setTitle("Node (" + Util.getFileName(ns.getSourceURL().getPath()) + ")");
 								partProperty1Label.setText("  Dimension:");
 								partProperty2Label.setText("  Position:");
-								partProperty3Label.setText("  Mesh:");
+								partProperty3Label.setText("  Mesh (" + selectedMesh.getMeshData().getVertexCount() + "):");
 								partProperty1TextField.setText(twoDecimals.format(xNodeBox) + "\u00d7" + (twoDecimals.format(yNodeBox)) + "\u00d7" + (twoDecimals.format(zNodeBox)) + " m");
 								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m");
 								partProperty3TextField.setText(twoDecimals.format(xMeshBox) + "\u00d7" + (twoDecimals.format(yMeshBox)) + "\u00d7" + (twoDecimals.format(zMeshBox)) + " m, " + "(" + twoDecimals.format(meshBoxCenter.getX() * scale) + ", " + twoDecimals.format(meshBoxCenter.getY() * scale) + ", " + twoDecimals.format(meshBoxCenter.getZ() * scale) + ") m");

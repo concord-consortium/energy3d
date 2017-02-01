@@ -81,7 +81,7 @@ public class Util {
 		if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
 			return true;
 		}
-		if (System.getProperty("os.name").startsWith("Mac") && e.isControlDown()) {
+		if (Config.isMac() && e.isControlDown()) {
 			return true;
 		}
 		return false;

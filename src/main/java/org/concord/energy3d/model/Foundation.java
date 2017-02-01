@@ -81,7 +81,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
 	private transient Mesh sideMesh[];
-	private transient BMText buildingLabel;
+	private transient BMText floatingLabel;
 	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
 	private transient Line azimuthArrow;
 	private transient double newBoundingHeight;
@@ -211,11 +211,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		setLabelOffset(-0.11);
 
-		buildingLabel = new BMText("Solar value Text", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
-		Util.initHousePartLabel(buildingLabel);
-		buildingLabel.setFontScale(0.75);
-		buildingLabel.setVisible(false);
-		root.attachChild(buildingLabel);
+		floatingLabel = new BMText("Floating Label", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(floatingLabel);
+		floatingLabel.setFontScale(0.75);
+		floatingLabel.setVisible(false);
+		root.attachChild(floatingLabel);
 
 		azimuthArrow = new Line("Azimuth Arrow");
 		azimuthArrow.setLineWidth(2);
@@ -1040,7 +1040,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void updateSolarLabelPosition() {
 		final ReadOnlyVector3 center = getCenter();
-		buildingLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6.0);
+		floatingLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6.0);
 	}
 
 	private double scanChildrenHeight(final HousePart part) {
@@ -1184,20 +1184,20 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void showBuildingLabel(final boolean b) {
-		buildingLabel.setVisible(b && SceneManager.getInstance().getSolarHeatMap());
+		floatingLabel.setVisible(b && SceneManager.getInstance().getSolarHeatMap());
 	}
 
 	public void setSolarLabelValue(final double solarValue) {
 		scanChildrenHeight();
 		if (solarValue == -2) {
-			buildingLabel.setVisible(false);
+			floatingLabel.setVisible(false);
 		} else {
-			buildingLabel.setVisible(SceneManager.getInstance().areBuildingLabelsVisible());
+			floatingLabel.setVisible(SceneManager.getInstance().areBuildingLabelsVisible());
 			final String idLabel = "(#" + id + ")";
 			if (solarValue == -1 || solarValue == 0) {
-				buildingLabel.setText(idLabel);
+				floatingLabel.setText(idLabel);
 			} else {
-				buildingLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
+				floatingLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 			}
 		}
 	}

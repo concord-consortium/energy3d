@@ -234,7 +234,7 @@ public class PopupMenuFactory {
 			final JMenuItem miInfo = new JMenuItem("Land");
 			miInfo.setEnabled(false);
 			miInfo.setOpaque(true);
-			miInfo.setBackground(Color.GRAY);
+			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
 			final JMenuItem miPaste = new JMenuItem("Paste");
@@ -613,7 +613,7 @@ public class PopupMenuFactory {
 			final JMenuItem miInfo = new JMenuItem("Sky");
 			miInfo.setEnabled(false);
 			miInfo.setOpaque(true);
-			miInfo.setBackground(Color.GRAY);
+			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
 			final JCheckBoxMenuItem miHeliodon = new JCheckBoxMenuItem("Heliodon");
@@ -786,7 +786,7 @@ public class PopupMenuFactory {
 			final JMenuItem miInfo = new JMenuItem("Floor");
 			miInfo.setEnabled(false);
 			miInfo.setOpaque(true);
-			miInfo.setBackground(Color.GRAY);
+			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
 			popupMenuForFloor = new JPopupMenu();
@@ -6406,7 +6406,7 @@ public class PopupMenuFactory {
 			final JMenuItem miInfo = new JMenuItem("Mesh");
 			miInfo.setEnabled(false);
 			miInfo.setOpaque(true);
-			miInfo.setBackground(Color.GRAY);
+			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
 			final JMenuItem miBottomOnGround = new JMenuItem("Align Node Bottom with Ground Level");
@@ -7018,7 +7018,7 @@ public class PopupMenuFactory {
 		final JMenuItem miInfo = new JMenuItem();
 		miInfo.setEnabled(false);
 		miInfo.setOpaque(true);
-		miInfo.setBackground(Color.GRAY);
+		miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 		miInfo.setForeground(Color.WHITE);
 
 		final JPopupMenu popupMenu = new JPopupMenu();
