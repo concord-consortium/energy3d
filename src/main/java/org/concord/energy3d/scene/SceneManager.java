@@ -188,7 +188,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private UserData pick;
 	private TwoInputStates firstClickState;
 	private MouseState lastSelectedEditPointMouseState;
-	private MouseState pasteMouseState;
+	private MouseState pickMouseState;
 	private Vector3 objectMoveStartPoint;
 	private ArrayList<Vector3> objectMovePoints;
 	private Map<Foundation, ArrayList<Vector3>> objectGroupMovePoints;
@@ -1716,7 +1716,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final int x = e.getX();
 		final int y = cp.getHeight() - e.getY();
 		mouseState = new MouseState(x, y, 0, 0, 0, null, null);
-		pasteMouseState = mouseState;
+		pickMouseState = mouseState;
 		refresh = true;
 		taskManager.update(new Callable<Object>() {
 			@Override
@@ -1757,7 +1757,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						EnergyPanel.getInstance().updateGraphs();
 						EnergyPanel.getInstance().updateProperties();
 						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-						PopupMenuFactory.getPopupMenu(onLand(pasteMouseState.getX(), pasteMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
+						PopupMenuFactory.getPopupMenu(onLand(pickMouseState.getX(), pickMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
 					}
 				} catch (final Throwable t) {
 					t.printStackTrace();
@@ -1914,6 +1914,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void mouseReleased(final MouseState mouseState) {
 		refresh = true;
+		pickMouseState = mouseState; // this method is not called when mouse is right-clicked, so we have to set the pick mouse state here
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
@@ -2234,80 +2235,80 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return SelectUtil.pickPart(x, y, land) != null;
 	}
 
-	Vector3 getPickedLocationOnLand() {
-		if (pasteMouseState != null) {
-			final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), land);
+	public Vector3 getPickedLocationOnLand() {
+		if (pickMouseState != null) {
+			final PickedHousePart pick = SelectUtil.pickPart(pickMouseState.getX(), pickMouseState.getY(), land);
 			if (pick != null) {
 				return pick.getPoint().multiply(1, 1, 0, null);
 			}
-			pasteMouseState = null;
+			pickMouseState = null;
 		}
 		return null;
 	}
 
 	public Vector3 getPickedLocationOnFoundation() {
-		if (pasteMouseState != null) {
+		if (pickMouseState != null) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Foundation) {
-				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
+				final PickedHousePart pick = SelectUtil.pickPart(pickMouseState.getX(), pickMouseState.getY(), selectedPart);
 				if (pick != null) {
 					return pick.getPoint().clone();
 				}
 			}
-			pasteMouseState = null;
+			pickMouseState = null;
 		}
 		return null;
 	}
 
 	Vector3 getPickedLocationOnWall() {
-		if (pasteMouseState != null) {
+		if (pickMouseState != null) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Wall) {
-				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
+				final PickedHousePart pick = SelectUtil.pickPart(pickMouseState.getX(), pickMouseState.getY(), selectedPart);
 				if (pick != null) {
 					return pick.getPoint().clone();
 				}
 			}
-			pasteMouseState = null;
+			pickMouseState = null;
 		}
 		return null;
 	}
 
 	Vector3 getPickedLocationOnRoof() {
-		if (pasteMouseState != null) {
+		if (pickMouseState != null) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Roof) {
-				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
+				final PickedHousePart pick = SelectUtil.pickPart(pickMouseState.getX(), pickMouseState.getY(), selectedPart);
 				if (pick != null) {
 					return pick.getPoint().clone();
 				}
 			}
-			pasteMouseState = null;
+			pickMouseState = null;
 		}
 		return null;
 	}
 
 	Vector3 getPickedLocationOnRack() {
-		if (pasteMouseState != null) {
+		if (pickMouseState != null) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 			if (selectedPart instanceof Rack) {
-				final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), selectedPart);
+				final PickedHousePart pick = SelectUtil.pickPart(pickMouseState.getX(), pickMouseState.getY(), selectedPart);
 				if (pick != null) {
 					return pick.getPoint().clone();
 				}
 			}
-			pasteMouseState = null;
+			pickMouseState = null;
 		}
 		return null;
 	}
 
 	Vector3 getPickedLocationOnMesh(final Mesh mesh) {
-		if (pasteMouseState != null) {
-			final PickedHousePart pick = SelectUtil.pickPart(pasteMouseState.getX(), pasteMouseState.getY(), mesh);
+		if (pickMouseState != null) {
+			final PickedHousePart pick = SelectUtil.pickPart(pickMouseState.getX(), pickMouseState.getY(), mesh);
 			if (pick != null) {
 				return pick.getPoint().clone();
 			}
-			pasteMouseState = null;
+			pickMouseState = null;
 		}
 		return null;
 	}

@@ -315,13 +315,21 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miImport = new JMenuItem("Import...");
-			miImport.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
-			miImport.addActionListener(new ActionListener() {
+			final JMenuItem miImportEnergy3D = new JMenuItem("Import Energy3D...");
+			miImportEnergy3D.setToolTipText("Import the content in an existing Energy3D file into the clicked location on the land as the center");
+			miImportEnergy3D.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MainFrame.getInstance().importFile();
-					Scene.getInstance().setEdited(true);
+					MainFrame.getInstance().importEnergy3DFile();
+				}
+			});
+
+			final JMenuItem miImportCollada = new JMenuItem("Import Collada...");
+			miImportCollada.setToolTipText("Import the content in an existing Collada file into the clicked location on the land as the center");
+			miImportCollada.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					MainFrame.getInstance().importColladaFile();
 				}
 			});
 
@@ -591,7 +599,8 @@ public class PopupMenuFactory {
 			popupMenuForLand.add(miRemoveAllHumans);
 			popupMenuForLand.add(miRemoveAllBuildings);
 			popupMenuForLand.addSeparator();
-			popupMenuForLand.add(miImport);
+			popupMenuForLand.add(miImportEnergy3D);
+			popupMenuForLand.add(miImportCollada);
 			popupMenuForLand.add(miImportPrefabMenu);
 			popupMenuForLand.addSeparator();
 			popupMenuForLand.add(groundImageMenu);

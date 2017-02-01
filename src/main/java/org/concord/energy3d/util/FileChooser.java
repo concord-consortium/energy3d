@@ -48,6 +48,7 @@ public class FileChooser {
 		}
 
 		fileChooser = new JFileChooser(directoryPath);
+		fileChooser.setAcceptAllFileFilterUsed(false);
 		if (Config.isMac()) {
 			fileDialog = new FileDialog(MainFrame.getInstance());
 		}

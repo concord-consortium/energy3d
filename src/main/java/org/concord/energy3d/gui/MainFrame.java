@@ -101,6 +101,7 @@ import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.undo.AddNodeCommand;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
@@ -130,7 +131,7 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
-	private static final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D Project (*.ng3)", "ng3");
+	private static final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D (*.ng3)", "ng3");
 	private static final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
 	static final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
 	static final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
@@ -207,7 +208,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem scaleToFitRadioButtonMenuItem;
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
 	private final ButtonGroup printSizeOptionBbuttonGroup = new ButtonGroup();
-	private JMenuItem importMenuItem;
+	private JMenuItem importEnergy3DMenuItem, importColladaMenuItem;
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem gridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
@@ -566,10 +567,12 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getSaveasMenuItem());
 			addItemToFileMenu(getRecoveryMenuItem());
 			addItemToFileMenu(new JSeparator());
+			addItemToFileMenu(getImportEnergy3DMenuItem());
+			addItemToFileMenu(getImportColladaMenuItem());
+			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getCopyImageMenuItem());
 			addItemToFileMenu(getExportImageMenuItem());
 			addItemToFileMenu(getExportLogMenuItem());
-			addItemToFileMenu(getImportMenuItem());
 			addItemToFileMenu(new JSeparator());
 
 			addItemToFileMenu(getReplayFolderMenuItem());
@@ -2610,22 +2613,58 @@ public class MainFrame extends JFrame {
 		FileChooser.getInstance().rememberFile(file.getAbsolutePath());
 	}
 
-	void importFile() {
+	void importEnergy3DFile() {
 		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, false);
-		if (file == null) {
-			return;
-		}
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				try {
-					Scene.importFile(file.toURI().toURL());
-				} catch (final Throwable err) {
-					Util.reportError(err);
+		if (file != null) {
+			EnergyPanel.getInstance().clearRadiationHeatMap();
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					try {
+						Scene.importFile(file.toURI().toURL());
+					} catch (final Throwable err) {
+						Util.reportError(err);
+					}
+					return null;
 				}
-				return null;
-			}
-		});
+			});
+			Scene.getInstance().setEdited(true);
+		}
+	}
+
+	void importColladaFile() {
+		final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
+		if (file != null) {
+			EnergyPanel.getInstance().clearRadiationHeatMap();
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					boolean success = true;
+					Vector3 position = SceneManager.getInstance().getPickedLocationOnLand();
+					if (position == null) {
+						position = new Vector3();
+					}
+					final Foundation foundation = new Foundation(80, 60);
+					final ArrayList<Vector3> movePoints = new ArrayList<Vector3>();
+					for (final Vector3 p : foundation.getPoints()) {
+						movePoints.add(p.clone());
+					}
+					foundation.move(position, movePoints);
+					Scene.getInstance().add(foundation, false);
+					try {
+						foundation.importCollada(file.toURI().toURL(), position);
+					} catch (final Throwable t) {
+						Util.reportError(t);
+						success = false;
+					}
+					if (success) {
+						SceneManager.getInstance().getUndoManager().addEdit(new AddNodeCommand(foundation));
+					}
+					return null;
+				}
+			});
+			Scene.getInstance().setEdited(true);
+		}
 	}
 
 	private JMenuItem getPageSetupMenuItem() {
@@ -2670,18 +2709,32 @@ public class MainFrame extends JFrame {
 		return exactSizeRadioButtonMenuItem;
 	}
 
-	private JMenuItem getImportMenuItem() {
-		if (importMenuItem == null) {
-			importMenuItem = new JMenuItem("Import...");
-			importMenuItem.setToolTipText("Import the content in an existing file into the clicked location on the land as the center");
-			importMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getImportEnergy3DMenuItem() {
+		if (importEnergy3DMenuItem == null) {
+			importEnergy3DMenuItem = new JMenuItem("Import Energy3D...");
+			importEnergy3DMenuItem.setToolTipText("Import the content in an existing Energy3D file into the clicked location on the land as the center");
+			importEnergy3DMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					importFile();
+					importEnergy3DFile();
 				}
 			});
 		}
-		return importMenuItem;
+		return importEnergy3DMenuItem;
+	}
+
+	private JMenuItem getImportColladaMenuItem() {
+		if (importColladaMenuItem == null) {
+			importColladaMenuItem = new JMenuItem("Import Collada...");
+			importColladaMenuItem.setToolTipText("Import the content in an existing Collada file into the clicked location on the land as the center");
+			importColladaMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					importColladaFile();
+				}
+			});
+		}
+		return importColladaMenuItem;
 	}
 
 	private JCheckBoxMenuItem getSnapMenuItem() {

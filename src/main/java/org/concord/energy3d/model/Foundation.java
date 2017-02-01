@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.geom.Area;
@@ -2604,6 +2606,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (importedNodeStates == null) {
 			importedNodeStates = new ArrayList<NodeState>();
 		}
+		if (position != null) { // when position is null, the cursor is already set to be wait by the loading method
+			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		}
 		File sourceFile = new File(file.toURI());
 		if (!sourceFile.exists() && Scene.getURL() != null) {
 			sourceFile = new File(new File(Scene.getURL().toURI()).getParentFile(), Util.getFileName(file.getPath()));
@@ -2662,6 +2667,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.setScale(scale);
 				root.attachChild(newNode);
 				return newNode;
+			}
+			if (position != null) {
+				((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		} else {
 			if (position != null) {
