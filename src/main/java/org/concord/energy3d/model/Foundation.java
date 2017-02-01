@@ -1,12 +1,15 @@
 package org.concord.energy3d.model;
 
 import java.awt.EventQueue;
+import java.awt.HeadlessException;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.FloatBuffer;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -260,8 +263,23 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		if (importedNodeStates != null) {
 			try {
-				for (final NodeState s : importedNodeStates) {
-					importCollada(s.getSourceURL(), null);
+				for (final Iterator<NodeState> it = importedNodeStates.iterator(); it.hasNext();) {
+					final NodeState ns = it.next();
+					if (importCollada(ns.getSourceURL(), null) == null) {
+						it.remove();
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), Paths.get(ns.getSourceURL().toURI()).toFile() + " was not found!", "File problem", JOptionPane.ERROR_MESSAGE);
+								} catch (final HeadlessException e) {
+									e.printStackTrace();
+								} catch (final URISyntaxException e) {
+									e.printStackTrace();
+								}
+							}
+						});
+					}
 				}
 			} catch (final Throwable t) {
 				Util.reportError(t);
@@ -2586,7 +2604,11 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (importedNodeStates == null) {
 			importedNodeStates = new ArrayList<NodeState>();
 		}
-		if (new File(file.toURI()).exists()) {
+		File sourceFile = new File(file.toURI());
+		if (!sourceFile.exists() && Scene.getURL() != null) {
+			sourceFile = new File(new File(Scene.getURL().toURI()).getParentFile(), Util.getFileName(file.getPath()));
+		}
+		if (sourceFile.exists()) {
 			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(file));
 			// final AssetData asset = storage.getAssetData();
@@ -2642,10 +2664,12 @@ public class Foundation extends HousePart implements Thermalizable {
 				return newNode;
 			}
 		} else {
-			// get rid of the dead nodes no longer linked to files
-			for (final Iterator<NodeState> it = importedNodeStates.iterator(); it.hasNext();) {
-				if (file.equals(it.next().getSourceURL())) {
-					it.remove();
+			if (position != null) {
+				// get rid of the dead nodes no longer linked to files
+				for (final Iterator<NodeState> it = importedNodeStates.iterator(); it.hasNext();) {
+					if (file.equals(it.next().getSourceURL())) {
+						it.remove();
+					}
 				}
 			}
 		}
