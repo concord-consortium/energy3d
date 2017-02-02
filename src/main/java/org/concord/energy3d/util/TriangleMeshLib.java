@@ -60,10 +60,13 @@ public class TriangleMeshLib {
 			v1.cross(v2, normal);
 			normal.normalizeLocal();
 
-			final Vector3 firstNormal = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
-			if (Double.isNaN(firstNormal.length())) {
-				continue;
-			}
+			// Vector3 firstNormal = null;
+			// if (!redoNormal) {
+			// firstNormal = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
+			// if (Double.isNaN(firstNormal.length())) {
+			// continue;
+			// }
+			// }
 
 			final GroupData group = new GroupData();
 			group.key.set(normal);
@@ -75,9 +78,15 @@ public class TriangleMeshLib {
 			group.vertices.add(p1);
 			group.vertices.add(p2);
 			group.vertices.add(p3);
-			group.normals.add(firstNormal);
-			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			// if (redoNormal) {
+			// group.normals.add(group.key.clone());
+			// group.normals.add(group.key.clone());
+			// group.normals.add(group.key.clone());
+			// } else {
+			// group.normals.add(firstNormal);
+			// group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			// group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			// }
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));

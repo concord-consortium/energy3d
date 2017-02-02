@@ -63,6 +63,7 @@ import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -1132,16 +1133,23 @@ public class EnergyPanel extends JPanel {
 								final ReadOnlyVector3 meshBoxCenter = meshBox.getCenter();
 								final NodeState ns = foundation.getNodeState(selectedNode);
 								final Vector3 position = ns.getPosition();
+								ReadOnlyVector3 meshNormal = null;
+								if (selectedMesh.getUserData() instanceof UserData) {
+									meshNormal = ((UserData) selectedMesh.getUserData()).getNormal();
+								}
+								final String meshBoxString = twoDecimals.format(xMeshBox) + "\u00d7" + (twoDecimals.format(yMeshBox)) + "\u00d7" + (twoDecimals.format(zMeshBox)) + " m";
+								final String meshCenterString = "(" + twoDecimals.format(meshBoxCenter.getX() * scale) + ", " + twoDecimals.format(meshBoxCenter.getY() * scale) + ", " + twoDecimals.format(meshBoxCenter.getZ() * scale) + ") m";
+								final String meshNormalString = meshNormal != null ? "(" + twoDecimals.format(meshNormal.getX()) + ", " + twoDecimals.format(meshNormal.getY()) + ", " + twoDecimals.format(meshNormal.getZ()) + ")" : "";
 								partPanelBorder.setTitle("Node (" + Util.getFileName(ns.getSourceURL().getPath()) + ")");
 								partProperty1Label.setText("  Dimension:");
 								partProperty2Label.setText("  Position:");
 								partProperty3Label.setText("  Mesh (" + selectedMesh.getMeshData().getVertexCount() + "):");
 								partProperty1TextField.setText(twoDecimals.format(xNodeBox) + "\u00d7" + (twoDecimals.format(yNodeBox)) + "\u00d7" + (twoDecimals.format(zNodeBox)) + " m");
-								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m");
-								partProperty3TextField.setText(twoDecimals.format(xMeshBox) + "\u00d7" + (twoDecimals.format(yMeshBox)) + "\u00d7" + (twoDecimals.format(zMeshBox)) + " m, " + "(" + twoDecimals.format(meshBoxCenter.getX() * scale) + ", " + twoDecimals.format(meshBoxCenter.getY() * scale) + ", " + twoDecimals.format(meshBoxCenter.getZ() * scale) + ") m");
+								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m, relative");
+								partProperty3TextField.setText(meshBoxString + ", \u2191" + meshNormalString + ", \u2605" + meshCenterString);
 								partProperty1TextField.setToolTipText("The bounding size of this node (" + ns.getSourceURL().getFile() + ")");
 								partProperty2TextField.setToolTipText("The (x, y) coordinate of the node center");
-								partProperty3TextField.setToolTipText("Info about the selected mesh");
+								partProperty3TextField.setToolTipText("<html>Info about the selected mesh:<br>" + partProperty3TextField.getText() + "</html>");
 							} else {
 								partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 								partProperty1Label.setText("  Size:");

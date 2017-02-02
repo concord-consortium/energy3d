@@ -17,7 +17,7 @@ public class NodeState implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Vector3 position;
+	private Vector3 position; // relative to the center of the foundation
 	private ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private URL sourceURL;
 	private String name;
@@ -42,10 +42,12 @@ public class NodeState implements Serializable {
 		return name;
 	}
 
+	/** relative to the center of the foundation */
 	public void setPosition(final Vector3 position) {
 		this.position = position;
 	}
 
+	/** relative to the center of the foundation */
 	public Vector3 getPosition() {
 		return position;
 	}

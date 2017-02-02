@@ -2378,4 +2378,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		SceneManager.executeAllTask = executeAllTask;
 	}
 
+	// make sure that mouse states are nullified in case they trigger inconsistent actions when mouse moves or clicks at the wrong time (e.g., while loading)
+	void clearMouseState() {
+		mouseState = null;
+		pickMouseState = null;
+	}
+
 }

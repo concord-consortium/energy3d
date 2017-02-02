@@ -892,6 +892,33 @@ public class Util {
 		return boundingBox;
 	}
 
+	public static Path2D getPath2D(final OrientedBoundingBox box) {
+		final ReadOnlyVector3 center = box.getCenter();
+		final ReadOnlyVector3 extent = box.getExtent();
+		final ReadOnlyVector3 vx = box.getXAxis().multiply(extent.getX(), null);
+		final ReadOnlyVector3 vy = box.getYAxis().multiply(extent.getY(), null);
+		double x, y;
+		final Path2D path = new Path2D.Double();
+		// (1, 1)
+		x = center.getX() + vx.getX();
+		y = center.getY() + vy.getY();
+		path.moveTo(x, y);
+		// (-1, 1)
+		x = center.getX() - vx.getX();
+		y = center.getY() + vy.getY();
+		path.lineTo(x, y);
+		// (-1, -1)
+		x = center.getX() - vx.getX();
+		y = center.getY() - vy.getY();
+		path.lineTo(x, y);
+		// (1, -1)
+		x = center.getX() + vx.getX();
+		y = center.getY() - vy.getY();
+		path.lineTo(x, y);
+		path.closePath();
+		return path;
+	}
+
 	public static void drawBoundingBox(final Spatial spatial, final Line boundingBox) {
 		OrientedBoundingBox box = null;
 		if (spatial instanceof Mesh) {

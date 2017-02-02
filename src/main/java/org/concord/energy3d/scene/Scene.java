@@ -260,6 +260,7 @@ public class Scene implements Serializable {
 	}
 
 	public static void openNow(final URL file) throws Exception {
+		SceneManager.getInstance().clearMouseState();
 		((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		if (PrintController.getInstance().isPrintPreview()) {
 			MainPanel.getInstance().getPreviewButton().setSelected(false);
@@ -342,8 +343,6 @@ public class Scene implements Serializable {
 				(b ? notReceivingShadowRoot : originalHouseRoot).attachChild(p.getRoot());
 			}
 			System.out.println("initSceneNow done");
-			/* must redraw now so that heliodon can be initialized to right size if it is to be visible */
-			// redrawAllNow();
 		}
 
 		root.updateWorldBound(true);
@@ -547,7 +546,7 @@ public class Scene implements Serializable {
 		if (position == null) {
 			position = new Vector3();
 		}
-		final Foundation foundation = new Foundation(10, 10);
+		final Foundation foundation = new Foundation(100, 100);
 		for (final Vector3 p : foundation.getPoints()) {
 			p.addLocal(position);
 		}
@@ -555,7 +554,7 @@ public class Scene implements Serializable {
 		try {
 			final Node n = foundation.importCollada(file.toURI().toURL(), position);
 			if (n != null) {
-				// automatically center the model at the center
+				// TODO: automatically center the model at the center
 			}
 		} catch (final Throwable t) {
 			Util.reportError(t);

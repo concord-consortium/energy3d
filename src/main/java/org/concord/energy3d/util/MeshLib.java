@@ -51,7 +51,7 @@ public class MeshLib {
 	static class GroupData {
 		final Vector3 key = new Vector3();
 		final ArrayList<ReadOnlyVector3> vertices = new ArrayList<ReadOnlyVector3>();
-		final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
+		// final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
 		final ArrayList<ReadOnlyVector2> textures = new ArrayList<ReadOnlyVector2>();
 		Image textureImage;
 	}
@@ -94,9 +94,9 @@ public class MeshLib {
 			group.vertices.add(p1);
 			group.vertices.add(p2);
 			group.vertices.add(p3);
-			group.normals.add(firstNormal);
-			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-			group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			// group.normals.add(firstNormal);
+			// group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			// group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
 		}
 		combineGroups(groups);
 		return groups;
@@ -134,7 +134,7 @@ public class MeshLib {
 							final ReadOnlyVector3 p3 = group2.vertices.get(w + 2);
 							if (hasCommonEdge(group1, p1, p2, p3)) {
 								group1.vertices.addAll(group2.vertices);
-								group1.normals.addAll(group2.normals);
+								// group1.normals.addAll(group2.normals);
 								group1.textures.addAll(group2.textures);
 								groups.remove(group2);
 								j--;

@@ -63,6 +63,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -6460,6 +6461,14 @@ public class PopupMenuFactory {
 									final Node n = m.getParent();
 									if (n != null) {
 										final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
+										// final Rectangle2D bounds = Util.getPath2D(boundingBox).getBounds2D();
+										// final Vector3 v0 = f.getAbsPoint(0);
+										// final Vector3 v1 = f.getAbsPoint(1);
+										// final Vector3 v2 = f.getAbsPoint(2);
+										// final double lx = v0.distance(v2);
+										// final double ly = v0.distance(v1);
+										// f.rescale(1.2 * bounds.getWidth() / lx, 1.2 * bounds.getHeight() / ly, 1);
+										// f.rescale(1.2, 1.2, 1);
 										final ReadOnlyVector3 shift = f.getAbsCenter().subtract(boundingBox.getCenter(), null);
 										f.translateImportedNode(n, shift.getX(), shift.getY(), 0);
 										f.setMeshSelectionVisible(false);
@@ -6627,7 +6636,7 @@ public class PopupMenuFactory {
 						final Mesh m = f.getSelectedMesh();
 						if (m != null) {
 							final JPanel gui = new JPanel(new BorderLayout());
-							final String title = "<html>A mesh is a basic unit (e.g., a triangle or a line)<br>of geometry of a structure.</html>";
+							final String title = "<html>A mesh is a basic unit (e.g., a triangle or a line) of geometry of a structure.</html>";
 							gui.add(new JLabel(title), BorderLayout.NORTH);
 							final JPanel propertiesPanel = new JPanel(new SpringLayout());
 							propertiesPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -6649,6 +6658,19 @@ public class PopupMenuFactory {
 							label.setLabelFor(textField);
 							propertiesPanel.add(textField);
 
+							// normal
+							label = new JLabel("Normal Vector: ", JLabel.TRAILING);
+							propertiesPanel.add(label);
+							if (m.getUserData() instanceof UserData) {
+								final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
+								textField = new JTextField("(" + threeDecimalsFormat.format(normal.getX()) + ", " + threeDecimalsFormat.format(normal.getY()) + ", " + threeDecimalsFormat.format(normal.getZ()) + "), relative", 5);
+							} else {
+								textField = new JTextField(m.getUserData() + ", relative", 5);
+							}
+							textField.setEditable(false);
+							label.setLabelFor(textField);
+							propertiesPanel.add(textField);
+
 							// color
 							label = new JLabel("Default Color: ", JLabel.TRAILING);
 							propertiesPanel.add(label);
@@ -6657,8 +6679,8 @@ public class PopupMenuFactory {
 							label.setLabelFor(colorChooser);
 							propertiesPanel.add(colorChooser);
 
-							SpringUtilities.makeCompactGrid(propertiesPanel, 3, 2, 6, 6, 6, 6);
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Mesh Properties", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							SpringUtilities.makeCompactGrid(propertiesPanel, 4, 2, 6, 6, 6, 6);
+							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Mesh Properties: " + miInfo.getText(), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 								final Color color = colorChooser.getColor();
 								m.clearRenderState(StateType.Texture);
 								m.setDefaultColor(new ColorRGBA(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1));

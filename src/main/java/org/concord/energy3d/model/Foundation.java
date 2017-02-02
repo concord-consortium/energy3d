@@ -892,8 +892,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		normalBuffer3.rewind();
 		final ReadOnlyVector3 n1 = p0.subtract(p1, null).normalizeLocal();
 		final ReadOnlyVector3 n2 = p2.subtract(p0, null).normalizeLocal();
-		ReadOnlyVector3 normal;
-		normal = n1;
+		ReadOnlyVector3 normal = n1;
 		((UserData) sideMesh[0].getUserData()).setNormal(normal);
 		for (int i = 0; i < 6; i++) {
 			normalBuffer0.put(normal.getXf()).put(normal.getYf()).put(normal.getZf());
@@ -1660,9 +1659,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private void updateHandle(final Vector3 p, final ReadOnlyVector3 dir) {
 		final ReadOnlyVector3 step = dir.normalize(null).multiplyLocal(3);
 		final ReadOnlyVector3 center = getCenter();
-
 		p.set(center).addLocal(dir).addLocal(step);
-
 		final Point2D p2D = new Point2D.Double();
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part != this && part instanceof Foundation) {
@@ -1673,15 +1670,13 @@ public class Foundation extends HousePart implements Thermalizable {
 				foundationPoly.lineTo(points.get(3).getX(), points.get(3).getY());
 				foundationPoly.lineTo(points.get(1).getX(), points.get(1).getY());
 				foundationPoly.closePath();
-
 				p2D.setLocation(p.getX(), p.getY());
-				while (foundationPoly.contains(p2D)) {
+				if (foundationPoly.contains(p2D)) {
 					while (foundationPoly.contains(p2D)) {
 						p.addLocal(step);
 						p2D.setLocation(p.getX(), p.getY());
 					}
 					p.addLocal(step);
-					p2D.setLocation(p.getX(), p.getY());
 				}
 			}
 		}
@@ -2767,7 +2762,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		selectedMeshOutline.setTransform(m.getWorldTransform());
 		selectedMeshOutline.updateModelBound();
 		selectedMeshOutline.setVisible(true);
-		Util.drawBoundingBox(m.getParent(), selectedNodeBoundingBox);
+		// Util.drawBoundingBox(m.getParent(), selectedNodeBoundingBox);
 	}
 
 	public void drawImports() {
