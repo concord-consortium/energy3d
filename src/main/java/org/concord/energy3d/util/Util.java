@@ -1067,4 +1067,19 @@ public class Util {
 		boundingBox.setVisible(true);
 	}
 
+	public static Vector3 getFirstNormal(final Mesh mesh) {
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		if (vertexBuffer.limit() < 9) {
+			return null;
+		}
+		final Vector3 p1 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2));
+		final Vector3 p2 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5));
+		final Vector3 p3 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8));
+		final Vector3 v1 = p2.subtract(p1, null);
+		final Vector3 v2 = p3.subtract(p1, null);
+		final Vector3 normal = v1.cross(v2, null);
+		mesh.getWorldTransform().applyForwardVector(normal); // as the vertex buffer can be relative to the node (?), apply the world transform to get the absolute normal
+		return normal.normalizeLocal();
+	}
+
 }

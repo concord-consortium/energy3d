@@ -1133,7 +1133,7 @@ public class EnergyPanel extends JPanel {
 								final double zMeshBox = 2 * meshBox.getExtent().getZ() * scale;
 								final ReadOnlyVector3 meshBoxCenter = meshBox.getCenter();
 								final NodeState ns = foundation.getNodeState(selectedNode);
-								final Vector3 position = ns.getPosition();
+								final Vector3 position = ns.getPosition().add(foundation.getAbsCenter(), null);
 								Vector3 meshNormal = null;
 								int meshIndex = -1;
 								if (selectedMesh.getUserData() instanceof UserData) {
@@ -1145,15 +1145,16 @@ public class EnergyPanel extends JPanel {
 										matrix.applyPost(meshNormal, meshNormal);
 									}
 								}
+								// System.out.println("**********" + Util.getFirstNormal(selectedMesh));
 								final String meshBoxString = oneDecimal.format(xMeshBox) + "\u00d7" + (oneDecimal.format(yMeshBox)) + "\u00d7" + (oneDecimal.format(zMeshBox)) + " m";
 								final String meshCenterString = "(" + oneDecimal.format(meshBoxCenter.getX() * scale) + ", " + oneDecimal.format(meshBoxCenter.getY() * scale) + ", " + oneDecimal.format(meshBoxCenter.getZ() * scale) + ") m";
-								final String meshNormalString = meshNormal != null ? "(" + oneDecimal.format(meshNormal.getX()) + ", " + oneDecimal.format(meshNormal.getY()) + ", " + oneDecimal.format(meshNormal.getZ()) + ")" : "";
+								final String meshNormalString = meshNormal != null ? "(" + twoDecimals.format(meshNormal.getX()) + ", " + twoDecimals.format(meshNormal.getY()) + ", " + twoDecimals.format(meshNormal.getZ()) + ")" : "";
 								partPanelBorder.setTitle("Node #" + foundation.getImportedNodes().indexOf(selectedNode) + " (" + Util.getFileName(ns.getSourceURL().getPath()) + "), Mesh #" + meshIndex);
 								partProperty1Label.setText("  Dimension:");
 								partProperty2Label.setText("  Position:");
 								partProperty3Label.setText("  Mesh (" + selectedMesh.getMeshData().getVertexCount() + "):");
 								partProperty1TextField.setText(twoDecimals.format(xNodeBox) + "\u00d7" + (twoDecimals.format(yNodeBox)) + "\u00d7" + (twoDecimals.format(zNodeBox)) + " m");
-								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m, relative to Foundation #" + foundation.getId());
+								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m, on Foundation #" + foundation.getId());
 								partProperty3TextField.setText(meshBoxString + ", \u2191" + meshNormalString + ", " + meshCenterString);
 								partProperty1TextField.setToolTipText("The bounding size of this node (" + ns.getSourceURL().getFile() + ")");
 								partProperty2TextField.setToolTipText("The (x, y) coordinate of the node center");
