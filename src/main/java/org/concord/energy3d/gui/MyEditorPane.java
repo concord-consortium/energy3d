@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -27,6 +28,7 @@ class MyEditorPane {
 	MyEditorPane(final int id) {
 		editorPane = new JEditorPane();
 		editorPane.setEditable(false);
+		editorPane.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 		editorPane.setToolTipText("<html>Double-click to enlarge this window<br>Right-click to open a popup menu for editing</html>");
 
 		final JMenuItem miEdit = new JMenuItem("Edit");

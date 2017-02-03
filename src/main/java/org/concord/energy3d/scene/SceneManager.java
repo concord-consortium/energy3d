@@ -1890,7 +1890,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							}
 							SelectUtil.nextPickLayer();
 							if (operation == Operation.DRAW_ROOF_GABLE && selectedPart instanceof Roof) {
-								System.out.println(selectedPart);
 								System.out.println("deleting roof #" + pick.getEditPointIndex());
 								final int roofPartIndex = pick.getEditPointIndex();
 								final Roof roof = (Roof) selectedPart;
