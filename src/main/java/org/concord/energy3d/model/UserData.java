@@ -60,7 +60,7 @@ public class UserData {
 	}
 
 	public ReadOnlyVector3 getNormal() {
-		return normal.clone();
+		return normal == null ? null : normal.clone();
 	}
 
 	public void setNormal(final ReadOnlyVector3 normal) {
@@ -83,8 +83,12 @@ public class UserData {
 	}
 
 	public void setTextureBuffer(final FloatBuffer textureBuffer) {
-		textureBuffer.rewind();
-		this.textureBuffer = BufferUtils.clone(textureBuffer); // must clone as the texture buffer will be modified later
+		if (textureBuffer != null) {
+			textureBuffer.rewind();
+			this.textureBuffer = BufferUtils.clone(textureBuffer); // must clone as the texture buffer will be modified later
+		} else {
+			this.textureBuffer = null;
+		}
 	}
 
 	public int getMeshIndex() {

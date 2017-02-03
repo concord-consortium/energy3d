@@ -1914,7 +1914,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void mouseReleased(final MouseState mouseState) {
 		refresh = true;
-		// pickMouseState = mouseState; // this method is not called when mouse is right-clicked, so we have to set the pick mouse state here
+		pickMouseState = mouseState; // this method is not called when mouse is right-clicked, so we have to set the pick mouse state here
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {
