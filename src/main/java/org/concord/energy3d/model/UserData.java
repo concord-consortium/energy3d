@@ -11,20 +11,26 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class UserData {
 	private final HousePart housePart;
-	private final int index;
+	private final int editPointIndex;
 	private final boolean isEditPoint;
 	private Vector3 printCenter = new Vector3();
 	private ReadOnlyVector3 normal;
 	private RenderState renderState;
 	private FloatBuffer textureBuffer;
+	private int meshIndex;
 
 	public UserData(final HousePart housePart) {
 		this(housePart, -1, false);
 	}
 
-	public UserData(final HousePart housePart, final int index, final boolean isEditPoint) {
+	public UserData(final HousePart housePart, final int meshIndex) {
+		this(housePart, -1, false);
+		this.meshIndex = meshIndex;
+	}
+
+	public UserData(final HousePart housePart, final int editPointIndex, final boolean isEditPoint) {
 		this.housePart = housePart;
-		this.index = index;
+		this.editPointIndex = editPointIndex;
 		this.isEditPoint = isEditPoint;
 	}
 
@@ -32,8 +38,8 @@ public class UserData {
 		return housePart;
 	}
 
-	public int getIndex() {
-		return index;
+	public int getEditPointIndex() {
+		return editPointIndex;
 	}
 
 	public boolean isEditPoint() {
@@ -50,7 +56,7 @@ public class UserData {
 
 	@Override
 	public String toString() {
-		return housePart + "  index=" + index + "  PrintCenter=" + Util.toString(printCenter);
+		return housePart + "  index=" + editPointIndex + "  PrintCenter=" + Util.toString(printCenter);
 	}
 
 	public ReadOnlyVector3 getNormal() {
@@ -79,6 +85,10 @@ public class UserData {
 	public void setTextureBuffer(final FloatBuffer textureBuffer) {
 		textureBuffer.rewind();
 		this.textureBuffer = BufferUtils.clone(textureBuffer); // must clone as the texture buffer will be modified later
+	}
+
+	public int getMeshIndex() {
+		return meshIndex;
 	}
 
 }

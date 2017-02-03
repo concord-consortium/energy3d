@@ -1589,7 +1589,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (hoveredPart.isFrozen()) {
 						hoveredPart = null;
 					}
-					if (pick.getIndex() != -1) {
+					if (pick.getEditPointIndex() != -1) {
 						lastSelectedEditPointMouseState = mouseState;
 					}
 				}
@@ -1605,7 +1605,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
 				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 			} else {
-				if (pick.getIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+				if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
 					canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 				}
 			}
@@ -1825,7 +1825,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									selectedPart = selectedPart.getTopContainer();
 								}
 							}
-							if (selectedPart instanceof Window || selectedPart instanceof Tree || (selectedPart instanceof Foundation && pick.getIndex() != -1)) {
+							if (selectedPart instanceof Window || selectedPart instanceof Tree || (selectedPart instanceof Foundation && pick.getEditPointIndex() != -1)) {
 								cameraControl.setLeftMouseButtonEnabled(false);
 								objectMoveStartPoint = pickedPart.getPoint().clone();
 								collisionLand.setTranslation(0, 0, objectMoveStartPoint.getZ());
@@ -1877,7 +1877,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							}
 							if (selectedPart != null && !PrintController.getInstance().isPrintPreview()) {
 								selectedPart.setEditPointsVisible(true);
-								if (pick.isEditPoint() && pick.getIndex() != -1 || operation == Operation.RESIZE || selectedPart instanceof Window || selectedPart instanceof Tree) {
+								if (pick.isEditPoint() && pick.getEditPointIndex() != -1 || operation == Operation.RESIZE || selectedPart instanceof Window || selectedPart instanceof Tree) {
 									selectedPart.setGridsVisible(true);
 									if (selectedPart instanceof Foundation) {
 										editPartCommand = new EditFoundationCommand((Foundation) selectedPart, !pick.isEditPoint());
@@ -1891,8 +1891,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							SelectUtil.nextPickLayer();
 							if (operation == Operation.DRAW_ROOF_GABLE && selectedPart instanceof Roof) {
 								System.out.println(selectedPart);
-								System.out.println("deleting roof #" + pick.getIndex());
-								final int roofPartIndex = pick.getIndex();
+								System.out.println("deleting roof #" + pick.getEditPointIndex());
+								final int roofPartIndex = pick.getEditPointIndex();
 								final Roof roof = (Roof) selectedPart;
 								roof.setGable(roofPartIndex, true, undoManager);
 							}
@@ -1914,7 +1914,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private void mouseReleased(final MouseState mouseState) {
 		refresh = true;
-		pickMouseState = mouseState; // this method is not called when mouse is right-clicked, so we have to set the pick mouse state here
+		// pickMouseState = mouseState; // this method is not called when mouse is right-clicked, so we have to set the pick mouse state here
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {

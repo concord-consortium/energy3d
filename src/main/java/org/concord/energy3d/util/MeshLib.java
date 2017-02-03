@@ -51,7 +51,7 @@ public class MeshLib {
 	static class GroupData {
 		final Vector3 key = new Vector3();
 		final ArrayList<ReadOnlyVector3> vertices = new ArrayList<ReadOnlyVector3>();
-		// final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
+		final ArrayList<ReadOnlyVector3> normals = new ArrayList<ReadOnlyVector3>();
 		final ArrayList<ReadOnlyVector2> textures = new ArrayList<ReadOnlyVector2>();
 		Image textureImage;
 	}

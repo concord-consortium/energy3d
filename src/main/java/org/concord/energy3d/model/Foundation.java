@@ -2624,26 +2624,29 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			// now construct a new node that is a parent of all planar meshes
 			final Node newNode = new Node(originalNode.getName());
+			final String nodeString = "Node #" + importedNodes.size() + ", Foundation #" + id;
 			final List<Mesh> meshes = new ArrayList<Mesh>();
 			Util.getMeshes(originalNode, meshes);
 			String warnInfo = null;
+			int meshIndex = 0;
 			for (final Mesh m : meshes) {
 				final ReadOnlyTransform t = m.getWorldTransform();
 				final MeshData md = m.getMeshData();
 				switch (md.getIndexMode(0)) {
 				case Triangles:
 					final List<Mesh> children = TriangleMeshLib.getPlanarMeshes(m);
-					// final List<Mesh> children = new ArrayList<Mesh>();
-					// children.add(m);
+					// final List<Mesh> children = new ArrayList<Mesh>(); children.add(m);
 					if (!children.isEmpty()) {
 						for (final Mesh s : children) {
-							final UserData ud = new UserData(this);
+							final UserData ud = new UserData(this, meshIndex);
 							ud.setNormal((Vector3) s.getUserData());
 							ud.setRenderState(s.getLocalRenderState(StateType.Texture));
 							ud.setTextureBuffer(s.getMeshData().getTextureBuffer(0));
 							s.setUserData(ud);
 							s.setTransform(t);
+							s.setName("Mesh #" + meshIndex + ", " + nodeString);
 							newNode.attachChild(s);
+							meshIndex++;
 						}
 					}
 					break;
@@ -2772,7 +2775,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				Node ni;
 				final Vector3 c = getAbsCenter();
 				c.setZ(height); // the absolute center is lifted to the center of the bounding box that includes walls when there are
-				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth()));
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(getAzimuth())); // FIXME: Why negate?
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
 					if (root.getChildren().contains(ni)) {

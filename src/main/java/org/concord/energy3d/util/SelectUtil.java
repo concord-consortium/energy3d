@@ -138,7 +138,7 @@ public class SelectUtil {
 						adjust -= 0.1;
 					}
 					pointDist_i += adjust;
-					if (pointDist_i < pointDist && (userData.getIndex() != -1 || pickedHousePart == null || pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getIndex() == -1)) {
+					if (pointDist_i < pointDist && (userData.getEditPointIndex() != -1 || pickedHousePart == null || pickedHousePart.getUserData() == null || pickedHousePart.getUserData().getEditPointIndex() == -1)) {
 						pickedHousePart = picked_i;
 						polyDist = polyDist_i;
 						pointDist = pointDist_i;
@@ -162,14 +162,14 @@ public class SelectUtil {
 		}
 
 		// set the color of edit point that the mouse currently hovers on to red
-		if (data == null || !data.isEditPoint() || currentEditPointMesh != data.getHousePart().getEditPointShape(data.getIndex())) {
+		if (data == null || !data.isEditPoint() || currentEditPointMesh != data.getHousePart().getEditPointShape(data.getEditPointIndex())) {
 			if (currentEditPointMesh != null) {
 				currentEditPointMesh.setDefaultColor(currentEditPointOriginalColor);
 				currentEditPointMesh = null;
 			}
 		}
-		if (data != null && data.isEditPoint() && currentEditPointMesh != data.getHousePart().getEditPointShape(data.getIndex())) {
-			currentEditPointMesh = data.getHousePart().getEditPointShape(data.getIndex());
+		if (data != null && data.isEditPoint() && currentEditPointMesh != data.getHousePart().getEditPointShape(data.getEditPointIndex())) {
+			currentEditPointMesh = data.getHousePart().getEditPointShape(data.getEditPointIndex());
 			currentEditPointOriginalColor.set(currentEditPointMesh.getDefaultColor());
 			currentEditPointMesh.setDefaultColor(ColorRGBA.RED);
 		}
@@ -177,7 +177,7 @@ public class SelectUtil {
 		if (data == null) {
 			Blinker.getInstance().setTarget(null);
 		} else if (edit && data.isEditPoint()) {
-			int pointIndex = data.getIndex();
+			int pointIndex = data.getEditPointIndex();
 			if (SceneManager.getInstance().isTopView() && data.getHousePart() instanceof Wall) {
 				pointIndex -= 1;
 			}
@@ -186,7 +186,7 @@ public class SelectUtil {
 			if (data.getHousePart().getOriginal() == null) {
 				Blinker.getInstance().setTarget(null);
 			} else if (data.getHousePart() instanceof Roof) {
-				Blinker.getInstance().setTarget(((Roof) data.getHousePart().getOriginal()).getRoofPartsRoot().getChild(data.getIndex() - 0));
+				Blinker.getInstance().setTarget(((Roof) data.getHousePart().getOriginal()).getRoofPartsRoot().getChild(data.getEditPointIndex() - 0));
 			} else {
 				Blinker.getInstance().setTarget(data.getHousePart().getOriginal().getRoot());
 			}

@@ -28,10 +28,10 @@ import com.ardor3d.util.geom.BufferUtils;
 public class TriangleMeshLib {
 
 	public static List<Mesh> getPlanarMeshes(final Mesh mesh) {
-		return createMeshes(findGroups(mesh));
+		return createMeshes(findGroups(mesh, false));
 	}
 
-	private static ArrayList<GroupData> findGroups(final Mesh mesh) {
+	private static ArrayList<GroupData> findGroups(final Mesh mesh, final boolean redoNormal) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
@@ -60,13 +60,13 @@ public class TriangleMeshLib {
 			v1.cross(v2, normal);
 			normal.normalizeLocal();
 
-			// Vector3 firstNormal = null;
-			// if (!redoNormal) {
-			// firstNormal = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
-			// if (Double.isNaN(firstNormal.length())) {
-			// continue;
-			// }
-			// }
+			Vector3 firstNormal = null;
+			if (!redoNormal) {
+				firstNormal = new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get());
+				if (Double.isNaN(firstNormal.length())) {
+					continue;
+				}
+			}
 
 			final GroupData group = new GroupData();
 			group.key.set(normal);
@@ -78,15 +78,15 @@ public class TriangleMeshLib {
 			group.vertices.add(p1);
 			group.vertices.add(p2);
 			group.vertices.add(p3);
-			// if (redoNormal) {
-			// group.normals.add(group.key.clone());
-			// group.normals.add(group.key.clone());
-			// group.normals.add(group.key.clone());
-			// } else {
-			// group.normals.add(firstNormal);
-			// group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-			// group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
-			// }
+			if (redoNormal) {
+				group.normals.add(group.key.clone());
+				group.normals.add(group.key.clone());
+				group.normals.add(group.key.clone());
+			} else {
+				group.normals.add(firstNormal);
+				group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+				group.normals.add(new Vector3(normalBuffer.get(), normalBuffer.get(), normalBuffer.get()));
+			}
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get())); // texture is 2D, vertex is 3D
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
 			group.textures.add(new Vector2(textureBuffer.get(), textureBuffer.get()));
@@ -97,21 +97,23 @@ public class TriangleMeshLib {
 
 	private static List<Mesh> createMeshes(final ArrayList<GroupData> groups) {
 		final List<Mesh> results = new ArrayList<Mesh>();
-		int meshIndex = 0;
 		for (final GroupData group : groups) {
-			final Mesh mesh = new Mesh("Mesh #" + meshIndex++);
+			final Mesh mesh = new Mesh();
 			mesh.setUserData(group.key);
 			mesh.setModelBound(new BoundingBox());
 			results.add(mesh);
 
 			final FloatBuffer vertexBuffer = BufferUtils.createVector3Buffer(group.vertices.size());
 			mesh.getMeshData().setVertexBuffer(vertexBuffer);
-			final Vector3 center = new Vector3();
 			for (final ReadOnlyVector3 v : group.vertices) {
 				vertexBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
-				center.addLocal(v);
 			}
-			center.multiplyLocal(1.0 / group.vertices.size());
+
+			final FloatBuffer normalBuffer = BufferUtils.createFloatBuffer(vertexBuffer.limit());
+			mesh.getMeshData().setNormalBuffer(normalBuffer);
+			for (final ReadOnlyVector3 v : group.normals) {
+				normalBuffer.put(v.getXf()).put(v.getYf()).put(v.getZf());
+			}
 
 			if (!group.textures.isEmpty()) {
 				final FloatBuffer textureBuffer = BufferUtils.createVector2Buffer(group.textures.size());

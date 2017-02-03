@@ -6539,14 +6539,11 @@ public class PopupMenuFactory {
 						final Foundation f = (Foundation) selectedPart;
 						final Mesh m = f.getSelectedMesh();
 						if (m != null) {
-							String s = m.toString();
-							s = s.substring(0, s.indexOf('(')).trim();
-							final int indexOfNode = f.getImportedNodes().indexOf(m.getParent());
 							String name = f.getNodeState(m.getParent()).getName();
 							if (name == null) {
 								name = "Undefined";
 							}
-							miInfo.setText(s + " (" + m.getMeshData().getVertexCount() + " Vertices), Node #" + indexOfNode + " (" + name + ")");
+							miInfo.setText(m.getName() + " (" + name + ")");
 							final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(m.getParent());
 							final ReadOnlyVector3 center = boundingBox.getCenter();
 							final double zBottom = center.getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ();

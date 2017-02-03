@@ -109,7 +109,7 @@ public class Sensor extends HousePart implements Solar {
 				final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
 				points.get(0).setZ(p.getZ());
 				final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
-				final int roofPartIndex = userData.getIndex();
+				final int roofPartIndex = userData.getEditPointIndex();
 				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(roofPartIndex).getUserData();
 			}
 		} else {

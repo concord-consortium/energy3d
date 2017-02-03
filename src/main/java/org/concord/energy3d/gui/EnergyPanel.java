@@ -1131,21 +1131,24 @@ public class EnergyPanel extends JPanel {
 								final double xMeshBox = 2 * meshBox.getExtent().getX() * scale;
 								final double yMeshBox = 2 * meshBox.getExtent().getY() * scale;
 								final double zMeshBox = 2 * meshBox.getExtent().getZ() * scale;
-								final ReadOnlyVector3 meshBoxCenter = new Vector3();// meshBox.getCenter();
+								final ReadOnlyVector3 meshBoxCenter = meshBox.getCenter();
 								final NodeState ns = foundation.getNodeState(selectedNode);
 								final Vector3 position = ns.getPosition();
 								Vector3 meshNormal = null;
+								int meshIndex = -1;
 								if (selectedMesh.getUserData() instanceof UserData) {
-									meshNormal = (Vector3) ((UserData) selectedMesh.getUserData()).getNormal();
+									final UserData ud = (UserData) selectedMesh.getUserData();
+									meshNormal = (Vector3) ud.getNormal();
+									meshIndex = ud.getMeshIndex();
 									if (!Util.isZero(az)) {
-										final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(az)); // FIXME: Why negate?
+										final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(az)); // FIXME: Why negate? See also Foundation.drawImports()
 										matrix.applyPost(meshNormal, meshNormal);
 									}
 								}
 								final String meshBoxString = twoDecimals.format(xMeshBox) + "\u00d7" + (twoDecimals.format(yMeshBox)) + "\u00d7" + (twoDecimals.format(zMeshBox)) + " m";
 								final String meshCenterString = "(" + twoDecimals.format(meshBoxCenter.getX() * scale) + ", " + twoDecimals.format(meshBoxCenter.getY() * scale) + ", " + twoDecimals.format(meshBoxCenter.getZ() * scale) + ") m";
 								final String meshNormalString = meshNormal != null ? "(" + twoDecimals.format(meshNormal.getX()) + ", " + twoDecimals.format(meshNormal.getY()) + ", " + twoDecimals.format(meshNormal.getZ()) + ")" : "";
-								partPanelBorder.setTitle("Node (" + Util.getFileName(ns.getSourceURL().getPath()) + ")");
+								partPanelBorder.setTitle("Node #" + foundation.getImportedNodes().indexOf(selectedNode) + " (" + Util.getFileName(ns.getSourceURL().getPath()) + "), Mesh #" + meshIndex + ", Foundation #" + foundation.getId());
 								partProperty1Label.setText("  Dimension:");
 								partProperty2Label.setText("  Position:");
 								partProperty3Label.setText("  Mesh (" + selectedMesh.getMeshData().getVertexCount() + "):");

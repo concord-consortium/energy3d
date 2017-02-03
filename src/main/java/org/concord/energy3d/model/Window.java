@@ -199,7 +199,7 @@ public class Window extends HousePart implements Thermalizable {
 		if (!isFirstPointInserted()) {
 			points.get(1).set(p);
 			if (container instanceof Roof) {
-				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData();
+				normal = (ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getEditPointIndex()).getUserData();
 			}
 		} else if (container instanceof Wall) {
 			if (index == 0 || index == 3) {
@@ -243,7 +243,7 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	private boolean isNormalHorizontal(final PickedHousePart pick) {
-		return Math.abs(((ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getIndex()).getUserData()).getZ()) < 0.1;
+		return Math.abs(((ReadOnlyVector3) ((Roof) container).getRoofPartsRoot().getChild(pick.getUserData().getEditPointIndex()).getUserData()).getZ()) < 0.1;
 	}
 
 	@Override

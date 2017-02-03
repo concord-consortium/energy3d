@@ -267,7 +267,7 @@ public abstract class HousePart implements Serializable {
 		if (original.mesh != null) {
 			root.detachChild(mesh);
 			mesh = original.mesh.makeCopy(true);
-			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getIndex(), false));
+			mesh.setUserData(new UserData(this, ((UserData) original.mesh.getUserData()).getEditPointIndex(), false));
 			root.attachChild(mesh);
 		}
 		drawAnnotations();
@@ -1242,7 +1242,7 @@ public abstract class HousePart implements Serializable {
 					final Vector3 p = pickData.getIntersectionRecord().getIntersectionPoint(0);
 					points.get(i).setZ(p.getZ());
 					final UserData userData = (UserData) ((Spatial) pickData.getTarget()).getUserData();
-					final int roofPartIndex = userData.getIndex();
+					final int roofPartIndex = userData.getEditPointIndex();
 					editPointToRoofIndex[i] = roofPartIndex;
 				}
 

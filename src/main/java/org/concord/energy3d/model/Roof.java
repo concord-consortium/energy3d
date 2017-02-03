@@ -631,7 +631,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 				// draw skylights outline
 				final int[] windowIndices = new int[] { 0, 2, 3, 1 };
 				for (final HousePart part : children) {
-					if (part instanceof Window && part.isDrawable() && ((Window) part).getRoofIndex() == ((UserData) mesh.getUserData()).getIndex()) {
+					if (part instanceof Window && part.isDrawable() && ((Window) part).getRoofIndex() == ((UserData) mesh.getUserData()).getEditPointIndex()) {
 						for (int i = 0; i < part.getPoints().size(); i++) {
 							final ReadOnlyVector3 p1 = part.getAbsPoint(windowIndices[i]);
 							final ReadOnlyVector3 p2 = part.getAbsPoint(windowIndices[(i + 1) % part.getPoints().size()]);
@@ -956,7 +956,7 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		for (int i = 0; i < roofPartsRoot.getNumberOfChildren(); i++) {
 			final UserData orgUserData = (UserData) ((Node) originalRoof.roofPartsRoot.getChild(i)).getChild(0).getUserData();
 			final Mesh mesh = (Mesh) ((Node) roofPartsRoot.getChild(i)).getChild(0);
-			mesh.setUserData(new UserData(this, orgUserData.getIndex(), false));
+			mesh.setUserData(new UserData(this, orgUserData.getEditPointIndex(), false));
 			roofPartsRoot.getChild(i).setUserData(originalRoof.roofPartsRoot.getChild(i).getUserData());
 			final Line outlineMesh = (Line) ((Node) roofPartsRoot.getChild(i)).getChild(4);
 			outlineMesh.setLineWidth(printOutlineThickness);

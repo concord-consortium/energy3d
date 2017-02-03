@@ -406,9 +406,9 @@ public class SolarRadiation {
 	private void computeOnImportedMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
 
 		final Vector3 normal = (Vector3) ((UserData) mesh.getUserData()).getNormal();
-		final double angle = foundation.getAzimuth();
-		if (!Util.isZero(angle)) {
-			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(angle)); // FIXME: Why negate?
+		final double az = foundation.getAzimuth();
+		if (!Util.isZero(az)) {
+			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(az)); // FIXME: Why negate? See also Foundation.drawImports()
 			matrix.applyPost(normal, normal);
 		}
 		MeshDataStore data = onMesh.get(mesh);

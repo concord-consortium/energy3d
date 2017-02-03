@@ -1472,7 +1472,7 @@ public class Wall extends HousePart implements Thermalizable {
 
 		final Mesh orgInvisibleMesh = originalWall.invisibleMesh;
 		invisibleMesh = orgInvisibleMesh.makeCopy(true);
-		invisibleMesh.setUserData(new UserData(this, ((UserData) orgInvisibleMesh.getUserData()).getIndex(), false));
+		invisibleMesh.setUserData(new UserData(this, ((UserData) orgInvisibleMesh.getUserData()).getEditPointIndex(), false));
 		root.attachChild(invisibleMesh);
 		wallAndWindowsPoints = originalWall.wallAndWindowsPoints;
 
