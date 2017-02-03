@@ -2189,6 +2189,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void rotate(final double angle) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {

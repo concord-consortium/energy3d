@@ -42,6 +42,7 @@ import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -404,7 +405,12 @@ public class SolarRadiation {
 	// Similar to the above method, but remove some unnecessary calculations for performance improvement
 	private void computeOnImportedMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
 
-		final ReadOnlyVector3 normal = ((UserData) mesh.getUserData()).getNormal();
+		final Vector3 normal = (Vector3) ((UserData) mesh.getUserData()).getNormal();
+		final double angle = foundation.getAzimuth();
+		if (!Util.isZero(angle)) {
+			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(angle)); // FIXME: Why negate?
+			matrix.applyPost(normal, normal);
+		}
 		MeshDataStore data = onMesh.get(mesh);
 		if (data == null) {
 			data = initMeshTextureData(mesh, mesh, normal, true);

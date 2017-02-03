@@ -149,6 +149,9 @@ public class MeshLib {
 	}
 
 	public static boolean isSameDirection(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
+		if (a == b) {
+			return true;
+		}
 		return a.dot(b) > 0.99;
 	}
 

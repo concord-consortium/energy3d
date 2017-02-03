@@ -54,7 +54,7 @@ public class UserData {
 	}
 
 	public ReadOnlyVector3 getNormal() {
-		return normal;
+		return normal.clone();
 	}
 
 	public void setNormal(final ReadOnlyVector3 normal) {

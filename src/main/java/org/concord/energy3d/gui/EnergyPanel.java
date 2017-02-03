@@ -82,6 +82,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -1130,12 +1131,16 @@ public class EnergyPanel extends JPanel {
 								final double xMeshBox = 2 * meshBox.getExtent().getX() * scale;
 								final double yMeshBox = 2 * meshBox.getExtent().getY() * scale;
 								final double zMeshBox = 2 * meshBox.getExtent().getZ() * scale;
-								final ReadOnlyVector3 meshBoxCenter = meshBox.getCenter();
+								final ReadOnlyVector3 meshBoxCenter = new Vector3();// meshBox.getCenter();
 								final NodeState ns = foundation.getNodeState(selectedNode);
 								final Vector3 position = ns.getPosition();
-								ReadOnlyVector3 meshNormal = null;
+								Vector3 meshNormal = null;
 								if (selectedMesh.getUserData() instanceof UserData) {
-									meshNormal = ((UserData) selectedMesh.getUserData()).getNormal();
+									meshNormal = (Vector3) ((UserData) selectedMesh.getUserData()).getNormal();
+									if (!Util.isZero(az)) {
+										final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(az)); // FIXME: Why negate?
+										matrix.applyPost(meshNormal, meshNormal);
+									}
 								}
 								final String meshBoxString = twoDecimals.format(xMeshBox) + "\u00d7" + (twoDecimals.format(yMeshBox)) + "\u00d7" + (twoDecimals.format(zMeshBox)) + " m";
 								final String meshCenterString = "(" + twoDecimals.format(meshBoxCenter.getX() * scale) + ", " + twoDecimals.format(meshBoxCenter.getY() * scale) + ", " + twoDecimals.format(meshBoxCenter.getZ() * scale) + ") m";
