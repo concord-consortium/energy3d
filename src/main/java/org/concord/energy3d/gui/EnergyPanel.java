@@ -1145,7 +1145,7 @@ public class EnergyPanel extends JPanel {
 										matrix.applyPost(meshNormal, meshNormal);
 									}
 								}
-								// System.out.println("**********" + Util.getFirstNormal(selectedMesh));
+								// System.out.println(">>>" + Util.computeFirstNormal(selectedMesh) + ", " + Util.getFirstNormalFromBuffer(selectedMesh));
 								final String meshBoxString = oneDecimal.format(xMeshBox) + "\u00d7" + (oneDecimal.format(yMeshBox)) + "\u00d7" + (oneDecimal.format(zMeshBox)) + " m";
 								final String meshCenterString = "(" + oneDecimal.format(meshBoxCenter.getX() * scale) + ", " + oneDecimal.format(meshBoxCenter.getY() * scale) + ", " + oneDecimal.format(meshBoxCenter.getZ() * scale) + ") m";
 								final String meshNormalString = meshNormal != null ? "(" + twoDecimals.format(meshNormal.getX()) + ", " + twoDecimals.format(meshNormal.getY()) + ", " + twoDecimals.format(meshNormal.getZ()) + ")" : "";

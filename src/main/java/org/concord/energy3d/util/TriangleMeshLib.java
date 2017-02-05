@@ -58,7 +58,7 @@ public class TriangleMeshLib {
 			p2.subtract(p1, v1);
 			p3.subtract(p1, v2);
 			v1.cross(v2, normal);
-			mesh.getWorldTransform().applyForwardVector(normal); // as the vertex buffer can be relative to the node (?), apply the world transform to get the absolute normal
+			mesh.getWorldTransform().applyForwardVector(normal); // as the vertex buffer can be relative to the node, apply the world transform to get the absolute normal
 			normal.normalizeLocal();
 
 			Vector3 firstNormal = null;

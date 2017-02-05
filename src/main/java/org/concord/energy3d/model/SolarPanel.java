@@ -226,7 +226,7 @@ public class SolarPanel extends HousePart implements Trackable {
 			}
 		} else if (container instanceof Foundation) {
 			if (pickedNormal != null) {
-				return Util.isEqual(pickedNormal, Vector3.UNIT_Z);
+				return Util.isEqualFaster(pickedNormal, Vector3.UNIT_Z);
 			}
 			return true;
 		}
@@ -373,7 +373,7 @@ public class SolarPanel extends HousePart implements Trackable {
 			dir = new Vector3(0.5, 0, 0);
 			p = o.add(0, 0, baseHeight, null);
 		} else {
-			dir = Util.isEqual(normal, Vector3.UNIT_Z, 0.001) ? new Vector3(0, 1, 0) : normal.cross(Vector3.UNIT_Z, null); // special case when normal is z-axis
+			dir = Util.isEqualFaster(normal, Vector3.UNIT_Z, 0.001) ? new Vector3(0, 1, 0) : normal.cross(Vector3.UNIT_Z, null); // special case when normal is z-axis
 			dir = dir.multiplyLocal(0.5);
 			p = o.add(0, 0, baseHeight, null);
 		}

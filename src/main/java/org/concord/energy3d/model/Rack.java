@@ -920,7 +920,7 @@ public class Rack extends HousePart implements Trackable {
 			}
 		} else if (container instanceof Foundation) {
 			if (pickedNormal != null) {
-				return Util.isEqual(pickedNormal, Vector3.UNIT_Z);
+				return Util.isEqualFaster(pickedNormal, Vector3.UNIT_Z);
 			}
 			return true;
 		}

@@ -121,6 +121,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh selectedMesh;
 	private transient Line selectedMeshOutline;
 	private transient Line selectedNodeBoundingBox;
+	private boolean noDuplicateMeshes;
 
 	static {
 		format.setGroupingUsed(true);
@@ -2638,12 +2639,12 @@ public class Foundation extends HousePart implements Thermalizable {
 					// final List<Mesh> children = new ArrayList<Mesh>(); children.add(m);
 					if (!children.isEmpty()) {
 						for (final Mesh s : children) {
+							s.setTransform(t);
 							final UserData ud = new UserData(this, meshIndex);
 							ud.setNormal((Vector3) s.getUserData());
 							ud.setRenderState(s.getLocalRenderState(StateType.Texture));
 							ud.setTextureBuffer(s.getMeshData().getTextureBuffer(0));
 							s.setUserData(ud);
-							s.setTransform(t);
 							s.setName("Mesh #" + meshIndex + ", " + nodeString);
 							newNode.attachChild(s);
 							meshIndex++;
@@ -2664,6 +2665,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				importedNodes.add(newNode);
 				newNode.setScale(scale);
 				root.attachChild(newNode);
+				if (noDuplicateMeshes) {
+					removeDuplicateMeshes();
+				}
 				return newNode;
 			}
 			if (position != null) {
@@ -2680,6 +2684,44 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 		}
 		return null;
+	}
+
+	public void setNoDuplicateMeshes(final boolean b) {
+		noDuplicateMeshes = b;
+	}
+
+	public boolean getNoDuplicateMeshes() {
+		return noDuplicateMeshes;
+	}
+
+	public void removeDuplicateMeshes() {
+		if (importedNodes != null) {
+			for (final Node node : importedNodes) {
+				final List<Mesh> list = new ArrayList<Mesh>();
+				for (final Spatial s : node.getChildren()) {
+					final Mesh m = (Mesh) s;
+					if (isDuplicate(m, node)) {
+						final UserData ud = (UserData) m.getUserData();
+						if (ud.getNormal().getZ() < -0.001 && !list.contains(m)) { // TODO: It is not safe to assume that a duplicated mesh with a downward normal can be removed
+							list.add(m);
+						}
+					}
+				}
+				for (final Mesh m : list) {
+					node.detachChild(m);
+				}
+			}
+		}
+	}
+
+	private boolean isDuplicate(final Mesh m, final Node n) {
+		for (final Spatial s : n.getChildren()) {
+			final Mesh t = (Mesh) s;
+			if (Util.isEqual(m.getMeshData().getVertexBuffer(), t.getMeshData().getVertexBuffer())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void removeAllImports() {

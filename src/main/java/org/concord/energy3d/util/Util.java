@@ -368,6 +368,39 @@ public class Util {
 		return Math.round(x * 100.0) / 100.0;
 	}
 
+	public static boolean isEqual(final FloatBuffer b1, final FloatBuffer b2) {
+		if (b1 == b2) {
+			return true;
+		}
+		final int n = b1.limit();
+		if (n != b2.limit()) {
+			return false;
+		}
+		for (int i = 0; i < n; i++) {
+			if (!Util.isZero(b1.get(i) - b2.get(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public static boolean isEqual(final OrientedBoundingBox b1, final OrientedBoundingBox b2, final double tolerance) {
+		if (b1 == b2) {
+			return true;
+		}
+		return isEqualFaster(b1.getCenter(), b2.getCenter(), tolerance) && isEqualFaster(b1.getExtent(), b2.getExtent(), tolerance) && isEqualFaster(b1.getXAxis(), b2.getXAxis(), tolerance) && isEqualFaster(b1.getYAxis(), b2.getYAxis(), tolerance) && isEqualFaster(b1.getZAxis(), b2.getZAxis(), tolerance);
+	}
+
+	// this method does not use square root and should be faster
+	public static boolean isEqualFaster(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
+		return isZero(a.getX() - b.getX()) && isZero(a.getY() - b.getY()) && isZero(a.getZ() - b.getZ());
+	}
+
+	// this method does not use square root and should be faster
+	public static boolean isEqualFaster(final ReadOnlyVector3 a, final ReadOnlyVector3 b, final double tolerance) {
+		return Math.abs(a.getX() - b.getX()) < tolerance && Math.abs(a.getY() - b.getY()) < tolerance && Math.abs(a.getZ() - b.getZ()) < tolerance;
+	}
+
 	public static boolean isEqual(final ReadOnlyVector3 a, final ReadOnlyVector3 b) {
 		return a.distance(b) < MathUtils.ZERO_TOLERANCE;
 	}
@@ -1067,7 +1100,8 @@ public class Util {
 		boundingBox.setVisible(true);
 	}
 
-	public static Vector3 getFirstNormal(final Mesh mesh) {
+	/** debug method */
+	public static Vector3 computeFirstNormal(final Mesh mesh) {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		if (vertexBuffer.limit() < 9) {
 			return null;
@@ -1078,8 +1112,17 @@ public class Util {
 		final Vector3 v1 = p2.subtract(p1, null);
 		final Vector3 v2 = p3.subtract(p1, null);
 		final Vector3 normal = v1.cross(v2, null);
-		mesh.getWorldTransform().applyForwardVector(normal); // as the vertex buffer can be relative to the node (?), apply the world transform to get the absolute normal
+		mesh.getWorldTransform().applyForwardVector(normal); // as the vertex buffer can be relative to the node, apply the world transform to get the absolute normal
 		return normal.normalizeLocal();
+	}
+
+	/** debug method */
+	public static Vector3 getFirstNormalFromBuffer(final Mesh mesh) {
+		final FloatBuffer normalBuffer = mesh.getMeshData().getNormalBuffer();
+		if (normalBuffer.limit() < 9) {
+			return null;
+		}
+		return new Vector3(normalBuffer.get(0), normalBuffer.get(1), normalBuffer.get(2));
 	}
 
 }
