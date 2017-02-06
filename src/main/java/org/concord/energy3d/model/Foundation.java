@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +35,7 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.CollisionTreeManager;
+import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
@@ -80,7 +80,6 @@ public class Foundation extends HousePart implements Thermalizable {
 	public static final int EQUAL_AZIMUTHAL_SPACING = 0;
 	public static final int RADIAL_STAGGER = 1;
 
-	private static DecimalFormat format = new DecimalFormat();
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
@@ -122,11 +121,6 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Line selectedMeshOutline;
 	private transient Line selectedNodeBoundingBox;
 	private boolean noDuplicateMeshes;
-
-	static {
-		format.setGroupingUsed(true);
-		format.setMaximumFractionDigits(0);
-	}
 
 	public Foundation() {
 		super(2, 12, 1);
@@ -298,6 +292,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				scanChildrenHeight();
 			}
 			setEditPointsVisible(resizeHouseMode);
+			updateFloatingLabelPosition();
 			boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
 		}
 	}
@@ -737,11 +732,11 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawSideMesh();
 			drawOutline(boundingMesh, points.get(7).getZf());
 			drawOutline(outlineMesh, (float) height);
-			updateSolarLabelPosition();
 			updateHandles();
 			drawSolarReceiver();
-			foundationPolygon.draw();
 			drawImports();
+			updateFloatingLabelPosition();
+			foundationPolygon.draw();
 		}
 	}
 
@@ -1052,15 +1047,23 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (int i = 4; i < Math.min(8, points.size()); i++) {
 			points.get(i).setZ(boundingHeight + height);
 		}
+		if (importedNodes != null) {
+			boolean taller = false;
+			for (final Node n : importedNodes) {
+				final OrientedBoundingBox b = Util.getOrientedBoundingBox(n);
+				final double bh = b.getCenter().getZ() + b.getExtent().getZ();
+				if (bh > boundingHeight) {
+					boundingHeight = bh;
+					taller = true;
+				}
+			}
+			if (taller) {
+				boundingHeight -= height; // subtract as bounding box height includes the foundation height
+			}
+		}
 		newBoundingHeight = boundingHeight;
 		syncUpperPoints();
 		updateEditShapes();
-		updateSolarLabelPosition();
-	}
-
-	public void updateSolarLabelPosition() {
-		final ReadOnlyVector3 center = getCenter();
-		floatingLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6.0);
 	}
 
 	private double scanChildrenHeight(final HousePart part) {
@@ -1199,25 +1202,6 @@ public class Foundation extends HousePart implements Thermalizable {
 						}
 					}
 				}
-			}
-		}
-	}
-
-	public void showBuildingLabel(final boolean b) {
-		floatingLabel.setVisible(b && SceneManager.getInstance().getSolarHeatMap());
-	}
-
-	public void setSolarLabelValue(final double solarValue) {
-		scanChildrenHeight();
-		if (solarValue == -2) {
-			floatingLabel.setVisible(false);
-		} else {
-			floatingLabel.setVisible(SceneManager.getInstance().areBuildingLabelsVisible());
-			final String idLabel = "(#" + id + ")";
-			if (solarValue == -1 || solarValue == 0) {
-				floatingLabel.setText(idLabel);
-			} else {
-				floatingLabel.setText(idLabel + "\n" + format.format(solarValue) + "kWh");
 			}
 		}
 	}
@@ -2664,6 +2648,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (newNode.getNumberOfChildren() > 0) {
 				importedNodes.add(newNode);
 				newNode.setScale(scale);
+				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
 				if (noDuplicateMeshes) {
 					removeDuplicateMeshes();
@@ -2702,7 +2687,8 @@ public class Foundation extends HousePart implements Thermalizable {
 					final Mesh m = (Mesh) s;
 					if (isDuplicate(m, node)) {
 						final UserData ud = (UserData) m.getUserData();
-						if (ud.getNormal().getZ() < -0.001 && !list.contains(m)) { // TODO: It is not safe to assume that a duplicated mesh with a downward normal can be removed
+						final ReadOnlyVector3 n2 = ud.getNormal();
+						if (n2.getZ() < -0.001 && !list.contains(m)) { // TODO: It is not safe to assume that a duplicated mesh with a downward normal can be removed
 							list.add(m);
 						}
 					}
@@ -2717,7 +2703,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean isDuplicate(final Mesh m, final Node n) {
 		for (final Spatial s : n.getChildren()) {
 			final Mesh t = (Mesh) s;
-			if (Util.isEqual(m.getMeshData().getVertexBuffer(), t.getMeshData().getVertexBuffer())) {
+			if (m == t || Util.isEqual(m.getMeshData().getVertexBuffer(), t.getMeshData().getVertexBuffer())) {
 				return true;
 			}
 		}
@@ -2834,6 +2820,24 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
+	}
+
+	public void showFloatingLabel(final boolean b) {
+		floatingLabel.setVisible(b && SceneManager.getInstance().getSolarHeatMap());
+	}
+
+	public void setFloatingLabelText(final String text) {
+		if (text == null) {
+			floatingLabel.setVisible(false);
+		} else {
+			floatingLabel.setVisible(Scene.getInstance().areFloatingLabelsVisible());
+			floatingLabel.setText(text);
+		}
+	}
+
+	private void updateFloatingLabelPosition() {
+		final ReadOnlyVector3 center = getCenter();
+		floatingLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6);
 	}
 
 }

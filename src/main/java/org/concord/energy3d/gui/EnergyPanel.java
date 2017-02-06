@@ -95,9 +95,9 @@ public class EnergyPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final EnergyPanel instance = new EnergyPanel();
-	private final DecimalFormat noDecimal = new DecimalFormat();
-	private final DecimalFormat oneDecimal = new DecimalFormat();
-	private final DecimalFormat twoDecimals = new DecimalFormat();
+	public final DecimalFormat noDecimal = new DecimalFormat();
+	public final DecimalFormat oneDecimal = new DecimalFormat();
+	public final DecimalFormat twoDecimals = new DecimalFormat();
 	private static boolean autoRecomputeEnergy;
 	private boolean computeRequest;
 	private boolean computing;
@@ -1544,18 +1544,11 @@ public class EnergyPanel extends JPanel {
 				if (SceneManager.getInstance().getSolarHeatMap()) {
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 				}
-				int numberOfHouses = 0;
-				for (final HousePart part : Scene.getInstance().getParts()) {
-					if (part instanceof Foundation && !part.getChildren().isEmpty() && !part.isFrozen()) {
-						numberOfHouses++;
-					}
-					if (numberOfHouses >= 2) {
-						break;
-					}
-				}
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part instanceof Foundation) {
-						((Foundation) part).setSolarLabelValue(numberOfHouses >= 2 && !part.getChildren().isEmpty() && !part.isFrozen() ? -1 : -2);
+						final Foundation f = (Foundation) part;
+						final boolean hasChildren = !f.getChildren().isEmpty() || (f.getImportedNodes() != null && !f.getImportedNodes().isEmpty());
+						f.setFloatingLabelText(hasChildren && !f.isFrozen() ? "(#" + f.getId() + ")" : null);
 					}
 				}
 				SceneManager.getInstance().getSolarLand().setVisible(false);

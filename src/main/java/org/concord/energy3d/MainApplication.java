@@ -8,6 +8,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -26,7 +27,7 @@ import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
-	public static final String VERSION = "6.4.7";
+	public static final String VERSION = "6.4.8";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -201,7 +202,7 @@ public class MainApplication {
 		}
 	}
 
-	public static void setupLibraryPath() {
+	private static void setupLibraryPath() {
 		System.out.println(System.getProperty("java.version") + ", " + System.getProperty("os.arch"));
 		final String OSPath;
 		final String os = System.getProperty("os.name").toLowerCase();
@@ -259,13 +260,8 @@ public class MainApplication {
 		}
 	}
 
-	public static void newActivation(final String[] args) {
-		System.out.println("newActivation()");
-
-		for (final String s : args) {
-			System.out.println(s);
-		}
-
+	private static void newActivation(final String[] args) {
+		System.out.println("newActivation(): " + Arrays.asList(args));
 		if (args.length > 0) {
 			try {
 				MainFrame.getInstance().open(args[0]);
@@ -274,11 +270,10 @@ public class MainApplication {
 				e.printStackTrace();
 			}
 		}
-
 		showAndBringToFront();
 	}
 
-	public static void showAndBringToFront() {
+	private static void showAndBringToFront() {
 		System.out.println("showAndBringToFront");
 		if (!MainFrame.getInstance().isVisible()) {
 			MainFrame.getInstance().setVisible(true);

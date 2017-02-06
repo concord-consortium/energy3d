@@ -396,7 +396,9 @@ public class SolarRadiation {
 				if (data.solarPotential != null) {
 					data.solarPotential[minute / timeStep] += radiation * scaledArea;
 				}
-				housePart.getSolarPotential()[minute / timeStep] += radiation * scaledArea;
+				if (!(housePart instanceof Foundation)) { // exclude radiation on foundation
+					housePart.getSolarPotential()[minute / timeStep] += radiation * scaledArea;
+				}
 			}
 		}
 
@@ -1230,7 +1232,7 @@ public class SolarRadiation {
 						heatLoss[i] += groundHeatLoss;
 					}
 				}
-				double solarPotentialTotal = 0.0;
+				double solarPotentialTotal = 0;
 				for (final HousePart child : Scene.getInstance().getParts()) {
 					if (child.getTopContainer() == foundation) {
 						child.setSolarPotentialToday(0);
@@ -1264,6 +1266,12 @@ public class SolarRadiation {
 						}
 					}
 				}
+				if (foundation.getImportedNodes() != null) {
+					for (int i = 0; i < n; i++) {
+						solarPotentialTotal += foundation.getSolarPotential()[i];
+						foundation.setSolarPotentialToday(foundation.getSolarPotentialToday() + foundation.getSolarPotential()[i]);
+					}
+				}
 
 				double heatingTotal = 0.0;
 				double coolingTotal = 0.0;
@@ -1285,7 +1293,7 @@ public class SolarRadiation {
 				}
 
 				foundation.setSolarPotentialToday(solarPotentialTotal);
-				foundation.setSolarLabelValue(solarPotentialTotal);
+				foundation.setFloatingLabelText("(#" + foundation.getId() + ")\n" + EnergyPanel.getInstance().oneDecimal.format(solarPotentialTotal) + " kWh");
 				foundation.setPassiveSolarToday(passiveSolarTotal);
 				foundation.setPhotovoltaicToday(photovoltaicTotal);
 				foundation.setHeatingToday(heatingTotal);

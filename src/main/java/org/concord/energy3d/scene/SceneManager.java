@@ -204,7 +204,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean zoomLock;
 	private boolean solarHeatMap;
 	private boolean heatFluxDaily = true;
-	private boolean showBuildingLabels;
 	private boolean showHeatFlux;
 	private boolean cameraChanged;
 	private boolean fineGrid;
@@ -2137,19 +2136,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public boolean areHeatFluxVectorsVisible() {
 		return showHeatFlux;
-	}
-
-	public void setBuildingLabelsVisible(final boolean b) {
-		showBuildingLabels = b;
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {
-				((Foundation) part).showBuildingLabel(b);
-			}
-		}
-	}
-
-	public boolean areBuildingLabelsVisible() {
-		return showBuildingLabels;
 	}
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */

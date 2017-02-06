@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<property name="app.name" value="Energy3D"/>
-	<property name="app.version" value="6.0"/>
+	<property name="app.version" value="6.x"/>
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
@@ -85,7 +85,7 @@
 			<fx:bundleargument arg="mac.CFBundleIdentifier" value="org.concord.Energy3D"/>
 			<fx:bundleargument arg="mac.CFBundleVersion" value="5.0.0"/>
 			<fx:bundleargument arg="mac.signing-key-developer-id-app" value="Developer ID Application: Concord"/>
-			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2010-2016 Concord Consortium Inc.">
+			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2011-2017 Concord Consortium Inc.">
 				<fx:association extension="ng3" description="${app.name} File" mimetype="application/energy3d" icon="${icon}">
 				</fx:association>
 			</fx:info>

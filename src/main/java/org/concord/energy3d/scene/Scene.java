@@ -132,7 +132,7 @@ public class Scene implements Serializable {
 	private boolean hideAxes;
 	private boolean hideLightBeams;
 	private boolean showSunAngles;
-	private boolean showBuildingLabels;
+	private boolean showFloatingLabels;
 	private boolean cleanup;
 	private boolean alwaysComputeHeatFluxVectors;
 	private boolean fullEnergyInSolarMap = true;
@@ -255,6 +255,7 @@ public class Scene implements Serializable {
 						break;
 					}
 				}
+				MainFrame.getInstance().toFront();
 			}
 		});
 	}
@@ -348,7 +349,6 @@ public class Scene implements Serializable {
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 		SceneManager.getInstance().setAxesVisible(!hideAxes);
-		SceneManager.getInstance().setBuildingLabelsVisible(showBuildingLabels);
 		SceneManager.getInstance().getSolarLand().setVisible(!noSolarMapForLand);
 
 		setTheme(theme);
@@ -766,7 +766,7 @@ public class Scene implements Serializable {
 		}
 
 		instance.hideAxes = !SceneManager.getInstance().areAxesVisible();
-		instance.showBuildingLabels = SceneManager.getInstance().areBuildingLabelsVisible();
+		// instance.showFloatingLabels = SceneManager.getInstance().areFloatingLabelsVisible();
 		instance.calendar.setTime(Heliodon.getInstance().getCalendar().getTime());
 		instance.latitude = (int) Math.toDegrees(Heliodon.getInstance().getLatitude());
 		instance.city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -3079,6 +3079,19 @@ public class Scene implements Serializable {
 			return null;
 		}
 		return instructionSheetTextType[i];
+	}
+
+	public void setFloatingLabelsVisible(final boolean b) {
+		showFloatingLabels = b;
+		for (final HousePart part : parts) {
+			if (part instanceof Foundation) {
+				((Foundation) part).showFloatingLabel(b);
+			}
+		}
+	}
+
+	public boolean areFloatingLabelsVisible() {
+		return showFloatingLabels;
 	}
 
 }

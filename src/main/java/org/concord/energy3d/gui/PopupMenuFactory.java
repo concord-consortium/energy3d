@@ -6419,7 +6419,7 @@ public class PopupMenuFactory {
 			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
-			final JCheckBoxMenuItem miNoDuplicateMeshes = new JCheckBoxMenuItem("Remove Duplicated Meshes");
+			final JCheckBoxMenuItem miNoDuplicateMeshes = new JCheckBoxMenuItem("Remove Duplicated Downward Meshes");
 			miNoDuplicateMeshes.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

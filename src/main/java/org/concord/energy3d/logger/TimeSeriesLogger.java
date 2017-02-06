@@ -806,7 +806,7 @@ public class TimeSeriesLogger {
 						line += ((EnergyDailyAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof BuildingDailyEnergyGraph) {
 						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
-						if (SceneManager.getInstance().areBuildingLabelsVisible()) {
+						if (Scene.getInstance().areFloatingLabelsVisible()) {
 							final String result = Building.getBuildingSolarPotentials();
 							if (result != null) {
 								line += ", \"Solar Potential\": " + result;
@@ -824,7 +824,7 @@ public class TimeSeriesLogger {
 						line += ((Cost) analysisRequester).toJson();
 					} else if (analysisRequester instanceof BuildingDailyEnergyGraph) {
 						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
-						if (SceneManager.getInstance().areBuildingLabelsVisible()) {
+						if (Scene.getInstance().areFloatingLabelsVisible()) {
 							final String result = Building.getBuildingSolarPotentials();
 							if (result != null) {
 								line += ", \"Solar Potential\": " + result;
