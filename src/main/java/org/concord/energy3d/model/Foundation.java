@@ -121,7 +121,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Line selectedMeshOutline;
 	private transient Line selectedNodeBoundingBox;
 	private static Map<Mesh, OrientedBoundingBox> meshToBox = new HashMap<Mesh, OrientedBoundingBox>();
-	private boolean offsetIdenticalMeshes;
+	private boolean offsetTwinMeshes;
+	private transient Map<Mesh, Mesh> meshTwins = new HashMap<Mesh, Mesh>();
 
 	public Foundation() {
 		super(2, 12, 1);
@@ -2651,8 +2652,8 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.setScale(scale);
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
-				if (offsetIdenticalMeshes) {
-					offsetIdenticalMeshes();
+				if (offsetTwinMeshes) {
+					offsetTwinMeshes();
 				}
 				return newNode;
 			}
@@ -2672,20 +2673,22 @@ public class Foundation extends HousePart implements Thermalizable {
 		return null;
 	}
 
-	public void setOffsetIdenticalMeshes(final boolean b) {
-		offsetIdenticalMeshes = b;
+	public void setOffsetTwinMeshes(final boolean b) {
+		offsetTwinMeshes = b;
 	}
 
-	public boolean getOffsetIdenticalMeshes() {
-		return offsetIdenticalMeshes;
+	public boolean getOffsetTwinMeshes() {
+		return offsetTwinMeshes;
 	}
 
-	// imported nodes often have a couple of meshes with identical vertex coordinates but opposite normal vectors, find these and offset them
-	public void offsetIdenticalMeshes() {
+	// imported nodes often have a twin of meshes with identical vertex coordinates but opposite normal vectors, find these and offset them
+	public void offsetTwinMeshes() {
 		SceneManager.getInstance().cursorWait(true); // this could be a very compute-intensive task
-		final double offset = 0.001;
+		if (meshTwins == null) {
+			meshTwins = new HashMap<Mesh, Mesh>();
+		}
+		final double offset = 0.01;
 		for (final Node node : importedNodes) {
-			meshToBox.clear();
 			final int n = node.getNumberOfChildren();
 			for (int i1 = 0; i1 < n; i1++) {
 				final Mesh m1 = (Mesh) node.getChild(i1);
@@ -2703,12 +2706,22 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (Util.isEqual(b1, b2, 0.001)) {
 						m1.addTranslation(((UserData) m1.getUserData()).getNormal().multiply(offset, null));
 						m2.addTranslation(((UserData) m2.getUserData()).getNormal().multiply(offset, null));
+						meshTwins.put(m1, m2);
+						meshTwins.put(m2, m1);
 						break;
 					}
 				}
 			}
+			meshToBox.clear();
 		}
 		SceneManager.getInstance().cursorWait(false);
+	}
+
+	public Mesh getTwin(final Mesh m) {
+		if (meshTwins == null) {
+			return null;
+		}
+		return meshTwins.get(m);
 	}
 
 	public void removeAllImports() {

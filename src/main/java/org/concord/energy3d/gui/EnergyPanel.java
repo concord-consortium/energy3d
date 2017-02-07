@@ -1146,19 +1146,30 @@ public class EnergyPanel extends JPanel {
 									}
 								}
 								// System.out.println(">>>" + Util.computeFirstNormal(selectedMesh) + ", " + Util.getFirstNormalFromBuffer(selectedMesh));
-								final String meshBoxString = oneDecimal.format(xMeshBox) + "\u00d7" + (oneDecimal.format(yMeshBox)) + "\u00d7" + (oneDecimal.format(zMeshBox)) + " m";
+								final String meshBoxString = twoDecimals.format(xMeshBox) + "\u00d7" + (twoDecimals.format(yMeshBox)) + "\u00d7" + (twoDecimals.format(zMeshBox)) + " m";
 								final String meshCenterString = "(" + oneDecimal.format(meshBoxCenter.getX() * scale) + ", " + oneDecimal.format(meshBoxCenter.getY() * scale) + ", " + oneDecimal.format(meshBoxCenter.getZ() * scale) + ") m";
 								final String meshNormalString = meshNormal != null ? "(" + twoDecimals.format(meshNormal.getX()) + ", " + twoDecimals.format(meshNormal.getY()) + ", " + twoDecimals.format(meshNormal.getZ()) + ")" : "";
-								partPanelBorder.setTitle("Node #" + foundation.getImportedNodes().indexOf(selectedNode) + " (" + Util.getFileName(ns.getSourceURL().getPath()) + "), Mesh #" + meshIndex);
-								partProperty1Label.setText("  Dimension:");
-								partProperty2Label.setText("  Position:");
-								partProperty3Label.setText("  Mesh (" + selectedMesh.getMeshData().getVertexCount() + "):");
-								partProperty1TextField.setText(twoDecimals.format(xNodeBox) + "\u00d7" + (twoDecimals.format(yNodeBox)) + "\u00d7" + (twoDecimals.format(zNodeBox)) + " m");
-								partProperty2TextField.setText("(" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m, on Foundation #" + foundation.getId());
-								partProperty3TextField.setText(meshBoxString + ", \u2191" + meshNormalString + ", " + meshCenterString);
-								partProperty1TextField.setToolTipText("The bounding size of this node (" + ns.getSourceURL().getFile() + ")");
-								partProperty2TextField.setToolTipText("The (x, y) coordinate of the node center");
-								partProperty3TextField.setToolTipText("<html>Info about the selected mesh:<br>" + partProperty3TextField.getText() + "</html>");
+								partPanelBorder.setTitle("Node #" + foundation.getImportedNodes().indexOf(selectedNode) + " (" + Util.getFileName(ns.getSourceURL().getPath()) + "), Mesh #" + meshIndex + ", Base #" + foundation.getId());
+								partProperty1Label.setText("  Node:");
+								partProperty2Label.setText("  Mesh:");
+								partProperty1TextField.setText(twoDecimals.format(xNodeBox) + "\u00d7" + (twoDecimals.format(yNodeBox)) + "\u00d7" + (twoDecimals.format(zNodeBox)) + " m, (" + twoDecimals.format(position.getX() * scale) + ", " + twoDecimals.format(position.getY() * scale) + ") m");
+								partProperty2TextField.setText(meshBoxString + ", " + meshCenterString);
+								partProperty1TextField.setToolTipText("<html>Dimension and location of the bounding box of the selected node:<br>" + partProperty1TextField.getText() + "<br>File:" + ns.getSourceURL().getFile() + "</html>");
+								partProperty2TextField.setToolTipText("<html>Dimension and location of the bounding box of the selected mesh:<br>" + partProperty2TextField.getText() + "</html>");
+								if (energyViewShown) {
+									double dailyMeshSolarPotential = 0;
+									final double[] meshSolarPotential = SolarRadiation.getInstance().getSolarPotential(selectedMesh);
+									for (final double x : meshSolarPotential) {
+										dailyMeshSolarPotential += x;
+									}
+									partProperty3Label.setText("  Solar:");
+									partProperty3TextField.setText("\u2191" + meshNormalString + ", " + twoDecimals.format(dailyMeshSolarPotential) + " kWh");
+									partProperty3TextField.setToolTipText("Normal vector and solar potential of the selected mesh");
+								} else {
+									partProperty3Label.setText("  Normal:");
+									partProperty3TextField.setText("\u2191" + meshNormalString + ", " + selectedMesh.getMeshData().getVertexCount() + " vertices");
+									partProperty3TextField.setToolTipText("<html>Normal vector and vertex count of the selected mesh");
+								}
 							} else {
 								partPanelBorder.setTitle("Foundation (" + foundation.getId() + ")");
 								partProperty1Label.setText("  Size:");

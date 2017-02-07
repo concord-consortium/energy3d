@@ -6419,19 +6419,19 @@ public class PopupMenuFactory {
 			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
-			final JCheckBoxMenuItem miOffsetIdenticalMeshes = new JCheckBoxMenuItem("Offset Identical Meshes");
-			miOffsetIdenticalMeshes.addActionListener(new ActionListener() {
+			final JCheckBoxMenuItem miOffsetTwinMeshes = new JCheckBoxMenuItem("Offset Twin Meshes");
+			miOffsetTwinMeshes.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
-						f.setOffsetIdenticalMeshes(miOffsetIdenticalMeshes.isSelected());
-						if (miOffsetIdenticalMeshes.isSelected()) {
+						f.setOffsetTwinMeshes(miOffsetTwinMeshes.isSelected());
+						if (miOffsetTwinMeshes.isSelected()) {
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() throws Exception {
-									f.offsetIdenticalMeshes();
+									f.offsetTwinMeshes();
 									f.draw();
 									return null;
 								}
@@ -6574,7 +6574,7 @@ public class PopupMenuFactory {
 							miAlignCenter.setEnabled(!Util.isEqual(new Vector2(foundationCenter.getX(), foundationCenter.getY()), new Vector2(center.getX(), center.getY())));
 							final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 							miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Rack);
-							Util.selectSilently(miOffsetIdenticalMeshes, f.getOffsetIdenticalMeshes());
+							Util.selectSilently(miOffsetTwinMeshes, f.getOffsetTwinMeshes());
 						}
 					}
 				}
@@ -6776,7 +6776,7 @@ public class PopupMenuFactory {
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miOffsetIdenticalMeshes);
+			popupMenuForMesh.add(miOffsetTwinMeshes);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);
 			popupMenuForMesh.addSeparator();

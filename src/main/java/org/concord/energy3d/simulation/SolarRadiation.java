@@ -331,8 +331,7 @@ public class SolarRadiation {
 		}
 
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
-		final double OFFSET = 0.1;
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(0.1, null);
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
@@ -417,10 +416,7 @@ public class SolarRadiation {
 		if (data == null) {
 			data = initMeshTextureData(mesh, mesh, normal, true);
 		}
-
-		/* needed in order to prevent picking collision with neighboring wall at wall edge */
-		final double OFFSET = 0.1;
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(OFFSET, null);
+		// final int meshIndex = ((UserData) mesh.getUserData()).getMeshIndex();
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
@@ -447,7 +443,7 @@ public class SolarRadiation {
 					continue;
 				}
 				final double h = row == data.rows - 1 ? data.p1.distance(data.p0) - row * solarStep : solarStep;
-				final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU).add(offset, null);
+				final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU); // cannot do offset as in computeOnMesh
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				final PickResults pickResults = new PrimitivePickResults();
 				double radiation = indirectRadiation; // assuming that indirect (ambient or diffuse) radiation can always reach a grid point
@@ -475,6 +471,10 @@ public class SolarRadiation {
 				foundation.getSolarPotential()[minute / timeStep] += radiation * scaledArea; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
 			}
 		}
+
+		// if (meshIndex == 27 || meshIndex == 29) {
+		// System.out.println(">>>" + data.solarPotential[minute / timeStep]);
+		// }
 
 	}
 
