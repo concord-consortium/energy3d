@@ -13,8 +13,10 @@ import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
@@ -120,7 +122,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh selectedMesh;
 	private transient Line selectedMeshOutline;
 	private transient Line selectedNodeBoundingBox;
-	private boolean noDuplicateMeshes;
+	private static Map<Mesh, OrientedBoundingBox> meshToBox = new HashMap<Mesh, OrientedBoundingBox>();
 
 	public Foundation() {
 		super(2, 12, 1);
@@ -213,7 +215,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		floatingLabel = new BMText("Floating Label", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 		Util.initHousePartLabel(floatingLabel);
-		floatingLabel.setFontScale(0.75);
+		floatingLabel.setFontScale(0.5);
 		floatingLabel.setVisible(false);
 		root.attachChild(floatingLabel);
 
@@ -2650,9 +2652,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.setScale(scale);
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
-				if (noDuplicateMeshes) {
-					removeDuplicateMeshes();
-				}
+				shiftOverlapMeshes();
 				return newNode;
 			}
 			if (position != null) {
@@ -2671,43 +2671,35 @@ public class Foundation extends HousePart implements Thermalizable {
 		return null;
 	}
 
-	public void setNoDuplicateMeshes(final boolean b) {
-		noDuplicateMeshes = b;
-	}
-
-	public boolean getNoDuplicateMeshes() {
-		return noDuplicateMeshes;
-	}
-
-	public void removeDuplicateMeshes() {
-		if (importedNodes != null) {
-			for (final Node node : importedNodes) {
-				final List<Mesh> list = new ArrayList<Mesh>();
-				for (final Spatial s : node.getChildren()) {
-					final Mesh m = (Mesh) s;
-					if (isDuplicate(m, node)) {
-						final UserData ud = (UserData) m.getUserData();
-						final ReadOnlyVector3 n2 = ud.getNormal();
-						if (n2.getZ() < -0.001 && !list.contains(m)) { // TODO: It is not safe to assume that a duplicated mesh with a downward normal can be removed
-							list.add(m);
+	private void shiftOverlapMeshes() {
+		final double shift = 0.01;
+		for (final Node node : importedNodes) {
+			meshToBox.clear();
+			for (final Spatial s1 : node.getChildren()) {
+				final Mesh m1 = (Mesh) s1;
+				final ReadOnlyVector3 n1 = ((UserData) m1.getUserData()).getNormal().multiply(shift, null);
+				final OrientedBoundingBox b1 = Util.getOrientedBoundingBox(m1);
+				meshToBox.put(m1, b1);
+				for (final Spatial s2 : node.getChildren()) {
+					if (s1 != s2) {
+						final Mesh m2 = (Mesh) s2;
+						final OrientedBoundingBox b2;
+						if (meshToBox.get(m2) == null) {
+							b2 = Util.getOrientedBoundingBox(m2);
+							meshToBox.put(m2, b2);
+						} else {
+							b2 = meshToBox.get(m2);
+						}
+						if (Util.isEqual(b1, b2, 0.001)) {
+							final ReadOnlyVector3 n2 = ((UserData) m2.getUserData()).getNormal().multiply(shift, null);
+							m1.addTranslation(n1);
+							m2.addTranslation(n2);
+							break;
 						}
 					}
 				}
-				for (final Mesh m : list) {
-					node.detachChild(m);
-				}
 			}
 		}
-	}
-
-	private boolean isDuplicate(final Mesh m, final Node n) {
-		for (final Spatial s : n.getChildren()) {
-			final Mesh t = (Mesh) s;
-			if (m == t || Util.isEqual(m.getMeshData().getVertexBuffer(), t.getMeshData().getVertexBuffer())) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public void removeAllImports() {

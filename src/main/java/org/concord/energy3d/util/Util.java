@@ -368,6 +368,10 @@ public class Util {
 		return Math.round(x * 100.0) / 100.0;
 	}
 
+	public static boolean isVertexBufferEqual(final Mesh m1, final Mesh m2) {
+		return isEqual(m1.getMeshData().getVertexBuffer(), m2.getMeshData().getVertexBuffer());
+	}
+
 	public static boolean isEqual(final FloatBuffer b1, final FloatBuffer b2) {
 		if (b1 == b2) {
 			return true;
