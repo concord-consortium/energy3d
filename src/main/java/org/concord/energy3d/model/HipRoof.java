@@ -36,8 +36,9 @@ public class HipRoof extends Roof {
 			final Vector3 p = Util.closestPoint(getAbsPoint(0), hipDirection, x, y);
 			if (p != null) {
 				// snapToGrid(p, getAbsPoint(editPointIndex), getGridSize(), false);
-				if (insideWallsPolygon(p))
+				if (insideWallsPolygon(p)) {
 					points.get(editPointIndex).set(toRelative(p));
+				}
 			}
 		}
 		postEdit(editState);
@@ -48,36 +49,36 @@ public class HipRoof extends Roof {
 		final TriangulationPoint roofUpperPoint1 = new ArdorVector3PolygonPoint(getAbsPoint(1));
 		final TriangulationPoint roofUpperPoint2 = new ArdorVector3PolygonPoint(getAbsPoint(2));
 		polygon.addSteinerPoint(roofUpperPoint1);
-		if (!roofUpperPoint2.equals(roofUpperPoint1))
+		if (!roofUpperPoint2.equals(roofUpperPoint1)) {
 			polygon.addSteinerPoint(roofUpperPoint2);
+		}
 		return polygon;
 	}
 
 	@Override
 	protected void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints) {
-		final ReadOnlyVector3 center = getCenter();
 		if (recalculateEditPoints) {
 			recalculateEditPoints = false;
-			points.get(0).set(toRelative(center));
-			// if (editPointIndex == -1) {
-			recalculateEditPoints = false;
-			points.add(toRelative(getCenter()));
+			final ReadOnlyVector3 center = getCenter();
+			points.clear();
+			points.add(toRelative(center));
 			final Vector3 hipDirection = container.getAbsPoint(2).subtractLocal(container.getAbsPoint(0)).normalizeLocal();
 			Vector3 point1 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(-1000, null), null));
 			Vector3 point2 = findFarthestIntersection(wallUpperPoints, center, center.add(hipDirection.multiply(1000, null), null));
-			if (point1 == null)
+			if (point1 == null) {
 				point1 = center.clone();
-			if (point2 == null)
+			}
+			if (point2 == null) {
 				point2 = center.clone();
+			}
 
 			point1.addLocal(hipDirection.multiply(point1.distance(center) * 0.5, null));
 			point2.addLocal(hipDirection.multiply(-point2.distance(center) * 0.5, null));
-			points.get(1).set(toRelative(point1));
-			points.get(2).set(toRelative(point2));
+			points.add(toRelative(point1));
+			points.add(toRelative(point2));
 
 			computeHeight(wallUpperPoints);
 			applyHeight();
-			// }
 		} else {
 			applyHeight();
 		}
