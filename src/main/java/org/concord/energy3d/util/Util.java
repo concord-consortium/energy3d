@@ -392,7 +392,8 @@ public class Util {
 		if (b1 == b2) {
 			return true;
 		}
-		return isEqualFaster(b1.getCenter(), b2.getCenter(), tolerance) && isEqualFaster(b1.getExtent(), b2.getExtent(), tolerance) && isEqualFaster(b1.getXAxis(), b2.getXAxis(), tolerance) && isEqualFaster(b1.getYAxis(), b2.getYAxis(), tolerance) && isEqualFaster(b1.getZAxis(), b2.getZAxis(), tolerance);
+		// only need to check the x and y axes. once these two are identical, the z axes must be identical as well
+		return isEqualFaster(b1.getCenter(), b2.getCenter(), tolerance) && isEqualFaster(b1.getExtent(), b2.getExtent(), tolerance) && isEqualFaster(b1.getXAxis(), b2.getXAxis(), tolerance) && isEqualFaster(b1.getYAxis(), b2.getYAxis(), tolerance);
 	}
 
 	// this method does not use square root and should be faster

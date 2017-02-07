@@ -2370,4 +2370,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		pickMouseState = null;
 	}
 
+	public void cursorWait(final boolean on) {
+		((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+	}
+
 }

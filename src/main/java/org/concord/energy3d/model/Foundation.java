@@ -1,7 +1,5 @@
 package org.concord.energy3d.model;
 
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.HeadlessException;
 import java.awt.geom.Area;
@@ -123,6 +121,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Line selectedMeshOutline;
 	private transient Line selectedNodeBoundingBox;
 	private static Map<Mesh, OrientedBoundingBox> meshToBox = new HashMap<Mesh, OrientedBoundingBox>();
+	private boolean offsetIdenticalMeshes;
 
 	public Foundation() {
 		super(2, 12, 1);
@@ -2589,7 +2588,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			importedNodeStates = new ArrayList<NodeState>();
 		}
 		if (position != null) { // when position is null, the cursor is already set to be wait by the loading method
-			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			SceneManager.getInstance().cursorWait(true);
 		}
 		File sourceFile = new File(file.toURI());
 		if (!sourceFile.exists() && Scene.getURL() != null) {
@@ -2652,11 +2651,13 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.setScale(scale);
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
-				shiftOverlapMeshes();
+				if (offsetIdenticalMeshes) {
+					offsetIdenticalMeshes();
+				}
 				return newNode;
 			}
 			if (position != null) {
-				((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				SceneManager.getInstance().cursorWait(false);
 			}
 		} else {
 			if (position != null) {
@@ -2671,35 +2672,43 @@ public class Foundation extends HousePart implements Thermalizable {
 		return null;
 	}
 
-	private void shiftOverlapMeshes() {
-		final double shift = 0.01;
+	public void setOffsetIdenticalMeshes(final boolean b) {
+		offsetIdenticalMeshes = b;
+	}
+
+	public boolean getOffsetIdenticalMeshes() {
+		return offsetIdenticalMeshes;
+	}
+
+	// imported nodes often have a couple of meshes with identical vertex coordinates but opposite normal vectors, find these and offset them
+	public void offsetIdenticalMeshes() {
+		SceneManager.getInstance().cursorWait(true); // this could be a very compute-intensive task
+		final double offset = 0.001;
 		for (final Node node : importedNodes) {
 			meshToBox.clear();
-			for (final Spatial s1 : node.getChildren()) {
-				final Mesh m1 = (Mesh) s1;
-				final ReadOnlyVector3 n1 = ((UserData) m1.getUserData()).getNormal().multiply(shift, null);
+			final int n = node.getNumberOfChildren();
+			for (int i1 = 0; i1 < n; i1++) {
+				final Mesh m1 = (Mesh) node.getChild(i1);
 				final OrientedBoundingBox b1 = Util.getOrientedBoundingBox(m1);
 				meshToBox.put(m1, b1);
-				for (final Spatial s2 : node.getChildren()) {
-					if (s1 != s2) {
-						final Mesh m2 = (Mesh) s2;
-						final OrientedBoundingBox b2;
-						if (meshToBox.get(m2) == null) {
-							b2 = Util.getOrientedBoundingBox(m2);
-							meshToBox.put(m2, b2);
-						} else {
-							b2 = meshToBox.get(m2);
-						}
-						if (Util.isEqual(b1, b2, 0.001)) {
-							final ReadOnlyVector3 n2 = ((UserData) m2.getUserData()).getNormal().multiply(shift, null);
-							m1.addTranslation(n1);
-							m2.addTranslation(n2);
-							break;
-						}
+				for (int i2 = i1 + 1; i2 < n; i2++) {
+					final Mesh m2 = (Mesh) node.getChild(i2);
+					final OrientedBoundingBox b2;
+					if (meshToBox.get(m2) == null) {
+						b2 = Util.getOrientedBoundingBox(m2);
+						meshToBox.put(m2, b2);
+					} else {
+						b2 = meshToBox.get(m2);
+					}
+					if (Util.isEqual(b1, b2, 0.001)) {
+						m1.addTranslation(((UserData) m1.getUserData()).getNormal().multiply(offset, null));
+						m2.addTranslation(((UserData) m2.getUserData()).getNormal().multiply(offset, null));
+						break;
 					}
 				}
 			}
 		}
+		SceneManager.getInstance().cursorWait(false);
 	}
 
 	public void removeAllImports() {
