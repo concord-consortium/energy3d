@@ -151,7 +151,7 @@ public abstract class CameraControl {
 							SceneManager.getInstance().getCameraNode().updateFromCamera();
 							Scene.getInstance().updateEditShapes();
 						} else if (middle || left && leftButtonAction == ButtonAction.ZOOM || right && rightButtonAction == ButtonAction.ZOOM) {
-							zoom(source, tpf, -inputStates.getCurrent().getMouseState().getDy() * getMaxExtent() / 100);
+							zoom(source, tpf, -inputStates.getCurrent().getMouseState().getDy() * getCurrentExtent() / 100);
 						}
 					} else {
 						firstPing = false;
@@ -166,27 +166,20 @@ public abstract class CameraControl {
 		layer.registerTrigger(new InputTrigger(new MouseWheelMovedCondition(), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel() * getMaxExtent() / 50);
+				zoom(source, tpf, inputStates.getCurrent().getMouseState().getDwheel() * getCurrentExtent() / 20);
 			}
 		}));
 	}
 
-	private static double getMaxExtent() {
-		double maxExtent = 1;
+	private static double getCurrentExtent() {
+		double extent = 1;
 		final BoundingVolume volume = Scene.getRoot().getWorldBound();
 		if (volume instanceof BoundingBox) {
 			final BoundingBox box = (BoundingBox) volume;
-			if (box.getXExtent() > maxExtent) {
-				maxExtent = box.getXExtent();
-			}
-			if (box.getYExtent() > maxExtent) {
-				maxExtent = box.getYExtent();
-			}
-			if (box.getZExtent() > maxExtent) {
-				maxExtent = box.getZExtent();
-			}
+			// the extent that depends on the camera orientation
+			extent = Math.abs(box.getExtent(null).dot(SceneManager.getInstance().getCamera().getDirection()));
 		}
-		return maxExtent;
+		return extent;
 	}
 
 	public InputTrigger getKeyTrigger() {

@@ -2036,8 +2036,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						final Foundation f = (Foundation) selectedPart;
 						final Mesh m = f.getSelectedMesh();
 						final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
-						m.getParent().detachChild(m);
+						final Node parent = m.getParent();
+						parent.detachChild(m);
 						f.clearSelectedMesh();
+						f.removeEmptyNodes();
 						f.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					} else {

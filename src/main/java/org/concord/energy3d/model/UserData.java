@@ -7,6 +7,7 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.RenderState;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class UserData {
@@ -18,6 +19,8 @@ public class UserData {
 	private RenderState renderState;
 	private FloatBuffer textureBuffer;
 	private int meshIndex;
+	private int sideIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
+	private Mesh twin; // the twin of this mesh
 
 	public UserData(final HousePart housePart) {
 		this(housePart, -1, false);
@@ -93,6 +96,22 @@ public class UserData {
 
 	public int getMeshIndex() {
 		return meshIndex;
+	}
+
+	public void setSideIndex(final int sideIndex) {
+		this.sideIndex = sideIndex;
+	}
+
+	public int getSideIndex() {
+		return sideIndex;
+	}
+
+	public void setTwin(final Mesh twin) {
+		this.twin = twin;
+	}
+
+	public Mesh getTwin() {
+		return twin;
 	}
 
 }

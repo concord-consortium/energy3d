@@ -406,7 +406,9 @@ public class SolarRadiation {
 	// Similar to the above method, but remove some unnecessary calculations for performance improvement
 	private void computeOnImportedMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
 
-		final Vector3 normal = (Vector3) ((UserData) mesh.getUserData()).getNormal();
+		final UserData userData = (UserData) mesh.getUserData();
+
+		final Vector3 normal = (Vector3) userData.getNormal();
 		final double az = foundation.getAzimuth();
 		if (!Util.isZero(az)) {
 			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(az)); // FIXME: Why negate? See also Foundation.drawImports()
@@ -416,21 +418,23 @@ public class SolarRadiation {
 		if (data == null) {
 			data = initMeshTextureData(mesh, mesh, normal, true);
 		}
-		// final int meshIndex = ((UserData) mesh.getUserData()).getMeshIndex();
+		final int timeStep = Scene.getInstance().getTimeStep();
+		if (data.solarPotential == null) {
+			data.solarPotential = new double[MINUTES_OF_DAY / timeStep];
+		}
+		if (userData.getSideIndex() == -1) {
+			return;
+		}
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
 		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
 
-		final int timeStep = Scene.getInstance().getTimeStep();
 		final double solarStep = Scene.getInstance().getSolarStep();
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		final double scaleFactor = annotationScale * annotationScale / 60 * timeStep;
 		final float absorption = 1 - foundation.getAlbedo();
-		if (data.solarPotential == null) {
-			data.solarPotential = new double[MINUTES_OF_DAY / timeStep];
-		}
 
 		for (int col = 0; col < data.cols; col++) {
 			final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
@@ -462,6 +466,13 @@ public class SolarRadiation {
 					}
 					if (pickResults.getNumber() == 0) {
 						radiation += directRadiation;
+						if (userData.getSideIndex() == 0) {
+							userData.setSideIndex(1);
+							final Mesh twin = userData.getTwin();
+							if (twin != null) {
+								((UserData) twin.getUserData()).setSideIndex(-1);
+							}
+						}
 					}
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
@@ -472,9 +483,10 @@ public class SolarRadiation {
 			}
 		}
 
-		// if (meshIndex == 27 || meshIndex == 29) {
-		// System.out.println(">>>" + data.solarPotential[minute / timeStep]);
-		// }
+		final int meshIndex = userData.getMeshIndex();
+		if (meshIndex == 27 || meshIndex == 29) {
+			System.out.println(">>>" + meshIndex + "=" + data.solarPotential[minute / timeStep]);
+		}
 
 	}
 

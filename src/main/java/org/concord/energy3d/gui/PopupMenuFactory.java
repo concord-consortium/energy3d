@@ -6608,6 +6608,7 @@ public class PopupMenuFactory {
 									final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
 									m.getParent().detachChild(m);
 									f.clearSelectedMesh();
+									f.removeEmptyNodes();
 									f.draw();
 									updateAfterEdit();
 									SceneManager.getInstance().getUndoManager().addEdit(c);

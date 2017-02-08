@@ -2725,7 +2725,7 @@ public class Scene implements Serializable {
 			c = new ColorRGBA(0, 1, 0.2f, 0.5f);
 			break;
 		default:
-			c = new ColorRGBA(0, 1, 0, 0.5f);
+			c = landColor == null ? new ColorRGBA(0, 1, 0, 0.5f) : landColor;
 		}
 		setLandColor(c);
 		SceneManager.getInstance().changeSkyTexture();
