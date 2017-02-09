@@ -82,7 +82,6 @@ import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -99,9 +98,9 @@ public class EnergyPanel extends JPanel {
 	public final DecimalFormat oneDecimal = new DecimalFormat();
 	public final DecimalFormat twoDecimals = new DecimalFormat();
 	private static boolean autoRecomputeEnergy;
-	private boolean computeRequest;
-	private boolean computing;
-	private boolean cancel;
+	private volatile boolean computeRequest;
+	private volatile boolean computing;
+	private volatile boolean cancel;
 	private boolean alreadyRenderedHeatmap;
 	private boolean computeEnabled = true;
 
@@ -1138,11 +1137,10 @@ public class EnergyPanel extends JPanel {
 								int meshIndex = -1;
 								if (selectedMesh.getUserData() instanceof UserData) {
 									final UserData ud = (UserData) selectedMesh.getUserData();
-									meshNormal = (Vector3) ud.getNormal();
 									meshIndex = ud.getMeshIndex();
+									meshNormal = (Vector3) ud.getNormal();
 									if (!Util.isZero(az)) {
-										final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(az)); // FIXME: Why negate? See also Foundation.drawImports()
-										matrix.applyPost(meshNormal, meshNormal);
+										selectedNode.getRotation().applyPost(meshNormal, meshNormal);
 									}
 								}
 								// System.out.println(">>>" + Util.computeFirstNormal(selectedMesh) + ", " + Util.getFirstNormalFromBuffer(selectedMesh));

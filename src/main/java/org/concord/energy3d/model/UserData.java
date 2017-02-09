@@ -15,12 +15,13 @@ public class UserData {
 	private final int editPointIndex;
 	private final boolean isEditPoint;
 	private Vector3 printCenter = new Vector3();
-	private ReadOnlyVector3 normal;
+	private ReadOnlyVector3 normal; // if this mesh is imported, save its original normal here
+	private ReadOnlyVector3 rotatedNormal; // store the result of current rotation to avoid recalculation, null if there is no need to rotate the original normal
 	private RenderState renderState;
 	private FloatBuffer textureBuffer;
 	private int meshIndex;
 	private int sideIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
-	private Mesh twin; // the twin of this mesh
+	private Mesh twin; // the twin of this mesh, usually created by SketchUp and other CAD software
 
 	public UserData(final HousePart housePart) {
 		this(housePart, -1, false);
@@ -112,6 +113,14 @@ public class UserData {
 
 	public Mesh getTwin() {
 		return twin;
+	}
+
+	public void setRotatedNormal(final ReadOnlyVector3 n) {
+		rotatedNormal = n;
+	}
+
+	public ReadOnlyVector3 getRotatedNormal() {
+		return rotatedNormal;
 	}
 
 }

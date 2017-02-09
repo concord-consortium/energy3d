@@ -42,7 +42,6 @@ import com.ardor3d.intersection.PickResults;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
-import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
@@ -198,25 +197,28 @@ public class SolarRadiation {
 		totalSteps -= 2;
 		final double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
+		rotateImportedMeshes();
 		// for (int minute = MINUTES_OF_DAY / 2; minute < MINUTES_OF_DAY / 2 + timeStep; minute += timeStep) { // test for 12 pm for comparison with shadow
 		for (int minute = 0; minute < MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
+				calculatePeakRadiation(directionTowardSun, dayLength);
+				resetSideIndicesForImportedMeshes();
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isDrawCompleted()) {
 						if (part instanceof Window) {
-							computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
+							computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						} else if (part instanceof Wall) {
 							if (((Wall) part).getType() == Wall.SOLID_WALL) {
-								computeOnMesh(minute, dayLength, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
+								computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 							}
 						} else if (part instanceof Foundation) {
 							final Foundation foundation = (Foundation) part;
 							for (int i = 0; i < 5; i++) {
 								final Mesh radiationMesh = foundation.getRadiationMesh(i);
 								final ReadOnlyVector3 normal = i == 0 ? part.getNormal() : ((UserData) radiationMesh.getUserData()).getNormal();
-								computeOnMesh(minute, dayLength, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
+								computeOnMesh(minute, directionTowardSun, part, radiationMesh, foundation.getRadiationCollisionSpatial(i), normal);
 							}
 							if (!Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
 								final List<Node> importedNodes = foundation.getImportedNodes();
@@ -224,7 +226,8 @@ public class SolarRadiation {
 									for (final Node node : importedNodes) {
 										for (final Spatial s : node.getChildren()) {
 											final Mesh m = (Mesh) s;
-											computeOnImportedMesh(minute, dayLength, directionTowardSun, foundation, m);
+											processImportedMesh(minute, directionTowardSun, foundation, m);
+											computeOnImportedMesh(minute, directionTowardSun, foundation, m);
 										}
 									}
 								}
@@ -234,21 +237,21 @@ public class SolarRadiation {
 								if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 									final ReadOnlyVector3 faceDirection = (ReadOnlyVector3) roofPart.getUserData();
 									final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
-									computeOnMesh(minute, dayLength, directionTowardSun, part, mesh, mesh, faceDirection);
+									computeOnMesh(minute, directionTowardSun, part, mesh, mesh, faceDirection);
 								}
 							}
 						} else if (part instanceof SolarPanel) {
-							computeOnSolarPanel(minute, dayLength, directionTowardSun, (SolarPanel) part);
+							computeOnSolarPanel(minute, directionTowardSun, (SolarPanel) part);
 						} else if (part instanceof Rack) {
-							computeOnRack(minute, dayLength, directionTowardSun, (Rack) part);
+							computeOnRack(minute, directionTowardSun, (Rack) part);
 						} else if (part instanceof Mirror) {
-							computeOnMirror(minute, dayLength, directionTowardSun, (Mirror) part);
+							computeOnMirror(minute, directionTowardSun, (Mirror) part);
 						} else if (part instanceof Sensor) {
-							computeOnSensor(minute, dayLength, directionTowardSun, (Sensor) part);
+							computeOnSensor(minute, directionTowardSun, (Sensor) part);
 						}
 					}
 				}
-				computeOnLand(dayLength, directionTowardSun);
+				computeOnLand(directionTowardSun);
 				EnergyPanel.getInstance().progress((int) Math.round(100.0 * step / totalSteps));
 				step++;
 			}
@@ -279,8 +282,7 @@ public class SolarRadiation {
 
 	}
 
-	private void computeOnLand(final double dayLength, final ReadOnlyVector3 directionTowardSun) {
-		calculatePeakRadiation(directionTowardSun, dayLength);
+	private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, Vector3.UNIT_Z);
 		final double totalRadiation = calculateDirectRadiation(directionTowardSun, Vector3.UNIT_Z) + indirectRadiation;
 		final double step = Scene.getInstance().getSolarStep() * 4;
@@ -319,7 +321,7 @@ public class SolarRadiation {
 	}
 
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
-	private void computeOnMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
+	private void computeOnMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 
 		if (Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
 			return;
@@ -333,7 +335,6 @@ public class SolarRadiation {
 		/* needed in order to prevent picking collision with neighboring wall at wall edge */
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(0.1, null);
 
-		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
 		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
@@ -403,31 +404,110 @@ public class SolarRadiation {
 
 	}
 
-	// Similar to the above method, but remove some unnecessary calculations for performance improvement
-	private void computeOnImportedMesh(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
+	// if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
+	private void rotateImportedMeshes() {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
+				final double az = foundation.getAzimuth();
+				if (!Util.isZero(az)) {
+					final List<Node> importedNodes = foundation.getImportedNodes();
+					if (importedNodes != null) {
+						for (final Node node : importedNodes) {
+							for (final Spatial s : node.getChildren()) {
+								final Mesh m = (Mesh) s;
+								final UserData ud = (UserData) m.getUserData();
+								ud.setRotatedNormal(node.getRotation().applyPost(ud.getNormal(), null));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void resetSideIndicesForImportedMeshes() {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
+				final List<Node> importedNodes = foundation.getImportedNodes();
+				if (importedNodes != null) {
+					for (final Node node : importedNodes) {
+						for (final Spatial s : node.getChildren()) {
+							final Mesh m = (Mesh) s;
+							final UserData ud = (UserData) m.getUserData();
+							ud.setSideIndex(0);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// process an imported mesh before calculation
+	private void processImportedMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
 
 		final UserData userData = (UserData) mesh.getUserData();
-
-		final Vector3 normal = (Vector3) userData.getNormal();
-		final double az = foundation.getAzimuth();
-		if (!Util.isZero(az)) {
-			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(az)); // FIXME: Why negate? See also Foundation.drawImports()
-			matrix.applyPost(normal, normal);
-		}
-		MeshDataStore data = onMesh.get(mesh);
+		final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
+		MeshDataStore data = onMesh.get(mesh); // initialize mesh solar data and texture
 		if (data == null) {
 			data = initMeshTextureData(mesh, mesh, normal, true);
+			data.solarPotential = new double[MINUTES_OF_DAY / Scene.getInstance().getTimeStep()];
 		}
-		final int timeStep = Scene.getInstance().getTimeStep();
-		if (data.solarPotential == null) {
-			data.solarPotential = new double[MINUTES_OF_DAY / timeStep];
-		}
-		if (userData.getSideIndex() == -1) {
-			// return;
+		if (userData.getSideIndex() != 0) { // this mesh has already been processed for this minute
+			return;
 		}
 		// final int meshIndex = userData.getMeshIndex();
+		// if (meshIndex == 82 || meshIndex == 83) {
+		// System.out.println("***" + Math.round(100.0 * minute / MINUTES_OF_DAY) + ": " + mesh + " = " + userData.getTwin());
+		// }
 
-		calculatePeakRadiation(directionTowardSun, dayLength);
+		// if this mesh faces the sun, check whether the sun ray can reach the center of the mesh
+		if (normal.dot(directionTowardSun) > 0) {
+			final double solarStep = Scene.getInstance().getSolarStep();
+			final int col = data.cols / 2;
+			final int row = data.rows / 2;
+			// final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
+			final double w = col == data.cols - 1 ? data.p2.distance(data.p0) - col * solarStep : solarStep;
+			final double h = row == data.rows - 1 ? data.p1.distance(data.p0) - row * solarStep : solarStep;
+			final ReadOnlyVector3 pU = data.u.multiply(col * solarStep + 0.5 * w, null).addLocal(data.p0);
+			final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU); // cannot do offset as done in computeOnMesh
+			final Ray3 pickRay = new Ray3(p, directionTowardSun);
+			final PickResults pickResults = new PrimitivePickResults();
+			for (final Spatial spatial : collidables) {
+				if (spatial != mesh) {
+					PickingUtil.findPick(spatial, pickRay, pickResults, false);
+					if (pickResults.getNumber() != 0) {
+						break;
+					}
+				}
+			}
+			if (pickResults.getNumber() == 0) { // the sun ray can reach the center of this mesh, mark it as an exterior face
+				// if (meshIndex == 33 || meshIndex == 37) {
+				// System.out.println(">>>" + Math.round(100.0 * minute / MINUTES_OF_DAY) + ": " + mesh + " = " + col + ", " + row + " | " + data.cols + ", " + data.rows);
+				// }
+				if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
+					userData.setSideIndex(1);
+					final Mesh twin = userData.getTwin(); // meanwhile, mark its twin (if any) as an interior face
+					if (twin != null) {
+						((UserData) twin.getUserData()).setSideIndex(-1);
+					}
+				}
+			}
+		}
+	}
+
+	private void computeOnImportedMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
+
+		final UserData userData = (UserData) mesh.getUserData();
+		if (userData.getSideIndex() == -1) {
+			return;
+		}
+
+		final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
+		final MeshDataStore data = onMesh.get(mesh);
+		final int timeStep = Scene.getInstance().getTimeStep();
+
 		final double dot = normal.dot(directionTowardSun);
 		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
 		final double indirectRadiation = calculateDiffuseAndReflectedRadiation(directionTowardSun, normal);
@@ -438,7 +518,8 @@ public class SolarRadiation {
 		final float absorption = 1 - foundation.getAlbedo();
 
 		for (int col = 0; col < data.cols; col++) {
-			final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
+			// final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
+			final double w = col == data.cols - 1 ? data.p2.distance(data.p0) - col * solarStep : solarStep;
 			final ReadOnlyVector3 pU = data.u.multiply(col * solarStep + 0.5 * w, null).addLocal(data.p0);
 			for (int row = 0; row < data.rows; row++) {
 				if (EnergyPanel.getInstance().isCancelled()) {
@@ -467,14 +548,11 @@ public class SolarRadiation {
 					}
 					if (pickResults.getNumber() == 0) {
 						radiation += directRadiation;
-						if (userData.getSideIndex() == 0) {
-							userData.setSideIndex(1);
-							final Mesh twin = userData.getTwin();
-							if (twin != null) {
-								((UserData) twin.getUserData()).setSideIndex(-1);
-							}
-						}
 					}
+				}
+				final int meshIndex = userData.getMeshIndex();
+				if (meshIndex == 82 || meshIndex == 83) {
+					System.out.println("***" + meshIndex + ": " + dot + " = " + row + "," + col + "," + indirectRadiation + "," + radiation);
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
 				if (data.solarPotential != null) {
@@ -487,7 +565,7 @@ public class SolarRadiation {
 	}
 
 	// unlike PV solar panels, no indirect (ambient or diffuse) radiation should be included in mirror reflection calculation
-	private void computeOnMirror(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Mirror mirror) {
+	private void computeOnMirror(final int minute, final ReadOnlyVector3 directionTowardSun, final Mirror mirror) {
 
 		final int nx = Scene.getInstance().getMirrorNx();
 		final int ny = Scene.getInstance().getMirrorNy();
@@ -515,7 +593,6 @@ public class SolarRadiation {
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
 
-		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0) {
@@ -611,7 +688,7 @@ public class SolarRadiation {
 
 	}
 
-	private void computeOnSensor(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Sensor sensor) {
+	private void computeOnSensor(final int minute, final ReadOnlyVector3 directionTowardSun, final Sensor sensor) {
 
 		final int nx = 2, ny = 2;
 		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
@@ -631,7 +708,6 @@ public class SolarRadiation {
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
 
-		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0) {
@@ -682,7 +758,7 @@ public class SolarRadiation {
 	}
 
 	// a solar panel typically has 6x10 cells, 6 and 10 are not power of 2. so we need some special handling here
-	private void computeOnSolarPanel(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final SolarPanel panel) {
+	private void computeOnSolarPanel(final int minute, final ReadOnlyVector3 directionTowardSun, final SolarPanel panel) {
 
 		if (panel.getTracker() != SolarPanel.NO_TRACKER) {
 			final Calendar calendar = Heliodon.getInstance().getCalendar();
@@ -708,7 +784,6 @@ public class SolarRadiation {
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
 
-		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0) {
@@ -844,7 +919,7 @@ public class SolarRadiation {
 	}
 
 	// TODO: we probably should handle the radiation heat map visualization on the rack using a coarse grid and the energy calculation using a fine grid
-	private void computeOnRack(final int minute, final double dayLength, final ReadOnlyVector3 directionTowardSun, final Rack rack) {
+	private void computeOnRack(final int minute, final ReadOnlyVector3 directionTowardSun, final Rack rack) {
 
 		if (rack.getTracker() != SolarPanel.NO_TRACKER) {
 			final Calendar calendar = Heliodon.getInstance().getCalendar();
@@ -874,7 +949,6 @@ public class SolarRadiation {
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
 
-		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
 		double directRadiation = 0;
 		if (dot > 0) {
