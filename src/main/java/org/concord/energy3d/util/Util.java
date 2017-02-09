@@ -198,17 +198,14 @@ public class Util {
 		return path;
 	}
 
-	private static double area(final double x1, final double y1, final double x2, final double y2, final double x3, final double y3) {
-		return Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2.0);
-	}
-
 	/** A function to check whether point P(x, y) lies inside the triangle formed by A(x1, y1), B(x2, y2) and C(x3, y3) */
 	public static boolean isPointInsideTriangle(final ReadOnlyVector2 p, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final ReadOnlyVector2 p3) {
-		final double A = area(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
-		final double A1 = area(p.getX(), p.getY(), p2.getX(), p2.getY(), p3.getX(), p3.getY());
-		final double A2 = area(p1.getX(), p1.getY(), p.getX(), p.getY(), p3.getX(), p3.getY());
-		final double A3 = area(p1.getX(), p1.getY(), p2.getX(), p2.getY(), p.getX(), p.getY());
-		return isEqual(A1 + A2 + A3, A);
+		final Path2D.Double path = new Path2D.Double();
+		path.moveTo(p1.getX(), p1.getY());
+		path.lineTo(p2.getX(), p2.getY());
+		path.lineTo(p3.getX(), p3.getY());
+		path.closePath();
+		return path.contains(p.getX(), p.getY());
 	}
 
 	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final int x, final int y) {

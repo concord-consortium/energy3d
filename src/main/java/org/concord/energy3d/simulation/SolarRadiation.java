@@ -423,8 +423,9 @@ public class SolarRadiation {
 			data.solarPotential = new double[MINUTES_OF_DAY / timeStep];
 		}
 		if (userData.getSideIndex() == -1) {
-			return;
+			// return;
 		}
+		// final int meshIndex = userData.getMeshIndex();
 
 		calculatePeakRadiation(directionTowardSun, dayLength);
 		final double dot = normal.dot(directionTowardSun);
@@ -481,11 +482,6 @@ public class SolarRadiation {
 				}
 				foundation.getSolarPotential()[minute / timeStep] += radiation * scaledArea; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
 			}
-		}
-
-		final int meshIndex = userData.getMeshIndex();
-		if (meshIndex == 27 || meshIndex == 29) {
-			System.out.println(">>>" + meshIndex + "=" + data.solarPotential[minute / timeStep]);
 		}
 
 	}
@@ -1091,7 +1087,7 @@ public class SolarRadiation {
 								break;
 							}
 						}
-						if (!isInside) {
+						if (!isInside && col > 0 && row > 0) { // must at least include one column or row
 							data.dailySolarIntensity[row][col] = -1;
 						}
 					}
