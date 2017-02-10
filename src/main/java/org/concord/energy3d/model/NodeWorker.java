@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
@@ -35,18 +37,22 @@ class NodeWorker {
 	NodeWorker(final Node node) {
 		this.node = node;
 		collidables = new ArrayList<Spatial>();
-		for (final Spatial s : node.getChildren()) {
-			collidables.add(s);
-		}
+		collidables.addAll(node.getChildren());
+		collidables.add(SceneManager.getInstance().getLand());
 		meshToBox = new HashMap<Mesh, OrientedBoundingBox>();
 	}
 
 	void work() {
 		// offsetTwinMeshes();
+		int count = 0;
 		for (final Spatial s : node.getChildren()) {
 			processMesh((Mesh) s);
+			if (count % 20 == 0) {
+				EnergyPanel.getInstance().progress((int) Math.round(100.0 * (count++) / node.getNumberOfChildren()));
+			}
 		}
 		removeInteriorMeshes();
+		EnergyPanel.getInstance().progress(0);
 	}
 
 	void offsetTwinMeshes() {
@@ -74,7 +80,11 @@ class NodeWorker {
 					break;
 				}
 			}
+			if (i1 % 20 == 0) {
+				EnergyPanel.getInstance().progress((int) Math.round(100.0 * i1 / n));
+			}
 		}
+		EnergyPanel.getInstance().progress(0);
 	}
 
 	private void processMesh(final Mesh mesh) {
@@ -95,7 +105,8 @@ class NodeWorker {
 		for (final ReadOnlyVector3 v : vertices) {
 			p.addLocal(v);
 		}
-		p.multiplyLocal(1.0 / vertices.size()).addLocal(mesh.getTranslation());
+		// we must apply the offset transfer as these points come from the vertex buffer that is not affected by the translation definition of the mesh
+		p.multiplyLocal(1.0 / vertices.size()).addLocal((userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal()).multiply(offset, null));
 
 		final Ray3 pickRay = new Ray3(p, normal);
 		final PickResults pickResults = new PrimitivePickResults();
