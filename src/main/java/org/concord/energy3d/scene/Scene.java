@@ -287,7 +287,7 @@ public class Scene implements Serializable {
 			instance = new Scene();
 			System.out.println("done");
 		} else {
-			System.out.print("Opening..." + file + "...");
+			System.out.println("Opening..." + file + "...");
 			final ObjectInputStream in = new ObjectInputStream(file.openStream());
 			instance = (Scene) in.readObject();
 			in.close();

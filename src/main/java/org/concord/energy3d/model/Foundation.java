@@ -11,10 +11,8 @@ import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JOptionPane;
 
@@ -120,7 +118,6 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh selectedMesh;
 	private transient Line selectedMeshOutline;
 	private transient Line selectedNodeBoundingBox;
-	private static Map<Mesh, OrientedBoundingBox> meshToBox = new HashMap<Mesh, OrientedBoundingBox>();
 	private boolean offsetTwinMeshes;
 
 	public Foundation() {
@@ -2652,7 +2649,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
 				if (offsetTwinMeshes) {
-					offsetTwinMeshes();
+					cleanImportedMeshes();
 				}
 				return newNode;
 			}
@@ -2681,36 +2678,10 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	// imported nodes often have a twin of meshes with identical vertex coordinates but opposite normal vectors, find these and offset them
-	public void offsetTwinMeshes() {
-		final double offset = 0.05;
+	public void cleanImportedMeshes() {
 		SceneManager.getInstance().cursorWait(true); // this could be a very compute-intensive task
 		for (final Node node : importedNodes) {
-			final int n = node.getNumberOfChildren();
-			for (int i1 = 0; i1 < n; i1++) {
-				final Mesh m1 = (Mesh) node.getChild(i1);
-				final UserData u1 = (UserData) m1.getUserData();
-				final OrientedBoundingBox b1 = Util.getOrientedBoundingBox(m1);
-				meshToBox.put(m1, b1);
-				for (int i2 = i1 + 1; i2 < n; i2++) {
-					final Mesh m2 = (Mesh) node.getChild(i2);
-					final OrientedBoundingBox b2;
-					if (meshToBox.get(m2) == null) {
-						b2 = Util.getOrientedBoundingBox(m2);
-						meshToBox.put(m2, b2);
-					} else {
-						b2 = meshToBox.get(m2);
-					}
-					if (Util.isEqual(b1, b2, 0.001)) {
-						final UserData u2 = (UserData) m2.getUserData();
-						m1.addTranslation((u1.getRotatedNormal() == null ? u1.getNormal() : u1.getRotatedNormal()).multiply(offset, null));
-						m2.addTranslation((u2.getRotatedNormal() == null ? u2.getNormal() : u2.getRotatedNormal()).multiply(offset, null));
-						u1.setTwin(m2);
-						u2.setTwin(m1);
-						break;
-					}
-				}
-			}
-			meshToBox.clear();
+			new NodeWorker(node).work();
 		}
 		SceneManager.getInstance().cursorWait(false);
 	}

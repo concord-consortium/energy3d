@@ -20,6 +20,7 @@ public class UserData {
 	private RenderState renderState;
 	private FloatBuffer textureBuffer;
 	private int meshIndex;
+	private boolean reachable;
 	private int sideIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
 	private Mesh twin; // the twin of this mesh, usually created by SketchUp and other CAD software
 
@@ -97,6 +98,14 @@ public class UserData {
 
 	public int getMeshIndex() {
 		return meshIndex;
+	}
+
+	public void setReachable(final boolean reachable) {
+		this.reachable = reachable;
+	}
+
+	public boolean isReachable() {
+		return reachable;
 	}
 
 	public void setSideIndex(final int sideIndex) {
