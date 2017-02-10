@@ -197,9 +197,7 @@ public class SolarRadiation {
 		totalSteps -= 2;
 		final double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
-		resetSideIndicesForImportedMeshes();
-		rotateImportedMeshes();
-		processImportedMeshes();
+		setupImportedMeshes();
 		// for (int minute = MINUTES_OF_DAY / 2; minute < MINUTES_OF_DAY / 2 + timeStep; minute += timeStep) { // test for 12 pm for comparison with shadow
 		for (int minute = 0; minute < MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
@@ -404,102 +402,30 @@ public class SolarRadiation {
 
 	}
 
-	// if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
-	private void rotateImportedMeshes() {
+	private void setupImportedMeshes() {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
-				final double az = foundation.getAzimuth();
-				if (!Util.isZero(az)) {
-					final List<Node> importedNodes = foundation.getImportedNodes();
-					if (importedNodes != null) {
-						for (final Node node : importedNodes) {
-							for (final Spatial s : node.getChildren()) {
-								final Mesh m = (Mesh) s;
-								final UserData ud = (UserData) m.getUserData();
-								ud.setRotatedNormal(node.getRotation().applyPost(ud.getNormal(), null));
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void resetSideIndicesForImportedMeshes() {
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {
-				final Foundation foundation = (Foundation) part;
+				final boolean nonZeroAz = !Util.isZero(foundation.getAzimuth());
 				final List<Node> importedNodes = foundation.getImportedNodes();
 				if (importedNodes != null) {
 					for (final Node node : importedNodes) {
 						for (final Spatial s : node.getChildren()) {
 							final Mesh m = (Mesh) s;
 							final UserData ud = (UserData) m.getUserData();
-							ud.setSideIndex(0);
+							ReadOnlyVector3 normal = ud.getNormal();
+							if (nonZeroAz) { // if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
+								ud.setRotatedNormal(node.getRotation().applyPost(normal, null));
+								normal = ud.getRotatedNormal();
+							}
+							ud.setSideIndex(0); // reset side index
+							MeshDataStore data = onMesh.get(m);
+							if (data == null) { // initialize mesh solar data and texture
+								data = initMeshTextureData(m, m, normal, true);
+								data.solarPotential = new double[MINUTES_OF_DAY / Scene.getInstance().getTimeStep()];
+							}
 						}
 					}
-				}
-			}
-		}
-	}
-
-	// process an imported mesh before calculation
-	private void processImportedMeshes() {
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {
-				final Foundation foundation = (Foundation) part;
-				final List<Node> importedNodes = foundation.getImportedNodes();
-				if (importedNodes != null) {
-					for (final Node node : importedNodes) {
-						for (final Spatial s : node.getChildren()) {
-							final Mesh m = (Mesh) s;
-							final UserData userData = (UserData) m.getUserData();
-							final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
-							processImportedMesh(normal, foundation, m);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	private void processImportedMesh(final ReadOnlyVector3 direction, final Foundation foundation, final Mesh mesh) {
-
-		final UserData userData = (UserData) mesh.getUserData();
-		final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
-		MeshDataStore data = onMesh.get(mesh); // initialize mesh solar data and texture
-		if (data == null) {
-			data = initMeshTextureData(mesh, mesh, normal, true);
-			data.solarPotential = new double[MINUTES_OF_DAY / Scene.getInstance().getTimeStep()];
-		}
-		if (userData.getSideIndex() != 0) { // this mesh has already been processed for this minute
-			return;
-		}
-
-		final double solarStep = Scene.getInstance().getSolarStep();
-		final int col = data.cols / 2;
-		final int row = data.rows / 2;
-		final double w = col == data.cols - 1 ? data.p2.distance(data.p0) - col * solarStep : solarStep;
-		final double h = row == data.rows - 1 ? data.p1.distance(data.p0) - row * solarStep : solarStep;
-		final ReadOnlyVector3 pU = data.u.multiply(col * solarStep + 0.5 * w, null).addLocal(data.p0);
-		final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU); // cannot do offset as in computeOnMesh as the interior face mesh would get hit by the ray due to the outward translation
-		final Ray3 pickRay = new Ray3(p, direction);
-		final PickResults pickResults = new PrimitivePickResults();
-		for (final Spatial spatial : collidables) {
-			if (spatial != mesh) {
-				PickingUtil.findPick(spatial, pickRay, pickResults, false);
-				if (pickResults.getNumber() != 0) {
-					break;
-				}
-			}
-		}
-		if (pickResults.getNumber() == 0) { // the ray can reach the center of this mesh, mark it as an exterior face
-			if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
-				userData.setSideIndex(1);
-				final Mesh twin = userData.getTwin(); // meanwhile, mark its twin (if any) as an interior face
-				if (twin != null) {
-					((UserData) twin.getUserData()).setSideIndex(-1);
 				}
 			}
 		}

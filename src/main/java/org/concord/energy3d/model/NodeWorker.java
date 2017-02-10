@@ -42,14 +42,14 @@ class NodeWorker {
 	}
 
 	void work() {
-		offsetTwinMeshes();
+		// offsetTwinMeshes();
 		for (final Spatial s : node.getChildren()) {
 			processMesh((Mesh) s);
 		}
 		removeInteriorMeshes();
 	}
 
-	private void offsetTwinMeshes() {
+	void offsetTwinMeshes() {
 		final int n = node.getNumberOfChildren();
 		for (int i1 = 0; i1 < n; i1++) {
 			final Mesh m1 = (Mesh) node.getChild(i1);
@@ -112,7 +112,8 @@ class NodeWorker {
 				userData.setSideIndex(1);
 				final Mesh twin = userData.getTwin(); // meanwhile, mark its twin (if any) as an interior face
 				if (twin != null) {
-					((UserData) twin.getUserData()).setSideIndex(-1);
+					final UserData uTwin = (UserData) twin.getUserData();
+					uTwin.setSideIndex(-1);
 				}
 			}
 		}
