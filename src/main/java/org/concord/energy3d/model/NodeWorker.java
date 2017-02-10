@@ -48,8 +48,9 @@ class NodeWorker {
 		for (final Spatial s : node.getChildren()) {
 			processMesh((Mesh) s);
 			if (count % 20 == 0) {
-				EnergyPanel.getInstance().progress((int) Math.round(100.0 * (count++) / node.getNumberOfChildren()));
+				EnergyPanel.getInstance().progress((int) Math.round(100.0 * count / node.getNumberOfChildren()));
 			}
+			count++;
 		}
 		removeInteriorMeshes();
 		EnergyPanel.getInstance().progress(0);
@@ -118,7 +119,8 @@ class NodeWorker {
 				}
 			}
 		}
-		if (pickResults.getNumber() == 0) { // the ray can reach the center of this mesh, mark it as an exterior face
+		userData.setReachable(pickResults.getNumber() == 0);
+		if (userData.isReachable()) { // the ray can reach the center of this mesh, mark it as an exterior face
 			if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
 				userData.setSideIndex(1);
 				final Mesh twin = userData.getTwin(); // meanwhile, mark its twin (if any) as an interior face

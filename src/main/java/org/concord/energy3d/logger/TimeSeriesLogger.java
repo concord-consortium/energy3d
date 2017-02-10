@@ -343,12 +343,16 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + r.getTopContainer().getId() + ", \"ID\": " + r.getId();
 					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
 					stateValue += ", \"New Value\": " + r.getOverhangLength() * Scene.getInstance().getAnnotationScale() + "}";
-				} else if (lastEdit instanceof ChangeFoundationHeightCommand) {
-					final ChangeFoundationHeightCommand c = (ChangeFoundationHeightCommand) lastEdit;
+				} else if (lastEdit instanceof ChangeFoundationSizeCommand) {
+					final ChangeFoundationSizeCommand c = (ChangeFoundationSizeCommand) lastEdit;
 					final Foundation f = c.getFoundation();
-					stateValue = "{\"Building\": " + f.getId();
-					stateValue += ", \"Old Value\": " + c.getOldValue() * Scene.getInstance().getAnnotationScale();
-					stateValue += ", \"New Value\": " + f.getHeight() * Scene.getInstance().getAnnotationScale() + "}";
+					stateValue = "{\"Foundation\": " + f.getId();
+					stateValue += ", \"Old Length\": " + c.getOldLength();
+					stateValue += ", \"New Length\": " + c.getNewLength();
+					stateValue += ", \"Old Width\": " + c.getOldWidth();
+					stateValue += ", \"New Width\": " + c.getNewWidth();
+					stateValue += ", \"Old Height\": " + c.getOldHeight();
+					stateValue += ", \"New Height\": " + c.getNewHeight() + "}";
 				} else if (lastEdit instanceof AdjustThermostatCommand) {
 					final Foundation f = ((AdjustThermostatCommand) lastEdit).getFoundation();
 					stateValue = "{\"Building\":" + f.getId() + "}";

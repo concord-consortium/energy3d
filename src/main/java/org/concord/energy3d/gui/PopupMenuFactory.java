@@ -3011,7 +3011,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miHeight = new JMenuItem("Height...");
+			final JMenuItem miHeight = new JMenuItem("Size...");
 			miHeight.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3020,32 +3020,86 @@ public class PopupMenuFactory {
 						return;
 					}
 					final Foundation f = (Foundation) selectedPart;
+					final Vector3 v0 = f.getAbsPoint(0);
+					final Vector3 v1 = f.getAbsPoint(1);
+					final Vector3 v2 = f.getAbsPoint(2);
+					final double lx0 = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
+					final double ly0 = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
+					final double lz0 = f.getHeight() * Scene.getInstance().getAnnotationScale();
+
+					final JPanel gui = new JPanel(new BorderLayout());
+					final String title = "<html>Size of Foundation #" + f.getId() + " (in meters)</html>";
+					gui.add(new JLabel(title), BorderLayout.NORTH);
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					JLabel l = new JLabel("Length: ", JLabel.TRAILING);
+					inputPanel.add(l);
+					final JTextField lxField = new JTextField(threeDecimalsFormat.format(lx0), 5);
+					l.setLabelFor(lxField);
+					inputPanel.add(lxField);
+					l = new JLabel("Width: ", JLabel.TRAILING);
+					inputPanel.add(l);
+					final JTextField lyField = new JTextField(threeDecimalsFormat.format(ly0), 5);
+					l.setLabelFor(lyField);
+					inputPanel.add(lyField);
+					l = new JLabel("Height: ", JLabel.TRAILING);
+					inputPanel.add(l);
+					final JTextField lzField = new JTextField(threeDecimalsFormat.format(lz0), 5);
+					l.setLabelFor(lzField);
+					inputPanel.add(lzField);
+					SpringUtilities.makeCompactGrid(inputPanel, 3, 2, 6, 6, 6, 6);
+
+					double lx1 = -1, ly1 = -1, lz1 = -1;
+
 					while (true) {
 						SceneManager.getInstance().refresh(1);
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), "Height (m)", f.getHeight() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 							break;
-						} else {
-							try {
-								final double val = Double.parseDouble(newValue);
-								if (val < 0 || val > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0 and 10 m.", "Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									final ChangeFoundationHeightCommand c = new ChangeFoundationHeightCommand(f);
-									f.setHeight(val / Scene.getInstance().getAnnotationScale());
-									f.draw();
-									f.drawChildren();
-									SceneManager.getInstance().refresh();
-									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									break;
-								}
-							} catch (final NumberFormatException exception) {
-								exception.printStackTrace();
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+						}
+						boolean pass = true;
+						try {
+							lx1 = Double.parseDouble(lxField.getText());
+							if (lx1 <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								pass = false;
 							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), lxField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							pass = false;
+						}
+						try {
+							ly1 = Double.parseDouble(lyField.getText());
+							if (ly1 <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								pass = false;
+							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), lyField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							pass = false;
+						}
+						try {
+							lz1 = Double.parseDouble(lzField.getText());
+							if (lz1 < 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								pass = false;
+							}
+						} catch (final NumberFormatException exception) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), lzField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							pass = false;
+						}
+						if (pass) {
+							f.rescale(lx1 / lx0, ly1 / ly0, 1);
+							f.setHeight(lz1 / Scene.getInstance().getAnnotationScale());
+							f.draw();
+							f.drawChildren();
+							SceneManager.getInstance().refresh();
+							updateAfterEdit();
+							SceneManager.getInstance().getUndoManager().addEdit(new ChangeFoundationSizeCommand(f, lx0, lx1, ly0, ly1, lz0, lz1));
+							break;
 						}
 					}
+
 				}
 			});
 
@@ -6419,8 +6473,8 @@ public class PopupMenuFactory {
 			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
-			final JMenuItem miCleanMeshes = new JMenuItem("Clean Meshes");
-			miCleanMeshes.addActionListener(new ActionListener() {
+			final JMenuItem miCleanInteriorMeshes = new JMenuItem("Clean Interior Meshes");
+			miCleanInteriorMeshes.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6773,7 +6827,7 @@ public class PopupMenuFactory {
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miCleanMeshes);
+			popupMenuForMesh.add(miCleanInteriorMeshes);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);
 			popupMenuForMesh.addSeparator();

@@ -118,7 +118,6 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh selectedMesh;
 	private transient Line selectedMeshOutline;
 	private transient Line selectedNodeBoundingBox;
-	private boolean offsetTwinMeshes;
 
 	public Foundation() {
 		super(2, 12, 1);
@@ -2665,14 +2664,6 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 		}
 		return null;
-	}
-
-	public void setOffsetTwinMeshes(final boolean b) {
-		offsetTwinMeshes = b;
-	}
-
-	public boolean getOffsetTwinMeshes() {
-		return offsetTwinMeshes;
 	}
 
 	// imported nodes often have a twin of meshes with identical vertex coordinates but opposite normal vectors, find these and offset them
