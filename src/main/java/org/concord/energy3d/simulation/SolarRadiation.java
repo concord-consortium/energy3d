@@ -197,14 +197,15 @@ public class SolarRadiation {
 		totalSteps -= 2;
 		final double dayLength = totalSteps * timeStep / 60.0;
 		int step = 1;
+		resetSideIndicesForImportedMeshes();
 		rotateImportedMeshes();
+		processImportedMeshes();
 		// for (int minute = MINUTES_OF_DAY / 2; minute < MINUTES_OF_DAY / 2 + timeStep; minute += timeStep) { // test for 12 pm for comparison with shadow
 		for (int minute = 0; minute < MINUTES_OF_DAY; minute += timeStep) {
 			final ReadOnlyVector3 sunLocation = sunLocations[minute / timeStep];
 			if (sunLocation.getZ() > 0) {
 				final ReadOnlyVector3 directionTowardSun = sunLocation.normalize(null);
 				calculatePeakRadiation(directionTowardSun, dayLength);
-				resetSideIndicesForImportedMeshes();
 				for (final HousePart part : Scene.getInstance().getParts()) {
 					if (part.isDrawCompleted()) {
 						if (part instanceof Window) {
@@ -226,7 +227,6 @@ public class SolarRadiation {
 									for (final Node node : importedNodes) {
 										for (final Spatial s : node.getChildren()) {
 											final Mesh m = (Mesh) s;
-											processImportedMesh(minute, directionTowardSun, foundation, m);
 											computeOnImportedMesh(minute, directionTowardSun, foundation, m);
 										}
 									}
@@ -332,8 +332,8 @@ public class SolarRadiation {
 			data = initMeshTextureData(drawMesh, collisionMesh, normal, !(housePart instanceof Window));
 		}
 
-		/* needed in order to prevent picking collision with neighboring wall at wall edge */
-		final ReadOnlyVector3 offset = directionTowardSun.multiply(0.1, null);
+		/* needed in order to prevent picking collision with neighboring wall at wall edge (seem 0.1 is too small, 0.5 is about right) */
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(0.5, null);
 
 		final double dot = normal.dot(directionTowardSun);
 		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
@@ -445,7 +445,26 @@ public class SolarRadiation {
 	}
 
 	// process an imported mesh before calculation
-	private void processImportedMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
+	private void processImportedMeshes() {
+		for (final HousePart part : Scene.getInstance().getParts()) {
+			if (part instanceof Foundation) {
+				final Foundation foundation = (Foundation) part;
+				final List<Node> importedNodes = foundation.getImportedNodes();
+				if (importedNodes != null) {
+					for (final Node node : importedNodes) {
+						for (final Spatial s : node.getChildren()) {
+							final Mesh m = (Mesh) s;
+							final UserData userData = (UserData) m.getUserData();
+							final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
+							processImportedMesh(normal, foundation, m);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void processImportedMesh(final ReadOnlyVector3 direction, final Foundation foundation, final Mesh mesh) {
 
 		final UserData userData = (UserData) mesh.getUserData();
 		final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
@@ -457,41 +476,30 @@ public class SolarRadiation {
 		if (userData.getSideIndex() != 0) { // this mesh has already been processed for this minute
 			return;
 		}
-		// final int meshIndex = userData.getMeshIndex();
-		// if (meshIndex == 82 || meshIndex == 83) {
-		// System.out.println("***" + Math.round(100.0 * minute / MINUTES_OF_DAY) + ": " + mesh + " = " + userData.getTwin());
-		// }
 
-		// if this mesh faces the sun, check whether the sun ray can reach the center of the mesh
-		if (normal.dot(directionTowardSun) > 0) {
-			final double solarStep = Scene.getInstance().getSolarStep();
-			final int col = data.cols / 2;
-			final int row = data.rows / 2;
-			// final double w = col == data.cols - 1 ? data.p2.distance(data.u.multiply(col * solarStep, null).addLocal(data.p0)) : solarStep;
-			final double w = col == data.cols - 1 ? data.p2.distance(data.p0) - col * solarStep : solarStep;
-			final double h = row == data.rows - 1 ? data.p1.distance(data.p0) - row * solarStep : solarStep;
-			final ReadOnlyVector3 pU = data.u.multiply(col * solarStep + 0.5 * w, null).addLocal(data.p0);
-			final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU); // cannot do offset as done in computeOnMesh
-			final Ray3 pickRay = new Ray3(p, directionTowardSun);
-			final PickResults pickResults = new PrimitivePickResults();
-			for (final Spatial spatial : collidables) {
-				if (spatial != mesh) {
-					PickingUtil.findPick(spatial, pickRay, pickResults, false);
-					if (pickResults.getNumber() != 0) {
-						break;
-					}
+		final double solarStep = Scene.getInstance().getSolarStep();
+		final int col = data.cols / 2;
+		final int row = data.rows / 2;
+		final double w = col == data.cols - 1 ? data.p2.distance(data.p0) - col * solarStep : solarStep;
+		final double h = row == data.rows - 1 ? data.p1.distance(data.p0) - row * solarStep : solarStep;
+		final ReadOnlyVector3 pU = data.u.multiply(col * solarStep + 0.5 * w, null).addLocal(data.p0);
+		final ReadOnlyVector3 p = data.v.multiply(row * solarStep + 0.5 * h, null).addLocal(pU); // cannot do offset as in computeOnMesh as the interior face mesh would get hit by the ray due to the outward translation
+		final Ray3 pickRay = new Ray3(p, direction);
+		final PickResults pickResults = new PrimitivePickResults();
+		for (final Spatial spatial : collidables) {
+			if (spatial != mesh) {
+				PickingUtil.findPick(spatial, pickRay, pickResults, false);
+				if (pickResults.getNumber() != 0) {
+					break;
 				}
 			}
-			if (pickResults.getNumber() == 0) { // the sun ray can reach the center of this mesh, mark it as an exterior face
-				// if (meshIndex == 33 || meshIndex == 37) {
-				// System.out.println(">>>" + Math.round(100.0 * minute / MINUTES_OF_DAY) + ": " + mesh + " = " + col + ", " + row + " | " + data.cols + ", " + data.rows);
-				// }
-				if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
-					userData.setSideIndex(1);
-					final Mesh twin = userData.getTwin(); // meanwhile, mark its twin (if any) as an interior face
-					if (twin != null) {
-						((UserData) twin.getUserData()).setSideIndex(-1);
-					}
+		}
+		if (pickResults.getNumber() == 0) { // the ray can reach the center of this mesh, mark it as an exterior face
+			if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
+				userData.setSideIndex(1);
+				final Mesh twin = userData.getTwin(); // meanwhile, mark its twin (if any) as an interior face
+				if (twin != null) {
+					((UserData) twin.getUserData()).setSideIndex(-1);
 				}
 			}
 		}
@@ -549,10 +557,6 @@ public class SolarRadiation {
 					if (pickResults.getNumber() == 0) {
 						radiation += directRadiation;
 					}
-				}
-				final int meshIndex = userData.getMeshIndex();
-				if (meshIndex == 82 || meshIndex == 83) {
-					System.out.println("***" + meshIndex + ": " + dot + " = " + row + "," + col + "," + indirectRadiation + "," + radiation);
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
 				if (data.solarPotential != null) {
@@ -1150,7 +1154,7 @@ public class SolarRadiation {
 			final int ncol = data.dailySolarIntensity[0].length;
 			for (int row = 0; row < nrow; row++) {
 				for (int col = 0; col < ncol; col++) {
-					if (row >= data.rows || col >= data.cols) {
+					if (row >= data.rows || col >= data.cols) { // overshot cells
 						data.dailySolarIntensity[row][col] = -1;
 					} else {
 						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * solarStep, null), null).add(vXY.multiply(row * solarStep, null), null);
@@ -1533,7 +1537,6 @@ public class SolarRadiation {
 			return;
 		}
 		final double[][] solarData = onMesh.get(mesh).dailySolarIntensity;
-		fillBlanksWithNeighboringValues(solarData);
 		final int rows = solarData.length;
 		if (rows == 0) {
 			return;
@@ -1542,6 +1545,7 @@ public class SolarRadiation {
 		if (cols == 0) {
 			return;
 		}
+		fillBlanksWithNeighboringValues(solarData);
 		final ByteBuffer data = BufferUtils.createByteBuffer(cols * rows * 3);
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
@@ -1562,13 +1566,7 @@ public class SolarRadiation {
 
 	private void fillBlanksWithNeighboringValues(final double[][] solarData) {
 		final int rows = solarData.length;
-		if (rows == 0) {
-			return;
-		}
 		final int cols = solarData[0].length;
-		if (cols == 0) {
-			return;
-		}
 		for (int repeat = 0; repeat < 2; repeat++) {
 			for (int row = 0; row < rows; row++) {
 				for (int col = 0; col < cols; col++) {
