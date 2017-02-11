@@ -583,7 +583,7 @@ public class EnergyPanel extends JPanel {
 		colorMapSlider.setSnapToTicks(true);
 		colorMapSlider.setMinorTickSpacing(1);
 		colorMapSlider.setMajorTickSpacing(5);
-		colorMapSlider.setFocusable(false);
+		// colorMapSlider.setFocusable(false); // set it false will disable keyboard interaction with the slider
 		colorMapSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {

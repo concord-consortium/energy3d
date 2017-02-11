@@ -3020,6 +3020,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final Foundation f = (Foundation) selectedPart;
+					final boolean hasChildren = !f.getChildren().isEmpty();
 					final Vector3 v0 = f.getAbsPoint(0);
 					final Vector3 v1 = f.getAbsPoint(1);
 					final Vector3 v2 = f.getAbsPoint(2);
@@ -3036,11 +3037,13 @@ public class PopupMenuFactory {
 					JLabel l = new JLabel("Length: ", JLabel.TRAILING);
 					inputPanel.add(l);
 					final JTextField lxField = new JTextField(threeDecimalsFormat.format(lx0), 5);
+					lxField.setEditable(!hasChildren);
 					l.setLabelFor(lxField);
 					inputPanel.add(lxField);
 					l = new JLabel("Width: ", JLabel.TRAILING);
 					inputPanel.add(l);
 					final JTextField lyField = new JTextField(threeDecimalsFormat.format(ly0), 5);
+					lyField.setEditable(!hasChildren);
 					l.setLabelFor(lyField);
 					inputPanel.add(lyField);
 					l = new JLabel("Height: ", JLabel.TRAILING);

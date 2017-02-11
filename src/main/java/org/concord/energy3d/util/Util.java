@@ -117,6 +117,9 @@ public class Util {
 	}
 
 	public static String toString(final ReadOnlyColorRGBA c) {
+		if (c == null) {
+			return "#000000";
+		}
 		return String.format("#%02x%02x%02x", Math.round(c.getRed() * 255), Math.round(c.getGreen() * 255), Math.round(c.getBlue() * 255));
 	}
 

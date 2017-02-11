@@ -1,12 +1,16 @@
 package org.concord.energy3d.model;
 
+import java.awt.EventQueue;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
@@ -120,6 +124,9 @@ class NodeWorker {
 			}
 		}
 		userData.setReachable(pickResults.getNumber() == 0);
+		if (userData.getMeshIndex() == 704 || userData.getMeshIndex() == 705) {
+			System.out.println("***" + mesh + ", " + userData.getTwin() + ", " + userData.isReachable());
+		}
 		if (userData.isReachable()) { // the ray can reach the center of this mesh, mark it as an exterior face
 			if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
 				userData.setSideIndex(1);
@@ -144,7 +151,12 @@ class NodeWorker {
 		for (final Mesh m : toRemove) {
 			node.detachChild(m);
 		}
-		System.out.println("NodeWorker: " + toRemove.size() + " interior meshes removed");
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), toRemove.size() + " interior meshes were removed", "Node Worker", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
 	}
 
 }
