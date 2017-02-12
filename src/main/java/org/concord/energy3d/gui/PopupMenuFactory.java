@@ -6489,6 +6489,7 @@ public class PopupMenuFactory {
 							public Object call() throws Exception {
 								f.cleanImportedMeshes();
 								f.draw();
+								updateAfterEdit();
 								return null;
 							}
 						});
@@ -6554,6 +6555,7 @@ public class PopupMenuFactory {
 										u.setRotatedNormal(u.getRotatedNormal().negate(null));
 									}
 									f.draw();
+									updateAfterEdit();
 								}
 								return null;
 							}
@@ -6580,6 +6582,7 @@ public class PopupMenuFactory {
 										final double zBottom = boundingBox.getCenter().getZ() - boundingBox.getZAxis().getZ() * boundingBox.getExtent().getZ() - f.getHeight();
 										f.translateImportedNode(n, 0, 0, -zBottom);
 										f.draw();
+										updateAfterEdit();
 									}
 									return null;
 								}
@@ -6616,6 +6619,7 @@ public class PopupMenuFactory {
 										f.translateImportedNode(n, shift.getX(), shift.getY(), 0);
 										f.setMeshSelectionVisible(false);
 										f.draw();
+										updateAfterEdit();
 									}
 									return null;
 								}
@@ -6664,6 +6668,7 @@ public class PopupMenuFactory {
 								if (m != null) {
 									Scene.getInstance().pasteToPickedLocationOnMesh(m);
 									Scene.getInstance().setEdited(true);
+									updateAfterEdit();
 								}
 							}
 							return null;
