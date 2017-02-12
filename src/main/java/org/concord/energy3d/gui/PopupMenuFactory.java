@@ -6477,8 +6477,8 @@ public class PopupMenuFactory {
 			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
-			final JMenuItem miCleanInteriorMeshes = new JMenuItem("Clean Interior Meshes");
-			miCleanInteriorMeshes.addActionListener(new ActionListener() {
+			final JMenuItem miIndexifyMeshFaces = new JMenuItem("Indexify Mesh Faces");
+			miIndexifyMeshFaces.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6487,7 +6487,7 @@ public class PopupMenuFactory {
 						SceneManager.getTaskManager().update(new Callable<Object>() {
 							@Override
 							public Object call() throws Exception {
-								f.cleanImportedMeshes();
+								f.processImportedMeshes();
 								f.draw();
 								updateAfterEdit();
 								return null;
@@ -6497,20 +6497,20 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miTwinMeshOffset = new JMenuItem("Twin Mesh Offset...");
-			miTwinMeshOffset.addActionListener(new ActionListener() {
+			final JMenuItem miMessThickness = new JMenuItem("Mesh Thickness...");
+			miMessThickness.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String title = "<html>Adjust twin mesh offset to mitigate z-fighting</html>";
+					final String title = "<html>Adjust the thickness of meshes that have two identical sides<br>A larger thickness also mitigates the z-fighting effect.</html>";
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getTwinMeshOffset() * Scene.getInstance().getAnnotationScale());
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getMeshThickness() * Scene.getInstance().getAnnotationScale());
 						if (newValue == null) {
 							break;
 						} else {
 							try {
 								final double val = Double.parseDouble(newValue);
 								if (val < 0 || val > 1) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Offset must be between 0 and 1 meter.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Thickness must be between 0 and 1 meter.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 									if (selectedPart instanceof Foundation) {
@@ -6520,7 +6520,7 @@ public class PopupMenuFactory {
 											public Object call() throws Exception {
 												final Mesh m = f.getSelectedMesh();
 												if (m != null) {
-													new NodeWorker(m.getParent()).offsetTwinMeshes(val / Scene.getInstance().getAnnotationScale());
+													new NodeWorker(m.getParent()).setThickness(val / Scene.getInstance().getAnnotationScale());
 													f.draw();
 												}
 												return null;
@@ -6537,7 +6537,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miReverseNormalVector = new JMenuItem("Reverse Normal Vector");
+			final JMenuItem miReverseNormalVector = new JMenuItem("Reverse Mesh Normal Vector");
 			miReverseNormalVector.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -6903,8 +6903,8 @@ public class PopupMenuFactory {
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miCleanInteriorMeshes);
-			popupMenuForMesh.add(miTwinMeshOffset);
+			popupMenuForMesh.add(miMessThickness);
+			popupMenuForMesh.add(miIndexifyMeshFaces);
 			popupMenuForMesh.add(miReverseNormalVector);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);

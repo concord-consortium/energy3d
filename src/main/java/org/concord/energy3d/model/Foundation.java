@@ -2647,7 +2647,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.setScale(scale);
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
-				new NodeWorker(newNode).findAndOffsetTwinMeshes();
+				new NodeWorker(newNode).findTwinMeshes();
 				return newNode;
 			}
 			if (position != null) {
@@ -2667,7 +2667,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	// imported nodes often have a twin of meshes with identical vertex coordinates but opposite normal vectors, find these and offset them
-	public void cleanImportedMeshes() {
+	public void processImportedMeshes() {
 		SceneManager.getInstance().cursorWait(true); // this could be a very compute-intensive task
 		for (final Node node : importedNodes) {
 			new NodeWorker(node).work(false);

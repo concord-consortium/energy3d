@@ -170,8 +170,8 @@ public class Scene implements Serializable {
 	// the step length of the discretized grid on any part that is not a plate
 	private double solarStep = 2.0;
 
-	// the offset to shift the twin meshes (imported from SketchUp and other CAD software)
-	private double twinMeshOffset = 0.05;
+	// give the twin meshes imported from SketchUp and other CAD software some thickness
+	private double meshThickness = 0.05;
 
 	public static enum Unit {
 		InternationalSystemOfUnits, USCustomaryUnits
@@ -295,8 +295,8 @@ public class Scene implements Serializable {
 			final ObjectInputStream in = new ObjectInputStream(file.openStream());
 			instance = (Scene) in.readObject();
 			in.close();
-			if (Util.isZero(instance.twinMeshOffset)) {
-				instance.twinMeshOffset = 0.05;
+			if (Util.isZero(instance.meshThickness)) {
+				instance.meshThickness = 0.05;
 			}
 			for (final HousePart part : instance.parts) {
 				part.getRoot();
@@ -2822,12 +2822,12 @@ public class Scene implements Serializable {
 		return solarStep;
 	}
 
-	public void setTwinMeshOffset(final double twinMeshOffset) {
-		this.twinMeshOffset = twinMeshOffset;
+	public void setMeshThickness(final double thickness) {
+		meshThickness = thickness;
 	}
 
-	public double getTwinMeshOffset() {
-		return twinMeshOffset;
+	public double getMeshThickness() {
+		return meshThickness;
 	}
 
 	public void setTimeStep(final int timeStep) {

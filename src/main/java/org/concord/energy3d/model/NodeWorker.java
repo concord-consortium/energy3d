@@ -63,8 +63,8 @@ public class NodeWorker {
 		EnergyPanel.getInstance().progress(0);
 	}
 
-	void findAndOffsetTwinMeshes() {
-		final double offset = Scene.getInstance().getTwinMeshOffset();
+	void findTwinMeshes() {
+		final double offset = Scene.getInstance().getMeshThickness();
 		final int n = node.getNumberOfChildren();
 		for (int i1 = 0; i1 < n; i1++) {
 			final Mesh m1 = (Mesh) node.getChild(i1);
@@ -96,16 +96,16 @@ public class NodeWorker {
 		EnergyPanel.getInstance().progress(0);
 	}
 
-	public void offsetTwinMeshes(final double offset) {
-		if (Util.isEqual(offset, Scene.getInstance().getTwinMeshOffset())) {
+	public void setThickness(final double thickness) {
+		if (Util.isEqual(thickness, Scene.getInstance().getMeshThickness())) {
 			return;
 		}
 		for (final Spatial s : node.getChildren()) {
 			final Mesh m = (Mesh) s;
 			final UserData u = (UserData) m.getUserData();
-			m.addTranslation((u.getRotatedNormal() == null ? u.getNormal() : u.getRotatedNormal()).multiply(offset - Scene.getInstance().getTwinMeshOffset(), null));
+			m.addTranslation((u.getRotatedNormal() == null ? u.getNormal() : u.getRotatedNormal()).multiply(thickness - Scene.getInstance().getMeshThickness(), null));
 		}
-		Scene.getInstance().setTwinMeshOffset(offset);
+		Scene.getInstance().setMeshThickness(thickness);
 	}
 
 	// If a ray in the direction of the normal of this mesh doesn't hit anything, it is considered as an exterior face of a twin mesh. Otherwise, it is considered as the interior face.
@@ -124,7 +124,7 @@ public class NodeWorker {
 			p.addLocal(v);
 		}
 		// we must apply the offset transfer as these points come from the vertex buffer that is not affected by the translation definition of the mesh
-		p.multiplyLocal(1.0 / vertices.size()).addLocal(normal.multiply(Scene.getInstance().getTwinMeshOffset(), null));
+		p.multiplyLocal(1.0 / vertices.size()).addLocal(normal.multiply(Scene.getInstance().getMeshThickness(), null));
 
 		final Ray3 pickRay = new Ray3(p, normal);
 		final PickResults pickResults = new PrimitivePickResults();
@@ -165,7 +165,7 @@ public class NodeWorker {
 						u.setSideIndex(1);
 					}
 				} else {
-					// u.setSideIndex(-1);
+					// we are not sure about the rest of the cases
 				}
 			}
 		}
