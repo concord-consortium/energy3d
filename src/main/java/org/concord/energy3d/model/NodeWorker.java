@@ -46,17 +46,20 @@ public class NodeWorker {
 		meshToBox = new HashMap<Mesh, OrientedBoundingBox>();
 	}
 
-	void work() {
+	void work(final boolean remove) {
 		// offsetTwinMeshes();
 		int count = 0;
 		for (final Spatial s : node.getChildren()) {
-			processMesh((Mesh) s);
+			reach((Mesh) s);
 			if (count % 20 == 0) {
 				EnergyPanel.getInstance().progress((int) Math.round(100.0 * count / node.getNumberOfChildren()));
 			}
 			count++;
 		}
-		removeInteriorMeshes();
+		indexify();
+		if (remove) {
+			removeInteriorMeshes();
+		}
 		EnergyPanel.getInstance().progress(0);
 	}
 
@@ -106,12 +109,8 @@ public class NodeWorker {
 	}
 
 	// If a ray in the direction of the normal of this mesh doesn't hit anything, it is considered as an exterior face of a twin mesh. Otherwise, it is considered as the interior face.
-	private void processMesh(final Mesh mesh) {
-
+	private void reach(final Mesh mesh) {
 		final UserData userData = (UserData) mesh.getUserData();
-		if (userData.getSideIndex() != 0) { // this mesh has already been processed
-			return;
-		}
 		final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
@@ -138,13 +137,35 @@ public class NodeWorker {
 			}
 		}
 		userData.setReachable(pickResults.getNumber() == 0);
-		if (userData.isReachable()) { // the ray can reach the center of this mesh, mark it as an exterior face
-			if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
-				userData.setSideIndex(1);
-				final Mesh twin = userData.getTwin(); // meanwhile, mark its twin (if any) as an interior face
-				if (twin != null) {
-					final UserData uTwin = (UserData) twin.getUserData();
-					uTwin.setSideIndex(-1);
+	}
+
+	private void resetSideIndex() {
+		for (final Spatial s : node.getChildren()) {
+			final Mesh m = (Mesh) s;
+			final UserData u = (UserData) m.getUserData();
+			u.setSideIndex(0);
+		}
+	}
+
+	private void indexify() {
+		resetSideIndex();
+		for (final Spatial s : node.getChildren()) {
+			final Mesh m = (Mesh) s;
+			final UserData u = (UserData) m.getUserData();
+			if (u.getSideIndex() == 0) { // side index = 0 means it hasn't been set or should not be set
+				if (u.isReachable()) { // the ray can reach the center of this mesh
+					final Mesh mTwin = u.getTwin();
+					if (mTwin != null) {
+						final UserData uTwin = (UserData) mTwin.getUserData();
+						if (!uTwin.isReachable()) {
+							uTwin.setSideIndex(-1);
+							u.setSideIndex(1);
+						}
+					} else {
+						u.setSideIndex(1);
+					}
+				} else {
+					// u.setSideIndex(-1);
 				}
 			}
 		}

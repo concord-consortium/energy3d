@@ -2670,8 +2670,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void cleanImportedMeshes() {
 		SceneManager.getInstance().cursorWait(true); // this could be a very compute-intensive task
 		for (final Node node : importedNodes) {
-			new NodeWorker(node).work();
+			new NodeWorker(node).work(false);
 		}
+		clearSelectedMesh();
 		SceneManager.getInstance().cursorWait(false);
 	}
 

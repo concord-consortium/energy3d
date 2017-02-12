@@ -418,7 +418,6 @@ public class SolarRadiation {
 								ud.setRotatedNormal(node.getRotation().applyPost(normal, null));
 								normal = ud.getRotatedNormal();
 							}
-							ud.setSideIndex(0); // reset side index
 							MeshDataStore data = onMesh.get(m);
 							if (data == null) { // initialize mesh solar data and texture
 								data = initMeshTextureData(m, m, normal, true);
