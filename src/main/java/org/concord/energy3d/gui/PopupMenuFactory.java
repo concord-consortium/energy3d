@@ -6536,6 +6536,32 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miReverseNormalVector = new JMenuItem("Reverse Normal Vector");
+			miReverseNormalVector.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() throws Exception {
+								final Mesh m = f.getSelectedMesh();
+								if (m != null) {
+									final UserData u = (UserData) m.getUserData();
+									u.setNormal(u.getNormal().negate(null));
+									if (u.getRotatedNormal() != null) {
+										u.setRotatedNormal(u.getRotatedNormal().negate(null));
+									}
+									f.draw();
+								}
+								return null;
+							}
+						});
+					}
+				}
+			});
+
 			final JMenuItem miAlignBottom = new JMenuItem("Align Node Bottom with Ground Level");
 			miAlignBottom.addActionListener(new ActionListener() {
 				@Override
@@ -6874,6 +6900,7 @@ public class PopupMenuFactory {
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miCleanInteriorMeshes);
 			popupMenuForMesh.add(miTwinMeshOffset);
+			popupMenuForMesh.add(miReverseNormalVector);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);
 			popupMenuForMesh.addSeparator();

@@ -125,7 +125,7 @@ public class NodeWorker {
 			p.addLocal(v);
 		}
 		// we must apply the offset transfer as these points come from the vertex buffer that is not affected by the translation definition of the mesh
-		p.multiplyLocal(1.0 / vertices.size()).addLocal((userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal()).multiply(Scene.getInstance().getTwinMeshOffset(), null));
+		p.multiplyLocal(1.0 / vertices.size()).addLocal(normal.multiply(Scene.getInstance().getTwinMeshOffset(), null));
 
 		final Ray3 pickRay = new Ray3(p, normal);
 		final PickResults pickResults = new PrimitivePickResults();
