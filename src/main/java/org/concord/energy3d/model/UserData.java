@@ -21,7 +21,7 @@ public class UserData {
 	private FloatBuffer textureBuffer;
 	private int meshIndex;
 	private boolean reachable = true;
-	private int sideIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
+	private int faceIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
 	private Mesh twin; // the twin of this mesh, usually created by SketchUp and other CAD software
 
 	public UserData(final HousePart housePart) {
@@ -108,12 +108,12 @@ public class UserData {
 		return reachable;
 	}
 
-	public void setSideIndex(final int sideIndex) {
-		this.sideIndex = sideIndex;
+	public void setFaceeIndex(final int faceIndex) {
+		this.faceIndex = faceIndex;
 	}
 
-	public int getSideIndex() {
-		return sideIndex;
+	public int getFaceIndex() {
+		return faceIndex;
 	}
 
 	public void setTwin(final Mesh twin) {

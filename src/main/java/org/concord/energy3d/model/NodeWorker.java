@@ -143,7 +143,7 @@ public class NodeWorker {
 		for (final Spatial s : node.getChildren()) {
 			final Mesh m = (Mesh) s;
 			final UserData u = (UserData) m.getUserData();
-			u.setSideIndex(0);
+			u.setFaceeIndex(0);
 		}
 	}
 
@@ -152,17 +152,17 @@ public class NodeWorker {
 		for (final Spatial s : node.getChildren()) {
 			final Mesh m = (Mesh) s;
 			final UserData u = (UserData) m.getUserData();
-			if (u.getSideIndex() == 0) { // side index = 0 means it hasn't been set or should not be set
+			if (u.getFaceIndex() == 0) { // side index = 0 means it hasn't been set or should not be set
 				if (u.isReachable()) { // the ray can reach the center of this mesh
 					final Mesh mTwin = u.getTwin();
 					if (mTwin != null) {
 						final UserData uTwin = (UserData) mTwin.getUserData();
 						if (!uTwin.isReachable()) {
-							uTwin.setSideIndex(-1);
-							u.setSideIndex(1);
+							uTwin.setFaceeIndex(-1);
+							u.setFaceeIndex(1);
 						}
 					} else {
-						u.setSideIndex(1);
+						u.setFaceeIndex(1);
 					}
 				} else {
 					// we are not sure about the rest of the cases
@@ -176,7 +176,7 @@ public class NodeWorker {
 		for (final Spatial s : node.getChildren()) {
 			final Mesh m = (Mesh) s;
 			final UserData u = (UserData) m.getUserData();
-			if (u.getSideIndex() == -1) {
+			if (u.getFaceIndex() == -1) {
 				toRemove.add(m);
 			}
 		}
@@ -189,6 +189,17 @@ public class NodeWorker {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), toRemove.size() + " interior meshes were removed", "Node Worker", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
+	}
+
+	public static void reverseFace(final Mesh m) {
+		if (m == null) {
+			return;
+		}
+		final UserData u = (UserData) m.getUserData();
+		u.setNormal(u.getNormal().negate(null));
+		if (u.getRotatedNormal() != null) {
+			u.setRotatedNormal(u.getRotatedNormal().negate(null));
+		}
 	}
 
 }

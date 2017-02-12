@@ -259,7 +259,8 @@ public class Foundation extends HousePart implements Thermalizable {
 			try {
 				for (final Iterator<NodeState> it = importedNodeStates.iterator(); it.hasNext();) {
 					final NodeState ns = it.next();
-					if (importCollada(ns.getSourceURL(), null) == null) {
+					final Node n = importCollada(ns.getSourceURL(), null);
+					if (n == null) {
 						it.remove();
 						EventQueue.invokeLater(new Runnable() {
 							@Override
@@ -273,6 +274,13 @@ public class Foundation extends HousePart implements Thermalizable {
 								}
 							}
 						});
+					} else {
+						final ArrayList<Integer> reversedFaceMeshes = ns.getMeshesWithReversedNormal();
+						if (reversedFaceMeshes != null) {
+							for (final Integer i : reversedFaceMeshes) {
+								NodeWorker.reverseFace((Mesh) n.getChild(i));
+							}
+						}
 					}
 				}
 			} catch (final Throwable t) {

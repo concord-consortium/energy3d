@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -21,6 +22,7 @@ public class NodeState implements Serializable {
 	private ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private URL sourceURL;
 	private String name;
+	private ArrayList<Integer> reversedFaceMeshes;
 
 	public NodeState() {
 	}
@@ -31,7 +33,26 @@ public class NodeState implements Serializable {
 		copy.defaultColor = defaultColor.clone();
 		copy.sourceURL = sourceURL;
 		copy.name = name;
+		if (reversedFaceMeshes != null) {
+			copy.reversedFaceMeshes = new ArrayList<Integer>();
+			copy.reversedFaceMeshes.addAll(reversedFaceMeshes);
+		}
 		return copy;
+	}
+
+	public void reverseNormalOfMesh(final int index) {
+		if (reversedFaceMeshes == null) {
+			reversedFaceMeshes = new ArrayList<Integer>();
+		}
+		if (reversedFaceMeshes.contains(index)) {
+			reversedFaceMeshes.remove(Integer.valueOf(index));
+		} else {
+			reversedFaceMeshes.add(index);
+		}
+	}
+
+	public ArrayList<Integer> getMeshesWithReversedNormal() {
+		return reversedFaceMeshes;
 	}
 
 	public void setName(final String name) {

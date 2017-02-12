@@ -6549,11 +6549,8 @@ public class PopupMenuFactory {
 							public Object call() throws Exception {
 								final Mesh m = f.getSelectedMesh();
 								if (m != null) {
-									final UserData u = (UserData) m.getUserData();
-									u.setNormal(u.getNormal().negate(null));
-									if (u.getRotatedNormal() != null) {
-										u.setRotatedNormal(u.getRotatedNormal().negate(null));
-									}
+									NodeWorker.reverseFace(m);
+									f.getNodeState(m.getParent()).reverseNormalOfMesh(((UserData) m.getUserData()).getMeshIndex());
 									f.draw();
 									updateAfterEdit();
 								}
