@@ -170,6 +170,9 @@ public class Scene implements Serializable {
 	// the step length of the discretized grid on any part that is not a plate
 	private double solarStep = 2.0;
 
+	// the offset to shift the twin meshes (imported from SketchUp and other CAD software)
+	private double twinMeshOffset = 0.05;
+
 	public static enum Unit {
 		InternationalSystemOfUnits, USCustomaryUnits
 	};
@@ -283,6 +286,7 @@ public class Scene implements Serializable {
 		if (instance != null) {
 			instance.deleteAll();
 		}
+
 		if (url == null) {
 			instance = new Scene();
 			System.out.println("done");
@@ -291,6 +295,9 @@ public class Scene implements Serializable {
 			final ObjectInputStream in = new ObjectInputStream(file.openStream());
 			instance = (Scene) in.readObject();
 			in.close();
+			if (Util.isZero(instance.twinMeshOffset)) {
+				instance.twinMeshOffset = 0.05;
+			}
 			for (final HousePart part : instance.parts) {
 				part.getRoot();
 			}
@@ -2813,6 +2820,14 @@ public class Scene implements Serializable {
 
 	public double getSolarStep() {
 		return solarStep;
+	}
+
+	public void setTwinMeshOffset(final double twinMeshOffset) {
+		this.twinMeshOffset = twinMeshOffset;
+	}
+
+	public double getTwinMeshOffset() {
+		return twinMeshOffset;
 	}
 
 	public void setTimeStep(final int timeStep) {

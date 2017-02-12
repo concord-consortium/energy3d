@@ -473,7 +473,7 @@ public class SolarRadiation {
 						if (EnergyPanel.getInstance().isCancelled()) {
 							throw new CancellationException();
 						}
-						if (spatial != mesh) {
+						if (spatial != mesh && spatial != userData.getTwin()) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 							if (pickResults.getNumber() != 0) {
 								break;

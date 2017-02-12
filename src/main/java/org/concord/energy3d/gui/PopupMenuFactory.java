@@ -56,6 +56,7 @@ import org.concord.energy3d.model.MirrorCircularFieldLayout;
 import org.concord.energy3d.model.MirrorRectangularFieldLayout;
 import org.concord.energy3d.model.MirrorSpiralFieldLayout;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.NodeWorker;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -6495,6 +6496,46 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miTwinMeshOffset = new JMenuItem("Twin Mesh Offset...");
+			miTwinMeshOffset.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String title = "<html>Adjust twin mesh offset to mitigate z-fighting</html>";
+					while (true) {
+						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getTwinMeshOffset() * Scene.getInstance().getAnnotationScale());
+						if (newValue == null) {
+							break;
+						} else {
+							try {
+								final double val = Double.parseDouble(newValue);
+								if (val < 0 || val > 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Offset must be between 0 and 1 meter.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+									if (selectedPart instanceof Foundation) {
+										final Foundation f = (Foundation) selectedPart;
+										SceneManager.getTaskManager().update(new Callable<Object>() {
+											@Override
+											public Object call() throws Exception {
+												final Mesh m = f.getSelectedMesh();
+												if (m != null) {
+													new NodeWorker(m.getParent()).offsetTwinMeshes(val / Scene.getInstance().getAnnotationScale());
+													f.draw();
+												}
+												return null;
+											}
+										});
+									}
+									break;
+								}
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+						}
+					}
+				}
+			});
+
 			final JMenuItem miAlignBottom = new JMenuItem("Align Node Bottom with Ground Level");
 			miAlignBottom.addActionListener(new ActionListener() {
 				@Override
@@ -6574,6 +6615,7 @@ public class PopupMenuFactory {
 									final Node n = m.getParent();
 									Scene.getInstance().setCopyNode(n, f.getNodeState(n));
 								}
+
 							}
 							return null;
 						}
@@ -6831,6 +6873,7 @@ public class PopupMenuFactory {
 			popupMenuForMesh.add(miDeleteMesh);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miCleanInteriorMeshes);
+			popupMenuForMesh.add(miTwinMeshOffset);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);
 			popupMenuForMesh.addSeparator();

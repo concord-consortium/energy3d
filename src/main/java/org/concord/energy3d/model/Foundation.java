@@ -2647,7 +2647,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.setScale(scale);
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
-				new NodeWorker(newNode).offsetTwinMeshes();
+				new NodeWorker(newNode).findAndOffsetTwinMeshes();
 				return newNode;
 			}
 			if (position != null) {

@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
@@ -31,14 +32,13 @@ import com.ardor3d.scenegraph.Spatial;
  * @author Charles Xie
  *
  */
-class NodeWorker {
+public class NodeWorker {
 
 	private final Node node;
 	private final List<Spatial> collidables;
 	private final Map<Mesh, OrientedBoundingBox> meshToBox;
-	private final double offset = 0.05;
 
-	NodeWorker(final Node node) {
+	public NodeWorker(final Node node) {
 		this.node = node;
 		collidables = new ArrayList<Spatial>();
 		collidables.addAll(node.getChildren());
@@ -60,7 +60,8 @@ class NodeWorker {
 		EnergyPanel.getInstance().progress(0);
 	}
 
-	void offsetTwinMeshes() {
+	void findAndOffsetTwinMeshes() {
+		final double offset = Scene.getInstance().getTwinMeshOffset();
 		final int n = node.getNumberOfChildren();
 		for (int i1 = 0; i1 < n; i1++) {
 			final Mesh m1 = (Mesh) node.getChild(i1);
@@ -76,7 +77,7 @@ class NodeWorker {
 				} else {
 					b2 = meshToBox.get(m2);
 				}
-				if (Util.isEqual(b1, b2, 0.001)) {
+				if (Util.isEqual(b1, b2, 0.001)) { // TODO: Use bounding box equality to detect mesh vertex equality is questionable
 					final UserData u2 = (UserData) m2.getUserData();
 					m1.addTranslation((u1.getRotatedNormal() == null ? u1.getNormal() : u1.getRotatedNormal()).multiply(offset, null));
 					m2.addTranslation((u2.getRotatedNormal() == null ? u2.getNormal() : u2.getRotatedNormal()).multiply(offset, null));
@@ -92,6 +93,19 @@ class NodeWorker {
 		EnergyPanel.getInstance().progress(0);
 	}
 
+	public void offsetTwinMeshes(final double offset) {
+		if (Util.isEqual(offset, Scene.getInstance().getTwinMeshOffset())) {
+			return;
+		}
+		for (final Spatial s : node.getChildren()) {
+			final Mesh m = (Mesh) s;
+			final UserData u = (UserData) m.getUserData();
+			m.addTranslation((u.getRotatedNormal() == null ? u.getNormal() : u.getRotatedNormal()).multiply(offset - Scene.getInstance().getTwinMeshOffset(), null));
+		}
+		Scene.getInstance().setTwinMeshOffset(offset);
+	}
+
+	// If a ray in the direction of the normal of this mesh doesn't hit anything, it is considered as an exterior face of a twin mesh. Otherwise, it is considered as the interior face.
 	private void processMesh(final Mesh mesh) {
 
 		final UserData userData = (UserData) mesh.getUserData();
@@ -111,7 +125,7 @@ class NodeWorker {
 			p.addLocal(v);
 		}
 		// we must apply the offset transfer as these points come from the vertex buffer that is not affected by the translation definition of the mesh
-		p.multiplyLocal(1.0 / vertices.size()).addLocal((userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal()).multiply(offset, null));
+		p.multiplyLocal(1.0 / vertices.size()).addLocal((userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal()).multiply(Scene.getInstance().getTwinMeshOffset(), null));
 
 		final Ray3 pickRay = new Ray3(p, normal);
 		final PickResults pickResults = new PrimitivePickResults();
@@ -124,9 +138,6 @@ class NodeWorker {
 			}
 		}
 		userData.setReachable(pickResults.getNumber() == 0);
-		if (userData.getMeshIndex() == 704 || userData.getMeshIndex() == 705) {
-			System.out.println("***" + mesh + ", " + userData.getTwin() + ", " + userData.isReachable());
-		}
 		if (userData.isReachable()) { // the ray can reach the center of this mesh, mark it as an exterior face
 			if (userData.getSideIndex() == 0) { // side index = 0 means it hasn't been set, set it to 1 to indicate it is an exterior face
 				userData.setSideIndex(1);
