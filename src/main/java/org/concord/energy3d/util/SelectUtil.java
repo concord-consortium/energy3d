@@ -163,7 +163,6 @@ public class SelectUtil {
 				polyDist = polyDist_i;
 				pointDist = pointDist_i;
 			}
-			break;
 		}
 		return pickedHousePart;
 	}
