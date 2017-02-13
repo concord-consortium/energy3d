@@ -279,7 +279,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						final ArrayList<Integer> reversedFaceMeshes = ns.getMeshesWithReversedNormal();
 						if (reversedFaceMeshes != null) {
 							for (final Integer i : reversedFaceMeshes) {
-								NodeWorker.reverseFace((Mesh) n.getChild(i));
+								NodeWorker.reverseFace(NodeWorker.getMesh(n, i));
 							}
 						}
 						final ArrayList<Integer> deletedMeshes = ns.getDeletedMeshes();

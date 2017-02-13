@@ -31,6 +31,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.NodeWorker;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -1159,6 +1160,17 @@ public class Scene implements Serializable {
 				final NodeState s = foundation.getNodeState(newNode);
 				s.setDefaultColor(copyNodeState.getDefaultColor());
 				s.setName(copyNodeState.getName());
+				if (copyNodeState.getMeshesWithReversedNormal() != null) {
+					for (final Integer i : copyNodeState.getMeshesWithReversedNormal()) {
+						s.reverseNormalOfMesh(i);
+						NodeWorker.reverseFace(NodeWorker.getMesh(newNode, i));
+					}
+				}
+				if (copyNodeState.getDeletedMeshes() != null) {
+					for (final Integer i : copyNodeState.getDeletedMeshes()) {
+						foundation.deleteMesh(NodeWorker.getMesh(newNode, i));
+					}
+				}
 			}
 		} else {
 			if (copyBuffer != null) {
