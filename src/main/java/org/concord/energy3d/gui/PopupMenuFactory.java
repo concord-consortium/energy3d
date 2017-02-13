@@ -6728,13 +6728,30 @@ public class PopupMenuFactory {
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() throws Exception {
-									final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
-									m.getParent().detachChild(m);
-									f.clearSelectedMesh();
-									f.removeEmptyNodes();
-									f.draw();
+									f.deleteMesh(m);
 									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									return null;
+								}
+							});
+						}
+					}
+				}
+			});
+
+			final JMenuItem miRestoreDeletedMeshes = new JMenuItem("Restore Deleted Meshes (Reload Required)");
+			miRestoreDeletedMeshes.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							SceneManager.getTaskManager().update(new Callable<Object>() {
+								@Override
+								public Object call() throws Exception {
+									f.restoreDeletedMeshes(m.getParent());
+									updateAfterEdit();
 									return null;
 								}
 							});
@@ -6899,6 +6916,7 @@ public class PopupMenuFactory {
 			popupMenuForMesh.add(miCopyNode);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miDeleteMesh);
+			popupMenuForMesh.add(miRestoreDeletedMeshes);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miMessThickness);
 			popupMenuForMesh.add(miIndexifyMeshFaces);
@@ -7237,7 +7255,7 @@ public class PopupMenuFactory {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart != null) {
 					Scene.getInstance().setCopyBuffer(selectedPart);
-					SceneManager.getInstance().deleteCurrentHousePart();
+					SceneManager.getInstance().deleteCurrentSelection();
 				}
 			}
 		});

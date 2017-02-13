@@ -202,4 +202,16 @@ public class NodeWorker {
 		}
 	}
 
+	// return the mesh by its mesh index, which is NOT the index of the children array of the node, but the original index of the mesh when the node is created
+	public static Mesh getMesh(final Node n, final int meshIndex) {
+		for (final Spatial s : n.getChildren()) {
+			final Mesh m = (Mesh) s;
+			final UserData u = (UserData) m.getUserData();
+			if (u.getMeshIndex() == meshIndex) {
+				return m;
+			}
+		}
+		return null;
+	}
+
 }

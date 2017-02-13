@@ -25,6 +25,7 @@ import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddArrayCommand;
+import org.concord.energy3d.undo.DeleteMeshCommand;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
@@ -279,6 +280,16 @@ public class Foundation extends HousePart implements Thermalizable {
 						if (reversedFaceMeshes != null) {
 							for (final Integer i : reversedFaceMeshes) {
 								NodeWorker.reverseFace((Mesh) n.getChild(i));
+							}
+						}
+						final ArrayList<Integer> deletedMeshes = ns.getDeletedMeshes();
+						if (deletedMeshes != null && !deletedMeshes.isEmpty()) {
+							final List<Mesh> toDelete = new ArrayList<Mesh>();
+							for (final Integer i : deletedMeshes) {
+								toDelete.add(NodeWorker.getMesh(n, i));
+							}
+							for (final Mesh m : toDelete) {
+								n.detachChild(m);
 							}
 						}
 					}
@@ -2601,15 +2612,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (sourceFile.exists()) {
 			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(sourceFile.toURI().toURL()));
-			// final AssetData asset = storage.getAssetData();
-			// System.out.println("***" + asset.getUnitName() + "," + asset.getUnitMeter());
 			final Node originalNode = storage.getScene();
 			originalNode.setScale(scale);
 			if (position != null) { // when position is null, the node uses the position saved in the associated NodeState object
 				final NodeState ns = new NodeState();
 				importedNodeStates.add(ns);
 				originalNode.setTranslation(position);
-				ns.setPosition(originalNode.getTranslation().subtract(getAbsCenter(), null));
+				ns.setPosition(originalNode.getTranslation().subtract(getAbsCenter().multiplyLocal(1, 1, 0), null).addLocal(0, 0, height));
 				ns.setSourceURL(file);
 			}
 			// now construct a new node that is a parent of all planar meshes
@@ -2625,7 +2634,6 @@ public class Foundation extends HousePart implements Thermalizable {
 				switch (md.getIndexMode(0)) {
 				case Triangles:
 					final List<Mesh> children = TriangleMeshLib.getPlanarMeshes(m);
-					// final List<Mesh> children = new ArrayList<Mesh>(); children.add(m);
 					if (!children.isEmpty()) {
 						for (final Mesh s : children) {
 							s.setTransform(t);
@@ -2754,6 +2762,24 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void setMeshSelectionVisible(final boolean b) {
 		selectedMeshOutline.setVisible(b);
 		selectedNodeBoundingBox.setVisible(b);
+	}
+
+	public void deleteMesh(final Mesh m) {
+		final DeleteMeshCommand c = new DeleteMeshCommand(m, this);
+		final Node n = m.getParent();
+		n.detachChild(m);
+		clearSelectedMesh();
+		removeEmptyNodes();
+		getNodeState(n).deleteMesh(((UserData) m.getUserData()).getMeshIndex());
+		draw();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+	}
+
+	public void restoreDeletedMeshes(final Node n) {
+		final NodeState ns = getNodeState(n);
+		if (ns.getDeletedMeshes() != null) {
+			ns.getDeletedMeshes().clear();
+		}
 	}
 
 	private void drawMeshSelection(final Mesh m) {

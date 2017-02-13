@@ -23,6 +23,7 @@ public class NodeState implements Serializable {
 	private URL sourceURL;
 	private String name;
 	private ArrayList<Integer> reversedFaceMeshes;
+	private ArrayList<Integer> deletedMeshes;
 
 	public NodeState() {
 	}
@@ -36,6 +37,10 @@ public class NodeState implements Serializable {
 		if (reversedFaceMeshes != null) {
 			copy.reversedFaceMeshes = new ArrayList<Integer>();
 			copy.reversedFaceMeshes.addAll(reversedFaceMeshes);
+		}
+		if (deletedMeshes != null) {
+			copy.deletedMeshes = new ArrayList<Integer>();
+			copy.deletedMeshes.addAll(deletedMeshes);
 		}
 		return copy;
 	}
@@ -53,6 +58,19 @@ public class NodeState implements Serializable {
 
 	public ArrayList<Integer> getMeshesWithReversedNormal() {
 		return reversedFaceMeshes;
+	}
+
+	public void deleteMesh(final int index) {
+		if (deletedMeshes == null) {
+			deletedMeshes = new ArrayList<Integer>();
+		}
+		if (!deletedMeshes.contains(index)) {
+			deletedMeshes.add(index);
+		}
+	}
+
+	public ArrayList<Integer> getDeletedMeshes() {
+		return deletedMeshes;
 	}
 
 	public void setName(final String name) {

@@ -2551,7 +2551,7 @@ public class MainFrame extends JFrame {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart != null) {
 						Scene.getInstance().setCopyBuffer(selectedPart);
-						SceneManager.getInstance().deleteCurrentHousePart();
+						SceneManager.getInstance().deleteCurrentSelection();
 					}
 				}
 			});

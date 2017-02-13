@@ -6,6 +6,8 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.UserData;
 
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -36,6 +38,9 @@ public class DeleteMeshCommand extends AbstractUndoableEdit {
 		super.undo();
 		parent.attachChild(mesh);
 		foundation.draw();
+		final int meshIndex = ((UserData) mesh.getUserData()).getMeshIndex();
+		final NodeState ns = foundation.getNodeState(parent);
+		ns.getDeletedMeshes().remove(Integer.valueOf(meshIndex));
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
@@ -44,6 +49,7 @@ public class DeleteMeshCommand extends AbstractUndoableEdit {
 		super.redo();
 		parent.detachChild(mesh);
 		foundation.draw();
+		foundation.getNodeState(parent).deleteMesh(((UserData) mesh.getUserData()).getMeshIndex());
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 

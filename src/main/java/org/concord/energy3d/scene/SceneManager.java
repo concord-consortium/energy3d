@@ -59,7 +59,6 @@ import org.concord.energy3d.scene.CameraControl.ButtonAction;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
-import org.concord.energy3d.undo.DeleteMeshCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MovePartCommand;
@@ -869,13 +868,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.DELETE), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				deleteCurrentHousePart();
+				deleteCurrentSelection();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.BACK), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				deleteCurrentHousePart();
+				deleteCurrentSelection();
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyHeldCondition(Key.ESCAPE), new TriggerAction() {
@@ -2016,7 +2015,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 	}
 
-	public void deleteCurrentHousePart() {
+	public void deleteCurrentSelection() {
 		if (selectedPart instanceof Foundation) {
 			final Foundation foundation = (Foundation) selectedPart;
 			if (foundation.getLockEdit()) {
@@ -2035,13 +2034,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (selectedPart instanceof Foundation && ((Foundation) selectedPart).getSelectedMesh() != null) { // a mesh is selected, instead of a part
 						final Foundation f = (Foundation) selectedPart;
 						final Mesh m = f.getSelectedMesh();
-						final DeleteMeshCommand c = new DeleteMeshCommand(m, f);
-						final Node parent = m.getParent();
-						parent.detachChild(m);
-						f.clearSelectedMesh();
-						f.removeEmptyNodes();
-						f.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (m != null) {
+							f.deleteMesh(m);
+						}
 					} else {
 						final RemovePartCommand c = new RemovePartCommand(selectedPart);
 						if (selectedPart instanceof Wall) { // undo/redo a gable roof
