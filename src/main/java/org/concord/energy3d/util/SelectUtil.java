@@ -55,6 +55,10 @@ public class SelectUtil {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 		PickingUtil.findPick(mesh, pickRay, pickResults, false);
+		final PickedHousePart picked = getPickResultForImportedMesh();
+		if (picked != null) {
+			return picked;
+		}
 		return getPickResult(pickRay);
 	}
 
@@ -66,6 +70,10 @@ public class SelectUtil {
 		} else {
 			PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
 			PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+		}
+		final PickedHousePart picked = getPickResultForImportedMesh();
+		if (picked != null) {
+			return picked;
 		}
 		return getPickResult(pickRay);
 	}
@@ -85,19 +93,28 @@ public class SelectUtil {
 				}
 			}
 		}
-		// if this is an imported mesh, do it here. getPickResult method below returns incorrect result.
+		final PickedHousePart picked = getPickResultForImportedMesh();
+		if (picked != null) {
+			return picked;
+		}
+		return getPickResult(pickRay);
+	}
+
+	// if this is an imported mesh, do it here. getPickResult method below returns incorrect result.
+	private static PickedHousePart getPickResultForImportedMesh() {
 		if (pickResults.getNumber() > 0) {
 			final PickData pick = pickResults.getPickData(0);
 			final Pickable pickable = pick.getTarget();
 			if (pickable instanceof Mesh) {
 				final Mesh m = (Mesh) pickable;
 				final UserData u = (UserData) m.getUserData();
-				if (u.isImported()) {
+				// the user data of land can be null
+				if (u != null && u.isImported()) {
 					return new PickedHousePart(u, pick.getIntersectionRecord().getIntersectionPoint(0), u.getRotatedNormal() == null ? u.getNormal() : u.getRotatedNormal());
 				}
 			}
 		}
-		return getPickResult(pickRay);
+		return null;
 	}
 
 	private static PickedHousePart getPickResult(final Ray3 pickRay) {
