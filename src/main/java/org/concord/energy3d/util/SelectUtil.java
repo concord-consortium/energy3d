@@ -12,6 +12,7 @@ import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.intersection.PickData;
 import com.ardor3d.intersection.PickResults;
+import com.ardor3d.intersection.Pickable;
 import com.ardor3d.intersection.PickingUtil;
 import com.ardor3d.intersection.PrimitivePickResults;
 import com.ardor3d.math.ColorRGBA;
@@ -84,6 +85,18 @@ public class SelectUtil {
 				}
 			}
 		}
+		// if this is an imported mesh, do it here. getPickResult method below returns incorrect result.
+		if (pickResults.getNumber() > 0) {
+			final PickData pick = pickResults.getPickData(0);
+			final Pickable pickable = pick.getTarget();
+			if (pickable instanceof Mesh) {
+				final Mesh m = (Mesh) pickable;
+				final UserData u = (UserData) m.getUserData();
+				if (u.isImported()) {
+					return new PickedHousePart(u, pick.getIntersectionRecord().getIntersectionPoint(0), u.getRotatedNormal() == null ? u.getNormal() : u.getRotatedNormal());
+				}
+			}
+		}
 		return getPickResult(pickRay);
 	}
 
@@ -150,6 +163,7 @@ public class SelectUtil {
 				polyDist = polyDist_i;
 				pointDist = pointDist_i;
 			}
+			break;
 		}
 		return pickedHousePart;
 	}

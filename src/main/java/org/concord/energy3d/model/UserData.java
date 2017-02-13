@@ -19,24 +19,31 @@ public class UserData {
 	private ReadOnlyVector3 rotatedNormal; // store the result of current rotation to avoid recalculation, null if there is no need to rotate the original normal
 	private RenderState renderState;
 	private FloatBuffer textureBuffer;
-	private int meshIndex;
+	private int meshIndex = -1;
 	private boolean reachable = true;
 	private int faceIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
 	private Mesh twin; // the twin of this mesh, usually created by SketchUp and other CAD software
+	private boolean imported; // flag that indicates this as an imported mesh
 
 	public UserData(final HousePart housePart) {
 		this(housePart, -1, false);
 	}
 
+	/** call only when this UserData serves an imported mesh */
 	public UserData(final HousePart housePart, final int meshIndex) {
 		this(housePart, -1, false);
 		this.meshIndex = meshIndex;
+		imported = true;
 	}
 
 	public UserData(final HousePart housePart, final int editPointIndex, final boolean isEditPoint) {
 		this.housePart = housePart;
 		this.editPointIndex = editPointIndex;
 		this.isEditPoint = isEditPoint;
+	}
+
+	public boolean isImported() {
+		return imported;
 	}
 
 	public HousePart getHousePart() {
