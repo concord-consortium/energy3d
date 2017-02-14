@@ -182,7 +182,8 @@ public class Rack extends HousePart implements Trackable {
 				isBaseZ = Util.isEqual(p.getZ(), baseZ);
 				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 				points.get(0).set(toRelative(p));
-				pickedNormal = picked.getUserData().getNormal();
+				final UserData ud = picked.getUserData();
+				pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
 				meshNormal = pickedNormal == null ? null : pickedNormal.clone();
 			} else {
 				pickedNormal = null;

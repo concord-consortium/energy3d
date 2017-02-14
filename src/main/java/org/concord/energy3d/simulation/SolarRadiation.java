@@ -415,7 +415,7 @@ public class SolarRadiation {
 							final UserData ud = (UserData) m.getUserData();
 							ReadOnlyVector3 normal = ud.getNormal();
 							if (nonZeroAz) { // if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
-								ud.setRotatedNormal(node.getRotation().applyPost(normal, null));
+								ud.setRotatedNormal(node.getRotation().applyPost(normal, null)); // this must be recalculated in case the foundation has been rotated after loading
 								normal = ud.getRotatedNormal();
 							}
 							MeshDataStore data = onMesh.get(m);

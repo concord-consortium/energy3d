@@ -297,6 +297,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			} catch (final Throwable t) {
 				Util.reportError(t);
 			}
+			setRotatedNormalsForImportedMeshes();
 		}
 
 	}
@@ -1376,6 +1377,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (SceneManager.getInstance().getSelectedPart() == this) {
 			drawAzimuthArrow();
 		}
+		setRotatedNormalsForImportedMeshes();
 	}
 
 	/** @return the azimuth of the reference vector of this foundation in degrees */
@@ -2829,6 +2831,22 @@ public class Foundation extends HousePart implements Thermalizable {
 								m.updateModelBound();
 							}
 						}
+					}
+				}
+			}
+		}
+	}
+
+	private void setRotatedNormalsForImportedMeshes() {
+		if (importedNodes != null) {
+			drawImports();
+			final boolean nonZeroAz = !Util.isZero(getAzimuth());
+			if (nonZeroAz) { // if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
+				for (final Node node : importedNodes) {
+					for (final Spatial s : node.getChildren()) {
+						final Mesh m = (Mesh) s;
+						final UserData ud = (UserData) m.getUserData();
+						ud.setRotatedNormal(node.getRotation().applyPost(ud.getNormal(), null));
 					}
 				}
 			}

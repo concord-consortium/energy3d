@@ -182,9 +182,9 @@ public class SolarPanel extends HousePart implements Trackable {
 			final Vector3 p = picked.getPoint().clone();
 			snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 			points.get(0).set(toRelative(p));
-			pickedNormal = picked.getUserData().getNormal();
+			final UserData ud = picked.getUserData();
+			pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
 			meshNormal = pickedNormal == null ? null : pickedNormal.clone();
-			// System.out.println("****" + meshNormal);
 		} else {
 			pickedNormal = null;
 		}
