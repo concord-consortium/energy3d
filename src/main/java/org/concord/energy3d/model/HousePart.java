@@ -1226,8 +1226,9 @@ public abstract class HousePart implements Serializable {
 		} else if (container instanceof Roof) {
 			final Roof roof = (Roof) container;
 			final int[] editPointToRoofIndex = new int[points.size()];
+			final PickResults pickResults = new PrimitivePickResults();
 			for (int i = 0; i < points.size(); i++) {
-				final PickResults pickResults = new PrimitivePickResults();
+				pickResults.clear();
 				final Ray3 ray = new Ray3(getAbsPoint(i).multiplyLocal(1, 1, 0), Vector3.UNIT_Z);
 				for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
 					if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
@@ -1270,11 +1271,12 @@ public abstract class HousePart implements Serializable {
 			final List<Node> nodes = foundation.getImportedNodes();
 			if (nodes != null) {
 				final Map<Vector3, ReadOnlyVector3> intersections = new HashMap<Vector3, ReadOnlyVector3>();
+				final PickResults pickResults = new PrimitivePickResults();
 				for (final Node n : nodes) {
 					for (final Spatial s : n.getChildren()) {
 						if (s instanceof Mesh) {
 							final Mesh m = (Mesh) s;
-							final PickResults pickResults = new PrimitivePickResults();
+							pickResults.clear();
 							PickingUtil.findPick(m, new Ray3(getAbsPoint(0).multiplyLocal(1, 1, 0), Vector3.UNIT_Z), pickResults, false);
 							if (pickResults.getNumber() > 0) {
 								intersections.put(pickResults.getPickData(0).getIntersectionRecord().getIntersectionPoint(0), ((UserData) m.getUserData()).getNormal());

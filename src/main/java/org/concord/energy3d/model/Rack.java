@@ -72,6 +72,7 @@ public class Rack extends HousePart implements Trackable {
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double baseZ;
 	private transient boolean isBaseZ;
+	private ReadOnlyVector3 meshNormal; // if the mesh is a vertical surface, store the normal as it can't be calculated
 
 	public Rack() {
 		super(1, 1, 0);
@@ -182,6 +183,7 @@ public class Rack extends HousePart implements Trackable {
 				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 				points.get(0).set(toRelative(p));
 				pickedNormal = picked.getUserData().getNormal();
+				meshNormal = pickedNormal == null ? null : pickedNormal.clone();
 			} else {
 				pickedNormal = null;
 			}
@@ -291,7 +293,11 @@ public class Rack extends HousePart implements Trackable {
 		}
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
-		normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
+		if (meshNormal == null) {
+			normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
+		} else {
+			normal = meshNormal;
+		}
 
 		final boolean onFlatSurface = onFlatSurface();
 
@@ -914,6 +920,9 @@ public class Rack extends HousePart implements Trackable {
 	}
 
 	private boolean onFlatSurface() {
+		if (meshNormal != null && !Util.isEqualFaster(meshNormal, Vector3.UNIT_Z)) {
+			return false;
+		}
 		if (container instanceof Roof) {
 			if (Util.isZero(container.getHeight())) {
 				return true;

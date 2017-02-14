@@ -77,6 +77,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	private int numberOfCellsInY = 10;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
+	private ReadOnlyVector3 meshNormal; // if the mesh is a vertical surface, store the normal as it can't be calculated
 
 	public SolarPanel() {
 		super(1, 1, 0);
@@ -182,6 +183,8 @@ public class SolarPanel extends HousePart implements Trackable {
 			snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 			points.get(0).set(toRelative(p));
 			pickedNormal = picked.getUserData().getNormal();
+			meshNormal = pickedNormal == null ? null : pickedNormal.clone();
+			// System.out.println("****" + meshNormal);
 		} else {
 			pickedNormal = null;
 		}
@@ -220,6 +223,9 @@ public class SolarPanel extends HousePart implements Trackable {
 	}
 
 	private boolean onFlatSurface() {
+		if (meshNormal != null && !Util.isEqualFaster(meshNormal, Vector3.UNIT_Z)) {
+			return false;
+		}
 		if (container instanceof Roof) {
 			if (Util.isZero(container.getHeight())) {
 				return true;
@@ -240,7 +246,11 @@ public class SolarPanel extends HousePart implements Trackable {
 			return;
 		}
 
-		normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
+		if (meshNormal == null) {
+			normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
+		} else {
+			normal = meshNormal;
+		}
 		updateEditShapes();
 
 		final double annotationScaleFactor = 0.5 / Scene.getInstance().getAnnotationScale();
