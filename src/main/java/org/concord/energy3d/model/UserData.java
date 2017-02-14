@@ -19,6 +19,7 @@ public class UserData {
 	private ReadOnlyVector3 rotatedNormal; // store the result of current rotation to avoid recalculation, null if there is no need to rotate the original normal
 	private RenderState renderState;
 	private FloatBuffer textureBuffer;
+	private int nodeIndex = -1;
 	private int meshIndex = -1;
 	private boolean reachable = true;
 	private int faceIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
@@ -30,8 +31,9 @@ public class UserData {
 	}
 
 	/** call only when this UserData serves an imported mesh */
-	public UserData(final HousePart housePart, final int meshIndex) {
-		this(housePart, -1, false);
+	public UserData(final Foundation foundation, final int nodeIndex, final int meshIndex) {
+		this(foundation, -1, false);
+		this.nodeIndex = nodeIndex;
 		this.meshIndex = meshIndex;
 		imported = true;
 	}
@@ -101,6 +103,10 @@ public class UserData {
 		} else {
 			this.textureBuffer = null;
 		}
+	}
+
+	public int getNodeIndex() {
+		return nodeIndex;
 	}
 
 	public int getMeshIndex() {

@@ -77,7 +77,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	private int numberOfCellsInY = 10;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
-	private ReadOnlyVector3 meshNormal; // if the mesh is a vertical surface, store the normal as it can't be calculated
+	private MeshLocator meshLocator; // if the mesh that this solar panel rests on is a vertical surface of unknown type (e.g., an imported mesh), store its info for finding it later
 
 	public SolarPanel() {
 		super(1, 1, 0);
@@ -184,7 +184,11 @@ public class SolarPanel extends HousePart implements Trackable {
 			points.get(0).set(toRelative(p));
 			final UserData ud = picked.getUserData();
 			pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
-			meshNormal = pickedNormal == null ? null : pickedNormal.clone();
+			if (ud.getHousePart() instanceof Foundation && ud.isImported() && ud.getNodeIndex() >= 0 && ud.getMeshIndex() >= 0) { // if this solar panel rests on an imported mesh, store its info
+				meshLocator = new MeshLocator((Foundation) ud.getHousePart(), ud.getNodeIndex(), ud.getMeshIndex());
+			} else {
+				meshLocator = null;
+			}
 		} else {
 			pickedNormal = null;
 		}
@@ -223,7 +227,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	}
 
 	private boolean onFlatSurface() {
-		if (meshNormal != null && !Util.isEqualFaster(meshNormal, Vector3.UNIT_Z)) {
+		if (meshLocator != null) { // if this solar panel rests on an imported mesh, treat it differently
 			return false;
 		}
 		if (container instanceof Roof) {
@@ -246,10 +250,12 @@ public class SolarPanel extends HousePart implements Trackable {
 			return;
 		}
 
-		if (meshNormal == null) {
+		final Mesh host = meshLocator == null ? null : meshLocator.find(); // if this solar panel rests on an imported mesh or not?
+		if (host == null) {
 			normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
 		} else {
-			normal = meshNormal;
+			final UserData ud = (UserData) host.getUserData();
+			normal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
 		}
 		updateEditShapes();
 

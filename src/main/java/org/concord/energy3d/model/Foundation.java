@@ -2629,6 +2629,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			final List<Mesh> meshes = new ArrayList<Mesh>();
 			Util.getMeshes(originalNode, meshes);
 			String warnInfo = null;
+			final int nodeIndex = importedNodes.size();
 			int meshIndex = 0;
 			for (final Mesh m : meshes) {
 				final ReadOnlyTransform t = m.getWorldTransform();
@@ -2639,7 +2640,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					if (!children.isEmpty()) {
 						for (final Mesh s : children) {
 							s.setTransform(t);
-							final UserData ud = new UserData(this, meshIndex);
+							final UserData ud = new UserData(this, nodeIndex, meshIndex);
 							ud.setNormal((Vector3) s.getUserData());
 							ud.setRenderState(s.getLocalRenderState(StateType.Texture));
 							ud.setTextureBuffer(s.getMeshData().getTextureBuffer(0));
