@@ -86,6 +86,7 @@ import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.Texture;
 import com.ardor3d.image.TextureStoreFormat;
+import com.ardor3d.image.util.ImageLoaderUtil;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.input.ButtonState;
 import com.ardor3d.input.FocusWrapper;
@@ -279,6 +280,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		System.out.println("done");
 		System.out.print("Initializing SceneManager...");
 		AWTImageLoader.registerLoader();
+		ImageLoaderUtil.registerDefaultHandler(new AWTImageLoader());
 		try {
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("images/")));
 			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, new SimpleResourceLocator(getClass().getResource("fonts/")));
