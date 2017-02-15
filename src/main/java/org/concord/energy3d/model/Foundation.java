@@ -524,7 +524,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	private void updateImportedNodePositionsAfterMove(final Vector3 displacement) {
+	private void updateImportedNodePositionsAfterMove() {
 		if (importedNodeStates != null) {
 			final double az = Math.toRadians(getAzimuth());
 			final Vector3 ac = getAbsCenter();
@@ -533,7 +533,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					ns.setAbsolutePosition(ac.addLocal(ns.getRelativePosition()));
 				}
 			} else {
-				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -az);
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -az); // why -az?
 				for (final NodeState ns : importedNodeStates) {
 					ns.setAbsolutePosition(ac.addLocal(matrix.applyPost(ns.getRelativePosition(), null)));
 				}
@@ -1316,7 +1316,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawChildren();
 			updateHandlesOfAllFoudations();
 		}
-		updateImportedNodePositionsAfterMove(d);
+		updateImportedNodePositionsAfterMove();
 	}
 
 	public void move(final Vector3 v, final double steplength) {
@@ -2935,14 +2935,13 @@ public class Foundation extends HousePart implements Thermalizable {
 	private void setRotatedNormalsForImportedMeshes() {
 		if (importedNodes != null) {
 			drawImportedNodes();
-			final boolean nonZeroAz = !Util.isZero(getAzimuth());
-			if (nonZeroAz) { // if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
-				for (final Node node : importedNodes) {
-					for (final Spatial s : node.getChildren()) {
-						final Mesh m = (Mesh) s;
-						final UserData ud = (UserData) m.getUserData();
-						ud.setRotatedNormal(node.getRotation().applyPost(ud.getNormal(), null));
-					}
+			// if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
+			// DO NOT skip zero azimuth case -- final boolean nonZeroAz = !Util.isZero(getAzimuth());
+			for (final Node node : importedNodes) {
+				for (final Spatial s : node.getChildren()) {
+					final Mesh m = (Mesh) s;
+					final UserData ud = (UserData) m.getUserData();
+					ud.setRotatedNormal(node.getRotation().applyPost(ud.getNormal(), null));
 				}
 			}
 		}
