@@ -874,7 +874,7 @@ public class Rack extends HousePart implements Trackable {
 			final Foundation foundation = getTopContainer();
 			final double azFoundation = Math.toRadians(foundation.getAzimuth());
 			if (!Util.isZero(azFoundation)) {
-				foundation.rotate(azFoundation, null);
+				foundation.rotate(azFoundation, null, false);
 			}
 			final double azRack = relativeAzimuth;
 			setRelativeAzimuth(0);
@@ -909,7 +909,7 @@ public class Rack extends HousePart implements Trackable {
 				}
 			}
 			if (!Util.isZero(azFoundation)) {
-				foundation.rotate(-azFoundation, null);
+				foundation.rotate(-azFoundation, null, false);
 			}
 			setRelativeAzimuth(azRack);
 			Scene.getInstance().redrawAll();

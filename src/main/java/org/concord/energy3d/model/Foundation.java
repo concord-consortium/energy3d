@@ -504,15 +504,22 @@ public class Foundation extends HousePart implements Thermalizable {
 	// while resizing the foundation, we don't want imported nodes to move. so fix them here
 	private void keepImportedNodesAtSamePositions() {
 		if (importedNodeStates != null) {
-			for (final NodeState ns : importedNodeStates) {
-				final Vector3 relativePosition = ns.getRelativePosition();
-				Vector3 diff = ns.getAbsolutePosition().subtract(getAbsCenter(), null);
-				final double az = Math.toRadians(getAzimuth());
-				if (!Util.isZero(az)) {
-					diff = new Matrix3().fromAngles(0, 0, az).applyPost(diff, null); // why not -getAzimuth()?
+			final Vector3 center = getAbsCenter();
+			final double az = Math.toRadians(getAzimuth());
+			if (Util.isZero(az)) {
+				for (final NodeState ns : importedNodeStates) {
+					final Vector3 r = ns.getAbsolutePosition().subtract(center, null);
+					ns.getRelativePosition().setX(r.getX());
+					ns.getRelativePosition().setY(r.getY());
 				}
-				relativePosition.setX(diff.getX());
-				relativePosition.setY(diff.getY());
+			} else {
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, az);
+				for (final NodeState ns : importedNodeStates) {
+					Vector3 r = ns.getAbsolutePosition().subtract(center, null);
+					r = matrix.applyPost(r, null);
+					ns.getRelativePosition().setX(r.getX());
+					ns.getRelativePosition().setY(r.getY());
+				}
 			}
 		}
 	}
@@ -735,7 +742,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		Scene.getInstance().setDisallowFoundationOverlap(false);
 		final double a = Math.toRadians(getAzimuth());
 		if (!Util.isZero(a)) {
-			rotate(a, null);
+			rotate(a, null, false);
 		}
 		final Vector3 center = getAbsCenter().multiplyLocal(1, 1, 0);
 		move(center.negateLocal(), center.length());
@@ -749,7 +756,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		move(center.negateLocal(), center.length());
 		if (!Util.isZero(a)) {
-			rotate(-a, null);
+			rotate(-a, null, false);
 		}
 		Scene.getInstance().setDisallowFoundationOverlap(currentOverlapAllowance);
 	}
@@ -1399,8 +1406,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		this.totalEnergyToday = totalEnergyToday;
 	}
 
-	/** If center is null, use the center of this foundation */
-	public void rotate(final double angle, ReadOnlyVector3 center) {
+	/** If center is null, use the center of this foundation. set update false if this is for rotating the coordinate system of this foundation for easier math */
+	public void rotate(final double angle, ReadOnlyVector3 center, final boolean update) {
 		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
 		if (center == null) {
 			center = toRelative(getCenter().clone());
@@ -1412,11 +1419,13 @@ public class Foundation extends HousePart implements Thermalizable {
 			op.add(center, p);
 			points.get(i).set(toRelative(p));
 		}
-		if (SceneManager.getInstance().getSelectedPart() == this) {
-			drawAzimuthArrow();
+		if (update) {
+			if (SceneManager.getInstance().getSelectedPart() == this) {
+				drawAzimuthArrow();
+			}
+			setRotatedNormalsForImportedMeshes();
+			updateImportedNodesAbsolutePositions();
 		}
-		setRotatedNormalsForImportedMeshes();
-		updateImportedNodesAbsolutePositions();
 	}
 
 	/** @return the azimuth of the reference vector of this foundation in degrees */
@@ -1927,7 +1936,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
-			rotate(az, null);
+			rotate(az, null, false);
 		}
 		final Vector3 p0 = getAbsPoint(0);
 		final double a = p0.distance(getAbsPoint(2));
@@ -1959,7 +1968,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			break;
 		}
 		if (!Util.isZero(az)) {
-			rotate(-az, null);
+			rotate(-az, null, false);
 		}
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
@@ -1978,7 +1987,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
-			rotate(az, null);
+			rotate(az, null, false);
 		}
 		final Vector3 p0 = getAbsPoint(0);
 		final double a = p0.distance(getAbsPoint(2));
@@ -2049,7 +2058,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			break;
 		}
 		if (!Util.isZero(az)) {
-			rotate(-az, null);
+			rotate(-az, null, false);
 		}
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
@@ -2067,7 +2076,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
 		if (!Util.isZero(az)) {
-			rotate(az, null);
+			rotate(az, null, false);
 		}
 		if (Util.isZero(tiltAngle - 90)) {
 			tiltAngle = 89.999;
@@ -2158,7 +2167,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			break;
 		}
 		if (!Util.isZero(az)) {
-			rotate(-az, null);
+			rotate(-az, null, false);
 		}
 		Scene.getInstance().redrawAll();
 		SceneManager.getInstance().getUndoManager().addEdit(command);
@@ -2630,6 +2639,10 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public NodeState getNodeState(final Node n) {
 		return importedNodeStates.get(importedNodes.indexOf(n));
+	}
+
+	public Node getNode(final NodeState s) {
+		return importedNodes.get(importedNodeStates.indexOf(s));
 	}
 
 	public void translateImportedNode(final Node n, final double x, final double y, final double z) {

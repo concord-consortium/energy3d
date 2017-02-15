@@ -2158,10 +2158,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
 				final Vector3 center = f.toRelative(f.getCenter().clone());
 				for (final Foundation x : g) {
-					x.rotate(angle, center);
+					x.rotate(angle, center, true);
 				}
 			} else {
-				f.rotate(angle, null);
+				f.rotate(angle, null, true);
 			}
 			if (redraw) {
 				Scene.getInstance().redrawAll();
@@ -2174,7 +2174,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Vector3 origin = new Vector3();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
-				((Foundation) p).rotate(angle, origin);
+				((Foundation) p).rotate(angle, origin, true);
 			}
 		}
 		Scene.getInstance().redrawAll();
