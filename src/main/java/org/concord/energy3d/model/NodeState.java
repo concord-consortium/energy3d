@@ -18,7 +18,8 @@ public class NodeState implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Vector3 position; // relative to the center of the foundation
+	private Vector3 relativePosition; // relative to the center of the foundation
+	private Vector3 absolutePosition; // save the absolute position as we need it to nail down the position of this node when the foundation is resized
 	private ReadOnlyColorRGBA defaultColor = ColorRGBA.WHITE;
 	private URL sourceURL;
 	private String name;
@@ -30,7 +31,7 @@ public class NodeState implements Serializable {
 
 	public NodeState makeCopy() {
 		final NodeState copy = new NodeState();
-		copy.position = position != null ? position.clone() : null;
+		copy.relativePosition = relativePosition != null ? relativePosition.clone() : null;
 		copy.defaultColor = defaultColor.clone();
 		copy.sourceURL = sourceURL;
 		copy.name = name;
@@ -82,13 +83,21 @@ public class NodeState implements Serializable {
 	}
 
 	/** relative to the center of the foundation */
-	public void setPosition(final Vector3 position) {
-		this.position = position;
+	public void setRelativePosition(final Vector3 relativePosition) {
+		this.relativePosition = relativePosition;
 	}
 
 	/** relative to the center of the foundation */
-	public Vector3 getPosition() {
-		return position;
+	public Vector3 getRelativePosition() {
+		return relativePosition;
+	}
+
+	public void setAbsolutePosition(final Vector3 absolutePosition) {
+		this.absolutePosition = absolutePosition;
+	}
+
+	public Vector3 getAbsolutePosition() {
+		return absolutePosition;
 	}
 
 	public void setDefaultColor(final ReadOnlyColorRGBA defaultColor) {

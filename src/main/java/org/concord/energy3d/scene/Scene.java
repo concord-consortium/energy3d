@@ -1149,7 +1149,7 @@ public class Scene implements Serializable {
 			if (position == null) {
 				return;
 			}
-			copyNodeState.setPosition(position);
+			copyNodeState.setAbsolutePosition(position.clone());
 			Node newNode = null;
 			try {
 				newNode = foundation.importCollada(copyNodeState.getSourceURL(), position);

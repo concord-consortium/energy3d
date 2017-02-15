@@ -1132,7 +1132,7 @@ public class EnergyPanel extends JPanel {
 								final double zMeshBox = 2 * meshBox.getExtent().getZ() * scale;
 								final ReadOnlyVector3 meshBoxCenter = meshBox.getCenter();
 								final NodeState ns = foundation.getNodeState(selectedNode);
-								final Vector3 position = ns.getPosition().add(foundation.getAbsCenter(), null);
+								final Vector3 position = ns.getRelativePosition().add(foundation.getAbsCenter(), null);
 								Vector3 meshNormal = null;
 								int meshIndex = -1;
 								if (selectedMesh.getUserData() instanceof UserData) {

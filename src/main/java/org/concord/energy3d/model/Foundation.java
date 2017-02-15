@@ -397,6 +397,18 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	@Override
+	public Vector3 getAbsCenter() {
+		double x = 0, y = 0, z = 0;
+		for (int i = 0; i < 4; i++) {
+			final Vector3 v = getAbsPoint(i);
+			x += v.getX();
+			y += v.getY();
+			z += v.getZ();
+		}
+		return new Vector3(x / 4, y / 4, z / 4);
+	}
+
+	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		if (lockEdit && editPointIndex < 4) {
 			return;
@@ -459,6 +471,8 @@ public class Foundation extends HousePart implements Thermalizable {
 						points.get(3).set(Util.projectPointOnLine(p, points.get(1), points.get(3), false));
 					}
 				}
+				keepImportedNodesAtSamePositions();
+
 			} else if (index < 8) {
 				final int lower = editPointIndex - 4;
 				final Vector3 base = getAbsPoint(lower);
@@ -485,6 +499,30 @@ public class Foundation extends HousePart implements Thermalizable {
 		draw();
 		setEditPointsVisible(true);
 		updateHandlesOfAllFoudations();
+	}
+
+	// while resizing the foundation, we don't want imported nodes to move. so fix them here
+	private void keepImportedNodesAtSamePositions() {
+		if (importedNodeStates != null) {
+			for (final NodeState ns : importedNodeStates) {
+				final Vector3 relativePosition = ns.getRelativePosition();
+				Vector3 diff = ns.getAbsolutePosition().subtract(getAbsCenter(), null);
+				final double az = Math.toRadians(getAzimuth());
+				if (!Util.isZero(az)) {
+					diff = new Matrix3().fromAngles(0, 0, az).applyPost(diff, null); // why not -getAzimuth()?
+				}
+				relativePosition.setX(diff.getX());
+				relativePosition.setY(diff.getY());
+			}
+		}
+	}
+
+	private void updateImportedNodesAbsolutePositions() {
+		if (importedNodeStates != null) {
+			for (final NodeState ns : importedNodeStates) {
+				ns.setAbsolutePosition(getAbsCenter().addLocal(ns.getRelativePosition()));
+			}
+		}
 	}
 
 	@Override
@@ -751,7 +789,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawOutline(outlineMesh, (float) height);
 			updateHandles();
 			drawSolarReceiver();
-			drawImports();
+			drawImportedNodes();
 			updateFloatingLabelPosition();
 			foundationPolygon.draw();
 		}
@@ -1253,6 +1291,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawChildren();
 			updateHandlesOfAllFoudations();
 		}
+		updateImportedNodesAbsolutePositions();
 	}
 
 	public void move(final Vector3 v, final double steplength) {
@@ -1377,6 +1416,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawAzimuthArrow();
 		}
 		setRotatedNormalsForImportedMeshes();
+		updateImportedNodesAbsolutePositions();
 	}
 
 	/** @return the azimuth of the reference vector of this foundation in degrees */
@@ -2593,8 +2633,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void translateImportedNode(final Node n, final double x, final double y, final double z) {
+		final NodeState ns = getNodeState(n);
 		final Vector3 v = new Vector3(x, y, z);
-		getNodeState(n).getPosition().addLocal(v);
+		ns.getRelativePosition().addLocal(v);
 		final Vector3 d = n.getRotation().applyPost(v, null);
 		for (final HousePart p : children) {
 			if (p instanceof SolarPanel) {
@@ -2613,6 +2654,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
+		ns.setAbsolutePosition(getAbsCenter().addLocal(ns.getRelativePosition()));
 	}
 
 	public Node importCollada(final URL file, final Vector3 position) throws Exception {
@@ -2636,11 +2678,12 @@ public class Foundation extends HousePart implements Thermalizable {
 			originalNode.setScale(scale);
 			if (position != null) { // when position is null, the node uses the position saved in the associated NodeState object
 				final NodeState ns = new NodeState();
+				ns.setAbsolutePosition(position.clone());
 				importedNodeStates.add(ns);
 				originalNode.setTranslation(position);
 				final Vector3 relativePosition = position.subtract(getAbsCenter().multiplyLocal(1, 1, 0), null).addLocal(0, 0, height);
 				final double az = Math.toRadians(getAzimuth());
-				ns.setPosition(Util.isZero(az) ? relativePosition : new Matrix3().fromAngles(0, 0, az).applyPost(relativePosition, null)); // why not -getAzimuth()?
+				ns.setRelativePosition(Util.isZero(az) ? relativePosition : new Matrix3().fromAngles(0, 0, az).applyPost(relativePosition, null)); // why not -getAzimuth()?
 				ns.setSourceURL(file);
 			}
 			// now construct a new node that is a parent of all planar meshes
@@ -2832,7 +2875,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		// Util.drawBoundingBox(m.getParent(), selectedNodeBoundingBox);
 	}
 
-	public void drawImports() {
+	public void drawImportedNodes() {
 		if (importedNodes != null) {
 			final int n = importedNodes.size();
 			if (n > 0) {
@@ -2843,7 +2886,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
 					if (root.getChildren().contains(ni)) {
-						final Vector3 vi = matrix.applyPost(importedNodeStates.get(i).getPosition(), null);
+						final Vector3 vi = matrix.applyPost(importedNodeStates.get(i).getRelativePosition(), null);
 						ni.setTranslation(c.add(vi, null));
 						ni.setRotation(matrix);
 						for (final Spatial s : ni.getChildren()) {
@@ -2860,7 +2903,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	private void setRotatedNormalsForImportedMeshes() {
 		if (importedNodes != null) {
-			drawImports();
+			drawImportedNodes();
 			final boolean nonZeroAz = !Util.isZero(getAzimuth());
 			if (nonZeroAz) { // if the foundation is rotated, rotate the imported meshes, too, but this doesn't alter their original normals
 				for (final Node node : importedNodes) {
