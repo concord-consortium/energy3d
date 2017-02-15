@@ -1090,6 +1090,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Rack r = (Rack) selectedPart;
 			r.move(v, selectedPart.getGridSize());
 			r.draw();
+		} else if (selectedPart instanceof Tree) {
+			final Tree t = (Tree) selectedPart;
+			t.move(v, selectedPart.getGridSize());
+			t.draw();
+		} else if (selectedPart instanceof Human) {
+			final Human h = (Human) selectedPart;
+			h.move(v, selectedPart.getGridSize());
+			h.draw();
 		}
 		undoManager.addEdit(c);
 		SceneManager.getInstance().refresh();
@@ -1871,7 +1879,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
 											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
 										}
-										foundationOfPreviousSelectedPart.setMeshSelectionVisible(false);
+										foundationOfPreviousSelectedPart.clearSelectedMesh();
 									}
 								}
 							}

@@ -786,8 +786,7 @@ public class Rack extends HousePart implements Trackable {
 	}
 
 	public void move(final Vector3 v, final double steplength) {
-		v.normalizeLocal();
-		v.multiplyLocal(steplength);
+		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 v_rel = toRelativeVector(v);
 		points.get(0).addLocal(v_rel);
 		moveSolarPanels(v_rel);

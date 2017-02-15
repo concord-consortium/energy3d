@@ -361,6 +361,12 @@ public class Tree extends HousePart {
 		draw();
 	}
 
+	public void move(final Vector3 v, final double steplength) {
+		v.normalizeLocal().multiplyLocal(steplength);
+		final Vector3 p = getAbsPoint(0).addLocal(v);
+		points.get(0).set(toRelative(p));
+	}
+
 	@Override
 	public boolean isCopyable() {
 		return true;

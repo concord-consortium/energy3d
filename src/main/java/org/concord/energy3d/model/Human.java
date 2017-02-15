@@ -193,6 +193,12 @@ public class Human extends HousePart {
 		}
 	}
 
+	public void move(final Vector3 v, final double steplength) {
+		v.normalizeLocal().multiplyLocal(steplength);
+		final Vector3 p = getAbsPoint(0).addLocal(v);
+		points.get(0).set(toRelative(p));
+	}
+
 	@Override
 	public void drawHeatFlux() {
 		// this method is left empty on purpose -- don't draw heat flux
