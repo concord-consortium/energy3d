@@ -524,10 +524,28 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	private void updateImportedNodesAbsolutePositions() {
+	private void updateImportedNodePositionsAfterMove(final Vector3 displacement) {
 		if (importedNodeStates != null) {
+			final double az = Math.toRadians(getAzimuth());
+			final Vector3 ac = getAbsCenter();
+			if (Util.isZero(az)) {
+				for (final NodeState ns : importedNodeStates) {
+					ns.setAbsolutePosition(ac.addLocal(ns.getRelativePosition()));
+				}
+			} else {
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -az);
+				for (final NodeState ns : importedNodeStates) {
+					ns.setAbsolutePosition(ac.addLocal(matrix.applyPost(ns.getRelativePosition(), null)));
+				}
+			}
+		}
+	}
+
+	private void updateImportedNodePositionsAfterRotate(final Matrix3 rotationMatrix) {
+		if (importedNodeStates != null) {
+			final Vector3 ac = getAbsCenter();
 			for (final NodeState ns : importedNodeStates) {
-				ns.setAbsolutePosition(getAbsCenter().addLocal(ns.getRelativePosition()));
+				ns.setAbsolutePosition(ac.addLocal(rotationMatrix.applyPost(ns.getAbsolutePosition().subtractLocal(ac), null)));
 			}
 		}
 	}
@@ -1298,7 +1316,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawChildren();
 			updateHandlesOfAllFoudations();
 		}
-		updateImportedNodesAbsolutePositions();
+		updateImportedNodePositionsAfterMove(d);
 	}
 
 	public void move(final Vector3 v, final double steplength) {
@@ -1424,7 +1442,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				drawAzimuthArrow();
 			}
 			setRotatedNormalsForImportedMeshes();
-			updateImportedNodesAbsolutePositions();
+			updateImportedNodePositionsAfterRotate(matrix);
 		}
 	}
 
