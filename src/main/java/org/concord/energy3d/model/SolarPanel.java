@@ -890,4 +890,8 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	}
 
+	public MeshLocator getMeshLocator() {
+		return meshLocator;
+	}
+
 }

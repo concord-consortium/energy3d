@@ -1229,7 +1229,6 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (selectedMesh != null) { // if a mesh is selected, move the parent node
 			translateImportedNode(selectedMesh.getParent(), d.getX(), d.getY(), d.getZ());
-			drawImports();
 			draw();
 			drawMeshSelection(selectedMesh);
 		} else {
@@ -2594,7 +2593,26 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void translateImportedNode(final Node n, final double x, final double y, final double z) {
-		getNodeState(n).getPosition().addLocal(x, y, z);
+		final Vector3 v = new Vector3(x, y, z);
+		getNodeState(n).getPosition().addLocal(v);
+		final Vector3 d = n.getRotation().applyPost(v, null);
+		for (final HousePart p : children) {
+			if (p instanceof SolarPanel) {
+				final SolarPanel s = (SolarPanel) p;
+				final MeshLocator l = s.getMeshLocator();
+				if (l != null && l.getFoundation() == this && l.getNodeIndex() == importedNodes.indexOf(n)) {
+					s.points.get(0).addLocal(s.toRelativeVector(d));
+					s.draw();
+				}
+			} else if (p instanceof Rack) {
+				final Rack r = (Rack) p;
+				final MeshLocator l = r.getMeshLocator();
+				if (l != null && l.getFoundation() == this && l.getNodeIndex() == importedNodes.indexOf(n)) {
+					r.points.get(0).addLocal(r.toRelativeVector(d));
+					r.draw();
+				}
+			}
+		}
 	}
 
 	public Node importCollada(final URL file, final Vector3 position) throws Exception {
@@ -2620,7 +2638,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				final NodeState ns = new NodeState();
 				importedNodeStates.add(ns);
 				originalNode.setTranslation(position);
-				ns.setPosition(originalNode.getTranslation().subtract(getAbsCenter().multiplyLocal(1, 1, 0), null).addLocal(0, 0, height));
+				final Vector3 relativePosition = position.subtract(getAbsCenter().multiplyLocal(1, 1, 0), null).addLocal(0, 0, height);
+				final double az = Math.toRadians(getAzimuth());
+				ns.setPosition(Util.isZero(az) ? relativePosition : new Matrix3().fromAngles(0, 0, az).applyPost(relativePosition, null)); // why not -getAzimuth()?
 				ns.setSourceURL(file);
 			}
 			// now construct a new node that is a parent of all planar meshes

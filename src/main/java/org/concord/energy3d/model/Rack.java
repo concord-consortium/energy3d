@@ -1222,4 +1222,8 @@ public class Rack extends HousePart implements Trackable {
 		this.yieldToday = yieldToday;
 	}
 
+	public MeshLocator getMeshLocator() {
+		return meshLocator;
+	}
+
 }

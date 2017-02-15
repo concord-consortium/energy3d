@@ -70,22 +70,26 @@ public class NodeWorker {
 			final UserData u1 = (UserData) m1.getUserData();
 			final OrientedBoundingBox b1 = Util.getOrientedBoundingBox(m1);
 			meshToBox.put(m1, b1);
+			final int vc1 = m1.getMeshData().getVertexCount();
 			for (int i2 = i1 + 1; i2 < n; i2++) {
 				final Mesh m2 = (Mesh) node.getChild(i2);
-				final OrientedBoundingBox b2;
-				if (meshToBox.get(m2) == null) {
-					b2 = Util.getOrientedBoundingBox(m2);
-					meshToBox.put(m2, b2);
-				} else {
-					b2 = meshToBox.get(m2);
-				}
-				if (Util.isEqual(b1, b2, 0.001)) { // TODO: Use bounding box equality to detect mesh vertex equality is questionable
-					final UserData u2 = (UserData) m2.getUserData();
-					m1.addTranslation((u1.getRotatedNormal() == null ? u1.getNormal() : u1.getRotatedNormal()).multiply(offset, null));
-					m2.addTranslation((u2.getRotatedNormal() == null ? u2.getNormal() : u2.getRotatedNormal()).multiply(offset, null));
-					u1.setTwin(m2);
-					u2.setTwin(m1);
-					break;
+				final int vc2 = m2.getMeshData().getVertexCount();
+				if (vc1 == vc2) {
+					final OrientedBoundingBox b2;
+					if (meshToBox.get(m2) == null) {
+						b2 = Util.getOrientedBoundingBox(m2);
+						meshToBox.put(m2, b2);
+					} else {
+						b2 = meshToBox.get(m2);
+					}
+					if (Util.isEqual(b1, b2, 0.001)) { // TODO: Use bounding box equality to detect mesh vertex equality is questionable
+						final UserData u2 = (UserData) m2.getUserData();
+						m1.addTranslation((u1.getRotatedNormal() == null ? u1.getNormal() : u1.getRotatedNormal()).multiply(offset, null));
+						m2.addTranslation((u2.getRotatedNormal() == null ? u2.getNormal() : u2.getRotatedNormal()).multiply(offset, null));
+						u1.setTwin(m2);
+						u2.setTwin(m1);
+						break;
+					}
 				}
 			}
 			if (i1 % 20 == 0) {
