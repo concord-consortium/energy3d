@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 
 /**
  * This allows a mesh to be found.
@@ -37,14 +38,21 @@ public class MeshLocator implements Serializable {
 	}
 
 	public Mesh find() {
-		if (foundation.getImportedNodes() == null) {
+		if (foundation.getImportedNodes() == null || foundation.getImportedNodes().isEmpty()) {
 			return null;
 		}
 		final Node node = foundation.getImportedNodes().get(nodeIndex);
 		if (node == null) {
 			return null;
 		}
-		return (Mesh) node.getChild(meshIndex);
+		for (final Spatial s : node.getChildren()) {
+			final Mesh m = (Mesh) s;
+			final UserData u = (UserData) m.getUserData();
+			if (u.getMeshIndex() == meshIndex) {
+				return m;
+			}
+		}
+		return null;
 	}
 
 }

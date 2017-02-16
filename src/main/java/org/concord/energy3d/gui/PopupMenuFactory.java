@@ -6775,10 +6775,8 @@ public class PopupMenuFactory {
 								public Object call() throws Exception {
 									final Node n = m.getParent();
 									Scene.getInstance().setCopyNode(n, f.getNodeState(n));
-									final DeleteNodeCommand c = new DeleteNodeCommand(n, f);
 									f.deleteNode(n);
 									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
 									return null;
 								}
 							});

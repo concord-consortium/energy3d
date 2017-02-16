@@ -1,12 +1,16 @@
 package org.concord.energy3d.undo;
 
+import java.util.List;
+
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.scenegraph.Node;
 
@@ -16,10 +20,12 @@ public class DeleteNodeCommand extends AbstractUndoableEdit {
 	private final Node node;
 	private final NodeState nodeState;
 	private final Foundation foundation;
+	private final List<HousePart> deletedParts;
 
-	public DeleteNodeCommand(final Node node, final Foundation foundation) {
+	public DeleteNodeCommand(final Node node, final Foundation foundation, final List<HousePart> deletedParts) {
 		this.node = node;
 		this.foundation = foundation;
+		this.deletedParts = deletedParts;
 		nodeState = foundation.getNodeState(node);
 	}
 
@@ -35,6 +41,11 @@ public class DeleteNodeCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		foundation.addNode(node, nodeState);
+		if (deletedParts != null) {
+			for (final HousePart p : deletedParts) {
+				Scene.getInstance().add(p, true);
+			}
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
@@ -42,6 +53,11 @@ public class DeleteNodeCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		foundation.deleteNode(node);
+		if (deletedParts != null) {
+			for (final HousePart p : deletedParts) {
+				Scene.getInstance().remove(p, true);
+			}
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 

@@ -26,6 +26,7 @@ import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.undo.DeleteMeshCommand;
+import org.concord.energy3d.undo.DeleteNodeCommand;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
@@ -1441,6 +1442,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (SceneManager.getInstance().getSelectedPart() == this) {
 				drawAzimuthArrow();
 			}
+			clearSelectedMesh();
 			setRotatedNormalsForImportedMeshes();
 			updateImportedNodePositionsAfterRotate(matrix);
 		}
@@ -2640,12 +2642,35 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void deleteNode(final Node n) {
+		final List<HousePart> toDelete = new ArrayList<HousePart>();
+		for (final HousePart p : children) {
+			if (p instanceof SolarPanel) {
+				final SolarPanel s = (SolarPanel) p;
+				final Mesh m = s.getMeshLocator().find();
+				if (m != null && n.hasChild(m)) {
+					toDelete.add(s);
+				}
+			} else if (p instanceof Rack) {
+				final Rack r = (Rack) p;
+				final Mesh m = r.getMeshLocator().find();
+				if (m != null && n.hasChild(m)) {
+					toDelete.add(r);
+				}
+			}
+		}
+		if (!toDelete.isEmpty()) {
+			for (final HousePart p : toDelete) {
+				Scene.getInstance().remove(p, false);
+			}
+		}
+		final DeleteNodeCommand c = new DeleteNodeCommand(n, this, toDelete);
 		n.getParent().detachChild(n);
 		final int i = importedNodes.indexOf(n);
 		importedNodes.remove(n);
 		importedNodeStates.remove(i);
 		clearSelectedMesh();
 		draw();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
 	}
 
 	public void addNode(final Node n, final NodeState ns) {
@@ -2703,19 +2728,20 @@ public class Foundation extends HousePart implements Thermalizable {
 			sourceFile = new File(new File(Scene.getURL().toURI()).getParentFile(), Util.getFileName(file.getPath()));
 		}
 		if (sourceFile.exists()) {
+			final double az = Math.toRadians(getAzimuth());
+			final boolean zeroAz = Util.isZero(az);
 			final double scale = Scene.getInstance().getAnnotationScale() * 0.633; // 0.633 is determined by fitting the length in Energy3D to the length in SketchUp
 			final ColladaStorage storage = new ColladaImporter().load(new URLResourceSource(sourceFile.toURI().toURL()));
 			final Node originalNode = storage.getScene();
 			originalNode.setScale(scale);
 			if (position != null) { // when position is null, the node uses the position saved in the associated NodeState object
 				final NodeState ns = new NodeState();
+				ns.setSourceURL(file);
 				ns.setAbsolutePosition(position.clone());
 				importedNodeStates.add(ns);
 				originalNode.setTranslation(position);
 				final Vector3 relativePosition = position.subtract(getAbsCenter().multiplyLocal(1, 1, 0), null).addLocal(0, 0, height);
-				final double az = Math.toRadians(getAzimuth());
-				ns.setRelativePosition(Util.isZero(az) ? relativePosition : new Matrix3().fromAngles(0, 0, az).applyPost(relativePosition, null)); // why not -getAzimuth()?
-				ns.setSourceURL(file);
+				ns.setRelativePosition(zeroAz ? relativePosition : new Matrix3().fromAngles(0, 0, az).applyPost(relativePosition, null)); // why not -getAzimuth()?
 			}
 			// now construct a new node that is a parent of all planar meshes
 			final Node newNode = new Node(originalNode.getName());
@@ -2761,6 +2787,9 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
 				new NodeWorker(newNode).findTwinMeshes();
+				if (!zeroAz) {
+					setRotatedNormalsForImportedMeshes();
+				}
 				return newNode;
 			}
 			if (position != null) {
@@ -2862,7 +2891,26 @@ public class Foundation extends HousePart implements Thermalizable {
 	}
 
 	public void deleteMesh(final Mesh m) {
-		final DeleteMeshCommand c = new DeleteMeshCommand(m, this);
+		final List<HousePart> toDelete = new ArrayList<HousePart>();
+		for (final HousePart p : children) {
+			if (p instanceof SolarPanel) {
+				final SolarPanel s = (SolarPanel) p;
+				if (m == s.getMeshLocator().find()) {
+					toDelete.add(s);
+				}
+			} else if (p instanceof Rack) {
+				final Rack r = (Rack) p;
+				if (m == r.getMeshLocator().find()) {
+					toDelete.add(r);
+				}
+			}
+		}
+		if (!toDelete.isEmpty()) {
+			for (final HousePart p : toDelete) {
+				Scene.getInstance().remove(p, false);
+			}
+		}
+		final DeleteMeshCommand c = new DeleteMeshCommand(m, this, toDelete);
 		final Node n = m.getParent();
 		n.detachChild(m);
 		clearSelectedMesh();
