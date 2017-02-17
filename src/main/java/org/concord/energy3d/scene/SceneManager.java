@@ -2102,12 +2102,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		setSolarHeatMapWithoutUpdate(solarHeatMap);
 		EnergyPanel.getInstance().clearAlreadyRendered();
 		EnergyPanel.getInstance().clearRadiationHeatMap();
-		// FIXME: (Xie) For some reason, rack's texture doesn't change correctly until it is redrawn. Rack has to change between a repeated texture (solar panel) and a single texture (solar radiation)
+		// For some reason, rack's texture doesn't change correctly until it is redrawn. Rack has to change between a repeated texture (solar panel) and a single texture (solar radiation)
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
 				for (final Rack rack : Scene.getInstance().getAllRacks()) {
 					rack.draw();
+				}
+				if (!solarHeatMap) { // reset the mesh colors after the heat map goes off
+					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+					for (final Foundation f : foundations) {
+						f.resetImportedMeshColors();
+						f.draw();
+					}
 				}
 				return null;
 			}

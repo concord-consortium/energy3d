@@ -1164,6 +1164,13 @@ public class Scene implements Serializable {
 						foundation.deleteMesh(Util.getMesh(newNode, i));
 					}
 				}
+				final HashMap<Integer, ReadOnlyColorRGBA> meshColors = copyNodeState.getMeshColors();
+				if (meshColors != null) {
+					for (final Integer i : meshColors.keySet()) {
+						s.setMeshColor(i, meshColors.get(i));
+						Util.getMesh(newNode, i).setDefaultColor(s.getMeshColor(i));
+					}
+				}
 			}
 		} else {
 			if (copyBuffer != null) {

@@ -151,7 +151,7 @@ public abstract class CameraControl {
 							SceneManager.getInstance().getCameraNode().updateFromCamera();
 							Scene.getInstance().updateEditShapes();
 						} else if (middle || left && leftButtonAction == ButtonAction.ZOOM || right && rightButtonAction == ButtonAction.ZOOM) {
-							zoom(source, tpf, -inputStates.getCurrent().getMouseState().getDy() * getCurrentExtent() / 100);
+							zoom(source, tpf, -mouse.getDy() * getCurrentExtent() / 100);
 						}
 					} else {
 						firstPing = false;
@@ -171,13 +171,18 @@ public abstract class CameraControl {
 		}));
 	}
 
+	// the extent that depends on the camera orientation (not a perfect solution)
 	private static double getCurrentExtent() {
 		double extent = 1;
 		final BoundingVolume volume = Scene.getRoot().getWorldBound();
 		if (volume instanceof BoundingBox) {
 			final BoundingBox box = (BoundingBox) volume;
-			// the extent that depends on the camera orientation
-			extent = Math.abs(box.getExtent(null).dot(SceneManager.getInstance().getCamera().getDirection()));
+			final ReadOnlyVector3 cameraDirection = SceneManager.getInstance().getCamera().getDirection();
+			final Vector3 e1 = box.getExtent(null);
+			final double extent1 = Math.abs(e1.cross(cameraDirection, null).length());
+			final Vector3 e2 = new Matrix3().applyRotationZ(Math.PI / 2).applyPost(e1, null);
+			final double extent2 = Math.abs(e2.cross(cameraDirection, null).length());
+			extent = 0.5 * (extent1 + extent2);
 		}
 		return extent;
 	}
@@ -228,11 +233,10 @@ public abstract class CameraControl {
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
 			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * (_moveSpeed * 10) * 2 * tpf).addLocal(camera.getLocation());
-			if (loc.length() > SceneManager.SKY_RADIUS) {
+			if (loc.length() > SceneManager.SKY_RADIUS || loc.getZ() < 0) {
 				return;
 			}
 			camera.setLocation(loc);
-
 			if (this instanceof OrbitControl) {
 				((OrbitControl) this).computeNewFrontDistance();
 			}

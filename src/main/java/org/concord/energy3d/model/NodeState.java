@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Vector3;
@@ -25,11 +26,13 @@ public class NodeState implements Serializable {
 	private String name;
 	private ArrayList<Integer> reversedFaceMeshes;
 	private ArrayList<Integer> deletedMeshes;
+	private HashMap<Integer, ReadOnlyColorRGBA> meshColors;
 	private double meshThickness = 0.05; // give the twin meshes imported from SketchUp and other CAD software some thickness
 
 	public NodeState() {
 	}
 
+	@Override
 	public NodeState clone() {
 		final NodeState copy = new NodeState();
 		copy.relativePosition = relativePosition != null ? relativePosition.clone() : null;
@@ -45,7 +48,26 @@ public class NodeState implements Serializable {
 			copy.deletedMeshes = new ArrayList<Integer>();
 			copy.deletedMeshes.addAll(deletedMeshes);
 		}
+		if (meshColors != null) {
+			copy.meshColors = new HashMap<Integer, ReadOnlyColorRGBA>();
+			copy.meshColors.putAll(meshColors);
+		}
 		return copy;
+	}
+
+	public void setMeshColor(final int index, final ReadOnlyColorRGBA color) {
+		if (meshColors == null) {
+			meshColors = new HashMap<Integer, ReadOnlyColorRGBA>();
+		}
+		meshColors.put(index, color);
+	}
+
+	public ReadOnlyColorRGBA getMeshColor(final int index) {
+		return meshColors.get(index);
+	}
+
+	public HashMap<Integer, ReadOnlyColorRGBA> getMeshColors() {
+		return meshColors;
 	}
 
 	public void reverseNormalOfMesh(final int index) {

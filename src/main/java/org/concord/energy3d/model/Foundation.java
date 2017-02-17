@@ -11,6 +11,7 @@ import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -178,16 +179,16 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		sideMesh = new Mesh[4];
 		for (int i = 0; i < 4; i++) {
-			final Mesh mesh = new Mesh("Foundation (Side " + i + ")");
-			mesh.setUserData(new UserData(this));
-			mesh.setRenderState(offsetState);
-			mesh.setModelBound(new BoundingBox());
-			final MeshData meshData = mesh.getMeshData();
+			final Mesh mesh_i = new Mesh("Foundation (Side " + i + ")");
+			mesh_i.setUserData(new UserData(this));
+			mesh_i.setRenderState(offsetState);
+			mesh_i.setModelBound(new BoundingBox());
+			final MeshData meshData = mesh_i.getMeshData();
 			meshData.setVertexBuffer(BufferUtils.createVector3Buffer(6));
 			meshData.setNormalBuffer(BufferUtils.createVector3Buffer(6));
-			mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
-			root.attachChild(mesh);
-			sideMesh[i] = mesh;
+			mesh_i.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
+			root.attachChild(mesh_i);
+			sideMesh[i] = mesh_i;
 		}
 
 		boundingMesh = new Line("Foundation (Bounding)");
@@ -293,6 +294,12 @@ public class Foundation extends HousePart implements Thermalizable {
 								n.detachChild(m);
 							}
 						}
+						final HashMap<Integer, ReadOnlyColorRGBA> meshColors = ns.getMeshColors();
+						if (meshColors != null) {
+							for (final Integer i : meshColors.keySet()) {
+								Util.getMesh(n, i).setDefaultColor(meshColors.get(i));
+							}
+						}
 					}
 				}
 			} catch (final Throwable t) {
@@ -301,6 +308,19 @@ public class Foundation extends HousePart implements Thermalizable {
 			setRotatedNormalsForImportedMeshes();
 		}
 
+	}
+
+	public void resetImportedMeshColors() {
+		if (importedNodeStates != null) {
+			for (final NodeState ns : importedNodeStates) {
+				final HashMap<Integer, ReadOnlyColorRGBA> meshColors = ns.getMeshColors();
+				if (meshColors != null) {
+					for (final Integer i : meshColors.keySet()) {
+						Util.getMesh(getNode(ns), i).setDefaultColor(meshColors.get(i));
+					}
+				}
+			}
+		}
 	}
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
