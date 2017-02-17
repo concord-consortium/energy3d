@@ -69,7 +69,6 @@ public class SelectUtil {
 			PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
 		} else {
 			PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
-			PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
 		}
 		final PickedHousePart picked = getPickResultForImportedMesh();
 		if (picked != null) {
@@ -88,7 +87,6 @@ public class SelectUtil {
 				for (final HousePart housePart : Scene.getInstance().getParts()) {
 					if (!housePart.isFrozen() && typeOfHousePart.isInstance(housePart)) {
 						PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
-						PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
 					}
 				}
 			}
