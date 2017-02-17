@@ -293,21 +293,31 @@ public class MainApplication {
 	}
 
 	public static void startDeadlockDetectionThread() {
-		new Thread() {
+		new Thread("Deadlock Detection") {
 			@Override
 			public void run() {
+				try {
+					sleep(3000);
+				} catch (final InterruptedException e) {
+				}
 				while (true) {
+					final boolean[] isInvoked = { false };
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							isInvoked[0] = true;
+						}
+					});
+
 					try {
 						sleep(3000);
 					} catch (final InterruptedException e) {
 					}
 
-					final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
-					final long[] threadIds = threadBean.findDeadlockedThreads();
-
-					if (threadIds != null) {
-						String msg = "";
-						msg += "Number of deadlocked threads: " + threadIds.length + "\n";
+					if (!isInvoked[0]) {
+						final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
+						final long[] threadIds = threadBean.getAllThreadIds();
+						String msg = "Number of threads: " + threadIds.length + "\n";
 						final ThreadInfo[] infos = threadBean.getThreadInfo(threadIds, true, true);
 						for (final ThreadInfo ti : infos) {
 							msg += ti.toString() + "\n";
