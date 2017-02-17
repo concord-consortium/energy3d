@@ -1084,10 +1084,12 @@ public class SolarRadiation {
 					} else {
 						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * solarStep, null), null).add(vXY.multiply(row * solarStep, null), null);
 						boolean isInside = false;
-						for (int i = 0; i < points.size(); i += 3) {
-							if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
-								isInside = true;
-								break;
+						if (points.size() >= 3) { // FIXME: sometimes we can end up with less than three points
+							for (int i = 0; i < points.size(); i += 3) {
+								if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
+									isInside = true;
+									break;
+								}
 							}
 						}
 						if (!isInside && col > 0 && row > 0) { // must at least include one column or row

@@ -143,6 +143,9 @@ public class SelectUtil {
 			if (pickLayer != -1 && objCounter - 1 != pickLayer) {
 				continue;
 			}
+			if (userData == null) { // userData could be null in some case
+				continue;
+			}
 			final Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
 			final PickedHousePart picked_i = new PickedHousePart(userData, intersectionPoint, pick.getIntersectionRecord().getIntersectionNormal(0));
 			double polyDist_i = pick.getIntersectionRecord().getClosestDistance();

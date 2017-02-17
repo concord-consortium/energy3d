@@ -611,8 +611,8 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (!p.isValid()) { // remove invalid parts
 				toBeRemoved.add(p);
-			} else if (p.getContainer() == null) { // remove orphan parts without a top container
-				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Rack || p instanceof Floor) {
+			} else if (p.getContainer() == null) { // remove orphan parts without a container
+				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Rack || p instanceof Mirror || p instanceof Sensor || p instanceof Floor) {
 					toBeRemoved.add(p);
 				}
 			} else if (!parts.contains(p.getContainer())) { // remove parts whose container doesn't exist in the scene
