@@ -17,7 +17,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.Spatial;
 
-class NodeWorker {
+class NodeWorker { // to be removed
 
 	static void reach(final Node node) {
 		final List<Spatial> collidables = new ArrayList<Spatial>();

@@ -119,7 +119,7 @@ public class Mirror extends HousePart implements Solar {
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
-		if (picked != null) {
+		if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 			final Vector3 p = picked.getPoint().clone();
 			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 			points.get(0).set(toRelative(p));

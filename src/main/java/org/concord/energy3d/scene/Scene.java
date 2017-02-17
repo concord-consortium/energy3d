@@ -1525,14 +1525,14 @@ public class Scene implements Serializable {
 				} else {
 					final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 					for (final HousePart part : parts) {
-						if (part instanceof SolarPanel && !part.isFrozen() && part.getTopContainer() == foundation) {
+						if (part instanceof SolarPanel && part.getTopContainer() == foundation) {
 							panels.add((SolarPanel) part);
 						}
 					}
 				}
 			} else {
 				for (final HousePart part : parts) {
-					if (part instanceof SolarPanel && !part.isFrozen()) {
+					if (part instanceof SolarPanel) {
 						panels.add((SolarPanel) part);
 					}
 				}
@@ -1560,13 +1560,13 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof Rack && !part.isFrozen() && part.getTopContainer() == foundation) {
+				if (part instanceof Rack && part.getTopContainer() == foundation) {
 					racks.add(part);
 				}
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof Rack && !part.isFrozen()) {
+				if (part instanceof Rack) {
 					racks.add(part);
 				}
 			}
@@ -1593,13 +1593,13 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof Mirror && !part.isFrozen() && part.getTopContainer() == foundation) {
+				if (part instanceof Mirror && part.getTopContainer() == foundation) {
 					mirrors.add(part);
 				}
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof Mirror && !part.isFrozen()) {
+				if (part instanceof Mirror) {
 					mirrors.add(part);
 				}
 			}
@@ -1613,6 +1613,39 @@ public class Scene implements Serializable {
 		}
 		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(mirrors);
 		for (final HousePart part : mirrors) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
+	public void removeAllSensors() {
+		final ArrayList<HousePart> sensors = new ArrayList<HousePart>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof Sensor && part.getTopContainer() == foundation) {
+					sensors.add(part);
+				}
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof Sensor) {
+					sensors.add(part);
+				}
+			}
+		}
+		if (sensors.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no sensor to remove.", "No Sensor", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + sensors.size() + " sensors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+			return;
+		}
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(sensors);
+		for (final HousePart part : sensors) {
 			remove(part, false);
 		}
 		redrawAll();

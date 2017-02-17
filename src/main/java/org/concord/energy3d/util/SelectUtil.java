@@ -131,7 +131,7 @@ public class SelectUtil {
 			}
 			final Object obj = ((Mesh) pick.getTarget()).getUserData();
 			UserData userData = null;
-			if (obj instanceof UserData) {
+			if (obj instanceof UserData) { // FIXME: Note that userData can be null if the pick is the land
 				userData = (UserData) obj;
 				if (userData.getHousePart() != prevHousePart) {
 					objCounter++;
@@ -141,9 +141,6 @@ public class SelectUtil {
 				continue;
 			}
 			if (pickLayer != -1 && objCounter - 1 != pickLayer) {
-				continue;
-			}
-			if (userData == null) { // userData could be null in some case
 				continue;
 			}
 			final Vector3 intersectionPoint = pick.getIntersectionRecord().getIntersectionPoint(0);
