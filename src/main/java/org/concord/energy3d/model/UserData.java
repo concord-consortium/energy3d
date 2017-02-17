@@ -7,7 +7,6 @@ import org.concord.energy3d.util.Util;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.RenderState;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class UserData {
@@ -22,8 +21,6 @@ public class UserData {
 	private int nodeIndex = -1;
 	private int meshIndex = -1;
 	private boolean reachable = true;
-	private int faceIndex; // 1 if this mesh faces outside, -1 if this mesh faces inside, 0 if undefined
-	private Mesh twin; // the twin of this mesh, usually created by SketchUp and other CAD software
 	private boolean imported; // flag that indicates this as an imported mesh
 
 	public UserData(final HousePart housePart) {
@@ -119,22 +116,6 @@ public class UserData {
 
 	public boolean isReachable() {
 		return reachable;
-	}
-
-	public void setFaceeIndex(final int faceIndex) {
-		this.faceIndex = faceIndex;
-	}
-
-	public int getFaceIndex() {
-		return faceIndex;
-	}
-
-	public void setTwin(final Mesh twin) {
-		this.twin = twin;
-	}
-
-	public Mesh getTwin() {
-		return twin;
 	}
 
 	public void setRotatedNormal(final ReadOnlyVector3 n) {

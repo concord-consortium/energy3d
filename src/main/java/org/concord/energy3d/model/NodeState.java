@@ -25,16 +25,18 @@ public class NodeState implements Serializable {
 	private String name;
 	private ArrayList<Integer> reversedFaceMeshes;
 	private ArrayList<Integer> deletedMeshes;
+	private double meshThickness = 0.05; // give the twin meshes imported from SketchUp and other CAD software some thickness
 
 	public NodeState() {
 	}
 
-	public NodeState makeCopy() {
+	public NodeState clone() {
 		final NodeState copy = new NodeState();
 		copy.relativePosition = relativePosition != null ? relativePosition.clone() : null;
 		copy.defaultColor = defaultColor.clone();
 		copy.sourceURL = sourceURL;
 		copy.name = name;
+		copy.meshThickness = meshThickness;
 		if (reversedFaceMeshes != null) {
 			copy.reversedFaceMeshes = new ArrayList<Integer>();
 			copy.reversedFaceMeshes.addAll(reversedFaceMeshes);
@@ -114,6 +116,14 @@ public class NodeState implements Serializable {
 
 	public URL getSourceURL() {
 		return sourceURL;
+	}
+
+	public void setMeshThickness(final double thickness) {
+		meshThickness = thickness;
+	}
+
+	public double getMeshThickness() {
+		return meshThickness;
 	}
 
 }

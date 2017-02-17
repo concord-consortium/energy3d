@@ -31,7 +31,6 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.NodeState;
-import org.concord.energy3d.model.NodeWorker;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -171,9 +170,6 @@ public class Scene implements Serializable {
 	// the step length of the discretized grid on any part that is not a plate
 	private double solarStep = 2.0;
 
-	// give the twin meshes imported from SketchUp and other CAD software some thickness
-	private double meshThickness = 0.05;
-
 	public static enum Unit {
 		InternationalSystemOfUnits, USCustomaryUnits
 	};
@@ -296,9 +292,6 @@ public class Scene implements Serializable {
 			final ObjectInputStream in = new ObjectInputStream(file.openStream());
 			instance = (Scene) in.readObject();
 			in.close();
-			if (Util.isZero(instance.meshThickness)) {
-				instance.meshThickness = 0.05;
-			}
 			for (final HousePart part : instance.parts) {
 				part.getRoot();
 			}
@@ -885,7 +878,7 @@ public class Scene implements Serializable {
 	public void setCopyNode(final Node n, final NodeState ns) {
 		if (n != null) {
 			copyNode = n.makeCopy(false);
-			copyNodeState = ns.makeCopy();
+			copyNodeState = ns.clone();
 		} else {
 			copyNode = null;
 			copyNodeState = null;
@@ -1163,12 +1156,12 @@ public class Scene implements Serializable {
 				if (copyNodeState.getMeshesWithReversedNormal() != null) {
 					for (final Integer i : copyNodeState.getMeshesWithReversedNormal()) {
 						s.reverseNormalOfMesh(i);
-						NodeWorker.reverseFace(NodeWorker.getMesh(newNode, i));
+						Util.reverseFace(Util.getMesh(newNode, i));
 					}
 				}
 				if (copyNodeState.getDeletedMeshes() != null) {
 					for (final Integer i : copyNodeState.getDeletedMeshes()) {
-						foundation.deleteMesh(NodeWorker.getMesh(newNode, i));
+						foundation.deleteMesh(Util.getMesh(newNode, i));
 					}
 				}
 			}
@@ -2832,14 +2825,6 @@ public class Scene implements Serializable {
 
 	public double getSolarStep() {
 		return solarStep;
-	}
-
-	public void setMeshThickness(final double thickness) {
-		meshThickness = thickness;
-	}
-
-	public double getMeshThickness() {
-		return meshThickness;
 	}
 
 	public void setTimeStep(final int timeStep) {

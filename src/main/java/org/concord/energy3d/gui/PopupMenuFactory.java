@@ -56,7 +56,6 @@ import org.concord.energy3d.model.MirrorCircularFieldLayout;
 import org.concord.energy3d.model.MirrorRectangularFieldLayout;
 import org.concord.energy3d.model.MirrorSpiralFieldLayout;
 import org.concord.energy3d.model.NodeState;
-import org.concord.energy3d.model.NodeWorker;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -6477,60 +6476,41 @@ public class PopupMenuFactory {
 			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
-			final JMenuItem miIndexifyMeshFaces = new JMenuItem("Indexify Mesh Faces");
-			miIndexifyMeshFaces.addActionListener(new ActionListener() {
+			final JMenuItem miMessThickness = new JMenuItem("Thickness...");
+			miMessThickness.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
-						SceneManager.getTaskManager().update(new Callable<Object>() {
-							@Override
-							public Object call() throws Exception {
-								f.processImportedMeshes();
-								f.draw();
-								updateAfterEdit();
-								return null;
-							}
-						});
-					}
-				}
-			});
-
-			final JMenuItem miMessThickness = new JMenuItem("Mesh Thickness...");
-			miMessThickness.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final String title = "<html>Adjust the thickness of meshes that have two identical sides<br>A larger thickness also mitigates the z-fighting effect.</html>";
-					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, Scene.getInstance().getMeshThickness() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null) {
-							break;
-						} else {
-							try {
-								final double val = Double.parseDouble(newValue);
-								if (val < 0 || val > 1) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Thickness must be between 0 and 1 meter.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-									if (selectedPart instanceof Foundation) {
-										final Foundation f = (Foundation) selectedPart;
-										SceneManager.getTaskManager().update(new Callable<Object>() {
-											@Override
-											public Object call() throws Exception {
-												final Mesh m = f.getSelectedMesh();
-												if (m != null) {
-													new NodeWorker(m.getParent()).setThickness(val / Scene.getInstance().getAnnotationScale());
-													f.draw();
-												}
-												return null;
-											}
-										});
-									}
+						final Mesh m = f.getSelectedMesh();
+						if (m != null) {
+							final Node n = m.getParent();
+							final String title = "<html>Adjust the distance between two mesh faces to create some thickness<br>A larger thickness also mitigates the z-fighting effect.</html>";
+							while (true) {
+								final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, f.getMeshThickness(n) * Scene.getInstance().getAnnotationScale());
+								if (newValue == null) {
 									break;
+								} else {
+									try {
+										final double val = Double.parseDouble(newValue);
+										if (val < 0 || val > 1) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Thickness must be between 0 and 1 meter.", "Range Error", JOptionPane.ERROR_MESSAGE);
+										} else {
+											SceneManager.getTaskManager().update(new Callable<Object>() {
+												@Override
+												public Object call() throws Exception {
+													f.setMeshThickness(n, val / Scene.getInstance().getAnnotationScale());
+													f.draw();
+													return null;
+												}
+											});
+											break;
+										}
+									} catch (final NumberFormatException exception) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -6539,6 +6519,7 @@ public class PopupMenuFactory {
 
 			final JMenuItem miReverseNormalVector = new JMenuItem("Reverse Mesh Normal Vector");
 			miReverseNormalVector.addActionListener(new ActionListener() {
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6549,7 +6530,7 @@ public class PopupMenuFactory {
 							public Object call() throws Exception {
 								final Mesh m = f.getSelectedMesh();
 								if (m != null) {
-									NodeWorker.reverseFace(m);
+									Util.reverseFace(m);
 									f.getNodeState(m.getParent()).reverseNormalOfMesh(((UserData) m.getUserData()).getMeshIndex());
 									f.draw();
 									updateAfterEdit();
@@ -6563,6 +6544,7 @@ public class PopupMenuFactory {
 
 			final JMenuItem miAlignBottom = new JMenuItem("Align Node Bottom with Ground Level");
 			miAlignBottom.addActionListener(new ActionListener() {
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6591,6 +6573,7 @@ public class PopupMenuFactory {
 
 			final JMenuItem miAlignCenter = new JMenuItem("Align Node Center with Foundation Center");
 			miAlignCenter.addActionListener(new ActionListener() {
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6604,15 +6587,7 @@ public class PopupMenuFactory {
 									final Node n = m.getParent();
 									if (n != null) {
 										final OrientedBoundingBox boundingBox = Util.getOrientedBoundingBox(n);
-										// final Rectangle2D bounds = Util.getPath2D(boundingBox).getBounds2D();
-										// final Vector3 v0 = f.getAbsPoint(0);
-										// final Vector3 v1 = f.getAbsPoint(1);
-										// final Vector3 v2 = f.getAbsPoint(2);
-										// final double lx = v0.distance(v2);
-										// final double ly = v0.distance(v1);
-										// f.rescale(1.2 * bounds.getWidth() / lx, 1.2 * bounds.getHeight() / ly, 1);
-										// f.rescale(1.2, 1.2, 1);
-										final ReadOnlyVector3 shift = f.getAbsCenter().subtract(boundingBox.getCenter(), null);
+										final ReadOnlyVector3 shift = boundingBox.getCenter().subtract(f.getAbsCenter(), null);
 										f.translateImportedNode(n, shift.getX(), shift.getY(), 0);
 										f.setMeshSelectionVisible(false);
 										f.draw();
@@ -6629,6 +6604,7 @@ public class PopupMenuFactory {
 			final JMenuItem miCopyNode = new JMenuItem("Copy Node");
 			miCopyNode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			miCopyNode.addActionListener(new ActionListener() {
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -6653,6 +6629,7 @@ public class PopupMenuFactory {
 			final JMenuItem miPaste = new JMenuItem("Paste");
 			miPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Config.isMac() ? KeyEvent.META_MASK : InputEvent.CTRL_MASK));
 			miPaste.addActionListener(new ActionListener() {
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -6917,7 +6894,6 @@ public class PopupMenuFactory {
 			popupMenuForMesh.add(miRestoreDeletedMeshes);
 			popupMenuForMesh.addSeparator();
 			popupMenuForMesh.add(miMessThickness);
-			popupMenuForMesh.add(miIndexifyMeshFaces);
 			popupMenuForMesh.add(miReverseNormalVector);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);
@@ -7138,6 +7114,7 @@ public class PopupMenuFactory {
 
 				{
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+
 						final String newValue = siField.getText();
 						try {
 							final double val = Double.parseDouble(newValue);

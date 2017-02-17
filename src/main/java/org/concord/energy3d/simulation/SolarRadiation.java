@@ -433,7 +433,7 @@ public class SolarRadiation {
 	private void computeOnImportedMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final Foundation foundation, final Mesh mesh) {
 
 		final UserData userData = (UserData) mesh.getUserData();
-		if (userData.getFaceIndex() == -1) {
+		if (!userData.isReachable()) {
 			return;
 		}
 
@@ -472,7 +472,7 @@ public class SolarRadiation {
 						if (EnergyPanel.getInstance().isCancelled()) {
 							throw new CancellationException();
 						}
-						if (spatial != mesh && spatial != userData.getTwin()) {
+						if (spatial != mesh) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 							if (pickResults.getNumber() != 0) {
 								break;

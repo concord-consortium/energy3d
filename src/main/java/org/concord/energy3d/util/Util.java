@@ -46,6 +46,7 @@ import javax.swing.text.JTextComponent;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.SnapshotLogger;
+import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.poly2tri.geometry.primitives.Point;
@@ -1128,6 +1129,29 @@ public class Util {
 			return null;
 		}
 		return new Vector3(normalBuffer.get(0), normalBuffer.get(1), normalBuffer.get(2));
+	}
+
+	public static void reverseFace(final Mesh m) {
+		if (m == null) {
+			return;
+		}
+		final UserData u = (UserData) m.getUserData();
+		u.setNormal(u.getNormal().negate(null));
+		if (u.getRotatedNormal() != null) {
+			u.setRotatedNormal(u.getRotatedNormal().negate(null));
+		}
+	}
+
+	/** return the mesh by its mesh index, which is NOT the index of the children array of the node, but the original index of the mesh when the node is created */
+	public static Mesh getMesh(final Node n, final int meshIndex) {
+		for (final Spatial s : n.getChildren()) {
+			final Mesh m = (Mesh) s;
+			final UserData u = (UserData) m.getUserData();
+			if (u.getMeshIndex() == meshIndex) {
+				return m;
+			}
+		}
+		return null;
 	}
 
 }

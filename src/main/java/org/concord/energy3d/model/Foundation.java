@@ -280,14 +280,14 @@ public class Foundation extends HousePart implements Thermalizable {
 						final ArrayList<Integer> reversedFaceMeshes = ns.getMeshesWithReversedNormal();
 						if (reversedFaceMeshes != null) {
 							for (final Integer i : reversedFaceMeshes) {
-								NodeWorker.reverseFace(NodeWorker.getMesh(n, i));
+								Util.reverseFace(Util.getMesh(n, i));
 							}
 						}
 						final ArrayList<Integer> deletedMeshes = ns.getDeletedMeshes();
 						if (deletedMeshes != null && !deletedMeshes.isEmpty()) {
 							final List<Mesh> toDelete = new ArrayList<Mesh>();
 							for (final Integer i : deletedMeshes) {
-								toDelete.add(NodeWorker.getMesh(n, i));
+								toDelete.add(Util.getMesh(n, i));
 							}
 							for (final Mesh m : toDelete) {
 								n.detachChild(m);
@@ -2786,7 +2786,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				newNode.setScale(scale);
 				newNode.updateWorldTransform(true);
 				root.attachChild(newNode);
-				new NodeWorker(newNode).findTwinMeshes();
+				createMeshThickness(newNode);
 				if (!zeroAz) {
 					setRotatedNormalsForImportedMeshes();
 				}
@@ -2808,11 +2808,42 @@ public class Foundation extends HousePart implements Thermalizable {
 		return null;
 	}
 
+	private void createMeshThickness(final Node node) {
+		final NodeState ns = getNodeState(node);
+		double thickness = ns.getMeshThickness();
+		if (Util.isZero(thickness)) {
+			thickness = 0.05;
+			ns.setMeshThickness(thickness);
+		}
+		for (final Spatial s : node.getChildren()) {
+			final Mesh m = (Mesh) s;
+			final UserData u = (UserData) m.getUserData();
+			m.addTranslation(u.getNormal().multiply(thickness, null)); // do not use u.getRotateNormal() because in this case rotation would be applied to node, not mesh
+		}
+	}
+
+	public void setMeshThickness(final Node node, final double thickness) {
+		final NodeState ns = getNodeState(node);
+		if (!Util.isEqual(thickness, ns.getMeshThickness())) {
+			final double delta = thickness - ns.getMeshThickness();
+			for (final Spatial s : node.getChildren()) {
+				final Mesh m = (Mesh) s;
+				final UserData u = (UserData) m.getUserData();
+				m.addTranslation(u.getNormal().multiply(delta, null)); // do not use u.getRotateNormal() because in this case rotation would be applied to node, not mesh
+			}
+			ns.setMeshThickness(thickness);
+		}
+	}
+
+	public double getMeshThickness(final Node node) {
+		return getNodeState(node).getMeshThickness();
+	}
+
 	// imported nodes often have a twin of meshes with identical vertex coordinates but opposite normal vectors, find these and offset them
 	public void processImportedMeshes() {
 		SceneManager.getInstance().cursorWait(true); // this could be a very compute-intensive task
 		for (final Node node : importedNodes) {
-			new NodeWorker(node).work(false);
+			NodeWorker.reach(node);
 		}
 		clearSelectedMesh();
 		SceneManager.getInstance().cursorWait(false);
