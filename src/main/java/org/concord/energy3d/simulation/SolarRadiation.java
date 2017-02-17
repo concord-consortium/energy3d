@@ -1197,18 +1197,16 @@ public class SolarRadiation {
 
 	// see: http://www.physics.arizona.edu/~cronin/Solar/References/Irradiance%20Models%20and%20Data/WOC01.pdf
 	private double calculateDiffuseAndReflectedRadiation(final ReadOnlyVector3 directionTowardSun, final ReadOnlyVector3 normal) {
+		final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
 		double result = 0;
 		final double cos = normal.dot(Vector3.UNIT_Z);
 		final double viewFactorWithSky = 0.5 * (1 + cos);
-		final double viewFactorWithGround = 0.5 * (1 - cos);
-		if (viewFactorWithSky > 0 || viewFactorWithGround > 0) {
-			final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
-			if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
-				result += ASHRAE_C[month] * viewFactorWithSky * peakRadiation;
-			}
-			if (viewFactorWithGround > 0) { // short-wave reflection from the ground
-				result += Scene.getInstance().getGround().getAdjustedAlbedo(month) * viewFactorWithGround * peakRadiation;
-			}
+		if (viewFactorWithSky > 0) { // diffuse irradiance from the sky
+			result += ASHRAE_C[month] * viewFactorWithSky * peakRadiation;
+		}
+		final double viewFactorWithGround = 0.5 * Math.abs(1 - cos); // if a surface faces down, it should receive ground reflection as well
+		if (viewFactorWithGround != 0) { // short-wave reflection from the ground
+			result += Scene.getInstance().getGround().getAdjustedAlbedo(month) * viewFactorWithGround * peakRadiation;
 		}
 		return result;
 	}
@@ -1487,7 +1485,7 @@ public class SolarRadiation {
 		// texture.setWrap(WrapMode.Clamp);
 		final TextureState textureState = new TextureState();
 		textureState.setTexture(texture);
-		mesh.setDefaultColor(Scene.GRAY);
+		mesh.setDefaultColor(Scene.WHITE);
 		mesh.setRenderState(textureState);
 	}
 

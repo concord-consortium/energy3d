@@ -6793,6 +6793,8 @@ public class PopupMenuFactory {
 						final Foundation f = (Foundation) selectedPart;
 						final Mesh m = f.getSelectedMesh();
 						if (m != null) {
+							final UserData ud = (UserData) m.getUserData();
+
 							final JPanel gui = new JPanel(new BorderLayout());
 							final String title = "<html>A mesh is a basic unit (e.g., a triangle or a line) of geometry of a structure.</html>";
 							gui.add(new JLabel(title), BorderLayout.NORTH);
@@ -6819,18 +6821,14 @@ public class PopupMenuFactory {
 							// normal
 							label = new JLabel("Normal Vector: ", JLabel.TRAILING);
 							propertiesPanel.add(label);
-							if (m.getUserData() instanceof UserData) {
-								final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
-								textField = new JTextField("(" + threeDecimalsFormat.format(normal.getX()) + ", " + threeDecimalsFormat.format(normal.getY()) + ", " + threeDecimalsFormat.format(normal.getZ()) + "), relative", 5);
-							} else {
-								textField = new JTextField(m.getUserData() + ", relative", 5);
-							}
+							final ReadOnlyVector3 normal = ((UserData) m.getUserData()).getNormal();
+							textField = new JTextField("(" + threeDecimalsFormat.format(normal.getX()) + ", " + threeDecimalsFormat.format(normal.getY()) + ", " + threeDecimalsFormat.format(normal.getZ()) + "), relative", 5);
 							textField.setEditable(false);
 							label.setLabelFor(textField);
 							propertiesPanel.add(textField);
 
 							// color
-							label = new JLabel("Default Color: ", JLabel.TRAILING);
+							label = new JLabel("Color: ", JLabel.TRAILING);
 							propertiesPanel.add(label);
 							final ReadOnlyColorRGBA rgb = m.getDefaultColor();
 							colorChooser.setColor(new Color(Math.round(rgb.getRed() * 255), Math.round(rgb.getGreen() * 255), Math.round(rgb.getBlue() * 255)));
@@ -6842,6 +6840,8 @@ public class PopupMenuFactory {
 								final Color color = colorChooser.getColor();
 								m.clearRenderState(StateType.Texture);
 								m.setDefaultColor(new ColorRGBA(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1));
+								final NodeState ns = f.getNodeState(m.getParent());
+								ns.setMeshColor(ud.getMeshIndex(), m.getDefaultColor());
 								f.draw();
 							}
 						}
