@@ -1241,6 +1241,8 @@ public class MainFrame extends JFrame {
 			addModel(complexMenu, "Federal", "templates/example-federal.ng3");
 			addModel(complexMenu, "Victorian", "templates/example-victorian.ng3");
 			addModel(complexMenu, "Shingle", "templates/example-shingle.ng3");
+			addModel(complexMenu, "Sunroom", "templates/example-sunroom.ng3");
+			addModel(complexMenu, "Barn House", "templates/example-barn-house.ng3");
 			final JMenu pvSolarMenu = new JMenu("Photovoltaic Systems");
 			pvSolarMenu.setEnabled(false);
 			examplesMenu.add(pvSolarMenu);
