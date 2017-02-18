@@ -920,7 +920,7 @@ public class MainFrame extends JFrame {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
 						getPreviewMenuItem().setSelected(true);
-						new Thread() {
+						new Thread("Energy3D Print") {
 							@Override
 							public void run() {
 								while (!printController.isFinished()) {

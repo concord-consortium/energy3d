@@ -72,7 +72,7 @@ final class OneInstanceServer implements Runnable {
 		if (thread != null) {
 			throw new IllegalStateException("Thread already started");
 		}
-		thread = new Thread(this, "One instance server");
+		thread = new Thread(this, "One Instance Server");
 		stop = false;
 		thread.start();
 	}
@@ -105,7 +105,7 @@ final class OneInstanceServer implements Runnable {
 				}
 
 				// Start new client thread
-				new Thread(new OneInstanceClient(socket, appId), "One instance client").start();
+				new Thread(new OneInstanceClient(socket, appId), "One Instance Client").start();
 			}
 		} finally {
 			thread = null;

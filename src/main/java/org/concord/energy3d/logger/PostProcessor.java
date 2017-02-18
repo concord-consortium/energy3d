@@ -44,7 +44,7 @@ public class PostProcessor extends PlayControl {
 
 	public void analyze(final File[] files, final File output, final Runnable update) {
 
-		new Thread() {
+		new Thread("Energy3D Post-Processor") {
 			@Override
 			public void run() {
 				active = true;

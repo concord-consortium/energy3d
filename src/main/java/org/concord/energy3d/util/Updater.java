@@ -16,7 +16,7 @@ public class Updater {
 	public static void download() {
 		System.out.println("Updater.download()");
 		if (!Config.isWebStart() && !Config.isEclipse()) {
-			new Thread("Energy3D updater") {
+			new Thread("Energy3D Update Downloader") {
 				@Override
 				public void run() {
 					try {

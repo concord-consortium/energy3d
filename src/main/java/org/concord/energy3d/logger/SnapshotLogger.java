@@ -47,7 +47,7 @@ public class SnapshotLogger {
 	}
 
 	public void start(final int period) {
-		final Thread t = new Thread("Snapshots Logger") {
+		final Thread t = new Thread("Energy3D Snapshot Logger") {
 			@Override
 			public void run() {
 				while (true) {

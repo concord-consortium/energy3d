@@ -597,7 +597,12 @@ public class EnergyPanel extends JPanel {
 							// compute(SceneManager.getInstance().getSolarHeatMap() ? UpdateRadiation.ALWAYS : UpdateRadiation.ONLY_IF_SLECTED_IN_GUI);
 							SolarRadiation.getInstance().updateTextures();
 							SceneManager.getInstance().refresh();
-							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+								}
+							});
 							return null;
 						}
 					});
@@ -620,7 +625,9 @@ public class EnergyPanel extends JPanel {
 		}
 		computingStartMillis = System.currentTimeMillis();
 		updateWeatherData(); // TODO: There got to be a better way to do this
-		((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		if (EventQueue.isDispatchThread()) {
+			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		}
 		final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
 		if (!doCompute && computing) {
 			cancel();
@@ -650,7 +657,9 @@ public class EnergyPanel extends JPanel {
 					Util.reportError(e);
 					return null;
 				} finally {
-					((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					if (EventQueue.isDispatchThread()) {
+						((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					}
 				}
 				EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
 					@Override

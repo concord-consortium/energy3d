@@ -1602,17 +1602,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			t.printStackTrace();
 			Util.reportError(t);
 		}
-		final Component canvasComponent = (Component) canvas;
-		canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
-			if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
-				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-			} else {
-				if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
-					canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		EventQueue.invokeLater(new Runnable() { // this method is run by the main Energy3D thread, so invoke the Swing code later
+			@Override
+			public void run() {
+				final Component canvasComponent = (Component) canvas;
+				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
+					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
+						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					} else {
+						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+							canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+						}
+					}
 				}
 			}
-		}
+		});
 	}
 
 	public void setMouseControlEnabled(final boolean enabled) {
@@ -2380,7 +2385,12 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void cursorWait(final boolean on) {
-		((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+			}
+		});
 	}
 
 }
