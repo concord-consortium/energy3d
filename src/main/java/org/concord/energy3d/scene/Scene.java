@@ -136,7 +136,7 @@ public class Scene implements Serializable {
 	private boolean fullEnergyInSolarMap = true;
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
 	private boolean onlySolarComponentsInSolarMap;
-	private boolean noSolarMapForLand;
+	private boolean solarMapForLand;
 	private boolean disallowFoundationOverlap;
 	private boolean dashedlineOnRoofs = true;
 	private boolean onlySolarAnalysis;
@@ -348,7 +348,7 @@ public class Scene implements Serializable {
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 		SceneManager.getInstance().setAxesVisible(!hideAxes);
-		SceneManager.getInstance().getSolarLand().setVisible(!noSolarMapForLand);
+		SceneManager.getInstance().getSolarLand().setVisible(solarMapForLand);
 
 		setTheme(theme);
 		SceneManager.getInstance().getLand().setDefaultColor(landColor != null ? landColor : new ColorRGBA(0, 1, 0, 0.5f));
@@ -2603,12 +2603,12 @@ public class Scene implements Serializable {
 		this.onlyReflectedEnergyInMirrorSolarMap = onlyReflectedEnergyInMirrorSolarMap;
 	}
 
-	public void setSolarMapForLand(final boolean showSolarMapForLand) {
-		noSolarMapForLand = !showSolarMapForLand;
+	public void setSolarMapForLand(final boolean solarMapForLand) {
+		this.solarMapForLand = solarMapForLand;
 	}
 
 	public boolean getSolarMapForLand() {
-		return !noSolarMapForLand;
+		return solarMapForLand;
 	}
 
 	public void setDisallowFoundationOverlap(final boolean disallowFoundationOverlap) {

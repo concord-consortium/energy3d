@@ -2227,6 +2227,7 @@ public class MainFrame extends JFrame {
 					final boolean b = showSolarLandMenuItem.isSelected();
 					SceneManager.getInstance().getSolarLand().setVisible(b);
 					Scene.getInstance().setSolarMapForLand(b);
+					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 					// SceneManager.getInstance().getUndoManager().addEdit(c);

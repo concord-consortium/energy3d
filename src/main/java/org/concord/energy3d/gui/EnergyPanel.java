@@ -624,10 +624,13 @@ public class EnergyPanel extends JPanel {
 			return;
 		}
 		computingStartMillis = System.currentTimeMillis();
-		updateWeatherData(); // TODO: There got to be a better way to do this
-		if (EventQueue.isDispatchThread()) {
-			((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		}
+		updateWeatherData(); // TODO: There got to be a better way to do this. WARNING: Putting this in the event queue could lead to deadlock while loading Energy3D (the main method uses a thread to open a new file at startup)
+		EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
+			@Override
+			public void run() {
+				((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			}
+		});
 		final boolean doCompute = updateRadiation == UpdateRadiation.ALWAYS || (SceneManager.getInstance().getSolarHeatMap() && (!alreadyRenderedHeatmap || autoRecomputeEnergy));
 		if (!doCompute && computing) {
 			cancel();
@@ -657,9 +660,12 @@ public class EnergyPanel extends JPanel {
 					Util.reportError(e);
 					return null;
 				} finally {
-					if (EventQueue.isDispatchThread()) {
-						((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					}
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+						}
+					});
 				}
 				EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
 					@Override
@@ -1348,6 +1354,7 @@ public class EnergyPanel extends JPanel {
 			}
 		} else {
 			EventQueue.invokeLater(new Runnable() {
+
 				@Override
 				public void run() {
 					final int numberOfSolarPanels = Scene.getInstance().getNumberOfSolarPanels();

@@ -2385,12 +2385,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void cursorWait(final boolean on) {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
-			}
-		});
+		if (EventQueue.isDispatchThread()) {
+			((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+		} else {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+				}
+			});
+		}
 	}
 
 }
