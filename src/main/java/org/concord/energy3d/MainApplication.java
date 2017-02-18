@@ -27,7 +27,7 @@ import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
-	public static final String VERSION = "6.6.0";
+	public static final String VERSION = "6.6.2";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -93,7 +93,7 @@ public class MainApplication {
 		TimeSeriesLogger.getInstance().start();
 		SnapshotLogger.getInstance().start(20);
 
-		new Thread() {
+		new Thread("Open file") {
 			@Override
 			public void run() {
 				try {

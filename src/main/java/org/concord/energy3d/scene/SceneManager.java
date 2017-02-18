@@ -659,14 +659,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		sky.getSceneHints().setAllPickingHints(false);
 		sky.updateModelBound();
 		sky.updateWorldBound(true);
-		new Thread() {
-			@Override
-			public void run() {
-				final TextureState ts = new TextureState();
-				ts.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-				sky.setRenderState(ts);
-			}
-		}.start();
+		final TextureState ts = new TextureState();
+		ts.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		sky.setRenderState(ts);
 		return sky;
 	}
 

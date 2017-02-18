@@ -69,9 +69,10 @@ final class OneInstanceServer implements Runnable {
 	 * Starts the server.
 	 */
 	public final void start() {
-		if (thread != null)
+		if (thread != null) {
 			throw new IllegalStateException("Thread already started");
-		thread = new Thread(this);
+		}
+		thread = new Thread(this, "One instance server");
 		stop = false;
 		thread.start();
 	}
@@ -80,10 +81,12 @@ final class OneInstanceServer implements Runnable {
 	 * Stops the server.
 	 */
 	public final void stop() {
-		if (thread == null)
+		if (thread == null) {
 			throw new IllegalStateException("Thread already stopped");
-		if (stop)
+		}
+		if (stop) {
 			throw new IllegalStateException("Thread already stopping");
+		}
 		stop = true;
 	}
 
@@ -97,11 +100,12 @@ final class OneInstanceServer implements Runnable {
 				// Accept the next client. If timeout occurred then do nothing in
 				// this thread iteration.
 				final Socket socket = accept();
-				if (socket == null)
+				if (socket == null) {
 					continue;
+				}
 
 				// Start new client thread
-				new Thread(new OneInstanceClient(socket, appId)).start();
+				new Thread(new OneInstanceClient(socket, appId), "One instance client").start();
 			}
 		} finally {
 			thread = null;

@@ -6912,16 +6912,15 @@ public class PopupMenuFactory {
 			popupMenuForMesh.add(miPaste);
 			popupMenuForMesh.add(miCopyNode);
 			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miDeleteMesh);
-			popupMenuForMesh.add(miRestoreDeletedMeshes);
-			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miMessThickness);
-			popupMenuForMesh.add(miReverseNormalVector);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);
-			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miMeshProperties);
+			popupMenuForMesh.add(miMessThickness);
 			popupMenuForMesh.add(miNodeProperties);
+			popupMenuForMesh.addSeparator();
+			popupMenuForMesh.add(miDeleteMesh);
+			popupMenuForMesh.add(miReverseNormalVector);
+			popupMenuForMesh.add(miRestoreDeletedMeshes);
+			popupMenuForMesh.add(miMeshProperties);
 
 		}
 

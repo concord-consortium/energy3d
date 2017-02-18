@@ -1067,7 +1067,7 @@ public class MainPanel extends JPanel {
 							EnergyPanel.getInstance().updateProperties();
 						}
 					}
-					new Thread() {
+					new Thread("Continuous rotation") {
 						@Override
 						public void run() {
 							while (mousePressed) {

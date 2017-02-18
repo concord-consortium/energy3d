@@ -594,29 +594,6 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	// private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
-	// final double MIN_LENGHT = getGridSize();
-	// final double x2 = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
-	// if (getAbsPoint(index).getX() > x2) {
-	// if (p.getX() - x2 < MIN_LENGHT)
-	// p.setX(x2 + MIN_LENGHT);
-	// } else {
-	// if (x2 - p.getX() < MIN_LENGHT)
-	// p.setX(x2 - MIN_LENGHT);
-	// }
-	//
-	// final double y2 = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
-	// if (getAbsPoint(index).getY() > y2) {
-	// if (p.getY() - y2 < MIN_LENGHT)
-	// p.setY(y2 + MIN_LENGHT);
-	// } else {
-	// if (y2 - p.getY() < MIN_LENGHT)
-	// p.setY(y2 - MIN_LENGHT);
-	// }
-	//
-	// return p;
-	// }
-
 	private void syncUpperPoints() {
 		for (int i = 0; i < 4; i++) {
 			points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
