@@ -1354,7 +1354,6 @@ public class EnergyPanel extends JPanel {
 			}
 		} else {
 			EventQueue.invokeLater(new Runnable() {
-
 				@Override
 				public void run() {
 					final int numberOfSolarPanels = Scene.getInstance().getNumberOfSolarPanels();

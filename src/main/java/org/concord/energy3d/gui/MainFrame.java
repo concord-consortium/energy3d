@@ -191,6 +191,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem roofDashedLineMenuItem;
 	private JCheckBoxMenuItem floatingLabelsMenuItem;
+	private JCheckBoxMenuItem disableShadowInActionMenuItem;
 	private JMenuItem exitMenuItem;
 	private JMenu helpMenu;
 	private JMenuItem aboutMenuItem;
@@ -1374,6 +1375,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					Util.selectSilently(floatingLabelsMenuItem, Scene.getInstance().areFloatingLabelsVisible());
+					Util.selectSilently(disableShadowInActionMenuItem, Scene.getInstance().getDisableShadowInAction());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					MainPanel.getInstance().defaultTool();
@@ -1406,6 +1408,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(solarHeatMapMenu);
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getShadowMenuItem());
+			viewMenu.add(getDisableShadowInActionMenuItem());
 			viewMenu.add(getSunAnglesMenuItem());
 			viewMenu.add(getLightBeamsMenuItem());
 			viewMenu.add(getVisualizationSettingsMenuItem());
@@ -1693,6 +1696,20 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return floatingLabelsMenuItem;
+	}
+
+	private JCheckBoxMenuItem getDisableShadowInActionMenuItem() {
+		if (disableShadowInActionMenuItem == null) {
+			disableShadowInActionMenuItem = new JCheckBoxMenuItem("Disable Shadows in Action", false);
+			disableShadowInActionMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					Scene.getInstance().setDisableShadowInAction(disableShadowInActionMenuItem.isSelected());
+					Scene.getInstance().setEdited(true);
+				}
+			});
+		}
+		return disableShadowInActionMenuItem;
 	}
 
 	private JCheckBoxMenuItem getRoofDashedLineMenuItem() {

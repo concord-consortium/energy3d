@@ -133,6 +133,7 @@ public class Scene implements Serializable {
 	private boolean showFloatingLabels;
 	private boolean cleanup;
 	private boolean alwaysComputeHeatFluxVectors;
+	private boolean disableShadowInAction;
 	private boolean fullEnergyInSolarMap = true;
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
 	private boolean onlySolarComponentsInSolarMap;
@@ -3142,6 +3143,14 @@ public class Scene implements Serializable {
 
 	public boolean areFloatingLabelsVisible() {
 		return showFloatingLabels;
+	}
+
+	public void setDisableShadowInAction(final boolean b) {
+		disableShadowInAction = b;
+	}
+
+	public boolean getDisableShadowInAction() {
+		return disableShadowInAction;
 	}
 
 }
