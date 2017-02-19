@@ -3128,6 +3128,56 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							final Foundation f = (Foundation) selectedPart;
+							f.setLabelId(false);
+							f.setLabelSolarPotential(false);
+							f.draw();
+							updateAfterEdit();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						f.setLabelId(miLabelId.isSelected());
+						f.draw();
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelSolarPotential = new JCheckBoxMenuItem("Solar Potential");
+			miLabelSolarPotential.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						f.setLabelSolarPotential(miLabelSolarPotential.isSelected());
+						f.draw();
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelSolarPotential);
+
 			popupMenuForFoundation = createPopupMenu(false, true, new Runnable() {
 				@Override
 				public void run() {
@@ -3148,6 +3198,9 @@ public class PopupMenuFactory {
 						Util.selectSilently(miLock, f.isFrozen());
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
 						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
+						Util.selectSilently(miLabelNone, !f.isLabelVisible());
+						Util.selectSilently(miLabelId, f.getLabelId());
+						Util.selectSilently(miLabelSolarPotential, f.getLabelSolarPotential());
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					final Node copyNode = Scene.getInstance().getCopyNode();
@@ -3170,6 +3223,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.add(editOptionsMenu);
+			popupMenuForFoundation.add(labelMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
@@ -3857,6 +3911,62 @@ public class PopupMenuFactory {
 			orientationMenu.add(rbmiPortrait);
 			orientationGroup.add(rbmiPortrait);
 
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof SolarPanel) {
+							final SolarPanel s = (SolarPanel) selectedPart;
+							// final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+							s.setLabelId(false);
+							s.setLabelEnergyOutput(false);
+							s.draw();
+							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							updateAfterEdit();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						// final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+						s.setLabelId(miLabelId.isSelected());
+						s.draw();
+						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelEnergyOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						// final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+						s.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						s.draw();
+						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelEnergyOutput);
+
 			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
 			miTiltAngle.addActionListener(new ActionListener() {
 				@Override
@@ -4256,6 +4366,10 @@ public class PopupMenuFactory {
 					Util.selectSilently(rbmiPortrait, !sp.isRotated());
 					Util.selectSilently(rbmiBlue, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLUE);
 					Util.selectSilently(rbmiBlack, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLACK);
+					Util.selectSilently(miLabelNone, !sp.isLabelVisible());
+					Util.selectSilently(miLabelId, sp.getLabelId());
+					Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
+
 					switch (sp.getTracker()) {
 					case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 						Util.selectSilently(miAltazimuthDualAxisTracker, true);
@@ -4527,6 +4641,7 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miBaseHeight);
 			popupMenuForSolarPanel.add(colorOptionMenu);
 			popupMenuForSolarPanel.add(orientationMenu);
+			popupMenuForSolarPanel.add(labelMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
 			popupMenuForSolarPanel.addSeparator();

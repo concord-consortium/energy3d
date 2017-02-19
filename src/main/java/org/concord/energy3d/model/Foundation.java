@@ -86,7 +86,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
 	private transient Mesh sideMesh[];
-	private transient BMText floatingLabel;
+	private transient BMText label;
 	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
 	private transient Line azimuthArrow;
 	private transient double newBoundingHeight;
@@ -116,6 +116,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
+	private boolean labelId;
+	private boolean labelSolarPotential;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Mesh selectedMesh;
@@ -211,11 +213,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		setLabelOffset(-0.11);
 
-		floatingLabel = new BMText("Floating Label", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
-		Util.initHousePartLabel(floatingLabel);
-		floatingLabel.setFontScale(0.5);
-		floatingLabel.setVisible(false);
-		root.attachChild(floatingLabel);
+		label = new BMText("Floating Label", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(label);
+		label.setFontScale(0.5);
+		label.setVisible(false);
+		root.attachChild(label);
 
 		azimuthArrow = new Line("Azimuth Arrow");
 		azimuthArrow.setLineWidth(2);
@@ -330,7 +332,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				scanChildrenHeight();
 			}
 			setEditPointsVisible(resizeHouseMode);
-			updateFloatingLabelPosition();
+			drawLabel();
 			boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
 		}
 	}
@@ -813,9 +815,29 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateHandles();
 			drawSolarReceiver();
 			drawImportedNodes();
-			updateFloatingLabelPosition();
 			foundationPolygon.draw();
+			drawLabel();
 		}
+	}
+
+	private void drawLabel() {
+		String text = "";
+		if (labelId) {
+			text += "#" + id;
+		}
+		if (labelSolarPotential) {
+			final String s = solarPotentialToday > 100 ? EnergyPanel.NO_DECIMAL.format(solarPotentialToday) : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday);
+			text += (text.equals("") ? "" : ", ") + s + " kWh";
+		}
+		if (!text.equals("")) {
+			label.setText(text);
+			final ReadOnlyVector3 center = getCenter();
+			label.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6);
+			label.setVisible(true);
+		} else {
+			label.setVisible(false);
+		}
+
 	}
 
 	public void drawSolarReceiver() {
@@ -3023,22 +3045,24 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	public void showFloatingLabel(final boolean b) {
-		floatingLabel.setVisible(b && SceneManager.getInstance().getSolarHeatMap());
+	public void setLabelId(final boolean labelId) {
+		this.labelId = labelId;
 	}
 
-	public void setFloatingLabelText(final String text) {
-		if (text == null) {
-			floatingLabel.setVisible(false);
-		} else {
-			floatingLabel.setVisible(Scene.getInstance().areFloatingLabelsVisible());
-			floatingLabel.setText(text);
-		}
+	public boolean getLabelId() {
+		return labelId;
 	}
 
-	private void updateFloatingLabelPosition() {
-		final ReadOnlyVector3 center = getCenter();
-		floatingLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6);
+	public void setLabelSolarPotential(final boolean labelSolarPotential) {
+		this.labelSolarPotential = labelSolarPotential;
+	}
+
+	public boolean getLabelSolarPotential() {
+		return labelSolarPotential;
+	}
+
+	public boolean isLabelVisible() {
+		return label.isVisible();
 	}
 
 }

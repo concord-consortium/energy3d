@@ -90,10 +90,10 @@ public abstract class HousePart implements Serializable {
 	protected transient double orgHeight;
 	protected transient double area;
 	protected transient int containerRoofIndex;
+	protected transient double solarPotentialToday;
 	private transient double[] solarPotential;
 	private transient double[] heatLoss;
 	private transient double solarPotentialNow; // solar potential of current hour
-	private transient double solarPotentialToday;
 	private transient boolean isPrintVertical;
 
 	protected final ArrayList<Vector3> points;

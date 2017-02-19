@@ -130,7 +130,6 @@ public class Scene implements Serializable {
 	private boolean hideAxes;
 	private boolean hideLightBeams;
 	private boolean showSunAngles;
-	private boolean showFloatingLabels;
 	private boolean cleanup;
 	private boolean alwaysComputeHeatFluxVectors;
 	private boolean disableShadowInAction;
@@ -373,7 +372,7 @@ public class Scene implements Serializable {
 			}
 			energyPanel.setLatitude(latitude); // already silent
 			Util.selectSilently(energyPanel.getCityComboBox(), city);
-			Scene.getInstance().setTreeLeaves();
+			Scene.getInstance().updateTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().changeSkyTexture();
@@ -2678,7 +2677,7 @@ public class Scene implements Serializable {
 	}
 
 	// XIE: This needs to be called for trees to change texture when the month changes
-	public void setTreeLeaves() {
+	public void updateTreeLeaves() {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
@@ -3130,19 +3129,6 @@ public class Scene implements Serializable {
 			return null;
 		}
 		return instructionSheetTextType[i];
-	}
-
-	public void setFloatingLabelsVisible(final boolean b) {
-		showFloatingLabels = b;
-		for (final HousePart part : parts) {
-			if (part instanceof Foundation) {
-				((Foundation) part).showFloatingLabel(b);
-			}
-		}
-	}
-
-	public boolean areFloatingLabelsVisible() {
-		return showFloatingLabels;
 	}
 
 	public void setDisableShadowInAction(final boolean b) {

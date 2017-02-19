@@ -810,11 +810,9 @@ public class TimeSeriesLogger {
 						line += ((EnergyDailyAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof BuildingDailyEnergyGraph) {
 						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
-						if (Scene.getInstance().areFloatingLabelsVisible()) {
-							final String result = Building.getBuildingSolarPotentials();
-							if (result != null) {
-								line += ", \"Solar Potential\": " + result;
-							}
+						final String result = Building.getBuildingSolarPotentials();
+						if (result != null) {
+							line += ", \"Solar Potential\": " + result;
 						}
 					} else if (analysisRequester instanceof EnergyAnnualAnalysis) {
 						line += ((EnergyAnnualAnalysis) analysisRequester).toJson();
@@ -828,11 +826,9 @@ public class TimeSeriesLogger {
 						line += ((Cost) analysisRequester).toJson();
 					} else if (analysisRequester instanceof BuildingDailyEnergyGraph) {
 						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
-						if (Scene.getInstance().areFloatingLabelsVisible()) {
-							final String result = Building.getBuildingSolarPotentials();
-							if (result != null) {
-								line += ", \"Solar Potential\": " + result;
-							}
+						final String result = Building.getBuildingSolarPotentials();
+						if (result != null) {
+							line += ", \"Solar Potential\": " + result;
 						}
 					}
 				}
