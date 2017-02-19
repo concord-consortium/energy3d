@@ -82,6 +82,9 @@ public class SolarPanel extends HousePart implements Trackable {
 	private int numberOfCellsInX = 6;
 	private int numberOfCellsInY = 10;
 	private boolean labelId;
+	private boolean labelCellEfficiency;
+	private boolean labelTiltAngle;
+	private boolean labelTracker;
 	private boolean labelEnergyOutput;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
@@ -374,8 +377,20 @@ public class SolarPanel extends HousePart implements Trackable {
 		if (labelId) {
 			text += "#" + id;
 		}
+		if (labelCellEfficiency) {
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.TWO_DECIMALS.format(100 * efficiency) + "%";
+		}
+		if (labelTiltAngle) {
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(onFlatSurface ? tiltAngle : Math.toDegrees(Math.asin(normal.getY()))) + " \u00B0";
+		}
+		if (labelTracker) {
+			final String name = getTrackerName();
+			if (name != null) {
+				text += (text.equals("") ? "" : "\n") + name;
+			}
+		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : ", ") + EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency(25)) + " kWh";
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Unknown" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency(25)) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);
@@ -386,6 +401,22 @@ public class SolarPanel extends HousePart implements Trackable {
 			label.setVisible(false);
 		}
 
+	}
+
+	public String getTrackerName() {
+		String name = null;
+		switch (trackerType) {
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+			name = "HSAT";
+			break;
+		case VERTICAL_SINGLE_AXIS_TRACKER:
+			name = "VSAT";
+			break;
+		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			name = "AADAT";
+			break;
+		}
+		return name;
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -923,6 +954,18 @@ public class SolarPanel extends HousePart implements Trackable {
 		return meshLocator;
 	}
 
+	public void clearLabels() {
+		labelId = false;
+		labelCellEfficiency = false;
+		labelTiltAngle = false;
+		labelTracker = false;
+		labelEnergyOutput = false;
+	}
+
+	public boolean isLabelVisible() {
+		return label.isVisible();
+	}
+
 	public void setLabelId(final boolean labelId) {
 		this.labelId = labelId;
 	}
@@ -931,16 +974,36 @@ public class SolarPanel extends HousePart implements Trackable {
 		return labelId;
 	}
 
+	public void setLabelTracker(final boolean labelTracker) {
+		this.labelTracker = labelTracker;
+	}
+
+	public boolean getLabelTracker() {
+		return labelTracker;
+	}
+
+	public void setLabelCellEfficiency(final boolean labelCellEfficiency) {
+		this.labelCellEfficiency = labelCellEfficiency;
+	}
+
+	public boolean getLabelCellEfficiency() {
+		return labelCellEfficiency;
+	}
+
+	public void setLabelTiltAngle(final boolean labelTiltAngle) {
+		this.labelTiltAngle = labelTiltAngle;
+	}
+
+	public boolean getLabelTiltAngle() {
+		return labelTiltAngle;
+	}
+
 	public void setLabelEnergyOutput(final boolean labelEnergyOutput) {
 		this.labelEnergyOutput = labelEnergyOutput;
 	}
 
 	public boolean getLabelEnergyOutput() {
 		return labelEnergyOutput;
-	}
-
-	public boolean isLabelVisible() {
-		return label.isVisible();
 	}
 
 }

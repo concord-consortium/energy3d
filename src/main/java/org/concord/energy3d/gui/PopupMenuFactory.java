@@ -3921,11 +3921,10 @@ public class PopupMenuFactory {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof SolarPanel) {
 							final SolarPanel s = (SolarPanel) selectedPart;
-							// final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
-							s.setLabelId(false);
-							s.setLabelEnergyOutput(false);
+							final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+							s.clearLabels();
 							s.draw();
-							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 							updateAfterEdit();
 						}
 					}
@@ -3940,15 +3939,66 @@ public class PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof SolarPanel) {
 						final SolarPanel s = (SolarPanel) selectedPart;
-						// final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
 						s.setLabelId(miLabelId.isSelected());
 						s.draw();
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 						updateAfterEdit();
 					}
 				}
 			});
 			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelCellEfficiency = new JCheckBoxMenuItem("Cell Efficiency");
+			miLabelCellEfficiency.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelCellEfficiency);
+
+			final JCheckBoxMenuItem miLabelTiltAngle = new JCheckBoxMenuItem("Tilt Angle");
+			miLabelTiltAngle.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelTiltAngle);
+
+			final JCheckBoxMenuItem miLabelTracker = new JCheckBoxMenuItem("Tracker");
+			miLabelTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelTracker(miLabelTracker.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelTracker);
 
 			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
 			miLabelEnergyOutput.addActionListener(new ActionListener() {
@@ -3957,10 +4007,10 @@ public class PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof SolarPanel) {
 						final SolarPanel s = (SolarPanel) selectedPart;
-						// final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
 						s.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
 						s.draw();
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 						updateAfterEdit();
 					}
 				}
@@ -4368,6 +4418,9 @@ public class PopupMenuFactory {
 					Util.selectSilently(rbmiBlack, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLACK);
 					Util.selectSilently(miLabelNone, !sp.isLabelVisible());
 					Util.selectSilently(miLabelId, sp.getLabelId());
+					Util.selectSilently(miLabelCellEfficiency, sp.getLabelCellEfficiency());
+					Util.selectSilently(miLabelTiltAngle, sp.getLabelTiltAngle());
+					Util.selectSilently(miLabelTracker, sp.getLabelTracker());
 					Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
 
 					switch (sp.getTracker()) {

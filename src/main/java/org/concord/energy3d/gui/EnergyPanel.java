@@ -957,22 +957,15 @@ public class EnergyPanel extends JPanel {
 							@Override
 							public void run() {
 								String title = "Solar Panel (" + sp.getId() + ")";
-								switch (sp.getTracker()) {
-								case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-									title += ", Tracker: HSAT";
-									break;
-								case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-									title += ", Tracker: VSAT";
-									break;
-								case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-									title += ", Tracker: AADAT";
-									break;
+								final String trackerName = sp.getTrackerName();
+								if (trackerName != null) {
+									title += ", Tracker: " + trackerName;
 								}
 								partPanelBorder.setTitle(title);
 								partProperty1Label.setText("  Size & Position:");
 								partProperty1TextField.setText(TWO_DECIMALS.format(sp.getPanelWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(sp.getPanelHeight() * meterToFoot) + " m, (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ") m");
 								partProperty2Label.setText("  Angles:");
-								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(sp.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
+								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(Util.isZero(sp.getTiltAngle()) ? Math.toDegrees(Math.asin(sp.getNormal().getY())) : sp.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
 								partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the solar panel");
 								partProperty2TextField.setToolTipText("The angles of the solar panel");
 								final String eff = ONE_DECIMAL.format(sp.getCellEfficiency() * 100) + "%";
@@ -1019,7 +1012,7 @@ public class EnergyPanel extends JPanel {
 								partProperty1Label.setText("  Size & Position:");
 								partProperty1TextField.setText(TWO_DECIMALS.format(rack.getRackWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(rack.getRackHeight() * meterToFoot) + " m, (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ") m");
 								partProperty2Label.setText("  Angles:");
-								partProperty2TextField.setText("tilt: " + ONE_DECIMAL.format(rack.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0");
+								partProperty2TextField.setText("tilt: " + ONE_DECIMAL.format(Util.isZero(rack.getTiltAngle()) ? Math.toDegrees(Math.asin(rack.getNormal().getY())) : rack.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0");
 								partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the rack");
 								partProperty2TextField.setToolTipText("The angles of the rack");
 								partProperty3Label.setText("  Solar Panels:");

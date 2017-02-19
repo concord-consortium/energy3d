@@ -827,7 +827,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		if (labelSolarPotential) {
 			final String s = solarPotentialToday > 100 ? EnergyPanel.NO_DECIMAL.format(solarPotentialToday) : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday);
-			text += (text.equals("") ? "" : ", ") + s + " kWh";
+			text += (text.equals("") ? "" : ", ") + (Util.isZero(solarPotentialToday) ? "Unknown" : s + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);

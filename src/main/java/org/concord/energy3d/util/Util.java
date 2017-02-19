@@ -473,6 +473,7 @@ public class Util {
 		final MultipartUtility multipart = new MultipartUtility("http://energy3d.concord.org/errors/error.php", "UTF-8");
 		multipart.addFormField("ip_address", InetAddress.getLocalHost().getHostAddress());
 		multipart.addFormField("os_name", System.getProperty("os.name"));
+		multipart.addFormField("user_name", System.getProperty("user.name"));
 		multipart.addFormField("os_version", System.getProperty("os.version"));
 		multipart.addFormField("energy3d_version", MainApplication.VERSION);
 		multipart.addFormField("error_message", msg);
