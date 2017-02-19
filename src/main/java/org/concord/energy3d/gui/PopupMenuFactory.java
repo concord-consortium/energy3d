@@ -5945,6 +5945,112 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Rack) {
+							final Rack s = (Rack) selectedPart;
+							final SetRackLabelCommand c = new SetRackLabelCommand(s);
+							s.clearLabels();
+							s.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							updateAfterEdit();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack s = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(s);
+						s.setLabelId(miLabelId.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelCellEfficiency = new JCheckBoxMenuItem("Cell Efficiency");
+			miLabelCellEfficiency.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack s = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(s);
+						s.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelCellEfficiency);
+
+			final JCheckBoxMenuItem miLabelTiltAngle = new JCheckBoxMenuItem("Tilt Angle");
+			miLabelTiltAngle.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack s = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(s);
+						s.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelTiltAngle);
+
+			final JCheckBoxMenuItem miLabelTracker = new JCheckBoxMenuItem("Tracker");
+			miLabelTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack s = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(s);
+						s.setLabelTracker(miLabelTracker.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelTracker);
+
+			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelEnergyOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack s = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(s);
+						s.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelEnergyOutput);
+
 			popupMenuForRack = createPopupMenu(true, true, new Runnable() {
 
 				@Override
@@ -5999,6 +6105,12 @@ public class PopupMenuFactory {
 						}
 					}
 					Util.selectSilently(cbmiDrawSunBeam, rack.isDrawSunBeamVisible());
+					Util.selectSilently(miLabelNone, !rack.isLabelVisible());
+					Util.selectSilently(miLabelId, rack.getLabelId());
+					Util.selectSilently(miLabelCellEfficiency, rack.getLabelCellEfficiency());
+					Util.selectSilently(miLabelTiltAngle, rack.getLabelTiltAngle());
+					Util.selectSilently(miLabelTracker, rack.getLabelTracker());
+					Util.selectSilently(miLabelEnergyOutput, rack.getLabelEnergyOutput());
 				}
 
 			});
@@ -6018,6 +6130,7 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(cbmiDrawSunBeam);
+			popupMenuForRack.add(labelMenu);
 			popupMenuForRack.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");

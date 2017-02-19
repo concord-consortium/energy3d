@@ -61,7 +61,6 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
@@ -997,16 +996,9 @@ public class EnergyPanel extends JPanel {
 							@Override
 							public void run() {
 								String title = "Rack (" + rack.getId() + ")";
-								switch (rack.getTracker()) {
-								case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-									title += ", Tracker: HSAT";
-									break;
-								case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-									title += ", Tracker: VSAT";
-									break;
-								case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-									title += ", Tracker: AADAT";
-									break;
+								final String trackerName = rack.getTrackerName();
+								if (trackerName != null) {
+									title += ", Tracker: " + trackerName;
 								}
 								partPanelBorder.setTitle(title);
 								partProperty1Label.setText("  Size & Position:");

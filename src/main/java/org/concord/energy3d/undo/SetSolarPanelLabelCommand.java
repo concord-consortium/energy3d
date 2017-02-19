@@ -71,7 +71,7 @@ public class SetSolarPanelLabelCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Change Label";
+		return "Change Label of Solar Panel";
 	}
 
 }
