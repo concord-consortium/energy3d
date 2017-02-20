@@ -3183,6 +3183,23 @@ public class PopupMenuFactory {
 			});
 			labelMenu.add(miLabelSolarPotential);
 
+			final JCheckBoxMenuItem miLabelBuildingEnergy = new JCheckBoxMenuItem("Building Energy");
+			miLabelBuildingEnergy.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelBuildingEnergy(miLabelBuildingEnergy.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
+					}
+				}
+			});
+			labelMenu.add(miLabelBuildingEnergy);
+
 			final JMenu powerTowerLabelMenu = new JMenu("Power Tower");
 			labelMenu.add(powerTowerLabelMenu);
 
@@ -3245,6 +3262,7 @@ public class PopupMenuFactory {
 						Util.selectSilently(miLabelPowerTowerOutput, f.getLabelPowerTowerOutput());
 						Util.selectSilently(miLabelPowerTowerHeight, f.getLabelPowerTowerHeight());
 						Util.selectSilently(miLabelSolarPotential, f.getLabelSolarPotential());
+						Util.selectSilently(miLabelBuildingEnergy, f.getLabelBuildingEnergy());
 						powerTowerLabelMenu.setEnabled(f.isSolarReceiverVisible());
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();

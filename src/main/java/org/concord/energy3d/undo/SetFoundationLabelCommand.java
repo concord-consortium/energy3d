@@ -13,10 +13,12 @@ public class SetFoundationLabelCommand extends AbstractUndoableEdit {
 	private final boolean oldLabelPowerTowerOutput;
 	private final boolean oldLabelPowerTowerHeight;
 	private final boolean oldLabelSolarPotential;
+	private final boolean oldLabelBuildingEnergy;
 	private boolean newLabelId;
 	private boolean newLabelPowerTowerOutput;
 	private boolean newLabelPowerTowerHeight;
 	private boolean newLabelSolarPotential;
+	private boolean newLabelBuildingEnergy;
 	private final Foundation foundation;
 
 	public SetFoundationLabelCommand(final Foundation foundation) {
@@ -25,6 +27,7 @@ public class SetFoundationLabelCommand extends AbstractUndoableEdit {
 		oldLabelPowerTowerOutput = foundation.getLabelPowerTowerOutput();
 		oldLabelPowerTowerHeight = foundation.getLabelPowerTowerHeight();
 		oldLabelSolarPotential = foundation.getLabelSolarPotential();
+		oldLabelBuildingEnergy = foundation.getLabelBuildingEnergy();
 	}
 
 	public Foundation getFoundation() {
@@ -46,10 +49,12 @@ public class SetFoundationLabelCommand extends AbstractUndoableEdit {
 		newLabelPowerTowerOutput = foundation.getLabelPowerTowerOutput();
 		newLabelPowerTowerHeight = foundation.getLabelPowerTowerHeight();
 		newLabelSolarPotential = foundation.getLabelSolarPotential();
+		newLabelBuildingEnergy = foundation.getLabelBuildingEnergy();
 		foundation.setLabelId(oldLabelId);
 		foundation.setLabelPowerTowerOutput(oldLabelPowerTowerOutput);
 		foundation.setLabelPowerTowerHeight(oldLabelPowerTowerHeight);
 		foundation.setLabelSolarPotential(oldLabelSolarPotential);
+		foundation.setLabelBuildingEnergy(oldLabelBuildingEnergy);
 		foundation.draw();
 	}
 
@@ -60,6 +65,7 @@ public class SetFoundationLabelCommand extends AbstractUndoableEdit {
 		foundation.setLabelPowerTowerOutput(newLabelPowerTowerOutput);
 		foundation.setLabelPowerTowerHeight(newLabelPowerTowerHeight);
 		foundation.setLabelSolarPotential(newLabelSolarPotential);
+		foundation.setLabelBuildingEnergy(newLabelBuildingEnergy);
 		foundation.draw();
 	}
 

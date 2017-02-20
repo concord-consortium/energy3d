@@ -120,6 +120,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean labelPowerTowerOutput;
 	private boolean labelPowerTowerHeight;
 	private boolean labelSolarPotential;
+	private boolean labelBuildingEnergy;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Mesh selectedMesh;
@@ -833,6 +834,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (labelPowerTowerOutput) {
 			final double output = getSolarReceiverOutputToday();
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(output) ? "Output" : EnergyPanel.NO_DECIMAL.format(output) + " kWh");
+		}
+		if (labelBuildingEnergy) {
+			final String s = totalEnergyToday > 100 ? EnergyPanel.NO_DECIMAL.format(totalEnergyToday) : EnergyPanel.ONE_DECIMAL.format(totalEnergyToday);
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(totalEnergyToday) ? "Building Energy" : s + " kWh");
 		}
 		if (labelSolarPotential) {
 			final String s = solarPotentialToday > 100 ? EnergyPanel.NO_DECIMAL.format(solarPotentialToday) : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday);
@@ -3074,7 +3079,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void clearLabels() {
 		labelId = false;
 		labelPowerTowerOutput = false;
+		labelPowerTowerHeight = false;
 		labelSolarPotential = false;
+		labelBuildingEnergy = false;
 	}
 
 	public boolean isLabelVisible() {
@@ -3111,6 +3118,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public boolean getLabelSolarPotential() {
 		return labelSolarPotential;
+	}
+
+	public void setLabelBuildingEnergy(final boolean labelBuildingEnergy) {
+		this.labelBuildingEnergy = labelBuildingEnergy;
+	}
+
+	public boolean getLabelBuildingEnergy() {
+		return labelBuildingEnergy;
 	}
 
 }
