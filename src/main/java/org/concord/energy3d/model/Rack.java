@@ -81,7 +81,7 @@ public class Rack extends HousePart implements Trackable {
 	private static double normalVectorLength = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double baseZ;
-	private transient boolean isBaseZ;
+	// private transient boolean isBaseZ;
 	private MeshLocator meshLocator; // if the mesh that this rack rests on is a vertical surface of unknown type (e.g., an imported mesh), store its info for finding it later
 
 	public Rack() {
@@ -164,7 +164,7 @@ public class Rack extends HousePart implements Trackable {
 		solarPanelOutlines.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
 		root.attachChild(solarPanelOutlines);
 
-		label = new BMText("Label", "# " + id, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		label = new BMText("Label", "#" + id, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 		Util.initHousePartLabel(label);
 		label.setFontScale(0.5);
 		label.setVisible(false);
@@ -191,12 +191,12 @@ public class Rack extends HousePart implements Trackable {
 			initSolarPanelsForMove();
 		}
 		if (editPointIndex <= 0) {
-			isBaseZ = true;
+			// isBaseZ = true;
 			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class, Wall.class });
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 				final Vector3 p = picked.getPoint().clone();
-				isBaseZ = Util.isEqual(p.getZ(), baseZ);
-				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
+				// isBaseZ = Util.isEqual(p.getZ(), baseZ);
+				snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 				points.get(0).set(toRelative(p));
 				final UserData ud = picked.getUserData();
 				pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();

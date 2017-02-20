@@ -1316,6 +1316,7 @@ public class MainFrame extends JFrame {
 			addModel(solarBasicsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
 			addModel(solarBasicsMenu, "Solar Panel Azimuthal Angles", "tutorials/solar-panel-azimuth-angle.ng3");
 			addModel(solarBasicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
+			addModel(solarBasicsMenu, "Solar Analysis of Cities", "tutorials/city-block.ng3");
 
 			final JMenu pvMenu = new JMenu("Photovoltaic Solar Power");
 			tutorialsMenu.add(pvMenu);
@@ -1326,7 +1327,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Solar Rack Array (Slow Full Model)", "tutorials/solar-rack-array-full.ng3");
 			addModel(pvMenu, "Rooftop Solar System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
-			addModel(pvMenu, "Solar Facade", "tutorials/solar-facade.ng3");
+			addModel(pvMenu, "Solar Facades", "tutorials/solar-facade.ng3");
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 			addModel(pvMenu, "Solar Trackers for Racks", "tutorials/solar-tracker-racks.ng3");
