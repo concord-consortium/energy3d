@@ -283,7 +283,7 @@ public class Mirror extends HousePart implements Solar {
 			text += "#" + id;
 		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency()) + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(getOutputToday()) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);
@@ -293,6 +293,10 @@ public class Mirror extends HousePart implements Solar {
 		} else {
 			label.setVisible(false);
 		}
+	}
+
+	public double getOutputToday() {
+		return solarPotentialToday * getSystemEfficiency();
 	}
 
 	public static void updateBloom() {

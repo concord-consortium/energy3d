@@ -117,6 +117,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean lockEdit;
 	private boolean groupMaster;
 	private boolean labelId;
+	private boolean labelPowerTowerOutput;
+	private boolean labelPowerTowerHeight;
 	private boolean labelSolarPotential;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
@@ -825,19 +827,39 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (labelId) {
 			text += "#" + id;
 		}
+		if (labelPowerTowerHeight) {
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight()) + " m";
+		}
+		if (labelPowerTowerOutput) {
+			final double output = getSolarReceiverOutputToday();
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(output) ? "Output" : EnergyPanel.NO_DECIMAL.format(output) + " kWh");
+		}
 		if (labelSolarPotential) {
 			final String s = solarPotentialToday > 100 ? EnergyPanel.NO_DECIMAL.format(solarPotentialToday) : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday);
-			text += (text.equals("") ? "" : ", ") + (Util.isZero(solarPotentialToday) ? "Solar Potential" : s + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Solar Potential" : s + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);
 			final ReadOnlyVector3 center = getCenter();
-			label.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6);
+			label.setTranslation(center.getX(), center.getY(), boundingHeight + height + 8);
 			label.setVisible(true);
 		} else {
 			label.setVisible(false);
 		}
 
+	}
+
+	private double getSolarReceiverOutputToday() {
+		double output = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror) {
+				final Mirror m = (Mirror) p;
+				if (m.getHeliostatTarget() == this) {
+					output += m.getOutputToday();
+				}
+			}
+		}
+		return output;
 	}
 
 	public void drawSolarReceiver() {
@@ -903,6 +925,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			solarReceiver.setTranslation(o);
 		}
+	}
+
+	public boolean isSolarReceiverVisible() {
+		return solarReceiver != null && solarReceiver.isVisible();
 	}
 
 	public static void updateBloom() {
@@ -3045,6 +3071,16 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
+	public void clearLabels() {
+		labelId = false;
+		labelPowerTowerOutput = false;
+		labelSolarPotential = false;
+	}
+
+	public boolean isLabelVisible() {
+		return label.isVisible();
+	}
+
 	public void setLabelId(final boolean labelId) {
 		this.labelId = labelId;
 	}
@@ -3053,16 +3089,28 @@ public class Foundation extends HousePart implements Thermalizable {
 		return labelId;
 	}
 
+	public void setLabelPowerTowerOutput(final boolean labelPowerTowerOutput) {
+		this.labelPowerTowerOutput = labelPowerTowerOutput;
+	}
+
+	public boolean getLabelPowerTowerOutput() {
+		return labelPowerTowerOutput;
+	}
+
+	public void setLabelPowerTowerHeight(final boolean labelPowerTowerHeight) {
+		this.labelPowerTowerHeight = labelPowerTowerHeight;
+	}
+
+	public boolean getLabelPowerTowerHeight() {
+		return labelPowerTowerHeight;
+	}
+
 	public void setLabelSolarPotential(final boolean labelSolarPotential) {
 		this.labelSolarPotential = labelSolarPotential;
 	}
 
 	public boolean getLabelSolarPotential() {
 		return labelSolarPotential;
-	}
-
-	public boolean isLabelVisible() {
-		return label.isVisible();
 	}
 
 }

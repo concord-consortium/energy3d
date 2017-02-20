@@ -15,10 +15,10 @@ public class SetMirrorLabelCommand extends AbstractUndoableEdit {
 	private boolean newLabelEnergyOutput;
 	private final Mirror mirror;
 
-	public SetMirrorLabelCommand(final Mirror rack) {
-		this.mirror = rack;
-		oldLabelId = rack.getLabelId();
-		oldLabelEnergyOutput = rack.getLabelEnergyOutput();
+	public SetMirrorLabelCommand(final Mirror mirror) {
+		this.mirror = mirror;
+		oldLabelId = mirror.getLabelId();
+		oldLabelEnergyOutput = mirror.getLabelEnergyOutput();
 	}
 
 	public Mirror getMirror() {
