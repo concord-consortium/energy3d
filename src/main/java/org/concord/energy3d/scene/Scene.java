@@ -815,54 +815,54 @@ public class Scene implements Serializable {
 	private Scene() {
 	}
 
-	public void add(final HousePart housePart, final boolean redraw) {
-		final HousePart container = housePart.getContainer();
+	public void add(final HousePart part, final boolean redraw) {
+		final HousePart container = part.getContainer();
 		if (container != null) {
-			container.getChildren().add(housePart);
+			container.getChildren().add(part);
 		}
-		add(housePart);
+		add(part);
 		if (redraw) {
 			redrawAll();
 		}
 	}
 
-	private void add(final HousePart housePart) {
-		System.out.println("Adding: " + housePart);
-		if (housePart instanceof Tree || housePart instanceof Human) {
-			notReceivingShadowRoot.attachChild(housePart.getRoot());
+	private void add(final HousePart part) {
+		System.out.println("Adding: " + part);
+		if (part instanceof Tree || part instanceof Human) {
+			notReceivingShadowRoot.attachChild(part.getRoot());
 		} else {
-			originalHouseRoot.attachChild(housePart.getRoot());
+			originalHouseRoot.attachChild(part.getRoot());
 		}
-		parts.add(housePart);
-		for (final HousePart child : housePart.getChildren()) {
+		parts.add(part);
+		for (final HousePart child : part.getChildren()) {
 			add(child);
 		}
 	}
 
-	public void remove(final HousePart housePart, final boolean redraw) {
-		if (housePart == null) {
+	public void remove(final HousePart part, final boolean redraw) {
+		if (part == null) {
 			return;
 		}
-		housePart.setGridsVisible(false);
-		final HousePart container = housePart.getContainer();
+		part.setGridsVisible(false);
+		final HousePart container = part.getContainer();
 		if (container != null) {
-			container.getChildren().remove(housePart);
+			container.getChildren().remove(part);
 		}
-		removeChildren(housePart);
+		removeChildren(part);
 		if (redraw) {
 			redrawAll();
 		}
 	}
 
-	private void removeChildren(final HousePart housePart) {
-		System.out.println("Removing: " + housePart);
-		parts.remove(housePart); // this must happen before call to wall.delete()
-		for (final HousePart child : housePart.getChildren()) {
+	private void removeChildren(final HousePart part) {
+		System.out.println("Removing: " + part);
+		parts.remove(part); // this must happen before call to wall.delete()
+		for (final HousePart child : part.getChildren()) {
 			removeChildren(child);
 		}
 		// originalHouseRoot.detachChild(housePart.getRoot());
-		housePart.getRoot().removeFromParent();
-		housePart.delete();
+		part.getRoot().removeFromParent();
+		part.delete();
 	}
 
 	private static void setIdOfChildren(final HousePart p) {

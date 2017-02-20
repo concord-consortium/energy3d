@@ -192,7 +192,7 @@ public class Rack extends HousePart implements Trackable {
 		}
 		if (editPointIndex <= 0) {
 			isBaseZ = true;
-			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class });
+			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class, Wall.class });
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 				final Vector3 p = picked.getPoint().clone();
 				isBaseZ = Util.isEqual(p.getZ(), baseZ);
@@ -381,7 +381,7 @@ public class Rack extends HousePart implements Trackable {
 		allowAzimuthLargeRotation = false;
 
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
-		if (onFlatSurface && isBaseZ) {
+		if (onFlatSurface && Util.isEqual(points.get(0).getZ(), baseZ)) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
 

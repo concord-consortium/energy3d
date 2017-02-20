@@ -1095,7 +1095,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable future</i></h3><br>Version: " + MainApplication.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Intelligent Learning Technology Laboratory, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, and 1512868.</html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable world</i></h3><br>Version: " + MainApplication.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Laboratory of Engineering Computation, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, and 1512868.</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
 				@Override
@@ -1326,6 +1326,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Solar Rack Array (Slow Full Model)", "tutorials/solar-rack-array-full.ng3");
 			addModel(pvMenu, "Rooftop Solar System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
+			addModel(pvMenu, "Solar Facade", "tutorials/solar-facade.ng3");
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 			addModel(pvMenu, "Solar Trackers for Racks", "tutorials/solar-tracker-racks.ng3");
