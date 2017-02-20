@@ -5,12 +5,14 @@ import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -25,6 +27,9 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Mirror extends HousePart implements Solar {
@@ -35,6 +40,7 @@ public class Mirror extends HousePart implements Solar {
 	private transient Box surround;
 	private transient Line lightBeams;
 	private transient Cylinder post;
+	private transient BMText label;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double mirrorWidth = 5;
 	private double mirrorHeight = 3;
@@ -44,6 +50,8 @@ public class Mirror extends HousePart implements Solar {
 	private Foundation heliostatTarget;
 	private double baseHeight = 10;
 	private boolean drawSunBeam;
+	private boolean labelId;
+	private boolean labelEnergyOutput;
 	private static transient BloomRenderPass bloomRenderPass;
 
 	public Mirror() {
@@ -111,6 +119,12 @@ public class Mirror extends HousePart implements Solar {
 		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		lightBeams.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
 		root.attachChild(lightBeams);
+
+		label = new BMText("Label", "# " + id, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(label);
+		label.setFontScale(0.5);
+		label.setVisible(false);
+		root.attachChild(label);
 
 		updateTextureAndColor();
 
@@ -204,6 +218,8 @@ public class Mirror extends HousePart implements Solar {
 
 		drawLightBeams();
 
+		updateLabel();
+
 	}
 
 	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -258,6 +274,24 @@ public class Mirror extends HousePart implements Solar {
 		}
 		if (!bloomRenderPass.contains(lightBeams)) {
 			bloomRenderPass.add(lightBeams);
+		}
+	}
+
+	public void updateLabel() {
+		String text = "";
+		if (labelId) {
+			text += "#" + id;
+		}
+		if (labelEnergyOutput) {
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency()) + " kWh");
+		}
+		if (!text.equals("")) {
+			label.setText(text);
+			final double shift = 0.5 * Math.min(mirrorWidth, mirrorHeight) / Scene.getInstance().getAnnotationScale();
+			label.setTranslation(getAbsCenter().addLocal(normal.multiply(shift, null)));
+			label.setVisible(true);
+		} else {
+			label.setVisible(false);
 		}
 	}
 
@@ -491,6 +525,31 @@ public class Mirror extends HousePart implements Solar {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
 		}
 		return e;
+	}
+
+	public void clearLabels() {
+		labelId = false;
+		labelEnergyOutput = false;
+	}
+
+	public boolean isLabelVisible() {
+		return label.isVisible();
+	}
+
+	public void setLabelId(final boolean labelId) {
+		this.labelId = labelId;
+	}
+
+	public boolean getLabelId() {
+		return labelId;
+	}
+
+	public void setLabelEnergyOutput(final boolean labelEnergyOutput) {
+		this.labelEnergyOutput = labelEnergyOutput;
+	}
+
+	public boolean getLabelEnergyOutput() {
+		return labelEnergyOutput;
 	}
 
 }

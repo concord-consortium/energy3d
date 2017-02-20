@@ -535,6 +535,25 @@ public class Rack extends HousePart implements Trackable {
 			drawSunBeam();
 		}
 
+		drawFloatingLabel(onFlatSurface);
+
+		if (heatMap) {
+			drawSolarPanelOutlines();
+		} else {
+			solarPanelOutlines.setVisible(false);
+		}
+
+		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
+		root.updateGeometricState(0);
+		drawChildren();
+	}
+
+	public void updateLabel() {
+		drawFloatingLabel(onFlatSurface());
+	}
+
+	private void drawFloatingLabel(final boolean onFlatSurface) {
 		String text = "";
 		if (labelId) {
 			text += "#" + id;
@@ -552,27 +571,16 @@ public class Rack extends HousePart implements Trackable {
 			}
 		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Unknown" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * sampleSolarPanel.getSystemEfficiency(25)) + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * sampleSolarPanel.getSystemEfficiency(25)) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = 0.5 * (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth()) / Scene.getInstance().getAnnotationScale();
+			final double shift = (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth()) / Scene.getInstance().getAnnotationScale();
 			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
 			label.setVisible(false);
 		}
-
-		if (heatMap) {
-			drawSolarPanelOutlines();
-		} else {
-			solarPanelOutlines.setVisible(false);
-		}
-
-		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
-		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
-		root.updateGeometricState(0);
-		drawChildren();
 	}
 
 	public String getTrackerName() {

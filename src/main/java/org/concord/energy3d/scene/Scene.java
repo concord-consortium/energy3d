@@ -2691,6 +2691,26 @@ public class Scene implements Serializable {
 		});
 	}
 
+	public void updateLabels() {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				for (final HousePart p : parts) { // update the parts that support floating labels
+					if (p instanceof SolarPanel) {
+						((SolarPanel) p).updateLabel();
+					} else if (p instanceof Rack) {
+						((Rack) p).updateLabel();
+					} else if (p instanceof Mirror) {
+						((Mirror) p).updateLabel();
+					} else if (p instanceof Foundation) {
+						((Foundation) p).updateLabel();
+					}
+				}
+				return null;
+			}
+		});
+	}
+
 	public void updateTrackables() {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override

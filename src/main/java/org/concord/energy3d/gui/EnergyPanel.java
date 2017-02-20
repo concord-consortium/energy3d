@@ -724,7 +724,7 @@ public class EnergyPanel extends JPanel {
 			HeatLoad.getInstance().computeEnergyToday(c);
 			SolarRadiation.getInstance().computeTotalEnergyForBuildings();
 			Scene.getInstance().updateTreeLeaves();
-			Scene.getInstance().redrawAll();
+			Scene.getInstance().updateLabels(); // we can't call Scene.getInstance().redrawAll() here as it will screw up the radiation texture
 
 			EventQueue.invokeLater(new Runnable() {
 				@Override

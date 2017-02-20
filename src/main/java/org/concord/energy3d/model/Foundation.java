@@ -332,7 +332,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				scanChildrenHeight();
 			}
 			setEditPointsVisible(resizeHouseMode);
-			drawLabel();
+			updateLabel();
 			boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
 		}
 	}
@@ -816,18 +816,18 @@ public class Foundation extends HousePart implements Thermalizable {
 			drawSolarReceiver();
 			drawImportedNodes();
 			foundationPolygon.draw();
-			drawLabel();
+			updateLabel();
 		}
 	}
 
-	private void drawLabel() {
+	public void updateLabel() {
 		String text = "";
 		if (labelId) {
 			text += "#" + id;
 		}
 		if (labelSolarPotential) {
 			final String s = solarPotentialToday > 100 ? EnergyPanel.NO_DECIMAL.format(solarPotentialToday) : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday);
-			text += (text.equals("") ? "" : ", ") + (Util.isZero(solarPotentialToday) ? "Unknown" : s + " kWh");
+			text += (text.equals("") ? "" : ", ") + (Util.isZero(solarPotentialToday) ? "Solar Potential" : s + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);

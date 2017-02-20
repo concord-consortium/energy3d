@@ -373,6 +373,15 @@ public class SolarPanel extends HousePart implements Trackable {
 			drawSunBeam();
 		}
 
+		drawFloatingLabel(onFlatSurface);
+
+	}
+
+	public void updateLabel() {
+		drawFloatingLabel(onFlatSurface());
+	}
+
+	private void drawFloatingLabel(final boolean onFlatSurface) {
 		String text = "";
 		if (labelId) {
 			text += "#" + id;
@@ -390,7 +399,7 @@ public class SolarPanel extends HousePart implements Trackable {
 			}
 		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Unknown" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency(25)) + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency(25)) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);
@@ -400,7 +409,6 @@ public class SolarPanel extends HousePart implements Trackable {
 		} else {
 			label.setVisible(false);
 		}
-
 	}
 
 	public String getTrackerName() {
