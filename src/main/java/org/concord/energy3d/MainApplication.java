@@ -299,7 +299,7 @@ public class MainApplication {
 			@Override
 			public void run() {
 				try {
-					sleep(3000);
+					sleep(5000);
 				} catch (final InterruptedException e) {
 				}
 				while (true) {
@@ -312,7 +312,7 @@ public class MainApplication {
 					});
 
 					try {
-						sleep(3000);
+						sleep(5000);
 					} catch (final InterruptedException e) {
 					}
 
@@ -321,7 +321,7 @@ public class MainApplication {
 						final ThreadInfo[] infos = threadBean.dumpAllThreads(true, true);
 						String msg = "Number of threads: " + infos.length + "\n";
 						for (final ThreadInfo ti : infos) {
-							msg += ti.toString() + "\n";
+							msg += getThreadInfoString(ti) + "\n";
 						}
 						try {
 							System.err.println(msg);
@@ -336,7 +336,7 @@ public class MainApplication {
 		}.start();
 	}
 
-	public String ThreadInfoToString(final ThreadInfo infos) {
+	public static String getThreadInfoString(final ThreadInfo infos) {
 		final StringBuilder sb = new StringBuilder("\"" + infos.getThreadName() + "\"" + " Id=" + infos.getThreadId() + " " + infos.getThreadState());
 		if (infos.getLockName() != null) {
 			sb.append(" on " + infos.getLockName());
@@ -352,7 +352,7 @@ public class MainApplication {
 		}
 		sb.append('\n');
 		int i = 0;
-		final int MAX_LINES = 30;
+		final int MAX_LINES = 100;
 		for (; i < infos.getStackTrace().length && i < MAX_LINES; i++) {
 			final StackTraceElement ste = infos.getStackTrace()[i];
 			sb.append("\tat " + ste.toString());
