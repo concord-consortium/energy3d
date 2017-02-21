@@ -4,7 +4,9 @@ import java.awt.EventQueue;
 import java.awt.Frame;
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.management.LockInfo;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
@@ -316,9 +318,8 @@ public class MainApplication {
 
 					if (!isInvoked[0]) {
 						final ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
-						final long[] threadIds = threadBean.getAllThreadIds();
-						String msg = "Number of threads: " + threadIds.length + "\n";
-						final ThreadInfo[] infos = threadBean.getThreadInfo(threadIds, true, true);
+						final ThreadInfo[] infos = threadBean.dumpAllThreads(true, true);
+						String msg = "Number of threads: " + infos.length + "\n";
 						for (final ThreadInfo ti : infos) {
 							msg += ti.toString() + "\n";
 						}
@@ -333,6 +334,71 @@ public class MainApplication {
 				}
 			}
 		}.start();
+	}
+
+	public String ThreadInfoToString(final ThreadInfo infos) {
+		final StringBuilder sb = new StringBuilder("\"" + infos.getThreadName() + "\"" + " Id=" + infos.getThreadId() + " " + infos.getThreadState());
+		if (infos.getLockName() != null) {
+			sb.append(" on " + infos.getLockName());
+		}
+		if (infos.getLockOwnerName() != null) {
+			sb.append(" owned by \"" + infos.getLockOwnerName() + "\" Id=" + infos.getLockOwnerId());
+		}
+		if (infos.isSuspended()) {
+			sb.append(" (suspended)");
+		}
+		if (infos.isInNative()) {
+			sb.append(" (in native)");
+		}
+		sb.append('\n');
+		int i = 0;
+		final int MAX_LINES = 30;
+		for (; i < infos.getStackTrace().length && i < MAX_LINES; i++) {
+			final StackTraceElement ste = infos.getStackTrace()[i];
+			sb.append("\tat " + ste.toString());
+			sb.append('\n');
+			if (i == 0 && infos.getLockInfo() != null) {
+				final Thread.State ts = infos.getThreadState();
+				switch (ts) {
+				case BLOCKED:
+					sb.append("\t-  blocked on " + infos.getLockInfo());
+					sb.append('\n');
+					break;
+				case WAITING:
+					sb.append("\t-  waiting on " + infos.getLockInfo());
+					sb.append('\n');
+					break;
+				case TIMED_WAITING:
+					sb.append("\t-  waiting on " + infos.getLockInfo());
+					sb.append('\n');
+					break;
+				default:
+				}
+			}
+
+			for (final MonitorInfo mi : infos.getLockedMonitors()) {
+				if (mi.getLockedStackDepth() == i) {
+					sb.append("\t-  locked " + mi);
+					sb.append('\n');
+				}
+			}
+		}
+		if (i < infos.getStackTrace().length) {
+			sb.append("\t...");
+			sb.append('\n');
+		}
+
+		final LockInfo[] locks = infos.getLockedSynchronizers();
+		if (locks.length > 0) {
+			sb.append("\n\tNumber of locked synchronizers = " + locks.length);
+			sb.append('\n');
+			for (final LockInfo li : locks) {
+				sb.append("\t- " + li);
+				sb.append('\n');
+			}
+		}
+		sb.append('\n');
+		return sb.toString();
 	}
 
 }
