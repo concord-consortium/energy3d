@@ -10,11 +10,13 @@ public class SetSolarPanelLabelCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;
+	private final boolean oldLabelCustom;
 	private final boolean oldLabelCellEfficiency;
 	private final boolean oldLabelTiltAngle;
 	private final boolean oldLabelTracker;
 	private final boolean oldLabelEnergyOutput;
 	private boolean newLabelId;
+	private boolean newLabelCustom;
 	private boolean newLabelCellEfficiency;
 	private boolean newLabelTiltAngle;
 	private boolean newLabelTracker;
@@ -24,6 +26,7 @@ public class SetSolarPanelLabelCommand extends AbstractUndoableEdit {
 	public SetSolarPanelLabelCommand(final SolarPanel panel) {
 		this.panel = panel;
 		oldLabelId = panel.getLabelId();
+		oldLabelCustom = panel.getLabelCustom();
 		oldLabelCellEfficiency = panel.getLabelCellEfficiency();
 		oldLabelTiltAngle = panel.getLabelTiltAngle();
 		oldLabelTracker = panel.getLabelTracker();
@@ -46,11 +49,13 @@ public class SetSolarPanelLabelCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		newLabelId = panel.getLabelId();
+		newLabelCustom = panel.getLabelCustom();
 		newLabelCellEfficiency = panel.getLabelCellEfficiency();
 		newLabelTiltAngle = panel.getLabelTiltAngle();
 		newLabelTracker = panel.getLabelTracker();
 		newLabelEnergyOutput = panel.getLabelEnergyOutput();
 		panel.setLabelId(oldLabelId);
+		panel.setLabelCustom(oldLabelCustom);
 		panel.setLabelCellEfficiency(oldLabelCellEfficiency);
 		panel.setLabelTiltAngle(oldLabelTiltAngle);
 		panel.setLabelTracker(oldLabelTracker);
@@ -62,6 +67,7 @@ public class SetSolarPanelLabelCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		panel.setLabelId(newLabelId);
+		panel.setLabelCustom(newLabelCustom);
 		panel.setLabelCellEfficiency(newLabelCellEfficiency);
 		panel.setLabelTiltAngle(newLabelTiltAngle);
 		panel.setLabelTracker(newLabelTracker);

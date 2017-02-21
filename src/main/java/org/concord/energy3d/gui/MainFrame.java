@@ -1327,6 +1327,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Solar Rack Array (Slow Full Model)", "tutorials/solar-rack-array-full.ng3");
 			addModel(pvMenu, "Rooftop Solar System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
+			addModel(pvMenu, "Solar Canopy Form Factors", "tutorials/solar-canopy-form-factors.ng3");
 			addModel(pvMenu, "Solar Facades", "tutorials/solar-facade.ng3");
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");

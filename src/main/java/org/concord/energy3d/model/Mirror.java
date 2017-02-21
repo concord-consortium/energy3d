@@ -50,6 +50,8 @@ public class Mirror extends HousePart implements Solar {
 	private Foundation heliostatTarget;
 	private double baseHeight = 10;
 	private boolean drawSunBeam;
+	private String labelCustomText;
+	private boolean labelCustom;
 	private boolean labelId;
 	private boolean labelEnergyOutput;
 	private static transient BloomRenderPass bloomRenderPass;
@@ -279,8 +281,11 @@ public class Mirror extends HousePart implements Solar {
 
 	public void updateLabel() {
 		String text = "";
+		if (labelCustom && labelCustomText != null) {
+			text += labelCustomText;
+		}
 		if (labelId) {
-			text += "#" + id;
+			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelEnergyOutput) {
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(getOutputToday()) + " kWh");
@@ -533,6 +538,7 @@ public class Mirror extends HousePart implements Solar {
 
 	public void clearLabels() {
 		labelId = false;
+		labelCustom = false;
 		labelEnergyOutput = false;
 	}
 
@@ -546,6 +552,22 @@ public class Mirror extends HousePart implements Solar {
 
 	public boolean getLabelId() {
 		return labelId;
+	}
+
+	public void setLabelCustom(final boolean labelCustom) {
+		this.labelCustom = labelCustom;
+	}
+
+	public boolean getLabelCustom() {
+		return labelCustom;
+	}
+
+	public void setLabelCustomText(final String labelCustomText) {
+		this.labelCustomText = labelCustomText;
+	}
+
+	public String getLabelCustomText() {
+		return labelCustomText;
 	}
 
 	public void setLabelEnergyOutput(final boolean labelEnergyOutput) {

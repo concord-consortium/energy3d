@@ -10,11 +10,13 @@ public class SetRackLabelCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;
+	private final boolean oldLabelCustom;
 	private final boolean oldLabelCellEfficiency;
 	private final boolean oldLabelTiltAngle;
 	private final boolean oldLabelTracker;
 	private final boolean oldLabelEnergyOutput;
 	private boolean newLabelId;
+	private boolean newLabelCustom;
 	private boolean newLabelCellEfficiency;
 	private boolean newLabelTiltAngle;
 	private boolean newLabelTracker;
@@ -24,6 +26,7 @@ public class SetRackLabelCommand extends AbstractUndoableEdit {
 	public SetRackLabelCommand(final Rack rack) {
 		this.rack = rack;
 		oldLabelId = rack.getLabelId();
+		oldLabelCustom = rack.getLabelCustom();
 		oldLabelCellEfficiency = rack.getLabelCellEfficiency();
 		oldLabelTiltAngle = rack.getLabelTiltAngle();
 		oldLabelTracker = rack.getLabelTracker();
@@ -46,11 +49,13 @@ public class SetRackLabelCommand extends AbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		newLabelId = rack.getLabelId();
+		newLabelCustom = rack.getLabelCustom();
 		newLabelCellEfficiency = rack.getLabelCellEfficiency();
 		newLabelTiltAngle = rack.getLabelTiltAngle();
 		newLabelTracker = rack.getLabelTracker();
 		newLabelEnergyOutput = rack.getLabelEnergyOutput();
 		rack.setLabelId(oldLabelId);
+		rack.setLabelCustom(oldLabelCustom);
 		rack.setLabelCellEfficiency(oldLabelCellEfficiency);
 		rack.setLabelTiltAngle(oldLabelTiltAngle);
 		rack.setLabelTracker(oldLabelTracker);
@@ -62,6 +67,7 @@ public class SetRackLabelCommand extends AbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		rack.setLabelId(newLabelId);
+		rack.setLabelCustom(newLabelCustom);
 		rack.setLabelCellEfficiency(newLabelCellEfficiency);
 		rack.setLabelTiltAngle(newLabelTiltAngle);
 		rack.setLabelTracker(newLabelTracker);

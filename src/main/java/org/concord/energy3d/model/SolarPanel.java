@@ -81,6 +81,8 @@ public class SolarPanel extends HousePart implements Trackable {
 	private int shadeTolerance = HIGH_SHADE_TOLERANCE;
 	private int numberOfCellsInX = 6;
 	private int numberOfCellsInY = 10;
+	private String labelCustomText;
+	private boolean labelCustom;
 	private boolean labelId;
 	private boolean labelCellEfficiency;
 	private boolean labelTiltAngle;
@@ -383,8 +385,11 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	private void drawFloatingLabel(final boolean onFlatSurface) {
 		String text = "";
+		if (labelCustom && labelCustomText != null) {
+			text += labelCustomText;
+		}
 		if (labelId) {
-			text += "#" + id;
+			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelCellEfficiency) {
 			text += (text.equals("") ? "" : "\n") + EnergyPanel.TWO_DECIMALS.format(100 * efficiency) + "%";
@@ -964,6 +969,7 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	public void clearLabels() {
 		labelId = false;
+		labelCustom = false;
 		labelCellEfficiency = false;
 		labelTiltAngle = false;
 		labelTracker = false;
@@ -980,6 +986,22 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	public boolean getLabelId() {
 		return labelId;
+	}
+
+	public void setLabelCustom(final boolean labelCustom) {
+		this.labelCustom = labelCustom;
+	}
+
+	public boolean getLabelCustom() {
+		return labelCustom;
+	}
+
+	public void setLabelCustomText(final String labelCustomText) {
+		this.labelCustomText = labelCustomText;
+	}
+
+	public String getLabelCustomText() {
+		return labelCustomText;
 	}
 
 	public void setLabelTracker(final boolean labelTracker) {

@@ -116,9 +116,12 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
+	private String labelCustomText;
+	private boolean labelCustom;
 	private boolean labelId;
 	private boolean labelPowerTowerOutput;
 	private boolean labelPowerTowerHeight;
+	private boolean labelPvEnergy;
 	private boolean labelSolarPotential;
 	private boolean labelBuildingEnergy;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
@@ -216,7 +219,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		setLabelOffset(-0.11);
 
-		label = new BMText("Floating Label", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		label = new BMText("Floating Label", "Undefined", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 		Util.initHousePartLabel(label);
 		label.setFontScale(0.5);
 		label.setVisible(false);
@@ -825,8 +828,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void updateLabel() {
 		String text = "";
+		if (labelCustom && labelCustomText != null) {
+			text += labelCustomText;
+		}
 		if (labelId) {
-			text += "#" + id;
+			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelPowerTowerHeight) {
 			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight()) + " m";
@@ -839,6 +845,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			final String s = totalEnergyToday > 100 ? EnergyPanel.NO_DECIMAL.format(totalEnergyToday) : EnergyPanel.ONE_DECIMAL.format(totalEnergyToday);
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(totalEnergyToday) ? "Building Energy" : s + " kWh");
 		}
+		if (labelPvEnergy) {
+			final String s = photovoltaicToday > 100 ? EnergyPanel.NO_DECIMAL.format(photovoltaicToday) : EnergyPanel.ONE_DECIMAL.format(photovoltaicToday);
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(photovoltaicToday) ? "PV Output" : s + " kWh");
+		}
 		if (labelSolarPotential) {
 			final String s = solarPotentialToday > 100 ? EnergyPanel.NO_DECIMAL.format(solarPotentialToday) : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday);
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Solar Potential" : s + " kWh");
@@ -846,7 +856,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		if (!text.equals("")) {
 			label.setText(text);
 			final ReadOnlyVector3 center = getCenter();
-			label.setTranslation(center.getX(), center.getY(), boundingHeight + height + 8);
+			label.setTranslation(center.getX(), center.getY(), boundingHeight + height + 10);
 			label.setVisible(true);
 		} else {
 			label.setVisible(false);
@@ -1199,7 +1209,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	private double scanChildrenHeight(final HousePart part) {
 		double maxHeight = height;
-		if (part instanceof Wall || part instanceof Roof) {
+		if (part instanceof Wall || part instanceof Roof || part instanceof Rack || part instanceof SolarPanel || part instanceof Mirror) {
 			for (int i = 0; i < part.points.size(); i++) {
 				final ReadOnlyVector3 p = part.getAbsPoint(i);
 				maxHeight = Math.max(maxHeight, p.getZ());
@@ -3078,8 +3088,10 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void clearLabels() {
 		labelId = false;
+		labelCustom = false;
 		labelPowerTowerOutput = false;
 		labelPowerTowerHeight = false;
+		labelPvEnergy = false;
 		labelSolarPotential = false;
 		labelBuildingEnergy = false;
 	}
@@ -3096,6 +3108,22 @@ public class Foundation extends HousePart implements Thermalizable {
 		return labelId;
 	}
 
+	public void setLabelCustom(final boolean labelCustom) {
+		this.labelCustom = labelCustom;
+	}
+
+	public boolean getLabelCustom() {
+		return labelCustom;
+	}
+
+	public void setLabelCustomText(final String labelCustomText) {
+		this.labelCustomText = labelCustomText;
+	}
+
+	public String getLabelCustomText() {
+		return labelCustomText;
+	}
+
 	public void setLabelPowerTowerOutput(final boolean labelPowerTowerOutput) {
 		this.labelPowerTowerOutput = labelPowerTowerOutput;
 	}
@@ -3110,6 +3138,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public boolean getLabelPowerTowerHeight() {
 		return labelPowerTowerHeight;
+	}
+
+	public void setLabelPvEnergy(final boolean labelPvEnergy) {
+		this.labelPvEnergy = labelPvEnergy;
+	}
+
+	public boolean getLabelPvEnergy() {
+		return labelPvEnergy;
 	}
 
 	public void setLabelSolarPotential(final boolean labelSolarPotential) {
