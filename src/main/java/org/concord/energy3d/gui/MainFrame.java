@@ -190,7 +190,7 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem lightBeamsMenuItem;
 	private JCheckBoxMenuItem shadowMenuItem;
 	private JCheckBoxMenuItem roofDashedLineMenuItem;
-	private JCheckBoxMenuItem floatingLabelsMenuItem;
+	private JCheckBoxMenuItem disableShadowInActionMenuItem;
 	private JMenuItem exitMenuItem;
 	private JMenu helpMenu;
 	private JMenuItem aboutMenuItem;
@@ -920,7 +920,7 @@ public class MainFrame extends JFrame {
 					final PrintController printController = PrintController.getInstance();
 					if (!printController.isPrintPreview()) {
 						getPreviewMenuItem().setSelected(true);
-						new Thread() {
+						new Thread("Energy3D Print") {
 							@Override
 							public void run() {
 								while (!printController.isFinished()) {
@@ -1095,7 +1095,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable future</i></h3><br>Version: " + MainApplication.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Intelligent Learning Technology Laboratory, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, and 1512868.</html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable world</i></h3><br>Version: " + MainApplication.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Laboratory of Engineering Computation, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, and 1512868.</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
 				@Override
@@ -1241,6 +1241,8 @@ public class MainFrame extends JFrame {
 			addModel(complexMenu, "Federal", "templates/example-federal.ng3");
 			addModel(complexMenu, "Victorian", "templates/example-victorian.ng3");
 			addModel(complexMenu, "Shingle", "templates/example-shingle.ng3");
+			addModel(complexMenu, "Sunroom", "templates/example-sunroom.ng3");
+			addModel(complexMenu, "Barn House", "templates/example-barn-house.ng3");
 			final JMenu pvSolarMenu = new JMenu("Photovoltaic Systems");
 			pvSolarMenu.setEnabled(false);
 			examplesMenu.add(pvSolarMenu);
@@ -1314,6 +1316,7 @@ public class MainFrame extends JFrame {
 			addModel(solarBasicsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
 			addModel(solarBasicsMenu, "Solar Panel Azimuthal Angles", "tutorials/solar-panel-azimuth-angle.ng3");
 			addModel(solarBasicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
+			addModel(solarBasicsMenu, "Solar Analysis of Cities", "tutorials/city-block.ng3");
 
 			final JMenu pvMenu = new JMenu("Photovoltaic Solar Power");
 			tutorialsMenu.add(pvMenu);
@@ -1324,6 +1327,8 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Solar Rack Array (Slow Full Model)", "tutorials/solar-rack-array-full.ng3");
 			addModel(pvMenu, "Rooftop Solar System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
+			addModel(pvMenu, "Solar Canopy Form Factors", "tutorials/solar-canopy-form-factors.ng3");
+			addModel(pvMenu, "Solar Facades", "tutorials/solar-facade.ng3");
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 			addModel(pvMenu, "Solar Trackers for Racks", "tutorials/solar-tracker-racks.ng3");
@@ -1371,7 +1376,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
 					Util.selectSilently(sunAnglesMenuItem, Scene.getInstance().areSunAnglesVisible());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
-					Util.selectSilently(floatingLabelsMenuItem, Scene.getInstance().areFloatingLabelsVisible());
+					Util.selectSilently(disableShadowInActionMenuItem, Scene.getInstance().getDisableShadowInAction());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					MainPanel.getInstance().defaultTool();
@@ -1404,13 +1409,13 @@ public class MainFrame extends JFrame {
 			viewMenu.add(solarHeatMapMenu);
 			viewMenu.add(getHeatFluxMenuItem());
 			viewMenu.add(getShadowMenuItem());
+			viewMenu.add(getDisableShadowInActionMenuItem());
 			viewMenu.add(getSunAnglesMenuItem());
 			viewMenu.add(getLightBeamsMenuItem());
 			viewMenu.add(getVisualizationSettingsMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getRoofDashedLineMenuItem());
-			viewMenu.add(getFloatingLabelsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
 			viewMenu.addSeparator();
@@ -1679,18 +1684,18 @@ public class MainFrame extends JFrame {
 		return lightBeamsMenuItem;
 	}
 
-	private JCheckBoxMenuItem getFloatingLabelsMenuItem() {
-		if (floatingLabelsMenuItem == null) {
-			floatingLabelsMenuItem = new JCheckBoxMenuItem("Floating Labels", false);
-			floatingLabelsMenuItem.addItemListener(new ItemListener() {
+	private JCheckBoxMenuItem getDisableShadowInActionMenuItem() {
+		if (disableShadowInActionMenuItem == null) {
+			disableShadowInActionMenuItem = new JCheckBoxMenuItem("Disable Shadows in Action", false);
+			disableShadowInActionMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					Scene.getInstance().setFloatingLabelsVisible(floatingLabelsMenuItem.isSelected());
+					Scene.getInstance().setDisableShadowInAction(disableShadowInActionMenuItem.isSelected());
 					Scene.getInstance().setEdited(true);
 				}
 			});
 		}
-		return floatingLabelsMenuItem;
+		return disableShadowInActionMenuItem;
 	}
 
 	private JCheckBoxMenuItem getRoofDashedLineMenuItem() {
@@ -2225,6 +2230,7 @@ public class MainFrame extends JFrame {
 					final boolean b = showSolarLandMenuItem.isSelected();
 					SceneManager.getInstance().getSolarLand().setVisible(b);
 					Scene.getInstance().setSolarMapForLand(b);
+					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 					// SceneManager.getInstance().getUndoManager().addEdit(c);

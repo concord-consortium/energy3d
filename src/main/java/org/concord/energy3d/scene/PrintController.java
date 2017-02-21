@@ -90,11 +90,13 @@ public class PrintController implements Updater {
 
 	@Override
 	public void update(final ReadOnlyTimer globalTimer) {
-		if (isPrintPreview)
+		if (isPrintPreview) {
 			rotate();
+		}
 
-		if (isFinished())
+		if (isFinished()) {
 			return;
+		}
 
 		final Spatial originalHouseRoot = Scene.getOriginalHouseRoot();
 		if (init) {
@@ -103,9 +105,11 @@ public class PrintController implements Updater {
 			if (!isPrintPreview) {
 				Scene.getRoot().detachChild(pagesRoot);
 				pagesRoot.detachAllChildren();
-				for (final HousePart part : printParts)
-					if (part instanceof Wall)
+				for (final HousePart part : printParts) {
+					if (part instanceof Wall) {
 						((Wall) part).setBackMeshesVisible(true);
+					}
+				}
 
 				for (final HousePart part : printParts) {
 					part.hideLabels();
@@ -132,8 +136,9 @@ public class PrintController implements Updater {
 				computePrintCenters(pages);
 
 				arrangePrintPages(pages);
-				if (!restartFlag)
+				if (!restartFlag) {
 					SceneManager.getInstance().updatePrintPreviewScene(true);
+				}
 				drawPrintParts(0);
 			}
 			originalHouseRoot.getSceneHints().setCullHint(CullHint.Always);
@@ -146,13 +151,15 @@ public class PrintController implements Updater {
 			drawPrintParts(isPrintPreview ? t : 1 - t);
 
 			finish = t > 1;
-			if (finish)
+			if (finish) {
 				timer.reset();
+			}
 		}
 
 		if (finish) {
-			if (isPrintPreview)
+			if (isPrintPreview) {
 				Scene.getRoot().attachChild(pagesRoot);
+			}
 
 			if (isPrintPreview && restartFlag) {
 				restartFlag = false;
@@ -162,8 +169,9 @@ public class PrintController implements Updater {
 			if (!isPrintPreview && doTheEndAnimation) {
 				originalHouseRoot.setRotation(new Matrix3().fromAngles(0, 0, 0));
 				angle = 0;
-				for (final HousePart housePart : printParts)
+				for (final HousePart housePart : printParts) {
 					Scene.getRoot().detachChild(housePart.getRoot());
+				}
 				printParts = null;
 				if (!isPrintPreview && restartFlag) {
 					/* to force redraw when animated back to normal scene */
@@ -190,15 +198,20 @@ public class PrintController implements Updater {
 				}
 			}
 
-			if (printParts != null)
-				for (final HousePart part : printParts)
-					if (part instanceof Foundation)
+			if (printParts != null) {
+				for (final HousePart part : printParts) {
+					if (part instanceof Foundation) {
 						part.getRoot().getSceneHints().setCullHint(isPrintPreview ? CullHint.Always : CullHint.Inherit);
+					}
+				}
+			}
 
 			if (isPrintPreview && printParts != null) {
-				for (final HousePart part : printParts)
-					if (part instanceof Wall)
+				for (final HousePart part : printParts) {
+					if (part instanceof Wall) {
 						((Wall) part).setBackMeshesVisible(false);
+					}
+				}
 			}
 
 			if (isPrintPreview || doTheEndAnimation) {
@@ -217,12 +230,15 @@ public class PrintController implements Updater {
 	}
 
 	private void drawPrintParts(double flattenTime) {
-		if (printParts == null)
+		if (printParts == null) {
 			return;
-		if (flattenTime < 0)
+		}
+		if (flattenTime < 0) {
 			flattenTime = 0;
-		if (flattenTime > 1)
+		}
+		if (flattenTime > 1) {
 			flattenTime = 1;
+		}
 
 		for (final HousePart part : printParts) {
 			if (part.isPrintable()) {
@@ -235,10 +251,9 @@ public class PrintController implements Updater {
 
 	public void print() {
 		Scene.getOriginalHouseRoot().getSceneHints().setCullHint(CullHint.Always);
-		final Component canvas = (java.awt.Component) SceneManager.getInstance().getCanvas();
+		final Component canvas = (Component) SceneManager.getInstance().getCanvas();
 		final int resolutionHeight = 2;
-		final Dimension newSize;
-		newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
+		final Dimension newSize = new Dimension(resolutionHeight * (int) pageFormat.getWidth(), resolutionHeight * (int) pageFormat.getHeight());
 
 		SceneManager.getInstance().resetCamera(ViewMode.PRINT);
 
@@ -255,10 +270,11 @@ public class PrintController implements Updater {
 		final double pageWidth = PrintController.getInstance().getPageWidth() / cols;
 		final double pageHeight = PrintController.getInstance().getPageHeight() / rows;
 
-		if (ratio > pageWidth / pageHeight)
+		if (ratio > pageWidth / pageHeight) {
 			SceneManager.getInstance().resizeCamera(pageHeight * ratio);
-		else
+		} else {
 			SceneManager.getInstance().resizeCamera(pageWidth);
+		}
 
 		SceneManager.getInstance().refresh();
 		final Printout printout = new Printout(pageFormat, newSize, pageWidth, pageHeight, printCenters);
@@ -276,17 +292,19 @@ public class PrintController implements Updater {
 	private void print(final int pageNum, final Printout printout, final double x, final double y, final double w, final double h) {
 		final PrinterJob job = PrinterJob.getPrinterJob();
 		job.setPageable(printout);
-		if (job.printDialog())
+		if (job.printDialog()) {
 			try {
 				job.print();
 			} catch (final PrinterException exc) {
 				exc.printStackTrace();
 			}
+		}
 	}
 
 	public void setPrintPreview(final boolean printPreview) {
-		if (printPreview == isPrintPreview)
+		if (printPreview == isPrintPreview) {
 			return;
+		}
 		isPrintPreview = printPreview;
 		init = true;
 		setFinished(false);
@@ -294,12 +312,15 @@ public class PrintController implements Updater {
 			shadingSelected = SceneManager.getInstance().isShadingEnabled();
 			shadowSelected = SceneManager.getInstance().isShadowEnabled();
 			heliodonSelected = SceneManager.getInstance().isHeliodonVisible();
-			if (shadingSelected)
+			if (shadingSelected) {
 				SceneManager.getInstance().setShading(false);
-			if (shadowSelected)
+			}
+			if (shadowSelected) {
 				SceneManager.getInstance().setShadow(false);
-			if (heliodonSelected)
+			}
+			if (heliodonSelected) {
 				Heliodon.getInstance().setVisible(false);
+			}
 		}
 	}
 
@@ -322,8 +343,9 @@ public class PrintController implements Updater {
 		this.finished = finished;
 		MainPanel.getInstance().getPreviewButton().setEnabled(finished);
 		MainFrame.getInstance().getPreviewMenuItem().setEnabled(finished);
-		if (isPrintPreview() || finished)
+		if (isPrintPreview() || finished) {
 			MainPanel.getInstance().setToolbarEnabledForPreview(!isPrintPreview());
+		}
 	}
 
 	public boolean isFinished() {
@@ -333,9 +355,9 @@ public class PrintController implements Updater {
 	private void computePageDimension() {
 		spaceBetweenParts = Scene.getInstance().areAnnotationsVisible() ? 3.0 : 0;
 		double fromPageToWorldCoord;
-		if (!isScaleToFit)
+		if (!isScaleToFit) {
 			fromPageToWorldCoord = exactFromPageToWorldCoord / (Scene.getInstance().getAnnotationScale() / 10.0);
-		else {
+		} else {
 			double maxWidth = 0;
 			double maxHeight = 0;
 			for (final HousePart printPart : printParts) {
@@ -346,20 +368,24 @@ public class PrintController implements Updater {
 								final OrientedBoundingBox boundingBox = (OrientedBoundingBox) ((Node) roofPartNode).getChild(0).getWorldBound().asType(Type.OBB);
 								final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
 								final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
-								if (width > maxWidth)
+								if (width > maxWidth) {
 									maxWidth = width;
-								if (height > maxHeight)
+								}
+								if (height > maxHeight) {
 									maxHeight = height;
+								}
 							}
 						}
 					} else {
 						final OrientedBoundingBox boundingBox = (OrientedBoundingBox) printPart.getMesh().getWorldBound().asType(Type.OBB);
 						final double width = Math.min(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
 						final double height = Math.max(boundingBox.getExtent().getX(), boundingBox.getExtent().getZ());
-						if (width > maxWidth)
+						if (width > maxWidth) {
 							maxWidth = width;
-						if (height > maxHeight)
+						}
+						if (height > maxHeight) {
 							maxHeight = height;
+						}
 
 					}
 				}
@@ -398,8 +424,9 @@ public class PrintController implements Updater {
 	private void arrangePrintPages(final ArrayList<ArrayList<Spatial>> pages) {
 		final double ratio = (double) Camera.getCurrentCamera().getWidth() / Camera.getCurrentCamera().getHeight();
 		cols = (int) Math.round(Math.sqrt(pages.size() + 4) * ratio);
-		if (cols % 2 == 0)
+		if (cols % 2 == 0) {
 			cols++;
+		}
 		rows = (int) Math.ceil((pages.size() + 4) / cols);
 
 		int pageNum = 0;
@@ -421,8 +448,9 @@ public class PrintController implements Updater {
 
 			printCenters.add(upperLeftCorner);
 
-			for (final Spatial printSpatial : page)
+			for (final Spatial printSpatial : page) {
 				((UserData) printSpatial.getUserData()).getPrintCenter().addLocal(upperLeftCorner.multiply(1, 0, 1, null));
+			}
 
 			final Box box = new Box("Page Boundary");
 			final double y = Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY();
@@ -474,8 +502,9 @@ public class PrintController implements Updater {
 
 	private void computePrintCenterOf(final Spatial printPart, final ArrayList<ArrayList<Spatial>> pages) {
 		boolean isFitted = false;
-		for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++)
+		for (int pageNum = 0; pageNum < pages.size() && !isFitted; pageNum++) {
 			isFitted = fitInPage(printPart, pages.get(pageNum));
+		}
 		if (!isFitted) {
 			printPart.updateWorldBound(true);
 			final OrientedBoundingBox bounds = (OrientedBoundingBox) printPart.getWorldBound().asType(Type.OBB);
@@ -498,20 +527,22 @@ public class PrintController implements Updater {
 				final boolean isHorizontal = angleQuarter % 2 == 0;
 				final Vector3 tryCenter = new Matrix3().fromAngles(0, angleQuarter * Math.PI / 2.0, 0).applyPost(new Vector3(isHorizontal ? xExtend : zExtend, 0, 0), null);
 				tryCenter.addLocal(neighborPartCenter);
-				if (!isHorizontal)
+				if (!isHorizontal) {
 					tryCenter.setX(pageLeft + printPartBound.getExtent().getX());
+				}
 
-				if (!isHorizontal)
+				if (!isHorizontal) {
 					tryCenter.setX(MathUtils.clamp(tryCenter.getX(), pageLeft + printPartBound.getExtent().getX(), pageRight - printPartBound.getExtent().getX()));
-				else
+				} else {
 					tryCenter.setZ(MathUtils.clamp(tryCenter.getZ(), -pageBottom + printPartBound.getExtent().getZ(), -pageTop - printPartBound.getExtent().getZ()));
+				}
 
 				tryCenter.setY(Scene.getOriginalHouseRoot().getWorldBound().getCenter().getY());
 
 				boolean collision = false;
-				if (tryCenter.getX() - printPartBound.getExtent().getX() < pageLeft - MathUtils.ZERO_TOLERANCE || tryCenter.getX() + printPartBound.getExtent().getX() > pageRight + MathUtils.ZERO_TOLERANCE || tryCenter.getZ() + printPartBound.getExtent().getZ() > -pageTop + MathUtils.ZERO_TOLERANCE || tryCenter.getZ() - printPartBound.getExtent().getZ() < -pageBottom - MathUtils.ZERO_TOLERANCE)
+				if (tryCenter.getX() - printPartBound.getExtent().getX() < pageLeft - MathUtils.ZERO_TOLERANCE || tryCenter.getX() + printPartBound.getExtent().getX() > pageRight + MathUtils.ZERO_TOLERANCE || tryCenter.getZ() + printPartBound.getExtent().getZ() > -pageTop + MathUtils.ZERO_TOLERANCE || tryCenter.getZ() - printPartBound.getExtent().getZ() < -pageBottom - MathUtils.ZERO_TOLERANCE) {
 					collision = true;
-				else
+				} else {
 					for (final Spatial otherPart : page) {
 						printPartBound.setCenter(tryCenter);
 						final OrientedBoundingBox otherPartBound = (OrientedBoundingBox) otherPart.getWorldBound().asType(Type.OBB);
@@ -522,6 +553,7 @@ public class PrintController implements Updater {
 							break;
 						}
 					}
+				}
 				if (!collision) {
 					((UserData) printPart.getUserData()).setPrintCenter(tryCenter);
 					page.add(printPart);
@@ -554,8 +586,9 @@ public class PrintController implements Updater {
 				final PageFormat pf = PrinterJob.getPrinterJob().pageDialog(pageFormat);
 				if (pf != pageFormat) {
 					pageFormat = pf;
-					if (isPrintPreview())
+					if (isPrintPreview()) {
 						restartAnimation();
+					}
 				}
 			}
 		});
@@ -563,8 +596,9 @@ public class PrintController implements Updater {
 
 	public void setScaleToFit(final boolean scaleToFit) {
 		isScaleToFit = scaleToFit;
-		if (isPrintPreview())
+		if (isPrintPreview()) {
 			restartAnimation();
+		}
 	}
 
 	public void restartAnimation() {

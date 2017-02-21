@@ -130,13 +130,13 @@ public class Scene implements Serializable {
 	private boolean hideAxes;
 	private boolean hideLightBeams;
 	private boolean showSunAngles;
-	private boolean showFloatingLabels;
 	private boolean cleanup;
 	private boolean alwaysComputeHeatFluxVectors;
+	private boolean disableShadowInAction;
 	private boolean fullEnergyInSolarMap = true;
 	private boolean onlyReflectedEnergyInMirrorSolarMap;
 	private boolean onlySolarComponentsInSolarMap;
-	private boolean noSolarMapForLand;
+	private boolean solarMapForLand;
 	private boolean disallowFoundationOverlap;
 	private boolean dashedlineOnRoofs = true;
 	private boolean onlySolarAnalysis;
@@ -348,7 +348,7 @@ public class Scene implements Serializable {
 		root.updateWorldBound(true);
 		SceneManager.getInstance().updateHeliodonAndAnnotationSize();
 		SceneManager.getInstance().setAxesVisible(!hideAxes);
-		SceneManager.getInstance().getSolarLand().setVisible(!noSolarMapForLand);
+		SceneManager.getInstance().getSolarLand().setVisible(solarMapForLand);
 
 		setTheme(theme);
 		SceneManager.getInstance().getLand().setDefaultColor(landColor != null ? landColor : new ColorRGBA(0, 1, 0, 0.5f));
@@ -372,7 +372,7 @@ public class Scene implements Serializable {
 			}
 			energyPanel.setLatitude(latitude); // already silent
 			Util.selectSilently(energyPanel.getCityComboBox(), city);
-			Scene.getInstance().setTreeLeaves();
+			Scene.getInstance().updateTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().changeSkyTexture();
@@ -815,54 +815,54 @@ public class Scene implements Serializable {
 	private Scene() {
 	}
 
-	public void add(final HousePart housePart, final boolean redraw) {
-		final HousePart container = housePart.getContainer();
+	public void add(final HousePart part, final boolean redraw) {
+		final HousePart container = part.getContainer();
 		if (container != null) {
-			container.getChildren().add(housePart);
+			container.getChildren().add(part);
 		}
-		add(housePart);
+		add(part);
 		if (redraw) {
 			redrawAll();
 		}
 	}
 
-	private void add(final HousePart housePart) {
-		System.out.println("Adding: " + housePart);
-		if (housePart instanceof Tree || housePart instanceof Human) {
-			notReceivingShadowRoot.attachChild(housePart.getRoot());
+	private void add(final HousePart part) {
+		System.out.println("Adding: " + part);
+		if (part instanceof Tree || part instanceof Human) {
+			notReceivingShadowRoot.attachChild(part.getRoot());
 		} else {
-			originalHouseRoot.attachChild(housePart.getRoot());
+			originalHouseRoot.attachChild(part.getRoot());
 		}
-		parts.add(housePart);
-		for (final HousePart child : housePart.getChildren()) {
+		parts.add(part);
+		for (final HousePart child : part.getChildren()) {
 			add(child);
 		}
 	}
 
-	public void remove(final HousePart housePart, final boolean redraw) {
-		if (housePart == null) {
+	public void remove(final HousePart part, final boolean redraw) {
+		if (part == null) {
 			return;
 		}
-		housePart.setGridsVisible(false);
-		final HousePart container = housePart.getContainer();
+		part.setGridsVisible(false);
+		final HousePart container = part.getContainer();
 		if (container != null) {
-			container.getChildren().remove(housePart);
+			container.getChildren().remove(part);
 		}
-		removeChildren(housePart);
+		removeChildren(part);
 		if (redraw) {
 			redrawAll();
 		}
 	}
 
-	private void removeChildren(final HousePart housePart) {
-		System.out.println("Removing: " + housePart);
-		parts.remove(housePart); // this must happen before call to wall.delete()
-		for (final HousePart child : housePart.getChildren()) {
+	private void removeChildren(final HousePart part) {
+		System.out.println("Removing: " + part);
+		parts.remove(part); // this must happen before call to wall.delete()
+		for (final HousePart child : part.getChildren()) {
 			removeChildren(child);
 		}
 		// originalHouseRoot.detachChild(housePart.getRoot());
-		housePart.getRoot().removeFromParent();
-		housePart.delete();
+		part.getRoot().removeFromParent();
+		part.delete();
 	}
 
 	private static void setIdOfChildren(final HousePart p) {
@@ -2603,12 +2603,12 @@ public class Scene implements Serializable {
 		this.onlyReflectedEnergyInMirrorSolarMap = onlyReflectedEnergyInMirrorSolarMap;
 	}
 
-	public void setSolarMapForLand(final boolean showSolarMapForLand) {
-		noSolarMapForLand = !showSolarMapForLand;
+	public void setSolarMapForLand(final boolean solarMapForLand) {
+		this.solarMapForLand = solarMapForLand;
 	}
 
 	public boolean getSolarMapForLand() {
-		return !noSolarMapForLand;
+		return solarMapForLand;
 	}
 
 	public void setDisallowFoundationOverlap(final boolean disallowFoundationOverlap) {
@@ -2677,13 +2677,33 @@ public class Scene implements Serializable {
 	}
 
 	// XIE: This needs to be called for trees to change texture when the month changes
-	public void setTreeLeaves() {
+	public void updateTreeLeaves() {
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
 				for (final HousePart p : parts) {
 					if (p instanceof Tree) {
 						p.updateTextureAndColor();
+					}
+				}
+				return null;
+			}
+		});
+	}
+
+	public void updateLabels() {
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				for (final HousePart p : parts) { // update the parts that support floating labels
+					if (p instanceof SolarPanel) {
+						((SolarPanel) p).updateLabel();
+					} else if (p instanceof Rack) {
+						((Rack) p).updateLabel();
+					} else if (p instanceof Mirror) {
+						((Mirror) p).updateLabel();
+					} else if (p instanceof Foundation) {
+						((Foundation) p).updateLabel();
 					}
 				}
 				return null;
@@ -3131,17 +3151,12 @@ public class Scene implements Serializable {
 		return instructionSheetTextType[i];
 	}
 
-	public void setFloatingLabelsVisible(final boolean b) {
-		showFloatingLabels = b;
-		for (final HousePart part : parts) {
-			if (part instanceof Foundation) {
-				((Foundation) part).showFloatingLabel(b);
-			}
-		}
+	public void setDisableShadowInAction(final boolean b) {
+		disableShadowInAction = b;
 	}
 
-	public boolean areFloatingLabelsVisible() {
-		return showFloatingLabels;
+	public boolean getDisableShadowInAction() {
+		return disableShadowInAction;
 	}
 
 }

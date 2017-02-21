@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -14,6 +15,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
+import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.BoundingBox;
@@ -33,6 +35,9 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
+import com.ardor3d.ui.text.BMText;
+import com.ardor3d.ui.text.BMText.Align;
+import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart implements Trackable {
@@ -56,6 +61,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	private transient Line normalVector;
 	private transient Node angles;
 	private transient AngleAnnotation sunAngle;
+	private transient BMText label;
 	private static double normalVectorLength = 5;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
@@ -75,6 +81,13 @@ public class SolarPanel extends HousePart implements Trackable {
 	private int shadeTolerance = HIGH_SHADE_TOLERANCE;
 	private int numberOfCellsInX = 6;
 	private int numberOfCellsInY = 10;
+	private String labelCustomText;
+	private boolean labelCustom;
+	private boolean labelId;
+	private boolean labelCellEfficiency;
+	private boolean labelTiltAngle;
+	private boolean labelTracker;
+	private boolean labelEnergyOutput;
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
 	private MeshLocator meshLocator; // if the mesh that this solar panel rests on is a vertical surface of unknown type (e.g., an imported mesh), store its info for finding it later
@@ -170,6 +183,12 @@ public class SolarPanel extends HousePart implements Trackable {
 		sunAngle.setFontSize(1);
 		sunAngle.setCustomRadius(normalVectorLength * 0.8);
 		angles.attachChild(sunAngle);
+
+		label = new BMText("Label", "# " + id, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(label);
+		label.setFontScale(0.5);
+		label.setVisible(false);
+		root.attachChild(label);
 
 		updateTextureAndColor();
 
@@ -356,6 +375,61 @@ public class SolarPanel extends HousePart implements Trackable {
 			drawSunBeam();
 		}
 
+		drawFloatingLabel(onFlatSurface);
+
+	}
+
+	public void updateLabel() {
+		drawFloatingLabel(onFlatSurface());
+	}
+
+	private void drawFloatingLabel(final boolean onFlatSurface) {
+		String text = "";
+		if (labelCustom && labelCustomText != null) {
+			text += labelCustomText;
+		}
+		if (labelId) {
+			text += (text.equals("") ? "" : "\n") + "#" + id;
+		}
+		if (labelCellEfficiency) {
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.TWO_DECIMALS.format(100 * efficiency) + "%";
+		}
+		if (labelTiltAngle) {
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(onFlatSurface ? tiltAngle : Math.toDegrees(Math.asin(normal.getY()))) + " \u00B0";
+		}
+		if (labelTracker) {
+			final String name = getTrackerName();
+			if (name != null) {
+				text += (text.equals("") ? "" : "\n") + name;
+			}
+		}
+		if (labelEnergyOutput) {
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency(25)) + " kWh");
+		}
+		if (!text.equals("")) {
+			label.setText(text);
+			final double shift = 0.5 * (rotated ? panelHeight : panelWidth) / Scene.getInstance().getAnnotationScale();
+			label.setTranslation((onFlatSurface ? getAbsCenter().addLocal(0, 0, baseHeight) : getAbsCenter()).addLocal(normal.multiply(shift, null)));
+			label.setVisible(true);
+		} else {
+			label.setVisible(false);
+		}
+	}
+
+	public String getTrackerName() {
+		String name = null;
+		switch (trackerType) {
+		case HORIZONTAL_SINGLE_AXIS_TRACKER:
+			name = "HSAT";
+			break;
+		case VERTICAL_SINGLE_AXIS_TRACKER:
+			name = "VSAT";
+			break;
+		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			name = "AADAT";
+			break;
+		}
+		return name;
 	}
 
 	// ensure that a solar panel in special cases (on a flat roof or at a tilt angle) will have correct orientation
@@ -891,6 +965,75 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	public MeshLocator getMeshLocator() {
 		return meshLocator;
+	}
+
+	public void clearLabels() {
+		labelId = false;
+		labelCustom = false;
+		labelCellEfficiency = false;
+		labelTiltAngle = false;
+		labelTracker = false;
+		labelEnergyOutput = false;
+	}
+
+	public boolean isLabelVisible() {
+		return label.isVisible();
+	}
+
+	public void setLabelId(final boolean labelId) {
+		this.labelId = labelId;
+	}
+
+	public boolean getLabelId() {
+		return labelId;
+	}
+
+	public void setLabelCustom(final boolean labelCustom) {
+		this.labelCustom = labelCustom;
+	}
+
+	public boolean getLabelCustom() {
+		return labelCustom;
+	}
+
+	public void setLabelCustomText(final String labelCustomText) {
+		this.labelCustomText = labelCustomText;
+	}
+
+	public String getLabelCustomText() {
+		return labelCustomText;
+	}
+
+	public void setLabelTracker(final boolean labelTracker) {
+		this.labelTracker = labelTracker;
+	}
+
+	public boolean getLabelTracker() {
+		return labelTracker;
+	}
+
+	public void setLabelCellEfficiency(final boolean labelCellEfficiency) {
+		this.labelCellEfficiency = labelCellEfficiency;
+	}
+
+	public boolean getLabelCellEfficiency() {
+		return labelCellEfficiency;
+	}
+
+	public void setLabelTiltAngle(final boolean labelTiltAngle) {
+		this.labelTiltAngle = labelTiltAngle;
+	}
+
+	public boolean getLabelTiltAngle() {
+		return labelTiltAngle;
+	}
+
+	public void setLabelEnergyOutput(final boolean labelEnergyOutput) {
+		this.labelEnergyOutput = labelEnergyOutput;
+	}
+
+	public boolean getLabelEnergyOutput() {
+		return labelEnergyOutput;
 	}
 
 }

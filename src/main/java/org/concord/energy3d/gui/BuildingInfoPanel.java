@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -26,10 +25,10 @@ public class BuildingInfoPanel extends JPanel {
 
 	private final DecimalFormat twoDecimals = new DecimalFormat();
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private JPanel heightPanel, areaPanel, windowToFloorPanel;
-	private ColorBar heightBar, areaBar, windowToFloorBar;
-	private JPanel solarPanelCountPanel, windowCountPanel, wallCountPanel;
-	private ColorBar solarPanelCountBar, windowCountBar, wallCountBar;
+	private final JPanel heightPanel, areaPanel, windowToFloorPanel;
+	private final ColorBar heightBar, areaBar, windowToFloorBar;
+	private final JPanel solarPanelCountPanel, windowCountPanel, wallCountPanel;
+	private final ColorBar solarPanelCountBar, windowCountBar, wallCountBar;
 
 	public BuildingInfoPanel() {
 
@@ -38,7 +37,7 @@ public class BuildingInfoPanel extends JPanel {
 		twoDecimals.setMaximumFractionDigits(2);
 		noDecimals.setMaximumFractionDigits(0);
 
-		JPanel container = new JPanel();
+		final JPanel container = new JPanel();
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		add(container, BorderLayout.NORTH);
 
@@ -134,8 +133,8 @@ public class BuildingInfoPanel extends JPanel {
 
 	}
 
-	void update(Foundation foundation) {
-		Building b = new Building(foundation);
+	void update(final Foundation foundation) {
+		final Building b = new Building(foundation);
 		if (b.isWallComplete()) {
 			b.calculate();
 			switch (Scene.getInstance().getUnit()) {
@@ -152,7 +151,7 @@ public class BuildingInfoPanel extends JPanel {
 			windowToFloorBar.setValue(0);
 		}
 		// relax the requirement of a building
-		solarPanelCountBar.setValue(foundation.countParts(SolarPanel.class));
+		solarPanelCountBar.setValue(foundation.getNumberOfSolarPanels());
 		windowCountBar.setValue(foundation.countParts(Window.class));
 		wallCountBar.setValue(foundation.countParts(Wall.class));
 		final double height = Scene.getInstance().getAnnotationScale() * foundation.getBoundingHeight();
@@ -172,15 +171,17 @@ public class BuildingInfoPanel extends JPanel {
 		String t = "Area (";
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
-			if (specs.isAreaEnabled())
+			if (specs.isAreaEnabled()) {
 				t += twoDecimals.format(specs.getMinimumArea()) + " - " + twoDecimals.format(specs.getMaximumArea()) + " ";
+			}
 			t += "m\u00B2)";
 			areaBar.setMinimum(specs.getMinimumArea());
 			areaBar.setMaximum(specs.getMaximumArea());
 			break;
 		case USCustomaryUnits:
-			if (specs.isAreaEnabled())
+			if (specs.isAreaEnabled()) {
 				t += noDecimals.format(specs.getMinimumArea() * r) + " - " + noDecimals.format(specs.getMaximumArea() * r) + " ";
+			}
 			t += "ft\u00B2)";
 			areaBar.setMinimum(specs.getMinimumArea() * r);
 			areaBar.setMaximum(specs.getMaximumArea() * r);
@@ -197,15 +198,17 @@ public class BuildingInfoPanel extends JPanel {
 		String t = "Height (";
 		switch (Scene.getInstance().getUnit()) {
 		case InternationalSystemOfUnits:
-			if (specs.isHeightEnabled())
+			if (specs.isHeightEnabled()) {
 				t += twoDecimals.format(specs.getMinimumHeight()) + " - " + twoDecimals.format(specs.getMaximumHeight()) + " ";
+			}
 			t += "m)";
 			heightBar.setMinimum(specs.getMinimumHeight());
 			heightBar.setMaximum(specs.getMaximumHeight());
 			break;
 		case USCustomaryUnits:
-			if (specs.isHeightEnabled())
+			if (specs.isHeightEnabled()) {
 				t += noDecimals.format(specs.getMinimumHeight() * r) + " - " + noDecimals.format(specs.getMaximumHeight() * r) + " ";
+			}
 			t += "ft)";
 			heightBar.setMinimum(specs.getMinimumHeight() * r);
 			heightBar.setMaximum(specs.getMaximumHeight() * r);
@@ -219,8 +222,9 @@ public class BuildingInfoPanel extends JPanel {
 	public void updateWindowToFloorRatio() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Window/floor area ratio";
-		if (specs.isWindowToFloorRatioEnabled())
+		if (specs.isWindowToFloorRatioEnabled()) {
 			t += " (" + twoDecimals.format(specs.getMinimumWindowToFloorRatio()) + " - " + twoDecimals.format(specs.getMaximumWindowToFloorRatio()) + ")";
+		}
 		windowToFloorBar.setMinimum(specs.getMinimumWindowToFloorRatio());
 		windowToFloorBar.setMaximum(specs.getMaximumWindowToFloorRatio());
 		windowToFloorPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
@@ -231,8 +235,9 @@ public class BuildingInfoPanel extends JPanel {
 	public void updateSolarPanel() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of solar panels";
-		if (specs.isNumberOfSolarPanelsEnabled())
+		if (specs.isNumberOfSolarPanelsEnabled()) {
 			t += " (" + specs.getMinimumNumberOfSolarPanels() + " - " + specs.getMaximumNumberOfSolarPanels() + ")";
+		}
 		solarPanelCountBar.setMinimum(specs.getMinimumNumberOfSolarPanels());
 		solarPanelCountBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
 		solarPanelCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
@@ -260,8 +265,9 @@ public class BuildingInfoPanel extends JPanel {
 	public void updateWall() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of walls";
-		if (specs.isNumberOfWallsEnabled())
+		if (specs.isNumberOfWallsEnabled()) {
 			t += " (" + specs.getMinimumNumberOfWalls() + " - " + specs.getMaximumNumberOfWalls() + ")";
+		}
 		wallCountBar.setMinimum(specs.getMinimumNumberOfWalls());
 		wallCountBar.setMaximum(specs.getMaximumNumberOfWalls());
 		wallCountPanel.setBorder(EnergyPanel.createTitledBorder(t, true));

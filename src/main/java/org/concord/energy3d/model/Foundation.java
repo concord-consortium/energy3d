@@ -86,7 +86,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
 	private transient Mesh sideMesh[];
-	private transient BMText floatingLabel;
+	private transient BMText label;
 	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
 	private transient Line azimuthArrow;
 	private transient double newBoundingHeight;
@@ -116,6 +116,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
+	private String labelCustomText;
+	private boolean labelCustom;
+	private boolean labelId;
+	private boolean labelPowerTowerOutput;
+	private boolean labelPowerTowerHeight;
+	private boolean labelPvEnergy;
+	private boolean labelSolarPotential;
+	private boolean labelBuildingEnergy;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Mesh selectedMesh;
@@ -211,11 +219,11 @@ public class Foundation extends HousePart implements Thermalizable {
 
 		setLabelOffset(-0.11);
 
-		floatingLabel = new BMText("Floating Label", "0", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
-		Util.initHousePartLabel(floatingLabel);
-		floatingLabel.setFontScale(0.5);
-		floatingLabel.setVisible(false);
-		root.attachChild(floatingLabel);
+		label = new BMText("Floating Label", "Undefined", FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
+		Util.initHousePartLabel(label);
+		label.setFontScale(0.5);
+		label.setVisible(false);
+		root.attachChild(label);
 
 		azimuthArrow = new Line("Azimuth Arrow");
 		azimuthArrow.setLineWidth(2);
@@ -330,7 +338,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				scanChildrenHeight();
 			}
 			setEditPointsVisible(resizeHouseMode);
-			updateFloatingLabelPosition();
+			updateLabel();
 			boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
 		}
 	}
@@ -594,29 +602,6 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	// private Vector3 ensureNotTooSmall(final Vector3 p, final int index) {
-	// final double MIN_LENGHT = getGridSize();
-	// final double x2 = getAbsPoint(index == 0 || index == 1 ? 2 : 0).getX();
-	// if (getAbsPoint(index).getX() > x2) {
-	// if (p.getX() - x2 < MIN_LENGHT)
-	// p.setX(x2 + MIN_LENGHT);
-	// } else {
-	// if (x2 - p.getX() < MIN_LENGHT)
-	// p.setX(x2 - MIN_LENGHT);
-	// }
-	//
-	// final double y2 = getAbsPoint(index == 0 || index == 2 ? 1 : 0).getY();
-	// if (getAbsPoint(index).getY() > y2) {
-	// if (p.getY() - y2 < MIN_LENGHT)
-	// p.setY(y2 + MIN_LENGHT);
-	// } else {
-	// if (y2 - p.getY() < MIN_LENGHT)
-	// p.setY(y2 - MIN_LENGHT);
-	// }
-	//
-	// return p;
-	// }
-
 	private void syncUpperPoints() {
 		for (int i = 0; i < 4; i++) {
 			points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
@@ -836,9 +821,60 @@ public class Foundation extends HousePart implements Thermalizable {
 			updateHandles();
 			drawSolarReceiver();
 			drawImportedNodes();
-			updateFloatingLabelPosition();
 			foundationPolygon.draw();
+			updateLabel();
 		}
+	}
+
+	public void updateLabel() {
+		String text = "";
+		if (labelCustom && labelCustomText != null) {
+			text += labelCustomText;
+		}
+		if (labelId) {
+			text += (text.equals("") ? "" : "\n") + "#" + id;
+		}
+		if (labelPowerTowerHeight) {
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight()) + " m";
+		}
+		if (labelPowerTowerOutput) {
+			final double output = getSolarReceiverOutputToday();
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(output) ? "Output" : EnergyPanel.NO_DECIMAL.format(output) + " kWh");
+		}
+		if (labelBuildingEnergy) {
+			final String s = totalEnergyToday > 100 ? EnergyPanel.NO_DECIMAL.format(totalEnergyToday) : EnergyPanel.ONE_DECIMAL.format(totalEnergyToday);
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(totalEnergyToday) ? "Building Energy" : s + " kWh");
+		}
+		if (labelPvEnergy) {
+			final String s = photovoltaicToday > 100 ? EnergyPanel.NO_DECIMAL.format(photovoltaicToday) : EnergyPanel.ONE_DECIMAL.format(photovoltaicToday);
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(photovoltaicToday) ? "PV Output" : s + " kWh");
+		}
+		if (labelSolarPotential) {
+			final String s = solarPotentialToday > 100 ? EnergyPanel.NO_DECIMAL.format(solarPotentialToday) : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday);
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Solar Potential" : s + " kWh");
+		}
+		if (!text.equals("")) {
+			label.setText(text);
+			final ReadOnlyVector3 center = getCenter();
+			label.setTranslation(center.getX(), center.getY(), boundingHeight + height + 10);
+			label.setVisible(true);
+		} else {
+			label.setVisible(false);
+		}
+
+	}
+
+	private double getSolarReceiverOutputToday() {
+		double output = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror) {
+				final Mirror m = (Mirror) p;
+				if (m.getHeliostatTarget() == this) {
+					output += m.getOutputToday();
+				}
+			}
+		}
+		return output;
 	}
 
 	public void drawSolarReceiver() {
@@ -904,6 +940,10 @@ public class Foundation extends HousePart implements Thermalizable {
 			}
 			solarReceiver.setTranslation(o);
 		}
+	}
+
+	public boolean isSolarReceiverVisible() {
+		return solarReceiver != null && solarReceiver.isVisible();
 	}
 
 	public static void updateBloom() {
@@ -1169,7 +1209,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	private double scanChildrenHeight(final HousePart part) {
 		double maxHeight = height;
-		if (part instanceof Wall || part instanceof Roof) {
+		if (part instanceof Wall || part instanceof Roof || part instanceof Rack || part instanceof SolarPanel || part instanceof Mirror) {
 			for (int i = 0; i < part.points.size(); i++) {
 				final ReadOnlyVector3 p = part.getAbsPoint(i);
 				maxHeight = Math.max(maxHeight, p.getZ());
@@ -3046,22 +3086,82 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
-	public void showFloatingLabel(final boolean b) {
-		floatingLabel.setVisible(b && SceneManager.getInstance().getSolarHeatMap());
+	public void clearLabels() {
+		labelId = false;
+		labelCustom = false;
+		labelPowerTowerOutput = false;
+		labelPowerTowerHeight = false;
+		labelPvEnergy = false;
+		labelSolarPotential = false;
+		labelBuildingEnergy = false;
 	}
 
-	public void setFloatingLabelText(final String text) {
-		if (text == null) {
-			floatingLabel.setVisible(false);
-		} else {
-			floatingLabel.setVisible(Scene.getInstance().areFloatingLabelsVisible());
-			floatingLabel.setText(text);
-		}
+	public boolean isLabelVisible() {
+		return label.isVisible();
 	}
 
-	private void updateFloatingLabelPosition() {
-		final ReadOnlyVector3 center = getCenter();
-		floatingLabel.setTranslation(center.getX(), center.getY(), boundingHeight + height + 6);
+	public void setLabelId(final boolean labelId) {
+		this.labelId = labelId;
+	}
+
+	public boolean getLabelId() {
+		return labelId;
+	}
+
+	public void setLabelCustom(final boolean labelCustom) {
+		this.labelCustom = labelCustom;
+	}
+
+	public boolean getLabelCustom() {
+		return labelCustom;
+	}
+
+	public void setLabelCustomText(final String labelCustomText) {
+		this.labelCustomText = labelCustomText;
+	}
+
+	public String getLabelCustomText() {
+		return labelCustomText;
+	}
+
+	public void setLabelPowerTowerOutput(final boolean labelPowerTowerOutput) {
+		this.labelPowerTowerOutput = labelPowerTowerOutput;
+	}
+
+	public boolean getLabelPowerTowerOutput() {
+		return labelPowerTowerOutput;
+	}
+
+	public void setLabelPowerTowerHeight(final boolean labelPowerTowerHeight) {
+		this.labelPowerTowerHeight = labelPowerTowerHeight;
+	}
+
+	public boolean getLabelPowerTowerHeight() {
+		return labelPowerTowerHeight;
+	}
+
+	public void setLabelPvEnergy(final boolean labelPvEnergy) {
+		this.labelPvEnergy = labelPvEnergy;
+	}
+
+	public boolean getLabelPvEnergy() {
+		return labelPvEnergy;
+	}
+
+	public void setLabelSolarPotential(final boolean labelSolarPotential) {
+		this.labelSolarPotential = labelSolarPotential;
+	}
+
+	public boolean getLabelSolarPotential() {
+		return labelSolarPotential;
+	}
+
+	public void setLabelBuildingEnergy(final boolean labelBuildingEnergy) {
+		this.labelBuildingEnergy = labelBuildingEnergy;
+	}
+
+	public boolean getLabelBuildingEnergy() {
+		return labelBuildingEnergy;
 	}
 
 }

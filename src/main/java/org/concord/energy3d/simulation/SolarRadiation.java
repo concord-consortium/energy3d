@@ -1304,8 +1304,6 @@ public class SolarRadiation {
 				}
 
 				foundation.setSolarPotentialToday(solarPotentialTotal);
-				final String totalSolarString = solarPotentialTotal > 100 ? EnergyPanel.getInstance().noDecimal.format(solarPotentialTotal) : EnergyPanel.getInstance().oneDecimal.format(solarPotentialTotal);
-				foundation.setFloatingLabelText("(#" + foundation.getId() + ")\nSolar=" + totalSolarString + " kWh");
 				foundation.setPassiveSolarToday(passiveSolarTotal);
 				foundation.setPhotovoltaicToday(photovoltaicTotal);
 				foundation.setHeatingToday(heatingTotal);

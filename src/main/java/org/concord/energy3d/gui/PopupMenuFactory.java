@@ -3128,6 +3128,160 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Foundation) {
+							final Foundation f = (Foundation) selectedPart;
+							final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+							f.clearLabels();
+							f.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().refresh();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
+			miLabelCustom.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelCustom(miLabelCustom.isSelected());
+						if (f.getLabelCustom()) {
+							f.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", f.getLabelCustomText()));
+						}
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCustom);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelId(miLabelId.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelPvEnergy = new JCheckBoxMenuItem("Photovoltaic Output");
+			miLabelPvEnergy.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelPvEnergy(miLabelPvEnergy.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelPvEnergy);
+
+			final JCheckBoxMenuItem miLabelSolarPotential = new JCheckBoxMenuItem("Solar Potential");
+			miLabelSolarPotential.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelSolarPotential(miLabelSolarPotential.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelSolarPotential);
+
+			final JCheckBoxMenuItem miLabelBuildingEnergy = new JCheckBoxMenuItem("Building Energy");
+			miLabelBuildingEnergy.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelBuildingEnergy(miLabelBuildingEnergy.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelBuildingEnergy);
+
+			final JMenu powerTowerLabelMenu = new JMenu("Power Tower");
+			labelMenu.add(powerTowerLabelMenu);
+
+			final JCheckBoxMenuItem miLabelPowerTowerHeight = new JCheckBoxMenuItem("Tower Height");
+			miLabelPowerTowerHeight.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelPowerTowerHeight(miLabelPowerTowerHeight.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			powerTowerLabelMenu.add(miLabelPowerTowerHeight);
+
+			final JCheckBoxMenuItem miLabelPowerTowerOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelPowerTowerOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelPowerTowerOutput(miLabelPowerTowerOutput.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			powerTowerLabelMenu.add(miLabelPowerTowerOutput);
+
 			popupMenuForFoundation = createPopupMenu(false, true, new Runnable() {
 				@Override
 				public void run() {
@@ -3148,6 +3302,15 @@ public class PopupMenuFactory {
 						Util.selectSilently(miLock, f.isFrozen());
 						Util.selectSilently(miDisableEdits, f.getLockEdit());
 						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
+						Util.selectSilently(miLabelNone, !f.isLabelVisible());
+						Util.selectSilently(miLabelCustom, f.getLabelCustom());
+						Util.selectSilently(miLabelId, f.getLabelId());
+						Util.selectSilently(miLabelPowerTowerOutput, f.getLabelPowerTowerOutput());
+						Util.selectSilently(miLabelPowerTowerHeight, f.getLabelPowerTowerHeight());
+						Util.selectSilently(miLabelSolarPotential, f.getLabelSolarPotential());
+						Util.selectSilently(miLabelPvEnergy, f.getLabelPvEnergy());
+						Util.selectSilently(miLabelBuildingEnergy, f.getLabelBuildingEnergy());
+						powerTowerLabelMenu.setEnabled(f.isSolarReceiverVisible());
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					final Node copyNode = Scene.getInstance().getCopyNode();
@@ -3170,6 +3333,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.add(editOptionsMenu);
+			popupMenuForFoundation.add(labelMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
@@ -3857,6 +4021,139 @@ public class PopupMenuFactory {
 			orientationMenu.add(rbmiPortrait);
 			orientationGroup.add(rbmiPortrait);
 
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof SolarPanel) {
+							final SolarPanel s = (SolarPanel) selectedPart;
+							final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+							s.clearLabels();
+							s.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().refresh();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
+			miLabelCustom.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelCustom(miLabelCustom.isSelected());
+						if (s.getLabelCustom()) {
+							s.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", s.getLabelCustomText()));
+						}
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCustom);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelId(miLabelId.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelCellEfficiency = new JCheckBoxMenuItem("Cell Efficiency");
+			miLabelCellEfficiency.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCellEfficiency);
+
+			final JCheckBoxMenuItem miLabelTiltAngle = new JCheckBoxMenuItem("Tilt Angle");
+			miLabelTiltAngle.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelTiltAngle);
+
+			final JCheckBoxMenuItem miLabelTracker = new JCheckBoxMenuItem("Tracker");
+			miLabelTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelTracker(miLabelTracker.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelTracker);
+
+			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelEnergyOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelEnergyOutput);
+
 			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
 			miTiltAngle.addActionListener(new ActionListener() {
 				@Override
@@ -4256,6 +4553,14 @@ public class PopupMenuFactory {
 					Util.selectSilently(rbmiPortrait, !sp.isRotated());
 					Util.selectSilently(rbmiBlue, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLUE);
 					Util.selectSilently(rbmiBlack, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLACK);
+					Util.selectSilently(miLabelNone, !sp.isLabelVisible());
+					Util.selectSilently(miLabelCustom, sp.getLabelCustom());
+					Util.selectSilently(miLabelId, sp.getLabelId());
+					Util.selectSilently(miLabelCellEfficiency, sp.getLabelCellEfficiency());
+					Util.selectSilently(miLabelTiltAngle, sp.getLabelTiltAngle());
+					Util.selectSilently(miLabelTracker, sp.getLabelTracker());
+					Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
+
 					switch (sp.getTracker()) {
 					case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 						Util.selectSilently(miAltazimuthDualAxisTracker, true);
@@ -4527,6 +4832,7 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miBaseHeight);
 			popupMenuForSolarPanel.add(colorOptionMenu);
 			popupMenuForSolarPanel.add(orientationMenu);
+			popupMenuForSolarPanel.add(labelMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
 			popupMenuForSolarPanel.addSeparator();
@@ -5777,6 +6083,139 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Rack) {
+							final Rack r = (Rack) selectedPart;
+							final SetRackLabelCommand c = new SetRackLabelCommand(r);
+							r.clearLabels();
+							r.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().refresh();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
+			miLabelCustom.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack r = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(r);
+						r.setLabelCustom(miLabelCustom.isSelected());
+						if (r.getLabelCustom()) {
+							r.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", r.getLabelCustomText()));
+						}
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCustom);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack r = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(r);
+						r.setLabelId(miLabelId.isSelected());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelCellEfficiency = new JCheckBoxMenuItem("Cell Efficiency");
+			miLabelCellEfficiency.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack r = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(r);
+						r.setLabelCellEfficiency(miLabelCellEfficiency.isSelected());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCellEfficiency);
+
+			final JCheckBoxMenuItem miLabelTiltAngle = new JCheckBoxMenuItem("Tilt Angle");
+			miLabelTiltAngle.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack r = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(r);
+						r.setLabelTiltAngle(miLabelTiltAngle.isSelected());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelTiltAngle);
+
+			final JCheckBoxMenuItem miLabelTracker = new JCheckBoxMenuItem("Tracker");
+			miLabelTracker.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack r = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(r);
+						r.setLabelTracker(miLabelTracker.isSelected());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelTracker);
+
+			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelEnergyOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Rack) {
+						final Rack r = (Rack) selectedPart;
+						final SetRackLabelCommand c = new SetRackLabelCommand(r);
+						r.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelEnergyOutput);
+
 			popupMenuForRack = createPopupMenu(true, true, new Runnable() {
 
 				@Override
@@ -5831,6 +6270,13 @@ public class PopupMenuFactory {
 						}
 					}
 					Util.selectSilently(cbmiDrawSunBeam, rack.isDrawSunBeamVisible());
+					Util.selectSilently(miLabelNone, !rack.isLabelVisible());
+					Util.selectSilently(miLabelCustom, rack.getLabelCustom());
+					Util.selectSilently(miLabelId, rack.getLabelId());
+					Util.selectSilently(miLabelCellEfficiency, rack.getLabelCellEfficiency());
+					Util.selectSilently(miLabelTiltAngle, rack.getLabelTiltAngle());
+					Util.selectSilently(miLabelTracker, rack.getLabelTracker());
+					Util.selectSilently(miLabelEnergyOutput, rack.getLabelEnergyOutput());
 				}
 
 			});
@@ -5850,6 +6296,7 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(cbmiDrawSunBeam);
+			popupMenuForRack.add(labelMenu);
 			popupMenuForRack.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
@@ -6299,6 +6746,85 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Mirror) {
+							final Mirror r = (Mirror) selectedPart;
+							final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+							r.clearLabels();
+							r.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().refresh();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
+			miLabelCustom.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Mirror) {
+						final Mirror f = (Mirror) selectedPart;
+						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(f);
+						f.setLabelCustom(miLabelCustom.isSelected());
+						if (f.getLabelCustom()) {
+							f.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", f.getLabelCustomText()));
+						}
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCustom);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Mirror) {
+						final Mirror r = (Mirror) selectedPart;
+						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+						r.setLabelId(miLabelId.isSelected());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelEnergyOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Mirror) {
+						final Mirror r = (Mirror) selectedPart;
+						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+						r.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						r.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelEnergyOutput);
+
 			popupMenuForMirror = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
@@ -6317,6 +6843,10 @@ public class PopupMenuFactory {
 						miDisableHeliostat.setEnabled(true);
 					}
 					Util.selectSilently(cbmiDrawSunBeam, m.getDrawSunBeam());
+					Util.selectSilently(miLabelNone, !m.isLabelVisible());
+					Util.selectSilently(miLabelCustom, m.getLabelCustom());
+					Util.selectSilently(miLabelId, m.getLabelId());
+					Util.selectSilently(miLabelEnergyOutput, m.getLabelEnergyOutput());
 				}
 			});
 
@@ -6389,6 +6919,7 @@ public class PopupMenuFactory {
 			popupMenuForMirror.add(miAzimuth);
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(cbmiDrawSunBeam);
+			popupMenuForMirror.add(labelMenu);
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSize);
 			popupMenuForMirror.add(miBaseHeight);
@@ -6912,16 +7443,15 @@ public class PopupMenuFactory {
 			popupMenuForMesh.add(miPaste);
 			popupMenuForMesh.add(miCopyNode);
 			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miDeleteMesh);
-			popupMenuForMesh.add(miRestoreDeletedMeshes);
-			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miMessThickness);
-			popupMenuForMesh.add(miReverseNormalVector);
 			popupMenuForMesh.add(miAlignBottom);
 			popupMenuForMesh.add(miAlignCenter);
-			popupMenuForMesh.addSeparator();
-			popupMenuForMesh.add(miMeshProperties);
+			popupMenuForMesh.add(miMessThickness);
 			popupMenuForMesh.add(miNodeProperties);
+			popupMenuForMesh.addSeparator();
+			popupMenuForMesh.add(miDeleteMesh);
+			popupMenuForMesh.add(miReverseNormalVector);
+			popupMenuForMesh.add(miRestoreDeletedMeshes);
+			popupMenuForMesh.add(miMeshProperties);
 
 		}
 

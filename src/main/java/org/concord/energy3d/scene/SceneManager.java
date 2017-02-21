@@ -659,14 +659,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		sky.getSceneHints().setAllPickingHints(false);
 		sky.updateModelBound();
 		sky.updateWorldBound(true);
-		new Thread() {
-			@Override
-			public void run() {
-				final TextureState ts = new TextureState();
-				ts.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
-				sky.setRenderState(ts);
-			}
-		}.start();
+		final TextureState ts = new TextureState();
+		ts.setTexture(TextureManager.load("daysky.jpg", Texture.MinificationFilter.Trilinear, TextureStoreFormat.GuessNoCompressedFormat, true));
+		sky.setRenderState(ts);
 		return sky;
 	}
 
@@ -819,7 +814,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		});
 
 		logicalLayer.registerTrigger(new InputTrigger(new MouseMovedCondition(), new TriggerAction() {
-
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
 				refresh = true;
@@ -1546,6 +1540,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		}
 		final int x = mouseState.getX();
 		final int y = mouseState.getY();
+		if (Scene.getInstance().getDisableShadowInAction()) {
+			if (mouseState.getButtonState(MouseButton.LEFT) == ButtonState.DOWN || mouseState.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN) {
+				if (MainPanel.getInstance().getShadowButton().isSelected()) {
+					shadowPass.setEnabled(false);
+				}
+			} else {
+				if (MainPanel.getInstance().getShadowButton().isSelected()) {
+					shadowPass.setEnabled(true);
+				}
+			}
+		}
 		try {
 			if (selectedPart != null) {
 				if (!selectedPart.isDrawCompleted()) {
@@ -1607,17 +1612,22 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			t.printStackTrace();
 			Util.reportError(t);
 		}
-		final Component canvasComponent = (Component) canvas;
-		canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
-			if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
-				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-			} else {
-				if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
-					canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+		EventQueue.invokeLater(new Runnable() { // this method is run by the main Energy3D thread, so invoke the Swing code later
+			@Override
+			public void run() {
+				final Component canvasComponent = (Component) canvas;
+				canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+				if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
+					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
+						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					} else {
+						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+							canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+						}
+					}
 				}
 			}
-		}
+		});
 	}
 
 	public void setMouseControlEnabled(final boolean enabled) {
@@ -2385,7 +2395,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void cursorWait(final boolean on) {
-		((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+		if (EventQueue.isDispatchThread()) {
+			((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+		} else {
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					((Component) canvas).setCursor(Cursor.getPredefinedCursor(on ? Cursor.WAIT_CURSOR : Cursor.DEFAULT_CURSOR));
+				}
+			});
+		}
 	}
 
 }

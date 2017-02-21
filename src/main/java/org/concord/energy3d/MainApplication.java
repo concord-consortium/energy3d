@@ -29,7 +29,7 @@ import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
-	public static final String VERSION = "6.5.9";
+	public static final String VERSION = "6.6.6";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -81,7 +81,7 @@ public class MainApplication {
 		mainFrame.updateTitleBar();
 		mainFrame.setVisible(true);
 		Scene.getInstance();
-		new Thread(sceneManager, "Energy3D Application").start();
+		new Thread(sceneManager, "Energy3D Main Application").start();
 
 		Updater.download();
 
@@ -95,7 +95,7 @@ public class MainApplication {
 		TimeSeriesLogger.getInstance().start();
 		SnapshotLogger.getInstance().start(20);
 
-		new Thread() {
+		new Thread("Energy3D Open File") {
 			@Override
 			public void run() {
 				try {
@@ -295,7 +295,7 @@ public class MainApplication {
 	}
 
 	public static void startDeadlockDetectionThread() {
-		new Thread("Deadlock Detection") {
+		new Thread("Energy3D Deadlock Detection") {
 			@Override
 			public void run() {
 				try {

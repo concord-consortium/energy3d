@@ -40,7 +40,7 @@ public class DesignReplay extends PlayControl {
 	}
 
 	public void play(final File[] files) {
-		new Thread() {
+		new Thread("Energy3D Design Replay") {
 			@Override
 			public void run() {
 				MainPanel.getInstance().setToolbarEnabledForReplay(false);
@@ -57,16 +57,19 @@ public class DesignReplay extends PlayControl {
 
 		active = true;
 		final int n = files.length;
-		if (n > 0)
+		if (n > 0) {
 			lastFolder = files[0].getParentFile();
+		}
 		int i = -1;
 		while (i < n) {
-			if (!active)
+			if (!active) {
 				break;
+			}
 			if (replaying) {
 				i++;
-				if (i == n)
+				if (i == n) {
 					break;
+				}
 				final int slash = files[i].toString().lastIndexOf(System.getProperty("file.separator"));
 				final String fileName = files[i].toString().substring(slash + 1).trim();
 				System.out.println("Play back " + (i + 1) + " of " + n + ": " + fileName);
