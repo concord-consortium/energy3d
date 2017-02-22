@@ -1244,7 +1244,9 @@ public class MainFrame extends JFrame {
 			addModel(complexMenu, "Sunroom", "templates/example-sunroom.ng3");
 			addModel(complexMenu, "Barn House", "templates/example-barn-house.ng3");
 			final JMenu pvSolarMenu = new JMenu("Photovoltaic Systems");
-			pvSolarMenu.setEnabled(false);
+			addModel(pvSolarMenu, "Solar Canopy with a Wavy Top", "templates/example-solar-canopy-wavy-top.ng3");
+			addModel(pvSolarMenu, "Bus Stop Solar Canopy", "templates/example-solar-canopy-bus-stop.ng3");
+			addModel(pvSolarMenu, "Solar Facades", "templates/example-solar-facade.ng3");
 			examplesMenu.add(pvSolarMenu);
 			final JMenu cspSolarMenu = new JMenu("Concentrated Solar Power Systems");
 			cspSolarMenu.setEnabled(false);
@@ -1328,7 +1330,6 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Rooftop Solar System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Solar Canopy", "tutorials/solar-canopy.ng3");
 			addModel(pvMenu, "Solar Canopy Form Factors", "tutorials/solar-canopy-form-factors.ng3");
-			addModel(pvMenu, "Solar Facades", "tutorials/solar-facade.ng3");
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 			addModel(pvMenu, "Solar Trackers for Racks", "tutorials/solar-tracker-racks.ng3");

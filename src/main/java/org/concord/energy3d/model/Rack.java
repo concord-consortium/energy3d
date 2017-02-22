@@ -383,7 +383,8 @@ public class Rack extends HousePart implements Trackable {
 		allowAzimuthLargeRotation = false;
 
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
-		if (onFlatSurface && Util.isEqual(points.get(0).getZ(), baseZ)) {
+		// if (onFlatSurface && Util.isEqual(points.get(0).getZ(), baseZ)) {
+		if (onFlatSurface) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
 
