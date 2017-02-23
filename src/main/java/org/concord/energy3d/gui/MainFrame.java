@@ -656,7 +656,7 @@ public class MainFrame extends JFrame {
 							@Override
 							public Object call() throws Exception {
 								try {
-									Scene.newFile();
+									Scene.newFile(true);
 									SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
 									SceneManager.getInstance().getCameraControl().reset();
 									updateTitleBar();

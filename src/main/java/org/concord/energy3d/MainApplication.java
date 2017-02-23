@@ -29,7 +29,7 @@ import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
-	public static final String VERSION = "6.6.9";
+	public static final String VERSION = "6.7.0";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -106,13 +106,13 @@ public class MainApplication {
 						if (args.length > 1 && !args[args.length - 1].startsWith("-")) {
 							mainFrame.open(args[args.length - 1]);
 						} else {
-							Scene.newFile();
+							Scene.newFile(false);
 						}
 					} else {
 						if (args.length > 0) {
 							mainFrame.open(args[0]);
 						} else {
-							Scene.newFile();
+							Scene.newFile(false);
 						}
 					}
 				} catch (final Exception e) {

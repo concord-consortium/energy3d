@@ -191,11 +191,11 @@ public class Scene implements Serializable {
 		return instance;
 	}
 
-	public static void newFile() {
-		newFile(80, 60); // by default, the foundation is 16 meters x 12 meters (192 square meters seem right for a house)
+	public static void newFile(final boolean updateGui) {
+		newFile(80, 60, updateGui); // by default, the foundation is 16 meters x 12 meters (192 square meters seem right for a house)
 	}
 
-	private static void newFile(final double xLength, final double yLength) {
+	private static void newFile(final double xLength, final double yLength, final boolean updateGui) {
 		try {
 			open(null);
 		} catch (final Exception e) {
@@ -209,14 +209,16 @@ public class Scene implements Serializable {
 				return null;
 			}
 		});
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				EnergyPanel.getInstance().update();
-				EnergyPanel.getInstance().clearAllGraphs();
-				EnergyPanel.getInstance().selectInstructionSheet(0);
-			}
-		});
+		if (updateGui) { // no need to update GUI during initialization (this could also cause a deadlock)
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					EnergyPanel.getInstance().update();
+					EnergyPanel.getInstance().clearAllGraphs();
+					EnergyPanel.getInstance().selectInstructionSheet(0);
+				}
+			});
+		}
 	}
 
 	public static void open(final URL file) throws Exception {
