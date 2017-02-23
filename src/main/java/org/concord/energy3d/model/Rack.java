@@ -377,7 +377,18 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		}
 		allowAzimuthLargeRotation = false;
 
-		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
+		if (container instanceof Foundation) {
+			if (host != null && Util.isEqualFaster(normal, Vector3.UNIT_Z, 0.001)) { // compute the height of the underlying mesh
+				final FloatBuffer buff = host.getMeshData().getVertexBuffer();
+				Vector3 v0 = new Vector3(buff.get(0), buff.get(1), buff.get(2));
+				v0 = host.getWorldTransform().applyForward(v0, null);
+				baseZ = v0.getZ();
+			} else {
+				baseZ = container.getHeight();
+			}
+		} else {
+			baseZ = container.getPoints().get(0).getZ();
+		}
 		// if (onFlatSurface && Util.isEqual(points.get(0).getZ(), baseZ)) {
 		if (onFlatSurface && host == null) {
 			points.get(0).setZ(baseZ + baseHeight);

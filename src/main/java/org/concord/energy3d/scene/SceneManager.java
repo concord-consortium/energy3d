@@ -42,6 +42,7 @@ import org.concord.energy3d.model.GambrelRoof;
 import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Meshable;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
@@ -1555,9 +1556,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (selectedPart != null) {
 				if (!selectedPart.isDrawCompleted()) {
 					selectedPart.setPreviewPoint(x, y);
-					// don't draw grid if it sits on an imported mesh
-					if (selectedPart instanceof SolarPanel) {
-						selectedPart.setGridsVisible(((SolarPanel) selectedPart).getMeshLocator() == null);
+					if (selectedPart instanceof Meshable) { // don't draw grid if it sits on an imported mesh
+						selectedPart.setGridsVisible(((Meshable) selectedPart).getMeshLocator() == null);
 					}
 				} else if (objectMoveStartPoint != null) {
 					if ((operation == Operation.RESIZE || selectedPart instanceof Foundation)) {
