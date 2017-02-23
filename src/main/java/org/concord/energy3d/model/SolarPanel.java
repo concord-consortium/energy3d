@@ -221,7 +221,7 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	@Override
 	public void setGridsVisible(final boolean visible) {
-		super.setGridsVisible(visible && meshLocator == null); // don't draw grid if it sits on an imported mesh
+		super.setGridsVisible(visible && meshLocator == null); // TODO:don't draw grid if it sits on an imported mesh
 	}
 
 	@Override
@@ -649,6 +649,7 @@ public class SolarPanel extends HousePart implements Trackable {
 	@Override
 	public HousePart copy(final boolean check) {
 		final SolarPanel c = (SolarPanel) super.copy(false);
+		c.meshLocator = meshLocator; // deepy copy creates a copy of the foundation, we don't want that
 		if (check) {
 			// normal = c.computeNormalAndKeepOnSurface();
 			final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -972,6 +973,10 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	public MeshLocator getMeshLocator() {
 		return meshLocator;
+	}
+
+	public void setMeshLocator(final MeshLocator meshLocator) {
+		this.meshLocator = meshLocator;
 	}
 
 	public void clearLabels() {

@@ -29,6 +29,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.MeshLocator;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.NodeState;
 import org.concord.energy3d.model.Rack;
@@ -39,6 +40,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
+import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
@@ -1230,9 +1232,22 @@ public class Scene implements Serializable {
 			final Vector3 v = c.getPoints().get(i);
 			v.addLocal(position);
 		}
-		if (c instanceof Rack) {
-			((Rack) c).moveSolarPanels(position);
+		if (copyBuffer instanceof Rack) {
+			final Rack rack = (Rack) c;
+			rack.moveSolarPanels(position);
 			setIdOfChildren(c);
+			final MeshLocator originalMeshLocator = ((Rack) copyBuffer).getMeshLocator();
+			if (originalMeshLocator != null) {
+				final UserData ud = (UserData) mesh.getUserData();
+				rack.setMeshLocator(new MeshLocator((Foundation) ud.getHousePart(), ud.getNodeIndex(), ud.getMeshIndex()));
+			}
+		} else if (copyBuffer instanceof SolarPanel) {
+			final SolarPanel panel = (SolarPanel) c;
+			final MeshLocator originalMeshLocator = ((SolarPanel) copyBuffer).getMeshLocator();
+			if (originalMeshLocator != null) {
+				final UserData ud = (UserData) mesh.getUserData();
+				panel.setMeshLocator(new MeshLocator((Foundation) ud.getHousePart(), ud.getNodeIndex(), ud.getMeshIndex()));
+			}
 		}
 		add(c, true);
 		copyBuffer = c;

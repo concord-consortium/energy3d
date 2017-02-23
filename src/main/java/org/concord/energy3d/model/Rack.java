@@ -228,14 +228,9 @@ public class Rack extends HousePart implements Trackable {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					p.setZ(points.get(0).getZ());
 					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 					if (rw > pw) {
-						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
-						System.out.println("****" + newCenter);
-						getEditPointShape(editPointIndex).setTranslation(p);
-						points.get(0).set(newCenter);
 						setRackWidth(Math.max(rw, pw));
 						if (outOfBound()) {
 							if (oldRackCenter != null) {
@@ -255,9 +250,6 @@ public class Rack extends HousePart implements Trackable {
 					final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final double ph = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 					if (rh > ph) {
-						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
-						getEditPointShape(editPointIndex).setTranslation(p);
-						points.get(0).set(newCenter);
 						setRackHeight(Math.max(rh, ph));
 						if (outOfBound()) {
 							if (oldRackCenter != null) {
@@ -314,7 +306,7 @@ public class Rack extends HousePart implements Trackable {
 
 	@Override
 	public void setGridsVisible(final boolean visible) {
-		super.setGridsVisible(visible && meshLocator == null); // don't draw grid if it sits on an imported mesh
+		super.setGridsVisible(visible && meshLocator == null); // TODO: don't draw grid if it sits on an imported mesh
 	}
 
 	@Override
@@ -741,6 +733,7 @@ public class Rack extends HousePart implements Trackable {
 	@Override
 	public HousePart copy(final boolean check) {
 		final Rack c = (Rack) super.copy(false);
+		c.meshLocator = meshLocator; // deepy copy creates a copy of the foundation, we don't want that
 		if (check) {
 			normal = container.getNormal();
 			if (container instanceof Foundation) {
@@ -1305,6 +1298,10 @@ public class Rack extends HousePart implements Trackable {
 
 	public MeshLocator getMeshLocator() {
 		return meshLocator;
+	}
+
+	public void setMeshLocator(final MeshLocator meshLocator) {
+		this.meshLocator = meshLocator;
 	}
 
 	public void clearLabels() {
