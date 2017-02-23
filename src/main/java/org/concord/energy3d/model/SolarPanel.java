@@ -199,15 +199,16 @@ public class SolarPanel extends HousePart implements Trackable {
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class, Rack.class });
 		if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 			final Vector3 p = picked.getPoint().clone();
-			snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
-			points.get(0).set(toRelative(p));
 			final UserData ud = picked.getUserData();
 			pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
-			if (ud.getHousePart() instanceof Foundation && ud.isImported() && ud.getNodeIndex() >= 0 && ud.getMeshIndex() >= 0) { // if this solar panel rests on an imported mesh, store its info
+			if (ud.getHousePart() instanceof Foundation && ud.isImported() && ud.getNodeIndex() >= 0 && ud.getMeshIndex() >= 0) {
+				// if this solar panel rests on an imported mesh, store its info and don't snap to grid as imported meshes do not sit on grid
 				meshLocator = new MeshLocator((Foundation) ud.getHousePart(), ud.getNodeIndex(), ud.getMeshIndex());
 			} else {
+				snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 				meshLocator = null;
 			}
+			points.get(0).set(toRelative(p));
 		} else {
 			pickedNormal = null;
 		}
@@ -216,6 +217,11 @@ public class SolarPanel extends HousePart implements Trackable {
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
+	}
+
+	@Override
+	public void setGridsVisible(final boolean visible) {
+		super.setGridsVisible(visible && meshLocator == null); // don't draw grid if it sits on an imported mesh
 	}
 
 	@Override
@@ -269,12 +275,14 @@ public class SolarPanel extends HousePart implements Trackable {
 			return;
 		}
 
+		boolean onFlatSurface = onFlatSurface();
 		final Mesh host = meshLocator == null ? null : meshLocator.find(); // if this solar panel rests on an imported mesh or not?
 		if (host == null) {
 			normal = pickedNormal != null ? pickedNormal : computeNormalAndKeepOnSurface();
 		} else {
 			final UserData ud = (UserData) host.getUserData();
 			normal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
+			onFlatSurface = Util.isEqual(normal, Vector3.UNIT_Z);
 		}
 		updateEditShapes();
 
@@ -322,7 +330,6 @@ public class SolarPanel extends HousePart implements Trackable {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		final boolean onFlatSurface = onFlatSurface();
 		switch (trackerType) {
 		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);

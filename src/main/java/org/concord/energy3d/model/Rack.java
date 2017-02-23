@@ -198,15 +198,16 @@ public class Rack extends HousePart implements Trackable {
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 				final Vector3 p = picked.getPoint().clone();
 				// isBaseZ = Util.isEqual(p.getZ(), baseZ);
-				snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
-				points.get(0).set(toRelative(p));
 				final UserData ud = picked.getUserData();
-				pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
-				if (ud.getHousePart() instanceof Foundation && ud.isImported() && ud.getNodeIndex() >= 0 && ud.getMeshIndex() >= 0) { // if this rack rests on an imported mesh, store its info
+				if (ud.getHousePart() instanceof Foundation && ud.isImported() && ud.getNodeIndex() >= 0 && ud.getMeshIndex() >= 0) {
+					// if this rack rests on an imported mesh, store its info and don't snap to grid (as imported meshes do not sit on grid)
 					meshLocator = new MeshLocator((Foundation) ud.getHousePart(), ud.getNodeIndex(), ud.getMeshIndex());
 				} else {
+					snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 					meshLocator = null;
 				}
+				points.get(0).set(toRelative(p));
+				pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
 			} else {
 				pickedNormal = null;
 			}
@@ -227,10 +228,12 @@ public class Rack extends HousePart implements Trackable {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
+					p.setZ(points.get(0).getZ());
 					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 					if (rw > pw) {
 						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
+						System.out.println("****" + newCenter);
 						getEditPointShape(editPointIndex).setTranslation(p);
 						points.get(0).set(newCenter);
 						setRackWidth(Math.max(rw, pw));
@@ -310,11 +313,17 @@ public class Rack extends HousePart implements Trackable {
 	}
 
 	@Override
+	public void setGridsVisible(final boolean visible) {
+		super.setGridsVisible(visible && meshLocator == null); // don't draw grid if it sits on an imported mesh
+	}
+
+	@Override
 	protected void drawMesh() {
 		if (container == null) {
 			return;
 		}
 
+		boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		final Mesh host = meshLocator == null ? null : meshLocator.find(); // if this rack rests on an imported mesh or not?
 		if (host == null) {
@@ -322,9 +331,8 @@ public class Rack extends HousePart implements Trackable {
 		} else {
 			final UserData ud = (UserData) host.getUserData();
 			normal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
+			onFlatSurface = Util.isEqual(normal, Vector3.UNIT_Z);
 		}
-
-		final boolean onFlatSurface = onFlatSurface();
 
 		final double dotE = 0.9999;
 		switch (trackerType) {
@@ -384,7 +392,7 @@ public class Rack extends HousePart implements Trackable {
 
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		// if (onFlatSurface && Util.isEqual(points.get(0).getZ(), baseZ)) {
-		if (onFlatSurface) {
+		if (onFlatSurface && host == null) {
 			points.get(0).setZ(baseZ + baseHeight);
 		}
 
@@ -433,7 +441,7 @@ public class Rack extends HousePart implements Trackable {
 		outlineMesh.updateModelBound();
 
 		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
-		mesh.setTranslation(getAbsPoint(0));
+		mesh.setTranslation(onFlatSurface && host != null ? getAbsPoint(0).addLocal(0, 0, baseHeight) : getAbsPoint(0));
 
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
@@ -1000,7 +1008,7 @@ public class Rack extends HousePart implements Trackable {
 	}
 
 	private boolean onFlatSurface() {
-		if (meshLocator != null) { // if this rack rests on an imported mesh, treat it differently
+		if (meshLocator != null) { // if this rack rests on an imported mesh, treat it differently (WHY? I don't remember)
 			return false;
 		}
 		if (container instanceof Roof) {
@@ -1043,7 +1051,6 @@ public class Rack extends HousePart implements Trackable {
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
-		int i = 1;
 		BufferUtils.populateFromBuffer(v1, buf, 0);
 		BufferUtils.populateFromBuffer(v2, buf, 1);
 		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
@@ -1064,6 +1071,7 @@ public class Rack extends HousePart implements Trackable {
 			p2.subtractLocal(d42.multiply(2.5, null));
 			p4.addLocal(d42.multiply(2.5, null));
 		}
+		int i = 1;
 		getEditPointShape(i++).setTranslation(p1);
 		getEditPointShape(i++).setTranslation(p2);
 		getEditPointShape(i++).setTranslation(p3);
@@ -1073,7 +1081,7 @@ public class Rack extends HousePart implements Trackable {
 			getEditPointShape(i).setDefaultColor(c);
 		}
 		super.updateEditShapes();
-		getEditPointShape(0).setTranslation(getAbsPoint(0).addLocal(0, 0, monolithic ? 0.15 : 1));
+		getEditPointShape(0).setTranslation(p1.addLocal(p3).multiplyLocal(0.5).addLocal(0, 0, (monolithic ? 0.15 : 1)));
 	}
 
 	private Vector3 getVertex(final int i) {
