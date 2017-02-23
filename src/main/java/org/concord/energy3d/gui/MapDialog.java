@@ -1,5 +1,6 @@
 package org.concord.energy3d.gui;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
+import java.util.concurrent.CancellationException;
 
 import javax.imageio.ImageIO;
 import javax.net.ssl.SSLKeyException;
@@ -27,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -39,7 +42,6 @@ public class MapDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
-	private static final RuntimeException missingExtensionPathException = new RuntimeException();
 	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA");
 	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.00001));
 	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.00001));
@@ -47,18 +49,32 @@ public class MapDialog extends JDialog {
 	private final JLabel mapLabel = new JLabel();
 	private static MapDialog instance;
 	private boolean lock = false;
+	private GoogleMapImageLoader mapImageLoader;
+
+	class GoogleMapImageLoader extends SwingWorker<BufferedImage, Void> {
+		final String googleMapUrl = getGoogleMapUrl(false);
+
+		@Override
+		protected BufferedImage doInBackground() throws Exception {
+			return ImageIO.read(new URL(googleMapUrl));
+		}
+
+		protected void displayError(final Exception e) {
+			if (e instanceof CancellationException) {
+				return;
+			}
+			e.printStackTrace();
+			if (e.getCause() instanceof SSLKeyException) {
+				JOptionPane.showMessageDialog(MapDialog.this, "Missing feature! To use this feature you need to download and install the latest version of Energy3D.", getTitle(), JOptionPane.ERROR_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(MapDialog.this, "Could not retrieve map from google!\nPlease check your internet connection and try again.", getTitle(), JOptionPane.WARNING_MESSAGE);
+			}
+		}
+	}
 
 	public static void showDialog() {
 		if (instance == null) {
-			try {
-				instance = new MapDialog(MainFrame.getInstance());
-			} catch (final RuntimeException e) {
-				if (e == missingExtensionPathException) {
-					return;
-				} else {
-					e.printStackTrace();
-				}
-			}
+			instance = new MapDialog(MainFrame.getInstance());
 		}
 		instance.setVisible(true);
 	}
@@ -73,6 +89,7 @@ public class MapDialog extends JDialog {
 		latitudeSpinner.setEditor(latEditor);
 		longitudeSpinner.setEditor(lngEditor);
 		mapLabel.setAlignmentX(0.5f);
+		mapLabel.setPreferredSize(new Dimension(640, 640));
 		final Point point = new Point();
 		mapLabel.addMouseListener(new MouseAdapter() {
 			@Override
@@ -163,13 +180,20 @@ public class MapDialog extends JDialog {
 					JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large. Please zoom in and try again.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				final BufferedImage mapImage = getGoogleMapImage(true);
-				if (mapImage != null) {
-					Scene.getInstance().setGroundImage(mapImage, getScale());
-					Scene.getInstance().setGroundImageEarthView(true);
-					Scene.getInstance().setEdited(true);
-					setVisible(false);
-				}
+				new GoogleMapImageLoader() {
+					@Override
+					protected void done() {
+						try {
+							final BufferedImage mapImage = get();
+							Scene.getInstance().setGroundImage(mapImage, getScale());
+							Scene.getInstance().setGroundImageEarthView(true);
+							Scene.getInstance().setEdited(true);
+							setVisible(false);
+						} catch (final Exception e) {
+							displayError(e);
+						}
+					};
+				}.execute();
 			}
 		});
 		final JButton cancelButton = new JButton("Cancel");
@@ -188,32 +212,33 @@ public class MapDialog extends JDialog {
 	}
 
 	private void updateMap() {
-		final BufferedImage mapImage = getGoogleMapImage(false);
-		if (mapImage != null) {
-			final int w = this.getContentPane().getPreferredSize().width;
-			mapLabel.setIcon(new ImageIcon(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT)));
+		if (mapImageLoader != null) {
+			mapImageLoader.cancel(true);
 		}
+		mapImageLoader = new GoogleMapImageLoader() {
+			@Override
+			protected void done() {
+				try {
+					final BufferedImage mapImage = get();
+					final int w = getContentPane().getPreferredSize().width;
+					mapLabel.setIcon(new ImageIcon(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT)));
+					pack();
+					mapImageLoader = null;
+				} catch (final Exception e) {
+					displayError(e);
+				}
+			}
+		};
+		mapImageLoader.execute();
 	}
 
-	private BufferedImage getGoogleMapImage(final boolean highResolution) {
+	private String getGoogleMapUrl(final boolean highResolution) {
 		final double x = (Double) latitudeSpinner.getValue();
 		final double y = (Double) longitudeSpinner.getValue();
 		final int zoom = (Integer) zoomSpinner.getValue();
 		final int scale = highResolution & zoom <= 20 ? 2 : 1;
-		BufferedImage mapImage = null;
-		try {
-			final URL url = new URL("https://maps.googleapis.com/maps/api/staticmap?maptype=satellite&center=" + x + "," + y + "&zoom=" + zoom + "&size=640x640&scale=" + scale + "&key=AIzaSyBEGiCg33CccHloDdPENWk1JDhwTEQaZQ0");
-			mapImage = ImageIO.read(url);
-		} catch (final IOException e) {
-			e.printStackTrace();
-			if (e.getCause() instanceof SSLKeyException) {
-				JOptionPane.showMessageDialog(this, "Missing feature! To use this feature you need to download and install the latest version of Energy3D.", this.getTitle(), JOptionPane.ERROR_MESSAGE);
-				throw missingExtensionPathException;
-			} else {
-				JOptionPane.showMessageDialog(this, "Could not retrieve map from google!\nPlease check your internet connection and try again.", this.getTitle(), JOptionPane.WARNING_MESSAGE);
-			}
-		}
-		return mapImage;
+		final String googleMapUrl = "https://maps.googleapis.com/maps/api/staticmap?maptype=satellite&center=" + x + "," + y + "&zoom=" + zoom + "&size=640x640&scale=" + scale + "&key=AIzaSyBEGiCg33CccHloDdPENWk1JDhwTEQaZQ0";
+		return googleMapUrl;
 	}
 
 	private double[] getGoogleMapAddressCoordinates() {
