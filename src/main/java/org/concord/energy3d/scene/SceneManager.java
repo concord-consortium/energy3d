@@ -1555,6 +1555,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			if (selectedPart != null) {
 				if (!selectedPart.isDrawCompleted()) {
 					selectedPart.setPreviewPoint(x, y);
+					// don't draw grid if it sits on an imported mesh
+					if (selectedPart instanceof SolarPanel) {
+						selectedPart.setGridsVisible(((SolarPanel) selectedPart).getMeshLocator() == null);
+					}
 				} else if (objectMoveStartPoint != null) {
 					if ((operation == Operation.RESIZE || selectedPart instanceof Foundation)) {
 						final PickedHousePart pick = SelectUtil.pickPart(x, y, collisionLand);

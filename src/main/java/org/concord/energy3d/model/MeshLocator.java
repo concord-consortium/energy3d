@@ -41,15 +41,25 @@ public class MeshLocator implements Serializable {
 		if (foundation.getImportedNodes() == null || foundation.getImportedNodes().isEmpty()) {
 			return null;
 		}
-		final Node node = foundation.getImportedNodes().get(nodeIndex);
-		if (node == null) {
-			return null;
+		Node node = null;
+		for (final Node n : foundation.getImportedNodes()) {
+			if (n.getNumberOfChildren() > 0) {
+				final Spatial s = n.getChild(0);
+				final Mesh m = (Mesh) s;
+				final UserData u = (UserData) m.getUserData();
+				if (u.getNodeIndex() == nodeIndex) {
+					node = n;
+					break;
+				}
+			}
 		}
-		for (final Spatial s : node.getChildren()) {
-			final Mesh m = (Mesh) s;
-			final UserData u = (UserData) m.getUserData();
-			if (u.getMeshIndex() == meshIndex) {
-				return m;
+		if (node != null) {
+			for (final Spatial s : node.getChildren()) {
+				final Mesh m = (Mesh) s;
+				final UserData u = (UserData) m.getUserData();
+				if (u.getMeshIndex() == meshIndex) {
+					return m;
+				}
 			}
 		}
 		return null;

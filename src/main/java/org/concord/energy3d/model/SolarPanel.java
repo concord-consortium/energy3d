@@ -40,7 +40,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class SolarPanel extends HousePart implements Trackable {
+public class SolarPanel extends HousePart implements Trackable, Meshable {
 	private static final long serialVersionUID = 1L;
 
 	public static final int PARTIAL_SHADE_TOLERANCE = 0;
@@ -217,11 +217,6 @@ public class SolarPanel extends HousePart implements Trackable {
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
-	}
-
-	@Override
-	public void setGridsVisible(final boolean visible) {
-		super.setGridsVisible(visible && meshLocator == null); // TODO:don't draw grid if it sits on an imported mesh
 	}
 
 	@Override
@@ -971,10 +966,12 @@ public class SolarPanel extends HousePart implements Trackable {
 
 	}
 
+	@Override
 	public MeshLocator getMeshLocator() {
 		return meshLocator;
 	}
 
+	@Override
 	public void setMeshLocator(final MeshLocator meshLocator) {
 		this.meshLocator = meshLocator;
 	}

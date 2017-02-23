@@ -2704,17 +2704,10 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void deleteNode(final Node n) {
 		final List<HousePart> toDelete = new ArrayList<HousePart>();
 		for (final HousePart p : children) {
-			if (p instanceof SolarPanel) {
-				final SolarPanel s = (SolarPanel) p;
-				final Mesh m = s.getMeshLocator().find();
+			if (p instanceof Meshable) {
+				final Mesh m = ((Meshable) p).getMeshLocator().find();
 				if (m != null && n.hasChild(m)) {
-					toDelete.add(s);
-				}
-			} else if (p instanceof Rack) {
-				final Rack r = (Rack) p;
-				final Mesh m = r.getMeshLocator().find();
-				if (m != null && n.hasChild(m)) {
-					toDelete.add(r);
+					toDelete.add(p);
 				}
 			}
 		}
@@ -2984,15 +2977,9 @@ public class Foundation extends HousePart implements Thermalizable {
 	public void deleteMesh(final Mesh m) {
 		final List<HousePart> toDelete = new ArrayList<HousePart>();
 		for (final HousePart p : children) {
-			if (p instanceof SolarPanel) {
-				final SolarPanel s = (SolarPanel) p;
-				if (m == s.getMeshLocator().find()) {
-					toDelete.add(s);
-				}
-			} else if (p instanceof Rack) {
-				final Rack r = (Rack) p;
-				if (m == r.getMeshLocator().find()) {
-					toDelete.add(r);
+			if (p instanceof Meshable) {
+				if (m == ((Meshable) p).getMeshLocator().find()) {
+					toDelete.add(p);
 				}
 			}
 		}

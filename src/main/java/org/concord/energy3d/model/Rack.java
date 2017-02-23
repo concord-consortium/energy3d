@@ -40,7 +40,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Rack extends HousePart implements Trackable {
+public class Rack extends HousePart implements Trackable, Meshable {
 	private static final long serialVersionUID = 1L;
 	private transient ArrayList<Vector3> solarOrgPoints;
 	private transient ReadOnlyVector3 normal;
@@ -302,11 +302,6 @@ public class Rack extends HousePart implements Trackable {
 
 		}
 		return false;
-	}
-
-	@Override
-	public void setGridsVisible(final boolean visible) {
-		super.setGridsVisible(visible && meshLocator == null); // TODO: don't draw grid if it sits on an imported mesh
 	}
 
 	@Override
@@ -1296,10 +1291,12 @@ public class Rack extends HousePart implements Trackable {
 		this.yieldToday = yieldToday;
 	}
 
+	@Override
 	public MeshLocator getMeshLocator() {
 		return meshLocator;
 	}
 
+	@Override
 	public void setMeshLocator(final MeshLocator meshLocator) {
 		this.meshLocator = meshLocator;
 	}
