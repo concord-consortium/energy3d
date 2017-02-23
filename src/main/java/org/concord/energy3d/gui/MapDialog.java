@@ -1,11 +1,13 @@
 package org.concord.energy3d.gui;
 
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
@@ -19,7 +21,6 @@ import java.util.concurrent.CancellationException;
 import javax.imageio.ImageIO;
 import javax.net.ssl.SSLKeyException;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -46,7 +47,7 @@ public class MapDialog extends JDialog {
 	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.00001));
 	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.00001));
 	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
-	private final JLabel mapLabel = new JLabel();
+	private final MapImageView mapImageView = new MapImageView();
 	private static MapDialog instance;
 	private boolean lock = false;
 	private GoogleMapImageLoader mapImageLoader;
@@ -81,30 +82,56 @@ public class MapDialog extends JDialog {
 
 	private MapDialog(final JFrame owner) {
 		super(owner);
-		setTitle("Map");
+		setTitle("Earth View");
+		// setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		final JSpinner.NumberEditor latEditor = new JSpinner.NumberEditor(latitudeSpinner, "0.00000");
 		final JSpinner.NumberEditor lngEditor = new JSpinner.NumberEditor(longitudeSpinner, "0.00000");
 		latEditor.getTextField().setColumns(6);
 		lngEditor.getTextField().setColumns(6);
 		latitudeSpinner.setEditor(latEditor);
 		longitudeSpinner.setEditor(lngEditor);
-		mapLabel.setAlignmentX(0.5f);
-		mapLabel.setPreferredSize(new Dimension(640, 640));
-		final Point point = new Point();
-		mapLabel.addMouseListener(new MouseAdapter() {
+		mapImageView.setAlignmentX(0.5f);
+		mapImageView.setPreferredSize(new Dimension(640, 640));
+		mapImageView.addKeyListener(new KeyAdapter() {
 			@Override
-			public void mousePressed(final MouseEvent e) {
-				point.setLocation(e.getPoint());
-			}
-
-			@Override
-			public void mouseReleased(final MouseEvent e) {
-				point.setLocation(0, 0);
+			public void keyPressed(final KeyEvent e) {
+				final double delta = getScale() / 10000.0;
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_UP:
+					Double lat = (Double) latitudeSpinner.getValue();
+					lock = true;
+					latitudeSpinner.setValue(lat + delta);
+					lock = false;
+					updateMap();
+					break;
+				case KeyEvent.VK_DOWN:
+					lat = (Double) latitudeSpinner.getValue();
+					lock = true;
+					latitudeSpinner.setValue(lat - delta);
+					lock = false;
+					updateMap();
+					break;
+				case KeyEvent.VK_LEFT:
+					Double lng = (Double) longitudeSpinner.getValue();
+					lock = true;
+					longitudeSpinner.setValue(lng - delta);
+					lock = false;
+					updateMap();
+					break;
+				case KeyEvent.VK_RIGHT:
+					lng = (Double) longitudeSpinner.getValue();
+					lock = true;
+					longitudeSpinner.setValue(lng + delta);
+					lock = false;
+					updateMap();
+					break;
+				}
 			}
 		});
-		mapLabel.addMouseMotionListener(new MouseMotionAdapter() {
+		mapImageView.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(final MouseEvent e) {
+				final Point point = mapImageView.getPoint();
 				if (point.getX() != 0 && point.getY() != 0) {
 					final double dx = e.getX() - point.getX();
 					final double dy = e.getY() - point.getY();
@@ -113,14 +140,14 @@ public class MapDialog extends JDialog {
 					lock = true;
 					final double scale = getScale();
 					latitudeSpinner.setValue(lat + dy / 1000000.0 * scale);
-					longitudeSpinner.setValue(lng - dx / 750000.0 * scale);
+					longitudeSpinner.setValue(lng - dx / 1000000.0 * scale);
 					lock = false;
 					updateMap();
 				}
 				point.setLocation(e.getPoint());
 			}
 		});
-		mapLabel.addMouseWheelListener(new MouseWheelListener() {
+		mapImageView.addMouseWheelListener(new MouseWheelListener() {
 			@Override
 			public void mouseWheelMoved(final MouseWheelEvent e) {
 				lock = true;
@@ -155,13 +182,13 @@ public class MapDialog extends JDialog {
 		latitudeSpinner.addChangeListener(changeListener);
 		longitudeSpinner.addChangeListener(changeListener);
 		zoomSpinner.addChangeListener(changeListener);
-		this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		final JPanel panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 		panel1.setBorder(new EmptyBorder(5, 5, 0, 5));
 		panel1.add(new JLabel("Address:"));
 		panel1.add(addressField);
-		this.getContentPane().add(panel1);
+		getContentPane().add(panel1);
 		final JPanel panel2 = new JPanel();
 		panel2.add(new JLabel("Latitude:"));
 		panel2.add(latitudeSpinner);
@@ -169,8 +196,8 @@ public class MapDialog extends JDialog {
 		panel2.add(longitudeSpinner);
 		panel2.add(new JLabel("Zoom:"));
 		panel2.add(zoomSpinner);
-		this.getContentPane().add(panel2);
-		this.getContentPane().add(mapLabel);
+		getContentPane().add(panel2);
+		getContentPane().add(mapImageView);
 		final JPanel bottomPanel = new JPanel();
 		final JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
@@ -205,13 +232,14 @@ public class MapDialog extends JDialog {
 		});
 		bottomPanel.add(okButton);
 		bottomPanel.add(cancelButton);
-		this.getContentPane().add(bottomPanel);
+		getContentPane().add(bottomPanel);
 		updateMap();
-		this.pack();
-		this.setLocationRelativeTo(owner);
+		pack();
+		setLocationRelativeTo(owner);
 	}
 
 	private void updateMap() {
+		mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		if (mapImageLoader != null) {
 			mapImageLoader.cancel(true);
 		}
@@ -221,11 +249,14 @@ public class MapDialog extends JDialog {
 				try {
 					final BufferedImage mapImage = get();
 					final int w = getContentPane().getPreferredSize().width;
-					mapLabel.setIcon(new ImageIcon(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT)));
-					pack();
-					mapImageLoader = null;
+					mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
+					mapImageView.repaint();
 				} catch (final Exception e) {
 					displayError(e);
+				} finally {
+					mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					mapImageLoader = null;
+					pack();
 				}
 			}
 		};
@@ -237,8 +268,7 @@ public class MapDialog extends JDialog {
 		final double y = (Double) longitudeSpinner.getValue();
 		final int zoom = (Integer) zoomSpinner.getValue();
 		final int scale = highResolution & zoom <= 20 ? 2 : 1;
-		final String googleMapUrl = "https://maps.googleapis.com/maps/api/staticmap?maptype=satellite&center=" + x + "," + y + "&zoom=" + zoom + "&size=640x640&scale=" + scale + "&key=AIzaSyBEGiCg33CccHloDdPENWk1JDhwTEQaZQ0";
-		return googleMapUrl;
+		return "https://maps.googleapis.com/maps/api/staticmap?maptype=satellite&center=" + x + "," + y + "&zoom=" + zoom + "&size=640x640&scale=" + scale + "&key=AIzaSyBEGiCg33CccHloDdPENWk1JDhwTEQaZQ0";
 	}
 
 	private double[] getGoogleMapAddressCoordinates() {
