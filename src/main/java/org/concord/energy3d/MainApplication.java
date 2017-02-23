@@ -29,7 +29,7 @@ import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
-	public static final String VERSION = "6.6.8";
+	public static final String VERSION = "6.6.9";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -277,21 +277,21 @@ public class MainApplication {
 
 	private static void showAndBringToFront() {
 		System.out.println("showAndBringToFront");
-		if (!MainFrame.getInstance().isVisible()) {
-			MainFrame.getInstance().setVisible(true);
-		}
-		if (MainFrame.getInstance().getState() == Frame.ICONIFIED) {
-			MainFrame.getInstance().setState(Frame.NORMAL);
-		} else if (Config.isMac()) {
-			Mac.bringToFront();
-		} else {
-			EventQueue.invokeLater(new Runnable() {
-				@Override
-				public void run() {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (!MainFrame.getInstance().isVisible()) {
+					MainFrame.getInstance().setVisible(true);
+				}
+				if (MainFrame.getInstance().getState() == Frame.ICONIFIED) {
+					MainFrame.getInstance().setState(Frame.NORMAL);
+				} else if (Config.isMac()) {
+					Mac.bringToFront();
+				} else {
 					MainFrame.getInstance().toFront();
 				}
-			});
-		}
+			}
+		});
 	}
 
 	public static void startDeadlockDetectionThread() {
