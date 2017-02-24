@@ -60,6 +60,22 @@ public class MapDialog extends JDialog {
 			return ImageIO.read(new URL(googleMapUrl));
 		}
 
+		@Override
+		protected void done() {
+			try {
+				final BufferedImage mapImage = get();
+				final int w = getContentPane().getPreferredSize().width;
+				mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
+				mapImageView.repaint();
+			} catch (final Exception e) {
+				displayError(e);
+			} finally {
+				mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				mapImageLoader = null;
+				pack();
+			}
+		}
+
 		protected void displayError(final Exception e) {
 			if (e instanceof CancellationException) {
 				return;
@@ -71,6 +87,7 @@ public class MapDialog extends JDialog {
 				JOptionPane.showMessageDialog(MapDialog.this, "Could not retrieve map from google!\nPlease check your internet connection and try again.", getTitle(), JOptionPane.WARNING_MESSAGE);
 			}
 		}
+
 	}
 
 	public static void showDialog() {
@@ -243,23 +260,7 @@ public class MapDialog extends JDialog {
 		if (mapImageLoader != null) {
 			mapImageLoader.cancel(true);
 		}
-		mapImageLoader = new GoogleMapImageLoader() {
-			@Override
-			protected void done() {
-				try {
-					final BufferedImage mapImage = get();
-					final int w = getContentPane().getPreferredSize().width;
-					mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
-					mapImageView.repaint();
-				} catch (final Exception e) {
-					displayError(e);
-				} finally {
-					mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-					mapImageLoader = null;
-					pack();
-				}
-			}
-		};
+		mapImageLoader = new GoogleMapImageLoader();
 		mapImageLoader.execute();
 	}
 

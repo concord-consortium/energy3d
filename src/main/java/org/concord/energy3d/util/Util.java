@@ -38,6 +38,7 @@ import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
@@ -439,33 +440,55 @@ public class Util {
 		final StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
 		final String msg = sw.toString();
-		final JPanel panel = new JPanel(new BorderLayout(10, 10));
-		final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
-		scrollPane.setPreferredSize(new Dimension(400, 400));
-		panel.add(scrollPane, BorderLayout.CENTER);
-		final boolean corrupted = msg.indexOf("java.io.EOFException") != -1;
-		panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.NO_OPTION) {
-			return;
-		}
-		try {
-			final String receipt = sendError(header + "\n" + msg);
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), receipt, "Notice", JOptionPane.INFORMATION_MESSAGE);
-		} catch (final Exception ex) {
-			ex.printStackTrace();
-			// backup solution
-			final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-			clpbrd.setContents(new StringSelection(msg), null);
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
-		} finally {
-			// attempt to fix problems
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() {
-					Scene.getInstance().fixProblems(true);
-					return null;
+		final String text = header + "\n" + msg;
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				final JPanel panel = new JPanel(new BorderLayout(10, 10));
+				final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
+				scrollPane.setPreferredSize(new Dimension(400, 400));
+				panel.add(scrollPane, BorderLayout.CENTER);
+				final boolean corrupted = msg.indexOf("java.io.EOFException") != -1;
+				panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
+				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
+					new ReportUploader(text).execute();
 				}
-			});
+				// attempt to fix problems
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() {
+						Scene.getInstance().fixProblems(true);
+						return null;
+					}
+				});
+			}
+		});
+	}
+
+	static class ReportUploader extends SwingWorker<String, Void> {
+
+		private final String text;
+
+		ReportUploader(final String text) {
+			super();
+			this.text = text;
+		}
+
+		@Override
+		protected String doInBackground() throws Exception {
+			return sendError(text);
+		}
+
+		@Override
+		protected void done() {
+			try {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), get(), "Notice", JOptionPane.INFORMATION_MESSAGE);
+			} catch (final Exception e) { // backup solution
+				e.printStackTrace();
+				final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+				clpbrd.setContents(new StringSelection(text), null);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
+			}
 		}
 	}
 
