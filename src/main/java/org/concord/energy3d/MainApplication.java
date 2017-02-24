@@ -12,7 +12,6 @@ import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.etc.oneinstance.OneInstance;
@@ -29,7 +28,7 @@ import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
-	public static final String VERSION = "6.7.1";
+	public static final String VERSION = "6.7.3";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -48,12 +47,6 @@ public class MainApplication {
 			testFile.delete();
 		} catch (final Throwable e) {
 			appDirectoryWritable = false;
-		}
-
-		final String version = System.getProperty("java.version");
-		if (version.compareTo("1.6") < 0) {
-			JOptionPane.showMessageDialog(null, "Your current Java version is " + version + ". Version 1.6 or higher is required.");
-			System.exit(0);
 		}
 
 		System.setProperty("jogl.gljpanel.noglsl", "true");
@@ -76,12 +69,45 @@ public class MainApplication {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+
 		final SceneManager sceneManager = SceneManager.getInstance();
-		final MainFrame mainFrame = MainFrame.getInstance();
-		mainFrame.updateTitleBar();
-		mainFrame.setVisible(true);
 		Scene.getInstance();
 		new Thread(sceneManager, "Energy3D Main Application").start();
+
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				final MainFrame mainFrame = MainFrame.getInstance();
+				mainFrame.updateTitleBar();
+				mainFrame.setVisible(true);
+				new Thread("Energy3D Open File") {
+					@Override
+					public void run() {
+						try {
+							if (isMacOpeningFile) {
+								return;
+							}
+							if (Config.isWebStart()) {
+								if (args.length > 1 && !args[args.length - 1].startsWith("-")) {
+									mainFrame.open(args[args.length - 1]);
+								} else {
+									Scene.newFile();
+								}
+							} else {
+								if (args.length > 0) {
+									mainFrame.open(args[0]);
+								} else {
+									Scene.newFile();
+								}
+							}
+						} catch (final Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}.start();
+
+			}
+		});
 
 		Updater.download();
 
@@ -94,32 +120,6 @@ public class MainApplication {
 		});
 		TimeSeriesLogger.getInstance().start();
 		SnapshotLogger.getInstance().start(20);
-
-		new Thread("Energy3D Open File") {
-			@Override
-			public void run() {
-				try {
-					if (isMacOpeningFile) {
-						return;
-					}
-					if (Config.isWebStart()) {
-						if (args.length > 1 && !args[args.length - 1].startsWith("-")) {
-							mainFrame.open(args[args.length - 1]);
-						} else {
-							Scene.newFile(false);
-						}
-					} else {
-						if (args.length > 0) {
-							mainFrame.open(args[0]);
-						} else {
-							Scene.newFile(false);
-						}
-					}
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
 
 		System.out.println("Initiatialization phase 2 done.");
 		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
