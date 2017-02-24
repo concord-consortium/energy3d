@@ -565,7 +565,7 @@ public class EnergyPanel extends JPanel {
 			instructionSheets[i].setContentType("text/plain");
 			((DefaultCaret) instructionSheets[i].getEditorPane().getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 			final JScrollPane scroller = new JScrollPane(instructionSheets[i].getEditorPane());
-			scroller.setPreferredSize(new Dimension(200, 300)); // somehow setting a preferred size of the scroller triggers the line wrapping of JEditorPane
+			scroller.setPreferredSize(new Dimension(200, 220)); // somehow setting a preferred size of the scroller triggers the line wrapping of JEditorPane
 			instructionTabbedPane.add(scroller, "Sheet " + (i + 1));
 		}
 
@@ -623,10 +623,10 @@ public class EnergyPanel extends JPanel {
 			return;
 		}
 		computingStartMillis = System.currentTimeMillis();
-		updateWeatherData(); // TODO: There got to be a better way to do this. WARNING: Putting this in the event queue could lead to deadlock while loading Energy3D (the main method uses a thread to open a new file at startup)
 		EventQueue.invokeLater(new Runnable() { // must run this Swing UI update in the event queue to avoid a possible deadlock
 			@Override
 			public void run() {
+				updateWeatherData(); // TODO: There got to be a better way to do this.
 				((Component) SceneManager.getInstance().getCanvas()).setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			}
 		});

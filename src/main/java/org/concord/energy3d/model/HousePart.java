@@ -933,7 +933,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public Foundation getTopContainer() {
-		HousePart c = this.getContainer();
+		HousePart c = getContainer();
 		if (c == null) {
 			return null;
 		}

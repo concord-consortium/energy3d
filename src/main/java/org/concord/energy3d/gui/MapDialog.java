@@ -89,7 +89,7 @@ public class MapDialog extends JDialog {
 					});
 					setVisible(false);
 				} else {
-					final int w = getContentPane().getPreferredSize().width;
+					final int w = mapImageView.getPreferredSize().width;
 					mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
 					mapImageView.repaint();
 				}
@@ -133,7 +133,7 @@ public class MapDialog extends JDialog {
 		latitudeSpinner.setEditor(latEditor);
 		longitudeSpinner.setEditor(lngEditor);
 		mapImageView.setAlignmentX(0.5f);
-		mapImageView.setPreferredSize(new Dimension(640, 640));
+		mapImageView.setPreferredSize(new Dimension(500, 500));
 		mapImageView.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(final KeyEvent e) {
