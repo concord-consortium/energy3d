@@ -29,7 +29,7 @@ import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
-	public static final String VERSION = "6.7.0";
+	public static final String VERSION = "6.7.1";
 
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -325,7 +325,7 @@ public class MainApplication {
 						}
 						try {
 							System.err.println(msg);
-							Util.sendError(msg);
+							Util.sendError(msg, null);
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}

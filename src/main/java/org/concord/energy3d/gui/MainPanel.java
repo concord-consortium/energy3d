@@ -569,7 +569,7 @@ public class MainPanel extends JPanel {
 					disableSunAnim();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 					// Scene.getInstance().setEdited(false); // shadow not saved -- make sense because it doesn't work on some machines
-					// Util.reportError(new RuntimeException("Error from Xie"));
+					// org.concord.energy3d.util.Util.reportError(new RuntimeException("Error from Xie"));
 				}
 			});
 		}

@@ -659,7 +659,15 @@ public class MainFrame extends JFrame {
 									Scene.newFile(true);
 									SceneManager.getInstance().resetCamera(ViewMode.NORMAL);
 									SceneManager.getInstance().getCameraControl().reset();
-									updateTitleBar();
+									EventQueue.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											updateTitleBar();
+											EnergyPanel.getInstance().update();
+											EnergyPanel.getInstance().clearAllGraphs();
+											EnergyPanel.getInstance().selectInstructionSheet(0);
+										}
+									});
 								} catch (final Throwable err) {
 									Util.reportError(err);
 								}

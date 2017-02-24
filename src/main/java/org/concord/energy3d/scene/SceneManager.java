@@ -131,6 +131,8 @@ import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.MaterialState.ColorMaterial;
+import com.ardor3d.renderer.state.OffsetState;
+import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.renderer.state.ZBufferState;
 import com.ardor3d.scenegraph.Line;
@@ -319,7 +321,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		solarLand.updateModelBound();
 		solarLand.updateWorldBound(true);
 		solarLand.setVisible(false);
-		groundImageLand = new Quad("Map Land");
+		groundImageLand = new Quad("Ground Image");
 		initGroundImageLand(1);
 		groundImageLand.setModelBound(new BoundingBox());
 		groundImageLand.updateModelBound();
@@ -580,7 +582,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private Mesh createLand() {
 		final Quad land = new Quad("Land", SKY_RADIUS * 2, SKY_RADIUS * 2);
 		land.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
-		land.setRenderState(HousePart.offsetState);
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(10);
+		offsetState.setUnits(10);
+		land.setRenderState(offsetState);
 		final BlendState blendState = new BlendState();
 		blendState.setBlendEnabled(true);
 		land.setRenderState(blendState);
@@ -1717,6 +1723,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private void initGroundImageLand(final double scale) {
 		final double d = 68.75 / 0.2 * scale; // 0.2 is the obsolete annotation scale by default, can't call Scene.getAnnotationScale() yet
 		groundImageLand.resize(d, d);
+		final OffsetState offsetState = new OffsetState();
+		offsetState.setTypeEnabled(OffsetType.Fill, true);
+		offsetState.setFactor(2);
+		offsetState.setUnits(2);
+		groundImageLand.setRenderState(offsetState);
 		groundImageLand.updateModelBound();
 		groundImageLand.updateWorldBound(true);
 	}

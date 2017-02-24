@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
 import javax.imageio.ImageIO;
@@ -36,6 +37,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.math.MathUtils;
 
@@ -49,30 +51,53 @@ public class MapDialog extends JDialog {
 	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
 	private final MapImageView mapImageView = new MapImageView();
 	private static MapDialog instance;
-	private boolean lock = false;
+	private boolean lock;
 	private GoogleMapImageLoader mapImageLoader;
 
 	class GoogleMapImageLoader extends SwingWorker<BufferedImage, Void> {
-		final String googleMapUrl = getGoogleMapUrl(false);
+		private final boolean highResolution;
+		private final String googleMapUrl;
+
+		public GoogleMapImageLoader(final boolean highResolution) {
+			if (mapImageLoader != null) {
+				mapImageLoader.cancel(true);
+			}
+			this.highResolution = highResolution;
+			googleMapUrl = getGoogleMapUrl(highResolution);
+			mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		}
 
 		@Override
 		protected BufferedImage doInBackground() throws Exception {
 			return ImageIO.read(new URL(googleMapUrl));
+
 		}
 
 		@Override
 		protected void done() {
 			try {
 				final BufferedImage mapImage = get();
-				final int w = getContentPane().getPreferredSize().width;
-				mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
-				mapImageView.repaint();
+				if (highResolution) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().setGroundImage(mapImage, getScale());
+							Scene.getInstance().setGroundImageEarthView(true);
+							Scene.getInstance().setEdited(true);
+							return null;
+						}
+					});
+					setVisible(false);
+				} else {
+					final int w = getContentPane().getPreferredSize().width;
+					mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
+					mapImageView.repaint();
+				}
 			} catch (final Exception e) {
 				displayError(e);
 			} finally {
 				mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				mapImageLoader = null;
-				pack();
 			}
 		}
 
@@ -224,20 +249,8 @@ public class MapDialog extends JDialog {
 					JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large. Please zoom in and try again.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				new GoogleMapImageLoader() {
-					@Override
-					protected void done() {
-						try {
-							final BufferedImage mapImage = get();
-							Scene.getInstance().setGroundImage(mapImage, getScale());
-							Scene.getInstance().setGroundImageEarthView(true);
-							Scene.getInstance().setEdited(true);
-							setVisible(false);
-						} catch (final Exception e) {
-							displayError(e);
-						}
-					};
-				}.execute();
+				mapImageLoader = new GoogleMapImageLoader(true);
+				mapImageLoader.execute();
 			}
 		});
 		final JButton cancelButton = new JButton("Cancel");
@@ -256,11 +269,7 @@ public class MapDialog extends JDialog {
 	}
 
 	private void updateMap() {
-		mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		if (mapImageLoader != null) {
-			mapImageLoader.cancel(true);
-		}
-		mapImageLoader = new GoogleMapImageLoader();
+		mapImageLoader = new GoogleMapImageLoader(false);
 		mapImageLoader.execute();
 	}
 

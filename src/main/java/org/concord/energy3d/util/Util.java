@@ -441,6 +441,14 @@ public class Util {
 		e.printStackTrace(new PrintWriter(sw));
 		final String msg = sw.toString();
 		final String text = header + "\n" + msg;
+		File file;
+		try {
+			file = SnapshotLogger.getInstance().saveSnapshot("error");
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+			file = null;
+		}
+		final File currentFile = file;
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -451,16 +459,8 @@ public class Util {
 				final boolean corrupted = msg.indexOf("java.io.EOFException") != -1;
 				panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
-					new ReportUploader(text).execute();
+					new ReportUploader(text, currentFile).execute();
 				}
-				// attempt to fix problems
-				SceneManager.getTaskManager().update(new Callable<Object>() {
-					@Override
-					public Object call() {
-						Scene.getInstance().fixProblems(true);
-						return null;
-					}
-				});
 			}
 		});
 	}
@@ -468,15 +468,17 @@ public class Util {
 	static class ReportUploader extends SwingWorker<String, Void> {
 
 		private final String text;
+		private final File currentFile;
 
-		ReportUploader(final String text) {
+		ReportUploader(final String text, final File currentFile) {
 			super();
 			this.text = text;
+			this.currentFile = currentFile;
 		}
 
 		@Override
 		protected String doInBackground() throws Exception {
-			return sendError(text);
+			return sendError(text, currentFile);
 		}
 
 		@Override
@@ -489,10 +491,18 @@ public class Util {
 				clpbrd.setContents(new StringSelection(text), null);
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
 			}
+			// attempt to fix problems
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() {
+					Scene.getInstance().fixProblems(true);
+					return null;
+				}
+			});
 		}
 	}
 
-	public static String sendError(final String msg) throws Exception {
+	public static String sendError(final String msg, final File currentFile) throws Exception {
 		final MultipartUtility multipart = new MultipartUtility("http://energy3d.concord.org/errors/error.php", "UTF-8");
 		multipart.addFormField("ip_address", InetAddress.getLocalHost().getHostAddress());
 		multipart.addFormField("os_name", System.getProperty("os.name"));
@@ -512,7 +522,9 @@ public class Util {
 			if (file != null) {
 				multipart.addFilePart("model_snapshot", file);
 			}
-			multipart.addFilePart("model_current", SnapshotLogger.getInstance().saveSnapshot("error"));
+			if (currentFile != null) {
+				multipart.addFilePart("model_current", currentFile);
+			}
 		}
 		return multipart.finish();
 	}
