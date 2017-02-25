@@ -215,8 +215,7 @@ public class Util {
 
 	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final int x, final int y) {
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
-		final Vector3 closest = closestPoint(p1, v1, pickRay.getOrigin(), pickRay.getDirection());
-		return closest;
+		return closestPoint(p1, v1, pickRay.getOrigin(), pickRay.getDirection());
 	}
 
 	public static Vector3 closestPoint(final ReadOnlyVector3 p1, final ReadOnlyVector3 v1, final ReadOnlyVector3 p2, final ReadOnlyVector3 v2) {
@@ -243,9 +242,7 @@ public class Util {
 		numer = d1343 * d4321 - d1321 * d4343;
 
 		final double mua = numer / denom;
-		final Vector3 pa = new Vector3(p1.getX() + mua * v1.getX(), p1.getY() + mua * v1.getY(), p1.getZ() + mua * v1.getZ());
-
-		return pa;
+		return new Vector3(p1.getX() + mua * v1.getX(), p1.getY() + mua * v1.getY(), p1.getZ() + mua * v1.getZ());
 	}
 
 	public static Vector2 projectPointOnLine(final ReadOnlyVector2 point, final ReadOnlyVector2 p1, final ReadOnlyVector2 p2, final boolean limitToLineSegment) {
