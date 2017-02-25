@@ -228,13 +228,12 @@ public class Rack extends HousePart implements Trackable, Meshable {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					System.out.println("***" + p1);
 					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 					if (rw > pw) {
-						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
+						final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
+						points.get(0).addLocal(delta);
 						getEditPointShape(editPointIndex).setTranslation(p);
-						points.get(0).set(newCenter);
 						setRackWidth(rw);
 						if (outOfBound()) {
 							if (oldRackCenter != null) {
@@ -254,9 +253,9 @@ public class Rack extends HousePart implements Trackable, Meshable {
 					final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final double ph = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 					if (rh > ph) {
-						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
+						final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
+						points.get(0).addLocal(delta);
 						getEditPointShape(editPointIndex).setTranslation(p);
-						points.get(0).set(newCenter);
 						setRackHeight(rh);
 						if (outOfBound()) {
 							if (oldRackCenter != null) {
