@@ -125,7 +125,7 @@ public class MapDialog extends JDialog {
 	private MapDialog(final JFrame owner) {
 		super(owner);
 		setTitle("Earth View");
-		// setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		setResizable(false);
 		final JSpinner.NumberEditor latEditor = new JSpinner.NumberEditor(latitudeSpinner, "0.00000");
 		final JSpinner.NumberEditor lngEditor = new JSpinner.NumberEditor(longitudeSpinner, "0.00000");
 		latEditor.getTextField().setColumns(6);

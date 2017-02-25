@@ -231,6 +231,9 @@ public class Rack extends HousePart implements Trackable, Meshable {
 					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final double pw = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
 					if (rw > pw) {
+						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
+						getEditPointShape(editPointIndex).setTranslation(p);
+						points.get(0).set(newCenter);
 						setRackWidth(Math.max(rw, pw));
 						if (outOfBound()) {
 							if (oldRackCenter != null) {
@@ -250,6 +253,9 @@ public class Rack extends HousePart implements Trackable, Meshable {
 					final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final double ph = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
 					if (rh > ph) {
+						final Vector3 newCenter = toRelative(p.add(p1, null).multiplyLocal(0.5));
+						getEditPointShape(editPointIndex).setTranslation(p);
+						points.get(0).set(newCenter);
 						setRackHeight(Math.max(rh, ph));
 						if (outOfBound()) {
 							if (oldRackCenter != null) {
