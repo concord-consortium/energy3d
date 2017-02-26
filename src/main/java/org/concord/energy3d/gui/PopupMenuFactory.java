@@ -5204,7 +5204,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miPoleSpacing = new JMenuItem("Pole Spacing...");
+			final JMenuItem miPoleSpacing = new JMenuItem("Pole Settings...");
 			miPoleSpacing.addActionListener(new ActionListener() {
 
 				@Override
@@ -5217,7 +5217,7 @@ public class PopupMenuFactory {
 					final Foundation foundation = rack.getTopContainer();
 					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					final JPanel inputPanel = new JPanel(new GridLayout(3, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
 					inputPanel.add(new JLabel("Distance X (m): "));
 					final JTextField dxField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceX()));
@@ -5225,6 +5225,10 @@ public class PopupMenuFactory {
 					inputPanel.add(new JLabel("Distance Y (m): "));
 					final JTextField dyField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceY()));
 					inputPanel.add(dyField);
+					inputPanel.add(new JLabel("Visible: "));
+					final JComboBox<String> visibleComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
+					visibleComboBox.setSelectedIndex(rack.isPoleVisible() ? 0 : 1);
+					inputPanel.add(visibleComboBox);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -5240,7 +5244,7 @@ public class PopupMenuFactory {
 					bg.add(rb2);
 					bg.add(rb3);
 					gui.add(scopePanel, BorderLayout.NORTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Pole Spacing for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Pole Settings for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
 					double dx = 0, dy = 0;
@@ -5266,19 +5270,21 @@ public class PopupMenuFactory {
 						ok = false;
 					}
 					if (ok) {
+						final boolean visible = visibleComboBox.getSelectedIndex() == 0;
 						if (rb1.isSelected()) {
-							final SetRackPoleSpacingCommand c = new SetRackPoleSpacingCommand(rack);
+							final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
 							rack.setPoleDistanceX(dx);
 							rack.setPoleDistanceY(dy);
+							rack.setPoleVisible(visible);
 							rack.draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb2.isSelected()) {
-							final SetPoleSpacingForRacksOnFoundationCommand c = new SetPoleSpacingForRacksOnFoundationCommand(foundation);
-							foundation.setPoleSpacingForRacks(dx, dy);
+							final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
+							foundation.setPoleSpacingForRacks(dx, dy, visible);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						} else if (rb3.isSelected()) {
-							final SetPoleSpacingForAllRacksCommand c = new SetPoleSpacingForAllRacksCommand();
-							Scene.getInstance().setPoleSpacingForAllRacks(dx, dy);
+							final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
+							Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 						updateAfterEdit();

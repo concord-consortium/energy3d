@@ -10,24 +10,28 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetPoleSpacingForAllRacksCommand extends AbstractUndoableEdit {
+public class ChangePoleSettingsForAllRacksCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldDxs;
 	private double[] newDxs;
 	private final double[] oldDys;
 	private double[] newDys;
+	private final boolean[] oldVisibles;
+	private boolean[] newVisibles;
 	private final List<Rack> racks;
 
-	public SetPoleSpacingForAllRacksCommand() {
+	public ChangePoleSettingsForAllRacksCommand() {
 		racks = Scene.getInstance().getAllRacks();
 		final int n = racks.size();
 		oldDxs = new double[n];
 		oldDys = new double[n];
+		oldVisibles = new boolean[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
 			oldDxs[i] = r.getPoleDistanceX();
 			oldDys[i] = r.getPoleDistanceY();
+			oldVisibles[i] = r.isPoleVisible();
 		}
 	}
 
@@ -37,12 +41,15 @@ public class SetPoleSpacingForAllRacksCommand extends AbstractUndoableEdit {
 		final int n = racks.size();
 		newDxs = new double[n];
 		newDys = new double[n];
+		newVisibles = new boolean[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
 			newDxs[i] = r.getPoleDistanceX();
 			r.setPoleDistanceX(oldDxs[i]);
 			newDys[i] = r.getPoleDistanceY();
 			r.setPoleDistanceY(oldDys[i]);
+			newVisibles[i] = r.isPoleVisible();
+			r.setPoleVisible(oldVisibles[i]);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -56,6 +63,7 @@ public class SetPoleSpacingForAllRacksCommand extends AbstractUndoableEdit {
 			final Rack r = racks.get(i);
 			r.setPoleDistanceX(newDxs[i]);
 			r.setPoleDistanceY(newDys[i]);
+			r.setPoleVisible(newVisibles[i]);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -63,7 +71,7 @@ public class SetPoleSpacingForAllRacksCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Set Pole Spacing for All Racks";
+		return "Change Pole Settings for All Racks";
 	}
 
 }

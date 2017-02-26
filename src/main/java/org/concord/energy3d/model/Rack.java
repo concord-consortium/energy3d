@@ -63,6 +63,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 	private double baseHeight = 15;
 	private double poleDistanceX = 4;
 	private double poleDistanceY = 2;
+	private boolean poleInvisible;
 	private int trackerType = NO_TRACKER;
 	private int rotationAxis;
 	private boolean monolithic = true; // true if the whole rack is covered by solar panels
@@ -453,96 +454,98 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		outlineMesh.setRotation(mesh.getRotation());
 
 		polesRoot.detachAllChildren();
-		final Vector3 center = getAbsPoint(0);
-		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(relativeAzimuth));
-		final double halfRackWidth = rackWidth * 0.5;
-		switch (trackerType) {
-		case Trackable.NO_TRACKER:
-			final HousePart container = getContainerRelative();
-			final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
-			final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
-			matrix.applyPost(uDir, uDir);
-			matrix.applyPost(vDir, vDir);
-			if (vDir.dot(normal) < 0) {
-				vDir.negateLocal();
-			}
-			final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
-			if (tanTiltAngle < 100) {
-				final double cosTiltAngle = Math.cos(Math.toRadians(tiltAngle));
-				final double poleDistanceYHorizontal = poleDistanceY * cosTiltAngle; // project to the horizontal direction
-				final double rackHeightHorizontal = rackHeight * cosTiltAngle;
-				final double halfRackHeightHorizontal = 0.5 * rackHeightHorizontal;
-				for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
-					for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
-						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
-						final double dz = tanTiltAngle * vFactor;
-						if (baseHeight > dz) {
-							addPole(position, baseHeight - dz, baseZ);
-						}
-					}
-					for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
-						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
-						final double dz = tanTiltAngle * vFactor;
-						if (baseHeight > dz) {
-							addPole(position, baseHeight - dz, baseZ);
-						}
-					}
+		if (!poleInvisible) {
+			final Vector3 center = getAbsPoint(0);
+			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(relativeAzimuth));
+			final double halfRackWidth = rackWidth * 0.5;
+			switch (trackerType) {
+			case Trackable.NO_TRACKER:
+				final HousePart container = getContainerRelative();
+				final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
+				final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
+				matrix.applyPost(uDir, uDir);
+				matrix.applyPost(vDir, vDir);
+				if (vDir.dot(normal) < 0) {
+					vDir.negateLocal();
 				}
-				for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
-					for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
-						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
-						final double dz = tanTiltAngle * vFactor;
-						if (baseHeight > dz) {
-							addPole(position, baseHeight - dz, baseZ);
+				final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
+				if (tanTiltAngle < 100) {
+					final double cosTiltAngle = Math.cos(Math.toRadians(tiltAngle));
+					final double poleDistanceYHorizontal = poleDistanceY * cosTiltAngle; // project to the horizontal direction
+					final double rackHeightHorizontal = rackHeight * cosTiltAngle;
+					final double halfRackHeightHorizontal = 0.5 * rackHeightHorizontal;
+					for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
+						for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
+							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double dz = tanTiltAngle * vFactor;
+							if (baseHeight > dz) {
+								addPole(position, baseHeight - dz, baseZ);
+							}
+						}
+						for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
+							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double dz = tanTiltAngle * vFactor;
+							if (baseHeight > dz) {
+								addPole(position, baseHeight - dz, baseZ);
+							}
 						}
 					}
-					for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
-						final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
-						final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
-						final double dz = tanTiltAngle * vFactor;
-						if (baseHeight > dz) {
-							addPole(position, baseHeight - dz, baseZ);
+					for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
+						for (double v = halfRackHeightHorizontal; v < rackHeightHorizontal; v += poleDistanceYHorizontal) {
+							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double dz = tanTiltAngle * vFactor;
+							if (baseHeight > dz) {
+								addPole(position, baseHeight - dz, baseZ);
+							}
+						}
+						for (double v = halfRackHeightHorizontal - poleDistanceYHorizontal; v > 0; v -= poleDistanceYHorizontal) {
+							final double vFactor = (v - halfRackHeightHorizontal) / annotationScale;
+							final Vector3 position = uDir.multiply((u - halfRackWidth) / annotationScale, null).addLocal(vDir.multiply(vFactor, null)).addLocal(center);
+							final double dz = tanTiltAngle * vFactor;
+							if (baseHeight > dz) {
+								addPole(position, baseHeight - dz, baseZ);
+							}
 						}
 					}
-				}
-			}
-			break;
-		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
-			final Vector3 p1 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
-			final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
-			switch (rotationAxis) {
-			case EAST_WEST_AXIS:
-				Vector3 pd = p1.subtract(p0, null).normalizeLocal();
-				for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
-					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-					addPole(position, baseHeight, baseZ);
-				}
-				for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
-					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-					addPole(position, baseHeight, baseZ);
 				}
 				break;
-			case NORTH_SOUTH_AXIS:
-				pd = p2.subtract(p0, null).normalizeLocal();
-				for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
-					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-					addPole(position, baseHeight, baseZ);
-				}
-				for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
-					final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-					addPole(position, baseHeight, baseZ);
+			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+				final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
+				final Vector3 p1 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
+				final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
+				switch (rotationAxis) {
+				case EAST_WEST_AXIS:
+					Vector3 pd = p1.subtract(p0, null).normalizeLocal();
+					for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
+						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
+						addPole(position, baseHeight, baseZ);
+					}
+					for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
+						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
+						addPole(position, baseHeight, baseZ);
+					}
+					break;
+				case NORTH_SOUTH_AXIS:
+					pd = p2.subtract(p0, null).normalizeLocal();
+					for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
+						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
+						addPole(position, baseHeight, baseZ);
+					}
+					for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
+						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
+						addPole(position, baseHeight, baseZ);
+					}
+					break;
 				}
 				break;
+			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+				addPole(getAbsPoint(0), baseHeight, baseZ);
+				break;
 			}
-			break;
-		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-			addPole(getAbsPoint(0), baseHeight, baseZ);
-			break;
 		}
 		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
 
@@ -908,6 +911,14 @@ public class Rack extends HousePart implements Trackable, Meshable {
 
 	public void setPoleDistanceY(final double poleDistanceY) {
 		this.poleDistanceY = poleDistanceY;
+	}
+
+	public void setPoleVisible(final boolean b) {
+		poleInvisible = !b;
+	}
+
+	public boolean isPoleVisible() {
+		return !poleInvisible;
 	}
 
 	private void initSolarPanelsForMove() {

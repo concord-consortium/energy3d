@@ -835,7 +835,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelPowerTowerHeight) {
-			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight()) + " m";
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight() * Scene.getInstance().getAnnotationScale()) + " m";
 		}
 		if (labelPowerTowerOutput) {
 			final double output = getSolarReceiverOutputToday();
@@ -2534,12 +2534,13 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setPoleSpacingForRacks(final double dx, final double dy) {
+	public void setPoleSpacingForRacks(final double dx, final double dy, final boolean visible) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
 				final Rack r = (Rack) p;
 				r.setPoleDistanceX(dx);
 				r.setPoleDistanceY(dy);
+				r.setPoleVisible(visible);
 				r.draw();
 			}
 		}

@@ -1034,7 +1034,7 @@ public class MainFrame extends JFrame {
 					Util.openBrowser("http://energy.concord.org/energy3d/Energy3D-Guide.pdf");
 				}
 			});
-			helpMenu.add(mi);
+			// helpMenu.add(mi);
 			mi = new JMenuItem("Visit Home Page...");
 			mi.addActionListener(new ActionListener() {
 				@Override
@@ -1253,6 +1253,7 @@ public class MainFrame extends JFrame {
 			addModel(complexMenu, "Barn House", "templates/example-barn-house.ng3");
 			final JMenu pvSolarMenu = new JMenu("Photovoltaic Systems");
 			addModel(pvSolarMenu, "Solar Canopy: Wavy Top", "templates/example-solar-canopy-wavy-top.ng3");
+			addModel(pvSolarMenu, "Solar Canopy: Curvy Top", "templates/example-solar-canopy-curvy-top.ng3");
 			addModel(pvSolarMenu, "Solar Canopy: Bus Stop", "templates/example-solar-canopy-bus-stop.ng3");
 			addModel(pvSolarMenu, "Solar Canopy: Overhang", "templates/example-solar-canopy-overhang.ng3");
 			addModel(pvSolarMenu, "Solar Facades: Example 1", "templates/example-solar-facade1.ng3");

@@ -10,26 +10,30 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetPoleSpacingForRacksOnFoundationCommand extends AbstractUndoableEdit {
+public class ChangePoleSettingsForRacksOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldDxs;
 	private double[] newDxs;
 	private final double[] oldDys;
 	private double[] newDys;
+	private final boolean[] oldVisibles;
+	private boolean[] newVisibles;
 	private final Foundation foundation;
 	private final List<Rack> racks;
 
-	public SetPoleSpacingForRacksOnFoundationCommand(final Foundation foundation) {
+	public ChangePoleSettingsForRacksOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		racks = foundation.getRacks();
 		final int n = racks.size();
 		oldDxs = new double[n];
 		oldDys = new double[n];
+		oldVisibles = new boolean[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
 			oldDxs[i] = r.getPoleDistanceX();
 			oldDys[i] = r.getPoleDistanceY();
+			oldVisibles[i] = r.isPoleVisible();
 		}
 	}
 
@@ -43,12 +47,15 @@ public class SetPoleSpacingForRacksOnFoundationCommand extends AbstractUndoableE
 		final int n = racks.size();
 		newDxs = new double[n];
 		newDys = new double[n];
+		newVisibles = new boolean[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
 			newDxs[i] = r.getPoleDistanceX();
 			newDys[i] = r.getPoleDistanceY();
+			newVisibles[i] = r.isPoleVisible();
 			r.setPoleDistanceX(oldDxs[i]);
 			r.setPoleDistanceY(oldDys[i]);
+			r.setPoleVisible(oldVisibles[i]);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -62,6 +69,7 @@ public class SetPoleSpacingForRacksOnFoundationCommand extends AbstractUndoableE
 			final Rack r = racks.get(i);
 			r.setPoleDistanceX(newDxs[i]);
 			r.setPoleDistanceY(newDys[i]);
+			r.setPoleVisible(newVisibles[i]);
 			r.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -69,7 +77,7 @@ public class SetPoleSpacingForRacksOnFoundationCommand extends AbstractUndoableE
 
 	@Override
 	public String getPresentationName() {
-		return "Set Pole Spacing for All Racks on Selected Foundation";
+		return "Change Pole Settings for All Racks on Selected Foundation";
 	}
 
 }
