@@ -13,7 +13,7 @@ import com.ardor3d.math.Vector3;
 
 public class EditPartCommand extends AbstractUndoableEdit {
 	private static final long serialVersionUID = 1L;
-	private final HousePart housePart;
+	final HousePart housePart;
 	protected final ArrayList<Vector3> orgPoints;
 	private final double orgHeight;
 	private ArrayList<Vector3> newPoints;

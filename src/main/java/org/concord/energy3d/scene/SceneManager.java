@@ -63,7 +63,7 @@ import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.MovePartCommand;
-import org.concord.energy3d.undo.RackEditPartCommand;
+import org.concord.energy3d.undo.EditRackCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.UndoManager;
@@ -1057,6 +1057,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void move(final Vector3 v) {
+		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final MovePartCommand c = new MovePartCommand(selectedPart, v);
 		if (selectedPart == null) {
 			for (final HousePart p : Scene.getInstance().getParts()) {
@@ -1915,7 +1916,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 									if (selectedPart instanceof Foundation) {
 										editPartCommand = new EditFoundationCommand((Foundation) selectedPart, !pick.isEditPoint());
 									} else if (selectedPart instanceof Rack) {
-										editPartCommand = new RackEditPartCommand((Rack) selectedPart);
+										editPartCommand = new EditRackCommand((Rack) selectedPart);
 									} else {
 										editPartCommand = new EditPartCommand(selectedPart);
 									}
