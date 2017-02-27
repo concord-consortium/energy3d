@@ -27,9 +27,8 @@ import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 public class MainApplication {
-
 	public static final String VERSION = "6.7.6";
-
+	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
 	private static ArrayList<Runnable> shutdownHooks;
@@ -72,7 +71,8 @@ public class MainApplication {
 
 		final SceneManager sceneManager = SceneManager.getInstance();
 		Scene.getInstance();
-		new Thread(sceneManager, "Energy3D Main Application").start();
+		sceneManagerThread = new Thread(sceneManager, "Energy3D Main Application");
+		sceneManagerThread.start();
 
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -399,6 +399,10 @@ public class MainApplication {
 		}
 		sb.append('\n');
 		return sb.toString();
+	}
+
+	public static boolean isSceneManagerThreadAlive() {
+		return sceneManagerThread.isAlive();
 	}
 
 }

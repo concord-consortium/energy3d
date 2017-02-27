@@ -20,6 +20,7 @@ import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
@@ -723,19 +724,29 @@ public class Scene implements Serializable {
 
 	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) {
 		isSaving = true;
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				try {
-					realSave(url, setAsCurrentFile, notifyUndoManager, logger);
-				} catch (final Throwable e) {
-					Util.reportError(e);
-				} finally {
-					isSaving = false;
+		if (MainApplication.isSceneManagerThreadAlive()) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					try {
+						realSave(url, setAsCurrentFile, notifyUndoManager, logger);
+					} catch (final Throwable e) {
+						Util.reportError(e);
+					} finally {
+						isSaving = false;
+					}
+					return null;
 				}
-				return null;
+			});
+		} else {
+			try {
+				realSave(url, setAsCurrentFile, notifyUndoManager, logger);
+			} catch (final Throwable e) {
+				Util.reportError(e);
+			} finally {
+				isSaving = false;
 			}
-		});
+		}
 	}
 
 	public static void saveOutsideTaskManager(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) {
