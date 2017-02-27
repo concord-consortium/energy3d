@@ -1,7 +1,11 @@
 package org.concord.energy3d.gui;
 
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -19,6 +23,8 @@ class MapImageView extends JComponent {
 
 	private static final long serialVersionUID = 1L;
 	private Image image;
+	private String text;
+	private Color textColor = Color.BLACK;
 	private final Point point;
 
 	MapImageView() {
@@ -45,6 +51,14 @@ class MapImageView extends JComponent {
 		return point;
 	}
 
+	void setText(final String text) {
+		this.text = text;
+	}
+
+	void setTextColor(final Color textColor) {
+		this.textColor = textColor;
+	}
+
 	void setImage(final Image image) {
 		this.image = image;
 	}
@@ -52,7 +66,17 @@ class MapImageView extends JComponent {
 	@Override
 	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
-		g.drawImage(image, 0, 0, this);
+		final Graphics2D g2 = (Graphics2D) g;
+		if (image != null) {
+			g2.drawImage(image, 0, 0, this);
+		}
+		if (text != null) {
+			final FontMetrics fm = g2.getFontMetrics();
+			final int textWidth = fm.stringWidth(text);
+			g2.setFont(new Font(null, Font.BOLD, 14));
+			g2.setColor(textColor);
+			g2.drawString(text, (getWidth() - textWidth) / 2, getHeight() / 2);
+		}
 	}
 
 }

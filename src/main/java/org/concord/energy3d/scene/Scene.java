@@ -27,6 +27,7 @@ import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.MeshLocator;
@@ -171,6 +172,8 @@ public class Scene implements Serializable {
 
 	// the step length of the discretized grid on any part that is not a plate
 	private double solarStep = 2.0;
+
+	private GeoLocation geoLocation;
 
 	public static enum Unit {
 		InternationalSystemOfUnits, USCustomaryUnits
@@ -3166,6 +3169,20 @@ public class Scene implements Serializable {
 
 	public boolean getDisableShadowInAction() {
 		return disableShadowInAction;
+	}
+
+	public void setGeoLocation(final double latitude, final double longitude, final int zoom, final String address) {
+		if (geoLocation == null) {
+			geoLocation = new GeoLocation(latitude, longitude);
+		}
+		geoLocation.setLatitude(latitude);
+		geoLocation.setLongitude(longitude);
+		geoLocation.setZoom(zoom);
+		geoLocation.setAddress(address);
+	}
+
+	public GeoLocation getGeoLocation() {
+		return geoLocation;
 	}
 
 }

@@ -36,6 +36,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
@@ -51,7 +52,7 @@ public class MapDialog extends JDialog {
 	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
 	private final MapImageView mapImageView = new MapImageView();
 	private static MapDialog instance;
-	private boolean lock;
+	private volatile boolean lock;
 	private GoogleMapImageLoader mapImageLoader;
 
 	class GoogleMapImageLoader extends SwingWorker<BufferedImage, Void> {
@@ -64,6 +65,7 @@ public class MapDialog extends JDialog {
 			}
 			this.highResolution = highResolution;
 			googleMapUrl = getGoogleMapUrl(highResolution);
+			mapImageView.setText("Loading...");
 			mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
@@ -78,6 +80,7 @@ public class MapDialog extends JDialog {
 			try {
 				final BufferedImage mapImage = get();
 				if (highResolution) {
+					Scene.getInstance().setGeoLocation((Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue(), addressField.getText());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -97,6 +100,7 @@ public class MapDialog extends JDialog {
 				displayError(e);
 			} finally {
 				mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				mapImageView.setText(null);
 				mapImageLoader = null;
 			}
 		}
@@ -119,6 +123,8 @@ public class MapDialog extends JDialog {
 		if (instance == null) {
 			instance = new MapDialog(MainFrame.getInstance());
 		}
+		instance.setGeoLocation();
+		instance.updateMap();
 		instance.setVisible(true);
 	}
 
@@ -132,6 +138,7 @@ public class MapDialog extends JDialog {
 		lngEditor.getTextField().setColumns(6);
 		latitudeSpinner.setEditor(latEditor);
 		longitudeSpinner.setEditor(lngEditor);
+		setGeoLocation();
 		mapImageView.setAlignmentX(0.5f);
 		mapImageView.setPreferredSize(new Dimension(500, 500));
 		mapImageView.addKeyListener(new KeyAdapter() {
@@ -228,7 +235,7 @@ public class MapDialog extends JDialog {
 		final JPanel panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
 		panel1.setBorder(new EmptyBorder(5, 5, 0, 5));
-		panel1.add(new JLabel("Address:"));
+		panel1.add(new JLabel("Address: "));
 		panel1.add(addressField);
 		getContentPane().add(panel1);
 		final JPanel panel2 = new JPanel();
@@ -266,6 +273,16 @@ public class MapDialog extends JDialog {
 		updateMap();
 		pack();
 		setLocationRelativeTo(owner);
+	}
+
+	private void setGeoLocation() {
+		final GeoLocation geoLocation = Scene.getInstance().getGeoLocation();
+		if (geoLocation != null) {
+			latitudeSpinner.setValue(geoLocation.getLatitude());
+			longitudeSpinner.setValue(geoLocation.getLongitude());
+			zoomSpinner.setValue(geoLocation.getZoom());
+			addressField.setText(geoLocation.getAddress());
+		}
 	}
 
 	private void updateMap() {
