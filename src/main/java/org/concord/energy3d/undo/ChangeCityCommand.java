@@ -28,7 +28,7 @@ public class ChangeCityCommand extends AbstractUndoableEdit {
 		newValue = Scene.getInstance().getCity();
 		Scene.getInstance().setCity(oldValue);
 		Util.selectSilently(EnergyPanel.getInstance().getCityComboBox(), oldValue);
-		Float latitude = LocationData.getInstance().getLatitutes().get(EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		Float latitude = LocationData.getInstance().getLatitudes().get(EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		if (latitude != null)
 			Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), latitude.intValue());
 	}
@@ -38,7 +38,7 @@ public class ChangeCityCommand extends AbstractUndoableEdit {
 		super.redo();
 		Scene.getInstance().setCity(newValue);
 		Util.selectSilently(EnergyPanel.getInstance().getCityComboBox(), newValue);
-		Float latitude = LocationData.getInstance().getLatitutes().get(EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
+		Float latitude = LocationData.getInstance().getLatitudes().get(EnergyPanel.getInstance().getCityComboBox().getSelectedItem());
 		if (latitude != null)
 			Util.setSilently(EnergyPanel.getInstance().getLatitudeSpinner(), latitude.intValue());
 	}

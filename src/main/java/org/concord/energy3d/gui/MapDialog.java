@@ -39,6 +39,7 @@ import javax.swing.event.ChangeListener;
 import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.LocationData;
 
 import com.ardor3d.math.MathUtils;
 
@@ -80,7 +81,9 @@ public class MapDialog extends JDialog {
 			try {
 				final BufferedImage mapImage = get();
 				if (highResolution) {
-					Scene.getInstance().setGeoLocation((Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue(), addressField.getText());
+					final double lat = (Double) latitudeSpinner.getValue();
+					final double lon = (Double) longitudeSpinner.getValue();
+					Scene.getInstance().setGeoLocation(lat, lon, (Integer) zoomSpinner.getValue(), addressField.getText());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -91,6 +94,10 @@ public class MapDialog extends JDialog {
 						}
 					});
 					setVisible(false);
+					final String closestCity = LocationData.getInstance().getClosestCity(lon, lat);
+					if (closestCity != null) {
+						EnergyPanel.getInstance().getCityComboBox().setSelectedItem(closestCity);
+					}
 				} else {
 					final int w = mapImageView.getPreferredSize().width;
 					mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
@@ -237,6 +244,9 @@ public class MapDialog extends JDialog {
 		panel1.setBorder(new EmptyBorder(5, 5, 0, 5));
 		panel1.add(new JLabel("Address: "));
 		panel1.add(addressField);
+		final JButton goButton = new JButton("Go");
+		goButton.addActionListener(addressField.getActionListeners()[0]);
+		panel1.add(goButton);
 		getContentPane().add(panel1);
 		final JPanel panel2 = new JPanel();
 		panel2.add(new JLabel("Latitude:"));

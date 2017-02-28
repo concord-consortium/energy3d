@@ -24,7 +24,7 @@ class MapImageView extends JComponent {
 	private static final long serialVersionUID = 1L;
 	private Image image;
 	private String text;
-	private Color textColor = Color.BLACK;
+	private Color textColor = Color.WHITE;
 	private final Point point;
 
 	MapImageView() {

@@ -50,6 +50,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
+import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddNodeCommand;
@@ -370,6 +371,7 @@ public class Scene implements Serializable {
 			}
 			energyPanel.setLatitude(latitude); // already silent
 			Util.selectSilently(energyPanel.getCityComboBox(), city);
+			energyPanel.getCityComboBox().setToolTipText("(" + LocationData.getInstance().getLatitudes().get(city) + "\u00B0, " + LocationData.getInstance().getLongitudes().get(city) + "\u00B0)");
 			Scene.getInstance().updateTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();

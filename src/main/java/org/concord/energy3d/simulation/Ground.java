@@ -123,7 +123,7 @@ public class Ground implements Serializable {
 		ave /= 2 * n;
 		amp = 0.25 * (hiMax - hiMin + loMax - loMin);
 		final double d2 = depth * Math.sqrt(OMEGA_YEAR / (2.0 * thermalDiffusivity));
-		if (LocationData.getInstance().getLatitutes().get(city) > 0) {
+		if (LocationData.getInstance().getLatitudes().get(city) > 0) {
 			return ave - amp * Math.exp(-d2) * Math.cos(OMEGA_YEAR * (day - yearlyLagInDays) - d2);
 		}
 		return ave - amp * Math.exp(-d2) * Math.cos(Math.PI + OMEGA_YEAR * (day - yearlyLagInDays) - d2);
