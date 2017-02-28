@@ -371,7 +371,8 @@ public class Scene implements Serializable {
 			}
 			energyPanel.setLatitude(latitude); // already silent
 			Util.selectSilently(energyPanel.getCityComboBox(), city);
-			energyPanel.getCityComboBox().setToolTipText("(" + LocationData.getInstance().getLatitudes().get(city) + "\u00B0, " + LocationData.getInstance().getLongitudes().get(city) + "\u00B0)");
+			final LocationData ld = LocationData.getInstance();
+			energyPanel.getCityComboBox().setToolTipText("(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)");
 			Scene.getInstance().updateTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();

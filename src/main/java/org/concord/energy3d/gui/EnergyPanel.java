@@ -242,7 +242,8 @@ public class EnergyPanel extends JPanel {
 					clearRadiationHeatMap();
 					Scene.getInstance().setCity(city);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
-					cityComboBox.setToolTipText("(" + LocationData.getInstance().getLatitudes().get(city) + "\u00B0, " + LocationData.getInstance().getLongitudes().get(city) + "\u00B0)");
+					final LocationData ld = LocationData.getInstance();
+					cityComboBox.setToolTipText("(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)");
 				}
 				Scene.getInstance().updateTrackables();
 				Scene.getInstance().updateTreeLeaves();
