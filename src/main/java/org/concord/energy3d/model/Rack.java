@@ -56,8 +56,8 @@ public class Rack extends HousePart implements Trackable, Meshable {
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private ReadOnlyVector3 previousNormal;
-	private double rackWidth = 5.94; // 6x2 0.99x1.65 solar panels by default
-	private double rackHeight = 3.3;
+	private double rackWidth = 4.95; // 5x1 0.99x1.65 solar panels by default (use only one row so that it can fit a small roof)
+	private double rackHeight = 1.65;
 	private double relativeAzimuth = 0;
 	private double tiltAngle = 0;
 	private double baseHeight = 15;
@@ -99,10 +99,10 @@ public class Rack extends HousePart implements Trackable, Meshable {
 			copyLayoutGap = 1;
 		}
 		if (Util.isZero(rackWidth)) {
-			rackWidth = 5.94;
+			rackWidth = 4.95;
 		}
 		if (Util.isZero(rackHeight)) {
-			rackHeight = 3.3;
+			rackHeight = 1.65;
 		}
 
 		mesh = new Mesh("Rack");

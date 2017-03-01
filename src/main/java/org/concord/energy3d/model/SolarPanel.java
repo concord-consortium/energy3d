@@ -75,7 +75,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	private double relativeAzimuth;
 	private double tiltAngle;
 	private int trackerType = NO_TRACKER;
-	private double baseHeight = 6;
+	private double baseHeight = 5;
 	private boolean drawSunBeam;
 	private int rotationAxis;
 	private int shadeTolerance = HIGH_SHADE_TOLERANCE;
@@ -116,7 +116,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 			inverterEfficiency = 0.95;
 		}
 		if (Util.isZero(baseHeight)) {
-			baseHeight = 6;
+			baseHeight = 5;
 		}
 		if (Util.isZero(numberOfCellsInX)) {
 			numberOfCellsInX = 6;

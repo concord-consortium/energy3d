@@ -132,6 +132,7 @@ public class PopupMenuFactory {
 	private static JColorChooser colorChooser = new JColorChooser();
 	private static double solarPanelArrayRowSpacing = 1;
 	private static double solarPanelArrayColSpacing = 0.5;
+	private static double solarPanelArrayBaseHeight = 1;
 	private static int solarPanelArrayRowAxis = 0;
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
@@ -140,6 +141,7 @@ public class PopupMenuFactory {
 	private static double solarPanelRackArrayInterRowSpacing = 5;
 	private static double solarPanelRackPoleSpacingX = 4;
 	private static double solarPanelRackPoleSpacingY = 2;
+	private static double solarPanelRackBaseHeight = 3;
 	private static double solarPanelTiltAngle = 0;
 	private static double solarCellEfficiencyPercentage = 15;
 	private static double inverterEfficiencyPercentage = 95;
@@ -2316,7 +2318,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(11, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Color:"));
 						final JComboBox<String> colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
@@ -2368,22 +2370,27 @@ public class PopupMenuFactory {
 						final JTextField colSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelArrayColSpacing));
 						panel.add(colSpacingField);
 
+						panel.add(new JLabel("Base Height (m):"));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelArrayBaseHeight));
+						panel.add(baseHeightField);
+
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-								final String rowValue = rowSpacingField.getText();
-								final String colValue = colSpacingField.getText();
 								try {
-									solarPanelArrayRowSpacing = Double.parseDouble(rowValue);
-									solarPanelArrayColSpacing = Double.parseDouble(colValue);
+									solarPanelArrayRowSpacing = Double.parseDouble(rowSpacingField.getText());
+									solarPanelArrayColSpacing = Double.parseDouble(colSpacingField.getText());
+									solarPanelArrayBaseHeight = Double.parseDouble(baseHeightField.getText());
 									solarPanelTiltAngle = Double.parseDouble(tiltAngleField.getText());
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
 									solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
 									if (solarPanelArrayRowSpacing < 0 || solarPanelArrayColSpacing < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel row or column spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelArrayBaseHeight < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Rack tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
@@ -2425,6 +2432,7 @@ public class PopupMenuFactory {
 							sp.setTiltAngle(solarPanelTiltAngle);
 							sp.setPanelWidth(solarPanelWidth);
 							sp.setPanelHeight(solarPanelHeight);
+							sp.setBaseHeight(solarPanelArrayBaseHeight / Scene.getInstance().getAnnotationScale());
 							sp.setShadeTolerance(solarPanelShadeTolerance);
 							sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
 							sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
@@ -2459,7 +2467,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(13, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(14, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Orientation:"));
 						final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
@@ -2524,6 +2532,10 @@ public class PopupMenuFactory {
 						final JTextField poleSpacingYField = new JTextField(threeDecimalsFormat.format(solarPanelRackPoleSpacingY));
 						panel.add(poleSpacingYField);
 
+						panel.add(new JLabel("Base Height (m):"));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelRackBaseHeight));
+						panel.add(baseHeightField);
+
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Rack Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
@@ -2536,10 +2548,13 @@ public class PopupMenuFactory {
 									solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
 									solarPanelRackPoleSpacingX = Double.parseDouble(poleSpacingXField.getText());
 									solarPanelRackPoleSpacingY = Double.parseDouble(poleSpacingYField.getText());
+									solarPanelRackBaseHeight = Double.parseDouble(baseHeightField.getText());
 									if (solarPanelRackArrayInterRowSpacing < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row rack spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackPoleSpacingX < 1 || solarPanelRackPoleSpacingX > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing X must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelRackBaseHeight < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackPoleSpacingY < 1 || solarPanelRackPoleSpacingY > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing Y must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRowsPerRack <= 0 || solarPanelRowsPerRack > 10) {
@@ -2594,7 +2609,7 @@ public class PopupMenuFactory {
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() {
-									f.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRowsPerRack, solarPanelRackArrayInterRowSpacing, solarPanelArrayRowAxis, solarPanelRackPoleSpacingX, solarPanelRackPoleSpacingY);
+									f.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRackBaseHeight, solarPanelRowsPerRack, solarPanelRackArrayInterRowSpacing, solarPanelArrayRowAxis, solarPanelRackPoleSpacingX, solarPanelRackPoleSpacingY);
 									return null;
 								}
 							});
@@ -2618,7 +2633,7 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
 						panel.add(new JLabel("Type:"));
 						final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Equal Azimuthal Spacing", "Radial Stagger" });
 						typeComboBox.setSelectedIndex(mirrorCircularFieldLayout.getType());
@@ -2647,6 +2662,9 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Axis Road Width:"));
 						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getAxisRoadWidth()));
 						panel.add(axisRoadWidthField);
+						panel.add(new JLabel("Base Height:"));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getBaseHeight()));
+						panel.add(baseHeightField);
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Circular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
@@ -2659,6 +2677,7 @@ public class PopupMenuFactory {
 									mirrorCircularFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
 									mirrorCircularFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
 									mirrorCircularFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
+									mirrorCircularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
 									if (mirrorCircularFieldLayout.getRadialSpacing() < 0 || mirrorCircularFieldLayout.getAzimuthalSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorCircularFieldLayout.getRadialSpacingIncrement() < 0) {
@@ -2675,6 +2694,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorCircularFieldLayout.getMirrorHeight() < 1 || mirrorCircularFieldLayout.getMirrorHeight() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorCircularFieldLayout.getBaseHeight() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;
@@ -2716,7 +2737,7 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
 						panel.add(new JLabel("Row Axis:"));
 						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
 						rowAxisComboBox.setSelectedIndex(mirrorRectangularFieldLayout.getRowAxis());
@@ -2733,6 +2754,9 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Column Spacing:"));
 						final JTextField columnSpacingField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getColumnSpacing()));
 						panel.add(columnSpacingField);
+						panel.add(new JLabel("Base Height:"));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getBaseHeight()));
+						panel.add(baseHeightField);
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Rectangular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
@@ -2741,12 +2765,15 @@ public class PopupMenuFactory {
 									mirrorRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
 									mirrorRectangularFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
 									mirrorRectangularFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
+									mirrorRectangularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
 									if (mirrorRectangularFieldLayout.getRowSpacing() < 0 || mirrorRectangularFieldLayout.getColumnSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorRectangularFieldLayout.getMirrorWidth() < 1 || mirrorRectangularFieldLayout.getMirrorWidth() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorRectangularFieldLayout.getMirrorHeight() < 1 || mirrorRectangularFieldLayout.getMirrorHeight() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorRectangularFieldLayout.getBaseHeight() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;
@@ -2788,7 +2815,7 @@ public class PopupMenuFactory {
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
 						panel.add(new JLabel("Type:"));
 						final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
 						typeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getType());
@@ -2817,6 +2844,9 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Axis Road Width:"));
 						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getAxisRoadWidth()));
 						panel.add(axisRoadWidthField);
+						panel.add(new JLabel("Base Height:"));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getBaseHeight()));
+						panel.add(baseHeightField);
 						boolean ok = false;
 						while (true) {
 							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Spiral Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
@@ -2829,6 +2859,7 @@ public class PopupMenuFactory {
 									mirrorSpiralFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
 									mirrorSpiralFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
 									mirrorSpiralFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
+									mirrorSpiralFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
 									if (mirrorSpiralFieldLayout.getStartTurn() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start turn cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getScalingFactor() <= 0) {
@@ -2847,6 +2878,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getMirrorHeight() < 1 || mirrorSpiralFieldLayout.getMirrorHeight() > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (mirrorSpiralFieldLayout.getBaseHeight() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										ok = true;
 										break;

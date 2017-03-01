@@ -1882,7 +1882,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		return Math.abs(x) < eps || Math.abs(x - 90) < eps || Math.abs(x - 180) < eps || Math.abs(x - 270) < eps || Math.abs(x - 360) < eps;
 	}
 
-	private void addMirror(final Vector3 p, final double w, final double h, final double az) {
+	private void addMirror(final Vector3 p, final double baseHeight, final double w, final double h, final double az) {
 		final Mirror m = new Mirror();
 		m.setContainer(this);
 		Scene.getInstance().add(m, false);
@@ -1894,6 +1894,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		m.points.get(0).setZ(height);
 		m.setMirrorWidth(w);
 		m.setMirrorHeight(h);
+		m.setBaseHeight(baseHeight / Scene.getInstance().getAnnotationScale());
 		m.draw();
 	}
 
@@ -1926,7 +1927,7 @@ public class Foundation extends HousePart implements Thermalizable {
 							continue;
 						}
 						final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-						addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 					}
 				}
 			}
@@ -1941,7 +1942,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows);
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 					}
 				}
 				theta = (i + 0.5) * 2.0 * Math.PI / n;
@@ -1950,7 +1951,7 @@ public class Foundation extends HousePart implements Thermalizable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows) - 0.5 * h;
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 					}
 				}
 			}
@@ -1995,7 +1996,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						continue;
 					}
 					final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-					addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 				}
 			}
 			break;
@@ -2032,7 +2033,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0);
-					addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 				}
 			}
 			break;
@@ -2042,7 +2043,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0);
-					addMirror(p, layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
 				}
 			}
 			break;
@@ -2150,7 +2151,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		});
 	}
 
-	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
+	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
@@ -2203,13 +2204,13 @@ public class Foundation extends HousePart implements Thermalizable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
-							final Rack rack = addRack(panel, tiltAngle, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
+							final Rack rack = addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, false);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setY(y0 + h * (r + 0.5));
-					addRack(panel, tiltAngle, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, false).draw();
+					addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, false).draw();
 				}
 			}
 			break;
@@ -2235,13 +2236,13 @@ public class Foundation extends HousePart implements Thermalizable {
 							final Point2D.Double pd1 = intersections.get(i);
 							final Point2D.Double pd2 = intersections.get(i + 1);
 							rackWidth = pd2.distance(pd1) * Scene.getInstance().getAnnotationScale();
-							final Rack rack = addRack(panel, tiltAngle, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
+							final Rack rack = addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, new Vector3(0.5 * (pd1.getX() + pd2.getX()), 0.5 * (pd1.getY() + pd2.getY()), 0), rackWidth, rackHeight, true);
 							rack.draw();
 						}
 					}
 				} else {
 					center.setX(x0 + h * (r + 0.5));
-					addRack(panel, tiltAngle, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, true).draw();
+					addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, true).draw();
 				}
 			}
 			break;
@@ -2259,7 +2260,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		});
 	}
 
-	private Rack addRack(final SolarPanel panel, final double tiltAngle, final int rowAxis, final double poleDistanceX, final double poleDistanceY, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
+	private Rack addRack(final SolarPanel panel, final double tiltAngle, final double baseHeight, final int rowAxis, final double poleDistanceX, final double poleDistanceY, final Vector3 center, final double rackWidth, final double rackHeight, final boolean rotate90) {
 		final Rack rack = new Rack();
 		rack.setContainer(this);
 		rack.setSolarPanel((SolarPanel) panel.copy(false));
@@ -2269,6 +2270,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		rack.roundUpRackWidth();
 		// rack.roundUpRackHeight();
 		rack.setTiltAngle(tiltAngle);
+		rack.setBaseHeight(baseHeight / Scene.getInstance().getAnnotationScale());
 		rack.setRotationAxis(rowAxis);
 		rack.setPoleDistanceX(poleDistanceX);
 		rack.setPoleDistanceY(poleDistanceY);

@@ -11,6 +11,15 @@ public abstract class MirrorFieldLayout {
 	double startAngle = 0;
 	double endAngle = 360;
 	double axisRoadWidth = 0;
+	double baseHeight = 2;
+
+	public void setBaseHeight(final double baseHeight) {
+		this.baseHeight = baseHeight;
+	}
+
+	public double getBaseHeight() {
+		return baseHeight;
+	}
 
 	public void setMirrorWidth(final double mirrorWidth) {
 		this.mirrorWidth = mirrorWidth;
