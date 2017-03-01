@@ -75,7 +75,6 @@ public abstract class HousePart implements Serializable {
 	protected static int printSequence;
 	private static HousePart gridsHighlightedHousePart;
 	private static boolean snapToObjects = true;
-	private static boolean snapToGrids = true;
 	protected transient final int numOfDrawPoints;
 	protected transient final int numOfEditPoints;
 	protected transient HousePart original = null;
@@ -125,14 +124,6 @@ public abstract class HousePart implements Serializable {
 
 	public static void setSnapToObjects(final boolean snapToObjects) {
 		HousePart.snapToObjects = snapToObjects;
-	}
-
-	public static boolean isSnapToGrids() {
-		return snapToGrids;
-	}
-
-	public static void setSnapToGrids(final boolean snapToGrid) {
-		HousePart.snapToGrids = snapToGrid;
 	}
 
 	public static HousePart getGridsHighlightedHousePart() {
@@ -478,7 +469,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected void snapToGrid(final Vector3 p, final ReadOnlyVector3 previous, final double gridSize, final boolean snapToZ) {
-		if (isSnapToGrids()) {
+		if (Scene.getInstance().isSnapToGrids()) {
 			final Vector3 newP = new Vector3();
 			if (container == null) {
 				newP.set(Math.round(p.getX() / gridSize) * gridSize, Math.round(p.getY() / gridSize) * gridSize, !snapToZ ? p.getZ() : Math.round(p.getZ() / gridSize) * gridSize);
@@ -566,20 +557,20 @@ public abstract class HousePart implements Serializable {
 
 	public void setGridsVisible(final boolean visible) {
 		if (container == null) {
-			SceneManager.getInstance().setGridsVisible(visible);
+			SceneManager.getInstance().setGridsVisible(Scene.getInstance().isSnapToGrids() && visible);
 		} else if (this instanceof Roof) {
 			if (visible) {
 				drawGrids(getGridSize());
 			}
 			if (gridsMesh != null) {
-				gridsMesh.setVisible(visible);
+				gridsMesh.setVisible(Scene.getInstance().isSnapToGrids() && visible);
 			}
 		} else if (container != null) {
 			if (visible) {
 				container.drawGrids(getGridSize());
 			}
 			if (container.gridsMesh != null) {
-				container.gridsMesh.getSceneHints().setCullHint(visible ? CullHint.Inherit : CullHint.Always);
+				container.gridsMesh.getSceneHints().setCullHint(Scene.getInstance().isSnapToGrids() && visible ? CullHint.Inherit : CullHint.Always);
 			}
 		}
 	}

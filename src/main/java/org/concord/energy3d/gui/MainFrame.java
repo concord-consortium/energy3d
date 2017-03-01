@@ -209,7 +209,7 @@ public class MainFrame extends JFrame {
 	private final ButtonGroup printSizeOptionBbuttonGroup = new ButtonGroup();
 	private JMenuItem importMenuItem, importColladaMenuItem;
 	private JCheckBoxMenuItem snapMenuItem;
-	private JCheckBoxMenuItem gridsMenuItem;
+	private JCheckBoxMenuItem snapToGridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
 	private JMenuItem zoomInMenuItem;
 	private JMenuItem zoomOutMenuItem;
@@ -1251,6 +1251,7 @@ public class MainFrame extends JFrame {
 			addModel(complexMenu, "Shingle", "templates/example-shingle.ng3");
 			addModel(complexMenu, "Sunroom", "templates/example-sunroom.ng3");
 			addModel(complexMenu, "Barn House", "templates/example-barn-house.ng3");
+			addModel(complexMenu, "Santa Fe Style House", "templates/example-santa-fe.ng3");
 			final JMenu pvSolarMenu = new JMenu("Photovoltaic Systems");
 			addModel(pvSolarMenu, "Solar Canopy: Wavy Top", "templates/example-solar-canopy-wavy-top.ng3");
 			addModel(pvSolarMenu, "Solar Canopy: Curvy Top", "templates/example-solar-canopy-curvy-top.ng3");
@@ -2434,6 +2435,7 @@ public class MainFrame extends JFrame {
 					pasteMenuItem.setEnabled(copyBuffer != null && !(copyBuffer instanceof Foundation));
 					Util.selectSilently(noteCheckBoxMenuItem, MainPanel.getInstance().isNoteVisible());
 					Util.selectSilently(infoPanelCheckBoxMenuItem, EnergyPanel.getInstance().isVisible());
+					Util.selectSilently(snapToGridsMenuItem, Scene.getInstance().isSnapToGrids());
 					MainPanel.getInstance().defaultTool();
 					if (Scene.getInstance().isStudentMode()) {
 						lockAllMenuItem.setEnabled(false);
@@ -2486,7 +2488,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(clearMenu);
 			editMenu.addSeparator();
 			editMenu.add(getFixProblemsMenuItem());
-			editMenu.add(getGridsMenuItem());
+			editMenu.add(getSnapToGridsMenuItem());
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
 			editMenu.add(getLockAllMenuItem());
@@ -2747,18 +2749,18 @@ public class MainFrame extends JFrame {
 		return snapMenuItem;
 	}
 
-	private JCheckBoxMenuItem getGridsMenuItem() {
-		if (gridsMenuItem == null) {
-			gridsMenuItem = new JCheckBoxMenuItem("Snap To Grids");
-			gridsMenuItem.setSelected(true);
-			gridsMenuItem.addActionListener(new ActionListener() {
+	private JCheckBoxMenuItem getSnapToGridsMenuItem() {
+		if (snapToGridsMenuItem == null) {
+			snapToGridsMenuItem = new JCheckBoxMenuItem("Snap To Grids");
+			snapToGridsMenuItem.setSelected(true);
+			snapToGridsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					HousePart.setSnapToGrids(gridsMenuItem.isSelected());
+					Scene.getInstance().setSnapToGrids(snapToGridsMenuItem.isSelected());
 				}
 			});
 		}
-		return gridsMenuItem;
+		return snapToGridsMenuItem;
 	}
 
 	public JCheckBoxMenuItem getTopViewCheckBoxMenuItem() {

@@ -135,6 +135,7 @@ public class Scene implements Serializable {
 	private boolean hideAxes;
 	private boolean hideLightBeams;
 	private boolean showSunAngles;
+	private boolean noSnapToGrids;
 	private boolean cleanup;
 	private boolean alwaysComputeHeatFluxVectors;
 	private boolean disableShadowInAction;
@@ -3197,6 +3198,14 @@ public class Scene implements Serializable {
 
 	public GeoLocation getGeoLocation() {
 		return geoLocation;
+	}
+
+	public boolean isSnapToGrids() {
+		return !noSnapToGrids;
+	}
+
+	public void setSnapToGrids(final boolean snapToGrid) {
+		this.noSnapToGrids = !snapToGrid;
 	}
 
 }

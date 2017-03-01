@@ -65,7 +65,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton wallButton;
 	private JToggleButton roofButton;
 	private JToggleButton windowButton;
-	private JToggleButton platformButton;
+	private JToggleButton foundationButton;
 	private JToggleButton shadowButton;
 	private JToggleButton spinViewButton;
 	private JToggleButton resizeButton;
@@ -406,7 +406,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getResizeButton());
 			appToolbar.add(getRotateButton());
 			appToolbar.addSeparator();
-			appToolbar.add(getPlatformButton());
+			appToolbar.add(getFoundationButton());
 			appToolbar.add(getWallButton());
 			appToolbar.add(getWindowButton());
 			appToolbar.add(getRoofButton());
@@ -426,7 +426,7 @@ public class MainPanel extends JPanel {
 			bg.add(selectButton);
 			bg.add(zoomButton);
 			bg.add(resizeButton);
-			bg.add(platformButton);
+			bg.add(foundationButton);
 			bg.add(wallButton);
 			bg.add(windowButton);
 			bg.add(roofButton);
@@ -530,22 +530,22 @@ public class MainPanel extends JPanel {
 		return windowButton;
 	}
 
-	private JToggleButton getPlatformButton() {
-		if (platformButton == null) {
-			platformButton = new JToggleButton();
-			platformButton.setIcon(new ImageIcon(getClass().getResource("icons/foundation.png")));
-			platformButton.setToolTipText("Draw platform");
-			platformButton.setFocusable(false);
-			platformButton.addActionListener(new ActionListener() {
+	private JToggleButton getFoundationButton() {
+		if (foundationButton == null) {
+			foundationButton = new JToggleButton();
+			foundationButton.setIcon(new ImageIcon(getClass().getResource("icons/foundation.png")));
+			foundationButton.setToolTipText("Draw foundation");
+			foundationButton.setFocusable(false);
+			foundationButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_FOUNDATION);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
-			platformButton.addMouseListener(operationStickAndRefreshUponExit);
+			foundationButton.addMouseListener(operationStickAndRefreshUponExit);
 		}
-		return platformButton;
+		return foundationButton;
 	}
 
 	public JToggleButton getShadowButton() {
