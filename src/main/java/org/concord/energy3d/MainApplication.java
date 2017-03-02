@@ -27,10 +27,11 @@ import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 public class MainApplication {
-	public static final String VERSION = "6.7.8";
+	public static final String VERSION = "6.7.9";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
+	private static volatile boolean initializing;
 	private static ArrayList<Runnable> shutdownHooks;
 
 	public static void main(final String[] args) {
@@ -74,6 +75,7 @@ public class MainApplication {
 		sceneManagerThread = new Thread(sceneManager, "Energy3D Main Application");
 		sceneManagerThread.start();
 
+		initializing = true;
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -102,6 +104,8 @@ public class MainApplication {
 							}
 						} catch (final Exception e) {
 							e.printStackTrace();
+						} finally {
+							initializing = false;
 						}
 					}
 				}.start();
@@ -251,7 +255,9 @@ public class MainApplication {
 			@Override
 			public boolean newInstanceCreated(final File workingDir, final String[] args) {
 				System.out.println("SingleInstance.open()");
-				newActivation(args);
+				if (!initializing) { // prevent user to invoke newActivation while the app is being initialized (e.g., user impatiently clicks the app multiple times)
+					newActivation(args);
+				}
 				return false;
 			}
 		});

@@ -173,7 +173,7 @@ public abstract class CameraControl {
 
 	// the extent that depends on the camera orientation (not a perfect solution)
 	private static double getCurrentExtent() {
-		double extent = 1;
+		double extent = 10;
 		final BoundingVolume volume = Scene.getRoot().getWorldBound();
 		if (volume instanceof BoundingBox) {
 			final BoundingBox box = (BoundingBox) volume;
