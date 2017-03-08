@@ -74,21 +74,30 @@ public final class LocationData {
 
 	}
 
+	// The great-circle distance or orthodromic distance is the shortest distance between two points on the surface of a sphere, measured along the surface of the sphere
+	// see: https://en.wikipedia.org/wiki/Great-circle_distance
 	public String getClosestCity(final double lon, final double lat) {
 		double min = Double.MAX_VALUE;
 		String city = null;
-		double dx, dy, d2;
+		double distance;
 		for (int i = 1; i < cities.length; i++) {
 			final String c = cities[i];
-			dx = longitudes.get(c) - lon;
-			dy = latitudes.get(c) - lat;
-			d2 = dx * dx + dy * dy;
-			if (d2 < min) {
-				min = d2;
+			distance = getDistance(lon, lat, longitudes.get(c), latitudes.get(c));
+			if (distance < min) {
+				min = distance;
 				city = c;
 			}
 		}
 		return city;
+	}
+
+	// the spherical law of cosines: https://en.wikipedia.org/wiki/Spherical_law_of_cosines
+	private static double getDistance(double lon1, double lat1, double lon2, double lat2) {
+		lon1 = Math.toRadians(lon1);
+		lat1 = Math.toRadians(lat1);
+		lon2 = Math.toRadians(lon2);
+		lat2 = Math.toRadians(lat2);
+		return Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(Math.abs(lon1 - lon2)));
 	}
 
 	public String[] getCities() {
