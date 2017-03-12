@@ -2781,7 +2781,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 		File sourceFile = new File(file.toURI());
 		if (!sourceFile.exists() && Scene.getURL() != null) {
-			sourceFile = new File(new File(Scene.getURL().toURI()).getParentFile(), Util.getFileName(file.getPath()));
+			sourceFile = new File(new File(Scene.getURL().toURI()).getParentFile(), Util.getFileName(file.getPath()).replaceAll("%20", " "));
 		}
 		if (sourceFile.exists()) {
 			final double az = Math.toRadians(getAzimuth());

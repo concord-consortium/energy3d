@@ -1150,7 +1150,7 @@ public class EnergyPanel extends JPanel {
 								final String meshBoxString = TWO_DECIMALS.format(xMeshBox) + "\u00d7" + (TWO_DECIMALS.format(yMeshBox)) + "\u00d7" + (TWO_DECIMALS.format(zMeshBox)) + " m";
 								final String meshCenterString = "(" + ONE_DECIMAL.format(meshBoxCenter.getX() * scale) + ", " + ONE_DECIMAL.format(meshBoxCenter.getY() * scale) + ", " + ONE_DECIMAL.format(meshBoxCenter.getZ() * scale) + ") m";
 								final String meshNormalString = meshNormal != null ? "(" + TWO_DECIMALS.format(meshNormal.getX()) + ", " + TWO_DECIMALS.format(meshNormal.getY()) + ", " + TWO_DECIMALS.format(meshNormal.getZ()) + ")" : "";
-								partPanelBorder.setTitle("Node #" + foundation.getImportedNodes().indexOf(selectedNode) + " (" + Util.getFileName(ns.getSourceURL().getPath()) + "), Mesh #" + meshIndex + ", Base #" + foundation.getId());
+								partPanelBorder.setTitle("Node #" + foundation.getImportedNodes().indexOf(selectedNode) + " (" + Util.getFileName(ns.getSourceURL().getPath()).replace("%20", " ") + "), Mesh #" + meshIndex + ", Base #" + foundation.getId());
 								partProperty1Label.setText("  Node:");
 								partProperty2Label.setText("  Mesh:");
 								partProperty1TextField.setText(TWO_DECIMALS.format(xNodeBox) + "\u00d7" + (TWO_DECIMALS.format(yNodeBox)) + "\u00d7" + (TWO_DECIMALS.format(zNodeBox)) + " m, (" + TWO_DECIMALS.format(position.getX() * scale) + ", " + TWO_DECIMALS.format(position.getY() * scale) + ") m");
