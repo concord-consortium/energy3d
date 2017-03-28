@@ -27,7 +27,7 @@ import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 public class MainApplication {
-	public static final String VERSION = "6.8.1";
+	public static final String VERSION = "6.8.2";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -70,15 +70,15 @@ public class MainApplication {
 			e.printStackTrace();
 		}
 
-		final SceneManager sceneManager = SceneManager.getInstance();
-		Scene.getInstance();
-		sceneManagerThread = new Thread(sceneManager, "Energy3D Main Application");
-		sceneManagerThread.start();
-
 		initializing = true;
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				final SceneManager sceneManager = SceneManager.getInstance();
+				Scene.getInstance();
+				sceneManagerThread = new Thread(sceneManager, "Energy3D Main Application");
+				sceneManagerThread.start();
+
 				final MainFrame mainFrame = MainFrame.getInstance();
 				mainFrame.updateTitleBar();
 				mainFrame.setVisible(true);
@@ -318,7 +318,7 @@ public class MainApplication {
 					});
 
 					try {
-						sleep(5000);
+						sleep(10000);
 					} catch (final InterruptedException e) {
 					}
 
