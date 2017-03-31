@@ -964,31 +964,29 @@ public class Util {
 		return boundingBox;
 	}
 
-	public static Path2D getPath2D(final OrientedBoundingBox box) {
+	public static Point2D.Double[] get2DPoints(final OrientedBoundingBox box) {
+		final Point2D.Double[] points = new Point2D.Double[4];
 		final ReadOnlyVector3 center = box.getCenter();
 		final ReadOnlyVector3 extent = box.getExtent();
 		final ReadOnlyVector3 vx = box.getXAxis().multiply(extent.getX(), null);
 		final ReadOnlyVector3 vy = box.getYAxis().multiply(extent.getY(), null);
-		double x, y;
-		final Path2D path = new Path2D.Double();
 		// (1, 1)
-		x = center.getX() + vx.getX();
-		y = center.getY() + vy.getY();
-		path.moveTo(x, y);
+		double x = center.getX() + vx.getX();
+		double y = center.getY() + vy.getY();
+		points[0] = new Point2D.Double(x, y);
 		// (-1, 1)
 		x = center.getX() - vx.getX();
 		y = center.getY() + vy.getY();
-		path.lineTo(x, y);
+		points[1] = new Point2D.Double(x, y);
 		// (-1, -1)
 		x = center.getX() - vx.getX();
 		y = center.getY() - vy.getY();
-		path.lineTo(x, y);
+		points[2] = new Point2D.Double(x, y);
 		// (1, -1)
 		x = center.getX() + vx.getX();
 		y = center.getY() - vy.getY();
-		path.lineTo(x, y);
-		path.closePath();
-		return path;
+		points[3] = new Point2D.Double(x, y);
+		return points;
 	}
 
 	public static void drawBoundingBox(final Spatial spatial, final Line boundingBox) {

@@ -74,8 +74,8 @@ public class MainApplication {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				final SceneManager sceneManager = SceneManager.getInstance();
-				Scene.getInstance();
+				final SceneManager sceneManager = SceneManager.getInstance(); // this calls Swing GUI
+				Scene.getInstance(); // this calls Swing GUI
 				sceneManagerThread = new Thread(sceneManager, "Energy3D Main Application");
 				sceneManagerThread.start();
 
