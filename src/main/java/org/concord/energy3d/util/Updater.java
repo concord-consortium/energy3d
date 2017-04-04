@@ -1,5 +1,6 @@
 package org.concord.energy3d.util;
 
+import java.awt.EventQueue;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
@@ -38,12 +39,17 @@ public class Updater {
 							e.printStackTrace();
 						}
 						if (Getdown.isUpdateAvailable()) {
-							if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "A new update is available. Would you like to install updates and restart now?", "Update", JOptionPane.YES_NO_OPTION)) {
-								restartRequested = true;
-								MainFrame.getInstance().exit();
-							} else {
-								firstTime = false;
-							}
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "A new update is available. Would you like to install updates and restart now?", "Update", JOptionPane.YES_NO_OPTION)) {
+										restartRequested = true;
+										MainFrame.getInstance().exit();
+									} else {
+										firstTime = false;
+									}
+								}
+							});
 						}
 					}
 				};

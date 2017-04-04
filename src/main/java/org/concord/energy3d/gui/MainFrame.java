@@ -490,7 +490,7 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 
 					enableMenuItems(true);
-					saveMenuItem.setEnabled(!Scene.isInternalFile() && Scene.getInstance().isEdited()); // cannot overwrite a template
+					saveMenuItem.setEnabled(!Scene.isInternalFile()); // cannot overwrite a template
 
 					// prevent multiple replay or postprocessing commands
 					final boolean inactive = !PlayControl.active;
