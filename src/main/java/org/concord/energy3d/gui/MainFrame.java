@@ -263,6 +263,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleGroundImageMenuItem;
 	private JMenuItem clearGroundImageMenuItem;
 	private JCheckBoxMenuItem showGroundImageMenuItem;
+	private String currentGroupType;
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -2104,30 +2105,40 @@ public class MainFrame extends JFrame {
 		return idArray;
 	}
 
+	private Class<?> getCurrentGroupClass() {
+		Class<?> c = null;
+		if ("Wall".equals(currentGroupType)) {
+			c = Wall.class;
+		} else if ("Window".equals(currentGroupType)) {
+			c = Window.class;
+		} else if ("Roof".equals(currentGroupType)) {
+			c = Roof.class;
+		} else if ("Solar Panel".equals(currentGroupType)) {
+			c = SolarPanel.class;
+		} else if ("Solar Panel Rack".equals(currentGroupType)) {
+			c = Rack.class;
+		} else if ("Mirror".equals(currentGroupType)) {
+			c = Mirror.class;
+		} else if ("Foundation".equals(currentGroupType)) {
+			c = Foundation.class;
+		}
+		return c;
+	}
+
 	private PartGroup selectGroup() {
 		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Rack", "Mirror", "Window", "Wall", "Roof" });
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Window", "Wall", "Roof", "Foundation" });
+		if (currentGroupType != null) {
+			typeComboBox.setSelectedItem(currentGroupType);
+		}
 		typeComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				idListModel.clear();
-				final String type = (String) typeComboBox.getSelectedItem();
-				Class<?> c = null;
-				if ("Wall".equals(type)) {
-					c = Wall.class;
-				} else if ("Window".equals(type)) {
-					c = Window.class;
-				} else if ("Roof".equals(type)) {
-					c = Roof.class;
-				} else if ("Solar Panel".equals(type)) {
-					c = SolarPanel.class;
-				} else if ("Rack".equals(type)) {
-					c = Rack.class;
-				} else if ("Mirror".equals(type)) {
-					c = Mirror.class;
-				}
+				currentGroupType = (String) typeComboBox.getSelectedItem();
+				final Class<?> c = getCurrentGroupClass();
 				if (c != null) {
 					final ArrayList<Long> idArray = getIdArray(c);
 					for (final Long id : idArray) {
@@ -2136,9 +2147,12 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		final ArrayList<Long> idArray = getIdArray(SolarPanel.class);
-		for (final Long id : idArray) {
-			idListModel.addElement(id);
+		final Class<?> c = getCurrentGroupClass();
+		if (c != null) {
+			final ArrayList<Long> idArray = getIdArray(c);
+			for (final Long id : idArray) {
+				idListModel.addElement(id);
+			}
 		}
 		final JList<Long> idList = new JList<Long>(idListModel);
 		idList.addListSelectionListener(new ListSelectionListener() {

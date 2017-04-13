@@ -46,6 +46,7 @@ import javax.swing.event.MenuListener;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
@@ -81,7 +82,10 @@ public class GroupAnnualAnalysis extends Analysis {
 			final int a = (int) ((n - i) / n * 128);
 			final int b = 255 - a;
 			Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
+			Graph.setColor("PV " + p.getId(), new Color(255, a, b));
+			Graph.setColor("CSP " + p.getId(), new Color(255, a, b));
 			Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
+			Graph.setColor("Building " + p.getId(), new Color(a, b, 255));
 			i++;
 		}
 		graph = new PartEnergyAnnualGraph();
@@ -158,6 +162,22 @@ public class GroupAnnualAnalysis extends Analysis {
 				final Mirror mirror = (Mirror) p;
 				final double solar = mirror.getSolarPotentialToday() * mirror.getSystemEfficiency();
 				graph.addData("Solar " + p.getId(), solar);
+			} else if (p instanceof Foundation) {
+				final Foundation foundation = (Foundation) p;
+				switch (foundation.getSupportingType()) {
+				case Foundation.PV_STATION:
+					final double pv = foundation.getPhotovoltaicToday();
+					graph.addData("PV " + p.getId(), pv);
+					break;
+				case Foundation.CSP_STATION:
+					final double csp = foundation.getCspToday();
+					graph.addData("CSP " + p.getId(), csp);
+					break;
+				case Foundation.BUILDING:
+					final double totalEnergy = foundation.getTotalEnergyToday();
+					graph.addData("Building " + p.getId(), totalEnergy);
+					break;
+				}
 			}
 		}
 		graph.repaint();

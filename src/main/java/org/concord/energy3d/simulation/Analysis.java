@@ -102,6 +102,7 @@ public abstract class Analysis {
 		SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());
 		graph.clearData();
 		SceneManager.setExecuteAllTask(false);
+		Scene.getInstance().redrawAllNow();
 	}
 
 	static boolean isBuildingComplete(final Foundation foundation) {

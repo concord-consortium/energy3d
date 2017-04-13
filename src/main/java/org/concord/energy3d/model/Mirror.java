@@ -55,6 +55,8 @@ public class Mirror extends HousePart implements Solar {
 	private boolean labelId;
 	private boolean labelEnergyOutput;
 	private static transient BloomRenderPass bloomRenderPass;
+	private transient double yieldNow; // output at current hour
+	private transient double yieldToday;
 
 	public Mirror() {
 		super(1, 1, 0);
@@ -576,6 +578,22 @@ public class Mirror extends HousePart implements Solar {
 
 	public boolean getLabelEnergyOutput() {
 		return labelEnergyOutput;
+	}
+
+	public double getYieldNow() {
+		return yieldNow;
+	}
+
+	public void setYieldNow(final double yieldNow) {
+		this.yieldNow = yieldNow;
+	}
+
+	public double getYieldToday() {
+		return yieldToday;
+	}
+
+	public void setYieldToday(final double yieldToday) {
+		this.yieldToday = yieldToday;
 	}
 
 }

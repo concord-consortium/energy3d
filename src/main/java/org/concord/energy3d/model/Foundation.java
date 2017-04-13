@@ -97,11 +97,13 @@ public class Foundation extends HousePart implements Thermalizable {
 	private transient double maxY;
 	private transient double passiveSolarNow; // energy terms of current hour
 	private transient double photovoltaicNow;
+	private transient double cspNow;
 	private transient double heatingNow;
 	private transient double coolingNow;
 	private transient double totalEnergyNow;
 	private transient double passiveSolarToday; // energy terms of current day
 	private transient double photovoltaicToday;
+	private transient double cspToday;
 	private transient double heatingToday;
 	private transient double coolingToday;
 	private transient double totalEnergyToday;
@@ -1421,6 +1423,14 @@ public class Foundation extends HousePart implements Thermalizable {
 		this.photovoltaicNow = photovoltaicNow;
 	}
 
+	public double getCspNow() {
+		return cspNow;
+	}
+
+	public void setCspNow(final double cspNow) {
+		this.cspNow = cspNow;
+	}
+
 	public double getHeatingNow() {
 		return heatingNow;
 	}
@@ -1459,6 +1469,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void setPhotovoltaicToday(final double photovoltaicToday) {
 		this.photovoltaicToday = photovoltaicToday;
+	}
+
+	public double getCspToday() {
+		return cspToday;
+	}
+
+	public void setCspToday(final double cspToday) {
+		this.cspToday = cspToday;
 	}
 
 	public double getHeatingToday() {

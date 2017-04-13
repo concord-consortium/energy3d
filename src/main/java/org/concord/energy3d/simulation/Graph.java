@@ -742,9 +742,9 @@ public abstract class Graph extends JPanel {
 					for (int i = 0; i < list.size(); i++) {
 						dataX = left + dx * i;
 						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-						if (key.startsWith("Solar")) {
+						if (key.startsWith("Solar") || key.startsWith("PV") || key.startsWith("CSP")) {
 							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get(key));
-						} else if (key.startsWith("Heat Gain")) {
+						} else if (key.startsWith("Heat Gain") || key.startsWith("Building")) {
 							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get(key));
 						}
 					}
@@ -824,10 +824,10 @@ public abstract class Graph extends JPanel {
 						continue;
 					}
 					y0 += 14;
-					if (k.startsWith("Solar")) {
+					if (k.startsWith("Solar") || k.startsWith("PV") || k.startsWith("CSP")) {
 						drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(k));
 					}
-					if (k.startsWith("Heat Gain")) {
+					if (k.startsWith("Heat Gain") || k.startsWith("Building")) {
 						drawSquare(g2, x0, y0, 8, colors.get(k));
 					}
 					g2.drawString(isAngularGraph ? k : k + " (" + TWO_DECIMALS.format(getSum(k)) + ")", x0 + 14, y0 + 8);

@@ -1211,7 +1211,7 @@ public class SolarRadiation {
 		return result;
 	}
 
-	public void computeTotalEnergyForBuildings() {
+	public void computeEnergyOfToday() {
 		updateTextures();
 		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
 			for (final HousePart part : Scene.getInstance().getParts()) {
@@ -1230,6 +1230,7 @@ public class SolarRadiation {
 				final double[] heatLoss = new double[n];
 				final double[] passiveSolar = new double[n];
 				final double[] photovoltaic = new double[n];
+				final double[] csp = new double[n];
 				for (int i = 0; i < n; i++) {
 					final double groundHeatLoss = foundation.getHeatLoss()[i];
 					// In most cases, the inside temperature is always higher than the ground temperature. In this winter, this adds to heating load, but in the summer, this reduces cooling load.
@@ -1251,6 +1252,8 @@ public class SolarRadiation {
 							((SolarPanel) child).setYieldToday(0);
 						} else if (child instanceof Rack) {
 							((Rack) child).setYieldToday(0);
+						} else if (child instanceof Mirror) {
+							((Mirror) child).setYieldToday(0);
 						}
 						for (int i = 0; i < n; i++) {
 							solarPotentialTotal += child.getSolarPotential()[i];
@@ -1273,6 +1276,11 @@ public class SolarRadiation {
 								final double yield = rack.getSolarPotential()[i] * rack.getSolarPanel().getSystemEfficiency(outsideTemperature);
 								rack.setYieldToday(rack.getYieldToday() + yield);
 								photovoltaic[i] += yield;
+							} else if (child instanceof Mirror) {
+								final Mirror mirror = (Mirror) child;
+								final double yield = mirror.getSolarPotential()[i] * mirror.getSystemEfficiency();
+								mirror.setYieldToday(mirror.getYieldToday() + yield);
+								csp[i] += yield;
 							}
 						}
 					}
@@ -1288,6 +1296,7 @@ public class SolarRadiation {
 				double coolingTotal = 0.0;
 				double passiveSolarTotal = 0.0;
 				double photovoltaicTotal = 0.0;
+				double cspTotal = 0.0;
 				for (int i = 0; i < n; i++) {
 					if (heatLoss[i] < 0) {
 						heatLoss[i] -= passiveSolar[i];
@@ -1301,11 +1310,13 @@ public class SolarRadiation {
 					}
 					passiveSolarTotal += passiveSolar[i];
 					photovoltaicTotal += photovoltaic[i];
+					cspTotal += csp[i];
 				}
 
 				foundation.setSolarPotentialToday(solarPotentialTotal);
 				foundation.setPassiveSolarToday(passiveSolarTotal);
 				foundation.setPhotovoltaicToday(photovoltaicTotal);
+				foundation.setCspToday(cspTotal);
 				foundation.setHeatingToday(heatingTotal);
 				foundation.setCoolingToday(coolingTotal);
 				foundation.setTotalEnergyToday(heatingTotal + coolingTotal - photovoltaicTotal);
@@ -1332,6 +1343,7 @@ public class SolarRadiation {
 				final double[] heatLoss = new double[n];
 				final double[] passiveSolar = new double[n];
 				final double[] photovoltaic = new double[n];
+				final double[] csp = new double[n];
 				final int t0 = n * hour;
 				for (int i = 0; i < n; i++) {
 					final double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
@@ -1362,6 +1374,11 @@ public class SolarRadiation {
 							if (child instanceof Window) {
 								final Window window = (Window) child;
 								passiveSolar[i] += window.getSolarPotential()[t0 + i] * window.getSolarHeatGainCoefficient();
+							} else if (child instanceof Mirror) {
+								final Mirror mirror = (Mirror) child;
+								final double yield = mirror.getSolarPotential()[t0 + i] * mirror.getSystemEfficiency();
+								csp[i] += yield;
+								mirror.setYieldNow(mirror.getYieldNow() + yield);
 							} else if (child instanceof SolarPanel) {
 								final SolarPanel sp = (SolarPanel) child;
 								final double yield = sp.getSolarPotential()[t0 + i] * sp.getSystemEfficiency(outsideTemperature);
@@ -1383,6 +1400,7 @@ public class SolarRadiation {
 				double coolingTotal = 0.0;
 				double passiveSolarTotal = 0.0;
 				double photovoltaicTotal = 0.0;
+				double cspTotal = 0.0;
 				for (int i = 0; i < n; i++) {
 					if (heatLoss[i] < 0) {
 						heatLoss[i] -= passiveSolar[i];
@@ -1396,11 +1414,13 @@ public class SolarRadiation {
 					}
 					passiveSolarTotal += passiveSolar[i];
 					photovoltaicTotal += photovoltaic[i];
+					cspTotal += csp[i];
 				}
 
 				foundation.setSolarPotentialNow(solarPotentialTotal);
 				foundation.setPassiveSolarNow(passiveSolarTotal);
 				foundation.setPhotovoltaicNow(photovoltaicTotal);
+				foundation.setCspNow(cspTotal);
 				foundation.setHeatingNow(heatingTotal);
 				foundation.setCoolingNow(coolingTotal);
 				foundation.setTotalEnergyNow(heatingTotal + coolingTotal - photovoltaicTotal);

@@ -724,7 +724,7 @@ public class EnergyPanel extends JPanel {
 			SolarRadiation.getInstance().compute();
 			final Calendar c = (Calendar) Heliodon.getInstance().getCalendar().clone();
 			HeatLoad.getInstance().computeEnergyToday(c);
-			SolarRadiation.getInstance().computeTotalEnergyForBuildings();
+			SolarRadiation.getInstance().computeEnergyOfToday();
 			Scene.getInstance().updateTreeLeaves();
 			Scene.getInstance().updateLabels(); // we can't call Scene.getInstance().redrawAll() here as it will screw up the radiation texture
 
