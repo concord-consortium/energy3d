@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
@@ -114,6 +115,12 @@ public class GroupAnnualAnalysis extends Analysis {
 								}
 							});
 						}
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								EnergyPanel.getInstance().getDateSpinner().setValue(c.getTime());
+							}
+						});
 					}
 					return null;
 				}
@@ -121,6 +128,7 @@ public class GroupAnnualAnalysis extends Analysis {
 		}
 
 		SceneManager.getTaskManager().update(new Callable<Object>() {
+
 			@Override
 			public Object call() {
 				EventQueue.invokeLater(new Runnable() {
@@ -131,6 +139,7 @@ public class GroupAnnualAnalysis extends Analysis {
 				});
 				return null;
 			}
+
 		});
 	}
 

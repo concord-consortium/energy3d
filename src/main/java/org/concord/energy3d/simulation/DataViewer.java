@@ -189,6 +189,19 @@ class DataViewer {
 			} else if (p instanceof Window) {
 				headers.add("Solar " + p.getId());
 				headers.add("Heat Gain " + p.getId());
+			} else if (p instanceof Foundation) {
+				final Foundation foundation = (Foundation) p;
+				switch (foundation.getSupportingType()) {
+				case Foundation.PV_STATION:
+					headers.add("PV " + p.getId());
+					break;
+				case Foundation.CSP_STATION:
+					headers.add("CSP " + p.getId());
+					break;
+				case Foundation.BUILDING:
+					headers.add("Building " + p.getId());
+					break;
+				}
 			}
 		}
 		final String[] headersArray = new String[headers.size()];
