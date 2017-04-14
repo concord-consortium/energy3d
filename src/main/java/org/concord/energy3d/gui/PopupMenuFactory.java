@@ -26,6 +26,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -2454,16 +2455,24 @@ public class PopupMenuFactory {
 			final JMenuItem miSolarRackArrays = new JMenuItem("Solar Panel Rack Arrays...");
 			layoutMenu.add(miSolarRackArrays);
 			miSolarRackArrays.addActionListener(new ActionListener() {
+
+				private Foundation foundation;
+				private JComboBox<String> orientationComboBox;
+				private JComboBox<String> sizeComboBox;
+				private JComboBox<String> colorOptionComboBox;
+				private JComboBox<String> shadeToleranceComboBox;
+				private JComboBox<String> rowAxisComboBox;
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						final Foundation f = (Foundation) selectedPart;
-						int n = f.countParts(Rack.class);
+						foundation = (Foundation) selectedPart;
+						int n = foundation.countParts(Rack.class);
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panel racks on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
-						n = f.countParts(SolarPanel.class);
+						n = foundation.countParts(SolarPanel.class);
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
@@ -2471,17 +2480,17 @@ public class PopupMenuFactory {
 						final JPanel panel = new JPanel(new GridLayout(14, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Orientation:"));
-						final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
+						orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
 						orientationComboBox.setSelectedIndex(solarPanelOrientation);
 						panel.add(orientationComboBox);
 
 						panel.add(new JLabel("Solar Panel Color:"));
-						final JComboBox<String> colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
 						colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
 						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Solar Panel Size:"));
-						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
+						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
 						} else if (Util.isZero(1.04 - solarPanelWidth) && Util.isZero(1.55 - solarPanelHeight)) {
@@ -2496,7 +2505,7 @@ public class PopupMenuFactory {
 						panel.add(cellEfficiencyField);
 
 						panel.add(new JLabel("Shade Tolerance:"));
-						final JComboBox<String> shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
+						shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
 						shadeToleranceComboBox.setSelectedIndex(solarPanelShadeTolerance);
 						panel.add(shadeToleranceComboBox);
 
@@ -2517,7 +2526,7 @@ public class PopupMenuFactory {
 						panel.add(rowsPerRackField);
 
 						panel.add(new JLabel("Row Axis:"));
-						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 						panel.add(rowAxisComboBox);
 
@@ -2537,9 +2546,16 @@ public class PopupMenuFactory {
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelRackBaseHeight));
 						panel.add(baseHeightField);
 
-						boolean ok = false;
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Rack Options");
+
 						while (true) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Rack Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
 								try {
 									solarPanelRackArrayInterRowSpacing = Double.parseDouble(interrowSpacingField.getText());
 									solarPanelTiltAngle = Double.parseDouble(tiltAngleField.getText());
@@ -2569,54 +2585,55 @@ public class PopupMenuFactory {
 									} else if (solarPanelTemperatureCoefficientPmaxPercentage < -1 || solarPanelTemperatureCoefficientPmaxPercentage > 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										ok = true;
-										break;
+										addSolarRackArrays();
+										if (choice == options[0]) {
+											break;
+										}
 									}
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
-							} else {
-								break;
 							}
-						}
-						if (ok) {
-							solarPanelOrientation = orientationComboBox.getSelectedIndex();
-							solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
-							solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
-							switch (sizeComboBox.getSelectedIndex()) {
-							case 0:
-								solarPanelWidth = 0.99;
-								solarPanelHeight = 1.65;
-								break;
-							case 1:
-								solarPanelWidth = 1.04;
-								solarPanelHeight = 1.55;
-								break;
-							default:
-								solarPanelWidth = 0.99;
-								solarPanelHeight = 1.96;
-								break;
-							}
-							solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
-							final SolarPanel sp = new SolarPanel();
-							sp.setRotated(solarPanelOrientation == 1);
-							sp.setColorOption(solarPanelColorOption);
-							sp.setPanelWidth(solarPanelWidth);
-							sp.setPanelHeight(solarPanelHeight);
-							sp.setShadeTolerance(solarPanelShadeTolerance);
-							sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
-							sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
-							sp.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
-							SceneManager.getTaskManager().update(new Callable<Object>() {
-								@Override
-								public Object call() {
-									f.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRackBaseHeight, solarPanelRowsPerRack, solarPanelRackArrayInterRowSpacing, solarPanelArrayRowAxis, solarPanelRackPoleSpacingX, solarPanelRackPoleSpacingY);
-									return null;
-								}
-							});
-							updateAfterEdit();
 						}
 					}
+				}
+
+				private void addSolarRackArrays() {
+					solarPanelOrientation = orientationComboBox.getSelectedIndex();
+					solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
+					solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
+					switch (sizeComboBox.getSelectedIndex()) {
+					case 0:
+						solarPanelWidth = 0.99;
+						solarPanelHeight = 1.65;
+						break;
+					case 1:
+						solarPanelWidth = 1.04;
+						solarPanelHeight = 1.55;
+						break;
+					default:
+						solarPanelWidth = 0.99;
+						solarPanelHeight = 1.96;
+						break;
+					}
+					solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
+					final SolarPanel sp = new SolarPanel();
+					sp.setRotated(solarPanelOrientation == 1);
+					sp.setColorOption(solarPanelColorOption);
+					sp.setPanelWidth(solarPanelWidth);
+					sp.setPanelHeight(solarPanelHeight);
+					sp.setShadeTolerance(solarPanelShadeTolerance);
+					sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
+					sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
+					sp.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							foundation.addSolarRackArrays(sp, solarPanelTiltAngle, solarPanelRackBaseHeight, solarPanelRowsPerRack, solarPanelRackArrayInterRowSpacing, solarPanelArrayRowAxis, solarPanelRackPoleSpacingX, solarPanelRackPoleSpacingY);
+							return null;
+						}
+					});
+					updateAfterEdit();
 				}
 			});
 
