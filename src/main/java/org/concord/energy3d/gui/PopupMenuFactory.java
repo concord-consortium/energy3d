@@ -2306,11 +2306,18 @@ public class PopupMenuFactory {
 			final JMenuItem miSolarPanelArrays = new JMenuItem("Solar Panel Arrays...");
 			layoutMenu.add(miSolarPanelArrays);
 			miSolarPanelArrays.addActionListener(new ActionListener() {
+
+				private Foundation f;
+				private JComboBox<String> colorOptionComboBox;
+				private JComboBox<String> sizeComboBox;
+				private JComboBox<String> shadeToleranceComboBox;
+				private JComboBox<String> rowAxisComboBox;
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						final Foundation f = (Foundation) selectedPart;
+						f = (Foundation) selectedPart;
 						int n = f.countParts(SolarPanel.class);
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " solar panels on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
@@ -2323,12 +2330,12 @@ public class PopupMenuFactory {
 						final JPanel panel = new JPanel(new GridLayout(11, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Color:"));
-						final JComboBox<String> colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
 						colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
 						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Panel Size:"));
-						final JComboBox<String> sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
+						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
 						} else if (Util.isZero(1.04 - solarPanelWidth) && Util.isZero(1.55 - solarPanelHeight)) {
@@ -2343,7 +2350,7 @@ public class PopupMenuFactory {
 						panel.add(cellEfficiencyField);
 
 						panel.add(new JLabel("Shade Tolerance:"));
-						final JComboBox<String> shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
+						shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
 						shadeToleranceComboBox.setSelectedIndex(solarPanelShadeTolerance);
 						panel.add(shadeToleranceComboBox);
 
@@ -2360,7 +2367,7 @@ public class PopupMenuFactory {
 						panel.add(tiltAngleField);
 
 						panel.add(new JLabel("Row Axis:"));
-						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 						panel.add(rowAxisComboBox);
 
@@ -2376,9 +2383,16 @@ public class PopupMenuFactory {
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelArrayBaseHeight));
 						panel.add(baseHeightField);
 
-						boolean ok = false;
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Array Options");
+
 						while (true) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Solar Panel Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
 								try {
 									solarPanelArrayRowSpacing = Double.parseDouble(rowSpacingField.getText());
 									solarPanelArrayColSpacing = Double.parseDouble(colSpacingField.getText());
@@ -2400,56 +2414,58 @@ public class PopupMenuFactory {
 									} else if (solarPanelTemperatureCoefficientPmaxPercentage < -1 || solarPanelTemperatureCoefficientPmaxPercentage > 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										ok = true;
-										break;
+										addSolarPanelArrays();
+										if (choice == options[0]) {
+											break;
+										}
 									}
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
-							} else {
-								break;
 							}
-						}
-						if (ok) {
-							switch (sizeComboBox.getSelectedIndex()) {
-							case 0:
-								solarPanelWidth = 0.99;
-								solarPanelHeight = 1.65;
-								break;
-							case 1:
-								solarPanelWidth = 1.04;
-								solarPanelHeight = 1.55;
-								break;
-							default:
-								solarPanelWidth = 0.99;
-								solarPanelHeight = 1.96;
-								break;
-							}
-							solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
-							solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
-							solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
-							final SolarPanel sp = new SolarPanel();
-							sp.setRotated(solarPanelOrientation == 1);
-							sp.setColorOption(solarPanelColorOption);
-							sp.setTiltAngle(solarPanelTiltAngle);
-							sp.setPanelWidth(solarPanelWidth);
-							sp.setPanelHeight(solarPanelHeight);
-							sp.setBaseHeight(solarPanelArrayBaseHeight / Scene.getInstance().getAnnotationScale());
-							sp.setShadeTolerance(solarPanelShadeTolerance);
-							sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
-							sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
-							sp.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
-							SceneManager.getTaskManager().update(new Callable<Object>() {
-								@Override
-								public Object call() {
-									f.addSolarPanelArrays(sp, solarPanelArrayRowSpacing, solarPanelArrayColSpacing, solarPanelArrayRowAxis);
-									return null;
-								}
-							});
-							updateAfterEdit();
 						}
 					}
 				}
+
+				private void addSolarPanelArrays() {
+					switch (sizeComboBox.getSelectedIndex()) {
+					case 0:
+						solarPanelWidth = 0.99;
+						solarPanelHeight = 1.65;
+						break;
+					case 1:
+						solarPanelWidth = 1.04;
+						solarPanelHeight = 1.55;
+						break;
+					default:
+						solarPanelWidth = 0.99;
+						solarPanelHeight = 1.96;
+						break;
+					}
+					solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
+					solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
+					solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
+					final SolarPanel sp = new SolarPanel();
+					sp.setRotated(solarPanelOrientation == 1);
+					sp.setColorOption(solarPanelColorOption);
+					sp.setTiltAngle(solarPanelTiltAngle);
+					sp.setPanelWidth(solarPanelWidth);
+					sp.setPanelHeight(solarPanelHeight);
+					sp.setBaseHeight(solarPanelArrayBaseHeight / Scene.getInstance().getAnnotationScale());
+					sp.setShadeTolerance(solarPanelShadeTolerance);
+					sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
+					sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
+					sp.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							f.addSolarPanelArrays(sp, solarPanelArrayRowSpacing, solarPanelArrayColSpacing, solarPanelArrayRowAxis);
+							return null;
+						}
+					});
+					updateAfterEdit();
+				}
+
 			});
 
 			final JMenuItem miSolarRackArrays = new JMenuItem("Solar Panel Rack Arrays...");
@@ -2635,6 +2651,7 @@ public class PopupMenuFactory {
 					});
 					updateAfterEdit();
 				}
+
 			});
 
 			layoutMenu.addSeparator();
@@ -2642,18 +2659,23 @@ public class PopupMenuFactory {
 			final JMenuItem miMirrorCircularArrays = new JMenuItem("Mirror Circular Layout...");
 			layoutMenu.add(miMirrorCircularArrays);
 			miMirrorCircularArrays.addActionListener(new ActionListener() {
+
+				private Foundation f;
+				private JComboBox<String> typeComboBox;
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						final Foundation f = (Foundation) selectedPart;
+						f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
+
 						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
 						panel.add(new JLabel("Type:"));
-						final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Equal Azimuthal Spacing", "Radial Stagger" });
+						typeComboBox = new JComboBox<String>(new String[] { "Equal Azimuthal Spacing", "Radial Stagger" });
 						typeComboBox.setSelectedIndex(mirrorCircularFieldLayout.getType());
 						panel.add(typeComboBox);
 						panel.add(new JLabel("Mirror Width:"));
@@ -2683,9 +2705,17 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Base Height:"));
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
-						boolean ok = false;
+
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Circular Mirror Array Options");
+
 						while (true) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Circular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
 								try {
 									mirrorCircularFieldLayout.setRadialSpacing(Double.parseDouble(rowSpacingField.getText()));
 									mirrorCircularFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
@@ -2715,49 +2745,56 @@ public class PopupMenuFactory {
 									} else if (mirrorCircularFieldLayout.getBaseHeight() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										ok = true;
-										break;
+										addCircularMirrorArrays();
+										if (choice == options[0]) {
+											break;
+										}
 									}
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
-							} else {
-								break;
 							}
-						}
-						if (ok) {
-							mirrorCircularFieldLayout.setType(typeComboBox.getSelectedIndex());
-							SceneManager.getTaskManager().update(new Callable<Object>() {
-								@Override
-								public Object call() {
-									final int count = f.addCircularMirrorArrays(mirrorCircularFieldLayout);
-									if (count == 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
-									}
-									return null;
-								}
-							});
-							updateAfterEdit();
 						}
 					}
 				}
+
+				private void addCircularMirrorArrays() {
+					mirrorCircularFieldLayout.setType(typeComboBox.getSelectedIndex());
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							final int count = f.addCircularMirrorArrays(mirrorCircularFieldLayout);
+							if (count == 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+							return null;
+						}
+					});
+					updateAfterEdit();
+				}
+
 			});
 
 			final JMenuItem miMirrorRectangularArrays = new JMenuItem("Mirror Rectangular Layout...");
 			layoutMenu.add(miMirrorRectangularArrays);
 			miMirrorRectangularArrays.addActionListener(new ActionListener() {
+
+				private Foundation f;
+				private JComboBox<String> rowAxisComboBox;
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						final Foundation f = (Foundation) selectedPart;
+						f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
+
 						final JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
 						panel.add(new JLabel("Row Axis:"));
-						final JComboBox<String> rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
+						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
 						rowAxisComboBox.setSelectedIndex(mirrorRectangularFieldLayout.getRowAxis());
 						panel.add(rowAxisComboBox);
 						panel.add(new JLabel("Mirror Width:"));
@@ -2775,9 +2812,17 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Base Height:"));
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
-						boolean ok = false;
+
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rectangular Mirror Array Options");
+
 						while (true) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Rectangular Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
 								try {
 									mirrorRectangularFieldLayout.setRowSpacing(Double.parseDouble(rowSpacingField.getText()));
 									mirrorRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
@@ -2793,49 +2838,56 @@ public class PopupMenuFactory {
 									} else if (mirrorRectangularFieldLayout.getBaseHeight() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										ok = true;
-										break;
+										addRectangularMirrorArrays();
+										if (choice == options[0]) {
+											break;
+										}
 									}
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
-							} else {
-								break;
 							}
-						}
-						if (ok) {
-							mirrorRectangularFieldLayout.setRowAxis(rowAxisComboBox.getSelectedIndex());
-							SceneManager.getTaskManager().update(new Callable<Object>() {
-								@Override
-								public Object call() {
-									final int count = f.addRectangularMirrorArrays(mirrorRectangularFieldLayout);
-									if (count == 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
-									}
-									return null;
-								}
-							});
-							updateAfterEdit();
 						}
 					}
 				}
+
+				private void addRectangularMirrorArrays() {
+					mirrorRectangularFieldLayout.setRowAxis(rowAxisComboBox.getSelectedIndex());
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							final int count = f.addRectangularMirrorArrays(mirrorRectangularFieldLayout);
+							if (count == 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+							return null;
+						}
+					});
+					updateAfterEdit();
+				}
+
 			});
 
 			final JMenuItem miMirrorFermatSpiralArrays = new JMenuItem("Mirror Spiral Layout...");
 			layoutMenu.add(miMirrorFermatSpiralArrays);
 			miMirrorFermatSpiralArrays.addActionListener(new ActionListener() {
+
+				private Foundation f;
+				private JComboBox<String> typeComboBox;
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						final Foundation f = (Foundation) selectedPart;
+						f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
 						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
+
 						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
 						panel.add(new JLabel("Type:"));
-						final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
+						typeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
 						typeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getType());
 						panel.add(typeComboBox);
 						panel.add(new JLabel("Mirror Width:"));
@@ -2865,9 +2917,17 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Base Height:"));
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
-						boolean ok = false;
+
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Spiral Mirror Array Options");
+
 						while (true) {
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Spiral Mirror Array Options", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
 								try {
 									mirrorSpiralFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
 									mirrorSpiralFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
@@ -2899,32 +2959,34 @@ public class PopupMenuFactory {
 									} else if (mirrorSpiralFieldLayout.getBaseHeight() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										ok = true;
-										break;
+										addSpiralMirrorArrays();
+										if (choice == options[0]) {
+											break;
+										}
 									}
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
-							} else {
-								break;
 							}
-						}
-						if (ok) {
-							mirrorSpiralFieldLayout.setType(typeComboBox.getSelectedIndex());
-							SceneManager.getTaskManager().update(new Callable<Object>() {
-								@Override
-								public Object call() {
-									final int count = f.addSpiralMirrorArrays(mirrorSpiralFieldLayout);
-									if (count == 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
-									}
-									return null;
-								}
-							});
-							updateAfterEdit();
 						}
 					}
 				}
+
+				private void addSpiralMirrorArrays() {
+					mirrorSpiralFieldLayout.setType(typeComboBox.getSelectedIndex());
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							final int count = f.addSpiralMirrorArrays(mirrorSpiralFieldLayout);
+							if (count == 0) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+							}
+							return null;
+						}
+					});
+					updateAfterEdit();
+				}
+
 			});
 
 			final JMenuItem miAddUtilityBill = new JMenuItem("Add Utility Bill");
