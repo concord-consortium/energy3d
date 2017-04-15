@@ -2393,6 +2393,7 @@ public class PopupMenuFactory {
 							if (choice == options[1]) {
 								break;
 							} else {
+								boolean ok = true;
 								try {
 									solarPanelArrayRowSpacing = Double.parseDouble(rowSpacingField.getText());
 									solarPanelArrayColSpacing = Double.parseDouble(colSpacingField.getText());
@@ -2401,6 +2402,11 @@ public class PopupMenuFactory {
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
 									solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
 									if (solarPanelArrayRowSpacing < 0 || solarPanelArrayColSpacing < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel row or column spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelArrayBaseHeight < 0) {
@@ -2419,8 +2425,6 @@ public class PopupMenuFactory {
 											break;
 										}
 									}
-								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
 							}
 						}
@@ -2572,6 +2576,7 @@ public class PopupMenuFactory {
 							if (choice == options[1]) {
 								break;
 							} else {
+								boolean ok = true;
 								try {
 									solarPanelRackArrayInterRowSpacing = Double.parseDouble(interrowSpacingField.getText());
 									solarPanelTiltAngle = Double.parseDouble(tiltAngleField.getText());
@@ -2582,6 +2587,11 @@ public class PopupMenuFactory {
 									solarPanelRackPoleSpacingX = Double.parseDouble(poleSpacingXField.getText());
 									solarPanelRackPoleSpacingY = Double.parseDouble(poleSpacingYField.getText());
 									solarPanelRackBaseHeight = Double.parseDouble(baseHeightField.getText());
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
 									if (solarPanelRackArrayInterRowSpacing < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row rack spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackPoleSpacingX < 1 || solarPanelRackPoleSpacingX > 50) {
@@ -2606,8 +2616,6 @@ public class PopupMenuFactory {
 											break;
 										}
 									}
-								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
 							}
 						}
@@ -2716,6 +2724,7 @@ public class PopupMenuFactory {
 							if (choice == options[1]) {
 								break;
 							} else {
+								boolean ok = true;
 								try {
 									mirrorCircularFieldLayout.setRadialSpacing(Double.parseDouble(rowSpacingField.getText()));
 									mirrorCircularFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
@@ -2726,6 +2735,11 @@ public class PopupMenuFactory {
 									mirrorCircularFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
 									mirrorCircularFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
 									mirrorCircularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
 									if (mirrorCircularFieldLayout.getRadialSpacing() < 0 || mirrorCircularFieldLayout.getAzimuthalSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorCircularFieldLayout.getRadialSpacingIncrement() < 0) {
@@ -2750,8 +2764,6 @@ public class PopupMenuFactory {
 											break;
 										}
 									}
-								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
 							}
 						}
@@ -2823,12 +2835,18 @@ public class PopupMenuFactory {
 							if (choice == options[1]) {
 								break;
 							} else {
+								boolean ok = true;
 								try {
 									mirrorRectangularFieldLayout.setRowSpacing(Double.parseDouble(rowSpacingField.getText()));
 									mirrorRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
 									mirrorRectangularFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
 									mirrorRectangularFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
 									mirrorRectangularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
 									if (mirrorRectangularFieldLayout.getRowSpacing() < 0 || mirrorRectangularFieldLayout.getColumnSpacing() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorRectangularFieldLayout.getMirrorWidth() < 1 || mirrorRectangularFieldLayout.getMirrorWidth() > 50) {
@@ -2843,8 +2861,6 @@ public class PopupMenuFactory {
 											break;
 										}
 									}
-								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
 							}
 						}
@@ -2928,6 +2944,7 @@ public class PopupMenuFactory {
 							if (choice == options[1]) {
 								break;
 							} else {
+								boolean ok = true;
 								try {
 									mirrorSpiralFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
 									mirrorSpiralFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
@@ -2938,6 +2955,11 @@ public class PopupMenuFactory {
 									mirrorSpiralFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
 									mirrorSpiralFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
 									mirrorSpiralFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
 									if (mirrorSpiralFieldLayout.getStartTurn() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start turn cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (mirrorSpiralFieldLayout.getScalingFactor() <= 0) {
@@ -2964,8 +2986,6 @@ public class PopupMenuFactory {
 											break;
 										}
 									}
-								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								}
 							}
 						}
@@ -5320,14 +5340,21 @@ public class PopupMenuFactory {
 			final JMenuItem miPoleSpacing = new JMenuItem("Pole Settings...");
 			miPoleSpacing.addActionListener(new ActionListener() {
 
+				private Rack rack;
+				private double dx;
+				private double dy;
+				private JComboBox<String> visibleComboBox;
+				private JRadioButton rb1;
+				private JRadioButton rb2;
+				private JRadioButton rb3;
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof Rack)) {
 						return;
 					}
-					final Rack rack = (Rack) selectedPart;
-					final Foundation foundation = rack.getTopContainer();
+					rack = (Rack) selectedPart;
 					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(3, 2, 5, 5));
@@ -5339,16 +5366,16 @@ public class PopupMenuFactory {
 					final JTextField dyField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceY()));
 					inputPanel.add(dyField);
 					inputPanel.add(new JLabel("Visible: "));
-					final JComboBox<String> visibleComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
+					visibleComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
 					visibleComboBox.setSelectedIndex(rack.isPoleVisible() ? 0 : 1);
 					inputPanel.add(visibleComboBox);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Racks");
+					rb1 = new JRadioButton("Only this Rack", true);
+					rb2 = new JRadioButton("All Racks on this Foundation");
+					rb3 = new JRadioButton("All Racks");
 					scopePanel.add(rb1);
 					scopePanel.add(rb2);
 					scopePanel.add(rb3);
@@ -5357,52 +5384,64 @@ public class PopupMenuFactory {
 					bg.add(rb2);
 					bg.add(rb3);
 					gui.add(scopePanel, BorderLayout.NORTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Pole Settings for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
-						return;
-					}
-					double dx = 0, dy = 0;
-					boolean ok = true;
-					try {
-						dx = Double.parseDouble(dxField.getText());
-						if (dx < 1 || dx > 50) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dx must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Pole Settings for " + partInfo);
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							boolean ok = true;
+							try {
+								dx = Double.parseDouble(dxField.getText());
+								dy = Double.parseDouble(dyField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (dx < 1 || dx > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dx must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (dy < 1 || dy > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dy must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									setPoles();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
 						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), dxField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
 					}
-					try {
-						dy = Double.parseDouble(dyField.getText());
-						if (dy < 1 || dy > 50) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dy must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
-						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), dyField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
-					}
-					if (ok) {
-						final boolean visible = visibleComboBox.getSelectedIndex() == 0;
-						if (rb1.isSelected()) {
-							final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
-							rack.setPoleDistanceX(dx);
-							rack.setPoleDistanceY(dy);
-							rack.setPoleVisible(visible);
-							rack.draw();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb2.isSelected()) {
-							final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
-							foundation.setPoleSpacingForRacks(dx, dy, visible);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb3.isSelected()) {
-							final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
-							Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						}
-						updateAfterEdit();
-					}
+
 				}
+
+				private void setPoles() {
+					final boolean visible = visibleComboBox.getSelectedIndex() == 0;
+					if (rb1.isSelected()) {
+						final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
+						rack.setPoleDistanceX(dx);
+						rack.setPoleDistanceY(dy);
+						rack.setPoleVisible(visible);
+						rack.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb2.isSelected()) {
+						final Foundation foundation = rack.getTopContainer();
+						final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
+						foundation.setPoleSpacingForRacks(dx, dy, visible);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					} else if (rb3.isSelected()) {
+						final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
+						Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+					updateAfterEdit();
+				}
+
 			});
 
 			final JMenuItem miSolarPanelArray = new JMenuItem("Solar Panel Array...");
@@ -5477,10 +5516,16 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
+							boolean ok = true;
 							try {
 								cellEfficiency = Double.parseDouble(cellEfficiencyField.getText());
 								inverterEfficiency = Double.parseDouble(inverterEfficiencyField.getText());
 								pmax = Double.parseDouble(pmaxField.getText());
+							} catch (final NumberFormatException ex) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (cellEfficiency < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || cellEfficiency > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (inverterEfficiency < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiency >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
@@ -5493,8 +5538,6 @@ public class PopupMenuFactory {
 										break;
 									}
 								}
-							} catch (final NumberFormatException ex) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), cellEfficiencyField.getText() + " is an invalid value for temperature coefficient of Pmax!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
