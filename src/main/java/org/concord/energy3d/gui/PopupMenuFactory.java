@@ -5127,6 +5127,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
 			miTiltAngle.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -5151,6 +5154,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(panel, BorderLayout.CENTER);
 					final JTextField inputField = new JTextField(rack.getTiltAngle() + "");
 					gui.add(inputField, BorderLayout.SOUTH);
@@ -5189,15 +5203,18 @@ public class PopupMenuFactory {
 										rack.setTiltAngle(val);
 										rack.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = rack.getTopContainer();
 										final ChangeFoundationRackTiltAngleCommand c = new ChangeFoundationRackTiltAngleCommand(foundation);
 										foundation.setTiltAngleForRacks(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final ChangeTiltAngleForAllRacksCommand c = new ChangeTiltAngleForAllRacksCommand();
 										Scene.getInstance().setTiltAngleForAllRacks(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
 									if (choice == options[0]) {
@@ -5212,6 +5229,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
 			miAzimuth.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -5237,6 +5257,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(panel, BorderLayout.CENTER);
 					double a = rack.getRelativeAzimuth() + foundation.getAzimuth();
 					if (a > 360) {
@@ -5273,14 +5304,17 @@ public class PopupMenuFactory {
 									rack.setRelativeAzimuth(a);
 									rack.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
 									foundation.setAzimuthForRacks(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
 									final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
 									Scene.getInstance().setAzimuthForAllRacks(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
 								}
 								updateAfterEdit();
 								if (choice == options[0]) {
@@ -5294,6 +5328,8 @@ public class PopupMenuFactory {
 
 			final JMenuItem miRackSize = new JMenuItem("Size...");
 			miRackSize.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -5332,6 +5368,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -5366,14 +5413,17 @@ public class PopupMenuFactory {
 										rack.ensureFullSolarPanels(false);
 										rack.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
 										foundation.setSizeForRacks(w, h);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
 										Scene.getInstance().setSizeForAllRacks(w, h);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
 									if (choice == options[0]) {
@@ -5388,6 +5438,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
 			miBaseHeight.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -5412,6 +5465,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					final JPanel gui = new JPanel(new BorderLayout());
 					gui.add(panel, BorderLayout.CENTER);
 					final JTextField inputField = new JTextField(rack.getBaseHeight() * Scene.getInstance().getAnnotationScale() + "");
@@ -5443,14 +5507,17 @@ public class PopupMenuFactory {
 									rack.setBaseHeight(val);
 									rack.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationRackBaseHeightCommand c = new ChangeFoundationRackBaseHeightCommand(foundation);
 									foundation.setBaseHeightForRacks(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
 									final ChangeBaseHeightForAllRacksCommand c = new ChangeBaseHeightForAllRacksCommand();
 									Scene.getInstance().setBaseHeightForAllRacks(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
 								}
 								updateAfterEdit();
 								if (choice == options[0]) {
@@ -5464,6 +5531,8 @@ public class PopupMenuFactory {
 
 			final JMenuItem miPoleSpacing = new JMenuItem("Pole Settings...");
 			miPoleSpacing.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -5502,6 +5571,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -5537,15 +5617,18 @@ public class PopupMenuFactory {
 										rack.setPoleVisible(visible);
 										rack.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = rack.getTopContainer();
 										final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
 										foundation.setPoleSpacingForRacks(dx, dy, visible);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
 										Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
 									if (choice == options[0]) {
@@ -5705,6 +5788,7 @@ public class PopupMenuFactory {
 
 				private double w = 0.99;
 				private double h = 1.65;
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -5759,6 +5843,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.CENTER);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -5778,14 +5873,17 @@ public class PopupMenuFactory {
 								r.ensureFullSolarPanels(false);
 								r.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final SetSolarPanelSizeForRacksOnFoundationCommand c = new SetSolarPanelSizeForRacksOnFoundationCommand(foundation);
 								foundation.setSolarPanelSizeForRacks(w, h);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
 								final SetSolarPanelSizeForAllRacksCommand c = new SetSolarPanelSizeForAllRacksCommand();
 								Scene.getInstance().setSolarPanelSizeForAllRacks(w, h);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
 							}
 							updateAfterEdit();
 							if (choice == options[0]) {
@@ -5799,6 +5897,8 @@ public class PopupMenuFactory {
 			final JMenuItem miSolarPanelOrientation = new JMenuItem("Orientation...");
 			solarPanelMenu.add(miSolarPanelOrientation);
 			miSolarPanelOrientation.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -5828,6 +5928,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.CENTER);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -5846,14 +5957,17 @@ public class PopupMenuFactory {
 								r.ensureFullSolarPanels(false);
 								r.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final RotateSolarPanelsForRacksOnFoundationCommand c = new RotateSolarPanelsForRacksOnFoundationCommand(foundation);
 								foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
 								final RotateSolarPanelsOnAllRacksCommand c = new RotateSolarPanelsOnAllRacksCommand();
 								Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
 							}
 							updateAfterEdit();
 							if (choice == options[0]) {
@@ -5867,6 +5981,8 @@ public class PopupMenuFactory {
 			final JMenuItem miSolarPanelColor = new JMenuItem("Color...");
 			solarPanelMenu.add(miSolarPanelColor);
 			miSolarPanelColor.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -5896,6 +6012,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.CENTER);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -5913,14 +6040,17 @@ public class PopupMenuFactory {
 								s.setColorOption(colorComboBox.getSelectedIndex());
 								r.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final SetSolarPanelColorForRacksOnFoundationCommand c = new SetSolarPanelColorForRacksOnFoundationCommand(foundation);
 								foundation.setSolarPanelColorForRacks(colorComboBox.getSelectedIndex());
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
 								final SetSolarPanelColorForAllRacksCommand c = new SetSolarPanelColorForAllRacksCommand();
 								Scene.getInstance().setSolarPanelColorForAllRacks(colorComboBox.getSelectedIndex());
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
 							}
 							updateAfterEdit();
 							if (choice == options[0]) {
@@ -5934,6 +6064,8 @@ public class PopupMenuFactory {
 			final JMenuItem miSolarCellEfficiency = new JMenuItem("Solar Cell Efficiency...");
 			solarPanelMenu.add(miSolarCellEfficiency);
 			miSolarCellEfficiency.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -5962,6 +6094,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.CENTER);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -5991,14 +6134,17 @@ public class PopupMenuFactory {
 										final SetSolarCellEfficiencyForRackCommand c = new SetSolarCellEfficiencyForRackCommand(r);
 										s.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetSolarCellEfficiencyForRacksOnFoundationCommand c = new SetSolarCellEfficiencyForRacksOnFoundationCommand(foundation);
 										foundation.setSolarCellEfficiencyForRacks(solarCellEfficiencyPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetSolarCellEfficiencyForAllRacksCommand c = new SetSolarCellEfficiencyForAllRacksCommand();
 										Scene.getInstance().setSolarCellEfficiencyForAllRacks(solarCellEfficiencyPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
 									if (choice == options[0]) {
@@ -6014,6 +6160,8 @@ public class PopupMenuFactory {
 			final JMenuItem miInverterEfficiency = new JMenuItem("Inverter Efficiency...");
 			solarPanelMenu.add(miInverterEfficiency);
 			miInverterEfficiency.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -6042,6 +6190,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.CENTER);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -6071,14 +6230,17 @@ public class PopupMenuFactory {
 										final SetInverterEfficiencyForRackCommand c = new SetInverterEfficiencyForRackCommand(r);
 										s.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetInverterEfficiencyForRacksOnFoundationCommand c = new SetInverterEfficiencyForRacksOnFoundationCommand(foundation);
 										foundation.setInverterEfficiencyForRacks(inverterEfficiencyPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetInverterEfficiencyForAllRacksCommand c = new SetInverterEfficiencyForAllRacksCommand();
 										Scene.getInstance().setInverterEfficiencyForAllRacks(inverterEfficiencyPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
 									if (choice == options[0]) {
@@ -6094,6 +6256,8 @@ public class PopupMenuFactory {
 			final JMenuItem miPmax = new JMenuItem("Temperature Coefficient of Pmax...");
 			solarPanelMenu.add(miPmax);
 			miPmax.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -6122,6 +6286,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.CENTER);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -6151,14 +6326,17 @@ public class PopupMenuFactory {
 										final SetTemperatureCoefficientPmaxForRackCommand c = new SetTemperatureCoefficientPmaxForRackCommand(r);
 										s.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetTemperatureCoefficientPmaxForRacksOnFoundationCommand c = new SetTemperatureCoefficientPmaxForRacksOnFoundationCommand(foundation);
 										foundation.setTemperatureCoefficientPmaxForRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetTemperatureCoefficientPmaxForAllRacksCommand c = new SetTemperatureCoefficientPmaxForAllRacksCommand();
 										Scene.getInstance().setTemperatureCoefficientPmaxForAllRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
 									if (choice == options[0]) {
@@ -6174,6 +6352,8 @@ public class PopupMenuFactory {
 			final JMenuItem miSolarPanelShadeTolerance = new JMenuItem("Shade Tolerance...");
 			solarPanelMenu.add(miSolarPanelShadeTolerance);
 			miSolarPanelShadeTolerance.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -6203,6 +6383,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.CENTER);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -6219,14 +6410,17 @@ public class PopupMenuFactory {
 								final SetShadeToleranceForSolarPanelsOnRackCommand c = new SetShadeToleranceForSolarPanelsOnRackCommand(r);
 								s.setShadeTolerance(toleranceComboBox.getSelectedIndex());
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final SetSolarPanelShadeToleranceForRacksOnFoundationCommand c = new SetSolarPanelShadeToleranceForRacksOnFoundationCommand(foundation);
 								foundation.setSolarPanelShadeToleranceForRacks(toleranceComboBox.getSelectedIndex());
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
 								final SetSolarPanelShadeToleranceForAllRacksCommand c = new SetSolarPanelShadeToleranceForAllRacksCommand();
 								Scene.getInstance().setSolarPanelShadeToleranceForAllRacks(toleranceComboBox.getSelectedIndex());
 								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
 							}
 							updateAfterEdit();
 							if (choice == options[0]) {
@@ -6242,6 +6436,9 @@ public class PopupMenuFactory {
 			final JRadioButtonMenuItem miNoTracker = new JRadioButtonMenuItem("No Tracker...", true);
 			trackerButtonGroup.add(miNoTracker);
 			miNoTracker.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6263,6 +6460,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					final String title = "<html>Disable tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>No tracker will be used.<hr></html>";
 					final Object[] params = { title, footnote, panel };
@@ -6274,15 +6482,18 @@ public class PopupMenuFactory {
 						rack.setTracker(Trackable.NO_TRACKER);
 						rack.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
 						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.NO_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 2;
 					}
 					updateAfterEdit();
 				}
@@ -6291,6 +6502,9 @@ public class PopupMenuFactory {
 			final JRadioButtonMenuItem miHorizontalSingleAxisTracker = new JRadioButtonMenuItem("Horizontal Single-Axis Tracker...");
 			trackerButtonGroup.add(miHorizontalSingleAxisTracker);
 			miHorizontalSingleAxisTracker.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6312,6 +6526,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					final String title = "<html>Enable horizontal single-axis tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final Object[] params = { title, footnote, panel };
@@ -6323,15 +6548,18 @@ public class PopupMenuFactory {
 						rack.setTracker(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						rack.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
 						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 2;
 					}
 					updateAfterEdit();
 				}
@@ -6340,6 +6568,9 @@ public class PopupMenuFactory {
 			final JRadioButtonMenuItem miVerticalSingleAxisTracker = new JRadioButtonMenuItem("Vertical Single-Axis Tracker...");
 			trackerButtonGroup.add(miVerticalSingleAxisTracker);
 			miVerticalSingleAxisTracker.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6361,6 +6592,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					final String title = "<html>Enable vertical single-axis tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final Object[] params = { title, footnote, panel };
@@ -6372,15 +6614,18 @@ public class PopupMenuFactory {
 						rack.setTracker(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						rack.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
 						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 2;
 					}
 					updateAfterEdit();
 				}
@@ -6389,6 +6634,9 @@ public class PopupMenuFactory {
 			final JRadioButtonMenuItem miAltazimuthDualAxisTracker = new JRadioButtonMenuItem("Altazimuth Dual-Axis Tracker...");
 			trackerButtonGroup.add(miAltazimuthDualAxisTracker);
 			miAltazimuthDualAxisTracker.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6410,6 +6658,17 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					final String title = "<html>Enable altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
 					final Object[] params = { title, footnote, panel };
@@ -6421,15 +6680,18 @@ public class PopupMenuFactory {
 						rack.setTracker(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						rack.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
 						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
 						foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
 						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
 						Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
+						selectedScopeIndex = 2;
 					}
 					updateAfterEdit();
 				}
