@@ -1059,24 +1059,38 @@ public class PopupMenuFactory {
 							bg.add(rb1);
 							bg.add(rb2);
 							bg.add(rb3);
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-								return;
+
+							final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+							final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+							final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Shutter Color");
+
+							while (true) {
+								dialog.setVisible(true);
+								final Object choice = optionPane.getValue();
+								if (choice == options[1]) {
+									break;
+								} else {
+									if (rb1.isSelected()) { // apply to only this window
+										final ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
+										window.setShutterColor(color);
+										window.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									} else if (rb2.isSelected()) {
+										final ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
+										Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, true);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									} else {
+										final ChangeBuildingShutterColorCommand cmd = new ChangeBuildingShutterColorCommand(window);
+										Scene.getInstance().setShutterColorOfBuilding(window, color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
+									Scene.getInstance().setEdited(true);
+									SceneManager.getInstance().refresh();
+									if (choice == options[0]) {
+										break;
+									}
+								}
 							}
-							if (rb1.isSelected()) { // apply to only this window
-								final ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
-								window.setShutterColor(color);
-								window.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(cmd);
-							} else if (rb2.isSelected()) {
-								final ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
-								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, true);
-								SceneManager.getInstance().getUndoManager().addEdit(cmd);
-							} else {
-								final ChangeBuildingShutterColorCommand cmd = new ChangeBuildingShutterColorCommand(window);
-								Scene.getInstance().setShutterColorOfBuilding(window, color);
-								SceneManager.getInstance().getUndoManager().addEdit(cmd);
-							}
-							Scene.getInstance().setEdited(true);
 						}
 					};
 					JColorChooser.createDialog(MainFrame.getInstance(), "Select Shutter Color", true, colorChooser, actionListener, null).setVisible(true);
@@ -1096,6 +1110,7 @@ public class PopupMenuFactory {
 					final String partInfo = window.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final String title = "<html>Relative Length of Shutter for " + partInfo + "</html>";
 					final String footnote = "<html><hr width=400></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -1109,14 +1124,31 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					gui.add(panel, BorderLayout.CENTER);
+					final JTextField inputField = new JTextField(window.getShutterLength() + "");
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Shutter Length (Relative)");
+
 					while (true) {
-						final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), params, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, window.getShutterLength());
-						if (newValue == null) {
+						dialog.setVisible(true);
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							boolean ok = true;
+							double val = 0;
 							try {
-								final double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (val <= 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Relative shutter length must be within (0, 1).", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -1130,11 +1162,12 @@ public class PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										Scene.getInstance().setShutterLengthOfBuilding(window, val);
 									}
+									SceneManager.getInstance().refresh();
 									Scene.getInstance().setEdited(true);
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -1179,6 +1212,7 @@ public class PopupMenuFactory {
 					final Window window = (Window) selectedPart;
 					final String title = "<html>Solar Heat Gain Coefficient of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Examples:<br><table><tr><td><font size=2>Single glass (clear)</td><td><font size=2>0.66</td></tr><tr><td><font size=2>Single glass (green tint)</td><td><font size=2>0.55</td></tr><tr><td><font size=2>Triple glass (air spaces)</td><td><font size=2>0.39</td></tr></table><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -1192,14 +1226,31 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					gui.add(panel, BorderLayout.CENTER);
+					final JTextField inputField = new JTextField(window.getSolarHeatGainCoefficient() + "");
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Heat Gain Coefficient (SHGC)");
+
 					while (true) {
-						final String newValue = (String) JOptionPane.showInputDialog(MainFrame.getInstance(), params, "Input: " + partInfo, JOptionPane.QUESTION_MESSAGE, null, null, window.getSolarHeatGainCoefficient());
-						if (newValue == null) {
+						dialog.setVisible(true);
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							boolean ok = true;
+							double val = 0;
 							try {
-								final double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (val < 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -1218,10 +1269,10 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									updateAfterEdit();
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -1261,23 +1312,36 @@ public class PopupMenuFactory {
 							bg.add(rb1);
 							bg.add(rb2);
 							bg.add(rb3);
-							if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-								return;
+
+							final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+							final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+							final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Window Tint");
+
+							while (true) {
+								dialog.setVisible(true);
+								final Object choice = optionPane.getValue();
+								if (choice == options[1]) {
+									break;
+								} else {
+									if (rb1.isSelected()) { // apply to only this window
+										final ChangePartColorCommand cmd = new ChangePartColorCommand(window);
+										window.setColor(color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									} else if (rb2.isSelected()) {
+										final ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
+										Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, false);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									} else {
+										final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(window);
+										Scene.getInstance().setPartColorOfBuilding(window, color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
 							}
-							if (rb1.isSelected()) { // apply to only this window
-								final ChangePartColorCommand cmd = new ChangePartColorCommand(window);
-								window.setColor(color);
-								SceneManager.getInstance().getUndoManager().addEdit(cmd);
-							} else if (rb2.isSelected()) {
-								final ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
-								Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, false);
-								SceneManager.getInstance().getUndoManager().addEdit(cmd);
-							} else {
-								final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(window);
-								Scene.getInstance().setPartColorOfBuilding(window, color);
-								SceneManager.getInstance().getUndoManager().addEdit(cmd);
-							}
-							updateAfterEdit();
 						}
 					};
 					JColorChooser.createDialog(MainFrame.getInstance(), "Select Tint", true, colorChooser, actionListener, null).setVisible(true);
@@ -1321,57 +1385,63 @@ public class PopupMenuFactory {
 					bg.add(rb2);
 					bg.add(rb3);
 					gui.add(scopePanel, BorderLayout.NORTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
-						return;
-					}
-					double wmax = 10;
-					if (container instanceof Wall) {
-						wmax = ((Wall) container).getWallWidth() * 0.99;
-					}
-					double hmax = 10;
-					if (container instanceof Wall) {
-						hmax = ((Wall) container).getWallHeight() * 0.99;
-					}
-					double w = 0, h = 0;
-					boolean ok = true;
-					try {
-						w = Double.parseDouble(widthField.getText());
-						if (w < 0.1 || w > wmax) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 0.1 and " + (int) wmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set Size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Window Size");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							boolean ok = true;
+							double w = 0, h = 0;
+							try {
+								w = Double.parseDouble(widthField.getText());
+								h = Double.parseDouble(heightField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								double wmax = 10;
+								if (container instanceof Wall) {
+									wmax = ((Wall) container).getWallWidth() * 0.99;
+								}
+								double hmax = 10;
+								if (container instanceof Wall) {
+									hmax = ((Wall) container).getWallHeight() * 0.99;
+								}
+								if (w < 0.1 || w > wmax) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 0.1 and " + (int) wmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (h < 0.1 || h > hmax) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0.1 and " + (int) hmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetPartSizeCommand c = new SetPartSizeCommand(window);
+										window.setWindowWidth(w);
+										window.setWindowHeight(h);
+										window.draw();
+										window.getContainer().draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										final ChangeContainerWindowSizeCommand c = new ChangeContainerWindowSizeCommand(window.getContainer());
+										Scene.getInstance().setWindowSizeInContainer(window.getContainer(), w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										final SetSizeForWindowsOnFoundationCommand c = new SetSizeForWindowsOnFoundationCommand(foundation);
+										foundation.setSizeForWindows(w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
 						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
-					}
-					try {
-						h = Double.parseDouble(heightField.getText());
-						if (h < 0.1 || h > hmax) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0.1 and " + (int) hmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
-						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
-					}
-					if (ok) {
-						if (rb1.isSelected()) {
-							final SetPartSizeCommand c = new SetPartSizeCommand(window);
-							window.setWindowWidth(w);
-							window.setWindowHeight(h);
-							window.draw();
-							window.getContainer().draw();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb2.isSelected()) {
-							final ChangeContainerWindowSizeCommand c = new ChangeContainerWindowSizeCommand(window.getContainer());
-							Scene.getInstance().setWindowSizeInContainer(window.getContainer(), w, h);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb3.isSelected()) {
-							final SetSizeForWindowsOnFoundationCommand c = new SetSizeForWindowsOnFoundationCommand(foundation);
-							foundation.setSizeForWindows(w, h);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						}
-						updateAfterEdit();
 					}
 				}
 			});
