@@ -5067,6 +5067,7 @@ public class PopupMenuFactory {
 					final Rack rack = (Rack) selectedPart;
 					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
 					final String footnote = "<html><hr><font size=2>The tilt angle of a rack is the angle between its surface and the ground surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -5080,14 +5081,29 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					gui.add(panel, BorderLayout.CENTER);
+					final JTextField inputField = new JTextField(rack.getTiltAngle() + "");
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Tilt Angle");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, rack.getTiltAngle());
-						if (newValue == null) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							double val = 0;
+							boolean ok = true;
 							try {
-								double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (val < -90 || val > 90) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -5111,12 +5127,11 @@ public class PopupMenuFactory {
 										Scene.getInstance().setTiltAngleForAllRacks(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
-									rack.draw();
 									updateAfterEdit();
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -5136,6 +5151,7 @@ public class PopupMenuFactory {
 					final Foundation foundation = rack.getTopContainer();
 					final String title = "<html>Azimuth Angle of " + partInfo + " (&deg;)</html>";
 					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -5149,19 +5165,32 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					gui.add(panel, BorderLayout.CENTER);
+					double a = rack.getRelativeAzimuth() + foundation.getAzimuth();
+					if (a > 360) {
+						a -= 360;
+					}
+					final JTextField inputField = new JTextField(a + "");
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Azimuth Angle");
+
 					while (true) {
-						double a = rack.getRelativeAzimuth() + foundation.getAzimuth();
-						if (a > 360) {
-							a -= 360;
-						}
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
-						if (newValue == null) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							boolean ok = true;
 							try {
-								final double val = Double.parseDouble(newValue);
-								a = val - foundation.getAzimuth();
+								a = Double.parseDouble(inputField.getText()) - foundation.getAzimuth();
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (a < 0) {
 									a += 360;
 								}
@@ -5179,11 +5208,10 @@ public class PopupMenuFactory {
 									Scene.getInstance().setAzimuthForAllRacks(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-								rack.draw();
 								updateAfterEdit();
-								break;
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								if (choice == options[0]) {
+									break;
+								}
 							}
 						}
 					}
@@ -5231,49 +5259,55 @@ public class PopupMenuFactory {
 					bg.add(rb2);
 					bg.add(rb3);
 					gui.add(scopePanel, BorderLayout.NORTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
-						return;
-					}
-					double w = 0, h = 0;
-					boolean ok = true;
-					try {
-						w = Double.parseDouble(widthField.getText());
-						if (w < 1 || w > 500) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 500 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set Size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rack Size");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double w = 0, h = 0;
+							boolean ok = true;
+							try {
+								w = Double.parseDouble(widthField.getText());
+								h = Double.parseDouble(heightField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (w < 1 || w > 500) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 500 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (h < 1 || h > 20) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetPartSizeCommand c = new SetPartSizeCommand(rack);
+										rack.setRackWidth(w);
+										rack.setRackHeight(h);
+										rack.ensureFullSolarPanels(false);
+										rack.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
+										foundation.setSizeForRacks(w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
+										Scene.getInstance().setSizeForAllRacks(w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
 						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
-					}
-					try {
-						h = Double.parseDouble(heightField.getText());
-						if (h < 1 || h > 20) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
-						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
-					}
-					if (ok) {
-						if (rb1.isSelected()) {
-							final SetPartSizeCommand c = new SetPartSizeCommand(rack);
-							rack.setRackWidth(w);
-							rack.setRackHeight(h);
-							rack.ensureFullSolarPanels(false);
-							rack.draw();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb2.isSelected()) {
-							final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
-							foundation.setSizeForRacks(w, h);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb3.isSelected()) {
-							final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
-							Scene.getInstance().setSizeForAllRacks(w, h);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						}
-						updateAfterEdit();
 					}
 				}
 			});
@@ -5304,14 +5338,30 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					final JPanel gui = new JPanel(new BorderLayout());
+					gui.add(panel, BorderLayout.CENTER);
+					final JTextField inputField = new JTextField(rack.getBaseHeight() * Scene.getInstance().getAnnotationScale() + "");
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Base Height");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, rack.getBaseHeight() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							boolean ok = true;
+							double val = 0;
 							try {
-								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
+								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getAnnotationScale();
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (rb1.isSelected()) {
 									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
 									rack.setBaseHeight(val);
@@ -5326,11 +5376,10 @@ public class PopupMenuFactory {
 									Scene.getInstance().setBaseHeightForAllRacks(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-								rack.draw();
 								updateAfterEdit();
-								break;
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								if (choice == options[0]) {
+									break;
+								}
 							}
 						}
 					}
@@ -5340,22 +5389,16 @@ public class PopupMenuFactory {
 			final JMenuItem miPoleSpacing = new JMenuItem("Pole Settings...");
 			miPoleSpacing.addActionListener(new ActionListener() {
 
-				private Rack rack;
-				private double dx;
-				private double dy;
-				private JComboBox<String> visibleComboBox;
-				private JRadioButton rb1;
-				private JRadioButton rb2;
-				private JRadioButton rb3;
-
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (!(selectedPart instanceof Rack)) {
 						return;
 					}
-					rack = (Rack) selectedPart;
-					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Rack rack = (Rack) selectedPart;
+					final String partInfo = rack.toString().substring(0, rack.toString().indexOf(')') + 1);
+					final String title = "<html>Pole Settings of " + partInfo + "</html>";
+
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(3, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
@@ -5366,16 +5409,16 @@ public class PopupMenuFactory {
 					final JTextField dyField = new JTextField(threeDecimalsFormat.format(rack.getPoleDistanceY()));
 					inputPanel.add(dyField);
 					inputPanel.add(new JLabel("Visible: "));
-					visibleComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
+					final JComboBox<String> visibleComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
 					visibleComboBox.setSelectedIndex(rack.isPoleVisible() ? 0 : 1);
 					inputPanel.add(visibleComboBox);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					rb1 = new JRadioButton("Only this Rack", true);
-					rb2 = new JRadioButton("All Racks on this Foundation");
-					rb3 = new JRadioButton("All Racks");
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
 					scopePanel.add(rb1);
 					scopePanel.add(rb2);
 					scopePanel.add(rb3);
@@ -5386,8 +5429,8 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Pole Settings for " + partInfo);
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Pole Settings");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -5396,6 +5439,7 @@ public class PopupMenuFactory {
 							break;
 						} else {
 							boolean ok = true;
+							double dx = 0, dy = 0;
 							try {
 								dx = Double.parseDouble(dxField.getText());
 								dy = Double.parseDouble(dyField.getText());
@@ -5409,7 +5453,25 @@ public class PopupMenuFactory {
 								} else if (dy < 1 || dy > 50) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dy must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									setPoles();
+									final boolean visible = visibleComboBox.getSelectedIndex() == 0;
+									if (rb1.isSelected()) {
+										final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
+										rack.setPoleDistanceX(dx);
+										rack.setPoleDistanceY(dy);
+										rack.setPoleVisible(visible);
+										rack.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = rack.getTopContainer();
+										final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
+										foundation.setPoleSpacingForRacks(dx, dy, visible);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									} else if (rb3.isSelected()) {
+										final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
+										Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									updateAfterEdit();
 									if (choice == options[0]) {
 										break;
 									}
@@ -5419,29 +5481,6 @@ public class PopupMenuFactory {
 					}
 
 				}
-
-				private void setPoles() {
-					final boolean visible = visibleComboBox.getSelectedIndex() == 0;
-					if (rb1.isSelected()) {
-						final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
-						rack.setPoleDistanceX(dx);
-						rack.setPoleDistanceY(dy);
-						rack.setPoleVisible(visible);
-						rack.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb2.isSelected()) {
-						final Foundation foundation = rack.getTopContainer();
-						final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
-						foundation.setPoleSpacingForRacks(dx, dy, visible);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb3.isSelected()) {
-						final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
-						Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					}
-					updateAfterEdit();
-				}
-
 			});
 
 			final JMenuItem miSolarPanelArray = new JMenuItem("Solar Panel Array...");
