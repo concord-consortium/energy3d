@@ -5,6 +5,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -72,16 +75,33 @@ public class PvDailyAnalysis extends Analysis {
 					public void run() {
 						onCompletion();
 						final String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
-						String previousRuns = "";
 						final Map<String, Double> recordedResults = getRecordedResults("Solar");
 						final int n = recordedResults.size();
 						if (n > 0) {
+							String previousRuns = "";
 							final Object[] keys = recordedResults.keySet().toArray();
 							for (int i = n - 1; i >= 0; i--) {
 								previousRuns += keys[i] + " : " + Graph.TWO_DECIMALS.format(recordedResults.get(keys[i])) + " kWh<br>";
 							}
+							final Object[] options = new Object[] { "OK", "Copy Data" };
+							final String msg = "<html>The calculated daily output is <b>" + current + " kWh</b>.<br><hr>Results from previously recorded tests:<br>" + previousRuns + "</html>";
+							final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
+							final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Daily Photovoltaic Output");
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								String output = "";
+								for (int i = 0; i < n; i++) {
+									output += Graph.TWO_DECIMALS.format(recordedResults.get(keys[i])) + "\n";
+								}
+								output += current;
+								final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
+								clpbrd.setContents(new StringSelection(output), null);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + (n + 1) + " data points copied to system clipboard.<br><hr>" + output, "Confirmation", JOptionPane.INFORMATION_MESSAGE);
+							}
+						} else {
+							JOptionPane.showMessageDialog(parent, "<html>The calculated daily output is <b>" + current + " kWh</b>.</html>", "Daily Photovoltaic Output", JOptionPane.INFORMATION_MESSAGE);
 						}
-						JOptionPane.showMessageDialog(parent, "<html>The calculated daily output is <b>" + current + " kWh</b>." + (previousRuns.equals("") ? "" : "<br>For details, look at the graph.<br><br><hr>Results from all previously recorded tests:<br>" + previousRuns) + "</html>", "Daily Solar Panel Output", JOptionPane.INFORMATION_MESSAGE);
 					}
 				});
 				return null;
