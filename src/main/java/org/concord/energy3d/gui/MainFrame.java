@@ -23,6 +23,7 @@ import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1128,7 +1129,7 @@ public class MainFrame extends JFrame {
 			saveasMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					saveFile();
+					saveFile(false);
 				}
 			});
 		}
@@ -2631,15 +2632,22 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private void saveFile() {
+	private void saveFile(final boolean outsideTaskManager) {
 		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, true);
 		if (file == null) {
 			return;
 		}
+		URL url = null;
 		try {
-			Scene.save(file.toURI().toURL(), true);
-		} catch (final Exception e) {
+			url = file.toURI().toURL();
+		} catch (final MalformedURLException e) {
 			e.printStackTrace();
+			return;
+		}
+		if (outsideTaskManager) {
+			Scene.saveOutsideTaskManager(url);
+		} else {
+			Scene.save(url, true);
 		}
 		updateTitleBar();
 		FileChooser.getInstance().rememberFile(file.getAbsolutePath());
@@ -3203,12 +3211,12 @@ public class MainFrame extends JFrame {
 			final URL url = Scene.getURL();
 			if (url != null) {
 				if (Scene.isInternalFile()) {
-					saveFile();
+					saveFile(true);
 				} else {
-					Scene.save(url, false);
+					Scene.saveOutsideTaskManager(url);
 				}
 			} else {
-				saveFile();
+				saveFile(true);
 			}
 			Scene.getInstance().setEdited(false);
 		} catch (final Throwable err) {

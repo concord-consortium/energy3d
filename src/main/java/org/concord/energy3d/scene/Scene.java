@@ -753,10 +753,11 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public static void saveOutsideTaskManager(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) {
+	// when saving before exit or saving in the log, don't use a callback through the task manager -- use whatever is the current thread to do the job
+	public static void saveOutsideTaskManager(final URL url) {
 		isSaving = true;
 		try {
-			realSave(url, setAsCurrentFile, notifyUndoManager, logger);
+			realSave(url, false, false, false);
 		} catch (final Throwable e) {
 			e.printStackTrace();
 		} finally {
