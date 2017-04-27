@@ -2980,13 +2980,13 @@ public class MainFrame extends JFrame {
 
 	void showColorDialogForParts() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		ActionListener actionListener;
+		ActionListener colorActionListener;
 		if (selectedPart == null) {
 			final ReadOnlyColorRGBA color = Scene.getInstance().getLandColor();
 			if (color != null) {
 				colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 			}
-			actionListener = new ActionListener() {
+			colorActionListener = new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ChangeLandColorCommand cmd = new ChangeLandColorCommand();
@@ -3009,7 +3009,7 @@ public class MainFrame extends JFrame {
 			if (color != null) {
 				colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 			}
-			actionListener = new ActionListener() {
+			colorActionListener = new ActionListener() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3021,10 +3021,12 @@ public class MainFrame extends JFrame {
 					final float[] newColor = c.getComponents(null);
 					final boolean restartPrintPreview = Scene.getInstance().getRoofColor().equals(ColorRGBA.WHITE) || c.equals(Color.WHITE);
 					final ColorRGBA color = new ColorRGBA(newColor[0], newColor[1], newColor[2], newColor[3]);
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+
 					if (selectedPart instanceof Wall) {
-						final JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+
 						final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
 						final JRadioButton rb2 = new JRadioButton("All Walls Connected to This One (Direct and Indirect)");
 						final JRadioButton rb3 = new JRadioButton("All Walls of this Building");
@@ -3038,31 +3040,43 @@ public class MainFrame extends JFrame {
 						bg.add(rb2);
 						bg.add(rb3);
 						bg.add(rb4);
-						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-							return;
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Wall Color");
+						while (true) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
+								if (rb1.isSelected()) { // apply to only this part
+									final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+									selectedPart.setColor(color);
+									selectedPart.draw();
+									SceneManager.getInstance().refresh();
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								} else if (rb2.isSelected()) {
+									final ChangeColorOfConnectedWallsCommand cmd = new ChangeColorOfConnectedWallsCommand((Wall) selectedPart);
+									Scene.getInstance().setColorOfConnectedWalls((Wall) selectedPart, color);
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								} else if (rb3.isSelected()) {
+									final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
+									Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								} else if (rb4.isSelected()) {
+									final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+									Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								}
+								Scene.getInstance().setWallColor(color); // remember the color decision for the next wall to be added
+								if (choice == options[0]) {
+									break;
+								}
+							}
 						}
-						if (rb1.isSelected()) { // apply to only this part
-							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-							selectedPart.setColor(color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						} else if (rb2.isSelected()) {
-							final ChangeColorOfConnectedWallsCommand cmd = new ChangeColorOfConnectedWallsCommand((Wall) selectedPart);
-							Scene.getInstance().setColorOfConnectedWalls((Wall) selectedPart, color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						} else if (rb3.isSelected()) {
-							final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
-							Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						} else {
-							final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-							Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						}
-						Scene.getInstance().setWallColor(color); // remember the color decision for the next wall to be added
+
 					} else if (selectedPart instanceof Roof) {
-						final JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+
 						final JRadioButton rb1 = new JRadioButton("Only this Roof", true);
 						final JRadioButton rb2 = new JRadioButton("All Roofs");
 						panel.add(rb1);
@@ -3070,23 +3084,35 @@ public class MainFrame extends JFrame {
 						final ButtonGroup bg = new ButtonGroup();
 						bg.add(rb1);
 						bg.add(rb2);
-						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-							return;
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Roof Color");
+						while (true) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
+								if (rb1.isSelected()) { // apply to only this part
+									final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+									selectedPart.setColor(color);
+									selectedPart.draw();
+									SceneManager.getInstance().refresh();
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								} else {
+									final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+									Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								}
+								Scene.getInstance().setRoofColor(color); // remember the color decision for the next roof to be added
+								if (choice == options[0]) {
+									break;
+								}
+							}
 						}
-						if (rb1.isSelected()) { // apply to only this part
-							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-							selectedPart.setColor(color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						} else {
-							final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-							Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						}
-						Scene.getInstance().setRoofColor(color); // remember the color decision for the next roof to be added
+
 					} else if (selectedPart instanceof Foundation) {
-						final JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+
 						final JRadioButton rb1 = new JRadioButton("Only this Foundation", true);
 						final JRadioButton rb2 = new JRadioButton("All Foundations");
 						panel.add(rb1);
@@ -3094,19 +3120,33 @@ public class MainFrame extends JFrame {
 						final ButtonGroup bg = new ButtonGroup();
 						bg.add(rb1);
 						bg.add(rb2);
-						if (JOptionPane.showConfirmDialog(MainFrame.this, panel, "Scope", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-							return;
+						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Foundation Color");
+						while (true) {
+							dialog.setVisible(true);
+							final Object choice = optionPane.getValue();
+							if (choice == options[1]) {
+								break;
+							} else {
+								if (rb1.isSelected()) { // apply to only this part
+									final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+									selectedPart.setColor(color);
+									selectedPart.draw();
+									SceneManager.getInstance().refresh();
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								} else {
+									final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+									Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+								}
+								Scene.getInstance().setFoundationColor(color); // remember the color decision for the next foundation to be added
+								if (choice == options[0]) {
+									break;
+								}
+							}
 						}
-						if (rb1.isSelected()) { // apply to only this part
-							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-							selectedPart.setColor(color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						} else {
-							final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-							Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
-							SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						}
-						Scene.getInstance().setFoundationColor(color); // remember the color decision for the next foundation to be added
+
 					} else {
 						final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
 						selectedPart.setColor(color);
@@ -3119,6 +3159,7 @@ public class MainFrame extends JFrame {
 							Scene.getInstance().setFloorColor(color);
 						}
 					}
+
 					Scene.getInstance().setTextureMode(Scene.getInstance().getTextureMode());
 					if (restartPrintPreview && PrintController.getInstance().isPrintPreview()) {
 						PrintController.getInstance().restartAnimation();
@@ -3129,7 +3170,7 @@ public class MainFrame extends JFrame {
 
 			};
 		}
-		JColorChooser.createDialog(this, "Select Color", true, colorChooser, actionListener, null).setVisible(true);
+		JColorChooser.createDialog(this, "Select Color", true, colorChooser, colorActionListener, null).setVisible(true);
 	}
 
 	public void open(final String filename) {

@@ -775,10 +775,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (int i = 0; i < points.size(); i++) {
 			points.get(i).multiplyLocal(scaleX, scaleY, 1);
 		}
-		applyNewHeight(children, scaleZ, true);
-		final List<Roof> roofs = getRoofs();
-		for (final Roof r : roofs) {
-			r.setOverhangLength(r.getOverhangLength() * scaleZ);
+		if (!Util.isEqual(scaleZ, 1)) {
+			applyNewHeight(children, scaleZ, true);
+			final List<Roof> roofs = getRoofs();
+			for (final Roof r : roofs) {
+				r.setOverhangLength(r.getOverhangLength() * scaleZ);
+			}
 		}
 		move(center.negateLocal(), center.length());
 		if (!Util.isZero(a)) {
@@ -1834,12 +1836,14 @@ public class Foundation extends HousePart implements Thermalizable {
 	@Override
 	public void setHeight(final double height) {
 		final double delta = height - this.height;
-		this.height = height;
-		for (final HousePart c : children) {
-			final int n = c.points.size();
-			for (int i = 0; i < n; i++) {
-				final Vector3 v = c.points.get(i);
-				v.setZ(v.getZ() + delta);
+		if (!Util.isZero(delta)) {
+			this.height = height;
+			for (final HousePart c : children) {
+				final int n = c.points.size();
+				for (int i = 0; i < n; i++) {
+					final Vector3 v = c.points.get(i);
+					v.setZ(v.getZ() + delta);
+				}
 			}
 		}
 	}

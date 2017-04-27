@@ -2044,21 +2044,26 @@ public class Scene implements Serializable {
 	public void setPartColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {
 		if (part instanceof Foundation) {
 			part.setColor(color);
+			part.draw();
 		} else {
 			for (final HousePart p : parts) {
 				if (p.getTopContainer() == part.getTopContainer() && p.getClass().equals(part.getClass())) {
 					p.setColor(color);
+					p.draw();
 				}
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setColorOfAllPartsOfSameType(final HousePart part, final ReadOnlyColorRGBA color) {
 		for (final HousePart p : parts) {
 			if (p.getClass().equals(part.getClass())) {
 				p.setColor(color);
+				p.draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public List<HousePart> getPartsOfSameTypeInBuilding(final HousePart x) {

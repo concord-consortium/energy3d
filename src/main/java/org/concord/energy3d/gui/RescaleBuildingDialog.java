@@ -47,9 +47,9 @@ class RescaleBuildingDialog extends JDialog {
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
-		final ActionListener okListener = new ActionListener() {
+		final Runnable action = new Runnable() {
 			@Override
-			public void actionPerformed(final ActionEvent e) {
+			public void run() {
 				double oldX = 1;
 				String t = oldXField.getText();
 				if (t != null && !t.trim().equals("")) {
@@ -164,7 +164,6 @@ class RescaleBuildingDialog extends JDialog {
 				SceneManager.getInstance().getUndoManager().addEdit(new RescaleBuildingCommand(foundation, oldX, newX, oldY, newY, oldZ, newZ));
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().update();
-				RescaleBuildingDialog.this.dispose();
 			}
 		};
 
@@ -188,7 +187,13 @@ class RescaleBuildingDialog extends JDialog {
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
 		final JButton okButton = new JButton("OK");
-		okButton.addActionListener(okListener);
+		okButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				action.run();
+				RescaleBuildingDialog.this.dispose();
+			}
+		});
 		okButton.setActionCommand("OK");
 		buttonPanel.add(okButton);
 		getRootPane().setDefaultButton(okButton);
@@ -202,6 +207,16 @@ class RescaleBuildingDialog extends JDialog {
 		});
 		cancelButton.setActionCommand("Cancel");
 		buttonPanel.add(cancelButton);
+
+		final JButton applyButton = new JButton("Apply");
+		applyButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				action.run();
+			}
+		});
+		applyButton.setActionCommand("Apply");
+		buttonPanel.add(applyButton);
 
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());

@@ -1526,6 +1526,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miThickness = new JMenuItem("Thickness...");
 			miThickness.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1536,7 +1539,9 @@ public class PopupMenuFactory {
 					final Wall w = (Wall) selectedPart;
 					final String title = "<html>Thickness of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Thickness of wall is in meters.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
@@ -1549,14 +1554,41 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(w.getThickness() * Scene.getInstance().getAnnotationScale()));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Wall Thickness");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, w.getThickness() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							double val = 0;
+							boolean ok = true;
 							try {
-								double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (val < 0.1 || val > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The thickness of a wall must be between 0.1 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -1567,29 +1599,37 @@ public class PopupMenuFactory {
 										w.setThickness(val);
 										w.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = w.getTopContainer();
 										final ChangeFoundationWallThicknessCommand c = new ChangeFoundationWallThicknessCommand(foundation);
 										foundation.setThicknessOfWalls(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final ChangeThicknessForAllWallsCommand c = new ChangeThicknessForAllWallsCommand(w);
 										Scene.getInstance().setThicknessForAllWalls(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+
 							}
 						}
 					}
+
 				}
 			});
 
 			final JMenuItem miHeight = new JMenuItem("Height...");
 			miHeight.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1600,7 +1640,9 @@ public class PopupMenuFactory {
 					final Wall w = (Wall) selectedPart;
 					final String title = "<html>Height of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Height of wall is in meters.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Wall", true);
@@ -1616,14 +1658,44 @@ public class PopupMenuFactory {
 					bg.add(rb2);
 					bg.add(rb3);
 					bg.add(rb4);
-					final Object[] params = { title, footnote, panel };
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					case 3:
+						rb4.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(w.getHeight() * Scene.getInstance().getAnnotationScale()));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Wall Height");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, w.getHeight() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							double val = 0;
+							boolean ok = true;
 							try {
-								double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (val < 1 || val > 1000) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The height of a wall must be between 1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -1633,28 +1705,34 @@ public class PopupMenuFactory {
 										w.setHeight(val, true);
 										w.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final ChangeHeightForConnectedWallsCommand c = new ChangeHeightForConnectedWallsCommand(w);
 										Scene.getInstance().setHeightOfConnectedWalls(w, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final Foundation foundation = w.getTopContainer();
 										final ChangeFoundationWallHeightCommand c = new ChangeFoundationWallHeightCommand(foundation);
 										foundation.setHeightOfWalls(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									} else if (rb4.isSelected()) {
 										final ChangeHeightForAllWallsCommand c = new ChangeHeightForAllWallsCommand(w);
 										Scene.getInstance().setHeightForAllWalls(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 3;
 									}
 									updateAfterEdit();
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+
 							}
 						}
 					}
+
 				}
 			});
 
@@ -3249,9 +3327,9 @@ public class PopupMenuFactory {
 					final Vector3 v0 = f.getAbsPoint(0);
 					final Vector3 v1 = f.getAbsPoint(1);
 					final Vector3 v2 = f.getAbsPoint(2);
-					final double lx0 = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
-					final double ly0 = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
-					final double lz0 = f.getHeight() * Scene.getInstance().getAnnotationScale();
+					double lx0 = v0.distance(v2) * Scene.getInstance().getAnnotationScale();
+					double ly0 = v0.distance(v1) * Scene.getInstance().getAnnotationScale();
+					double lz0 = f.getHeight() * Scene.getInstance().getAnnotationScale();
 
 					final JPanel gui = new JPanel(new BorderLayout());
 					final String title = "<html>Size of Foundation #" + f.getId() + " (in meters)</html>";
@@ -3278,53 +3356,49 @@ public class PopupMenuFactory {
 					inputPanel.add(lzField);
 					SpringUtilities.makeCompactGrid(inputPanel, 3, 2, 6, 6, 6, 6);
 
-					double lx1 = -1, ly1 = -1, lz1 = -1;
-
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Foundation Size");
 					while (true) {
-						SceneManager.getInstance().refresh(1);
-						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
-						}
-						boolean pass = true;
-						try {
-							lx1 = Double.parseDouble(lxField.getText());
-							if (lx1 <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								pass = false;
+						} else {
+							double lx1 = lx0, ly1 = ly0, lz1 = lz0;
+							boolean ok = true;
+							try {
+								lx1 = Double.parseDouble(lxField.getText());
+								ly1 = Double.parseDouble(lyField.getText());
+								lz1 = Double.parseDouble(lzField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
 							}
-						} catch (final NumberFormatException exception) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), lxField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-							pass = false;
-						}
-						try {
-							ly1 = Double.parseDouble(lyField.getText());
-							if (ly1 <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								pass = false;
+							if (ok) {
+								if (lx1 <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (ly1 <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (lz1 < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									f.rescale(lx1 / lx0, ly1 / ly0, 1);
+									f.setHeight(lz1 / Scene.getInstance().getAnnotationScale());
+									f.draw();
+									f.drawChildren();
+									SceneManager.getInstance().refresh();
+									SceneManager.getInstance().getUndoManager().addEdit(new ChangeFoundationSizeCommand(f, lx0, lx1, ly0, ly1, lz0, lz1));
+									updateAfterEdit();
+									lx0 = lx1;
+									ly0 = ly1;
+									lz0 = lz1;
+									if (choice == options[0]) {
+										break;
+									}
+								}
 							}
-						} catch (final NumberFormatException exception) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), lyField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-							pass = false;
-						}
-						try {
-							lz1 = Double.parseDouble(lzField.getText());
-							if (lz1 < 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								pass = false;
-							}
-						} catch (final NumberFormatException exception) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), lzField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-							pass = false;
-						}
-						if (pass) {
-							f.rescale(lx1 / lx0, ly1 / ly0, 1);
-							f.setHeight(lz1 / Scene.getInstance().getAnnotationScale());
-							f.draw();
-							f.drawChildren();
-							SceneManager.getInstance().refresh();
-							updateAfterEdit();
-							SceneManager.getInstance().getUndoManager().addEdit(new ChangeFoundationSizeCommand(f, lx0, lx1, ly0, ly1, lz0, lz1));
-							break;
+
 						}
 					}
 
@@ -3335,6 +3409,7 @@ public class PopupMenuFactory {
 
 			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
 			miLabelNone.addActionListener(new ActionListener() {
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (miLabelNone.isSelected()) {
@@ -6983,6 +7058,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miSetHeliostat = new JMenuItem("Set Heliostat...");
 			miSetHeliostat.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -6991,7 +7069,9 @@ public class PopupMenuFactory {
 					}
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
@@ -7004,20 +7084,49 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(m.getHeliostatTarget().getId() + "");
+					gui.add(inputField, BorderLayout.SOUTH);
+
 					final String title = "<html>Set the ID of the foundation of the target tower for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will focus on the top of the target foundation.<hr></html>";
-					final Object[] params = { title, footnote, panel };
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Heliostat Target");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getHeliostatTarget() == null ? "" : m.getHeliostatTarget().getId());
-						if (newValue == null) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							int id = 0;
+							boolean ok = true;
 							try {
-								final int id = Integer.parseInt(newValue);
+								id = Integer.parseInt(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								final HousePart p = Scene.getInstance().getPart(id);
 								if (id < 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (!(p instanceof Foundation)) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									final HousePart p = Scene.getInstance().getPart(id);
 									if (p instanceof Foundation) {
 										final Foundation target = (Foundation) p;
 										if (rb1.isSelected()) {
@@ -7029,25 +7138,26 @@ public class PopupMenuFactory {
 												oldTarget.drawSolarReceiver();
 											}
 											SceneManager.getInstance().getUndoManager().addEdit(c);
+											selectedScopeIndex = 0;
 										} else if (rb2.isSelected()) {
 											final Foundation foundation = m.getTopContainer();
 											final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
 											foundation.setTargetForMirrors(target);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
+											selectedScopeIndex = 1;
 										} else if (rb3.isSelected()) {
 											final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
 											Scene.getInstance().setTargetForAllMirrors(target);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
+											selectedScopeIndex = 2;
 										}
 										target.drawSolarReceiver();
 										updateAfterEdit();
-									} else {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
+										if (choice == options[0]) {
+											break;
+										}
 									}
-									break;
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -7056,6 +7166,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miDisableHeliostat = new JMenuItem("Disable Heliostat...");
 			miDisableHeliostat.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -7077,36 +7190,64 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					final String title = "<html>Disable heliostat for " + partInfo + "</html>";
 					final String footnote = "<html><hr></html>";
-					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable heliostat", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
-						return;
-					}
-					if (rb1.isSelected()) {
-						final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-						if (m.getHeliostatTarget() != null) {
-							m.getHeliostatTarget().drawSolarReceiver();
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Disable Heliostat");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
+								if (m.getHeliostatTarget() != null) {
+									m.getHeliostatTarget().drawSolarReceiver();
+								}
+								m.setHeliostatTarget(null);
+								m.draw();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final Foundation foundation = m.getTopContainer();
+								final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
+								foundation.setTargetForMirrors(null);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
+								Scene.getInstance().setTargetForAllMirrors(null);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (choice == options[0]) {
+								break;
+							}
 						}
-						m.setHeliostatTarget(null);
-						m.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb2.isSelected()) {
-						final Foundation foundation = m.getTopContainer();
-						final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-						foundation.setTargetForMirrors(null);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-					} else if (rb3.isSelected()) {
-						final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-						Scene.getInstance().setTargetForAllMirrors(null);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					updateAfterEdit();
 				}
 			});
 
 			final JMenuItem miZenith = new JMenuItem("Tilt Angle...");
 			miZenith.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -7117,7 +7258,9 @@ public class PopupMenuFactory {
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
 					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
 					final String footnote = "<html><hr><font size=2>The tilt angle of a mirror is the angle between its surface and the base surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
@@ -7130,14 +7273,41 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getTiltAngle()));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Mirror Tilt Angle");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getTiltAngle());
-						if (newValue == null) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							double val = 0;
+							boolean ok = true;
 							try {
-								double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (val < -90 || val > 90) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -7151,22 +7321,24 @@ public class PopupMenuFactory {
 										m.setTiltAngle(val);
 										m.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = m.getTopContainer();
 										final ChangeFoundationMirrorTiltAngleCommand c = new ChangeFoundationMirrorTiltAngleCommand(foundation);
 										foundation.setZenithAngleForMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final ChangeTiltAngleForAllMirrorsCommand c = new ChangeTiltAngleForAllMirrorsCommand();
 										Scene.getInstance().setTiltAngleForAllMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
-									m.draw();
 									updateAfterEdit();
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -7175,6 +7347,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
 			miAzimuth.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -7186,7 +7361,9 @@ public class PopupMenuFactory {
 					final Foundation foundation = mirror.getTopContainer();
 					final String title = "<html>Azimuth Angle (&deg;) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
@@ -7199,18 +7376,45 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					double a = mirror.getRelativeAzimuth() + foundation.getAzimuth();
+					if (a > 360) {
+						a -= 360;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(a));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Mirror Azimuth");
+
 					while (true) {
-						double a = mirror.getRelativeAzimuth() + foundation.getAzimuth();
-						if (a > 360) {
-							a -= 360;
-						}
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, a);
-						if (newValue == null) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							double val = 0;
+							boolean ok = true;
 							try {
-								final double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								a = val - foundation.getAzimuth();
 								if (a < 0) {
 									a += 360;
@@ -7220,20 +7424,22 @@ public class PopupMenuFactory {
 									mirror.setRelativeAzimuth(a);
 									mirror.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
 									foundation.setAzimuthForMirrors(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
 									final ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
 									Scene.getInstance().setAzimuthForAllMirrors(a);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
 								}
-								mirror.draw();
 								updateAfterEdit();
-								break;
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								if (choice == options[0]) {
+									break;
+								}
 							}
 						}
 					}
@@ -7242,6 +7448,8 @@ public class PopupMenuFactory {
 
 			final JMenuItem miSize = new JMenuItem("Size...");
 			miSize.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -7275,55 +7483,78 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.NORTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size for " + partInfo, JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
-						return;
-					}
-					double w = 0, h = 0;
-					boolean ok = true;
-					try {
-						w = Double.parseDouble(widthField.getText());
-						if (w < 1 || w > 50) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Mirror Size");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double w = 0, h = 0;
+							boolean ok = true;
+							try {
+								w = Double.parseDouble(widthField.getText());
+								h = Double.parseDouble(heightField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (w < 1 || w > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (h < 1 || h > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetPartSizeCommand c = new SetPartSizeCommand(m);
+										m.setMirrorWidth(w);
+										m.setMirrorHeight(h);
+										m.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
+										foundation.setSizeForMirrors(w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
+										Scene.getInstance().setSizeForAllMirrors(w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
 						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), widthField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
-					}
-					try {
-						h = Double.parseDouble(heightField.getText());
-						if (h < 1 || h > 50) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-							ok = false;
-						}
-					} catch (final NumberFormatException x) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), heightField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-						ok = false;
-					}
-					if (ok) {
-						if (rb1.isSelected()) {
-							final SetPartSizeCommand c = new SetPartSizeCommand(m);
-							m.setMirrorWidth(w);
-							m.setMirrorHeight(h);
-							m.draw();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb2.isSelected()) {
-							final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
-							foundation.setSizeForMirrors(w, h);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						} else if (rb3.isSelected()) {
-							final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
-							Scene.getInstance().setSizeForAllMirrors(w, h);
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-						}
-						updateAfterEdit();
 					}
 				}
 			});
 
 			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
 			miBaseHeight.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -7335,7 +7566,9 @@ public class PopupMenuFactory {
 					final Foundation foundation = m.getTopContainer();
 					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
@@ -7348,36 +7581,66 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getBaseHeight() * Scene.getInstance().getAnnotationScale()));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Mirror Base Height");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getBaseHeight() * Scene.getInstance().getAnnotationScale());
-						if (newValue == null) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							double val = 0;
+							boolean ok = true;
 							try {
-								final double val = Double.parseDouble(newValue) / Scene.getInstance().getAnnotationScale();
+								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getAnnotationScale();
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (rb1.isSelected()) {
 									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(m);
 									m.setBaseHeight(val);
 									m.draw();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
 									foundation.setBaseHeightForMirrors(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
 									final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
 									Scene.getInstance().setBaseHeightForAllMirrors(val);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
 								}
-								m.draw();
 								updateAfterEdit();
-								break;
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								if (choice == options[0]) {
+									break;
+								}
 							}
 						}
 					}
+
 				}
 			});
 
@@ -7487,6 +7750,9 @@ public class PopupMenuFactory {
 
 			final JMenuItem miReflectivity = new JMenuItem("Reflectivity...");
 			miReflectivity.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -7496,8 +7762,10 @@ public class PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Mirror m = (Mirror) selectedPart;
 					final String title = "<html>Reflectivity (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2><hr></html>";
+					final String footnote = "<html><hr><font size=2>Reflectivity can be affected by pollen and dust.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
@@ -7510,14 +7778,41 @@ public class PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					final Object[] params = { title, footnote, panel };
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getReflectivity() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Mirror Reflectivity");
+
 					while (true) {
-						final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), params, m.getReflectivity() * 100);
-						if (newValue == null) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
 							break;
 						} else {
+							double val = 0;
+							boolean ok = true;
 							try {
-								final double val = Double.parseDouble(newValue);
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror reflectivity must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -7525,21 +7820,24 @@ public class PopupMenuFactory {
 										final ChangeMirrorReflectivityCommand c = new ChangeMirrorReflectivityCommand(m);
 										m.setReflectivity(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = m.getTopContainer();
 										final ChangeFoundationMirrorReflectivityCommand c = new ChangeFoundationMirrorReflectivityCommand(foundation);
 										foundation.setReflectivityForMirrors(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final ChangeReflectivityForAllMirrorsCommand c = new ChangeReflectivityForAllMirrorsCommand();
 										Scene.getInstance().setReflectivityForAllMirrors(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), newValue + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 						}
 					}
@@ -8300,7 +8598,9 @@ public class PopupMenuFactory {
 				while (true)
 
 				{
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)
+
+					{
 
 						final String newValue = siField.getText();
 						try {
