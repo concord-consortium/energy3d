@@ -13,6 +13,7 @@ import com.threerings.getdown.launcher.GetdownApp;
 public class Updater {
 	private static boolean firstTime = true;
 	private static boolean restartRequested = false;
+	private static boolean messageShown = false;
 
 	public static void download() {
 		System.out.println("Updater.download()");
@@ -39,17 +40,20 @@ public class Updater {
 							e.printStackTrace();
 						}
 						if (Getdown.isUpdateAvailable()) {
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "A new update is available. Would you like to install updates and restart now?", "Update", JOptionPane.YES_NO_OPTION)) {
-										restartRequested = true;
-										MainFrame.getInstance().exit();
-									} else {
-										firstTime = false;
+							if (!messageShown) {
+								EventQueue.invokeLater(new Runnable() {
+									@Override
+									public void run() {
+										if (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(MainFrame.getInstance(), "A new update is available. Would you like to install updates and restart now?", "Update", JOptionPane.YES_NO_OPTION)) {
+											restartRequested = true;
+											MainFrame.getInstance().exit();
+										} else {
+											firstTime = false;
+										}
 									}
-								}
-							});
+								});
+								messageShown = true;
+							}
 						}
 					}
 				};
