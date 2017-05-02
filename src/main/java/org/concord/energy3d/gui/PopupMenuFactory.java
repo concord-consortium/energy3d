@@ -5270,6 +5270,117 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miTemperatureCoefficientPmax = new JMenuItem("Temperature Effects...");
+			miTemperatureCoefficientPmax.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final SolarPanel solarPanel = (SolarPanel) selectedPart;
+					final String title = "<html>Temperature effects of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Increased temperature reduces solar cell efficiency. To determine this temperature effect,<br>it is important to know the expected operating temperature: the Nominal Operating Cell<br>Temperature (NOCT). NOCT ranges from 33&deg;C to 58&deg;C.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(panel, BorderLayout.SOUTH);
+
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+					JLabel label = new JLabel("<html>Nominal Operating Cell Temperature (&deg;C): ", JLabel.LEFT);
+					inputPanel.add(label);
+					final JTextField noctField = new JTextField(EnergyPanel.TWO_DECIMALS.format(solarPanel.getNominalOperatingCellTemperature()));
+					label.setLabelFor(noctField);
+					inputPanel.add(noctField);
+					label = new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C): ", JLabel.LEFT);
+					inputPanel.add(label);
+					final JTextField pmaxField = new JTextField(EnergyPanel.TWO_DECIMALS.format(solarPanel.getTemperatureCoefficientPmax() * 100));
+					label.setLabelFor(pmaxField);
+					inputPanel.add(pmaxField);
+					SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Temperature Effects");
+
+					while (true) {
+						pmaxField.selectAll();
+						pmaxField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(pmaxField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), pmaxField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < -1 || val > 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetTemperatureCoefficientPmaxCommand c = new SetTemperatureCoefficientPmaxCommand(solarPanel);
+										solarPanel.setTemperatureCoefficientPmax(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = solarPanel.getTopContainer();
+										final SetFoundationTemperatureCoefficientPmaxCommand c = new SetFoundationTemperatureCoefficientPmaxCommand(foundation);
+										foundation.setTemperatureCoefficientPmax(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final SetTemperatrureCoeffientPmaxForAllCommand c = new SetTemperatrureCoeffientPmaxForAllCommand();
+										Scene.getInstance().setTemperatureCoefficientPmaxForAll(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
 			final JMenuItem miInverterEff = new JMenuItem("Inverter Efficiency...");
 			miInverterEff.addActionListener(new ActionListener() {
 
@@ -5291,7 +5402,7 @@ public class PopupMenuFactory {
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -5353,103 +5464,6 @@ public class PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										final ChangeInverterEfficiencyForAllCommand c = new ChangeInverterEfficiencyForAllCommand();
 										Scene.getInstance().setSolarPanelInverterEfficiencyForAll(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-										selectedScopeIndex = 2;
-									}
-									updateAfterEdit();
-									if (choice == options[0]) {
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			});
-
-			final JMenuItem miTemperatureCoefficientPmax = new JMenuItem("Temperature Coefficient of Pmax...");
-			miTemperatureCoefficientPmax.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel)) {
-						return;
-					}
-					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Temperature Coefficient of Pmax (%/&deg;C) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>Increased temperature reduces solar cell efficiency.<hr></html>";
-					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel panel = new JPanel();
-					gui.add(panel, BorderLayout.CENTER);
-					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
-					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
-					panel.add(rb1);
-					panel.add(rb2);
-					panel.add(rb3);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					switch (selectedScopeIndex) {
-					case 0:
-						rb1.setSelected(true);
-						break;
-					case 1:
-						rb2.setSelected(true);
-						break;
-					case 2:
-						rb3.setSelected(true);
-						break;
-					}
-					gui.add(panel, BorderLayout.CENTER);
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(solarPanel.getTemperatureCoefficientPmax() * 100));
-					gui.add(inputField, BorderLayout.SOUTH);
-
-					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Temperature Coefficient of Pmax");
-
-					while (true) {
-						inputField.selectAll();
-						inputField.requestFocusInWindow();
-						dialog.setVisible(true);
-						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
-							break;
-						} else {
-							double val = 0;
-							boolean ok = true;
-							try {
-								val = Double.parseDouble(inputField.getText());
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-								ok = false;
-							}
-							if (ok) {
-								if (val < -1 || val > 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									if (rb1.isSelected()) {
-										final SetTemperatureCoefficientPmaxCommand c = new SetTemperatureCoefficientPmaxCommand(solarPanel);
-										solarPanel.setTemperatureCoefficientPmax(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-										selectedScopeIndex = 0;
-									} else if (rb2.isSelected()) {
-										final Foundation foundation = solarPanel.getTopContainer();
-										final SetFoundationTemperatureCoefficientPmaxCommand c = new SetFoundationTemperatureCoefficientPmaxCommand(foundation);
-										foundation.setTemperatureCoefficientPmax(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-										selectedScopeIndex = 1;
-									} else if (rb3.isSelected()) {
-										final SetTemperatrureCoeffientPmaxForAllCommand c = new SetTemperatrureCoeffientPmaxForAllCommand();
-										Scene.getInstance().setTemperatureCoefficientPmaxForAll(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}

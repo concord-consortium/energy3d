@@ -70,6 +70,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	private transient double yieldToday;
 	private double efficiency = 0.15; // a number in (0, 1)
 	private double temperatureCoefficientPmax = -0.005;
+	private double nominalOperatingCellTemperature = 48;
 	private double inverterEfficiency = 0.95;
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
@@ -115,6 +116,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 		}
 		if (Util.isZero(temperatureCoefficientPmax)) {
 			temperatureCoefficientPmax = -0.005;
+		}
+		if (Util.isZero(nominalOperatingCellTemperature)) {
+			nominalOperatingCellTemperature = 48;
 		}
 		if (Util.isZero(inverterEfficiency)) {
 			inverterEfficiency = 0.95;
@@ -794,6 +798,16 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	/** a number between 0 and 1 to specify power output change with respect to STC temperature (25C) */
 	public double getTemperatureCoefficientPmax() {
 		return temperatureCoefficientPmax;
+	}
+
+	/** Nominal Operating Cell Temperature (http://pveducation.org/pvcdrom/modules/nominal-operating-cell-temperature) */
+	public void setNominalOperatingCellTemperature(final double nominalOperatingCellTemperature) {
+		this.nominalOperatingCellTemperature = nominalOperatingCellTemperature;
+	}
+
+	/** Nominal Operating Cell Temperature (http://pveducation.org/pvcdrom/modules/nominal-operating-cell-temperature) */
+	public double getNominalOperatingCellTemperature() {
+		return nominalOperatingCellTemperature;
 	}
 
 	/** a number between 0 and 1, typically 0.95 */
