@@ -2435,6 +2435,16 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setCellTypeForSolarPanels(final int cellType) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setCellType(cellType);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setColorForSolarPanels(final int colorOption) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarPanel && p.getTopContainer() == this) {

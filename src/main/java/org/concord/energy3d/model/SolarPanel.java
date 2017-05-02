@@ -52,6 +52,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	public static final int MAX_INVERTER_EFFICIENCY_PERCENTAGE = 100;
 	public static final int COLOR_OPTION_BLUE = 0;
 	public static final int COLOR_OPTION_BLACK = 1;
+	public static final int MONOCRYSTALLINE = 0;
+	public static final int POLYCRYSTALLINE = 1;
+	public static final int THIN_FILM = 2;
 
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -71,6 +74,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	private double panelWidth = 0.99; // 39"
 	private double panelHeight = 1.65; // 65"
 	private int colorOption = COLOR_OPTION_BLUE;
+	private int cellType = MONOCRYSTALLINE;
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double tiltAngle;
@@ -578,9 +582,19 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	protected String getTextureFileName() {
 		switch (colorOption) {
 		case COLOR_OPTION_BLACK:
-			return rotated ? "solarpanel-black-landscape.png" : "solarpanel-black-portrait.png";
+			switch (cellType) {
+			case MONOCRYSTALLINE:
+				return rotated ? "solarpanel-black-landscape.png" : "solarpanel-black-portrait.png";
+			case POLYCRYSTALLINE:
+				return rotated ? "polycrystal-solarpanel-black-landscape.png" : "polycrystal-solarpanel-black-portrait.png";
+			}
 		default:
-			return rotated ? "solarpanel-blue-landscape.png" : "solarpanel-blue-portrait.png";
+			switch (cellType) {
+			case POLYCRYSTALLINE:
+				return rotated ? "polycrystal-solarpanel-blue-landscape.png" : "polycrystal-solarpanel-blue-portrait.png";
+			default:
+				return rotated ? "solarpanel-blue-landscape.png" : "solarpanel-blue-portrait.png";
+			}
 		}
 	}
 
@@ -955,6 +969,14 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 
 	public int getColorOption() {
 		return colorOption;
+	}
+
+	public void setCellType(final int cellType) {
+		this.cellType = cellType;
+	}
+
+	public int getCellType() {
+		return cellType;
 	}
 
 	@Override

@@ -27,7 +27,7 @@ import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 public class MainApplication {
-	public static final String VERSION = "6.8.7";
+	public static final String VERSION = "6.8.8";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -305,7 +305,7 @@ public class MainApplication {
 			@Override
 			public void run() {
 				try {
-					sleep(5000);
+					sleep(10000);
 				} catch (final InterruptedException e) {
 				}
 				while (true) {

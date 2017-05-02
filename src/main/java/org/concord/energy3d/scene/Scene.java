@@ -817,8 +817,10 @@ public class Scene implements Serializable {
 
 	public static void saveCameraLocation() {
 		final Camera camera = SceneManager.getInstance().getCamera();
-		instance.setCameraLocation(camera.getLocation().clone());
-		instance.setCameraDirection(SceneManager.getInstance().getCamera().getDirection().clone());
+		if (camera != null) {
+			instance.setCameraLocation(camera.getLocation().clone());
+			instance.setCameraDirection(SceneManager.getInstance().getCamera().getDirection().clone());
+		}
 	}
 
 	public static Node getRoot() {
@@ -2196,6 +2198,16 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel && !(p.getContainer() instanceof Rack)) { // no tracker for solar panels on racks as they use rack trackers
 				((SolarPanel) p).setTracker(tracker);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setCellTypeForAllSolarPanels(final int cellType) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setCellType(cellType);
 				p.draw();
 			}
 		}
