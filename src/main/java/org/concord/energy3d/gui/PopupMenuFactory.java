@@ -4356,332 +4356,6 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenu cellTypeMenu = new JMenu("Type");
-			final ButtonGroup cellTypeGroup = new ButtonGroup();
-
-			final JRadioButtonMenuItem rbmiMonocrystalline = new JRadioButtonMenuItem("Monocrystalline", true);
-			rbmiMonocrystalline.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (rbmiMonocrystalline.isSelected()) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof SolarPanel)) {
-							return;
-						}
-						final SolarPanel s = (SolarPanel) selectedPart;
-						final String partInfo = s.toString().substring(0, s.toString().indexOf(')') + 1);
-						final JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-						final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-						final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
-						final JRadioButton rb3 = new JRadioButton("All Solar Panels");
-						panel.add(rb1);
-						panel.add(rb2);
-						panel.add(rb3);
-						final ButtonGroup bg = new ButtonGroup();
-						bg.add(rb1);
-						bg.add(rb2);
-						bg.add(rb3);
-						switch (selectedScopeIndex) {
-						case 0:
-							rb1.setSelected(true);
-							break;
-						case 1:
-							rb2.setSelected(true);
-							break;
-						case 2:
-							rb3.setSelected(true);
-							break;
-						}
-						final String title = "<html>Set type to monocrystalline for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2>Solar cells made of monocrystalline silicon are usually round or semi-round.<br>Hence, there is a small fraction of area on a solar panel not covered by cells.<br>In other words, a monocrystalline solar panel has a smaller packing density.<hr></html>";
-						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-						final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Monocrystalline Solar Panel");
-						while (true) {
-							dialog.setVisible(true);
-							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
-								break;
-							} else {
-								if (rb1.isSelected()) {
-									final SetSolarPanelCellTypeCommand c = new SetSolarPanelCellTypeCommand(s);
-									s.setCellType(SolarPanel.MONOCRYSTALLINE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									s.draw();
-									SceneManager.getInstance().refresh();
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									final Foundation foundation = s.getTopContainer();
-									final SetCellTypeForSolarPanelsOnFoundationCommand c = new SetCellTypeForSolarPanelsOnFoundationCommand(foundation);
-									foundation.setCellTypeForSolarPanels(SolarPanel.MONOCRYSTALLINE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									final SetCellTypeForAllSolarPanelsCommand c = new SetCellTypeForAllSolarPanelsCommand();
-									Scene.getInstance().setCellTypeForAllSolarPanels(SolarPanel.MONOCRYSTALLINE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 2;
-								}
-								updateAfterEdit();
-								if (choice == options[0]) {
-									break;
-								}
-							}
-						}
-					}
-				}
-			});
-			cellTypeMenu.add(rbmiMonocrystalline);
-			cellTypeGroup.add(rbmiMonocrystalline);
-
-			final JRadioButtonMenuItem rbmiPolycrystalline = new JRadioButtonMenuItem("Polycrystalline", true);
-			rbmiPolycrystalline.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (rbmiPolycrystalline.isSelected()) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof SolarPanel)) {
-							return;
-						}
-						final SolarPanel s = (SolarPanel) selectedPart;
-						final String partInfo = s.toString().substring(0, s.toString().indexOf(')') + 1);
-						final JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-						final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-						final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
-						final JRadioButton rb3 = new JRadioButton("All Solar Panels");
-						panel.add(rb1);
-						panel.add(rb2);
-						panel.add(rb3);
-						final ButtonGroup bg = new ButtonGroup();
-						bg.add(rb1);
-						bg.add(rb2);
-						bg.add(rb3);
-						switch (selectedScopeIndex) {
-						case 0:
-							rb1.setSelected(true);
-							break;
-						case 1:
-							rb2.setSelected(true);
-							break;
-						case 2:
-							rb3.setSelected(true);
-							break;
-						}
-						final String title = "<html>Set type to polycrystalline for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2>Solar cells made of polycrystalline silicon are usually square.<br>Compared with a monocrystalline solar panel, a polycrystalline<br>solar panel has a higher packing density.<hr></html>";
-						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-						final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Polycrystalline Solar Panel");
-						while (true) {
-							dialog.setVisible(true);
-							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
-								break;
-							} else {
-								if (rb1.isSelected()) {
-									final SetSolarPanelCellTypeCommand c = new SetSolarPanelCellTypeCommand(s);
-									s.setCellType(SolarPanel.POLYCRYSTALLINE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									s.draw();
-									SceneManager.getInstance().refresh();
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									final Foundation foundation = s.getTopContainer();
-									final SetCellTypeForSolarPanelsOnFoundationCommand c = new SetCellTypeForSolarPanelsOnFoundationCommand(foundation);
-									foundation.setCellTypeForSolarPanels(SolarPanel.POLYCRYSTALLINE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									final SetCellTypeForAllSolarPanelsCommand c = new SetCellTypeForAllSolarPanelsCommand();
-									Scene.getInstance().setCellTypeForAllSolarPanels(SolarPanel.POLYCRYSTALLINE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 2;
-								}
-								updateAfterEdit();
-								if (choice == options[0]) {
-									break;
-								}
-							}
-						}
-					}
-				}
-			});
-			cellTypeMenu.add(rbmiPolycrystalline);
-			cellTypeGroup.add(rbmiPolycrystalline);
-
-			final JMenu colorOptionMenu = new JMenu("Color");
-			final ButtonGroup colorOptionGroup = new ButtonGroup();
-
-			final JRadioButtonMenuItem rbmiBlue = new JRadioButtonMenuItem("Blue", true);
-			rbmiBlue.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (rbmiBlue.isSelected()) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof SolarPanel)) {
-							return;
-						}
-						final SolarPanel s = (SolarPanel) selectedPart;
-						final String partInfo = s.toString().substring(0, s.toString().indexOf(')') + 1);
-						final JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-						final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-						final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
-						final JRadioButton rb3 = new JRadioButton("All Solar Panels");
-						panel.add(rb1);
-						panel.add(rb2);
-						panel.add(rb3);
-						final ButtonGroup bg = new ButtonGroup();
-						bg.add(rb1);
-						bg.add(rb2);
-						bg.add(rb3);
-						switch (selectedScopeIndex) {
-						case 0:
-							rb1.setSelected(true);
-							break;
-						case 1:
-							rb2.setSelected(true);
-							break;
-						case 2:
-							rb3.setSelected(true);
-							break;
-						}
-						final String title = "<html>Set color to blue for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2>Color has no effect in energy generation.<hr></html>";
-						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-						final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Blue Solar Panel");
-						while (true) {
-							dialog.setVisible(true);
-							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
-								break;
-							} else {
-								if (rb1.isSelected()) {
-									final SetSolarPanelColorCommand c = new SetSolarPanelColorCommand(s);
-									s.setColorOption(SolarPanel.COLOR_OPTION_BLUE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									s.draw();
-									SceneManager.getInstance().refresh();
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									final Foundation foundation = s.getTopContainer();
-									final SetColorForSolarPanelsOnFoundationCommand c = new SetColorForSolarPanelsOnFoundationCommand(foundation);
-									foundation.setColorForSolarPanels(SolarPanel.COLOR_OPTION_BLUE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									final SetColorForAllSolarPanelsCommand c = new SetColorForAllSolarPanelsCommand();
-									Scene.getInstance().setColorOptionForAllSolarPanels(SolarPanel.COLOR_OPTION_BLUE);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 2;
-								}
-								updateAfterEdit();
-								if (choice == options[0]) {
-									break;
-								}
-							}
-						}
-					}
-				}
-			});
-			colorOptionMenu.add(rbmiBlue);
-			colorOptionGroup.add(rbmiBlue);
-
-			final JRadioButtonMenuItem rbmiBlack = new JRadioButtonMenuItem("Black");
-			rbmiBlack.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					if (rbmiBlack.isSelected()) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof SolarPanel)) {
-							return;
-						}
-						final SolarPanel s = (SolarPanel) selectedPart;
-						final String partInfo = s.toString().substring(0, s.toString().indexOf(')') + 1);
-						final JPanel panel = new JPanel();
-						panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-						panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-						final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-						final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
-						final JRadioButton rb3 = new JRadioButton("All Solar Panels");
-						panel.add(rb1);
-						panel.add(rb2);
-						panel.add(rb3);
-						final ButtonGroup bg = new ButtonGroup();
-						bg.add(rb1);
-						bg.add(rb2);
-						bg.add(rb3);
-						switch (selectedScopeIndex) {
-						case 0:
-							rb1.setSelected(true);
-							break;
-						case 1:
-							rb2.setSelected(true);
-							break;
-						case 2:
-							rb3.setSelected(true);
-							break;
-						}
-						final String title = "<html>Set color to black for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2>Color has no effect in energy generation.<hr></html>";
-						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-						final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Black Solar Panel");
-						while (true) {
-							dialog.setVisible(true);
-							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
-								break;
-							} else {
-								if (rb1.isSelected()) {
-									final SetSolarPanelColorCommand c = new SetSolarPanelColorCommand(s);
-									s.setColorOption(SolarPanel.COLOR_OPTION_BLACK);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									s.draw();
-									SceneManager.getInstance().refresh();
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									final Foundation foundation = s.getTopContainer();
-									final SetColorForSolarPanelsOnFoundationCommand c = new SetColorForSolarPanelsOnFoundationCommand(foundation);
-									foundation.setColorForSolarPanels(SolarPanel.COLOR_OPTION_BLACK);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									final SetColorForAllSolarPanelsCommand c = new SetColorForAllSolarPanelsCommand();
-									Scene.getInstance().setColorOptionForAllSolarPanels(SolarPanel.COLOR_OPTION_BLACK);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 2;
-								}
-								updateAfterEdit();
-								if (choice == options[0]) {
-									break;
-								}
-							}
-						}
-					}
-				}
-			});
-			colorOptionMenu.add(rbmiBlack);
-			colorOptionGroup.add(rbmiBlack);
-
 			final JMenu orientationMenu = new JMenu("Orientation");
 			final ButtonGroup orientationGroup = new ButtonGroup();
 
@@ -5139,8 +4813,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miCells = new JMenuItem("Cells...");
-			miCells.addActionListener(new ActionListener() {
+			final JMenuItem miModuleStructure = new JMenuItem("Module Structure...");
+			miModuleStructure.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -5202,7 +4876,7 @@ public class PopupMenuFactory {
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Cells");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Cells of Module");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -5408,10 +5082,6 @@ public class PopupMenuFactory {
 					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
 					Util.selectSilently(rbmiLandscape, sp.isRotated());
 					Util.selectSilently(rbmiPortrait, !sp.isRotated());
-					Util.selectSilently(rbmiMonocrystalline, sp.getCellType() == SolarPanel.MONOCRYSTALLINE);
-					Util.selectSilently(rbmiPolycrystalline, sp.getCellType() == SolarPanel.POLYCRYSTALLINE);
-					Util.selectSilently(rbmiBlue, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLUE);
-					Util.selectSilently(rbmiBlack, sp.getColorOption() == SolarPanel.COLOR_OPTION_BLACK);
 					Util.selectSilently(miLabelNone, !sp.isLabelVisible());
 					Util.selectSilently(miLabelCustom, sp.getLabelCustom());
 					Util.selectSilently(miLabelId, sp.getLabelId());
@@ -5471,8 +5141,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miEff = new JMenuItem("Solar Cell Efficiency...");
-			miEff.addActionListener(new ActionListener() {
+			final JMenuItem miCells = new JMenuItem("Solar Cells...");
+			miCells.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -5483,15 +5153,17 @@ public class PopupMenuFactory {
 						return;
 					}
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Solar Cell Efficiency (%) of " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "</html>";
-					final String footnote = "<html><hr><font size=2>How efficient can a solar panel be?<br>The Shockley-Queisser limit is 34% and the theoretical limit for multilayer cells is 86%.<br>As of 2016, the best solar panel in the market has an efficiency of 24%.<br>So the highest efficiency you can choose is limited to " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.<hr></html>";
+					final String title = "<html>Solar Cell Properties of " + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "</html>";
+					String footnote = "<html><hr><font size=2><b>How efficiently can a solar cell convert light into electricity?</b><br>The Shockley-Queisser limit is 34%. The theoretical limit for multilayer cells<br>is 86%. As of 2017, the best solar panel in the market has an efficiency of 24%.<br>The highest efficiency you can choose is limited to " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.<hr>";
+					footnote += "<font size=2>Solar cells made of monocrystalline silicon are usually round or semi-round.<br>Hence, there is a small fraction of area on a solar panel not covered by cells.<br>In other words, a monocrystalline solar panel has a smaller packing density.";
+					footnote += "<br><font size=2>Solar cells made of polycrystalline silicon are usually square. Compared with a<br>monocrystalline solar panel, a polycrystalline one has a higher packing density.<br>Color has no relationship with efficiency.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
-					gui.add(panel, BorderLayout.CENTER);
+					gui.add(panel, BorderLayout.SOUTH);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels of this Building");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
 					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					panel.add(rb1);
 					panel.add(rb2);
@@ -5511,17 +5183,40 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					gui.add(panel, BorderLayout.CENTER);
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(solarPanel.getCellEfficiency() * 100));
-					gui.add(inputField, BorderLayout.SOUTH);
+
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					JLabel label = new JLabel("Type: ", JLabel.LEFT);
+					inputPanel.add(label);
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
+					if (solarPanel.getCellType() == SolarPanel.POLYCRYSTALLINE) {
+						typeComboBox.setSelectedIndex(1);
+					}
+					label.setLabelFor(typeComboBox);
+					inputPanel.add(typeComboBox);
+					label = new JLabel("Color: ", JLabel.LEFT);
+					inputPanel.add(label);
+					final JComboBox<String> colorComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+					if (solarPanel.getColorOption() == SolarPanel.COLOR_OPTION_BLACK) {
+						colorComboBox.setSelectedIndex(1);
+					}
+					label.setLabelFor(colorComboBox);
+					inputPanel.add(colorComboBox);
+					label = new JLabel("Efficiency (%): ", JLabel.LEFT);
+					inputPanel.add(label);
+					final JTextField efficiencyField = new JTextField(EnergyPanel.TWO_DECIMALS.format(solarPanel.getCellEfficiency() * 100));
+					label.setLabelFor(efficiencyField);
+					inputPanel.add(efficiencyField);
+					SpringUtilities.makeCompactGrid(inputPanel, 3, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Cell Efficiency");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Cell Properties");
 
 					while (true) {
-						inputField.selectAll();
-						inputField.requestFocusInWindow();
+						efficiencyField.selectAll();
+						efficiencyField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
 						if (choice == options[1]) {
@@ -5530,29 +5225,37 @@ public class PopupMenuFactory {
 							double val = 0;
 							boolean ok = true;
 							try {
-								val = Double.parseDouble(inputField.getText());
+								val = Double.parseDouble(efficiencyField.getText());
 							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), efficiencyField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
 								if (val < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || val > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									final int cellType = typeComboBox.getSelectedIndex();
+									final int colorOption = colorComboBox.getSelectedIndex();
 									if (rb1.isSelected()) {
-										final ChangeSolarCellEfficiencyCommand c = new ChangeSolarCellEfficiencyCommand(solarPanel);
+										final ChangeSolarCellPropertiesCommand c = new ChangeSolarCellPropertiesCommand(solarPanel);
 										solarPanel.setCellEfficiency(val * 0.01);
+										solarPanel.setCellType(cellType);
+										solarPanel.setColorOption(colorOption);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										final ChangeFoundationSolarCellEfficiencyCommand c = new ChangeFoundationSolarCellEfficiencyCommand(foundation);
+										final ChangeFoundationSolarCellPropertiesCommand c = new ChangeFoundationSolarCellPropertiesCommand(foundation);
 										foundation.setSolarCellEfficiency(val * 0.01);
+										foundation.setCellTypeForSolarPanels(cellType);
+										foundation.setColorForSolarPanels(colorOption);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeSolarCellEfficiencyForAllCommand c = new ChangeSolarCellEfficiencyForAllCommand();
+										final ChangeSolarCellPropertiesForAllCommand c = new ChangeSolarCellPropertiesForAllCommand();
 										Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
+										Scene.getInstance().setCellTypeForAllSolarPanels(cellType);
+										Scene.getInstance().setColorForAllSolarPanels(colorOption);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -5795,16 +5498,14 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miTiltAngle);
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miSize);
-			popupMenuForSolarPanel.add(miCells);
+			popupMenuForSolarPanel.add(miModuleStructure);
 			popupMenuForSolarPanel.add(miBaseHeight);
-			popupMenuForSolarPanel.add(cellTypeMenu);
-			popupMenuForSolarPanel.add(colorOptionMenu);
 			popupMenuForSolarPanel.add(orientationMenu);
 			popupMenuForSolarPanel.add(labelMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
 			popupMenuForSolarPanel.addSeparator();
-			popupMenuForSolarPanel.add(miEff);
+			popupMenuForSolarPanel.add(miCells);
 			popupMenuForSolarPanel.add(miTemperatureCoefficientPmax);
 			popupMenuForSolarPanel.add(miInverterEff);
 			popupMenuForSolarPanel.add(shadeToleranceMenu);

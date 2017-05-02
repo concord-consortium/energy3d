@@ -2214,7 +2214,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setColorOptionForAllSolarPanels(final int colorOption) {
+	public void setColorForAllSolarPanels(final int colorOption) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
 				((SolarPanel) p).setColorOption(colorOption);

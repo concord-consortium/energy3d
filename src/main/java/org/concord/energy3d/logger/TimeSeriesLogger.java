@@ -461,31 +461,35 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"New Value\": " + sp.isRotated() + "}";
 				}
 
-				else if (lastEdit instanceof SetSolarPanelColorCommand) {
-					final SetSolarPanelColorCommand c = (SetSolarPanelColorCommand) lastEdit;
+				else if (lastEdit instanceof ChangeSolarCellPropertiesCommand) {
+					final ChangeSolarCellPropertiesCommand c = (ChangeSolarCellPropertiesCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getColorOption() + "}";
-				} else if (lastEdit instanceof SetColorForSolarPanelsOnFoundationCommand) {
-					final SetColorForSolarPanelsOnFoundationCommand c = (SetColorForSolarPanelsOnFoundationCommand) lastEdit;
-					final Foundation f = c.getFoundation();
+					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
+					stateValue += ", \"Old Efficiency\": " + c.getOldEfficiency() + ", \"New Efficiency\": " + sp.getCellEfficiency();
+					stateValue += ", \"Old Type\": " + c.getOldType() + ", \"New Type\": " + sp.getCellType();
+					stateValue += ", \"Old Color\": " + c.getOldColor() + ", \"New Color\": " + sp.getColorOption();
+					stateValue += "}";
+				} else if (lastEdit instanceof ChangeFoundationSolarCellPropertiesCommand) {
+					final Foundation f = ((ChangeFoundationSolarCellPropertiesCommand) lastEdit).getFoundation();
 					final List<SolarPanel> solarPanels = f.getSolarPanels();
-					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getColorOption()) + "}";
-				} else if (lastEdit instanceof SetColorForAllSolarPanelsCommand) {
+					if (solarPanels.isEmpty()) {
+						stateValue = "{\"Foundation\": " + f.getId() + "}";
+					} else {
+						final SolarPanel p = solarPanels.get(0);
+						stateValue = "{\"Foundation\": " + f.getId() + ", \"New Efficiency\": " + p.getCellEfficiency();
+						stateValue += ", \"New Type\": " + p.getCellType();
+						stateValue += ", \"New Color\": " + p.getColorOption() + "}";
+					}
+				} else if (lastEdit instanceof ChangeSolarCellPropertiesForAllCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
-					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getColorOption()) + "}";
-				}
-
-				else if (lastEdit instanceof ChangeSolarCellEfficiencyCommand) {
-					final ChangeSolarCellEfficiencyCommand c = (ChangeSolarCellEfficiencyCommand) lastEdit;
-					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getCellEfficiency() + "}";
-				} else if (lastEdit instanceof ChangeFoundationSolarCellEfficiencyCommand) {
-					final Foundation f = ((ChangeFoundationSolarCellEfficiencyCommand) lastEdit).getFoundation();
-					final List<SolarPanel> solarPanels = f.getSolarPanels();
-					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getCellEfficiency()) + "}";
-				} else if (lastEdit instanceof ChangeSolarCellEfficiencyForAllCommand) {
-					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
-					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getCellEfficiency()) + "}";
+					if (solarPanels.isEmpty()) {
+						stateValue = "{}";
+					} else {
+						final SolarPanel p = solarPanels.get(0);
+						stateValue = "{\"New Efficiency\": " + p.getCellEfficiency();
+						stateValue += ", \"New Type\": " + p.getCellType();
+						stateValue += ", \"New Color\": " + p.getColorOption() + "}";
+					}
 				}
 
 				else if (lastEdit instanceof SetTemperatureCoefficientPmaxCommand) {
