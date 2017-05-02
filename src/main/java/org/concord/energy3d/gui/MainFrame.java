@@ -1258,7 +1258,8 @@ public class MainFrame extends JFrame {
 			addModel(pvSolarMenu, "Solar Canopy: Wavy Top", "templates/example-solar-canopy-wavy-top.ng3");
 			addModel(pvSolarMenu, "Solar Canopy: Curvy Top", "templates/example-solar-canopy-curvy-top.ng3");
 			addModel(pvSolarMenu, "Solar Canopy: Bus Stop", "templates/example-solar-canopy-bus-stop.ng3");
-			addModel(pvSolarMenu, "Solar Canopy: Parking Garage", "templates/example-solar-canopy-parking-garage.ng3");
+			addModel(pvSolarMenu, "Solar Canopy: Parking Garage 1", "templates/example-solar-canopy-parking-garage-1.ng3");
+			addModel(pvSolarMenu, "Solar Canopy: Parking Garage 2", "templates/example-solar-canopy-parking-garage-2.ng3");
 			addModel(pvSolarMenu, "Solar Canopy: Overhang", "templates/example-solar-canopy-overhang.ng3");
 			addModel(pvSolarMenu, "Solar Facades: Example 1", "templates/example-solar-facade1.ng3");
 			addModel(pvSolarMenu, "Solar Facades: Example 2", "templates/example-solar-facade2.ng3");
