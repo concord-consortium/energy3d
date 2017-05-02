@@ -581,9 +581,11 @@ public abstract class HousePart implements Serializable {
 			for (int i = 0; i < points.size(); i++) {
 				getAbsPoint(i, p);
 				getEditPointShape(i).setTranslation(p);
+			}
+			for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
 				final Camera camera = SceneManager.getInstance().getCamera();
 				if (camera != null && camera.getProjectionMode() != ProjectionMode.Parallel) {
-					final double distance = camera.getLocation().distance(p);
+					final double distance = camera.getLocation().distance(getEditPointShape(i).getTranslation());
 					getEditPointShape(i).setScale(distance > 0.1 ? distance / 10 : 0.01);
 				} else {
 					getEditPointShape(i).setScale(camera.getFrustumTop() / 4);
