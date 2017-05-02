@@ -929,6 +929,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 
 	public double getSystemEfficiency(final double temperature) {
 		double e = efficiency * inverterEfficiency;
+		if (cellType == MONOCRYSTALLINE) {
+			e *= 0.95; // assuming that the packing density factor of semi-round cells is 0.95
+		}
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));

@@ -2333,6 +2333,17 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSolarPanelCellTypeForAllRacks(final int cellType) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				final Rack rack = (Rack) p;
+				rack.getSolarPanel().setCellType(cellType);
+				rack.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setSolarPanelShadeToleranceForAllRacks(final int tolerance) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {

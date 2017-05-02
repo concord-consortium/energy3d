@@ -139,6 +139,7 @@ public class PopupMenuFactory {
 	private static double solarPanelHeight = 1.96;
 	private static int solarPanelOrientation = 0;
 	private static int solarPanelColorOption = SolarPanel.COLOR_OPTION_BLUE;
+	private static int solarPanelCellType = SolarPanel.MONOCRYSTALLINE;
 	private static double solarPanelRackArrayInterRowSpacing = 5;
 	private static double solarPanelRackPoleSpacingX = 4;
 	private static double solarPanelRackPoleSpacingY = 2;
@@ -2456,6 +2457,7 @@ public class PopupMenuFactory {
 			miSolarPanelArrays.addActionListener(new ActionListener() {
 
 				private Foundation f;
+				private JComboBox<String> cellTypeComboBox;
 				private JComboBox<String> colorOptionComboBox;
 				private JComboBox<String> sizeComboBox;
 				private JComboBox<String> shadeToleranceComboBox;
@@ -2475,7 +2477,12 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(11, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(12, 2, 5, 5));
+
+						panel.add(new JLabel("Solar Panel Cell Type:"));
+						cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
+						cellTypeComboBox.setSelectedIndex(solarPanelCellType);
+						panel.add(cellTypeComboBox);
 
 						panel.add(new JLabel("Solar Panel Color:"));
 						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
@@ -2597,8 +2604,10 @@ public class PopupMenuFactory {
 					solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
 					solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
 					solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
+					solarPanelCellType = cellTypeComboBox.getSelectedIndex();
 					final SolarPanel sp = new SolarPanel();
 					sp.setRotated(solarPanelOrientation == 1);
+					sp.setCellType(solarPanelCellType);
 					sp.setColorOption(solarPanelColorOption);
 					sp.setTiltAngle(solarPanelTiltAngle);
 					sp.setPanelWidth(solarPanelWidth);
@@ -2627,6 +2636,7 @@ public class PopupMenuFactory {
 				private Foundation foundation;
 				private JComboBox<String> orientationComboBox;
 				private JComboBox<String> sizeComboBox;
+				private JComboBox<String> cellTypeComboBox;
 				private JComboBox<String> colorOptionComboBox;
 				private JComboBox<String> shadeToleranceComboBox;
 				private JComboBox<String> rowAxisComboBox;
@@ -2645,12 +2655,17 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(14, 2, 5, 5));
+						final JPanel panel = new JPanel(new GridLayout(15, 2, 5, 5));
 
 						panel.add(new JLabel("Solar Panel Orientation:"));
 						orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
 						orientationComboBox.setSelectedIndex(solarPanelOrientation);
 						panel.add(orientationComboBox);
+
+						panel.add(new JLabel("Solar Panel Cell Type:"));
+						cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
+						cellTypeComboBox.setSelectedIndex(solarPanelCellType);
+						panel.add(cellTypeComboBox);
 
 						panel.add(new JLabel("Solar Panel Color:"));
 						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
@@ -2773,6 +2788,7 @@ public class PopupMenuFactory {
 				private void addSolarRackArrays() {
 					solarPanelOrientation = orientationComboBox.getSelectedIndex();
 					solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
+					solarPanelCellType = cellTypeComboBox.getSelectedIndex();
 					solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
 					switch (sizeComboBox.getSelectedIndex()) {
 					case 0:
@@ -2791,6 +2807,7 @@ public class PopupMenuFactory {
 					solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
 					final SolarPanel sp = new SolarPanel();
 					sp.setRotated(solarPanelOrientation == 1);
+					sp.setCellType(solarPanelCellType);
 					sp.setColorOption(solarPanelColorOption);
 					sp.setPanelWidth(solarPanelWidth);
 					sp.setPanelHeight(solarPanelHeight);
@@ -4381,7 +4398,7 @@ public class PopupMenuFactory {
 							break;
 						}
 						final String title = "<html>Set type to monocrystalline for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2>Solar cells made of monocrystalline silicon.<hr></html>";
+						final String footnote = "<html><hr><font size=2>Solar cells made of monocrystalline silicon are usually round or semi-round.<br>Hence, there is a small fraction of area on a solar panel not covered by cells.<br>In other words, a monocrystalline solar panel has a smaller packing density.<hr></html>";
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Monocrystalline Solar Panel");
@@ -4461,7 +4478,7 @@ public class PopupMenuFactory {
 							break;
 						}
 						final String title = "<html>Set type to polycrystalline for " + partInfo + "</html>";
-						final String footnote = "<html><hr><font size=2>Solar cells made of polycrystalline silicon.<hr></html>";
+						final String footnote = "<html><hr><font size=2>Solar cells made of polycrystalline silicon are usually square.<br>Compared with a monocrystalline solar panel, a polycrystalline<br>solar panel has a higher packing density.<hr></html>";
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Polycrystalline Solar Panel");
@@ -6397,6 +6414,7 @@ public class PopupMenuFactory {
 				private JComboBox<String> monolithicComboBox;
 				private JComboBox<String> sizeComboBox;
 				private JComboBox<String> orientationComboBox;
+				private JComboBox<String> cellTypeComboBox;
 				private JComboBox<String> colorOptionComboBox;
 				private JComboBox<String> shadeToleranceComboBox;
 				private double cellEfficiency;
@@ -6415,7 +6433,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final SolarPanel solarPanel = rack.getSolarPanel();
-					final JPanel panel = new JPanel(new GridLayout(8, 2, 5, 5));
+					final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
 					panel.add(new JLabel("Monolithic:"));
 					monolithicComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
 					monolithicComboBox.setSelectedIndex(rack.isMonolithic() ? 0 : 1);
@@ -6434,6 +6452,10 @@ public class PopupMenuFactory {
 					orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
 					orientationComboBox.setSelectedIndex(solarPanel.isRotated() ? 1 : 0);
 					panel.add(orientationComboBox);
+					panel.add(new JLabel("Cell Type:"));
+					cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
+					cellTypeComboBox.setSelectedIndex(solarPanel.getCellType());
+					panel.add(cellTypeComboBox);
 					panel.add(new JLabel("Color:"));
 					colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
 					colorOptionComboBox.setSelectedIndex(solarPanel.getColorOption());
@@ -6507,6 +6529,7 @@ public class PopupMenuFactory {
 						break;
 					}
 					solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
+					solarPanel.setCellType(cellTypeComboBox.getSelectedIndex());
 					solarPanel.setColorOption(colorOptionComboBox.getSelectedIndex());
 					solarPanel.setCellEfficiency(cellEfficiency * 0.01);
 					solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
@@ -6726,6 +6749,89 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miSolarPanelCellType = new JMenuItem("Cell Type...");
+			solarPanelMenu.add(miSolarPanelCellType);
+			miSolarPanelCellType.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Choose Cell Type for " + partInfo));
+					final JComboBox<String> cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
+					cellTypeComboBox.setSelectedIndex(s.getCellType());
+					gui.add(cellTypeComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.CENTER);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Cell Type");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								final SetCellTypeForSolarPanelsOnRackCommand c = new SetCellTypeForSolarPanelsOnRackCommand(r);
+								s.setCellType(cellTypeComboBox.getSelectedIndex());
+								r.draw();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final SetSolarPanelCellTypeForRacksOnFoundationCommand c = new SetSolarPanelCellTypeForRacksOnFoundationCommand(foundation);
+								foundation.setSolarPanelCellTypeForRacks(cellTypeComboBox.getSelectedIndex());
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final SetSolarPanelCellTypeForAllRacksCommand c = new SetSolarPanelCellTypeForAllRacksCommand();
+								Scene.getInstance().setSolarPanelCellTypeForAllRacks(cellTypeComboBox.getSelectedIndex());
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (choice == options[0]) {
+								break;
+							}
+						}
+					}
+				}
+			});
+
 			final JMenuItem miSolarPanelColor = new JMenuItem("Color...");
 			solarPanelMenu.add(miSolarPanelColor);
 			miSolarPanelColor.addActionListener(new ActionListener() {
@@ -6743,7 +6849,7 @@ public class PopupMenuFactory {
 					final SolarPanel s = r.getSolarPanel();
 					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
-					gui.setBorder(BorderFactory.createTitledBorder("Choose Solar Panel Color for " + partInfo));
+					gui.setBorder(BorderFactory.createTitledBorder("Choose Color for " + partInfo));
 					final JComboBox<String> colorComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
 					colorComboBox.setSelectedIndex(s.getColorOption());
 					gui.add(colorComboBox, BorderLayout.NORTH);
