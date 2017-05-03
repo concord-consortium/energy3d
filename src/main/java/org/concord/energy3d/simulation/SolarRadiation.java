@@ -76,8 +76,8 @@ public class SolarRadiation {
 	private long maxValue;
 	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
 	private double peakRadiation;
-	private static double[][] cellOutputs; // temporarily hold the intermediate calculated solar radiation on the solar cells of a solar panel or rack
 	private double[] dailyAirTemperatures; // daily air temperature high and low
+	private double[][] cellOutputs; // cache the intermediate calculated solar radiation on the solar cells of a solar panel or rack
 
 	private class MeshDataStore { // renamed this to avoid name conflict with MeshData
 		public Vector3 p0;
@@ -814,41 +814,51 @@ public class SolarRadiation {
 		}
 
 		final double airTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(dailyAirTemperatures[1], dailyAirTemperatures[0], minute);
-		final double eff = panel.getSystemEfficiency(airTemperature);
-		// System.out.println("****" + minute + "=" + airTemperature + "," + eff);
+		double syseff;
+		double output;
+		double tcell; // cell temperature
+		final double noctFactor = (panel.getNominalOperatingCellTemperature() - 20.0) * 100.0 / (a * 80.0); // Tcell = Tair + (NOCT - 20) / 80 * R, where the unit of R is mW/cm^2
 
-		// now consider cell wiring
+		// now consider cell wiring and distributed efficiency
 		switch (panel.getShadeTolerance()) {
 		case SolarPanel.HIGH_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
 				for (int y = 0; y < ny; y++) {
-					panel.getSolarPotential()[iMinute] += cellOutputs[x][y] * eff;
+					output = cellOutputs[x][y];
+					tcell = airTemperature + output * noctFactor;
+					syseff = panel.getSystemEfficiency(tcell);
+					panel.getSolarPotential()[iMinute] += output * syseff;
 				}
 			}
 			break;
 		case SolarPanel.NO_SHADE_TOLERANCE:
-			double output;
 			double min = Double.MAX_VALUE;
 			for (int x = 0; x < nx; x++) {
 				for (int y = 0; y < ny; y++) {
 					output = cellOutputs[x][y];
+					tcell = airTemperature + output * noctFactor;
+					syseff = panel.getSystemEfficiency(tcell);
+					output *= syseff;
 					if (output < min) {
 						min = output;
 					}
 				}
 			}
-			panel.getSolarPotential()[iMinute] += min * ny * nx * eff;
+			panel.getSolarPotential()[iMinute] += min * ny * nx;
 			break;
 		case SolarPanel.PARTIAL_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
 				min = Double.MAX_VALUE;
 				for (int y = 0; y < ny; y++) {
 					output = cellOutputs[x][y];
+					tcell = airTemperature + output * noctFactor;
+					syseff = panel.getSystemEfficiency(tcell);
+					output *= syseff;
 					if (output < min) {
 						min = output;
 					}
 				}
-				panel.getSolarPotential()[iMinute] += min * ny * eff;
+				panel.getSolarPotential()[iMinute] += min * ny;
 			}
 			break;
 		}
@@ -953,7 +963,7 @@ public class SolarRadiation {
 			cellOutputs = new double[nx][ny];
 		}
 
-		// calculate the solar radiation first without worrying about the underlying cell wiring
+		// calculate the solar radiation first without worrying about the underlying cell wiring and distributed efficiency
 		for (int x = 0; x < nx; x++) {
 			for (int y = 0; y < ny; y++) {
 				if (EnergyPanel.getInstance().isCancelled()) {
@@ -983,40 +993,51 @@ public class SolarRadiation {
 		}
 
 		final double airTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(dailyAirTemperatures[1], dailyAirTemperatures[0], minute);
-		final double eff = panel.getSystemEfficiency(airTemperature);
+		double syseff;
+		double output;
+		double tcell; // cell temperature
+		final double noctFactor = (panel.getNominalOperatingCellTemperature() - 20.0) * 100.0 / (a * 80.0); // Tcell = Tair + (NOCT - 20) / 80 * R, where the unit of R is mW/cm^2
 
-		// now consider cell wiring
+		// now consider cell wiring and distributed efficiency. TODO: This is very inaccurate. The output depends on both cell wiring and panel wiring.
 		switch (panel.getShadeTolerance()) {
 		case SolarPanel.HIGH_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
 				for (int y = 0; y < ny; y++) {
-					rack.getSolarPotential()[iMinute] += cellOutputs[x][y] * eff;
+					output = cellOutputs[x][y];
+					tcell = airTemperature + output * noctFactor;
+					syseff = panel.getSystemEfficiency(tcell);
+					rack.getSolarPotential()[iMinute] += output * syseff;
 				}
 			}
 			break;
 		case SolarPanel.NO_SHADE_TOLERANCE:
-			double output;
 			double min = Double.MAX_VALUE;
 			for (int x = 0; x < nx; x++) {
 				for (int y = 0; y < ny; y++) {
 					output = cellOutputs[x][y];
+					tcell = airTemperature + output * noctFactor;
+					syseff = panel.getSystemEfficiency(tcell);
+					output *= syseff;
 					if (output < min) {
 						min = output;
 					}
 				}
 			}
-			rack.getSolarPotential()[iMinute] += min * ny * nx * eff;
+			rack.getSolarPotential()[iMinute] += min * ny * nx;
 			break;
 		case SolarPanel.PARTIAL_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
 				min = Double.MAX_VALUE;
 				for (int y = 0; y < ny; y++) {
 					output = cellOutputs[x][y];
+					tcell = airTemperature + output * noctFactor;
+					syseff = panel.getSystemEfficiency(tcell);
+					output *= syseff;
 					if (output < min) {
 						min = output;
 					}
 				}
-				rack.getSolarPotential()[iMinute] += min * ny * eff;
+				rack.getSolarPotential()[iMinute] += min * ny;
 			}
 			break;
 		}
