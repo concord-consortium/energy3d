@@ -23,6 +23,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
@@ -4826,7 +4827,6 @@ public class PopupMenuFactory {
 						return;
 					}
 					final SolarPanel s = (SolarPanel) selectedPart;
-					final HousePart container = s.getContainer();
 					final Foundation foundation = s.getTopContainer();
 					int nx = s.getNumberOfCellsInX();
 					int ny = s.getNumberOfCellsInY();
@@ -4838,25 +4838,19 @@ public class PopupMenuFactory {
 					inputFields.add(new JLabel("  \u00D7  "));
 					final JTextField nyField = new JTextField(ny + "", 10);
 					inputFields.add(nyField);
-					inputFields.add(new JLabel("(Portrait)"));
 					final JPanel scopeFields = new JPanel();
 					scopeFields.setLayout(new BoxLayout(scopeFields, BoxLayout.Y_AXIS));
 					scopeFields.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Rack");
-					final JRadioButton rb3 = new JRadioButton("All Solar Panels on this Foundation");
-					final JRadioButton rb4 = new JRadioButton("All Solar Panels");
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
 					scopeFields.add(rb1);
-					if (container instanceof Rack) {
-						scopeFields.add(rb2);
-					}
+					scopeFields.add(rb2);
 					scopeFields.add(rb3);
-					scopeFields.add(rb4);
 					final ButtonGroup bg = new ButtonGroup();
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
-					bg.add(rb4);
 					switch (selectedScopeIndex) {
 					case 0:
 						rb1.setSelected(true);
@@ -4867,13 +4861,11 @@ public class PopupMenuFactory {
 					case 2:
 						rb3.setSelected(true);
 						break;
-					case 3:
-						rb4.setSelected(true);
-						break;
 					}
-					final JPanel panel = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel(new BorderLayout(0, 8));
 					panel.add(inputFields, BorderLayout.NORTH);
-					panel.add(scopeFields, BorderLayout.CENTER);
+					panel.add(new JLabel(new ImageIcon(PopupMenuFactory.class.getResource("icons/solarcells.png"))));
+					panel.add(scopeFields, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -4901,28 +4893,15 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									if (container instanceof Rack) {
-										final List<HousePart> children = ((Rack) container).getChildren();
-										final ChangeCellNumbersForSolarPanelOnRackCommand c = new ChangeCellNumbersForSolarPanelOnRackCommand((Rack) container);
-										for (final HousePart x : children) {
-											if (x instanceof SolarPanel) {
-												((SolarPanel) x).setNumberOfCellsInX(nx);
-												((SolarPanel) x).setNumberOfCellsInY(ny);
-											}
-										}
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-									}
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
 									final ChangeFoundationSolarPanelCellNumbersCommand c = new ChangeFoundationSolarPanelCellNumbersCommand(foundation);
 									foundation.setCellNumbersForSolarPanels(nx, ny);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 2;
-								} else if (rb4.isSelected()) {
+									selectedScopeIndex = 1;
+								} else if (rb3.isSelected()) {
 									final ChangeCellNumbersForAllSolarPanelsCommand c = new ChangeCellNumbersForAllSolarPanelsCommand();
 									Scene.getInstance().setCellNumbersForAllSolarPanels(nx, ny);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 3;
+									selectedScopeIndex = 2;
 								}
 								updateAfterEdit();
 								if (choice == options[0]) {
