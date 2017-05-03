@@ -452,13 +452,13 @@ public class TimeSeriesLogger {
 				else if (lastEdit instanceof ChooseSolarPanelSizeCommand) {
 					final ChooseSolarPanelSizeCommand c = (ChooseSolarPanelSizeCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
+					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
 					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + sp.getPanelWidth();
 					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + sp.getPanelHeight() + "}";
 				} else if (lastEdit instanceof RotateSolarPanelCommand) {
 					final RotateSolarPanelCommand c = (RotateSolarPanelCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"New Value\": " + sp.isRotated() + "}";
+					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"New Value\": " + sp.isRotated() + "}";
 				}
 
 				else if (lastEdit instanceof ChangeSolarCellPropertiesCommand) {
@@ -492,27 +492,27 @@ public class TimeSeriesLogger {
 					}
 				}
 
-				else if (lastEdit instanceof SetTemperatureCoefficientPmaxCommand) {
-					final SetTemperatureCoefficientPmaxCommand c = (SetTemperatureCoefficientPmaxCommand) lastEdit;
+				else if (lastEdit instanceof SetTemperatureEffectsCommand) {
+					final SetTemperatureEffectsCommand c = (SetTemperatureEffectsCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getTemperatureCoefficientPmax() + "}";
-				} else if (lastEdit instanceof SetFoundationTemperatureCoefficientPmaxCommand) {
-					final Foundation f = ((SetFoundationTemperatureCoefficientPmaxCommand) lastEdit).getFoundation();
+					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Noct\": " + c.getOldNoct() + ", \"New Noct\": " + sp.getNominalOperatingCellTemperature() + ", \"Old Pmax\": " + c.getOldPmax() + ", \"New Pmax\": " + sp.getTemperatureCoefficientPmax() + "}";
+				} else if (lastEdit instanceof SetFoundationTemperatureEffectsCommand) {
+					final Foundation f = ((SetFoundationTemperatureEffectsCommand) lastEdit).getFoundation();
 					final List<SolarPanel> solarPanels = f.getSolarPanels();
-					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTemperatureCoefficientPmax()) + "}";
-				} else if (lastEdit instanceof SetTemperatrureCoeffientPmaxForAllCommand) {
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Pmax\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTemperatureCoefficientPmax()) + "}";
+				} else if (lastEdit instanceof SetTemperatrureEffectsForAllCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
-					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTemperatureCoefficientPmax()) + "}";
+					stateValue = "{\"New Pmax\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTemperatureCoefficientPmax()) + "}";
 				}
 
 				else if (lastEdit instanceof ChangeInverterEfficiencyCommand) {
 					final ChangeInverterEfficiencyCommand c = (ChangeInverterEfficiencyCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getInverterEfficiency() + "}";
+					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getInverterEfficiency() + "}";
 				} else if (lastEdit instanceof ChangeFoundationInverterEfficiencyCommand) {
 					final Foundation f = ((ChangeFoundationInverterEfficiencyCommand) lastEdit).getFoundation();
 					final List<SolarPanel> solarPanels = f.getSolarPanels();
-					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
 				} else if (lastEdit instanceof ChangeInverterEfficiencyForAllCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getInverterEfficiency()) + "}";
@@ -521,12 +521,12 @@ public class TimeSeriesLogger {
 				else if (lastEdit instanceof SetShadeToleranceCommand) {
 					final SetShadeToleranceCommand c = (SetShadeToleranceCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
-					stateValue = "{\"Building\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getShadeTolerance() + "}";
+					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + sp.getShadeTolerance() + "}";
 				} else if (lastEdit instanceof SetShadeToleranceForSolarPanelsOnFoundationCommand) {
 					final SetShadeToleranceForSolarPanelsOnFoundationCommand c = (SetShadeToleranceForSolarPanelsOnFoundationCommand) lastEdit;
 					final Foundation f = c.getFoundation();
 					final List<SolarPanel> solarPanels = f.getSolarPanels();
-					stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getShadeTolerance()) + "}";
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getShadeTolerance()) + "}";
 				} else if (lastEdit instanceof SetShadeToleranceForAllSolarPanelsCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getShadeTolerance()) + "}";
@@ -564,7 +564,7 @@ public class TimeSeriesLogger {
 				else if (lastEdit instanceof ChooseSolarPanelSizeForRackCommand) {
 					final ChooseSolarPanelSizeForRackCommand c = (ChooseSolarPanelSizeForRackCommand) lastEdit;
 					final Rack rack = c.getRack();
-					stateValue = "{\"Building\": " + rack.getTopContainer().getId() + ", \"ID\": " + rack.getId();
+					stateValue = "{\"Foundation\": " + rack.getTopContainer().getId() + ", \"ID\": " + rack.getId();
 					stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + rack.getSolarPanel().getPanelWidth();
 					stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + rack.getSolarPanel().getPanelHeight() + "}";
 				} else if (lastEdit instanceof SetSolarPanelSizeForRacksOnFoundationCommand) {
@@ -618,17 +618,17 @@ public class TimeSeriesLogger {
 						bid = ((HousePart) tracker).getTopContainer().getId();
 						cid = ((HousePart) tracker).getId();
 					}
-					stateValue = "{\"Building\": " + bid + ", \"ID\": " + cid + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + tracker.getTracker() + "}";
+					stateValue = "{\"Foundation\": " + bid + ", \"ID\": " + cid + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + tracker.getTracker() + "}";
 				} else if (lastEdit instanceof SetSolarTrackersOnFoundationCommand) {
 					final SetSolarTrackersOnFoundationCommand c = (SetSolarTrackersOnFoundationCommand) lastEdit;
 					final Foundation f = c.getFoundation();
 					final Trackable tracker = c.getTracker();
 					if (tracker instanceof SolarPanel) {
 						final List<SolarPanel> solarPanels = f.getSolarPanels();
-						stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTracker()) + "}";
+						stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getTracker()) + "}";
 					} else if (tracker instanceof Rack) {
 						final List<Rack> racks = f.getRacks();
-						stateValue = "{\"Building\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getTracker()) + "}";
+						stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getTracker()) + "}";
 					}
 				} else if (lastEdit instanceof SetSolarTrackersForAllCommand) {
 					final SetSolarTrackersForAllCommand c = (SetSolarTrackersForAllCommand) lastEdit;

@@ -7,23 +7,24 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
-public class SetFoundationTemperatureCoefficientPmaxCommand extends AbstractUndoableEdit {
+public class SetNoctForRacksOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final Foundation foundation;
-	private final List<SolarPanel> panels;
+	private final List<Rack> racks;
 
-	public SetFoundationTemperatureCoefficientPmaxCommand(final Foundation foundation) {
+	public SetNoctForRacksOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
-		panels = foundation.getSolarPanels();
-		final int n = panels.size();
+		racks = foundation.getRacks();
+		final int n = racks.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = panels.get(i).getTemperatureCoefficientPmax();
+			oldValues[i] = racks.get(i).getSolarPanel().getNominalOperatingCellTemperature();
 		}
 	}
 
@@ -34,26 +35,27 @@ public class SetFoundationTemperatureCoefficientPmaxCommand extends AbstractUndo
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		final int n = panels.size();
+		final int n = racks.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newValues[i] = panels.get(i).getTemperatureCoefficientPmax();
-			panels.get(i).setTemperatureCoefficientPmax(oldValues[i]);
+			final SolarPanel s = racks.get(i).getSolarPanel();
+			newValues[i] = s.getNominalOperatingCellTemperature();
+			s.setNominalOperatingCellTemperature(oldValues[i]);
 		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		final int n = panels.size();
+		final int n = racks.size();
 		for (int i = 0; i < n; i++) {
-			panels.get(i).setTemperatureCoefficientPmax(newValues[i]);
+			racks.get(i).getSolarPanel().setNominalOperatingCellTemperature(newValues[i]);
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Temperature Coefficient of Pmax Change for All Solar Panels on Selected Foundation";
+		return "Set Nominal Operating Cell Temperature for All Racks on Selected Foundation";
 	}
 
 }

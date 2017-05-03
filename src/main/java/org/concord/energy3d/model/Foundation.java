@@ -2409,6 +2409,14 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
+	public void setNominalOperatingCellTemperature(final double noct) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setNominalOperatingCellTemperature(noct);
+			}
+		}
+	}
+
 	public void setSolarPanelInverterEfficiency(final double eff) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarPanel && p.getTopContainer() == this) {
@@ -2563,6 +2571,14 @@ public class Foundation extends HousePart implements Thermalizable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
 				((Rack) p).getSolarPanel().setTemperatureCoefficientPmax(pmax);
+			}
+		}
+	}
+
+	public void setNominalOperatingCellTemperatureForRacks(final double noct) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).getSolarPanel().setNominalOperatingCellTemperature(noct);
 			}
 		}
 	}

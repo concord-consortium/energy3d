@@ -180,6 +180,10 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		if (sampleSolarPanel == null) {
 			sampleSolarPanel = new SolarPanel();
 		}
+		// ugly fixes for zero initial values when sampleSolarPanel is previously serialized without new variables
+		if (Util.isZero(sampleSolarPanel.getNominalOperatingCellTemperature())) {
+			sampleSolarPanel.setNominalOperatingCellTemperature(48);
+		}
 
 		if (!points.isEmpty()) {
 			oldRackCenter = points.get(0).clone();

@@ -2248,6 +2248,14 @@ public class Scene implements Serializable {
 		}
 	}
 
+	public void setNominalOperatingCellTemperatureForAll(final double noct) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setNominalOperatingCellTemperature(noct);
+			}
+		}
+	}
+
 	public void setSolarPanelInverterEfficiencyForAll(final double eff) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {
@@ -2372,6 +2380,14 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
 				((Rack) p).getSolarPanel().setTemperatureCoefficientPmax(pmax);
+			}
+		}
+	}
+
+	public void setNominalOperatingCellTemperatureForAllRacks(final double noct) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).getSolarPanel().setNominalOperatingCellTemperature(noct);
 			}
 		}
 	}

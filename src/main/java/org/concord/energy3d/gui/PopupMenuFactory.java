@@ -149,6 +149,7 @@ public class PopupMenuFactory {
 	private static double inverterEfficiencyPercentage = 95;
 	private static int solarPanelShadeTolerance = SolarPanel.HIGH_SHADE_TOLERANCE;
 	private static double solarPanelTemperatureCoefficientPmaxPercentage = -0.5;
+	private static double solarPanelNominalOperatingCellTemperature = 48;
 	private static int solarPanelRowsPerRack = 3;
 	private static MirrorRectangularFieldLayout mirrorRectangularFieldLayout = new MirrorRectangularFieldLayout();
 	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
@@ -5283,7 +5284,7 @@ public class PopupMenuFactory {
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
-					final String title = "<html>Temperature effects of " + partInfo + "</html>";
+					final String title = "<html>Temperature Effects of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Increased temperature reduces solar cell efficiency. To determine this temperature effect,<br>it is important to know the expected operating temperature: the Nominal Operating Cell<br>Temperature (NOCT). NOCT ranges from 33&deg;C to 58&deg;C.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
@@ -5341,32 +5342,39 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
-							double val = 0;
+							double noct = 0;
+							double pmax = 0;
 							boolean ok = true;
 							try {
-								val = Double.parseDouble(pmaxField.getText());
+								noct = Double.parseDouble(noctField.getText());
+								pmax = Double.parseDouble(pmaxField.getText());
 							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), pmaxField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (val < -1 || val > 0) {
+								if (noct < 33 || noct > 58) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal Operating Cell Temperature must be between 33 and 58 Celsius degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (pmax < -1 || pmax > 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final SetTemperatureCoefficientPmaxCommand c = new SetTemperatureCoefficientPmaxCommand(solarPanel);
-										solarPanel.setTemperatureCoefficientPmax(val * 0.01);
+										final SetTemperatureEffectsCommand c = new SetTemperatureEffectsCommand(solarPanel);
+										solarPanel.setTemperatureCoefficientPmax(pmax * 0.01);
+										solarPanel.setNominalOperatingCellTemperature(noct);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										final SetFoundationTemperatureCoefficientPmaxCommand c = new SetFoundationTemperatureCoefficientPmaxCommand(foundation);
-										foundation.setTemperatureCoefficientPmax(val * 0.01);
+										final SetFoundationTemperatureEffectsCommand c = new SetFoundationTemperatureEffectsCommand(foundation);
+										foundation.setTemperatureCoefficientPmax(pmax * 0.01);
+										foundation.setNominalOperatingCellTemperature(noct);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetTemperatrureCoeffientPmaxForAllCommand c = new SetTemperatrureCoeffientPmaxForAllCommand();
-										Scene.getInstance().setTemperatureCoefficientPmaxForAll(val * 0.01);
+										final SetTemperatrureEffectsForAllCommand c = new SetTemperatrureEffectsForAllCommand();
+										Scene.getInstance().setTemperatureCoefficientPmaxForAll(pmax * 0.01);
+										Scene.getInstance().setNominalOperatingCellTemperatureForAll(noct);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -6126,7 +6134,6 @@ public class PopupMenuFactory {
 			miSolarPanelArray.addActionListener(new ActionListener() {
 
 				private Rack rack;
-				private JComboBox<String> monolithicComboBox;
 				private JComboBox<String> sizeComboBox;
 				private JComboBox<String> orientationComboBox;
 				private JComboBox<String> cellTypeComboBox;
@@ -6135,6 +6142,7 @@ public class PopupMenuFactory {
 				private double cellEfficiency;
 				private double inverterEfficiency;
 				private double pmax;
+				private double noct;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -6149,10 +6157,6 @@ public class PopupMenuFactory {
 					}
 					final SolarPanel solarPanel = rack.getSolarPanel();
 					final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
-					panel.add(new JLabel("Monolithic:"));
-					monolithicComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
-					monolithicComboBox.setSelectedIndex(rack.isMonolithic() ? 0 : 1);
-					panel.add(monolithicComboBox);
 					panel.add(new JLabel("Panel Size:"));
 					sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 					if (Util.isZero(0.99 - solarPanel.getPanelWidth()) && Util.isZero(1.65 - solarPanel.getPanelHeight())) {
@@ -6178,6 +6182,12 @@ public class PopupMenuFactory {
 					panel.add(new JLabel("Solar Cell Efficiency (%):"));
 					final JTextField cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getCellEfficiency() * 100));
 					panel.add(cellEfficiencyField);
+					panel.add(new JLabel("<html>Nominal Operating Cell Temperature (&deg;C):"));
+					final JTextField noctField = new JTextField(threeDecimalsFormat.format(solarPanel.getNominalOperatingCellTemperature()));
+					panel.add(noctField);
+					panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
+					final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanel.getTemperatureCoefficientPmax() * 100));
+					panel.add(pmaxField);
 					panel.add(new JLabel("Shade Tolerance:"));
 					shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
 					shadeToleranceComboBox.setSelectedIndex(solarPanel.getShadeTolerance());
@@ -6185,9 +6195,6 @@ public class PopupMenuFactory {
 					panel.add(new JLabel("Inverter Efficiency (%):"));
 					final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getInverterEfficiency() * 100));
 					panel.add(inverterEfficiencyField);
-					panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
-					final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanel.getTemperatureCoefficientPmax() * 100));
-					panel.add(pmaxField);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -6204,6 +6211,7 @@ public class PopupMenuFactory {
 								cellEfficiency = Double.parseDouble(cellEfficiencyField.getText());
 								inverterEfficiency = Double.parseDouble(inverterEfficiencyField.getText());
 								pmax = Double.parseDouble(pmaxField.getText());
+								noct = Double.parseDouble(noctField.getText());
 							} catch (final NumberFormatException ex) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -6215,6 +6223,8 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and less than " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (pmax < -1 || pmax > 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (noct < 33 || noct > 58) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal Cell Operating Temperature must be between 33 and 58 Celsius degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									setSolarPanels();
 									if (choice == options[0]) {
@@ -6249,11 +6259,11 @@ public class PopupMenuFactory {
 					solarPanel.setCellEfficiency(cellEfficiency * 0.01);
 					solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
 					solarPanel.setTemperatureCoefficientPmax(pmax * 0.01);
+					solarPanel.setNominalOperatingCellTemperature(noct);
 					solarPanel.setShadeTolerance(shadeToleranceComboBox.getSelectedIndex());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							rack.setMonolithic(monolithicComboBox.getSelectedIndex() == 0);
 							rack.addSolarPanels();
 							if (command != null) {
 								SceneManager.getInstance().getUndoManager().addEdit(command);
@@ -6726,9 +6736,9 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miInverterEfficiency = new JMenuItem("Inverter Efficiency...");
-			solarPanelMenu.add(miInverterEfficiency);
-			miInverterEfficiency.addActionListener(new ActionListener() {
+			final JMenuItem miNoct = new JMenuItem("Nominal Operating Cell Temperature...");
+			solarPanelMenu.add(miNoct);
+			miNoct.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -6741,10 +6751,10 @@ public class PopupMenuFactory {
 					final Rack r = (Rack) selectedPart;
 					final Foundation foundation = r.getTopContainer();
 					final SolarPanel s = r.getSolarPanel();
-					final String title = "Set Inverter Efficiency (%) for " + r.toString().substring(0, r.toString().indexOf(')') + 1);
-					final String footnote = "<html><hr><font size=2>The efficiency of a micro inverter for converting electricity<br>from DC to AC is typically 95%.<hr></html>";
+					final String title = "<html>Nominal Operating Cell Temperature (&deg;C) for " + r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final String footnote = "<html><hr><font size=2>Increased temperature reduces solar cell efficiency.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
-					final JTextField inputField = new JTextField(threeDecimalsFormat.format(s.getInverterEfficiency() * 100));
+					final JTextField inputField = new JTextField(threeDecimalsFormat.format(s.getNominalOperatingCellTemperature()));
 					gui.add(inputField, BorderLayout.NORTH);
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -6774,7 +6784,7 @@ public class PopupMenuFactory {
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Inverter Efficiency");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Nominal Operating Cell Temperature");
 
 					while (true) {
 						inputField.selectAll();
@@ -6786,28 +6796,28 @@ public class PopupMenuFactory {
 						} else {
 							boolean ok = true;
 							try {
-								inverterEfficiencyPercentage = Double.parseDouble(inputField.getText());
+								solarPanelNominalOperatingCellTemperature = Double.parseDouble(inputField.getText());
 							} catch (final NumberFormatException exception) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage > SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be between " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal Operating Cell Temperature must be between 33 and 58 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final SetInverterEfficiencyForRackCommand c = new SetInverterEfficiencyForRackCommand(r);
-										s.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
+										final SetNoctForRackCommand c = new SetNoctForRackCommand(r);
+										s.setNominalOperatingCellTemperature(solarPanelNominalOperatingCellTemperature);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetInverterEfficiencyForRacksOnFoundationCommand c = new SetInverterEfficiencyForRacksOnFoundationCommand(foundation);
-										foundation.setInverterEfficiencyForRacks(inverterEfficiencyPercentage * 0.01);
+										final SetNoctForRacksOnFoundationCommand c = new SetNoctForRacksOnFoundationCommand(foundation);
+										foundation.setNominalOperatingCellTemperatureForRacks(solarPanelNominalOperatingCellTemperature);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetInverterEfficiencyForAllRacksCommand c = new SetInverterEfficiencyForAllRacksCommand();
-										Scene.getInstance().setInverterEfficiencyForAllRacks(inverterEfficiencyPercentage * 0.01);
+										final SetNoctForAllRacksCommand c = new SetNoctForAllRacksCommand();
+										Scene.getInstance().setNominalOperatingCellTemperatureForAllRacks(solarPanelNominalOperatingCellTemperature);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -6994,6 +7004,102 @@ public class PopupMenuFactory {
 							updateAfterEdit();
 							if (choice == options[0]) {
 								break;
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miInverterEfficiency = new JMenuItem("Inverter Efficiency...");
+			solarPanelMenu.add(miInverterEfficiency);
+			miInverterEfficiency.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String title = "Set Inverter Efficiency (%) for " + r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final String footnote = "<html><hr><font size=2>The efficiency of a micro inverter for converting electricity<br>from DC to AC is typically 95%.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					final JTextField inputField = new JTextField(threeDecimalsFormat.format(s.getInverterEfficiency() * 100));
+					gui.add(inputField, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.CENTER);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Inverter Efficiency");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							boolean ok = true;
+							try {
+								inverterEfficiencyPercentage = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage > SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be between " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetInverterEfficiencyForRackCommand c = new SetInverterEfficiencyForRackCommand(r);
+										s.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final SetInverterEfficiencyForRacksOnFoundationCommand c = new SetInverterEfficiencyForRacksOnFoundationCommand(foundation);
+										foundation.setInverterEfficiencyForRacks(inverterEfficiencyPercentage * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final SetInverterEfficiencyForAllRacksCommand c = new SetInverterEfficiencyForAllRacksCommand();
+										Scene.getInstance().setInverterEfficiencyForAllRacks(inverterEfficiencyPercentage * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
 							}
 						}
 					}
