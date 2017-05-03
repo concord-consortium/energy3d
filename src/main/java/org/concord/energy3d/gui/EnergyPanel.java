@@ -972,7 +972,7 @@ public class EnergyPanel extends JPanel {
 								final String eff = ONE_DECIMAL.format(sp.getCellEfficiency() * 100) + "%";
 								if (energyViewShown) {
 									partProperty3Label.setText("  Efficiency & Yield:");
-									partProperty3TextField.setText(eff + ", " + TWO_DECIMALS.format(sp.getSolarPotentialToday() * sp.getSystemEfficiency(25)) + " kWh"); // TODO: more accurate system efficiency should consider hourly temperature fluctuations
+									partProperty3TextField.setText(eff + ", " + TWO_DECIMALS.format(sp.getSolarPotentialToday()) + " kWh");
 									partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel");
 								} else {
 									partProperty3Label.setText("  Efficiency:");
@@ -1014,7 +1014,7 @@ public class EnergyPanel extends JPanel {
 								final String eff = ONE_DECIMAL.format(sp.getCellEfficiency() * 100) + "%";
 								if (energyViewShown) {
 									partProperty3Label.setText("  Efficiency & Yield:");
-									partProperty3TextField.setText(eff + ", " + TWO_DECIMALS.format(rack.getSolarPotentialToday() * sp.getSystemEfficiency(25)) + " kWh"); // TODO: more accurate system efficiency should consider hourly temperature fluctuations
+									partProperty3TextField.setText(eff + ", " + TWO_DECIMALS.format(rack.getSolarPotentialToday()) + " kWh");
 									partProperty3TextField.setToolTipText("The solar cell efficiency and daily yield of the solar panel array on the rack");
 								} else {
 									if (rack.isMonolithic()) {

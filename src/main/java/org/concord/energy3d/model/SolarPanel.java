@@ -414,7 +414,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 			}
 		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * getSystemEfficiency(25)) + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);

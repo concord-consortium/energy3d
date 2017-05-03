@@ -77,6 +77,7 @@ public class SolarRadiation {
 	private int airMassSelection = AIR_MASS_SPHERE_MODEL;
 	private double peakRadiation;
 	private static double[][] cellOutputs; // temporarily hold the intermediate calculated solar radiation on the solar cells of a solar panel or rack
+	private double[] dailyAirTemperatures; // daily air temperature high and low
 
 	private class MeshDataStore { // renamed this to avoid name conflict with MeshData
 		public Vector3 p0;
@@ -96,11 +97,12 @@ public class SolarRadiation {
 	}
 
 	public void compute() {
-		System.out.println("computeSolarRadiation()");
+		System.out.println("Compute solar radiation...");
 		initCollidables();
 		onMesh.clear();
+		final int n = Math.round(MINUTES_OF_DAY / (float) Scene.getInstance().getTimeStep());
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			part.setSolarPotential(new double[MINUTES_OF_DAY / Scene.getInstance().getTimeStep()]);
+			part.setSolarPotential(new double[n]);
 		}
 		computeToday();
 		if (Scene.getInstance().getAlwaysComputeHeatFluxVectors()) {
@@ -182,6 +184,8 @@ public class SolarRadiation {
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		dailyAirTemperatures = Weather.computeOutsideTemperature(today, city);
 
 		final int timeStep = Scene.getInstance().getTimeStep();
 		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[SolarRadiation.MINUTES_OF_DAY / timeStep];
@@ -686,7 +690,7 @@ public class SolarRadiation {
 
 	}
 
-	// a solar panel typically has 6x10 cells, 6 and 10 are not power of 2. so we need some special handling here
+	// a solar panel typically has 6x10 cells, 6 and 10 are not power of 2 for texture. so we need some special handling here
 	private void computeOnSolarPanel(final int minute, final ReadOnlyVector3 directionTowardSun, final SolarPanel panel) {
 
 		if (panel.getTracker() != SolarPanel.NO_TRACKER) {
@@ -780,7 +784,7 @@ public class SolarRadiation {
 			cellOutputs = new double[nx][ny];
 		}
 
-		// calculate the solar radiation first without worrying about the underlying cell wiring
+		// calculate the solar radiation first without worrying about the underlying cell wiring and distributed efficiency
 		for (int x = 0; x < nx; x++) {
 			for (int y = 0; y < ny; y++) {
 				if (EnergyPanel.getInstance().isCancelled()) {
@@ -809,12 +813,16 @@ public class SolarRadiation {
 			}
 		}
 
+		final double airTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(dailyAirTemperatures[1], dailyAirTemperatures[0], minute);
+		final double eff = panel.getSystemEfficiency(airTemperature);
+		// System.out.println("****" + minute + "=" + airTemperature + "," + eff);
+
 		// now consider cell wiring
 		switch (panel.getShadeTolerance()) {
 		case SolarPanel.HIGH_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
 				for (int y = 0; y < ny; y++) {
-					panel.getSolarPotential()[iMinute] += cellOutputs[x][y];
+					panel.getSolarPotential()[iMinute] += cellOutputs[x][y] * eff;
 				}
 			}
 			break;
@@ -829,7 +837,7 @@ public class SolarRadiation {
 					}
 				}
 			}
-			panel.getSolarPotential()[iMinute] += min * ny * nx;
+			panel.getSolarPotential()[iMinute] += min * ny * nx * eff;
 			break;
 		case SolarPanel.PARTIAL_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
@@ -840,7 +848,7 @@ public class SolarRadiation {
 						min = output;
 					}
 				}
-				panel.getSolarPotential()[iMinute] += min * ny;
+				panel.getSolarPotential()[iMinute] += min * ny * eff;
 			}
 			break;
 		}
@@ -974,12 +982,15 @@ public class SolarRadiation {
 			}
 		}
 
+		final double airTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(dailyAirTemperatures[1], dailyAirTemperatures[0], minute);
+		final double eff = panel.getSystemEfficiency(airTemperature);
+
 		// now consider cell wiring
 		switch (panel.getShadeTolerance()) {
 		case SolarPanel.HIGH_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
 				for (int y = 0; y < ny; y++) {
-					rack.getSolarPotential()[iMinute] += cellOutputs[x][y];
+					rack.getSolarPotential()[iMinute] += cellOutputs[x][y] * eff;
 				}
 			}
 			break;
@@ -994,7 +1005,7 @@ public class SolarRadiation {
 					}
 				}
 			}
-			rack.getSolarPotential()[iMinute] += min * ny * nx;
+			rack.getSolarPotential()[iMinute] += min * ny * nx * eff;
 			break;
 		case SolarPanel.PARTIAL_SHADE_TOLERANCE:
 			for (int x = 0; x < nx; x++) {
@@ -1005,7 +1016,7 @@ public class SolarRadiation {
 						min = output;
 					}
 				}
-				rack.getSolarPotential()[iMinute] += min * ny;
+				rack.getSolarPotential()[iMinute] += min * ny * eff;
 			}
 			break;
 		}
@@ -1265,15 +1276,13 @@ public class SolarRadiation {
 								final Window window = (Window) child;
 								passiveSolar[i] += child.getSolarPotential()[i] * window.getSolarHeatGainCoefficient();
 							} else if (child instanceof SolarPanel) {
-								final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * Scene.getInstance().getTimeStep());
 								final SolarPanel sp = (SolarPanel) child;
-								final double yield = sp.getSolarPotential()[i] * sp.getSystemEfficiency(outsideTemperature);
+								final double yield = sp.getSolarPotential()[i]; // distributed efficiency must be handled for each individual cell
 								sp.setYieldToday(sp.getYieldToday() + yield);
 								photovoltaic[i] += yield;
 							} else if (child instanceof Rack) {
-								final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], i * Scene.getInstance().getTimeStep());
 								final Rack rack = (Rack) child;
-								final double yield = rack.getSolarPotential()[i] * rack.getSolarPanel().getSystemEfficiency(outsideTemperature);
+								final double yield = rack.getSolarPotential()[i]; // distributed efficiency must be handled for each individual cell
 								rack.setYieldToday(rack.getYieldToday() + yield);
 								photovoltaic[i] += yield;
 							} else if (child instanceof Mirror) {
@@ -1330,8 +1339,8 @@ public class SolarRadiation {
 	public void computeEnergyAtHour(final int hour) {
 		final Calendar today = Heliodon.getInstance().getCalendar();
 		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		final double[] outsideTemperatureRange = Weather.computeOutsideTemperature(today, city);
-		final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], hour * 60);
+		final double[] outsideAirTemperatureRange = Weather.computeOutsideTemperature(today, city);
+		final double outsideAirTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideAirTemperatureRange[1], outsideAirTemperatureRange[0], hour * 60);
 
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
@@ -1349,7 +1358,7 @@ public class SolarRadiation {
 					final double groundHeatLoss = foundation.getHeatLoss()[t0 + i];
 					if (groundHeatLoss > 0) {
 						final double thermostat = foundation.getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, today.get(Calendar.HOUR_OF_DAY));
-						if (outsideTemperature >= thermostat) {
+						if (outsideAirTemperature >= thermostat) {
 							heatLoss[i] -= groundHeatLoss;
 						}
 					} else {
@@ -1381,13 +1390,13 @@ public class SolarRadiation {
 								mirror.setYieldNow(mirror.getYieldNow() + yield);
 							} else if (child instanceof SolarPanel) {
 								final SolarPanel sp = (SolarPanel) child;
-								final double yield = sp.getSolarPotential()[t0 + i] * sp.getSystemEfficiency(outsideTemperature);
+								final double yield = sp.getSolarPotential()[t0 + i]; // distributed efficiency must be handled for each individual cell
 								photovoltaic[i] += yield;
 								sp.setYieldNow(sp.getYieldNow() + yield);
 							} else if (child instanceof Rack) {
 								final Rack rack = (Rack) child;
 								if (rack.isMonolithic()) {
-									final double yield = rack.getSolarPotential()[t0 + i] * rack.getSolarPanel().getSystemEfficiency(outsideTemperature);
+									final double yield = rack.getSolarPotential()[t0 + i]; // distributed efficiency must be handled for each individual cell
 									photovoltaic[i] += yield;
 									rack.setYieldNow(rack.getYieldNow() + yield);
 								}

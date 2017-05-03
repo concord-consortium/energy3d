@@ -596,7 +596,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 			}
 		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday * sampleSolarPanel.getSystemEfficiency(25)) + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);
@@ -829,17 +829,6 @@ public class Rack extends HousePart implements Trackable, Meshable {
 			oldRelativeAzimuth = this.relativeAzimuth;
 		}
 		allowAzimuthLargeRotation = true;
-	}
-
-	private void rotateSolarPanelsAzimuth(final double angle) {
-		final Vector3 center = getAbsPoint(0);
-		final Matrix3 matrix = new Matrix3().fromAngles(0, 0, angle);
-		for (final HousePart child : children) {
-			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
-			matrix.applyPost(v, v);
-			v.addLocal(center);
-			child.getPoints().get(0).set(child.toRelative(v));
-		}
 	}
 
 	public double getRelativeAzimuth() {

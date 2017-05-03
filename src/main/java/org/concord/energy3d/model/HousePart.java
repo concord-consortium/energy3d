@@ -976,18 +976,22 @@ public abstract class HousePart implements Serializable {
 		return sum;
 	}
 
+	/** Note: For solar panels, this stores the energy that is actually converted into electricity */
 	public double getSolarPotentialNow() {
 		return solarPotentialNow;
 	}
 
+	/** Note: For solar panels, this stores the energy that is actually converted into electricity */
 	public void setSolarPotentialNow(final double solarPotentialNow) {
 		this.solarPotentialNow = solarPotentialNow;
 	}
 
+	/** Note: For solar panels, this stores the energy that is actually converted into electricity */
 	public double getSolarPotentialToday() {
 		return solarPotentialToday;
 	}
 
+	/** Note: For solar panels, this stores the energy that is actually converted into electricity */
 	public void setSolarPotentialToday(final double solarPotentialToday) {
 		this.solarPotentialToday = solarPotentialToday;
 	}
