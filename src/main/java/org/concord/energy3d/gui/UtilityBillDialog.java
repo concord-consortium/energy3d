@@ -45,7 +45,7 @@ class UtilityBillDialog extends JDialog {
 		}
 
 		getContentPane().setLayout(new BorderLayout());
-		JPanel container = new JPanel(new GridLayout(1, 2, 10, 10));
+		final JPanel container = new JPanel(new GridLayout(1, 2, 10, 10));
 		container.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		getContentPane().add(container, BorderLayout.CENTER);
 
@@ -54,7 +54,7 @@ class UtilityBillDialog extends JDialog {
 		container.add(panel);
 
 		for (int i = 0; i < 6; i++) {
-			JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+			final JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
 			p.add(labels[i]);
 			p.add(fields[i]);
 			panel.add(p);
@@ -65,7 +65,7 @@ class UtilityBillDialog extends JDialog {
 		container.add(panel);
 
 		for (int i = 6; i < 12; i++) {
-			JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+			final JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
 			p.add(labels[i]);
 			p.add(fields[i]);
 			panel.add(p);
@@ -80,7 +80,7 @@ class UtilityBillDialog extends JDialog {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 
-				double[] x = new double[12];
+				final double[] x = new double[12];
 				try {
 					for (int i = 0; i < 12; i++) {
 						x[i] = Double.parseDouble(fields[i].getText());

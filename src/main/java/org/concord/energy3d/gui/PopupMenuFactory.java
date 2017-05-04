@@ -148,7 +148,7 @@ public class PopupMenuFactory {
 	private static double solarPanelTiltAngle = 0;
 	private static double solarCellEfficiencyPercentage = 15;
 	private static double inverterEfficiencyPercentage = 95;
-	private static int solarPanelShadeTolerance = SolarPanel.HIGH_SHADE_TOLERANCE;
+	private static int solarPanelShadeTolerance = SolarPanel.PARTIAL_SHADE_TOLERANCE;
 	private static double solarPanelTemperatureCoefficientPmaxPercentage = -0.5;
 	private static double solarPanelNominalOperatingCellTemperature = 48;
 	private static int solarPanelRowsPerRack = 3;
@@ -2479,7 +2479,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(12, 2, 5, 5));
+						final JPanel panel = new JPanel(new SpringLayout());
 
 						panel.add(new JLabel("Solar Panel Cell Type:"));
 						cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
@@ -2506,6 +2506,14 @@ public class PopupMenuFactory {
 						final JTextField cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarCellEfficiencyPercentage));
 						panel.add(cellEfficiencyField);
 
+						panel.add(new JLabel("<html>Nominal Operating Cell Temperature (&deg;C):"));
+						final JTextField noctField = new JTextField(threeDecimalsFormat.format(solarPanelNominalOperatingCellTemperature));
+						panel.add(noctField);
+
+						panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
+						final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
+						panel.add(pmaxField);
+
 						panel.add(new JLabel("Shade Tolerance:"));
 						shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
 						shadeToleranceComboBox.setSelectedIndex(solarPanelShadeTolerance);
@@ -2514,10 +2522,6 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Inverter Efficiency (%):"));
 						final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(inverterEfficiencyPercentage));
 						panel.add(inverterEfficiencyField);
-
-						panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
-						final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
-						panel.add(pmaxField);
 
 						panel.add(new JLabel("Tile Angle (\u00B0):"));
 						final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
@@ -2540,6 +2544,8 @@ public class PopupMenuFactory {
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelArrayBaseHeight));
 						panel.add(baseHeightField);
 
+						SpringUtilities.makeCompactGrid(panel, 13, 2, 6, 6, 6, 6);
+
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Array Options");
@@ -2559,8 +2565,9 @@ public class PopupMenuFactory {
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
 									solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
+									solarPanelNominalOperatingCellTemperature = Double.parseDouble(noctField.getText());
 								} catch (final NumberFormatException exception) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
 								}
 								if (ok) {
@@ -2576,6 +2583,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and less than " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelTemperatureCoefficientPmaxPercentage < -1 || solarPanelTemperatureCoefficientPmaxPercentage > 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal operating cell temperature must be between 33 and 58 Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addSolarPanelArrays();
 										if (choice == options[0]) {
@@ -2619,6 +2628,7 @@ public class PopupMenuFactory {
 					sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
 					sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
 					sp.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+					sp.setNominalOperatingCellTemperature(solarPanelNominalOperatingCellTemperature);
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -2657,7 +2667,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(15, 2, 5, 5));
+						final JPanel panel = new JPanel(new SpringLayout());
 
 						panel.add(new JLabel("Solar Panel Orientation:"));
 						orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
@@ -2689,6 +2699,14 @@ public class PopupMenuFactory {
 						final JTextField cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarCellEfficiencyPercentage));
 						panel.add(cellEfficiencyField);
 
+						panel.add(new JLabel("<html>Nominal Operating Cell Temperature (&deg;C):"));
+						final JTextField noctField = new JTextField(threeDecimalsFormat.format(solarPanelNominalOperatingCellTemperature));
+						panel.add(noctField);
+
+						panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
+						final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
+						panel.add(pmaxField);
+
 						panel.add(new JLabel("Shade Tolerance:"));
 						shadeToleranceComboBox = new JComboBox<String>(new String[] { "Partial", "High", "None" });
 						shadeToleranceComboBox.setSelectedIndex(solarPanelShadeTolerance);
@@ -2697,10 +2715,6 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Inverter Efficiency (%):"));
 						final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(inverterEfficiencyPercentage));
 						panel.add(inverterEfficiencyField);
-
-						panel.add(new JLabel("<html>Temperature Coefficient of Pmax (%/&deg;C):"));
-						final JTextField pmaxField = new JTextField(sixDecimalsFormat.format(solarPanelTemperatureCoefficientPmaxPercentage));
-						panel.add(pmaxField);
 
 						panel.add(new JLabel("Tile Angle (\u00B0):"));
 						final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
@@ -2731,6 +2745,8 @@ public class PopupMenuFactory {
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelRackBaseHeight));
 						panel.add(baseHeightField);
 
+						SpringUtilities.makeCompactGrid(panel, 16, 2, 6, 6, 6, 6);
+
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Rack Options");
@@ -2749,6 +2765,7 @@ public class PopupMenuFactory {
 									solarCellEfficiencyPercentage = Double.parseDouble(cellEfficiencyField.getText());
 									inverterEfficiencyPercentage = Double.parseDouble(inverterEfficiencyField.getText());
 									solarPanelTemperatureCoefficientPmaxPercentage = Double.parseDouble(pmaxField.getText());
+									solarPanelNominalOperatingCellTemperature = Double.parseDouble(noctField.getText());
 									solarPanelRackPoleSpacingX = Double.parseDouble(poleSpacingXField.getText());
 									solarPanelRackPoleSpacingY = Double.parseDouble(poleSpacingYField.getText());
 									solarPanelRackBaseHeight = Double.parseDouble(baseHeightField.getText());
@@ -2775,6 +2792,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and less than " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelTemperatureCoefficientPmaxPercentage < -1 || solarPanelTemperatureCoefficientPmaxPercentage > 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal operating cell temperature must be between 33 and 58 Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addSolarRackArrays();
 										if (choice == options[0]) {
@@ -2817,6 +2836,7 @@ public class PopupMenuFactory {
 					sp.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
 					sp.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
 					sp.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+					sp.setNominalOperatingCellTemperature(solarPanelNominalOperatingCellTemperature);
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -2848,7 +2868,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
+						final JPanel panel = new JPanel(new SpringLayout());
 						panel.add(new JLabel("Type:"));
 						typeComboBox = new JComboBox<String>(new String[] { "Equal Azimuthal Spacing", "Radial Stagger" });
 						typeComboBox.setSelectedIndex(mirrorCircularFieldLayout.getType());
@@ -2880,6 +2900,7 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Base Height:"));
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
+						SpringUtilities.makeCompactGrid(panel, 10, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -2971,7 +2992,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+						final JPanel panel = new JPanel(new SpringLayout());
 						panel.add(new JLabel("Row Axis:"));
 						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
 						rowAxisComboBox.setSelectedIndex(mirrorRectangularFieldLayout.getRowAxis());
@@ -2991,6 +3012,7 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Base Height:"));
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
+						SpringUtilities.makeCompactGrid(panel, 6, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -3068,7 +3090,7 @@ public class PopupMenuFactory {
 							return;
 						}
 
-						final JPanel panel = new JPanel(new GridLayout(10, 2, 5, 5));
+						final JPanel panel = new JPanel(new SpringLayout());
 						panel.add(new JLabel("Type:"));
 						typeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
 						typeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getType());
@@ -3100,6 +3122,7 @@ public class PopupMenuFactory {
 						panel.add(new JLabel("Base Height:"));
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
+						SpringUtilities.makeCompactGrid(panel, 10, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -6135,7 +6158,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final SolarPanel solarPanel = rack.getSolarPanel();
-					final JPanel panel = new JPanel(new GridLayout(9, 2, 5, 5));
+					final JPanel panel = new JPanel(new SpringLayout());
 					panel.add(new JLabel("Panel Size:"));
 					sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 					if (Util.isZero(0.99 - solarPanel.getPanelWidth()) && Util.isZero(1.65 - solarPanel.getPanelHeight())) {
@@ -6174,6 +6197,7 @@ public class PopupMenuFactory {
 					panel.add(new JLabel("Inverter Efficiency (%):"));
 					final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getInverterEfficiency() * 100));
 					panel.add(inverterEfficiencyField);
+					SpringUtilities.makeCompactGrid(panel, 9, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);

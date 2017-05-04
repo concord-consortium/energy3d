@@ -2,7 +2,6 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -14,12 +13,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.undo.RescaleBuildingCommand;
+import org.concord.energy3d.util.SpringUtilities;
 
 /**
  * @author Charles Xie
@@ -35,15 +36,15 @@ class RescaleBuildingDialog extends JDialog {
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setTitle("Rescale Building #" + foundation.getId());
 
-		final JTextField oldXField = new JTextField();
-		final JTextField newXField = new JTextField();
-		final JTextField oldYField = new JTextField();
-		final JTextField newYField = new JTextField();
-		final JTextField oldZField = new JTextField();
-		final JTextField newZField = new JTextField();
+		final JTextField oldXField = new JTextField(10);
+		final JTextField newXField = new JTextField(10);
+		final JTextField oldYField = new JTextField(10);
+		final JTextField newYField = new JTextField(10);
+		final JTextField oldZField = new JTextField(10);
+		final JTextField newZField = new JTextField(10);
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(6, 2, 8, 8));
+		final JPanel panel = new JPanel(new SpringLayout());
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -181,6 +182,8 @@ class RescaleBuildingDialog extends JDialog {
 		panel.add(oldZField);
 		panel.add(new JLabel("New Height: "));
 		panel.add(newZField);
+
+		SpringUtilities.makeCompactGrid(panel, 6, 2, 6, 6, 6, 6);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
