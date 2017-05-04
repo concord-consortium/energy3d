@@ -720,14 +720,14 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final JPanel gui = new JPanel(new BorderLayout());
-					final String title = "<html>Loss of productivity due to atmospheric dust and pollen<br>(a dimensionless parameter within [0, 1])</html>";
+					final String title = "<html><b>Soiling loss factor:</b><br>Loss of productivity due to atmospheric dust and pollen<br>(a dimensionless parameter within [0, 1])</html>";
 					gui.add(new JLabel(title), BorderLayout.NORTH);
 					final JPanel inputPanel = new JPanel(new SpringLayout());
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
 					final JTextField[] fields = new JTextField[12];
 					for (int i = 0; i < 12; i++) {
-						final JLabel l = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i] + ": ", JLabel.TRAILING);
+						final JLabel l = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i] + ": ", JLabel.LEFT);
 						inputPanel.add(l);
 						fields[i] = new JTextField(threeDecimalsFormat.format(Scene.getInstance().getAtmosphere().getDustLoss(i)), 5);
 						l.setLabelFor(fields[i]);

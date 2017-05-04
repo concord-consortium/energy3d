@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 
 import javax.swing.JButton;
@@ -36,7 +38,7 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(4, 3, 8, 8));
+		final JPanel panel = new JPanel(new GridLayout(5, 3, 8, 8));
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -44,8 +46,24 @@ class SimulationSettingsDialog extends JDialog {
 		final JTextField mirrorNxTextField = new JTextField(s.getMirrorNx() + "", 6);
 		final JTextField mirrorNyTextField = new JTextField(s.getMirrorNy() + "", 6);
 		final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(Scene.getInstance().getRackCellSize()));
+		final JLabel rackCellSizeLabelLeft = new JLabel("Rack grid cell: ");
+		final JLabel rackCellSizeLabelRight = new JLabel("Meters");
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
+
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
+		airMassComboBox.setSelectedIndex(SolarRadiation.getInstance().getAirMassSelection() + 1);
+
+		final JComboBox<String> rackModelComboBox = new JComboBox<String>(new String[] { "Approximate", "Exact" });
+		rackModelComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				final boolean approximate = rackModelComboBox.getSelectedIndex() == 0;
+				rackCellSizeTextField.setEnabled(approximate);
+				rackCellSizeLabelLeft.setEnabled(approximate);
+				rackCellSizeLabelRight.setEnabled(approximate);
+			}
+		});
+		rackModelComboBox.setSelectedIndex(s.isRackModelExact() ? 1 : 0);
 
 		final ActionListener okListener = new ActionListener() {
 			@Override
@@ -83,6 +101,7 @@ class SimulationSettingsDialog extends JDialog {
 				}
 				s.setMirrorNx(mirrorNx);
 				s.setMirrorNy(mirrorNy);
+				s.setRackModelExact(rackModelComboBox.getSelectedIndex() == 1);
 				s.setRackCellSize(rackCellSize);
 				s.setTimeStep(timeStep);
 				s.setEdited(true);
@@ -101,10 +120,15 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(p1);
 		panel.add(new JLabel("Must be power of 2"));
 
+		// select the model for racks
+		panel.add(new JLabel("Rack model:"));
+		panel.add(rackModelComboBox);
+		panel.add(new JLabel("Accuracy or speed"));
+
 		// set number of grid points for a solar rack, used in both heat map generation and energy calculation
-		panel.add(new JLabel("Rack grid cell: "));
+		panel.add(rackCellSizeLabelLeft);
 		panel.add(rackCellSizeTextField);
-		panel.add(new JLabel("Meters"));
+		panel.add(rackCellSizeLabelRight);
 
 		// set the time step
 		panel.add(new JLabel("Time step: "));
@@ -114,7 +138,6 @@ class SimulationSettingsDialog extends JDialog {
 
 		// choose air mass
 		panel.add(new JLabel("Air mass: "));
-		airMassComboBox.setSelectedIndex(SolarRadiation.getInstance().getAirMassSelection() + 1);
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
 

@@ -169,6 +169,8 @@ public class Scene implements Serializable {
 
 	private double rackCellSize = 1; // by default, the cell is 1 x 1 meter
 
+	private boolean rackModelExact = false; // by default, use the approximate model for rack for speed
+
 	// number of points in x and y directions when a mirror is discretized into a grid (to meet the need of texture, these numbers must be power of 2)
 	// used in both radiation calculation and heat map visualization for reflecting mirrors (which are closer to square, except parabolic troughs)
 	private int mirrorNx = 4, mirrorNy = 4;
@@ -2933,6 +2935,14 @@ public class Scene implements Serializable {
 
 	public double getRackCellSize() {
 		return rackCellSize;
+	}
+
+	public void setRackModelExact(final boolean rackModelExact) {
+		this.rackModelExact = rackModelExact;
+	}
+
+	public boolean isRackModelExact() {
+		return rackModelExact;
 	}
 
 	public void setMirrorNx(final int mirrorNx) {

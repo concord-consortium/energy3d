@@ -19,6 +19,7 @@ public class Atmosphere implements Serializable {
 		Arrays.fill(dustLosses, 0.05);
 	}
 
+	// Reference: http://solarprofessional.com/articles/operations-maintenance/impacts-of-soiling-on-utility-scale-pv-system-performance
 	public void setDustLoss(final double loss, final int i) {
 		if (dustLosses == null) {
 			dustLosses = new double[12];

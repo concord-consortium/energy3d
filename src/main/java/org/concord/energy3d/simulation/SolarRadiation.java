@@ -824,7 +824,7 @@ public class SolarRadiation {
 		double tcell; // cell temperature
 		final double noctFactor = (panel.getNominalOperatingCellTemperature() - 20.0) * 100.0 / (a * 80.0); // Tcell = Tair + (NOCT - 20) / 80 * R, where the unit of R is mW/cm^2
 
-		// now consider cell wiring and distributed efficiency
+		// now consider cell wiring and distributed efficiency (Nice demo at: https://www.youtube.com/watch?v=UNPJapaZlCU)
 		switch (panel.getShadeTolerance()) {
 		case SolarPanel.HIGH_SHADE_TOLERANCE: // the most ideal assumption that probably doesn't exist in reality (just keep it here in case someone has a breakthrough in the future)
 			for (int x = 0; x < nx; x++) {
