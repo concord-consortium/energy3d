@@ -6,6 +6,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -18,25 +19,33 @@ public class ChangeCellNumbersForAllSolarPanelsCommand extends AbstractUndoableE
 	private final int[] oldNys;
 	private int[] newNys;
 	private final List<SolarPanel> panels;
+	private final List<Rack> racks;
 
 	public ChangeCellNumbersForAllSolarPanelsCommand() {
 		panels = Scene.getInstance().getAllSolarPanels();
-		final int n = panels.size();
+		racks = Scene.getInstance().getAllRacks();
+		final int n = panels.size() + racks.size();
 		oldNxs = new int[n];
 		oldNys = new int[n];
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < panels.size(); i++) {
 			oldNxs[i] = panels.get(i).getNumberOfCellsInX();
 			oldNys[i] = panels.get(i).getNumberOfCellsInY();
+		}
+		for (int i = 0; i < racks.size(); i++) {
+			final int j = i + panels.size();
+			final SolarPanel p = racks.get(i).getSolarPanel();
+			oldNxs[j] = p.getNumberOfCellsInX();
+			oldNys[j] = p.getNumberOfCellsInY();
 		}
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		final int n = panels.size();
+		final int n = panels.size() + racks.size();
 		newNxs = new int[n];
 		newNys = new int[n];
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < panels.size(); i++) {
 			final SolarPanel p = panels.get(i);
 			newNxs[i] = p.getNumberOfCellsInX();
 			newNys[i] = p.getNumberOfCellsInY();
@@ -44,18 +53,33 @@ public class ChangeCellNumbersForAllSolarPanelsCommand extends AbstractUndoableE
 			p.setNumberOfCellsInY(oldNys[i]);
 			p.draw();
 		}
+		for (int i = 0; i < racks.size(); i++) {
+			final int j = i + panels.size();
+			final SolarPanel p = racks.get(i).getSolarPanel();
+			newNxs[j] = p.getNumberOfCellsInX();
+			newNys[j] = p.getNumberOfCellsInY();
+			p.setNumberOfCellsInX(oldNxs[j]);
+			p.setNumberOfCellsInY(oldNys[j]);
+			racks.get(i).draw();
+		}
 		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		final int n = panels.size();
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < panels.size(); i++) {
 			final SolarPanel p = panels.get(i);
 			p.setNumberOfCellsInX(newNxs[i]);
 			p.setNumberOfCellsInY(newNys[i]);
 			p.draw();
+		}
+		for (int i = 0; i < racks.size(); i++) {
+			final int j = i + panels.size();
+			final SolarPanel p = racks.get(i).getSolarPanel();
+			p.setNumberOfCellsInX(newNxs[j]);
+			p.setNumberOfCellsInY(newNys[j]);
+			racks.get(i).draw();
 		}
 		SceneManager.getInstance().refresh();
 	}

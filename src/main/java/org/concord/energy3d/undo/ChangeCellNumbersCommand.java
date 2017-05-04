@@ -23,6 +23,9 @@ public class ChangeCellNumbersCommand extends AbstractUndoableEdit {
 			oldNx = s.getNumberOfCellsInX();
 			oldNy = s.getNumberOfCellsInY();
 		} else if (part instanceof Rack) {
+			final SolarPanel s = ((Rack) part).getSolarPanel();
+			oldNx = s.getNumberOfCellsInX();
+			oldNy = s.getNumberOfCellsInY();
 		} else if (part instanceof Mirror) {
 		}
 	}
@@ -41,6 +44,9 @@ public class ChangeCellNumbersCommand extends AbstractUndoableEdit {
 			newNx = s.getNumberOfCellsInX();
 			newNy = s.getNumberOfCellsInY();
 		} else if (part instanceof Rack) {
+			final SolarPanel s = ((Rack) part).getSolarPanel();
+			newNx = s.getNumberOfCellsInX();
+			newNy = s.getNumberOfCellsInY();
 		} else if (part instanceof Mirror) {
 		}
 		return new int[] { newNx, newNy };
@@ -56,6 +62,11 @@ public class ChangeCellNumbersCommand extends AbstractUndoableEdit {
 			s.setNumberOfCellsInX(oldNx);
 			s.setNumberOfCellsInY(oldNy);
 		} else if (part instanceof Rack) {
+			final SolarPanel s = ((Rack) part).getSolarPanel();
+			newNx = s.getNumberOfCellsInX();
+			newNy = s.getNumberOfCellsInY();
+			s.setNumberOfCellsInX(oldNx);
+			s.setNumberOfCellsInY(oldNy);
 		} else if (part instanceof Mirror) {
 		}
 		part.draw();
@@ -69,6 +80,9 @@ public class ChangeCellNumbersCommand extends AbstractUndoableEdit {
 			s.setNumberOfCellsInX(newNx);
 			s.setNumberOfCellsInY(newNy);
 		} else if (part instanceof Rack) {
+			final SolarPanel s = ((Rack) part).getSolarPanel();
+			s.setNumberOfCellsInX(newNx);
+			s.setNumberOfCellsInY(newNy);
 		} else if (part instanceof Mirror) {
 		}
 		part.draw();

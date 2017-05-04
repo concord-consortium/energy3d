@@ -2160,8 +2160,12 @@ public class Scene implements Serializable {
 				final SolarPanel s = (SolarPanel) p;
 				s.setNumberOfCellsInX(nx);
 				s.setNumberOfCellsInY(ny);
-				s.draw();
+			} else if (p instanceof Rack) {
+				final SolarPanel s = ((Rack) p).getSolarPanel();
+				s.setNumberOfCellsInX(nx);
+				s.setNumberOfCellsInY(ny);
 			}
+			p.draw();
 		}
 		SceneManager.getInstance().refresh();
 	}

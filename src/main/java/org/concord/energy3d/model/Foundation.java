@@ -2353,11 +2353,17 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void setCellNumbersForSolarPanels(final int nx, final int ny) {
 		for (final HousePart p : Scene.getInstance().getParts()) { // don't just call children as a solar panel may not be a direct offspring of the foundation (e.g., it can be a child of a roof or wall)
-			if (p instanceof SolarPanel && p.getTopContainer() == this) {
-				final SolarPanel s = (SolarPanel) p;
-				s.setNumberOfCellsInX(nx);
-				s.setNumberOfCellsInY(ny);
-				s.draw();
+			if (p.getTopContainer() == this) {
+				if (p instanceof SolarPanel) {
+					final SolarPanel s = (SolarPanel) p;
+					s.setNumberOfCellsInX(nx);
+					s.setNumberOfCellsInY(ny);
+				} else if (p instanceof Rack) {
+					final SolarPanel s = ((Rack) p).getSolarPanel();
+					s.setNumberOfCellsInX(nx);
+					s.setNumberOfCellsInY(ny);
+				}
+				p.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();

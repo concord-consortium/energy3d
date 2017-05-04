@@ -5273,8 +5273,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miTemperatureCoefficientPmax = new JMenuItem("Temperature Effects...");
-			miTemperatureCoefficientPmax.addActionListener(new ActionListener() {
+			final JMenuItem miTemperatureEffects = new JMenuItem("Temperature Effects...");
+			miTemperatureEffects.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -5517,22 +5517,21 @@ public class PopupMenuFactory {
 			popupMenuForSolarPanel.add(miDeleteRow);
 
 			popupMenuForSolarPanel.addSeparator();
-			popupMenuForSolarPanel.add(trackerMenu);
+			popupMenuForSolarPanel.add(miCells);
+			popupMenuForSolarPanel.add(miModuleStructure);
+			popupMenuForSolarPanel.add(miSize);
+			popupMenuForSolarPanel.add(miTemperatureEffects);
+			popupMenuForSolarPanel.add(orientationMenu);
+			popupMenuForSolarPanel.add(shadeToleranceMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miTiltAngle);
 			popupMenuForSolarPanel.add(miAzimuth);
-			popupMenuForSolarPanel.add(miSize);
-			popupMenuForSolarPanel.add(miModuleStructure);
 			popupMenuForSolarPanel.add(miBaseHeight);
-			popupMenuForSolarPanel.add(orientationMenu);
-			popupMenuForSolarPanel.add(labelMenu);
+			popupMenuForSolarPanel.add(miInverterEff);
+			popupMenuForSolarPanel.add(trackerMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
-			popupMenuForSolarPanel.addSeparator();
-			popupMenuForSolarPanel.add(miCells);
-			popupMenuForSolarPanel.add(miTemperatureCoefficientPmax);
-			popupMenuForSolarPanel.add(miInverterEff);
-			popupMenuForSolarPanel.add(shadeToleranceMenu);
+			popupMenuForSolarPanel.add(labelMenu);
 			popupMenuForSolarPanel.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
@@ -6471,6 +6470,106 @@ public class PopupMenuFactory {
 							updateAfterEdit();
 							if (choice == options[0]) {
 								break;
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miModuleStructure = new JMenuItem("Module Structure...");
+			solarPanelMenu.add(miModuleStructure);
+			miModuleStructure.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final SolarPanel s = r.getSolarPanel();
+					final Foundation foundation = r.getTopContainer();
+					int nx = s.getNumberOfCellsInX();
+					int ny = s.getNumberOfCellsInY();
+					final String partInfo = r.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel inputFields = new JPanel();
+					inputFields.setBorder(BorderFactory.createTitledBorder("Cell Numbers for " + partInfo));
+					final JTextField nxField = new JTextField(nx + "", 10);
+					inputFields.add(nxField);
+					inputFields.add(new JLabel("  \u00D7  "));
+					final JTextField nyField = new JTextField(ny + "", 10);
+					inputFields.add(nyField);
+					final JPanel scopeFields = new JPanel();
+					scopeFields.setLayout(new BoxLayout(scopeFields, BoxLayout.Y_AXIS));
+					scopeFields.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopeFields.add(rb1);
+					scopeFields.add(rb2);
+					scopeFields.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JPanel panel = new JPanel(new BorderLayout(0, 8));
+					panel.add(inputFields, BorderLayout.NORTH);
+					panel.add(new JLabel(new ImageIcon(PopupMenuFactory.class.getResource("icons/solarcells.png"))));
+					panel.add(scopeFields, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Cells of Panels on Rack");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							boolean ok = true;
+							try {
+								nx = Integer.parseInt(nxField.getText());
+								ny = Integer.parseInt(nyField.getText());
+							} catch (final NumberFormatException ex) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (rb1.isSelected()) {
+									final ChangeCellNumbersCommand c = new ChangeCellNumbersCommand(s);
+									s.setNumberOfCellsInX(nx);
+									s.setNumberOfCellsInY(ny);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
+								} else if (rb2.isSelected()) {
+									final ChangeFoundationSolarPanelCellNumbersCommand c = new ChangeFoundationSolarPanelCellNumbersCommand(foundation);
+									foundation.setCellNumbersForSolarPanels(nx, ny);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
+								} else if (rb3.isSelected()) {
+									final ChangeCellNumbersForAllSolarPanelsCommand c = new ChangeCellNumbersForAllSolarPanelsCommand();
+									Scene.getInstance().setCellNumbersForAllSolarPanels(nx, ny);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
+								}
+								updateAfterEdit();
+								if (choice == options[0]) {
+									break;
+								}
 							}
 						}
 					}
@@ -7597,8 +7696,6 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miPaste);
 			popupMenuForRack.add(miClear);
 			popupMenuForRack.addSeparator();
-			popupMenuForRack.add(trackerMenu);
-			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miSolarPanelArray);
 			popupMenuForRack.add(solarPanelMenu);
 			popupMenuForRack.addSeparator();
@@ -7607,6 +7704,7 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miRackSize);
 			popupMenuForRack.add(miBaseHeight);
 			popupMenuForRack.add(miPoleSpacing);
+			popupMenuForRack.add(trackerMenu);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(cbmiDrawSunBeam);
 			popupMenuForRack.add(labelMenu);
