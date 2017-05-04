@@ -48,6 +48,7 @@ class SimulationSettingsDialog extends JDialog {
 		final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(Scene.getInstance().getRackCellSize()));
 		final JLabel rackCellSizeLabelLeft = new JLabel("Rack grid cell: ");
 		final JLabel rackCellSizeLabelRight = new JLabel("Meters");
+		final JLabel rackModelLabelRight = new JLabel("Fast but inaccurate");
 		final JTextField timeStepTextField = new JTextField(FORMAT2.format(Scene.getInstance().getTimeStep()));
 
 		final JComboBox<String> airMassComboBox = new JComboBox<String>(new String[] { "None", "Kasten-Young", "Sphere Model" });
@@ -61,6 +62,7 @@ class SimulationSettingsDialog extends JDialog {
 				rackCellSizeTextField.setEnabled(approximate);
 				rackCellSizeLabelLeft.setEnabled(approximate);
 				rackCellSizeLabelRight.setEnabled(approximate);
+				rackModelLabelRight.setText(approximate ? "Fast but inaccurate" : "Slow but accurate");
 			}
 		});
 		rackModelComboBox.setSelectedIndex(s.isRackModelExact() ? 1 : 0);
@@ -123,7 +125,7 @@ class SimulationSettingsDialog extends JDialog {
 		// select the model for racks
 		panel.add(new JLabel("Rack model:"));
 		panel.add(rackModelComboBox);
-		panel.add(new JLabel("Accuracy or speed"));
+		panel.add(rackModelLabelRight);
 
 		// set number of grid points for a solar rack, used in both heat map generation and energy calculation
 		panel.add(rackCellSizeLabelLeft);

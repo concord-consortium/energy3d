@@ -51,9 +51,13 @@ public class SetSolarPanelArrayOnRackCommand extends AbstractUndoableEdit {
 		des.setPanelWidth(src.getPanelWidth());
 		des.setPanelHeight(src.getPanelHeight());
 		des.setRotated(src.isRotated());
+		des.setCellType(src.getCellType());
+		des.setNumberOfCellsInX(src.getNumberOfCellsInX());
+		des.setNumberOfCellsInY(src.getNumberOfCellsInY());
 		des.setColorOption(src.getColorOption());
 		des.setCellEfficiency(src.getCellEfficiency());
 		des.setInverterEfficiency(src.getInverterEfficiency());
+		des.setNominalOperatingCellTemperature(src.getNominalOperatingCellTemperature());
 		des.setTemperatureCoefficientPmax(src.getTemperatureCoefficientPmax());
 		des.setShadeTolerance(src.getShadeTolerance());
 	}
