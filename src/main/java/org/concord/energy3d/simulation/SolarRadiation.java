@@ -1000,6 +1000,8 @@ public class SolarRadiation {
 			ny = nyCells * rc[1];
 			// get the area of a solar cell. 60 converts the unit of timeStep from minute to kWh
 			final double a = panel.getPanelWidth() * panel.getPanelHeight() * Scene.getInstance().getTimeStep() / (panel.getNumberOfCellsInX() * panel.getNumberOfCellsInY() * 60.0);
+			xSpacing = d20 / nx; // swap the x and y back to correct order
+			ySpacing = d10 / ny;
 			u = p20;
 			v = p10;
 			if (cellOutputs == null || cellOutputs.length != nx || cellOutputs[0].length != ny) {
