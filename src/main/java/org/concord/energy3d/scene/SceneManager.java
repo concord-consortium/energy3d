@@ -62,8 +62,8 @@ import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
 import org.concord.energy3d.undo.EditPartCommand;
-import org.concord.energy3d.undo.MovePartCommand;
 import org.concord.energy3d.undo.EditRackCommand;
+import org.concord.energy3d.undo.MovePartCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.undo.UndoManager;
@@ -1234,6 +1234,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setOperation(final Operation operation) {
+		if (isZoomLock()) {
+			setZoomLock(false);
+		}
 		operationStick = false;
 		if (this.operation != operation) {
 			this.operation = operation;
@@ -1675,7 +1678,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setZoomLock(final boolean zoomLock) {
 		this.zoomLock = zoomLock;
 		cameraControl.setLeftButtonAction(zoomLock ? ButtonAction.ZOOM : viewMode == ViewMode.NORMAL ? ButtonAction.ROTATE : ButtonAction.MOVE);
+	}
 
+	public boolean isZoomLock() {
+		return this.zoomLock;
 	}
 
 	public void zoom(final boolean in) {

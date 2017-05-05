@@ -448,8 +448,7 @@ public class MainPanel extends JPanel {
 			selectButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					defaultTool();
 				}
 			});
 		}
@@ -671,6 +670,7 @@ public class MainPanel extends JPanel {
 			@Override
 			public void run() {
 				getSelectButton().setSelected(true);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
 		});
 		SceneManager.getInstance().setOperation(Operation.SELECT);
@@ -706,12 +706,16 @@ public class MainPanel extends JPanel {
 			zoomButton.setIcon(new ImageIcon(getClass().getResource("icons/zoom.png")));
 			zoomButton.setToolTipText("Zoom");
 			zoomButton.setFocusable(false);
-			zoomButton.addItemListener(new ItemListener() {
+			zoomButton.addActionListener(new ActionListener() {
 				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
-					SceneManager.getInstance().setZoomLock(zoomButton.isSelected());
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().isZoomLock()) {
+						defaultTool();
+					} else {
+						SceneManager.getInstance().setOperation(SceneManager.Operation.SELECT);
+						SceneManager.getInstance().setZoomLock(true);
+						((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					}
 				}
 			});
 		}
@@ -1029,8 +1033,12 @@ public class MainPanel extends JPanel {
 			resizeButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.RESIZE);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					if (SceneManager.getInstance().getOperation() == Operation.RESIZE) {
+						defaultTool();
+					} else {
+						SceneManager.getInstance().setOperation(SceneManager.Operation.RESIZE);
+						((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					}
 				}
 			});
 		}
