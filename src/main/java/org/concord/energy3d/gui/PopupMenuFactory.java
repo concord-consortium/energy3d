@@ -4801,10 +4801,16 @@ public class PopupMenuFactory {
 					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 					if (Util.isZero(s.getPanelHeight() - 1.65)) {
 						typeComboBox.setSelectedIndex(0);
+						w = 0.99;
+						h = 1.65;
 					} else if (Util.isZero(s.getPanelHeight() - 1.55)) {
 						typeComboBox.setSelectedIndex(1);
+						w = 1.04;
+						h = 1.55;
 					} else if (Util.isZero(s.getPanelHeight() - 1.96)) {
 						typeComboBox.setSelectedIndex(2);
+						w = 0.99;
+						h = 1.96;
 					}
 					typeComboBox.addItemListener(new ItemListener() {
 						@Override
@@ -4829,6 +4835,7 @@ public class PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
+					System.out.println("****" + w + "," + h);
 					final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
 					s.setPanelWidth(w);
 					s.setPanelHeight(h);

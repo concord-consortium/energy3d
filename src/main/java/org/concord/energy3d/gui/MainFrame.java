@@ -1335,7 +1335,9 @@ public class MainFrame extends JFrame {
 			solarBasicsMenu.addSeparator();
 			addModel(solarBasicsMenu, "Solar Panel Tilt Angles", "tutorials/solar-panel-tilt-angle.ng3");
 			addModel(solarBasicsMenu, "Solar Panel Azimuthal Angles", "tutorials/solar-panel-azimuth-angle.ng3");
+			addModel(solarBasicsMenu, "Solar Panel Orientation", "tutorials/solar-panel-orientation.ng3");
 			addModel(solarBasicsMenu, "Solar Panel Cell Efficiency", "tutorials/solar-panel-cell-efficiency.ng3");
+			addModel(solarBasicsMenu, "Nominal Operating Cell Temperature", "tutorials/solar-panel-noct.ng3");
 			addModel(solarBasicsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 
 			final JMenu pvMenu = new JMenu("Photovoltaic Solar Power");
@@ -1350,6 +1352,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Rack Arrays)", "tutorials/pv-fixed-rack-arrays.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Rack Arrays)", "tutorials/pv-hsat-rack-arrays.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: The Effect of Inter-Row Spacing", "tutorials/solar-rack-array-row-spacing.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: Landscape vs. Portrait Arrays", "tutorials/solar-rack-array-row-spacing-portrait.ng3");
 
 			final JMenu cspMenu = new JMenu("Concentrated Solar Power");
 			tutorialsMenu.add(cspMenu);
