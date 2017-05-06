@@ -4835,7 +4835,6 @@ public class PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
-					System.out.println("****" + w + "," + h);
 					final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
 					s.setPanelWidth(w);
 					s.setPanelHeight(h);
