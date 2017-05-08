@@ -93,7 +93,10 @@ public class TimeSeriesLogger {
 
 		/* write the header */
 
-		final String filename = url == null ? null : new File(url.getFile()).getName();
+		String filename = url == null ? null : new File(url.getFile()).getName();
+		if (Scene.isInternalFile()) {
+			filename = "@" + filename;
+		}
 		final Date time = Calendar.getInstance().getTime();
 		final String timestamp = TIME_FORMAT.format(time);
 		String line = "";

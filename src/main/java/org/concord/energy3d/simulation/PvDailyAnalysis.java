@@ -371,9 +371,9 @@ public class PvDailyAnalysis extends Analysis {
 			} else if (selectedPart instanceof Rack) {
 				s += "\"Rack\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart instanceof Foundation) {
-				s += "\"Platform\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+				s += "\"Foundation\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
-				s += "\"Platform\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
+				s += "\"Foundation\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
 			}
 		} else {
 			s += "\"Panel\": \"All\"";
@@ -382,10 +382,12 @@ public class PvDailyAnalysis extends Analysis {
 		final List<Double> data = graph.getData(name);
 		s += ", \"" + name + "\": {";
 		s += "\"Hourly\": [";
-		for (final Double x : data) {
-			s += Graph.FIVE_DECIMALS.format(x) + ",";
+		if (data != null) {
+			for (final Double x : data) {
+				s += Graph.FIVE_DECIMALS.format(x) + ",";
+			}
+			s = s.substring(0, s.length() - 1);
 		}
-		s = s.substring(0, s.length() - 1);
 		s += "]\n";
 		s += ", \"Total\": " + Graph.ENERGY_FORMAT.format(getResult(name));
 		s += "}";

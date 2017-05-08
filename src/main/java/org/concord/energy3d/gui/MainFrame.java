@@ -264,7 +264,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleGroundImageMenuItem;
 	private JMenuItem clearGroundImageMenuItem;
 	private JCheckBoxMenuItem showGroundImageMenuItem;
-	private String currentGroupType;
+	private String currentGroupType = "Solar Panel";
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override

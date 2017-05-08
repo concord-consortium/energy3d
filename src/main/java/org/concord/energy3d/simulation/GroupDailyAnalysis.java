@@ -424,6 +424,20 @@ public class GroupDailyAnalysis extends Analysis {
 				names.add("Solar " + p.getId());
 				names.add("Heat Gain " + p.getId());
 				type = "Window";
+			} else if (p instanceof Foundation) {
+				final Foundation foundation = (Foundation) p;
+				switch (foundation.getSupportingType()) {
+				case Foundation.PV_STATION:
+					names.add("PV " + p.getId());
+					break;
+				case Foundation.CSP_STATION:
+					names.add("CSP " + p.getId());
+					break;
+				case Foundation.BUILDING:
+					names.add("Building " + p.getId());
+					break;
+				}
+				type = "Foundation";
 			}
 		}
 		String s = "{\"Type\": \"" + type + "\"";
