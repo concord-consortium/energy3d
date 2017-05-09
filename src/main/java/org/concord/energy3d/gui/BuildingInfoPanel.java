@@ -165,7 +165,7 @@ public class BuildingInfoPanel extends JPanel {
 		}
 	}
 
-	public void updateArea() {
+	public void updateAreaBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		final double r = 3.28084 * 3.28084;
 		String t = "Area (";
@@ -192,7 +192,7 @@ public class BuildingInfoPanel extends JPanel {
 		areaBar.repaint();
 	}
 
-	public void updateHeight() {
+	public void updateHeightBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		final double r = 3.28084;
 		String t = "Height (";
@@ -219,7 +219,7 @@ public class BuildingInfoPanel extends JPanel {
 		heightBar.repaint();
 	}
 
-	public void updateWindowToFloorRatio() {
+	public void updateWindowToFloorRatioBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Window/floor area ratio";
 		if (specs.isWindowToFloorRatioEnabled()) {
@@ -232,7 +232,7 @@ public class BuildingInfoPanel extends JPanel {
 		windowToFloorBar.repaint();
 	}
 
-	public void updateSolarPanel() {
+	public void updateSolarPanelNumberBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of solar panels";
 		if (specs.isNumberOfSolarPanelsEnabled()) {
@@ -245,7 +245,7 @@ public class BuildingInfoPanel extends JPanel {
 		solarPanelCountBar.repaint();
 	}
 
-	public void updateWindow() {
+	public void updateWindowNumberBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of windows";
 		if (specs.isNumberOfWindowsEnabled()) {
@@ -262,7 +262,7 @@ public class BuildingInfoPanel extends JPanel {
 		windowCountBar.repaint();
 	}
 
-	public void updateWall() {
+	public void updateWallNumberBounds() {
 		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		String t = "Number of walls";
 		if (specs.isNumberOfWallsEnabled()) {

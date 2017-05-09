@@ -27,57 +27,67 @@ class ColorBar extends JPanel {
 	private String unit = "$";
 	private boolean unitPrefix = true;
 	private boolean verticalLineRepresentation = true;
-	private DecimalFormat decimalFormat = new DecimalFormat();
+	private final DecimalFormat decimalFormat = new DecimalFormat();
 
-	public ColorBar(Color background, Color foreground) {
+	public ColorBar(final Color background, final Color foreground) {
 		super();
 		setBackground(background);
 		setForeground(foreground);
 		setDecimalDigits(0);
 	}
 
-	public void setDecimalDigits(int n) {
+	public void setDecimalDigits(final int n) {
 		decimalFormat.setMaximumFractionDigits(n);
 	}
 
-	public void setUnitPrefix(boolean b) {
+	public void setUnitPrefix(final boolean b) {
 		unitPrefix = b;
 	}
 
-	public void setVerticalLineRepresentation(boolean b) {
+	public void setVerticalLineRepresentation(final boolean b) {
 		verticalLineRepresentation = b;
 	}
 
-	public void setUnit(String unit) {
+	public void setUnit(final String unit) {
 		this.unit = unit;
 	}
 
-	public void setValue(float value) {
+	public void setValue(final float value) {
 		this.value = value;
 	}
 
-	public void setMinimum(double minimum) {
+	public void setMinimum(final double minimum) {
 		this.minimum = minimum;
 	}
 
-	public void setMaximum(double maximum) {
+	public double getMinimum() {
+		return minimum;
+	}
+
+	public void setMaximum(final double maximum) {
 		this.maximum = maximum;
 	}
 
-	public void paintComponent(Graphics g) {
+	public double getMaximum() {
+		return maximum;
+	}
+
+	@Override
+	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		update(g);
 	}
 
-	public void update(Graphics g) {
+	@Override
+	public void update(final Graphics g) {
 
-		Graphics2D g2 = (Graphics2D) g;
+		final Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-		Dimension dim = getSize();
-		int width = dim.width;
-		int height = dim.height;
+		final Dimension dim = getSize();
+		final int width = dim.width;
+		final int height = dim.height;
 		g2.setColor(getBackground());
 		g2.fillRect(1, 1, width - 3, height - 3);
 		g2.setColor(getBackground().darker());
@@ -91,20 +101,21 @@ class ColorBar extends JPanel {
 			} else {
 				g2.setColor(getForeground());
 			}
-			double max = maximum + (Double.isNaN(minimum) ? 0 : (minimum == 0 ? 0.1 * maximum : minimum));
+			final double max = maximum + (Double.isNaN(minimum) ? 0 : (minimum == 0 ? 0.1 * maximum : minimum));
 			g2.fillRect(1, 1, (int) Math.round(value * width / max), height);
 			if (verticalLineRepresentation) {
 				g2.setColor(Color.RED);
 				g2.fillRect((int) Math.round(maximum * width / max), 1, 2, height - 2);
-				if (!Double.isNaN(minimum))
+				if (!Double.isNaN(minimum)) {
 					g2.fillRect((int) Math.round(minimum * width / max), 1, 2, height - 2);
+				}
 			} else {
 				if (!Double.isNaN(minimum)) {
 					g2.setColor(new Color(0xCD5C5C));
 					int x1 = 0;
 					x1 = (int) Math.round(minimum * width / max);
 					g2.fillRect(0, height - 4, x1, 4);
-					int x2 = (int) Math.round(maximum * width / max);
+					final int x2 = (int) Math.round(maximum * width / max);
 					g2.fillRect(x2, height - 4, width - x2, 4);
 					g2.setColor(new Color(0x32CD32));
 					g2.fillRect(x1, height - 4, x2 - x1, 4);
@@ -115,8 +126,8 @@ class ColorBar extends JPanel {
 		if (value / maximum > 0.000001) {
 			g2.setFont(new Font(null, Font.PLAIN, 10));
 			g2.setColor(Color.BLACK);
-			String s = unitPrefix ? unit + decimalFormat.format(value) : decimalFormat.format(value) + unit;
-			FontMetrics fm = g2.getFontMetrics();
+			final String s = unitPrefix ? unit + decimalFormat.format(value) : decimalFormat.format(value) + unit;
+			final FontMetrics fm = g2.getFontMetrics();
 			g2.drawString(s, (width - fm.stringWidth(s)) / 2, (fm.getAscent() + (height - (fm.getAscent() + fm.getDescent())) / 2));
 		}
 

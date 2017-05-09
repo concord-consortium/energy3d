@@ -800,8 +800,16 @@ public class EnergyPanel extends JPanel {
 		return latitudeSpinner;
 	}
 
-	public BuildingInfoPanel getBasicsPanel() {
+	public BuildingInfoPanel getBuildingInfoPanel() {
 		return buildingInfoPanel;
+	}
+
+	public PvStationInfoPanel getPvStationInfoPanel() {
+		return pvStationInfoPanel;
+	}
+
+	public CspStationInfoPanel getCspStationInfoPanel() {
+		return cspStationInfoPanel;
 	}
 
 	public ConstructionCostGraph getConstructionCostGraph() {
@@ -1411,9 +1419,6 @@ public class EnergyPanel extends JPanel {
 		} else {
 			selectedFoundation = selectedPart.getTopContainer();
 		}
-		if (selectedFoundation != null) {
-			buildingInfoPanel.update(selectedFoundation);
-		}
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -1440,6 +1445,7 @@ public class EnergyPanel extends JPanel {
 						final int i1 = s2.indexOf('(');
 						final int i2 = s2.indexOf(')');
 						((TitledBorder) buildingPanel.getBorder()).setTitle("Building #" + s2.substring(i1 + 1, i2));
+						buildingInfoPanel.update(selectedFoundation);
 						break;
 					case Foundation.PV_STATION:
 						dataPanel.remove(instructionPanel);
@@ -1511,12 +1517,13 @@ public class EnergyPanel extends JPanel {
 			public void run() {
 				final String s = Scene.getInstance().getProjectName();
 				timeAndLocationPanel.setBorder(createTitledBorder("Project: " + (s != null ? s : ""), true));
-				buildingInfoPanel.updateArea();
-				buildingInfoPanel.updateHeight();
-				buildingInfoPanel.updateWindowToFloorRatio();
-				buildingInfoPanel.updateSolarPanel();
-				buildingInfoPanel.updateWindow();
-				buildingInfoPanel.updateWall();
+				buildingInfoPanel.updateAreaBounds();
+				buildingInfoPanel.updateHeightBounds();
+				buildingInfoPanel.updateWindowToFloorRatioBounds();
+				buildingInfoPanel.updateSolarPanelNumberBounds();
+				buildingInfoPanel.updateWindowNumberBounds();
+				buildingInfoPanel.updateWallNumberBounds();
+				pvStationInfoPanel.updateSolarPanelNumberBounds();
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {

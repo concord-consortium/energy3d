@@ -13,7 +13,9 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.DesignSpecs;
 
 /**
  * @author Charles Xie
@@ -94,6 +96,7 @@ public class PvStationInfoPanel extends JPanel {
 	}
 
 	void update(final Foundation foundation) {
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 		int countSolarPanels = 0;
 		double cost = 0;
 		double panelArea = 0;
@@ -114,6 +117,9 @@ public class PvStationInfoPanel extends JPanel {
 			}
 		}
 		countBar.setValue(countSolarPanels);
+		countBar.setMinimum(specs.getMinimumNumberOfSolarPanels());
+		countBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
+		countBar.setEnabled(specs.isNumberOfSolarPanelsEnabled());
 		float landArea;
 		final FoundationPolygon polygon = foundation.getPolygon();
 		if (polygon != null && polygon.isVisible()) {
@@ -124,6 +130,19 @@ public class PvStationInfoPanel extends JPanel {
 		landAreaBar.setValue(landArea / countSolarPanels);
 		costBar.setValue(Math.round(cost));
 		panelAreaBar.setValue((float) panelArea);
+	}
+
+	public void updateSolarPanelNumberBounds() {
+		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		String t = "Number of solar panels";
+		if (specs.isNumberOfSolarPanelsEnabled()) {
+			t += " (" + specs.getMinimumNumberOfSolarPanels() + " - " + specs.getMaximumNumberOfSolarPanels() + ")";
+		}
+		countBar.setMinimum(specs.getMinimumNumberOfSolarPanels());
+		countBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
+		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		countBar.setEnabled(specs.isNumberOfSolarPanelsEnabled());
+		countBar.repaint();
 	}
 
 }
