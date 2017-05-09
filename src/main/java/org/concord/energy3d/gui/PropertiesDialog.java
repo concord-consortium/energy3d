@@ -2,7 +2,6 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,9 +11,11 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.util.SpringUtilities;
 
 /**
  * @author Charles Xie
@@ -31,7 +32,7 @@ class PropertiesDialog extends JDialog {
 		setTitle("Properties - " + Scene.getInstance().getParts().size() + " parts");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(6, 2, 8, 8));
+		final JPanel panel = new JPanel(new SpringLayout());
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -101,6 +102,8 @@ class PropertiesDialog extends JDialog {
 		// ground image color
 		panel.add(new JLabel("Ground Image Coloration: "));
 		panel.add(groundImageColorationComboBox);
+
+		SpringUtilities.makeCompactGrid(panel, 6, 2, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

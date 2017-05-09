@@ -231,6 +231,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem lockAllMenuItem;
 	private JMenuItem specificationsMenuItem;
 	private JMenuItem propertiesMenuItem;
+	private JMenuItem pricesMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
 	private JMenu examplesMenu;
@@ -2515,6 +2516,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getLockAllMenuItem());
 			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
+			editMenu.add(getPricesMenuItem());
 			editMenu.add(getOverallUtilityBillMenuItem());
 			editMenu.add(getSpecificationsMenuItem());
 			editMenu.addSeparator();
@@ -3368,6 +3370,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return overallUtilityBillMenuItem;
+	}
+
+	private JMenuItem getPricesMenuItem() {
+		if (pricesMenuItem == null) {
+			pricesMenuItem = new JMenuItem("Prices...");
+			pricesMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new PricesDialog().setVisible(true);
+				}
+			});
+		}
+		return pricesMenuItem;
 	}
 
 	private JMenuItem getPropertiesMenuItem() {

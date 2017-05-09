@@ -2,7 +2,6 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -16,10 +15,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.SolarRadiation;
+import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -38,7 +39,7 @@ class SimulationSettingsDialog extends JDialog {
 		setTitle("Simulation Settings");
 
 		getContentPane().setLayout(new BorderLayout());
-		final JPanel panel = new JPanel(new GridLayout(5, 3, 8, 8));
+		final JPanel panel = new JPanel(new SpringLayout());
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
@@ -142,6 +143,8 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(new JLabel("Air mass: "));
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
+
+		SpringUtilities.makeCompactGrid(panel, 5, 3, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

@@ -2,24 +2,24 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.AnnualGraph;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.util.SpringUtilities;
 
 /**
  * @author Charles Xie
@@ -40,7 +40,6 @@ class UtilityBillDialog extends JDialog {
 		final JTextField[] fields = new JTextField[12];
 		for (int i = 0; i < 12; i++) {
 			labels[i] = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i]);
-			labels[i].setFont(new Font("Courier New", Font.PLAIN, 12));
 			fields[i] = new JTextField(FORMAT1.format(utilityBill.getMonthlyEnergy(i)), 10);
 		}
 
@@ -49,27 +48,14 @@ class UtilityBillDialog extends JDialog {
 		container.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		getContentPane().add(container, BorderLayout.CENTER);
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		final JPanel panel = new JPanel();
 		container.add(panel);
-
-		for (int i = 0; i < 6; i++) {
-			final JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-			p.add(labels[i]);
-			p.add(fields[i]);
-			panel.add(p);
+		panel.setLayout(new SpringLayout());
+		for (int i = 0; i < 12; i++) {
+			panel.add(labels[i]);
+			panel.add(fields[i]);
 		}
-
-		panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		container.add(panel);
-
-		for (int i = 6; i < 12; i++) {
-			final JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-			p.add(labels[i]);
-			p.add(fields[i]);
-			panel.add(p);
-		}
+		SpringUtilities.makeCompactGrid(panel, 6, 4, 6, 6, 6, 6);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
