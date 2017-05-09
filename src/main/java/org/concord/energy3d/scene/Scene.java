@@ -51,7 +51,7 @@ import org.concord.energy3d.simulation.Atmosphere;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.LocationData;
-import org.concord.energy3d.simulation.Price;
+import org.concord.energy3d.simulation.CustomPrice;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddNodeCommand;
@@ -114,7 +114,7 @@ public class Scene implements Serializable {
 	private Unit unit = Unit.InternationalSystemOfUnits;
 	private Ground ground = new Ground();
 	private Atmosphere atmosphere = new Atmosphere();
-	private Price price = new Price();
+	private CustomPrice customPrice = new CustomPrice();
 	private DesignSpecs designSpecs = new DesignSpecs();
 	private transient HousePart copyBuffer, originalCopy;
 	private transient Node copyNode;
@@ -391,10 +391,10 @@ public class Scene implements Serializable {
 		} else {
 			designSpecs.setDefaultValues();
 		}
-		if (price == null) {
-			price = new Price();
+		if (customPrice == null) {
+			customPrice = new CustomPrice();
 		} else {
-			price.setDefaultValues();
+			customPrice.setDefaultValues();
 		}
 		if (ground == null) {
 			ground = new Ground();
@@ -2844,8 +2844,8 @@ public class Scene implements Serializable {
 		return designSpecs;
 	}
 
-	public Price getPrice() {
-		return price;
+	public CustomPrice getCustomPrice() {
+		return customPrice;
 	}
 
 	public void setDashedLinesOnRoofShown(final boolean dashedLineOnRoofs) {

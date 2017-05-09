@@ -132,16 +132,17 @@ public class PopupMenuFactory {
 
 	// cached values
 	private static JColorChooser colorChooser = new JColorChooser();
-	private static double solarPanelArrayRowSpacing = 1;
-	private static double solarPanelArrayColSpacing = 0.5;
 	private static double solarPanelArrayBaseHeight = 1;
 	private static int solarPanelArrayRowAxis = 0;
 	private static double solarPanelWidth = 0.99;
 	private static double solarPanelHeight = 1.96;
+	private static double solarPanelArrayRowSpacing = solarPanelHeight + 1;
+	private static double solarPanelArrayColSpacing = solarPanelWidth + 1;
 	private static int solarPanelOrientation = 0;
 	private static int solarPanelColorOption = SolarPanel.COLOR_OPTION_BLUE;
 	private static int solarPanelCellType = SolarPanel.MONOCRYSTALLINE;
-	private static double solarPanelRackArrayInterRowSpacing = 5;
+	private static int solarPanelRowsPerRack = 3;
+	private static double solarPanelRackArrayInterRowSpacing = solarPanelHeight * solarPanelRowsPerRack + 1;
 	private static double solarPanelRackPoleSpacingX = 4;
 	private static double solarPanelRackPoleSpacingY = 2;
 	private static double solarPanelRackBaseHeight = 3;
@@ -151,7 +152,6 @@ public class PopupMenuFactory {
 	private static int solarPanelShadeTolerance = SolarPanel.PARTIAL_SHADE_TOLERANCE;
 	private static double solarPanelTemperatureCoefficientPmaxPercentage = -0.5;
 	private static double solarPanelNominalOperatingCellTemperature = 48;
-	private static int solarPanelRowsPerRack = 3;
 	private static MirrorRectangularFieldLayout mirrorRectangularFieldLayout = new MirrorRectangularFieldLayout();
 	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
 	private static MirrorSpiralFieldLayout mirrorSpiralFieldLayout = new MirrorSpiralFieldLayout();
@@ -2462,6 +2462,7 @@ public class PopupMenuFactory {
 				private JComboBox<String> cellTypeComboBox;
 				private JComboBox<String> colorOptionComboBox;
 				private JComboBox<String> sizeComboBox;
+				private JComboBox<String> orientationComboBox;
 				private JComboBox<String> shadeToleranceComboBox;
 				private JComboBox<String> rowAxisComboBox;
 
@@ -2481,17 +2482,17 @@ public class PopupMenuFactory {
 
 						final JPanel panel = new JPanel(new SpringLayout());
 
-						panel.add(new JLabel("Solar Panel Cell Type:"));
+						panel.add(new JLabel("Cell Type:"));
 						cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
 						cellTypeComboBox.setSelectedIndex(solarPanelCellType);
 						panel.add(cellTypeComboBox);
 
-						panel.add(new JLabel("Solar Panel Color:"));
+						panel.add(new JLabel("Color:"));
 						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
 						colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
 						panel.add(colorOptionComboBox);
 
-						panel.add(new JLabel("Panel Size:"));
+						panel.add(new JLabel("Size:"));
 						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m", "1.04m \u00D7 1.55m", "0.99m \u00D7 1.96m" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
@@ -2501,6 +2502,11 @@ public class PopupMenuFactory {
 							sizeComboBox.setSelectedIndex(2);
 						}
 						panel.add(sizeComboBox);
+
+						panel.add(new JLabel("Orientation:"));
+						orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
+						orientationComboBox.setSelectedIndex(solarPanelOrientation);
+						panel.add(orientationComboBox);
 
 						panel.add(new JLabel("Solar Cell Efficiency (%):"));
 						final JTextField cellEfficiencyField = new JTextField(threeDecimalsFormat.format(solarCellEfficiencyPercentage));
@@ -2544,7 +2550,7 @@ public class PopupMenuFactory {
 						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(solarPanelArrayBaseHeight));
 						panel.add(baseHeightField);
 
-						SpringUtilities.makeCompactGrid(panel, 13, 2, 6, 6, 6, 6);
+						SpringUtilities.makeCompactGrid(panel, 14, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -2571,8 +2577,23 @@ public class PopupMenuFactory {
 									ok = false;
 								}
 								if (ok) {
-									if (solarPanelArrayRowSpacing < 0 || solarPanelArrayColSpacing < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel row or column spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									switch (sizeComboBox.getSelectedIndex()) {
+									case 0:
+										solarPanelWidth = 0.99;
+										solarPanelHeight = 1.65;
+										break;
+									case 1:
+										solarPanelWidth = 1.04;
+										solarPanelHeight = 1.55;
+										break;
+									default:
+										solarPanelWidth = 0.99;
+										solarPanelHeight = 1.96;
+										break;
+									}
+									solarPanelOrientation = orientationComboBox.getSelectedIndex();
+									if (solarPanelArrayRowSpacing < (solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth) || solarPanelArrayColSpacing < (solarPanelOrientation == 0 ? solarPanelWidth : solarPanelHeight)) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel row or column spacing is too small.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelArrayBaseHeight < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
@@ -2598,20 +2619,6 @@ public class PopupMenuFactory {
 				}
 
 				private void addSolarPanelArrays() {
-					switch (sizeComboBox.getSelectedIndex()) {
-					case 0:
-						solarPanelWidth = 0.99;
-						solarPanelHeight = 1.65;
-						break;
-					case 1:
-						solarPanelWidth = 1.04;
-						solarPanelHeight = 1.55;
-						break;
-					default:
-						solarPanelWidth = 0.99;
-						solarPanelHeight = 1.96;
-						break;
-					}
 					solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
 					solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
 					solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
@@ -2729,7 +2736,7 @@ public class PopupMenuFactory {
 						rowAxisComboBox.setSelectedIndex(solarPanelArrayRowAxis);
 						panel.add(rowAxisComboBox);
 
-						panel.add(new JLabel("Inter-Row Spacing (m):"));
+						panel.add(new JLabel("Inter-Row Center-to-Center Distance (m):"));
 						final JTextField interrowSpacingField = new JTextField(threeDecimalsFormat.format(solarPanelRackArrayInterRowSpacing));
 						panel.add(interrowSpacingField);
 
@@ -2774,8 +2781,24 @@ public class PopupMenuFactory {
 									ok = false;
 								}
 								if (ok) {
-									if (solarPanelRackArrayInterRowSpacing < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row rack spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									switch (sizeComboBox.getSelectedIndex()) {
+									case 0:
+										solarPanelWidth = 0.99;
+										solarPanelHeight = 1.65;
+										break;
+									case 1:
+										solarPanelWidth = 1.04;
+										solarPanelHeight = 1.55;
+										break;
+									default:
+										solarPanelWidth = 0.99;
+										solarPanelHeight = 1.96;
+										break;
+									}
+									solarPanelOrientation = orientationComboBox.getSelectedIndex();
+									final double rackHeight = (solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth) * solarPanelRowsPerRack;
+									if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Rack tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackPoleSpacingX < 1 || solarPanelRackPoleSpacingX > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing X must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackBaseHeight < 0) {
@@ -2784,8 +2807,6 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing Y must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRowsPerRack <= 0 || solarPanelRowsPerRack > 10) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Illegal value for solar panel rows per rack.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Rack tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
@@ -2794,6 +2815,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal operating cell temperature must be between 33 and 58 Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (solarPanelRackArrayInterRowSpacing < rackHeight) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row rack spacing is too small.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addSolarRackArrays();
 										if (choice == options[0]) {
@@ -2807,24 +2830,9 @@ public class PopupMenuFactory {
 				}
 
 				private void addSolarRackArrays() {
-					solarPanelOrientation = orientationComboBox.getSelectedIndex();
 					solarPanelColorOption = colorOptionComboBox.getSelectedIndex();
 					solarPanelCellType = cellTypeComboBox.getSelectedIndex();
 					solarPanelShadeTolerance = shadeToleranceComboBox.getSelectedIndex();
-					switch (sizeComboBox.getSelectedIndex()) {
-					case 0:
-						solarPanelWidth = 0.99;
-						solarPanelHeight = 1.65;
-						break;
-					case 1:
-						solarPanelWidth = 1.04;
-						solarPanelHeight = 1.55;
-						break;
-					default:
-						solarPanelWidth = 0.99;
-						solarPanelHeight = 1.96;
-						break;
-					}
 					solarPanelArrayRowAxis = rowAxisComboBox.getSelectedIndex();
 					final SolarPanel sp = new SolarPanel();
 					sp.setRotated(solarPanelOrientation == 1);

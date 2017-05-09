@@ -2097,8 +2097,8 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double b = p0.distance(getAbsPoint(1));
 		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
-		final double w = (solarPanel.getPanelWidth() + colSpacing) / Scene.getInstance().getAnnotationScale();
-		final double h = (solarPanel.getPanelHeight() + rowSpacing) / Scene.getInstance().getAnnotationScale();
+		final double w = colSpacing / Scene.getInstance().getAnnotationScale();
+		final double h = rowSpacing / Scene.getInstance().getAnnotationScale();
 		Path2D.Double path = null;
 		if (foundationPolygon != null && foundationPolygon.isVisible()) {
 			path = new Path2D.Double();
@@ -2196,7 +2196,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		final double panelHeight = panel.isRotated() ? panel.getPanelWidth() : panel.getPanelHeight();
 		final double rackHeight = panelHeight * panelRowsPerRack;
 		final double halfHeight = 0.5 * rackHeight / Scene.getInstance().getAnnotationScale();
-		final double h = (rackHeight + rowSpacing) / Scene.getInstance().getAnnotationScale();
+		final double h = rowSpacing / Scene.getInstance().getAnnotationScale();
 		double rackWidth, rows;
 		final Vector3 center = new Vector3();
 		final Vector3 v1 = new Vector3();

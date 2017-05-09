@@ -23,7 +23,7 @@ import org.concord.energy3d.util.SpringUtilities;
  * @author Charles Xie
  * 
  */
-class PricesDialog extends JDialog {
+class CustomPricesDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT = new DecimalFormat("#0.##");
@@ -32,6 +32,10 @@ class PricesDialog extends JDialog {
 
 		private static final long serialVersionUID = 1L;
 
+		final JTextField foundationField;
+		final JTextField wallField;
+		final JTextField roofField;
+		final JTextField doorField;
 		final JTextField windowField;
 		final JTextField solarPanelField;
 
@@ -39,17 +43,37 @@ class PricesDialog extends JDialog {
 
 			super(new SpringLayout());
 
+			add(new JLabel("Foundation: "));
+			foundationField = new JTextField(6);
+			add(foundationField);
+			add(new JLabel("<html>$/m<sup>2</sup></html>"));
+
+			add(new JLabel("Wall: "));
+			wallField = new JTextField(6);
+			add(wallField);
+			add(new JLabel("<html>$/m<sup>2</sup></html>"));
+
+			add(new JLabel("Roof: "));
+			roofField = new JTextField(6);
+			add(roofField);
+			add(new JLabel("<html>$/m<sup>2</sup></html>"));
+
 			add(new JLabel("Window: "));
 			windowField = new JTextField(6);
 			add(windowField);
 			add(new JLabel("<html>$/m<sup>2</sup></html>"));
 
+			add(new JLabel("Door: "));
+			doorField = new JTextField(6);
+			add(doorField);
+			add(new JLabel("<html>$/m<sup>2</sup></html>"));
+
 			add(new JLabel("Solar Panel: "));
-			solarPanelField = new JTextField(FORMAT.format(Scene.getInstance().getPrice().getSolarPanelPrice()), 6);
+			solarPanelField = new JTextField(FORMAT.format(Scene.getInstance().getCustomPrice().getResidentialSolarPanelPrice()), 6);
 			add(solarPanelField);
 			add(new JLabel("<html>$/panel</html>"));
 
-			SpringUtilities.makeCompactGrid(this, 2, 3, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, 6, 3, 6, 6, 6, 6);
 
 		}
 
@@ -68,7 +92,7 @@ class PricesDialog extends JDialog {
 			super(new SpringLayout());
 
 			add(new JLabel("Solar Panel: "));
-			solarPanelField = new JTextField(FORMAT.format(Scene.getInstance().getPrice().getSolarPanelPrice()), 6);
+			solarPanelField = new JTextField(FORMAT.format(Scene.getInstance().getCustomPrice().getCommercialSolarPanelPrice()), 6);
 			add(solarPanelField);
 			add(new JLabel("<html>$ per panel</html>"));
 
@@ -88,11 +112,38 @@ class PricesDialog extends JDialog {
 
 	}
 
-	public PricesDialog() {
+	class CspStationPricesPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+
+		final JTextField mirrorField;
+		final JTextField heliostatField;
+
+		CspStationPricesPanel() {
+
+			super(new SpringLayout());
+
+			add(new JLabel("Mirror: "));
+			mirrorField = new JTextField(6);
+			add(mirrorField);
+			add(new JLabel("<html>$/<sup>2</sup></html>"));
+
+			add(new JLabel("Heliostat: "));
+			heliostatField = new JTextField(6);
+			add(heliostatField);
+			add(new JLabel("<html>$ per unit</html>"));
+
+			SpringUtilities.makeCompactGrid(this, 2, 3, 6, 6, 6, 6);
+
+		}
+
+	}
+
+	public CustomPricesDialog() {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		setTitle("Prices");
+		setTitle("Custom Prices");
 
 		final JTabbedPane tabbedPane = new JTabbedPane();
 		getContentPane().setLayout(new BorderLayout());
@@ -110,6 +161,12 @@ class PricesDialog extends JDialog {
 		p.add(pvStationPricesPanel, BorderLayout.NORTH);
 		tabbedPane.addTab("PV Station", p);
 
+		final CspStationPricesPanel cspStationPricesPanel = new CspStationPricesPanel();
+		cspStationPricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		p = new JPanel(new BorderLayout());
+		p.add(cspStationPricesPanel, BorderLayout.NORTH);
+		tabbedPane.addTab("CSP Station", p);
+
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -123,17 +180,17 @@ class PricesDialog extends JDialog {
 					solarPanelPrice = (int) Double.parseDouble(buildingPricesPanel.solarPanelField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
-					JOptionPane.showMessageDialog(PricesDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
 				// range check
 				if (solarPanelPrice < 0 && solarPanelPrice > 10000) {
-					JOptionPane.showMessageDialog(PricesDialog.this, "Your solar panel price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your solar panel price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
-				PricesDialog.this.dispose();
+				CustomPricesDialog.this.dispose();
 
 			}
 		});
@@ -145,7 +202,7 @@ class PricesDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				PricesDialog.this.dispose();
+				CustomPricesDialog.this.dispose();
 			}
 		});
 		cancelButton.setActionCommand("Cancel");
