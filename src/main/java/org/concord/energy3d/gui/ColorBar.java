@@ -23,7 +23,7 @@ class ColorBar extends JPanel {
 
 	private double value = 0.0;
 	private double minimum = Double.NaN;
-	private double maximum = 100000.0;
+	private double maximum = 1000000.0;
 	private String unit = "$";
 	private boolean unitPrefix = true;
 	private boolean verticalLineRepresentation = true;

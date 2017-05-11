@@ -576,7 +576,10 @@ public class PrintController implements Updater {
 		final double pageHeight = getPageHeight() + SPACE_BETWEEN_PAGES;
 		final double w = cols * (getPageWidth() + SPACE_BETWEEN_PAGES);
 		final double h = rows * pageHeight;
-		return Scene.getOriginalHouseRoot().getWorldBound().getCenter().add(0, -Math.max(w, h), h / 2, null);
+		if (Scene.getOriginalHouseRoot().getWorldBound() != null) {
+			return Scene.getOriginalHouseRoot().getWorldBound().getCenter().add(0, -Math.max(w, h), h / 2, null);
+		}
+		return new Vector3(0, -Math.max(w, h), h / 2);
 	}
 
 	public void pageSetup() {
