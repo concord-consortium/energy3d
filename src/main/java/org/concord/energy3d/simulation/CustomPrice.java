@@ -17,7 +17,8 @@ public class CustomPrice implements Serializable {
 	private double solarPanelVsatPrice = 100;
 	private double solarPanelAadatPrice = 100;
 	private double mirrorUnitPrice = 100;
-	private double heliostatPrice = 1000;
+	private double heliostatPrice = 100;
+	private double towerUnitPrice = 500;
 
 	public CustomPrice() {
 		setDefaultValues();
@@ -48,6 +49,9 @@ public class CustomPrice implements Serializable {
 		if (heliostatPrice == 0) {
 			heliostatPrice = 1000;
 		}
+		if (towerUnitPrice == 0) {
+			towerUnitPrice = 1000;
+		}
 	}
 
 	public void setMirrorUnitPrice(final double mirrorUnitPrice) {
@@ -64,6 +68,14 @@ public class CustomPrice implements Serializable {
 
 	public double getHeliostatPrice() {
 		return heliostatPrice;
+	}
+
+	public void setTowerUnitPrice(final double towerUnitPrice) {
+		this.towerUnitPrice = towerUnitPrice;
+	}
+
+	public double getTowerUnitPrice() {
+		return towerUnitPrice;
 	}
 
 	public void setSolarPanelPrice(final double solarPanelPrice) {

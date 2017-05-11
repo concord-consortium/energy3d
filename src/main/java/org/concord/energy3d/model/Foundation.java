@@ -839,7 +839,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelPowerTowerHeight) {
-			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight() * Scene.getInstance().getAnnotationScale()) + " m";
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale()) + " m";
 		}
 		if (labelPowerTowerOutput) {
 			final double output = getSolarReceiverOutputToday();
@@ -930,14 +930,14 @@ public class Foundation extends HousePart implements Thermalizable {
 					count++;
 				}
 			}
-			solarReceiver.setHeight(getSolarReceiverHeight() * 0.15);
+			solarReceiver.setHeight(getSolarReceiverHeight(0.1) * 0.15);
 			Vector3 o;
 			if (count == 0) {
 				o = getAbsCenter();
-				o.setZ(getSolarReceiverHeight() - solarReceiver.getHeight() * 0.5);
+				o.setZ(getSolarReceiverHeight(0.1) - solarReceiver.getHeight() * 0.5);
 				solarReceiver.setRadius(10);
 			} else {
-				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight() - solarReceiver.getHeight() * 0.5);
+				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight(0.1) - solarReceiver.getHeight() * 0.5);
 				final double r1 = Math.max((xmax - xmin), (ymax - ymin)) / 2;
 				final double r2 = Math.max(r1 * 0.4, 4);
 				solarReceiver.setRadius(r1 + r2);
@@ -971,15 +971,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		Vector3 o;
 		if (count == 0) {
 			o = getAbsCenter();
-			o.setZ(getSolarReceiverHeight());
+			o.setZ(getSolarReceiverHeight(0.1));
 		} else {
-			o = new Vector3(rx / count, ry / count, getSolarReceiverHeight());
+			o = new Vector3(rx / count, ry / count, getSolarReceiverHeight(0.1));
 		}
 		return o;
 	}
 
-	private double getSolarReceiverHeight() {
-		return getBoundingHeight() + height - 0.1; // shift a small distance to avoid collision with a possible roof
+	public double getSolarReceiverHeight(final double offset) {
+		return getBoundingHeight() + height - offset; // shift a small distance to avoid collision with a possible roof
 	}
 
 	public void drawSideMesh() {

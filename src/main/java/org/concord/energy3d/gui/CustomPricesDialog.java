@@ -91,6 +91,7 @@ class CustomPricesDialog extends JDialog {
 
 		final JTextField mirrorField;
 		final JTextField heliostatField;
+		final JTextField towerField;
 
 		CspStationPricesPanel() {
 
@@ -106,9 +107,14 @@ class CustomPricesDialog extends JDialog {
 			add(new JLabel("Heliostat: "));
 			heliostatField = new JTextField(FORMAT.format(price.getHeliostatPrice()), 6);
 			add(heliostatField);
-			add(new JLabel("<html>$ per unit</html>"));
+			add(new JLabel("<html>$ per square meter</html>"));
 
-			SpringUtilities.makeCompactGrid(this, 2, 3, 6, 6, 6, 6);
+			add(new JLabel("Tower: "));
+			towerField = new JTextField(FORMAT.format(price.getTowerUnitPrice()), 6);
+			add(towerField);
+			add(new JLabel("<html>$ per meter</html>"));
+
+			SpringUtilities.makeCompactGrid(this, 3, 3, 6, 6, 6, 6);
 
 		}
 

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -11,7 +12,8 @@ import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.simulation.CustomPrice;
 
 /**
  * @author Charles Xie
@@ -65,7 +67,7 @@ public class CspStationInfoPanel extends JPanel {
 		// mirror cost on the selected base
 
 		costPanel = new JPanel(new BorderLayout());
-		costPanel.setBorder(EnergyPanel.createTitledBorder("Cost of mirrors", true));
+		costPanel.setBorder(EnergyPanel.createTitledBorder("Cost", true));
 		container.add(costPanel);
 		costBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		costBar.setUnit("$");
@@ -83,9 +85,24 @@ public class CspStationInfoPanel extends JPanel {
 		countBar.setValue(mirrors.size());
 		double cost = 0;
 		double reflectingArea = 0;
+		double mirrorArea = 0;
+		final CustomPrice price = Scene.getInstance().getCustomPrice();
+		final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 		for (final Mirror m : mirrors) {
-			cost += Cost.getInstance().getPartCost(m);
-			reflectingArea += m.getMirrorWidth() * m.getMirrorHeight();
+			mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
+			cost += price.getMirrorUnitPrice() * mirrorArea;
+			cost += price.getHeliostatPrice() * mirrorArea;
+			reflectingArea += mirrorArea;
+			if (m.getHeliostatTarget() != null) {
+				if (!towers.contains(m.getHeliostatTarget())) {
+					towers.add(m.getHeliostatTarget());
+				}
+			}
+		}
+		if (!towers.isEmpty()) {
+			for (final Foundation tower : towers) {
+				cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+			}
 		}
 		costBar.setValue(Math.round(cost));
 		packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
