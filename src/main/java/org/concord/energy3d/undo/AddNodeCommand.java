@@ -22,8 +22,13 @@ public class AddNodeCommand extends AbstractUndoableEdit {
 	public AddNodeCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		final List<Node> nodes = foundation.getImportedNodes();
-		node = nodes.get(nodes.size() - 1);
-		nodeState = foundation.getNodeState(node);
+		if (nodes.isEmpty()) {
+			node = null;
+			nodeState = null;
+		} else {
+			node = nodes.get(nodes.size() - 1);
+			nodeState = foundation.getNodeState(node);
+		}
 	}
 
 	public Node getNode() {
@@ -37,14 +42,18 @@ public class AddNodeCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		foundation.deleteNode(node);
+		if (node != null) {
+			foundation.deleteNode(node);
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		foundation.addNode(node, nodeState);
+		if (node != null) {
+			foundation.addNode(node, nodeState);
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 

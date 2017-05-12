@@ -60,6 +60,7 @@ public class CspStationInfoPanel extends JPanel {
 		packingDensityBar.setUnit("");
 		packingDensityBar.setVerticalLineRepresentation(false);
 		packingDensityBar.setDecimalDigits(2);
+		packingDensityBar.setMaximum(1);
 		packingDensityBar.setToolTipText(packingDensityPanel.getToolTipText());
 		packingDensityBar.setPreferredSize(new Dimension(100, 16));
 		packingDensityPanel.add(packingDensityBar, BorderLayout.CENTER);

@@ -63,6 +63,7 @@ public class PvStationInfoPanel extends JPanel {
 		landAreaBar.setUnit("");
 		landAreaBar.setVerticalLineRepresentation(false);
 		landAreaBar.setDecimalDigits(2);
+		landAreaBar.setMaximum(10);
 		landAreaBar.setToolTipText(landAreaPanel.getToolTipText());
 		landAreaBar.setPreferredSize(new Dimension(100, 16));
 		landAreaPanel.add(landAreaBar, BorderLayout.CENTER);
@@ -76,6 +77,7 @@ public class PvStationInfoPanel extends JPanel {
 		panelAreaBar.setUnit("");
 		panelAreaBar.setVerticalLineRepresentation(false);
 		panelAreaBar.setDecimalDigits(2);
+		panelAreaBar.setMaximum(100000);
 		panelAreaBar.setToolTipText(panelAreaPanel.getToolTipText());
 		panelAreaBar.setPreferredSize(new Dimension(100, 16));
 		panelAreaPanel.add(panelAreaBar, BorderLayout.CENTER);

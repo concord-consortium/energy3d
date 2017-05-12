@@ -2115,10 +2115,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		case Trackable.NORTH_SOUTH_AXIS:
 			int rows = (int) Math.floor(b / w);
 			int cols = (int) Math.floor(a / h);
+			double marginx = (a - cols * h) * 0.5;
+			double marginy = (b - rows * w) * 0.5;
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
-					final double x = x0 + h * (c + 0.5);
-					final double y = y0 + w * (r + 0.5);
+					final double x = x0 + marginx + h * (c + 0.5);
+					final double y = y0 + marginy + w * (r + 0.5);
 					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
@@ -2139,10 +2141,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		case Trackable.EAST_WEST_AXIS:
 			rows = (int) Math.floor(a / w);
 			cols = (int) Math.floor(b / h);
+			marginx = (a - rows * w) * 0.5;
+			marginy = (b - cols * h) * 0.5;
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
-					final double x = x0 + w * (r + 0.5);
-					final double y = y0 + h * (c + 0.5);
+					final double x = x0 + marginx + w * (r + 0.5);
+					final double y = y0 + marginy + h * (c + 0.5);
 					if (path != null && !path.contains(x, y)) {
 						continue;
 					}
@@ -2208,6 +2212,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			center.setX((x0 + x1) * 0.5);
 			rackWidth = a * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(b / h);
+			double margin = (b - rows * h) * 0.5;
 			for (int r = 0; r < rows; r++) {
 				if (foundationPolygon != null && foundationPolygon.isVisible()) {
 					if (bounds == null) {
@@ -2231,7 +2236,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						}
 					}
 				} else {
-					center.setY(y0 + h * (r + 0.5));
+					center.setY(y0 + margin + h * (r + 0.5));
 					addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, false).draw();
 				}
 			}
@@ -2240,6 +2245,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			center.setY((y0 + y1) * 0.5);
 			rackWidth = b * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(a / h);
+			margin = (a - rows * h) * 0.5;
 			for (int r = 0; r < rows; r++) {
 				if (foundationPolygon != null && foundationPolygon.isVisible()) {
 					if (bounds == null) {
@@ -2263,7 +2269,7 @@ public class Foundation extends HousePart implements Thermalizable {
 						}
 					}
 				} else {
-					center.setX(x0 + h * (r + 0.5));
+					center.setX(x0 + margin + h * (r + 0.5));
 					addRack(panel, tiltAngle, baseHeight, rowAxis, poleDistanceX, poleDistanceY, center, rackWidth, rackHeight, true).draw();
 				}
 			}

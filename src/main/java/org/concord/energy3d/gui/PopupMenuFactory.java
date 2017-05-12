@@ -2816,7 +2816,7 @@ public class PopupMenuFactory {
 									} else if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal operating cell temperature must be between 33 and 58 Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackArrayInterRowSpacing < rackHeight) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row rack spacing is too small.", "Range Error", JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inter-row center-to-center distance cannot be smaller than " + EnergyPanel.TWO_DECIMALS.format(rackHeight) + "m (" + solarPanelRowsPerRack + "\u00d7" + EnergyPanel.TWO_DECIMALS.format((solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth)) + "m)", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
 										addSolarRackArrays();
 										if (choice == options[0]) {
