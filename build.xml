@@ -135,7 +135,7 @@
 	</target>
 
 	<target name="compile" depends="clean">
-		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" debug="on" classpathref="CLASSPATH">
+		<javac includeantruntime="false" srcdir="${build.src.dir}" destdir="${build.classes.dir}" fork="yes" executable="${JAVA_HOME}/bin/javac" debug="on" classpathref="CLASSPATH" encoding="iso-8859-1">
 		</javac>
 
 		<!-- Copy resources to build.classes.dir -->

@@ -86,6 +86,9 @@ public class MainApplication {
 					@Override
 					public void run() {
 						try {
+							if (Config.isMac()) {
+								Thread.sleep(200);
+							}
 							if (isMacOpeningFile) {
 								return;
 							}
