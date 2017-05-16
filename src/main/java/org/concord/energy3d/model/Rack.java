@@ -1167,6 +1167,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
 			sunBeam.setVisible(false);
 			normalVector.setVisible(false);
+			sunAngle.setVisible(false);
 			return;
 		}
 		final Vector3 o = getAbsPoint(0);
@@ -1221,6 +1222,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		// draw the angle between the sun beam and the normal vector
 		normal.cross(sunLocation, a);
 		sunAngle.setRange(o, o.add(sunLocation, null), o.add(normal, null), a);
+		sunAngle.setVisible(true);
 
 		normalVector.updateModelBound();
 		normalVector.setVisible(true);

@@ -65,6 +65,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	private transient Node angles;
 	private transient AngleAnnotation sunAngle;
 	private transient BMText label;
+	private transient Line solarCellOutlines;
 	private static double normalVectorLength = 5;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
@@ -198,6 +199,15 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 		label.setVisible(false);
 		root.attachChild(label);
 
+		solarCellOutlines = new Line("Solar Cell Outlines");
+		solarCellOutlines.setLineWidth(0.01f);
+		solarCellOutlines.setStipplePattern((short) 0xffff);
+		solarCellOutlines.setModelBound(null);
+		Util.disablePickShadowLight(solarCellOutlines);
+		solarCellOutlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(1));
+		solarCellOutlines.setDefaultColor(new ColorRGBA(0f, 0f, 0f, 1f));
+		root.attachChild(solarCellOutlines);
+
 		updateTextureAndColor();
 
 	}
@@ -278,6 +288,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 			return;
 		}
 
+		final boolean heatMap = SceneManager.getInstance().getSolarHeatMap();
 		boolean onFlatSurface = onFlatSurface();
 		final Mesh host = meshLocator == null ? null : meshLocator.find(); // if this solar panel rests on an imported mesh or not?
 		if (host == null) {
@@ -383,6 +394,12 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 
 		if (drawSunBeam) {
 			drawSunBeam();
+		}
+
+		if (heatMap) {
+			drawSolarCellOutlines();
+		} else {
+			solarCellOutlines.setVisible(false);
 		}
 
 		drawFloatingLabel(onFlatSurface);
@@ -496,6 +513,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
 			sunBeam.setVisible(false);
 			normalVector.setVisible(false);
+			sunAngle.setVisible(false);
 			return;
 		}
 		final Vector3 o = (!onFlatSurface() || container instanceof Rack) ? getAbsPoint(0) : getAbsPoint(0).addLocal(0, 0, baseHeight);
@@ -550,9 +568,49 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 		// draw the angle between the sun beam and the normal vector
 		normal.cross(sunLocation, a);
 		sunAngle.setRange(o, o.add(sunLocation, null), o.add(normal, null), a);
+		sunAngle.setVisible(true);
 
 		normalVector.updateModelBound();
 		normalVector.setVisible(true);
+	}
+
+	// draw solar cell outlines when in heat map mode
+	private void drawSolarCellOutlines() {
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final Vector3 p0 = trans.applyForward(new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5))); // (0, 0)
+		final Vector3 p1 = trans.applyForward(new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8))); // (1, 0)
+		final Vector3 p2 = trans.applyForward(new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2))); // (0, 1)
+		final int bufferSize = (numberOfCellsInX + numberOfCellsInY - 2) * 6;
+		FloatBuffer vertices = solarCellOutlines.getMeshData().getVertexBuffer();
+		if (vertices.capacity() != bufferSize) {
+			vertices = BufferUtils.createFloatBuffer(bufferSize);
+			solarCellOutlines.getMeshData().setVertexBuffer(vertices);
+		} else {
+			vertices.rewind();
+			vertices.limit(vertices.capacity());
+		}
+		final int ny = rotated ? numberOfCellsInY : numberOfCellsInX;
+		final int nx = rotated ? numberOfCellsInX : numberOfCellsInY;
+		final Vector3 u = p1.subtract(p0, null).multiplyLocal(1.0 / nx);
+		final Vector3 v = p2.subtract(p0, null).multiplyLocal(1.0 / ny);
+		Vector3 p, q;
+		for (int i = 1; i < ny; i++) {
+			q = v.multiply(i, null);
+			p = p0.add(q, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = p1.add(q, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+		for (int i = 1; i < nx; i++) {
+			q = u.multiply(i, null);
+			p = p0.add(q, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = p2.add(q, null);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+		solarCellOutlines.updateModelBound();
+		solarCellOutlines.setVisible(true);
 	}
 
 	@Override

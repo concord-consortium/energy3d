@@ -5854,7 +5854,7 @@ public class PopupMenuFactory {
 					final JTextField widthField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth()));
 					label.setLabelFor(widthField);
 					inputPanel.add(widthField);
-					label = new JLabel("Height (m): ", JLabel.TRAILING);
+					label = new JLabel("Length (m): ", JLabel.TRAILING);
 					inputPanel.add(label);
 					final JTextField heightField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight()));
 					label.setLabelFor(heightField);
@@ -5909,7 +5909,7 @@ public class PopupMenuFactory {
 								if (w < 1 || w > 500) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 500 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (h < 1 || h > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(rack);
@@ -8200,7 +8200,7 @@ public class PopupMenuFactory {
 					inputPanel.add(new JLabel("Width: "));
 					final JTextField widthField = new JTextField(threeDecimalsFormat.format(m.getMirrorWidth()));
 					inputPanel.add(widthField);
-					inputPanel.add(new JLabel("Height: "));
+					inputPanel.add(new JLabel("Length: "));
 					final JTextField heightField = new JTextField(threeDecimalsFormat.format(m.getMirrorHeight()));
 					inputPanel.add(heightField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

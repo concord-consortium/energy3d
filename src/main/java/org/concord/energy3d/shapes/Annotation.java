@@ -21,7 +21,7 @@ public abstract class Annotation extends Node {
 		label.setFontScale(fontSize);
 	}
 
-	public static BMText makeNewLabel(double fontSize) {
+	public static BMText makeNewLabel(final double fontSize) {
 		final BMText label = new BMText("Annotation Label", "", FontManager.getInstance().getAnnotationFont(), BMText.Align.Center, BMText.Justify.Center);
 		label.setTextColor(ColorRGBA.BLACK);
 		label.setAutoScale(AutoScale.Off);
@@ -43,6 +43,11 @@ public abstract class Annotation extends Node {
 		attachChild(mesh);
 	}
 
+	public void setVisible(final boolean visible) {
+		mesh.setVisible(visible);
+		label.setVisible(visible);
+	}
+
 	public void setColor(final ReadOnlyColorRGBA color) {
 		mesh.setDefaultColor(color);
 		label.setTextColor(color);
@@ -52,7 +57,7 @@ public abstract class Annotation extends Node {
 		mesh.setLineWidth(lineWidth);
 	}
 
-	public void setStipplePattern(short stipplePattern) {
+	public void setStipplePattern(final short stipplePattern) {
 		mesh.setStipplePattern(stipplePattern);
 	}
 
