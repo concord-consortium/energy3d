@@ -2138,7 +2138,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() throws Exception {
-				for (final Rack rack : Scene.getInstance().getAllRacks()) {
+				for (final SolarPanel panel : Scene.getInstance().getAllSolarPanels()) { // draw the cell outlines
+					panel.draw();
+				}
+				for (final Rack rack : Scene.getInstance().getAllRacks()) { // draw the panel outlines
 					rack.draw();
 				}
 				if (!solarHeatMap) { // reset the mesh colors after the heat map goes off

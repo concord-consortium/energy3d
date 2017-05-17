@@ -581,7 +581,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 		final Vector3 p0 = trans.applyForward(new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5))); // (0, 0)
 		final Vector3 p1 = trans.applyForward(new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8))); // (1, 0)
 		final Vector3 p2 = trans.applyForward(new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2))); // (0, 1)
-		final int bufferSize = (numberOfCellsInX + numberOfCellsInY - 2) * 6;
+		final int bufferSize = (numberOfCellsInX + numberOfCellsInY + 2) * 6;
 		FloatBuffer vertices = solarCellOutlines.getMeshData().getVertexBuffer();
 		if (vertices.capacity() != bufferSize) {
 			vertices = BufferUtils.createFloatBuffer(bufferSize);
@@ -590,25 +590,37 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 			vertices.rewind();
 			vertices.limit(vertices.capacity());
 		}
-		final int ny = rotated ? numberOfCellsInY : numberOfCellsInX;
-		final int nx = rotated ? numberOfCellsInX : numberOfCellsInY;
-		final Vector3 u = p1.subtract(p0, null).multiplyLocal(1.0 / nx);
-		final Vector3 v = p2.subtract(p0, null).multiplyLocal(1.0 / ny);
+		final int nx = rotated ? numberOfCellsInY : numberOfCellsInX;
+		final int ny = rotated ? numberOfCellsInX : numberOfCellsInY;
+		final Vector3 u = p1.subtract(p0, null).normalizeLocal();
+		final Vector3 v = p2.subtract(p0, null).normalizeLocal();
+		final double margin = 0.3;
+		final double dx = (p1.distance(p0) - margin * 2) / ny;
+		final double dy = (p2.distance(p0) - margin * 2) / nx;
+		final Vector3 ud = u.multiply(dx, null);
+		final Vector3 vd = v.multiply(dy, null);
+		final Vector3 um = u.multiply(margin, null);
+		final Vector3 vm = v.multiply(margin, null);
 		Vector3 p, q;
-		for (int i = 1; i < ny; i++) {
-			q = v.multiply(i, null);
-			p = p0.add(q, null);
+
+		// draw x-lines
+		for (int i = 0; i <= nx; i++) {
+			q = vm.add(vd.multiply(i, null), null);
+			p = p0.add(um, null).addLocal(q);
 			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = p1.add(q, null);
-			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-		}
-		for (int i = 1; i < nx; i++) {
-			q = u.multiply(i, null);
-			p = p0.add(q, null);
-			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			p = p2.add(q, null);
+			p = p1.subtract(um, null).addLocal(q);
 			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		}
+
+		// draw y-lines
+		for (int i = 0; i <= ny; i++) {
+			q = um.add(ud.multiply(i, null), null);
+			p = p0.add(vm, null).addLocal(q);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			p = p2.subtract(vm, null).addLocal(q);
+			vertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
+		}
+
 		solarCellOutlines.updateModelBound();
 		solarCellOutlines.setVisible(true);
 	}
