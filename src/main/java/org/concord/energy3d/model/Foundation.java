@@ -118,9 +118,6 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
-	private String labelCustomText;
-	private boolean labelCustom;
-	private boolean labelId;
 	private boolean labelPowerTowerOutput;
 	private boolean labelPowerTowerHeight;
 	private boolean labelPvEnergy;
@@ -3151,9 +3148,9 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
+	@Override
 	public void clearLabels() {
-		labelId = false;
-		labelCustom = false;
+		super.clearLabels();
 		labelPowerTowerOutput = false;
 		labelPowerTowerHeight = false;
 		labelPvEnergy = false;
@@ -3163,30 +3160,6 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public boolean isLabelVisible() {
 		return label.isVisible();
-	}
-
-	public void setLabelId(final boolean labelId) {
-		this.labelId = labelId;
-	}
-
-	public boolean getLabelId() {
-		return labelId;
-	}
-
-	public void setLabelCustom(final boolean labelCustom) {
-		this.labelCustom = labelCustom;
-	}
-
-	public boolean getLabelCustom() {
-		return labelCustom;
-	}
-
-	public void setLabelCustomText(final String labelCustomText) {
-		this.labelCustomText = labelCustomText;
-	}
-
-	public String getLabelCustomText() {
-		return labelCustomText;
 	}
 
 	public void setLabelPowerTowerOutput(final boolean labelPowerTowerOutput) {

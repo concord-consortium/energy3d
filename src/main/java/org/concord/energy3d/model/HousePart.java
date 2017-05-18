@@ -106,6 +106,9 @@ public abstract class HousePart implements Serializable {
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
 	private boolean freeze;
+	boolean labelCustom;
+	boolean labelId;
+	String labelCustomText;
 
 	transient Line heatFlux;
 	transient ReadOnlyVector3 pickedNormal;
@@ -1302,6 +1305,35 @@ public abstract class HousePart implements Serializable {
 
 	protected boolean fits(final HousePart child) {
 		return true;
+	}
+
+	public void clearLabels() {
+		labelId = false;
+		labelCustom = false;
+	}
+
+	public void setLabelId(final boolean labelId) {
+		this.labelId = labelId;
+	}
+
+	public boolean getLabelId() {
+		return labelId;
+	}
+
+	public void setLabelCustom(final boolean labelCustom) {
+		this.labelCustom = labelCustom;
+	}
+
+	public boolean getLabelCustom() {
+		return labelCustom;
+	}
+
+	public void setLabelCustomText(final String labelCustomText) {
+		this.labelCustomText = labelCustomText;
+	}
+
+	public String getLabelCustomText() {
+		return labelCustomText;
 	}
 
 }

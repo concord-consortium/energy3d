@@ -87,9 +87,6 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	private int shadeTolerance = HIGH_SHADE_TOLERANCE;
 	private int numberOfCellsInX = 6;
 	private int numberOfCellsInY = 10;
-	private String labelCustomText;
-	private boolean labelCustom;
-	private boolean labelId;
 	private boolean labelCellEfficiency;
 	private boolean labelTiltAngle;
 	private boolean labelTracker;
@@ -1085,9 +1082,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 		this.meshLocator = meshLocator;
 	}
 
+	@Override
 	public void clearLabels() {
-		labelId = false;
-		labelCustom = false;
+		super.clearLabels();
 		labelCellEfficiency = false;
 		labelTiltAngle = false;
 		labelTracker = false;
@@ -1096,30 +1093,6 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 
 	public boolean isLabelVisible() {
 		return label.isVisible();
-	}
-
-	public void setLabelId(final boolean labelId) {
-		this.labelId = labelId;
-	}
-
-	public boolean getLabelId() {
-		return labelId;
-	}
-
-	public void setLabelCustom(final boolean labelCustom) {
-		this.labelCustom = labelCustom;
-	}
-
-	public boolean getLabelCustom() {
-		return labelCustom;
-	}
-
-	public void setLabelCustomText(final String labelCustomText) {
-		this.labelCustomText = labelCustomText;
-	}
-
-	public String getLabelCustomText() {
-		return labelCustomText;
 	}
 
 	public void setLabelTracker(final boolean labelTracker) {

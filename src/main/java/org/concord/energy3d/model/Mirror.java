@@ -50,9 +50,6 @@ public class Mirror extends HousePart implements Solar {
 	private Foundation heliostatTarget;
 	private double baseHeight = 10;
 	private boolean drawSunBeam;
-	private String labelCustomText;
-	private boolean labelCustom;
-	private boolean labelId;
 	private boolean labelEnergyOutput;
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double yieldNow; // output at current hour
@@ -538,38 +535,14 @@ public class Mirror extends HousePart implements Solar {
 		return e;
 	}
 
+	@Override
 	public void clearLabels() {
-		labelId = false;
-		labelCustom = false;
+		super.clearLabels();
 		labelEnergyOutput = false;
 	}
 
 	public boolean isLabelVisible() {
 		return label.isVisible();
-	}
-
-	public void setLabelId(final boolean labelId) {
-		this.labelId = labelId;
-	}
-
-	public boolean getLabelId() {
-		return labelId;
-	}
-
-	public void setLabelCustom(final boolean labelCustom) {
-		this.labelCustom = labelCustom;
-	}
-
-	public boolean getLabelCustom() {
-		return labelCustom;
-	}
-
-	public void setLabelCustomText(final String labelCustomText) {
-		this.labelCustomText = labelCustomText;
-	}
-
-	public String getLabelCustomText() {
-		return labelCustomText;
 	}
 
 	public void setLabelEnergyOutput(final boolean labelEnergyOutput) {
