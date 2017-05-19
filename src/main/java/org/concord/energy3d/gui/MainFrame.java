@@ -2067,8 +2067,8 @@ public class MainFrame extends JFrame {
 					}
 					final PartGroup g = selectGroup();
 					if (g != null) {
-						final GroupDailyAnalysis a = new GroupDailyAnalysis(g.getIds());
-						a.show(g.getType() + " " + g.getIds());
+						final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
+						a.show(g.getType() + ": " + g.getIds());
 					}
 					SceneManager.getInstance().hideAllEditPoints();
 				}
@@ -2090,8 +2090,8 @@ public class MainFrame extends JFrame {
 					}
 					final PartGroup g = selectGroup();
 					if (g != null) {
-						final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g.getIds());
-						a.show(g.getType() + " " + g.getIds());
+						final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g);
+						a.show(g.getType() + ": " + g.getIds());
 					}
 					SceneManager.getInstance().hideAllEditPoints();
 				}
@@ -2125,7 +2125,7 @@ public class MainFrame extends JFrame {
 			c = Rack.class;
 		} else if ("Mirror".equals(currentGroupType)) {
 			c = Mirror.class;
-		} else if ("Foundation".equals(currentGroupType)) {
+		} else if ("Foundation".equals(currentGroupType) || currentGroupType.startsWith("Foundation")) {
 			c = Foundation.class;
 		}
 		return c;
@@ -2135,7 +2135,7 @@ public class MainFrame extends JFrame {
 		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Window", "Wall", "Roof", "Foundation" });
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
 		if (currentGroupType != null) {
 			typeComboBox.setSelectedItem(currentGroupType);
 		}

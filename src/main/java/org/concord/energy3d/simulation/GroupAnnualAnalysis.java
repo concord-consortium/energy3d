@@ -50,6 +50,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
@@ -70,11 +71,13 @@ public class GroupAnnualAnalysis extends Analysis {
 	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	private final List<HousePart> selectedParts;
+	private final PartGroup group;
 
-	public GroupAnnualAnalysis(final List<Long> ids) {
+	public GroupAnnualAnalysis(final PartGroup group) {
 		super();
+		this.group = group;
 		selectedParts = new ArrayList<HousePart>();
-		for (final Long i : ids) {
+		for (final Long i : group.getIds()) {
 			selectedParts.add(Scene.getInstance().getPart(i));
 		}
 		double i = 0;
@@ -85,6 +88,8 @@ public class GroupAnnualAnalysis extends Analysis {
 			Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
 			Graph.setColor("PV " + p.getId(), new Color(255, a, b));
 			Graph.setColor("CSP " + p.getId(), new Color(255, a, b));
+			Graph.setColor("PV " + p.getId() + " mean", new Color(255, a, b));
+			Graph.setColor("CSP " + p.getId() + " mean", new Color(255, a, b));
 			Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
 			Graph.setColor("Building " + p.getId(), new Color(a, b, 255));
 			i++;
@@ -172,15 +177,26 @@ public class GroupAnnualAnalysis extends Analysis {
 				final double solar = mirror.getSolarPotentialToday() * mirror.getSystemEfficiency();
 				graph.addData("Solar " + p.getId(), solar);
 			} else if (p instanceof Foundation) {
+				final boolean mean = group.getType().endsWith("(Mean)");
 				final Foundation foundation = (Foundation) p;
 				switch (foundation.getSupportingType()) {
 				case Foundation.PV_STATION:
-					final double pv = foundation.getPhotovoltaicToday();
-					graph.addData("PV " + p.getId(), pv);
+					double pv = foundation.getPhotovoltaicToday();
+					if (mean) {
+						pv /= foundation.getNumberOfSolarPanels();
+						graph.addData("PV " + p.getId() + " mean", pv);
+					} else {
+						graph.addData("PV " + p.getId(), pv);
+					}
 					break;
 				case Foundation.CSP_STATION:
-					final double csp = foundation.getCspToday();
-					graph.addData("CSP " + p.getId(), csp);
+					double csp = foundation.getCspToday();
+					if (mean) {
+						csp /= foundation.countParts(Mirror.class);
+						graph.addData("CSP " + p.getId() + " mean", csp);
+					} else {
+						graph.addData("CSP " + p.getId(), csp);
+					}
 					break;
 				case Foundation.BUILDING:
 					final double totalEnergy = foundation.getTotalEnergyToday();

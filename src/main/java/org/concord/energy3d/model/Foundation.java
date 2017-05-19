@@ -118,9 +118,11 @@ public class Foundation extends HousePart implements Thermalizable {
 	private double childGridSize = 2.5;
 	private boolean lockEdit;
 	private boolean groupMaster;
+	private boolean labelNumberOfMirrors;
 	private boolean labelPowerTowerOutput;
 	private boolean labelPowerTowerHeight;
 	private boolean labelPvEnergy;
+	private boolean labelNumberOfSolarPanels;
 	private boolean labelSolarPotential;
 	private boolean labelBuildingEnergy;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
@@ -842,9 +844,17 @@ public class Foundation extends HousePart implements Thermalizable {
 			final double output = getSolarReceiverOutputToday();
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(output) ? "Output" : EnergyPanel.NO_DECIMAL.format(output) + " kWh");
 		}
+		if (labelNumberOfMirrors) {
+			final int n = getNumberOfTargetingMirrors();
+			text += n == 0 ? "" : "\n" + n + " Mirrors";
+		}
 		if (labelBuildingEnergy) {
 			final String s = totalEnergyToday > 100 ? EnergyPanel.NO_DECIMAL.format(totalEnergyToday) : EnergyPanel.ONE_DECIMAL.format(totalEnergyToday);
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(totalEnergyToday) ? "Building Energy" : s + " kWh");
+		}
+		if (labelNumberOfSolarPanels) {
+			final int n = getNumberOfSolarPanels();
+			text += n == 0 ? "" : "\n" + n + " Solar Panels";
 		}
 		if (labelPvEnergy) {
 			final String s = photovoltaicToday > 100 ? EnergyPanel.NO_DECIMAL.format(photovoltaicToday) : EnergyPanel.ONE_DECIMAL.format(photovoltaicToday);
@@ -863,6 +873,19 @@ public class Foundation extends HousePart implements Thermalizable {
 			label.setVisible(false);
 		}
 
+	}
+
+	private int getNumberOfTargetingMirrors() {
+		int count = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Mirror) {
+				final Mirror m = (Mirror) p;
+				if (m.getHeliostatTarget() == this) {
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 	private double getSolarReceiverOutputToday() {
@@ -3156,10 +3179,20 @@ public class Foundation extends HousePart implements Thermalizable {
 		labelPvEnergy = false;
 		labelSolarPotential = false;
 		labelBuildingEnergy = false;
+		labelNumberOfMirrors = false;
+		labelNumberOfSolarPanels = false;
 	}
 
 	public boolean isLabelVisible() {
 		return label.isVisible();
+	}
+
+	public void setLabelNumberOfMirrors(final boolean labelNumberOfMirrors) {
+		this.labelNumberOfMirrors = labelNumberOfMirrors;
+	}
+
+	public boolean getLabelNumberOfMirrors() {
+		return labelNumberOfMirrors;
 	}
 
 	public void setLabelPowerTowerOutput(final boolean labelPowerTowerOutput) {
@@ -3184,6 +3217,14 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public boolean getLabelPvEnergy() {
 		return labelPvEnergy;
+	}
+
+	public void setLabelNumberOfSolarPanels(final boolean labelNumberOfSolarPanels) {
+		this.labelNumberOfSolarPanels = labelNumberOfSolarPanels;
+	}
+
+	public boolean getLabelNumberOfSolarPanels() {
+		return labelNumberOfSolarPanels;
 	}
 
 	public void setLabelSolarPotential(final boolean labelSolarPotential) {

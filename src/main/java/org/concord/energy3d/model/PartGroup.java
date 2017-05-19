@@ -9,20 +9,20 @@ import java.util.List;
  */
 public class PartGroup {
 
-	private String type;
-	private List<Long> ids;
+	private final String type;
+	private final List<Long> ids;
 
-	public PartGroup(String type) {
+	public PartGroup(final String type) {
 		this.type = type;
 		ids = new ArrayList<Long>();
 	}
 
-	public PartGroup(String type, List<Long> listOfIds) {
+	public PartGroup(final String type, final List<Long> listOfIds) {
 		this.type = type;
 		ids = new ArrayList<Long>(listOfIds);
 	}
 
-	public void addId(long id) {
+	public void addId(final long id) {
 		ids.add(id);
 	}
 

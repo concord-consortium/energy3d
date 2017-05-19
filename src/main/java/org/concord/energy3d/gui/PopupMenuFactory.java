@@ -3517,6 +3517,24 @@ public class PopupMenuFactory {
 			});
 			labelMenu.add(miLabelId);
 
+			final JCheckBoxMenuItem miLabelNumberOfSolarPanels = new JCheckBoxMenuItem("Number of Solar Panels");
+			miLabelNumberOfSolarPanels.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelNumberOfSolarPanels(miLabelNumberOfSolarPanels.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelNumberOfSolarPanels);
+
 			final JCheckBoxMenuItem miLabelPvEnergy = new JCheckBoxMenuItem("Photovoltaic Output");
 			miLabelPvEnergy.addActionListener(new ActionListener() {
 				@Override
@@ -3573,6 +3591,24 @@ public class PopupMenuFactory {
 
 			final JMenu powerTowerLabelMenu = new JMenu("Power Tower");
 			labelMenu.add(powerTowerLabelMenu);
+
+			final JCheckBoxMenuItem miLabelNumberOfMirrors = new JCheckBoxMenuItem("Number of Mirrors");
+			miLabelNumberOfMirrors.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
+						f.setLabelNumberOfMirrors(miLabelNumberOfMirrors.isSelected());
+						f.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			powerTowerLabelMenu.add(miLabelNumberOfMirrors);
 
 			final JCheckBoxMenuItem miLabelPowerTowerHeight = new JCheckBoxMenuItem("Tower Height");
 			miLabelPowerTowerHeight.addActionListener(new ActionListener() {
@@ -3635,8 +3671,10 @@ public class PopupMenuFactory {
 						Util.selectSilently(miLabelId, f.getLabelId());
 						Util.selectSilently(miLabelPowerTowerOutput, f.getLabelPowerTowerOutput());
 						Util.selectSilently(miLabelPowerTowerHeight, f.getLabelPowerTowerHeight());
+						Util.selectSilently(miLabelNumberOfMirrors, f.getLabelNumberOfMirrors());
 						Util.selectSilently(miLabelSolarPotential, f.getLabelSolarPotential());
 						Util.selectSilently(miLabelPvEnergy, f.getLabelPvEnergy());
+						Util.selectSilently(miLabelNumberOfSolarPanels, f.getLabelNumberOfSolarPanels());
 						Util.selectSilently(miLabelBuildingEnergy, f.getLabelBuildingEnergy());
 						powerTowerLabelMenu.setEnabled(f.isSolarReceiverVisible());
 					}

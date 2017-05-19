@@ -84,7 +84,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	private double baseHeight = 5;
 	private boolean drawSunBeam;
 	private int rotationAxis;
-	private int shadeTolerance = HIGH_SHADE_TOLERANCE;
+	private int shadeTolerance = PARTIAL_SHADE_TOLERANCE;
 	private int numberOfCellsInX = 6;
 	private int numberOfCellsInY = 10;
 	private boolean labelCellEfficiency;
