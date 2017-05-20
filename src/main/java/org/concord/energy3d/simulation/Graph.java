@@ -82,6 +82,7 @@ public abstract class Graph extends JPanel {
 	JDialog parent;
 	Calendar today;
 
+	private String dataNameDelimiter = "_";
 	private boolean popup = true;
 	private final JPopupMenu popupMenu;
 	private int legendX, legendY, legendWidth, legendHeight;
@@ -830,7 +831,12 @@ public abstract class Graph extends JPanel {
 					if (k.startsWith("Heat Gain") || k.startsWith("Building")) {
 						drawSquare(g2, x0, y0, 8, colors.get(k));
 					}
-					g2.drawString(isAngularGraph ? k : k + " (" + TWO_DECIMALS.format(getSum(k)) + ")", x0 + 14, y0 + 8);
+					String k2 = k;
+					final int i2 = k2.indexOf(dataNameDelimiter);
+					if (i2 != -1) {
+						k2 = k2.substring(i2 + 1);
+					}
+					g2.drawString(isAngularGraph ? k2 : k2 + " (" + TWO_DECIMALS.format(getSum(k)) + ")", x0 + 14, y0 + 8);
 				}
 			}
 		}
@@ -889,6 +895,14 @@ public abstract class Graph extends JPanel {
 		g.fillPolygon(p);
 		g.setColor(Color.BLACK);
 		g.drawPolygon(p);
+	}
+
+	public void setDataNameDelimiter(final String dataNameDelimiter) {
+		this.dataNameDelimiter = dataNameDelimiter;
+	}
+
+	public String getDataNameDelimiter() {
+		return dataNameDelimiter;
 	}
 
 }

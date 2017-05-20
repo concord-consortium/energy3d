@@ -62,23 +62,35 @@ public class GroupDailyAnalysis extends Analysis {
 		for (final Long i : group.getIds()) {
 			selectedParts.add(Scene.getInstance().getPart(i));
 		}
+		graph = new PartEnergyDailyGraph();
+		graph.setPreferredSize(new Dimension(600, 400));
+		graph.setBackground(Color.WHITE);
 		double i = 0;
 		final double n = selectedParts.size();
 		for (final HousePart p : selectedParts) {
 			final int a = (int) ((n - i) / n * 128);
 			final int b = 255 - a;
-			Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
-			Graph.setColor("PV " + p.getId(), new Color(255, a, b));
-			Graph.setColor("CSP " + p.getId(), new Color(255, a, b));
-			Graph.setColor("PV " + p.getId() + " mean", new Color(255, a, b));
-			Graph.setColor("CSP " + p.getId() + " mean", new Color(255, a, b));
-			Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
-			Graph.setColor("Building " + p.getId(), new Color(a, b, 255));
+			String s = p.getLabelCustomText();
+			if (s != null) {
+				s = graph.getDataNameDelimiter() + s;
+				Graph.setColor("Solar " + p.getId() + s, new Color(255, a, b));
+				Graph.setColor("PV " + p.getId() + s, new Color(255, a, b));
+				Graph.setColor("CSP " + p.getId() + s, new Color(255, a, b));
+				Graph.setColor("PV " + p.getId() + s + " mean", new Color(255, a, b));
+				Graph.setColor("CSP " + p.getId() + s + " mean", new Color(255, a, b));
+				Graph.setColor("Heat Gain " + p.getId() + s, new Color(a, b, 255));
+				Graph.setColor("Building " + p.getId() + s, new Color(a, b, 255));
+			} else {
+				Graph.setColor("Solar " + p.getId(), new Color(255, a, b));
+				Graph.setColor("PV " + p.getId(), new Color(255, a, b));
+				Graph.setColor("CSP " + p.getId(), new Color(255, a, b));
+				Graph.setColor("PV " + p.getId() + " mean", new Color(255, a, b));
+				Graph.setColor("CSP " + p.getId() + " mean", new Color(255, a, b));
+				Graph.setColor("Heat Gain " + p.getId(), new Color(a, b, 255));
+				Graph.setColor("Building " + p.getId(), new Color(a, b, 255));
+			}
 			i++;
 		}
-		graph = new PartEnergyDailyGraph();
-		graph.setPreferredSize(new Dimension(600, 400));
-		graph.setBackground(Color.WHITE);
 	}
 
 	private void runAnalysis(final JDialog parent) {
@@ -114,6 +126,7 @@ public class GroupDailyAnalysis extends Analysis {
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
 			for (final HousePart p : selectedParts) {
+				final String customText = p.getLabelCustomText();
 				if (p instanceof Window) {
 					final Window window = (Window) p;
 					final double solar = p.getSolarPotentialNow() * window.getSolarHeatGainCoefficient();
@@ -134,13 +147,25 @@ public class GroupDailyAnalysis extends Analysis {
 					}
 					graph.addData("Heat Gain " + p.getId(), -sum);
 				} else if (p instanceof SolarPanel) {
-					graph.addData("Solar " + p.getId(), ((SolarPanel) p).getYieldNow());
+					if (customText != null) {
+						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, ((SolarPanel) p).getYieldNow());
+					} else {
+						graph.addData("Solar " + p.getId(), ((SolarPanel) p).getYieldNow());
+					}
 				} else if (p instanceof Rack) {
-					graph.addData("Solar " + p.getId(), ((Rack) p).getYieldNow());
+					if (customText != null) {
+						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, ((Rack) p).getYieldNow());
+					} else {
+						graph.addData("Solar " + p.getId(), ((Rack) p).getYieldNow());
+					}
 				} else if (p instanceof Mirror) {
 					final Mirror mirror = (Mirror) p;
 					final double solar = mirror.getSolarPotentialNow() * mirror.getSystemEfficiency();
-					graph.addData("Solar " + p.getId(), solar);
+					if (customText != null) {
+						graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+					} else {
+						graph.addData("Solar " + p.getId(), solar);
+					}
 				} else if (p instanceof Foundation) {
 					final boolean mean = group.getType().endsWith("(Mean)");
 					final Foundation foundation = (Foundation) p;
@@ -149,18 +174,34 @@ public class GroupDailyAnalysis extends Analysis {
 						double pv = foundation.getPhotovoltaicNow();
 						if (mean) {
 							pv /= foundation.getNumberOfSolarPanels();
-							graph.addData("PV " + p.getId() + " mean", pv);
+							if (customText != null) {
+								graph.addData("PV " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", pv);
+							} else {
+								graph.addData("PV " + p.getId() + " mean", pv);
+							}
 						} else {
-							graph.addData("PV " + p.getId(), pv);
+							if (customText != null) {
+								graph.addData("PV " + p.getId() + graph.getDataNameDelimiter() + customText, pv);
+							} else {
+								graph.addData("PV " + p.getId(), pv);
+							}
 						}
 						break;
 					case Foundation.CSP_STATION:
 						double csp = foundation.getCspNow();
 						if (mean) {
 							csp /= foundation.countParts(Mirror.class);
-							graph.addData("CSP " + p.getId() + " mean", csp);
+							if (customText != null) {
+								graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", csp);
+							} else {
+								graph.addData("CSP " + p.getId() + " mean", csp);
+							}
 						} else {
-							graph.addData("CSP " + p.getId(), csp);
+							if (customText != null) {
+								graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText, csp);
+							} else {
+								graph.addData("CSP " + p.getId(), csp);
+							}
 						}
 						break;
 					case Foundation.BUILDING:
