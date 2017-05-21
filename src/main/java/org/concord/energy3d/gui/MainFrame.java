@@ -1350,8 +1350,9 @@ public class MainFrame extends JFrame {
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Rooftop Solar Power System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Parking Lot Solar Canopy", "tutorials/solar-canopy.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm (Fixed Rack Arrays)", "tutorials/pv-fixed-rack-arrays.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm (HSAT Rack Arrays)", "tutorials/pv-hsat-rack-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: Fixed Rack Arrays", "tutorials/pv-fixed-rack-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: HSAT Rack Arrays", "tutorials/pv-hsat-rack-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: Cost-Effectiveness", "tutorials/solar-rack-why-array.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: The Effect of Inter-Row Spacing", "tutorials/solar-rack-array-row-spacing.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: Landscape vs. Portrait Arrays", "tutorials/solar-rack-array-row-spacing-portrait.ng3");
 
