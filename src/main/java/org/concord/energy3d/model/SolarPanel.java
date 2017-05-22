@@ -574,7 +574,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	// draw solar cell outlines when in heat map mode
 	private void drawSolarCellOutlines() {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final ReadOnlyTransform trans = mesh.getTransform(); // do not use WorldTransform
 		final Vector3 p0 = trans.applyForward(new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5))); // (0, 0)
 		final Vector3 p1 = trans.applyForward(new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8))); // (1, 0)
 		final Vector3 p2 = trans.applyForward(new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2))); // (0, 1)
