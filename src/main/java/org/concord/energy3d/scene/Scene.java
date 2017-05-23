@@ -40,7 +40,6 @@ import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
-import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
@@ -2802,28 +2801,26 @@ public class Scene implements Serializable {
 			public Object call() throws Exception {
 				final boolean night = Heliodon.getInstance().isNightTime();
 				for (final HousePart part : parts) {
-					if (part instanceof Trackable) {
-						if (part instanceof Mirror) {
-							final Mirror mirror = (Mirror) part;
-							if (night) {
-								mirror.drawLightBeams(); // call this so that the light beams can be set invisible
-							} else {
-								mirror.draw();
-							}
-						} else if (part instanceof SolarPanel) {
-							final SolarPanel panel = (SolarPanel) part;
-							if (night) {
-								panel.drawSunBeam(); // call this so that the sun beam can be set invisible
-							} else {
-								panel.draw();
-							}
-						} else if (part instanceof Rack) {
-							final Rack rack = (Rack) part;
-							if (night) {
-								rack.drawSunBeam(); // call this so that the sun beam can be set invisible
-							} else {
-								rack.draw();
-							}
+					if (part instanceof Mirror) {
+						final Mirror mirror = (Mirror) part;
+						if (night) {
+							mirror.drawLightBeams(); // call this so that the light beams can be set invisible
+						} else {
+							mirror.draw();
+						}
+					} else if (part instanceof SolarPanel) {
+						final SolarPanel panel = (SolarPanel) part;
+						if (night) {
+							panel.drawSunBeam(); // call this so that the sun beam can be set invisible
+						} else {
+							panel.draw();
+						}
+					} else if (part instanceof Rack) {
+						final Rack rack = (Rack) part;
+						if (night) {
+							rack.drawSunBeam(); // call this so that the sun beam can be set invisible
+						} else {
+							rack.draw();
 						}
 					}
 				}

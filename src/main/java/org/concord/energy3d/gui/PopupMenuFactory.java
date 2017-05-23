@@ -2598,6 +2598,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelTiltAngle < -90 || solarPanelTiltAngle > 90) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panel tilt angle must be between -90\u00B0 and 90\u00B0.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (Math.abs(0.5 * (solarPanelOrientation == 0 ? solarPanelHeight : solarPanelWidth) * Math.sin(Math.toRadians(solarPanelTiltAngle))) > solarPanelArrayBaseHeight) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panels intersect with ground.", "Geometry Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
@@ -2803,6 +2805,8 @@ public class PopupMenuFactory {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing X must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackBaseHeight < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (Math.abs(0.5 * rackHeight * Math.sin(Math.toRadians(solarPanelTiltAngle))) > solarPanelRackBaseHeight) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar panels intersect with ground.", "Geometry Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRackPoleSpacingY < 1 || solarPanelRackPoleSpacingY > 50) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Pole spacing Y must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else if (solarPanelRowsPerRack <= 0 || solarPanelRowsPerRack > 10) {
