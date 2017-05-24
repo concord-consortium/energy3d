@@ -305,7 +305,6 @@ public class Scene implements Serializable {
 		if (Util.isZero(instance.groundImageScale)) {
 			instance.groundImageScale = 1;
 		}
-		instance.applyGroundImage();
 		SceneManager.getInstance().hideAllEditPoints();
 		final CameraControl cameraControl = SceneManager.getInstance().getCameraControl();
 		if (cameraControl != null) {
@@ -313,6 +312,7 @@ public class Scene implements Serializable {
 		}
 
 		instance.init();
+		instance.applyGroundImage();
 
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
 			@Override

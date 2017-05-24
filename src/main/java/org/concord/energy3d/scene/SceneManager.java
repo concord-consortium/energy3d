@@ -1740,7 +1740,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void resizeGroundImageLand(final double scale) {
-		final double d = 68.75 / Scene.getInstance().getAnnotationScale() * scale;
+		// the resolution of a map with the mercator projection (like Google maps) is dependent on the latitude
+		final double d = 68.75 / Scene.getInstance().getAnnotationScale() * scale * Math.cos(Heliodon.getInstance().getLatitude()) / Math.cos(Heliodon.DEFAULT_LATITUDE * Math.PI / 180.0);
 		groundImageLand.resize(d, d);
 		groundImageLand.updateModelBound();
 		groundImageLand.updateWorldBound(true);

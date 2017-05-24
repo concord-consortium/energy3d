@@ -65,7 +65,7 @@ import com.ardor3d.ui.text.BMText.AutoScale;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Heliodon {
-	public static final int DEFAULT_LATITUDE = 42;
+	public static final double DEFAULT_LATITUDE = 42.36;
 	private static final int BASE_DIVISIONS = 72;
 	private static final int DECLINATION_DIVISIONS = 12;
 	private static final int HOUR_DIVISIONS = 96;
