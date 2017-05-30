@@ -2729,7 +2729,7 @@ public class PopupMenuFactory {
 						final JTextField tiltAngleField = new JTextField(threeDecimalsFormat.format(solarPanelTiltAngle));
 						panel.add(tiltAngleField);
 
-						panel.add(new JLabel("Solar Panel Rows Per Rack:"));
+						panel.add(new JLabel("Solar Panel Sub-Rows Per Rack:"));
 						final JTextField rowsPerRackField = new JTextField(threeDecimalsFormat.format(solarPanelRowsPerRack));
 						panel.add(rowsPerRackField);
 

@@ -1523,7 +1523,10 @@ public class EnergyPanel extends JPanel {
 				buildingInfoPanel.updateSolarPanelNumberBounds();
 				buildingInfoPanel.updateWindowNumberBounds();
 				buildingInfoPanel.updateWallNumberBounds();
-				pvStationInfoPanel.updateSolarPanelNumberBounds();
+				pvStationInfoPanel.updateSolarPanelNumberMaximum();
+				pvStationInfoPanel.updateBudgetMaximum();
+				cspStationInfoPanel.updateMirrorNumberMaximum();
+				cspStationInfoPanel.updateBudgetMaximum();
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {

@@ -167,16 +167,34 @@ public class PvStationInfoPanel extends JPanel {
 		costBar.setValue(Math.round(cost));
 		costBar.setMaximum(specs.getMaximumBudget());
 		costBar.setEnabled(specs.isBudgetEnabled());
-		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost over " + price.getLifespan() + " years", true));
+		String t = "Total cost over " + price.getLifespan() + " years";
+		if (specs.isBudgetEnabled()) {
+			t += " (" + "<$" + specs.getMaximumBudget() + ")";
+		}
+		costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 		panelAreaBar.setValue((float) panelArea);
+		panelAreaBar.setMaximum(foundation.getArea());
 		repaint();
 	}
 
-	public void updateSolarPanelNumberBounds() {
+	public void updateBudgetMaximum() {
+		final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
+		final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
+		String t = "Total cost over " + price.getLifespan() + " years";
+		if (specs.isBudgetEnabled()) {
+			t += " (" + "<$" + specs.getMaximumBudget() + ")";
+		}
+		costBar.setMaximum(specs.getMaximumBudget());
+		costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		costBar.setEnabled(specs.isBudgetEnabled());
+		costBar.repaint();
+	}
+
+	public void updateSolarPanelNumberMaximum() {
 		final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
 		String t = "Number of solar panels";
 		if (specs.isNumberOfSolarPanelsEnabled()) {
-			t += " (" + " < " + specs.getMaximumNumberOfSolarPanels() + ")";
+			t += " (" + "<" + specs.getMaximumNumberOfSolarPanels() + ")";
 		}
 		countBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
 		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));

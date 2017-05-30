@@ -72,7 +72,7 @@ class SpecsDialog extends JDialog {
 			panel.add(p);
 			budgetCheckBox = new JCheckBox("", specs.isBudgetEnabled());
 			budgetCheckBox.setToolTipText("Select to apply a budget");
-			budgetField = new JTextField(FORMAT2.format(specs.getMaximumBudget()), 6);
+			budgetField = new JTextField(FORMAT2.format(specs.getMaximumBudget()), 10);
 			p.add(budgetCheckBox);
 			p.add(new JLabel("<"));
 			p.add(budgetField);
@@ -93,7 +93,7 @@ class SpecsDialog extends JDialog {
 			numberOfSolarPanelsCheckBox.setToolTipText("Select to apply a requirement of the number of solar panels");
 			p.add(numberOfSolarPanelsCheckBox);
 			p.add(new JLabel("<"));
-			maximumNumberOfSolarPanelsField = new JTextField("" + specs.getMaximumNumberOfSolarPanels(), 6);
+			maximumNumberOfSolarPanelsField = new JTextField("" + specs.getMaximumNumberOfSolarPanels(), 10);
 			p.add(maximumNumberOfSolarPanelsField);
 			numberOfSolarPanelsCheckBox.addItemListener(new ItemListener() {
 				@Override
@@ -141,7 +141,7 @@ class SpecsDialog extends JDialog {
 			panel.add(p);
 			budgetCheckBox = new JCheckBox("", specs.isBudgetEnabled());
 			budgetCheckBox.setToolTipText("Select to apply a budget");
-			budgetField = new JTextField(FORMAT2.format(specs.getMaximumBudget()), 6);
+			budgetField = new JTextField(FORMAT2.format(specs.getMaximumBudget()), 10);
 			p.add(budgetCheckBox);
 			p.add(new JLabel("<"));
 			p.add(budgetField);
@@ -162,7 +162,7 @@ class SpecsDialog extends JDialog {
 			numberOfMirrorsCheckBox.setToolTipText("Select to apply a requirement of the number of mirrors");
 			p.add(numberOfMirrorsCheckBox);
 			p.add(new JLabel("<"));
-			maximumNumberOfMirrorsField = new JTextField("" + specs.getMaximumNumberOfMirrors(), 6);
+			maximumNumberOfMirrorsField = new JTextField("" + specs.getMaximumNumberOfMirrors(), 10);
 			p.add(maximumNumberOfMirrorsField);
 			numberOfMirrorsCheckBox.addItemListener(new ItemListener() {
 				@Override

@@ -109,15 +109,33 @@ public class CspStationInfoPanel extends JPanel {
 		}
 		cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
 		costBar.setValue(Math.round(cost));
-		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost over " + price.getLifespan() + " years", true));
+		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+		String t = "Total cost over " + price.getLifespan() + " years";
+		if (specs.isBudgetEnabled()) {
+			t += " (" + "<$" + specs.getMaximumBudget() + ")";
+		}
+		costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 		packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
 	}
 
-	public void updateMirrorNumberBounds() {
+	public void updateBudgetMaximum() {
+		final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+		String t = "Total cost over " + price.getLifespan() + " years";
+		if (specs.isBudgetEnabled()) {
+			t += " (" + "<$" + specs.getMaximumBudget() + ")";
+		}
+		costBar.setMaximum(specs.getMaximumBudget());
+		costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		costBar.setEnabled(specs.isBudgetEnabled());
+		costBar.repaint();
+	}
+
+	public void updateMirrorNumberMaximum() {
 		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
 		String t = "Number of mirrors";
 		if (specs.isNumberOfMirrorsEnabled()) {
-			t += " (" + " < " + specs.getMaximumNumberOfMirrors() + ")";
+			t += " (" + "<" + specs.getMaximumNumberOfMirrors() + ")";
 		}
 		countBar.setMaximum(specs.getMaximumNumberOfMirrors());
 		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));

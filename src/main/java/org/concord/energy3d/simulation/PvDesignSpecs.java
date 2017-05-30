@@ -46,6 +46,7 @@ public class PvDesignSpecs implements Serializable {
 			@Override
 			public void run() {
 				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
+				EnergyPanel.getInstance().getPvStationInfoPanel().updateBudgetMaximum();
 			}
 		});
 	}
@@ -60,6 +61,7 @@ public class PvDesignSpecs implements Serializable {
 			@Override
 			public void run() {
 				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
+				EnergyPanel.getInstance().getPvStationInfoPanel().updateBudgetMaximum();
 			}
 		});
 	}
@@ -73,7 +75,7 @@ public class PvDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getPvStationInfoPanel().updateSolarPanelNumberBounds();
+				EnergyPanel.getInstance().getPvStationInfoPanel().updateSolarPanelNumberMaximum();
 			}
 		});
 	}
@@ -87,7 +89,7 @@ public class PvDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getPvStationInfoPanel().updateSolarPanelNumberBounds();
+				EnergyPanel.getInstance().getPvStationInfoPanel().updateSolarPanelNumberMaximum();
 			}
 		});
 	}

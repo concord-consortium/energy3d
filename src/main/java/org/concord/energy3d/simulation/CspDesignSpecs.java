@@ -46,6 +46,7 @@ public class CspDesignSpecs implements Serializable {
 			@Override
 			public void run() {
 				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
+				EnergyPanel.getInstance().getCspStationInfoPanel().updateBudgetMaximum();
 			}
 		});
 	}
@@ -60,6 +61,7 @@ public class CspDesignSpecs implements Serializable {
 			@Override
 			public void run() {
 				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
+				EnergyPanel.getInstance().getCspStationInfoPanel().updateBudgetMaximum();
 			}
 		});
 	}
@@ -73,7 +75,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateMirrorNumberBounds();
+				EnergyPanel.getInstance().getCspStationInfoPanel().updateMirrorNumberMaximum();
 			}
 		});
 	}
@@ -87,7 +89,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateMirrorNumberBounds();
+				EnergyPanel.getInstance().getCspStationInfoPanel().updateMirrorNumberMaximum();
 			}
 		});
 	}

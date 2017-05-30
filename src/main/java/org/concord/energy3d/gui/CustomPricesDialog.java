@@ -127,12 +127,12 @@ class CustomPricesDialog extends JDialog {
 			add(new JLabel("Mirror: "));
 			mirrorField = new JTextField(FORMAT.format(price.getMirrorUnitPrice()), 6);
 			add(mirrorField);
-			add(new JLabel("<html>$ per square meter</html>"));
+			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
 
 			add(new JLabel("Heliostat: "));
 			heliostatField = new JTextField(FORMAT.format(price.getHeliostatPrice()), 6);
 			add(heliostatField);
-			add(new JLabel("<html>$ per square meter</html>"));
+			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
 
 			add(new JLabel("Tower: "));
 			towerField = new JTextField(FORMAT.format(price.getTowerUnitPrice()), 6);
