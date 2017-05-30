@@ -15,8 +15,8 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.simulation.CustomPrice;
-import org.concord.energy3d.simulation.DesignSpecs;
+import org.concord.energy3d.simulation.PvCustomPrice;
+import org.concord.energy3d.simulation.PvDesignSpecs;
 
 /**
  * @author Charles Xie
@@ -85,7 +85,7 @@ public class PvStationInfoPanel extends JPanel {
 		// solar panel cost on the selected base
 
 		costPanel = new JPanel(new BorderLayout());
-		costPanel.setBorder(EnergyPanel.createTitledBorder("Cost of solar panels", true));
+		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost", true));
 		container.add(costPanel);
 		costBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		costBar.setUnit("$");
@@ -99,11 +99,11 @@ public class PvStationInfoPanel extends JPanel {
 	}
 
 	void update(final Foundation foundation) {
-		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
+		final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
 		int countSolarPanels = 0;
 		double cost = 0;
 		double panelArea = 0;
-		final CustomPrice price = Scene.getInstance().getCustomPrice();
 		final List<SolarPanel> panels = foundation.getSolarPanels();
 		if (!panels.isEmpty()) {
 			countSolarPanels += panels.size();
@@ -153,7 +153,6 @@ public class PvStationInfoPanel extends JPanel {
 			}
 		}
 		countBar.setValue(countSolarPanels);
-		countBar.setMinimum(specs.getMinimumNumberOfSolarPanels());
 		countBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
 		countBar.setEnabled(specs.isNumberOfSolarPanelsEnabled());
 		float landArea;
@@ -163,19 +162,22 @@ public class PvStationInfoPanel extends JPanel {
 		} else {
 			landArea = (float) foundation.getArea();
 		}
+		cost += landArea * price.getLandUnitPrice() * price.getLifespan();
 		landAreaBar.setValue(landArea / countSolarPanels);
 		costBar.setValue(Math.round(cost));
+		costBar.setMaximum(specs.getMaximumBudget());
+		costBar.setEnabled(specs.isBudgetEnabled());
+		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost over " + price.getLifespan() + " years", true));
 		panelAreaBar.setValue((float) panelArea);
 		repaint();
 	}
 
 	public void updateSolarPanelNumberBounds() {
-		final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+		final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
 		String t = "Number of solar panels";
 		if (specs.isNumberOfSolarPanelsEnabled()) {
-			t += " (" + specs.getMinimumNumberOfSolarPanels() + " - " + specs.getMaximumNumberOfSolarPanels() + ")";
+			t += " (" + " < " + specs.getMaximumNumberOfSolarPanels() + ")";
 		}
-		countBar.setMinimum(specs.getMinimumNumberOfSolarPanels());
 		countBar.setMaximum(specs.getMaximumNumberOfSolarPanels());
 		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 		countBar.setEnabled(specs.isNumberOfSolarPanelsEnabled());

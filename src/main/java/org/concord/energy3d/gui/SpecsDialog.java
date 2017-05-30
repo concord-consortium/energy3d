@@ -20,8 +20,13 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.CspDesignSpecs;
 import org.concord.energy3d.simulation.DesignSpecs;
+import org.concord.energy3d.simulation.PvDesignSpecs;
 
 /**
  * @author Charles Xie
@@ -32,6 +37,144 @@ class SpecsDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
 	private final static DecimalFormat FORMAT2 = new DecimalFormat("##");
+
+	class PvSpecsPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		final JCheckBox budgetCheckBox;
+		final JTextField budgetField;
+
+		final JCheckBox numberOfSolarPanelsCheckBox;
+		final JTextField maximumNumberOfSolarPanelsField;
+
+		private void enableBudgetItems(final boolean b) {
+			budgetField.setEnabled(b);
+		}
+
+		private void enableSolarPanelItems(final boolean b) {
+			maximumNumberOfSolarPanelsField.setEnabled(b);
+		}
+
+		PvSpecsPanel() {
+
+			super(new BorderLayout());
+
+			final PvDesignSpecs specs = Scene.getInstance().getPvDesignSpecs();
+
+			final JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+			add(panel, BorderLayout.NORTH);
+
+			// set the budget limit
+
+			JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			p.setBorder(BorderFactory.createTitledBorder("Budget ($)"));
+			panel.add(p);
+			budgetCheckBox = new JCheckBox("", specs.isBudgetEnabled());
+			budgetCheckBox.setToolTipText("Select to apply a budget");
+			budgetField = new JTextField(FORMAT2.format(specs.getMaximumBudget()), 6);
+			p.add(budgetCheckBox);
+			p.add(new JLabel("<"));
+			p.add(budgetField);
+			budgetCheckBox.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					enableBudgetItems(budgetCheckBox.isSelected());
+				}
+			});
+			enableBudgetItems(specs.isBudgetEnabled());
+
+			// set the maximum number of solar panels allowed
+
+			p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			p.setBorder(BorderFactory.createTitledBorder("Number of Solar Panels"));
+			panel.add(p);
+			numberOfSolarPanelsCheckBox = new JCheckBox("", specs.isNumberOfSolarPanelsEnabled());
+			numberOfSolarPanelsCheckBox.setToolTipText("Select to apply a requirement of the number of solar panels");
+			p.add(numberOfSolarPanelsCheckBox);
+			p.add(new JLabel("<"));
+			maximumNumberOfSolarPanelsField = new JTextField("" + specs.getMaximumNumberOfSolarPanels(), 6);
+			p.add(maximumNumberOfSolarPanelsField);
+			numberOfSolarPanelsCheckBox.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					enableSolarPanelItems(numberOfSolarPanelsCheckBox.isSelected());
+				}
+			});
+			enableSolarPanelItems(specs.isNumberOfSolarPanelsEnabled());
+
+		}
+
+	}
+
+	class CspSpecsPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		final JCheckBox budgetCheckBox;
+		final JTextField budgetField;
+
+		final JCheckBox numberOfMirrorsCheckBox;
+		final JTextField maximumNumberOfMirrorsField;
+
+		private void enableBudgetItems(final boolean b) {
+			budgetField.setEnabled(b);
+		}
+
+		private void enableMirrorItems(final boolean b) {
+			maximumNumberOfMirrorsField.setEnabled(b);
+		}
+
+		CspSpecsPanel() {
+
+			super(new BorderLayout());
+
+			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+
+			final JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+			add(panel, BorderLayout.NORTH);
+
+			// set the budget limit
+
+			JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			p.setBorder(BorderFactory.createTitledBorder("Budget ($)"));
+			panel.add(p);
+			budgetCheckBox = new JCheckBox("", specs.isBudgetEnabled());
+			budgetCheckBox.setToolTipText("Select to apply a budget");
+			budgetField = new JTextField(FORMAT2.format(specs.getMaximumBudget()), 6);
+			p.add(budgetCheckBox);
+			p.add(new JLabel("<"));
+			p.add(budgetField);
+			budgetCheckBox.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					enableBudgetItems(budgetCheckBox.isSelected());
+				}
+			});
+			enableBudgetItems(specs.isBudgetEnabled());
+
+			// set the maximum number of mirrors allowed
+
+			p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			p.setBorder(BorderFactory.createTitledBorder("Number of Mirrors"));
+			panel.add(p);
+			numberOfMirrorsCheckBox = new JCheckBox("", specs.isNumberOfMirrorsEnabled());
+			numberOfMirrorsCheckBox.setToolTipText("Select to apply a requirement of the number of mirrors");
+			p.add(numberOfMirrorsCheckBox);
+			p.add(new JLabel("<"));
+			maximumNumberOfMirrorsField = new JTextField("" + specs.getMaximumNumberOfMirrors(), 6);
+			p.add(maximumNumberOfMirrorsField);
+			numberOfMirrorsCheckBox.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					enableMirrorItems(numberOfMirrorsCheckBox.isSelected());
+				}
+			});
+			enableMirrorItems(specs.isNumberOfMirrorsEnabled());
+
+		}
+
+	}
 
 	class BuildingSpecsPanel extends JPanel {
 
@@ -123,7 +266,7 @@ class SpecsDialog extends JDialog {
 			// set the maximum number of windows allowed
 
 			p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			p.setBorder(BorderFactory.createTitledBorder("Number Of Windows"));
+			p.setBorder(BorderFactory.createTitledBorder("Number of Windows"));
 			panel.add(p);
 			numberOfWindowsCheckBox = new JCheckBox("", specs.isNumberOfWindowsEnabled());
 			numberOfWindowsCheckBox.setToolTipText("Select to apply a requirement of the number of windows");
@@ -144,7 +287,7 @@ class SpecsDialog extends JDialog {
 			// set the maximum number of solar panels allowed
 
 			p = new JPanel(new FlowLayout(FlowLayout.LEFT));
-			p.setBorder(BorderFactory.createTitledBorder("Number Of Solar Panels"));
+			p.setBorder(BorderFactory.createTitledBorder("Number of Solar Panels"));
 			panel.add(p);
 			numberOfSolarPanelsCheckBox = new JCheckBox("", specs.isNumberOfSolarPanelsEnabled());
 			numberOfSolarPanelsCheckBox.setToolTipText("Select to apply a requirement of the number of solar panels");
@@ -283,6 +426,14 @@ class SpecsDialog extends JDialog {
 		buildingSpecsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		tabbedPane.addTab("Building", buildingSpecsPanel);
 
+		final PvSpecsPanel pvSpecsPanel = new PvSpecsPanel();
+		pvSpecsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+		tabbedPane.addTab("PV", pvSpecsPanel);
+
+		final CspSpecsPanel cspSpecsPanel = new CspSpecsPanel();
+		cspSpecsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+		tabbedPane.addTab("CSP", cspSpecsPanel);
+
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -291,24 +442,27 @@ class SpecsDialog extends JDialog {
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				int maximumBudget;
-				int minimumNumberOfSolarPanels, maximumNumberOfSolarPanels;
+
+				// Building
+
+				int maximumBudgetOfBuilding;
+				int minimumNumberOfSolarPanelsOnBuilding, maximumNumberOfSolarPanelsOnBuilding;
 				int minimumNumberOfWindows, maximumNumberOfWindows;
 				int minimumNumberOfWalls, maximumNumberOfWalls;
-				double minimumArea, maximumArea, minimumHeight, maximumHeight;
+				double minimumAreaOfBuilding, maximumAreaOfBuilding, minimumHeightOfBuilding, maximumHeightOfBuilding;
 				double minimumWindowToFloorRatio, maximumWindowToFloorRatio;
 				try {
-					maximumBudget = (int) Double.parseDouble(buildingSpecsPanel.budgetField.getText());
-					minimumNumberOfWindows = (int) Double.parseDouble(buildingSpecsPanel.minimumNumberOfWindowsField.getText());
-					maximumNumberOfWindows = (int) Double.parseDouble(buildingSpecsPanel.maximumNumberOfWindowsField.getText());
-					minimumNumberOfSolarPanels = (int) Double.parseDouble(buildingSpecsPanel.minimumNumberOfSolarPanelsField.getText());
-					maximumNumberOfSolarPanels = (int) Double.parseDouble(buildingSpecsPanel.maximumNumberOfSolarPanelsField.getText());
-					minimumNumberOfWalls = (int) Double.parseDouble(buildingSpecsPanel.minimumNumberOfWallsField.getText());
-					maximumNumberOfWalls = (int) Double.parseDouble(buildingSpecsPanel.maximumNumberOfWallsField.getText());
-					minimumArea = Double.parseDouble(buildingSpecsPanel.minimumAreaField.getText());
-					maximumArea = Double.parseDouble(buildingSpecsPanel.maximumAreaField.getText());
-					minimumHeight = Double.parseDouble(buildingSpecsPanel.minimumHeightField.getText());
-					maximumHeight = Double.parseDouble(buildingSpecsPanel.maximumHeightField.getText());
+					maximumBudgetOfBuilding = Integer.parseInt(buildingSpecsPanel.budgetField.getText());
+					minimumNumberOfWindows = Integer.parseInt(buildingSpecsPanel.minimumNumberOfWindowsField.getText());
+					maximumNumberOfWindows = Integer.parseInt(buildingSpecsPanel.maximumNumberOfWindowsField.getText());
+					minimumNumberOfSolarPanelsOnBuilding = Integer.parseInt(buildingSpecsPanel.minimumNumberOfSolarPanelsField.getText());
+					maximumNumberOfSolarPanelsOnBuilding = Integer.parseInt(buildingSpecsPanel.maximumNumberOfSolarPanelsField.getText());
+					minimumNumberOfWalls = Integer.parseInt(buildingSpecsPanel.minimumNumberOfWallsField.getText());
+					maximumNumberOfWalls = Integer.parseInt(buildingSpecsPanel.maximumNumberOfWallsField.getText());
+					minimumAreaOfBuilding = Double.parseDouble(buildingSpecsPanel.minimumAreaField.getText());
+					maximumAreaOfBuilding = Double.parseDouble(buildingSpecsPanel.maximumAreaField.getText());
+					minimumHeightOfBuilding = Double.parseDouble(buildingSpecsPanel.minimumHeightField.getText());
+					maximumHeightOfBuilding = Double.parseDouble(buildingSpecsPanel.maximumHeightField.getText());
 					minimumWindowToFloorRatio = Double.parseDouble(buildingSpecsPanel.minimumWindowToFloorRatioField.getText());
 					maximumWindowToFloorRatio = Double.parseDouble(buildingSpecsPanel.maximumWindowToFloorRatioField.getText());
 				} catch (final NumberFormatException err) {
@@ -318,7 +472,7 @@ class SpecsDialog extends JDialog {
 				}
 
 				// range check
-				if (maximumBudget <= 1000) {
+				if (maximumBudgetOfBuilding <= 1000) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Your budget is too low to construct a building.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -341,11 +495,11 @@ class SpecsDialog extends JDialog {
 					return;
 				}
 
-				if (minimumNumberOfSolarPanels < 0 || maximumNumberOfSolarPanels < 0) {
+				if (minimumNumberOfSolarPanelsOnBuilding < 0 || maximumNumberOfSolarPanelsOnBuilding < 0) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Number of solar panels cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (minimumNumberOfSolarPanels >= maximumNumberOfSolarPanels) {
+				if (minimumNumberOfSolarPanelsOnBuilding >= maximumNumberOfSolarPanelsOnBuilding) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Maximum number of solar panels must be greater than minimum.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -359,20 +513,20 @@ class SpecsDialog extends JDialog {
 					return;
 				}
 
-				if (minimumArea < 0 || maximumArea < 0) {
+				if (minimumAreaOfBuilding < 0 || maximumAreaOfBuilding < 0) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Area cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (minimumArea >= maximumArea) {
+				if (minimumAreaOfBuilding >= maximumAreaOfBuilding) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum area must be less than maximum area.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
-				if (minimumHeight < 0 || maximumHeight < 0) {
+				if (minimumHeightOfBuilding < 0 || maximumHeightOfBuilding < 0) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Height cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (minimumHeight >= maximumHeight) {
+				if (minimumHeightOfBuilding >= maximumHeightOfBuilding) {
 					JOptionPane.showMessageDialog(SpecsDialog.this, "Minimum height must be less than maximum height.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -380,31 +534,111 @@ class SpecsDialog extends JDialog {
 				final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 
 				specs.setBudgetEnabled(buildingSpecsPanel.budgetCheckBox.isSelected());
-				specs.setMaximumBudget(maximumBudget);
+				specs.setMaximumBudget(maximumBudgetOfBuilding);
 
 				specs.setNumberOfWindowsEnabled(buildingSpecsPanel.numberOfWindowsCheckBox.isSelected());
 				specs.setMinimumNumberOfWindows(minimumNumberOfWindows);
 				specs.setMaximumNumberOfWindows(maximumNumberOfWindows);
 
 				specs.setNumberOfSolarPanelsEnabled(buildingSpecsPanel.numberOfSolarPanelsCheckBox.isSelected());
-				specs.setMinimumNumberOfSolarPanels(minimumNumberOfSolarPanels);
-				specs.setMaximumNumberOfSolarPanels(maximumNumberOfSolarPanels);
+				specs.setMinimumNumberOfSolarPanels(minimumNumberOfSolarPanelsOnBuilding);
+				specs.setMaximumNumberOfSolarPanels(maximumNumberOfSolarPanelsOnBuilding);
 
 				specs.setNumberOfWallsEnabled(buildingSpecsPanel.numberOfWallsCheckBox.isSelected());
 				specs.setMaximumNumberOfWalls(maximumNumberOfWalls);
 				specs.setMinimumNumberOfWalls(minimumNumberOfWalls);
 
 				specs.setAreaEnabled(buildingSpecsPanel.areaCheckBox.isSelected());
-				specs.setMaximumArea(maximumArea);
-				specs.setMinimumArea(minimumArea);
+				specs.setMaximumArea(maximumAreaOfBuilding);
+				specs.setMinimumArea(minimumAreaOfBuilding);
 
 				specs.setHeightEnabled(buildingSpecsPanel.heightCheckBox.isSelected());
-				specs.setMaximumHeight(maximumHeight);
-				specs.setMinimumHeight(minimumHeight);
+				specs.setMaximumHeight(maximumHeightOfBuilding);
+				specs.setMinimumHeight(minimumHeightOfBuilding);
 
 				specs.setWindowToFloorRatioEnabled(buildingSpecsPanel.windowToFloorRatioCheckBox.isSelected());
 				specs.setMinimumWindowToFloorRatio(minimumWindowToFloorRatio);
 				specs.setMaximumWindowToFloorRatio(maximumWindowToFloorRatio);
+
+				// PV
+
+				int maximumBudgetOfPV;
+				int maximumNumberOfSolarPanelsOnPV;
+				try {
+					maximumBudgetOfPV = Integer.parseInt(pvSpecsPanel.budgetField.getText());
+					maximumNumberOfSolarPanelsOnPV = Integer.parseInt(pvSpecsPanel.maximumNumberOfSolarPanelsField.getText());
+				} catch (final NumberFormatException err) {
+					err.printStackTrace();
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				// range check
+				if (maximumBudgetOfPV <= 1000) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Your budget is too low to construct a PV array.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				if (maximumNumberOfSolarPanelsOnPV <= 0) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Number of solar panels on a PV site must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				final PvDesignSpecs pvSpecs = Scene.getInstance().getPvDesignSpecs();
+
+				pvSpecs.setBudgetEnabled(pvSpecsPanel.budgetCheckBox.isSelected());
+				pvSpecs.setMaximumBudget(maximumBudgetOfPV);
+
+				pvSpecs.setNumberOfSolarPanelsEnabled(pvSpecsPanel.numberOfSolarPanelsCheckBox.isSelected());
+				pvSpecs.setMaximumNumberOfSolarPanels(maximumNumberOfSolarPanelsOnPV);
+
+				// CSP
+
+				int maximumBudgetOfCSP;
+				int maximumNumberOfMirrors;
+				try {
+					maximumBudgetOfCSP = Integer.parseInt(cspSpecsPanel.budgetField.getText());
+					maximumNumberOfMirrors = Integer.parseInt(cspSpecsPanel.maximumNumberOfMirrorsField.getText());
+				} catch (final NumberFormatException err) {
+					err.printStackTrace();
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				// range check
+				if (maximumBudgetOfCSP <= 1000) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Your budget is too low to construct a CSP power plant.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				if (maximumNumberOfMirrors <= 0) {
+					JOptionPane.showMessageDialog(SpecsDialog.this, "Number of mirrors on a CSP site must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				final CspDesignSpecs cspSpecs = Scene.getInstance().getCspDesignSpecs();
+
+				cspSpecs.setBudgetEnabled(cspSpecsPanel.budgetCheckBox.isSelected());
+				cspSpecs.setMaximumBudget(maximumBudgetOfCSP);
+
+				cspSpecs.setNumberOfMirrorsEnabled(cspSpecsPanel.numberOfMirrorsCheckBox.isSelected());
+				cspSpecs.setMaximumNumberOfMirrors(maximumNumberOfMirrors);
+
+				final HousePart part = SceneManager.getInstance().getSelectedPart();
+				if (part instanceof Foundation) {
+					final Foundation foundation = (Foundation) part;
+					switch (foundation.getSupportingType()) {
+					case Foundation.BUILDING:
+						EnergyPanel.getInstance().getBuildingInfoPanel().update(foundation);
+						break;
+					case Foundation.PV_STATION:
+						EnergyPanel.getInstance().getPvStationInfoPanel().update(foundation);
+						break;
+					case Foundation.CSP_STATION:
+						EnergyPanel.getInstance().getCspStationInfoPanel().update(foundation);
+						break;
+					}
+				}
 
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().clearRadiationHeatMap();

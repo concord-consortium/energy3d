@@ -7,7 +7,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.util.Util;
 
 /**
- * This class defines the design specifications.
+ * This class defines the design specifications for a building.
  * 
  * @author Charles Xie
  * 
@@ -191,7 +191,6 @@ public class DesignSpecs implements Serializable {
 			@Override
 			public void run() {
 				EnergyPanel.getInstance().getBuildingInfoPanel().updateSolarPanelNumberBounds();
-				EnergyPanel.getInstance().getPvStationInfoPanel().updateSolarPanelNumberBounds();
 			}
 		});
 	}

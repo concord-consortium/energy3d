@@ -2518,8 +2518,8 @@ public class MainFrame extends JFrame {
 			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getCustomPricesMenuItem());
-			editMenu.add(getOverallUtilityBillMenuItem());
 			editMenu.add(getSpecificationsMenuItem());
+			editMenu.add(getOverallUtilityBillMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getPropertiesMenuItem());
 		}

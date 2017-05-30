@@ -20,7 +20,8 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.CustomPrice;
+import org.concord.energy3d.simulation.CspCustomPrice;
+import org.concord.energy3d.simulation.PvCustomPrice;
 import org.concord.energy3d.util.SpringUtilities;
 
 /**
@@ -42,12 +43,24 @@ class CustomPricesDialog extends JDialog {
 		final JTextField hsatField;
 		final JTextField vsatField;
 		final JTextField aadatField;
+		JTextField lifespanField;
+		JTextField landCostField;
 
 		PvStationPricesPanel() {
 
 			super(new SpringLayout());
 
-			final CustomPrice price = Scene.getInstance().getCustomPrice();
+			final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
+
+			add(new JLabel("Life Span: "));
+			lifespanField = new JTextField(FORMAT.format(price.getLifespan()), 6);
+			add(lifespanField);
+			add(new JLabel("<html>Years</html>"));
+
+			add(new JLabel("Land Cost: "));
+			landCostField = new JTextField(FORMAT.format(price.getLandUnitPrice()), 6);
+			add(landCostField);
+			add(new JLabel("<html>$ per year per m<sup>2</sup></html>"));
 
 			add(new JLabel("Solar Panel: "));
 			solarPanelField = new JTextField(FORMAT.format(price.getSolarPanelPrice()), 6);
@@ -79,7 +92,7 @@ class CustomPricesDialog extends JDialog {
 			add(aadatField);
 			add(new JLabel("<html>$ per panel</html>"));
 
-			SpringUtilities.makeCompactGrid(this, 6, 3, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, 8, 3, 6, 6, 6, 6);
 
 		}
 
@@ -92,12 +105,24 @@ class CustomPricesDialog extends JDialog {
 		final JTextField mirrorField;
 		final JTextField heliostatField;
 		final JTextField towerField;
+		JTextField lifespanField;
+		JTextField landCostField;
 
 		CspStationPricesPanel() {
 
 			super(new SpringLayout());
 
-			final CustomPrice price = Scene.getInstance().getCustomPrice();
+			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+
+			add(new JLabel("Life Span: "));
+			lifespanField = new JTextField(FORMAT.format(price.getLifespan()), 6);
+			add(lifespanField);
+			add(new JLabel("<html>Years</html>"));
+
+			add(new JLabel("Land Cost: "));
+			landCostField = new JTextField(FORMAT.format(price.getLandUnitPrice()), 6);
+			add(landCostField);
+			add(new JLabel("<html>$ per year per m<sup>2</sup></html>"));
 
 			add(new JLabel("Mirror: "));
 			mirrorField = new JTextField(FORMAT.format(price.getMirrorUnitPrice()), 6);
@@ -114,7 +139,7 @@ class CustomPricesDialog extends JDialog {
 			add(towerField);
 			add(new JLabel("<html>$ per meter</html>"));
 
-			SpringUtilities.makeCompactGrid(this, 3, 3, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, 5, 3, 6, 6, 6, 6);
 
 		}
 
@@ -150,29 +175,49 @@ class CustomPricesDialog extends JDialog {
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				int pvLifespan;
+				double pvLandUnitPrice;
 				double solarPanelPrice;
 				double solarPanelRackBasePrice;
 				double solarPanelRackHeightPrice;
 				double solarPanelHsatPrice;
 				double solarPanelVsatPrice;
 				double solarPanelAadatPrice;
+
+				int cspLifespan;
+				double cspLandUnitPrice;
 				double mirrorUnitPrice;
 				double heliostatPrice;
 				try {
-					solarPanelPrice = (int) Double.parseDouble(pvStationPricesPanel.solarPanelField.getText());
-					solarPanelRackBasePrice = (int) Double.parseDouble(pvStationPricesPanel.rackBaseField.getText());
-					solarPanelRackHeightPrice = (int) Double.parseDouble(pvStationPricesPanel.rackHeightField.getText());
-					solarPanelHsatPrice = (int) Double.parseDouble(pvStationPricesPanel.hsatField.getText());
-					solarPanelVsatPrice = (int) Double.parseDouble(pvStationPricesPanel.vsatField.getText());
-					solarPanelAadatPrice = (int) Double.parseDouble(pvStationPricesPanel.aadatField.getText());
-					mirrorUnitPrice = (int) Double.parseDouble(cspStationPricesPanel.mirrorField.getText());
-					heliostatPrice = (int) Double.parseDouble(cspStationPricesPanel.heliostatField.getText());
+					pvLifespan = Integer.parseInt(pvStationPricesPanel.lifespanField.getText());
+					pvLandUnitPrice = Double.parseDouble(pvStationPricesPanel.landCostField.getText());
+					solarPanelPrice = Double.parseDouble(pvStationPricesPanel.solarPanelField.getText());
+					solarPanelRackBasePrice = Double.parseDouble(pvStationPricesPanel.rackBaseField.getText());
+					solarPanelRackHeightPrice = Double.parseDouble(pvStationPricesPanel.rackHeightField.getText());
+					solarPanelHsatPrice = Double.parseDouble(pvStationPricesPanel.hsatField.getText());
+					solarPanelVsatPrice = Double.parseDouble(pvStationPricesPanel.vsatField.getText());
+					solarPanelAadatPrice = Double.parseDouble(pvStationPricesPanel.aadatField.getText());
+
+					cspLifespan = Integer.parseInt(cspStationPricesPanel.lifespanField.getText());
+					cspLandUnitPrice = Double.parseDouble(cspStationPricesPanel.landCostField.getText());
+					mirrorUnitPrice = Double.parseDouble(cspStationPricesPanel.mirrorField.getText());
+					heliostatPrice = Double.parseDouble(cspStationPricesPanel.heliostatField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
+				// PV
+
+				if (pvLifespan < 5 && pvLifespan > 30) {
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your PV lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (pvLandUnitPrice < 0 && pvLandUnitPrice > 1000) {
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your land price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (solarPanelPrice < 0 && solarPanelPrice > 10000) {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your solar panel price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -197,6 +242,17 @@ class CustomPricesDialog extends JDialog {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your AADAT price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+
+				// CSP
+
+				if (cspLifespan < 5 && cspLifespan > 50) {
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your CSP lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				if (cspLandUnitPrice < 0 && cspLandUnitPrice > 1000) {
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your land price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (mirrorUnitPrice < 0 && mirrorUnitPrice > 10000) {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your mirror unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -206,24 +262,32 @@ class CustomPricesDialog extends JDialog {
 					return;
 				}
 
-				final CustomPrice price = Scene.getInstance().getCustomPrice();
-				price.setSolarPanelPrice(solarPanelPrice);
-				price.setSolarPanelRackBasePrice(solarPanelRackBasePrice);
-				price.setSolarPanelRackHeightPrice(solarPanelRackHeightPrice);
-				price.setSolarPanelHsatPrice(solarPanelHsatPrice);
-				price.setSolarPanelVsatPrice(solarPanelVsatPrice);
-				price.setSolarPanelAadatPrice(solarPanelAadatPrice);
-				price.setMirrorUnitPrice(mirrorUnitPrice);
-				price.setHeliostatPrice(heliostatPrice);
+				final PvCustomPrice pvPrice = Scene.getInstance().getPvCustomPrice();
+				pvPrice.setLifespan(pvLifespan);
+				pvPrice.setLandUnitPrice(pvLandUnitPrice);
+				pvPrice.setSolarPanelPrice(solarPanelPrice);
+				pvPrice.setSolarPanelRackBasePrice(solarPanelRackBasePrice);
+				pvPrice.setSolarPanelRackHeightPrice(solarPanelRackHeightPrice);
+				pvPrice.setSolarPanelHsatPrice(solarPanelHsatPrice);
+				pvPrice.setSolarPanelVsatPrice(solarPanelVsatPrice);
+				pvPrice.setSolarPanelAadatPrice(solarPanelAadatPrice);
+
+				final CspCustomPrice cspPrice = Scene.getInstance().getCspCustomPrice();
+				cspPrice.setLifespan(cspLifespan);
+				cspPrice.setLandUnitPrice(cspLandUnitPrice);
+				cspPrice.setMirrorUnitPrice(mirrorUnitPrice);
+				cspPrice.setHeliostatPrice(heliostatPrice);
 
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart != null) {
 					if (selectedPart instanceof Foundation) {
 						EnergyPanel.getInstance().getPvStationInfoPanel().update((Foundation) selectedPart);
+						EnergyPanel.getInstance().getCspStationInfoPanel().update((Foundation) selectedPart);
 					} else {
 						final Foundation foundation = selectedPart.getTopContainer();
 						if (foundation != null) {
 							EnergyPanel.getInstance().getPvStationInfoPanel().update(foundation);
+							EnergyPanel.getInstance().getCspStationInfoPanel().update(foundation);
 						}
 					}
 				}

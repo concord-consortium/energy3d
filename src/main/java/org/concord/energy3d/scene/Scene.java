@@ -47,10 +47,13 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
-import org.concord.energy3d.simulation.CustomPrice;
+import org.concord.energy3d.simulation.CspCustomPrice;
+import org.concord.energy3d.simulation.CspDesignSpecs;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.LocationData;
+import org.concord.energy3d.simulation.PvCustomPrice;
+import org.concord.energy3d.simulation.PvDesignSpecs;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddNodeCommand;
@@ -113,8 +116,11 @@ public class Scene implements Serializable {
 	private Unit unit = Unit.InternationalSystemOfUnits;
 	private Ground ground = new Ground();
 	private Atmosphere atmosphere = new Atmosphere();
-	private CustomPrice customPrice = new CustomPrice();
+	private PvCustomPrice pvCustomPrice = new PvCustomPrice();
+	private CspCustomPrice cspCustomPrice = new CspCustomPrice();
 	private DesignSpecs designSpecs = new DesignSpecs();
+	private PvDesignSpecs pvDesignSpecs = new PvDesignSpecs();
+	private CspDesignSpecs cspDesignSpecs = new CspDesignSpecs();
 	private transient HousePart copyBuffer, originalCopy;
 	private transient Node copyNode;
 	private transient NodeState copyNodeState;
@@ -390,10 +396,25 @@ public class Scene implements Serializable {
 		} else {
 			designSpecs.setDefaultValues();
 		}
-		if (customPrice == null) {
-			customPrice = new CustomPrice();
+		if (pvDesignSpecs == null) {
+			pvDesignSpecs = new PvDesignSpecs();
 		} else {
-			customPrice.setDefaultValues();
+			pvDesignSpecs.setDefaultValues();
+		}
+		if (cspDesignSpecs == null) {
+			cspDesignSpecs = new CspDesignSpecs();
+		} else {
+			cspDesignSpecs.setDefaultValues();
+		}
+		if (pvCustomPrice == null) {
+			pvCustomPrice = new PvCustomPrice();
+		} else {
+			pvCustomPrice.setDefaultValues();
+		}
+		if (cspCustomPrice == null) {
+			cspCustomPrice = new CspCustomPrice();
+		} else {
+			cspCustomPrice.setDefaultValues();
 		}
 		if (ground == null) {
 			ground = new Ground();
@@ -2841,8 +2862,20 @@ public class Scene implements Serializable {
 		return designSpecs;
 	}
 
-	public CustomPrice getCustomPrice() {
-		return customPrice;
+	public PvDesignSpecs getPvDesignSpecs() {
+		return pvDesignSpecs;
+	}
+
+	public CspDesignSpecs getCspDesignSpecs() {
+		return cspDesignSpecs;
+	}
+
+	public PvCustomPrice getPvCustomPrice() {
+		return pvCustomPrice;
+	}
+
+	public CspCustomPrice getCspCustomPrice() {
+		return cspCustomPrice;
 	}
 
 	public void setDashedLinesOnRoofShown(final boolean dashedLineOnRoofs) {

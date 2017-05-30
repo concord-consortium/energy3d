@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author Charles Xie
  *
  */
-public class CustomPrice implements Serializable {
+public class PvCustomPrice implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -16,15 +16,20 @@ public class CustomPrice implements Serializable {
 	private double solarPanelHsatPrice = 100;
 	private double solarPanelVsatPrice = 100;
 	private double solarPanelAadatPrice = 100;
-	private double mirrorUnitPrice = 100;
-	private double heliostatPrice = 100;
-	private double towerUnitPrice = 500;
+	private int lifespan = 20;
+	private double landUnitPrice = 50;
 
-	public CustomPrice() {
+	public PvCustomPrice() {
 		setDefaultValues();
 	}
 
 	public void setDefaultValues() {
+		if (lifespan == 0) {
+			lifespan = 20;
+		}
+		if (landUnitPrice == 0) {
+			landUnitPrice = 50;
+		}
 		if (solarPanelPrice == 0) {
 			solarPanelPrice = 1000;
 		}
@@ -43,39 +48,22 @@ public class CustomPrice implements Serializable {
 		if (solarPanelAadatPrice == 0) {
 			solarPanelAadatPrice = 1000;
 		}
-		if (mirrorUnitPrice == 0) {
-			mirrorUnitPrice = 100;
-		}
-		if (heliostatPrice == 0) {
-			heliostatPrice = 1000;
-		}
-		if (towerUnitPrice == 0) {
-			towerUnitPrice = 1000;
-		}
 	}
 
-	public void setMirrorUnitPrice(final double mirrorUnitPrice) {
-		this.mirrorUnitPrice = mirrorUnitPrice;
+	public void setLifespan(final int lifespan) {
+		this.lifespan = lifespan;
 	}
 
-	public double getMirrorUnitPrice() {
-		return mirrorUnitPrice;
+	public int getLifespan() {
+		return lifespan;
 	}
 
-	public void setHeliostatPrice(final double heliostatPrice) {
-		this.heliostatPrice = heliostatPrice;
+	public void setLandUnitPrice(final double landUnitPrice) {
+		this.landUnitPrice = landUnitPrice;
 	}
 
-	public double getHeliostatPrice() {
-		return heliostatPrice;
-	}
-
-	public void setTowerUnitPrice(final double towerUnitPrice) {
-		this.towerUnitPrice = towerUnitPrice;
-	}
-
-	public double getTowerUnitPrice() {
-		return towerUnitPrice;
+	public double getLandUnitPrice() {
+		return landUnitPrice;
 	}
 
 	public void setSolarPanelPrice(final double solarPanelPrice) {

@@ -13,7 +13,8 @@ import javax.swing.JPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.simulation.CustomPrice;
+import org.concord.energy3d.simulation.CspCustomPrice;
+import org.concord.energy3d.simulation.CspDesignSpecs;
 
 /**
  * @author Charles Xie
@@ -68,9 +69,10 @@ public class CspStationInfoPanel extends JPanel {
 		// mirror cost on the selected base
 
 		costPanel = new JPanel(new BorderLayout());
-		costPanel.setBorder(EnergyPanel.createTitledBorder("Cost", true));
+		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost", true));
 		container.add(costPanel);
 		costBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		costBar.setMaximum(10000000);
 		costBar.setUnit("$");
 		costBar.setUnitPrefix(true);
 		costBar.setVerticalLineRepresentation(false);
@@ -87,7 +89,7 @@ public class CspStationInfoPanel extends JPanel {
 		double cost = 0;
 		double reflectingArea = 0;
 		double mirrorArea = 0;
-		final CustomPrice price = Scene.getInstance().getCustomPrice();
+		final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 		final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 		for (final Mirror m : mirrors) {
 			mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
@@ -105,8 +107,22 @@ public class CspStationInfoPanel extends JPanel {
 				cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
 			}
 		}
+		cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
 		costBar.setValue(Math.round(cost));
+		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost over " + price.getLifespan() + " years", true));
 		packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+	}
+
+	public void updateMirrorNumberBounds() {
+		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+		String t = "Number of mirrors";
+		if (specs.isNumberOfMirrorsEnabled()) {
+			t += " (" + " < " + specs.getMaximumNumberOfMirrors() + ")";
+		}
+		countBar.setMaximum(specs.getMaximumNumberOfMirrors());
+		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		countBar.setEnabled(specs.isNumberOfMirrorsEnabled());
+		countBar.repaint();
 	}
 
 }
