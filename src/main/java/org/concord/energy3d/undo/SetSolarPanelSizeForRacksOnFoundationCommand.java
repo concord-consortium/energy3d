@@ -18,6 +18,8 @@ public class SetSolarPanelSizeForRacksOnFoundationCommand extends AbstractUndoab
 	private double[] newWidths;
 	private final double[] oldHeights;
 	private double[] newHeights;
+	private final int[] oldCellNxs, oldCellNys;
+	private int[] newCellNxs, newCellNys;
 	private final Foundation foundation;
 	private final List<Rack> racks;
 
@@ -27,10 +29,14 @@ public class SetSolarPanelSizeForRacksOnFoundationCommand extends AbstractUndoab
 		final int n = racks.size();
 		oldWidths = new double[n];
 		oldHeights = new double[n];
+		oldCellNxs = new int[n];
+		oldCellNys = new int[n];
 		for (int i = 0; i < n; i++) {
 			final SolarPanel s = racks.get(i).getSolarPanel();
 			oldWidths[i] = s.getPanelWidth();
 			oldHeights[i] = s.getPanelHeight();
+			oldCellNxs[i] = s.getNumberOfCellsInX();
+			oldCellNys[i] = s.getNumberOfCellsInY();
 		}
 	}
 
@@ -51,6 +57,10 @@ public class SetSolarPanelSizeForRacksOnFoundationCommand extends AbstractUndoab
 			newHeights[i] = s.getPanelHeight();
 			s.setPanelWidth(oldWidths[i]);
 			s.setPanelHeight(oldHeights[i]);
+			newCellNxs[i] = s.getNumberOfCellsInX();
+			newCellNys[i] = s.getNumberOfCellsInY();
+			s.setNumberOfCellsInX(oldCellNxs[i]);
+			s.setNumberOfCellsInY(oldCellNys[i]);
 			r.ensureFullSolarPanels(false);
 			r.draw();
 		}
@@ -66,6 +76,8 @@ public class SetSolarPanelSizeForRacksOnFoundationCommand extends AbstractUndoab
 			final SolarPanel s = r.getSolarPanel();
 			s.setPanelWidth(newWidths[i]);
 			s.setPanelHeight(newHeights[i]);
+			s.setNumberOfCellsInX(newCellNxs[i]);
+			s.setNumberOfCellsInY(newCellNys[i]);
 			r.ensureFullSolarPanels(false);
 			r.draw();
 		}

@@ -229,6 +229,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem copyImageMenuItem;
 	private JMenuItem exportLogMenuItem;
 	private JMenuItem lockAllMenuItem;
+	private JMenuItem enableAllFoundationEditsMenuItem;
+	private JMenuItem disableAllFoundationEditsMenuItem;
 	private JMenuItem specificationsMenuItem;
 	private JMenuItem propertiesMenuItem;
 	private JMenuItem customPricesMenuItem;
@@ -2515,6 +2517,8 @@ public class MainFrame extends JFrame {
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
 			editMenu.add(getLockAllMenuItem());
+			editMenu.add(getEnableAllFoundationEditsMenuItem());
+			editMenu.add(getDisableAllFoundationEditsMenuItem());
 			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getCustomPricesMenuItem());
@@ -3945,6 +3949,40 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return lockAllMenuItem;
+	}
+
+	private JMenuItem getEnableAllFoundationEditsMenuItem() {
+		if (enableAllFoundationEditsMenuItem == null) {
+			enableAllFoundationEditsMenuItem = new JMenuItem("Enable All Foundation Edits");
+			enableAllFoundationEditsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+					for (final Foundation f : foundations) {
+						f.setLockEdit(false);
+					}
+					Scene.getInstance().setEdited(true);
+				}
+			});
+		}
+		return enableAllFoundationEditsMenuItem;
+	}
+
+	private JMenuItem getDisableAllFoundationEditsMenuItem() {
+		if (disableAllFoundationEditsMenuItem == null) {
+			disableAllFoundationEditsMenuItem = new JMenuItem("Disable All Foundation Edits");
+			disableAllFoundationEditsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+					for (final Foundation f : foundations) {
+						f.setLockEdit(true);
+					}
+					Scene.getInstance().setEdited(true);
+				}
+			});
+		}
+		return disableAllFoundationEditsMenuItem;
 	}
 
 	public JColorChooser getColorChooser() {

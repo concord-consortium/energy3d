@@ -14,11 +14,15 @@ public class ChooseSolarPanelSizeCommand extends AbstractUndoableEdit {
 	private final double oldHeight;
 	private double newHeight;
 	private final SolarPanel solarPanel;
+	private final int oldCellNx, oldCellNy;
+	private int newCellNx, newCellNy;
 
 	public ChooseSolarPanelSizeCommand(final SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
 		oldWidth = solarPanel.getPanelWidth();
 		oldHeight = solarPanel.getPanelHeight();
+		oldCellNx = solarPanel.getNumberOfCellsInX();
+		oldCellNy = solarPanel.getNumberOfCellsInY();
 	}
 
 	public SolarPanel getSolarPanel() {
@@ -38,8 +42,12 @@ public class ChooseSolarPanelSizeCommand extends AbstractUndoableEdit {
 		super.undo();
 		newWidth = solarPanel.getPanelWidth();
 		newHeight = solarPanel.getPanelHeight();
+		newCellNx = solarPanel.getNumberOfCellsInX();
+		newCellNy = solarPanel.getNumberOfCellsInY();
 		solarPanel.setPanelWidth(oldWidth);
 		solarPanel.setPanelHeight(oldHeight);
+		solarPanel.setNumberOfCellsInX(oldCellNx);
+		solarPanel.setNumberOfCellsInY(oldCellNy);
 		solarPanel.draw();
 	}
 
@@ -48,6 +56,8 @@ public class ChooseSolarPanelSizeCommand extends AbstractUndoableEdit {
 		super.redo();
 		solarPanel.setPanelWidth(newWidth);
 		solarPanel.setPanelHeight(newHeight);
+		solarPanel.setNumberOfCellsInX(newCellNx);
+		solarPanel.setNumberOfCellsInY(newCellNy);
 		solarPanel.draw();
 	}
 

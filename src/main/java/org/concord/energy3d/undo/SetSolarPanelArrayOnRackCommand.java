@@ -50,6 +50,8 @@ public class SetSolarPanelArrayOnRackCommand extends AbstractUndoableEdit {
 	private void copySolarPanelProperties(final SolarPanel des, final SolarPanel src) {
 		des.setPanelWidth(src.getPanelWidth());
 		des.setPanelHeight(src.getPanelHeight());
+		des.setNumberOfCellsInX(src.getNumberOfCellsInX());
+		des.setNumberOfCellsInY(src.getNumberOfCellsInY());
 		des.setRotated(src.isRotated());
 		des.setCellType(src.getCellType());
 		des.setNumberOfCellsInX(src.getNumberOfCellsInX());

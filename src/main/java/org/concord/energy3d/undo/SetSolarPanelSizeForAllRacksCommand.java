@@ -18,6 +18,8 @@ public class SetSolarPanelSizeForAllRacksCommand extends AbstractUndoableEdit {
 	private double[] newWidths;
 	private final double[] oldHeights;
 	private double[] newHeights;
+	private final int[] oldCellNxs, oldCellNys;
+	private int[] newCellNxs, newCellNys;
 	private final List<Rack> racks;
 
 	public SetSolarPanelSizeForAllRacksCommand() {
@@ -25,10 +27,14 @@ public class SetSolarPanelSizeForAllRacksCommand extends AbstractUndoableEdit {
 		final int n = racks.size();
 		oldWidths = new double[n];
 		oldHeights = new double[n];
+		oldCellNxs = new int[n];
+		oldCellNys = new int[n];
 		for (int i = 0; i < n; i++) {
 			final SolarPanel s = racks.get(i).getSolarPanel();
 			oldWidths[i] = s.getPanelWidth();
 			oldHeights[i] = s.getPanelHeight();
+			oldCellNxs[i] = s.getNumberOfCellsInX();
+			oldCellNys[i] = s.getNumberOfCellsInY();
 		}
 	}
 
@@ -38,6 +44,8 @@ public class SetSolarPanelSizeForAllRacksCommand extends AbstractUndoableEdit {
 		final int n = racks.size();
 		newWidths = new double[n];
 		newHeights = new double[n];
+		newCellNxs = new int[n];
+		newCellNys = new int[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
 			final SolarPanel s = r.getSolarPanel();
@@ -45,6 +53,10 @@ public class SetSolarPanelSizeForAllRacksCommand extends AbstractUndoableEdit {
 			s.setPanelWidth(oldWidths[i]);
 			newHeights[i] = s.getPanelHeight();
 			s.setPanelHeight(oldHeights[i]);
+			newCellNxs[i] = s.getNumberOfCellsInX();
+			newCellNys[i] = s.getNumberOfCellsInY();
+			s.setNumberOfCellsInX(oldCellNxs[i]);
+			s.setNumberOfCellsInY(oldCellNys[i]);
 			r.ensureFullSolarPanels(false);
 			r.draw();
 		}
@@ -60,6 +72,8 @@ public class SetSolarPanelSizeForAllRacksCommand extends AbstractUndoableEdit {
 			final SolarPanel s = r.getSolarPanel();
 			s.setPanelWidth(newWidths[i]);
 			s.setPanelHeight(newHeights[i]);
+			s.setNumberOfCellsInX(newCellNxs[i]);
+			s.setNumberOfCellsInY(newCellNys[i]);
 			r.ensureFullSolarPanels(false);
 			r.draw();
 		}

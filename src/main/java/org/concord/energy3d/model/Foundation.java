@@ -2540,12 +2540,15 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSolarPanelSizeForRacks(final double width, final double height) {
+	public void setSolarPanelSizeForRacks(final double width, final double height, final int numberOfCellsInX, final int numberOfCellsInY) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {
 				final Rack r = (Rack) p;
-				r.getSolarPanel().setPanelWidth(width);
-				r.getSolarPanel().setPanelHeight(height);
+				final SolarPanel s = r.getSolarPanel();
+				s.setPanelWidth(width);
+				s.setPanelHeight(height);
+				s.setNumberOfCellsInX(numberOfCellsInX);
+				s.setNumberOfCellsInY(numberOfCellsInY);
 				r.ensureFullSolarPanels(false);
 				r.draw();
 			}

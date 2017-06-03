@@ -2350,12 +2350,15 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSolarPanelSizeForAllRacks(final double width, final double height) {
+	public void setSolarPanelSizeForAllRacks(final double width, final double height, final int numberOfCellsInX, final int numberOfCellsInY) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
 				final Rack rack = (Rack) p;
-				rack.getSolarPanel().setPanelWidth(width);
-				rack.getSolarPanel().setPanelHeight(height);
+				final SolarPanel s = rack.getSolarPanel();
+				s.setPanelWidth(width);
+				s.setPanelHeight(height);
+				s.setNumberOfCellsInX(numberOfCellsInX);
+				s.setNumberOfCellsInY(numberOfCellsInY);
 				rack.ensureFullSolarPanels(false);
 				rack.draw();
 			}

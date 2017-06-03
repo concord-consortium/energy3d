@@ -32,8 +32,10 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.CspDesignSpecs;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.PieChart;
+import org.concord.energy3d.simulation.PvDesignSpecs;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
@@ -51,7 +53,7 @@ public class ConstructionCostGraph extends JPanel {
 	private final ColorBar budgetBar;
 	private final JPopupMenu popupMenu;
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private Foundation building;
+	private Foundation foundation;
 	private int wallSum;
 	private int floorSum;
 	private int windowSum;
@@ -69,7 +71,7 @@ public class ConstructionCostGraph extends JPanel {
 		budgetPanel = new JPanel(new BorderLayout());
 		budgetBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		budgetBar.setPreferredSize(new Dimension(100, 16));
-		budgetBar.setToolTipText("<html>The total construction cost for the selected building<br><b>Must not exceed the limit (if specified).</b></html>");
+		budgetBar.setToolTipText("<html>The total construction cost must not exceed the limit (if specified).</html>");
 		budgetPanel.add(budgetBar, BorderLayout.CENTER);
 
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
@@ -139,9 +141,9 @@ public class ConstructionCostGraph extends JPanel {
 		doorSum = 0;
 		solarPanelSum = 0;
 		treeSum = 0;
-		foundationSum = Cost.getInstance().getPartCost(building);
+		foundationSum = Cost.getInstance().getPartCost(foundation);
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.getTopContainer() == building) {
+			if (p.getTopContainer() == foundation) {
 				if (p instanceof Wall) {
 					wallSum += Cost.getInstance().getPartCost(p);
 				} else if (p instanceof Floor) {
@@ -172,32 +174,46 @@ public class ConstructionCostGraph extends JPanel {
 		repaint();
 		add(buttonPanel, BorderLayout.CENTER);
 		EnergyPanel.getInstance().validate();
-		building = null;
+		foundation = null;
 	}
 
 	public void updateBudget() {
 		if (budgetPanel != null) {
 			calculateCost();
-			final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
-			budgetBar.setEnabled(specs.isBudgetEnabled());
-			budgetBar.setMaximum(specs.getMaximumBudget());
+			switch (foundation.getSupportingType()) {
+			case Foundation.BUILDING:
+				final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
+				budgetBar.setEnabled(specs.isBudgetEnabled());
+				budgetBar.setMaximum(specs.getMaximumBudget());
+				String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
+				budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+				break;
+			case Foundation.PV_STATION:
+				final PvDesignSpecs pvSpecs = Scene.getInstance().getPvDesignSpecs();
+				budgetBar.setEnabled(pvSpecs.isBudgetEnabled());
+				budgetBar.setMaximum(pvSpecs.getMaximumBudget());
+				t = "Total (" + (pvSpecs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(pvSpecs.getMaximumBudget()) : "$") + ")";
+				budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+				break;
+			case Foundation.CSP_STATION:
+				final CspDesignSpecs cspSpecs = Scene.getInstance().getCspDesignSpecs();
+				budgetBar.setEnabled(cspSpecs.isBudgetEnabled());
+				budgetBar.setMaximum(cspSpecs.getMaximumBudget());
+				t = "Total (" + (cspSpecs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(cspSpecs.getMaximumBudget()) : "$") + ")";
+				budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+				break;
+			}
 			budgetBar.setValue(totalCost);
 			budgetBar.repaint();
-			final String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
-			budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 			budgetPanel.repaint();
 		}
 	}
 
-	public Foundation getBuilding() {
-		return building;
-	}
-
-	public void addGraph(final Foundation building) {
+	public void addGraph(final Foundation foundation) {
 
 		removeAll();
 
-		this.building = building;
+		this.foundation = foundation;
 		calculateCost();
 		updateBudget();
 

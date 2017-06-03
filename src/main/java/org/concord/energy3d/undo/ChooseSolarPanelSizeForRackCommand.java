@@ -13,12 +13,16 @@ public class ChooseSolarPanelSizeForRackCommand extends AbstractUndoableEdit {
 	private double newWidth;
 	private final double oldHeight;
 	private double newHeight;
+	private final int oldCellNx, oldCellNy;
+	private int newCellNx, newCellNy;
 	private final Rack rack;
 
 	public ChooseSolarPanelSizeForRackCommand(final Rack rack) {
 		this.rack = rack;
 		oldWidth = rack.getSolarPanel().getPanelWidth();
 		oldHeight = rack.getSolarPanel().getPanelHeight();
+		oldCellNx = rack.getSolarPanel().getNumberOfCellsInX();
+		oldCellNy = rack.getSolarPanel().getNumberOfCellsInY();
 	}
 
 	public Rack getRack() {
@@ -38,8 +42,12 @@ public class ChooseSolarPanelSizeForRackCommand extends AbstractUndoableEdit {
 		super.undo();
 		newWidth = rack.getSolarPanel().getPanelWidth();
 		newHeight = rack.getSolarPanel().getPanelHeight();
+		newCellNx = rack.getSolarPanel().getNumberOfCellsInX();
+		newCellNy = rack.getSolarPanel().getNumberOfCellsInY();
 		rack.getSolarPanel().setPanelWidth(oldWidth);
 		rack.getSolarPanel().setPanelHeight(oldHeight);
+		rack.getSolarPanel().setNumberOfCellsInX(oldCellNx);
+		rack.getSolarPanel().setNumberOfCellsInY(oldCellNy);
 		rack.ensureFullSolarPanels(false);
 		rack.draw();
 	}
@@ -49,6 +57,8 @@ public class ChooseSolarPanelSizeForRackCommand extends AbstractUndoableEdit {
 		super.redo();
 		rack.getSolarPanel().setPanelWidth(newWidth);
 		rack.getSolarPanel().setPanelHeight(newHeight);
+		rack.getSolarPanel().setNumberOfCellsInX(newCellNx);
+		rack.getSolarPanel().setNumberOfCellsInY(newCellNy);
 		rack.ensureFullSolarPanels(false);
 		rack.draw();
 	}
