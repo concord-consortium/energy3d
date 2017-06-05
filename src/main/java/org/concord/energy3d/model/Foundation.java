@@ -73,9 +73,10 @@ public class Foundation extends HousePart implements Thermalizable {
 	private static final long serialVersionUID = 1L;
 	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
-	public static final int BUILDING = 0;
-	public static final int PV_STATION = 1;
-	public static final int CSP_STATION = 2;
+	public static final int TYPE_AUTO_DETECTED = 0;
+	public static final int TYPE_BUILDING = 1;
+	public static final int TYPE_PV_STATION = 2;
+	public static final int TYPE_CSP_STATION = 3;
 
 	public static final int FERMAT_SPIRAL = 0;
 	public static final int EQUAL_AZIMUTHAL_SPACING = 0;
@@ -125,6 +126,7 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean labelNumberOfSolarPanels;
 	private boolean labelSolarPotential;
 	private boolean labelBuildingEnergy;
+	private int structureType = TYPE_AUTO_DETECTED;
 	private List<NodeState> importedNodeStates; // for now, save only the node states
 	private transient List<Node> importedNodes; // for now, do not save the actual nodes (this is why we can't use Map<Node, NodeState> here)
 	private transient Mesh selectedMesh;
@@ -2330,19 +2332,25 @@ public class Foundation extends HousePart implements Thermalizable {
 		return rack;
 	}
 
-	public int getSupportingType() {
-		for (final HousePart p : children) {
-			if (p instanceof Wall) {
-				return BUILDING;
-			}
-			if (p instanceof SolarPanel || p instanceof Rack) {
-				return PV_STATION;
-			}
-			if (p instanceof Mirror) {
-				return CSP_STATION;
+	public void setStructureType(final int structureType) {
+		this.structureType = structureType;
+	}
+
+	public int getStructureType() {
+		if (structureType == TYPE_AUTO_DETECTED) {
+			for (final HousePart p : children) {
+				if (p instanceof Wall) {
+					return TYPE_BUILDING;
+				}
+				if (p instanceof SolarPanel || p instanceof Rack) {
+					return TYPE_PV_STATION;
+				}
+				if (p instanceof Mirror) {
+					return TYPE_CSP_STATION;
+				}
 			}
 		}
-		return -1;
+		return structureType;
 	}
 
 	public void setSolarReceiverEfficiency(final double solarReceiverEfficiency) {

@@ -418,7 +418,7 @@ public class EnergyPanel extends JPanel {
 
 		// pv station panel
 		pvStationPanel = new JPanel();
-		pvStationPanel.setBorder(createTitledBorder("Photovoltaic System", true));
+		pvStationPanel.setBorder(createTitledBorder("Photovoltaic Solar Power System", true));
 		pvStationPanel.setLayout(new BoxLayout(pvStationPanel, BoxLayout.Y_AXIS));
 
 		pvStationTabbedPane = new JTabbedPane();
@@ -676,18 +676,18 @@ public class EnergyPanel extends JPanel {
 							final HousePart p = SceneManager.getInstance().getSelectedPart();
 							if (p instanceof Foundation) {
 								final Foundation f = (Foundation) p;
-								switch (f.getSupportingType()) {
-								case Foundation.BUILDING:
+								switch (f.getStructureType()) {
+								case Foundation.TYPE_BUILDING:
 									Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
 									buildingDailyEnergyGraph.addGraph(f);
 									TimeSeriesLogger.getInstance().logAnalysis(buildingDailyEnergyGraph);
 									break;
-								case Foundation.PV_STATION:
+								case Foundation.TYPE_PV_STATION:
 									Util.setSilently(pvStationTabbedPane, pvStationDailyEnergyGraph);
 									pvStationDailyEnergyGraph.addGraph(f);
 									TimeSeriesLogger.getInstance().logAnalysis(pvStationDailyEnergyGraph);
 									break;
-								case Foundation.CSP_STATION:
+								case Foundation.TYPE_CSP_STATION:
 									Util.setSilently(cspStationTabbedPane, cspStationDailyEnergyGraph);
 									cspStationDailyEnergyGraph.addGraph(f);
 									TimeSeriesLogger.getInstance().logAnalysis(cspStationDailyEnergyGraph);
@@ -1423,8 +1423,8 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void run() {
 				if (selectedFoundation != null) {
-					switch (selectedFoundation.getSupportingType()) {
-					case Foundation.BUILDING:
+					switch (selectedFoundation.getStructureType()) {
+					case Foundation.TYPE_BUILDING:
 						dataPanel.remove(instructionPanel);
 						dataPanel.remove(pvStationPanel);
 						dataPanel.remove(cspStationPanel);
@@ -1447,14 +1447,14 @@ public class EnergyPanel extends JPanel {
 						((TitledBorder) buildingPanel.getBorder()).setTitle("Building #" + s2.substring(i1 + 1, i2));
 						buildingInfoPanel.update(selectedFoundation);
 						break;
-					case Foundation.PV_STATION:
+					case Foundation.TYPE_PV_STATION:
 						dataPanel.remove(instructionPanel);
 						dataPanel.remove(buildingPanel);
 						dataPanel.remove(cspStationPanel);
 						dataPanel.add(pvStationPanel, 2);
 						pvStationInfoPanel.update(selectedFoundation);
 						break;
-					case Foundation.CSP_STATION:
+					case Foundation.TYPE_CSP_STATION:
 						dataPanel.remove(instructionPanel);
 						dataPanel.remove(buildingPanel);
 						dataPanel.remove(pvStationPanel);
@@ -1579,15 +1579,15 @@ public class EnergyPanel extends JPanel {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
 					final Foundation f = (Foundation) selectedPart;
-					switch (f.getSupportingType()) {
-					case Foundation.BUILDING:
+					switch (f.getStructureType()) {
+					case Foundation.TYPE_BUILDING:
 						constructionCostGraph.addGraph(f);
 						buildingDailyEnergyGraph.addGraph(f);
 						break;
-					case Foundation.PV_STATION:
+					case Foundation.TYPE_PV_STATION:
 						pvStationDailyEnergyGraph.addGraph(f);
 						break;
-					case Foundation.CSP_STATION:
+					case Foundation.TYPE_CSP_STATION:
 						cspStationDailyEnergyGraph.addGraph(f);
 						break;
 					}

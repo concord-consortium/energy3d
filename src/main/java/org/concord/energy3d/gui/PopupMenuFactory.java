@@ -3340,7 +3340,7 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenu editOptionsMenu = new JMenu("Edit Options");
+			final JMenu optionsMenu = new JMenu("Options");
 
 			final JMenuItem miChildGridSize = new JMenuItem("Grid Size...");
 			miChildGridSize.addActionListener(new ActionListener() {
@@ -3373,7 +3373,68 @@ public class PopupMenuFactory {
 					}
 				}
 			});
-			editOptionsMenu.add(miChildGridSize);
+			optionsMenu.add(miChildGridSize);
+
+			final JMenu structureTypeSubMenu = new JMenu("Structure Type");
+			optionsMenu.add(structureTypeSubMenu);
+
+			final ButtonGroup bgStructureTypes = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiTypeAutoDetected = new JRadioButtonMenuItem("Auto Detected");
+			rbmiTypeAutoDetected.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation foundation = (Foundation) selectedPart;
+						foundation.setStructureType(Foundation.TYPE_AUTO_DETECTED);
+					}
+				}
+			});
+			structureTypeSubMenu.add(rbmiTypeAutoDetected);
+			bgStructureTypes.add(rbmiTypeAutoDetected);
+
+			final JRadioButtonMenuItem rbmiTypeBuilding = new JRadioButtonMenuItem("Building");
+			rbmiTypeBuilding.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation foundation = (Foundation) selectedPart;
+						foundation.setStructureType(Foundation.TYPE_BUILDING);
+					}
+				}
+			});
+			structureTypeSubMenu.add(rbmiTypeBuilding);
+			bgStructureTypes.add(rbmiTypeBuilding);
+
+			final JRadioButtonMenuItem rbmiTypePvStation = new JRadioButtonMenuItem("Photovoltaic Solar Power System");
+			rbmiTypePvStation.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation foundation = (Foundation) selectedPart;
+						foundation.setStructureType(Foundation.TYPE_PV_STATION);
+					}
+				}
+			});
+			structureTypeSubMenu.add(rbmiTypePvStation);
+			bgStructureTypes.add(rbmiTypePvStation);
+
+			final JRadioButtonMenuItem rbmiTypeCspStation = new JRadioButtonMenuItem("Concentrated Solar Power System");
+			rbmiTypeCspStation.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation foundation = (Foundation) selectedPart;
+						foundation.setStructureType(Foundation.TYPE_CSP_STATION);
+					}
+				}
+			});
+			structureTypeSubMenu.add(rbmiTypeCspStation);
+			bgStructureTypes.add(rbmiTypeCspStation);
 
 			final JMenuItem miThermostat = new JMenuItem("Thermostat...");
 			miThermostat.addActionListener(new ActionListener() {
@@ -3703,6 +3764,19 @@ public class PopupMenuFactory {
 						Util.selectSilently(miLabelNumberOfSolarPanels, f.getLabelNumberOfSolarPanels());
 						Util.selectSilently(miLabelBuildingEnergy, f.getLabelBuildingEnergy());
 						powerTowerLabelMenu.setEnabled(f.isSolarReceiverVisible());
+						switch (f.getStructureType()) {
+						case Foundation.TYPE_BUILDING:
+							Util.selectSilently(rbmiTypeBuilding, true);
+							break;
+						case Foundation.TYPE_PV_STATION:
+							Util.selectSilently(rbmiTypePvStation, true);
+							break;
+						case Foundation.TYPE_CSP_STATION:
+							Util.selectSilently(rbmiTypeCspStation, true);
+							break;
+						default:
+							Util.selectSilently(rbmiTypeAutoDetected, true);
+						}
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					final Node copyNode = Scene.getInstance().getCopyNode();
@@ -3724,7 +3798,7 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miBorderLine);
 			popupMenuForFoundation.add(miLock);
 			popupMenuForFoundation.add(miDisableEdits);
-			popupMenuForFoundation.add(editOptionsMenu);
+			popupMenuForFoundation.add(optionsMenu);
 			popupMenuForFoundation.add(labelMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);

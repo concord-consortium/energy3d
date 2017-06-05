@@ -169,8 +169,8 @@ public class GroupDailyAnalysis extends Analysis {
 				} else if (p instanceof Foundation) {
 					final boolean mean = group.getType().endsWith("(Mean)");
 					final Foundation foundation = (Foundation) p;
-					switch (foundation.getSupportingType()) {
-					case Foundation.PV_STATION:
+					switch (foundation.getStructureType()) {
+					case Foundation.TYPE_PV_STATION:
 						double pv = foundation.getPhotovoltaicNow();
 						if (mean) {
 							pv /= foundation.getNumberOfSolarPanels();
@@ -187,7 +187,7 @@ public class GroupDailyAnalysis extends Analysis {
 							}
 						}
 						break;
-					case Foundation.CSP_STATION:
+					case Foundation.TYPE_CSP_STATION:
 						double csp = foundation.getCspNow();
 						if (mean) {
 							csp /= foundation.countParts(Mirror.class);
@@ -204,7 +204,7 @@ public class GroupDailyAnalysis extends Analysis {
 							}
 						}
 						break;
-					case Foundation.BUILDING:
+					case Foundation.TYPE_BUILDING:
 						final double totalEnergy = foundation.getTotalEnergyNow();
 						graph.addData("Building " + p.getId(), totalEnergy);
 						break;
@@ -483,14 +483,14 @@ public class GroupDailyAnalysis extends Analysis {
 				type = "Window";
 			} else if (p instanceof Foundation) {
 				final Foundation foundation = (Foundation) p;
-				switch (foundation.getSupportingType()) {
-				case Foundation.PV_STATION:
+				switch (foundation.getStructureType()) {
+				case Foundation.TYPE_PV_STATION:
 					names.add("PV " + p.getId());
 					break;
-				case Foundation.CSP_STATION:
+				case Foundation.TYPE_CSP_STATION:
 					names.add("CSP " + p.getId());
 					break;
-				case Foundation.BUILDING:
+				case Foundation.TYPE_BUILDING:
 					names.add("Building " + p.getId());
 					break;
 				}

@@ -17,7 +17,7 @@ public class PvCustomPrice implements Serializable {
 	private double solarPanelVsatPrice = 100;
 	private double solarPanelAadatPrice = 100;
 	private int lifespan = 20;
-	private double landUnitPrice = 50;
+	private double landUnitPrice = 20;
 
 	public PvCustomPrice() {
 		setDefaultValues();
@@ -28,7 +28,7 @@ public class PvCustomPrice implements Serializable {
 			lifespan = 20;
 		}
 		if (landUnitPrice == 0) {
-			landUnitPrice = 50;
+			landUnitPrice = 20;
 		}
 		if (solarPanelPrice == 0) {
 			solarPanelPrice = 1000;

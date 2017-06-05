@@ -180,22 +180,22 @@ public class ConstructionCostGraph extends JPanel {
 	public void updateBudget() {
 		if (budgetPanel != null) {
 			calculateCost();
-			switch (foundation.getSupportingType()) {
-			case Foundation.BUILDING:
+			switch (foundation.getStructureType()) {
+			case Foundation.TYPE_BUILDING:
 				final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 				budgetBar.setEnabled(specs.isBudgetEnabled());
 				budgetBar.setMaximum(specs.getMaximumBudget());
 				String t = "Total (" + (specs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(specs.getMaximumBudget()) : "$") + ")";
 				budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 				break;
-			case Foundation.PV_STATION:
+			case Foundation.TYPE_PV_STATION:
 				final PvDesignSpecs pvSpecs = Scene.getInstance().getPvDesignSpecs();
 				budgetBar.setEnabled(pvSpecs.isBudgetEnabled());
 				budgetBar.setMaximum(pvSpecs.getMaximumBudget());
 				t = "Total (" + (pvSpecs.isBudgetEnabled() ? "\u2264 $" + noDecimals.format(pvSpecs.getMaximumBudget()) : "$") + ")";
 				budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 				break;
-			case Foundation.CSP_STATION:
+			case Foundation.TYPE_CSP_STATION:
 				final CspDesignSpecs cspSpecs = Scene.getInstance().getCspDesignSpecs();
 				budgetBar.setEnabled(cspSpecs.isBudgetEnabled());
 				budgetBar.setMaximum(cspSpecs.getMaximumBudget());

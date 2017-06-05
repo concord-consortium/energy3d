@@ -243,19 +243,19 @@ public class Scene implements Serializable {
 				final HousePart p = SceneManager.getInstance().getSelectedPart();
 				if (p instanceof Foundation) {
 					final Foundation f = (Foundation) p;
-					switch (f.getSupportingType()) {
-					case Foundation.BUILDING:
+					switch (f.getStructureType()) {
+					case Foundation.TYPE_BUILDING:
 						e.getConstructionCostGraph().addGraph(f);
 						e.getBuildingDailyEnergyGraph().clearData();
 						e.getBuildingDailyEnergyGraph().addGraph(f);
 						e.validate();
 						break;
-					case Foundation.PV_STATION:
+					case Foundation.TYPE_PV_STATION:
 						e.getPvStationDailyEnergyGraph().clearData();
 						e.getPvStationDailyEnergyGraph().addGraph(f);
 						e.validate();
 						break;
-					case Foundation.CSP_STATION:
+					case Foundation.TYPE_CSP_STATION:
 						e.getCspStationDailyEnergyGraph().clearData();
 						e.getCspStationDailyEnergyGraph().addGraph(f);
 						e.validate();

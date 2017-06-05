@@ -14,7 +14,7 @@ public class CspCustomPrice implements Serializable {
 	private double heliostatPrice = 100;
 	private double towerUnitPrice = 500;
 	private int lifespan = 50;
-	private double landUnitPrice = 20;
+	private double landUnitPrice = 10;
 
 	public CspCustomPrice() {
 		setDefaultValues();
@@ -25,7 +25,7 @@ public class CspCustomPrice implements Serializable {
 			lifespan = 50;
 		}
 		if (landUnitPrice == 0) {
-			landUnitPrice = 20;
+			landUnitPrice = 10;
 		}
 		if (mirrorUnitPrice == 0) {
 			mirrorUnitPrice = 100;
