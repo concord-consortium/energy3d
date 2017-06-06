@@ -939,7 +939,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.replaying = false;
 					PlayControl.backward = true;
 				}
-				if (SceneManager.getInstance().isTopView()) {
+				if (isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
 				} else {
 					if (selectedPart instanceof Window) {
@@ -958,7 +958,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.replaying = false;
 					PlayControl.backward = true;
 				}
-				if (SceneManager.getInstance().isTopView()) {
+				if (isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
 				} else {
 					if (selectedPart instanceof Window) {
@@ -977,7 +977,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.replaying = false;
 					PlayControl.forward = true;
 				}
-				if (SceneManager.getInstance().isTopView()) {
+				if (isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
 				} else {
 					if (selectedPart instanceof Window) {
@@ -996,7 +996,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.replaying = false;
 					PlayControl.forward = true;
 				}
-				if (SceneManager.getInstance().isTopView()) {
+				if (isTopView()) {
 					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
 				} else {
 					if (selectedPart instanceof Window) {

@@ -163,7 +163,7 @@ public class PvStationInfoPanel extends JPanel {
 			landArea = (float) foundation.getArea();
 		}
 		cost += landArea * price.getLandUnitPrice() * price.getLifespan();
-		landAreaBar.setValue(landArea / countSolarPanels);
+		landAreaBar.setValue(countSolarPanels == 0 ? 0 : landArea / countSolarPanels);
 		costBar.setValue(Math.round(cost));
 		costBar.setMaximum(specs.getMaximumBudget());
 		costBar.setEnabled(specs.isBudgetEnabled());

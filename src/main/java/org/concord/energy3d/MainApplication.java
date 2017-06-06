@@ -27,7 +27,7 @@ import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 public class MainApplication {
-	public static final String VERSION = "6.9.8";
+	public static final String VERSION = "6.9.9";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -143,6 +143,9 @@ public class MainApplication {
 	}
 
 	public static void exit() {
+		if (Scene.isSaving()) {
+			return;
+		}
 		if (shutdownHooks != null) { // e.g., save the log file before exit to ensure that the last segment is saved
 			for (final Runnable r : shutdownHooks) {
 				r.run();

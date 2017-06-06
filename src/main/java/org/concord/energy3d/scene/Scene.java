@@ -1868,9 +1868,27 @@ public class Scene implements Serializable {
 		for (final HousePart p : copy) {
 			remove(p, false);
 		}
-		redrawAll();
+		parent.draw();
 		SceneManager.getInstance().getUndoManager().addEdit(c);
 		edited = true;
+		SceneManager.getInstance().refresh();
+	}
+
+	public void deleteAllConnectedWalls(final Wall w) {
+		final List<HousePart> copy = new ArrayList<HousePart>();
+		w.visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+				copy.add(currentWall);
+			}
+		});
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(copy);
+		for (final HousePart p : copy) {
+			remove(p, false);
+		}
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+		SceneManager.getInstance().refresh();
 	}
 
 	public void lockAll(final boolean freeze) {

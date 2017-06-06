@@ -229,7 +229,7 @@ public abstract class CameraControl {
 			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
 			camera.setFrustumRight(camera.getFrustumRight() * fac);
 			camera.update();
-			setMoveSpeed(2 * camera.getFrustumTop());
+			_moveSpeed = 2 * camera.getFrustumTop();
 		} else {
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
 			final Vector3 loc = new Vector3(camera.getDirection()).multiplyLocal(-val * (_moveSpeed * 10) * 2 * tpf).addLocal(camera.getLocation());

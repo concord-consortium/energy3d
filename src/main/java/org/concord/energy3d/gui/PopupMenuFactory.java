@@ -1529,6 +1529,17 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miDeleteAllConnectedWalls = new JMenuItem("Delete All Connected Walls");
+			miDeleteAllConnectedWalls.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Wall) {
+						Scene.getInstance().deleteAllConnectedWalls((Wall) selectedPart);
+					}
+				}
+			});
+
 			final JMenuItem miThickness = new JMenuItem("Thickness...");
 			miThickness.addActionListener(new ActionListener() {
 
@@ -1750,6 +1761,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForWall.add(miPaste);
+			popupMenuForWall.add(miDeleteAllConnectedWalls);
 			popupMenuForWall.add(miClear);
 			popupMenuForWall.addSeparator();
 			popupMenuForWall.add(colorAction);
