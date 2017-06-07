@@ -1345,8 +1345,8 @@ public class MainFrame extends JFrame {
 
 			final JMenu designBasicsMenu = new JMenu("Engineering Design Basics");
 			tutorialsMenu.add(designBasicsMenu);
-			addModel(designBasicsMenu, "Criteria and Constraints: Optimizing Inter-Row Distance of a Solar Array", "tutorials/guided-design-inter-row-distance.ng3");
-			addModel(designBasicsMenu, "Multi-Objective Optimization", "tutorials/guided-design-yield-area-vs-yield-cost.ng3");
+			addModel(designBasicsMenu, "Optimization: Find Optimal Inter-Row Distance for a Solar Panel Array", "tutorials/guided-design-inter-row-distance.ng3");
+			// addModel(designBasicsMenu, "Multi-Objective Optimization", "tutorials/guided-design-yield-area-vs-yield-cost.ng3");
 
 			final JMenu pvMenu = new JMenu("Photovoltaic Solar Power");
 			tutorialsMenu.add(pvMenu);

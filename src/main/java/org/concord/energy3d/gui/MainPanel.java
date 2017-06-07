@@ -680,7 +680,7 @@ public class MainPanel extends JPanel {
 	public JToggleButton getAnnotationButton() {
 		if (annotationButton == null) {
 			annotationButton = new JToggleButton();
-			annotationButton.setSelected(true);
+			// annotationButton.setSelected(true);
 			annotationButton.addMouseListener(refreshUponMouseExit);
 			annotationButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
 			annotationButton.setToolTipText("Show annotations");

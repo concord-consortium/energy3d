@@ -136,7 +136,7 @@ public class Scene implements Serializable {
 	private double annotationScale = 0.2;
 	private double heatVectorLength = 2000;
 	private double heatFluxGridSize = 2;
-	private boolean isAnnotationsVisible = true;
+	private boolean isAnnotationsVisible;
 	private boolean studentMode;
 	private boolean isHeliodonVisible;
 	private boolean hideAxes;
