@@ -161,7 +161,7 @@ public class MainApplication {
 		System.exit(0);
 	}
 
-	private static void restartApplication() {
+	public static void restartApplication() {
 		try {
 			System.out.println("Restarting...");
 			final String userDir = System.getProperty("user.dir");

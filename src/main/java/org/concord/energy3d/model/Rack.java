@@ -415,8 +415,10 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
 		// when the heat map is on, use a single texture from the radiation calculation, don't repeat
-		final float spw = heatMap ? 1 : (monolithic ? (float) (rackWidth / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth())) : 1);
-		final float sph = heatMap ? 1 : (monolithic ? (float) (rackHeight / (sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight())) : 1);
+		final double sampleSolarPanelX = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelHeight() : sampleSolarPanel.getPanelWidth();
+		final double sampleSolarPanelY = sampleSolarPanel.isRotated() ? sampleSolarPanel.getPanelWidth() : sampleSolarPanel.getPanelHeight();
+		final float spw = heatMap ? 1 : (monolithic ? (float) (rackWidth / sampleSolarPanelX) : 1);
+		final float sph = heatMap ? 1 : (monolithic ? (float) (rackHeight / sampleSolarPanelY) : 1);
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(spw).put(0);
@@ -556,7 +558,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 
 		drawFloatingLabel(onFlatSurface);
 
-		if (heatMap) {
+		if (heatMap && (rackWidth > sampleSolarPanelX || rackHeight > sampleSolarPanelY)) {
 			drawSolarPanelOutlines();
 		} else {
 			solarPanelOutlines.setVisible(false);

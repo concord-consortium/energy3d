@@ -120,6 +120,7 @@ import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Printout;
+import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -1032,6 +1033,39 @@ public class MainFrame extends JFrame {
 		if (helpMenu == null) {
 			helpMenu = new JMenu();
 			helpMenu.setText("Help");
+			final JMenuItem miUpdate = new JMenuItem("Check Update...");
+			helpMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					miUpdate.setEnabled(!Updater.isDownloadInProgress());
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					miUpdate.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					miUpdate.setEnabled(true);
+				}
+			});
+			helpMenu.add(miUpdate);
+			miUpdate.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Updater.download();
+					if (Updater.isUpdateAvailable()) {
+						Updater.install();
+						if (Updater.isRestartRequested()) {
+							MainApplication.restartApplication();
+						}
+					} else {
+						JOptionPane.showMessageDialog(instance, "Your software is up to date.", "Update Status", JOptionPane.INFORMATION_MESSAGE);
+					}
+				}
+			});
 			JMenuItem mi = new JMenuItem("Download PDF User's Guide...");
 			mi.addActionListener(new ActionListener() {
 				@Override

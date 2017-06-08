@@ -14,6 +14,7 @@ public class Updater {
 	private static boolean firstTime = true;
 	private static boolean restartRequested = false;
 	private static boolean messageShown = false;
+	private static boolean downloadInProgress = false;
 
 	public static void download() {
 		System.out.println("Updater.download()");
@@ -21,6 +22,7 @@ public class Updater {
 			new Thread("Energy3D Update Downloader") {
 				@Override
 				public void run() {
+					downloadInProgress = true;
 					try {
 						Thread.sleep(1000);
 					} catch (final InterruptedException e) {
@@ -54,11 +56,20 @@ public class Updater {
 								});
 								messageShown = true;
 							}
+							downloadInProgress = false;
 						}
 					}
 				};
 			}.start();
 		}
+	}
+
+	public static boolean isUpdateAvailable() {
+		return Getdown.isUpdateAvailable();
+	}
+
+	public static boolean isDownloadInProgress() {
+		return downloadInProgress;
 	}
 
 	public static void install() {
