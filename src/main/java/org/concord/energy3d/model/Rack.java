@@ -705,7 +705,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 
 	@Override
 	protected HousePart getContainerRelative() {
-		return getTopContainer();
+		return container instanceof Wall ? container : getTopContainer();
 	}
 
 	@Override
@@ -722,7 +722,25 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		return true;
 	}
 
-	private double copyOverlap() { // copy only in the direction of rack height
+	private double copyOverlap() { // assume that we copy in the direction of shorter side
+		final double w1 = Math.min(rackWidth, rackHeight) / Scene.getInstance().getAnnotationScale();
+		final Vector3 center = getAbsCenter();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.container == container && p != this) {
+				if (p instanceof Rack) {
+					final Rack s2 = (Rack) p;
+					final double w2 = Math.min(s2.rackWidth, s2.rackHeight) / Scene.getInstance().getAnnotationScale();
+					final double distance = p.getAbsCenter().distance(center);
+					if (distance < (w1 + w2) * 0.499) {
+						return distance;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
+	private double copyOverlapInDirectionOfHeight() { // copy only in the direction of rack height
 		final double w1 = rackHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -751,12 +769,41 @@ public class Rack extends HousePart implements Trackable, Meshable {
 					return null;
 				}
 			} else if (container instanceof Roof) {
-				if (!isPositionLegal(c, container.getTopContainer(), !Util.isZero(container.getHeight()))) {
+				if (!isPositionLegal(c, (Roof) container, !Util.isZero(container.getHeight()))) {
 					return null;
 				}
 			}
 		}
 		return c;
+	}
+
+	private boolean isPositionLegal(final Rack rack, final Roof roof, final boolean nonFlatRoof) {
+		if (!nonFlatRoof) { // flat roof
+			return isPositionLegal(rack, getTopContainer(), nonFlatRoof);
+		}
+		final Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+		d.normalizeLocal();
+		if (Util.isZero(d.length())) {
+			d.set(1, 0, 0);
+		}
+		final double s = Math.signum(roof.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(d));
+		d.multiplyLocal((1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackWidth / Scene.getInstance().getAnnotationScale());
+		d.addLocal(getContainerRelative().getPoints().get(0));
+		final Vector3 v = toRelative(d);
+		rack.points.get(0).setX(points.get(0).getX() + s * v.getX());
+		rack.points.get(0).setY(points.get(0).getY() + s * v.getY());
+		rack.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
+		final boolean isOutside = !roof.insideWallsPolygon(rack.getAbsCenter());
+		if (isOutside) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel outside a roof or rack.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		final double o = rack.copyOverlap(); // TODO
+		if (o >= 0) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isPositionLegal(final Rack rack, final Foundation foundation, final boolean nonFlatRoof) {
@@ -781,7 +828,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		}
 		rack.points.get(0).setX(newX);
 		rack.points.get(0).setY(newY);
-		final double o = rack.copyOverlap();
+		final double o = rack.copyOverlapInDirectionOfHeight(); // TODO
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;

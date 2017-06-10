@@ -6310,7 +6310,6 @@ public class PopupMenuFactory {
 				private double inverterEfficiency;
 				private double pmax;
 				private double noct;
-				private int nx, ny;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -6339,12 +6338,6 @@ public class PopupMenuFactory {
 					orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
 					orientationComboBox.setSelectedIndex(solarPanel.isRotated() ? 1 : 0);
 					panel.add(orientationComboBox);
-					panel.add(new JLabel("Number of Cells in X:"));
-					final JTextField nxField = new JTextField("" + solarPanel.getNumberOfCellsInX());
-					panel.add(nxField);
-					panel.add(new JLabel("Number of Cells in Y:"));
-					final JTextField nyField = new JTextField("" + solarPanel.getNumberOfCellsInY());
-					panel.add(nyField);
 					panel.add(new JLabel("Cell Type:"));
 					cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline" });
 					cellTypeComboBox.setSelectedIndex(solarPanel.getCellType());
@@ -6369,7 +6362,7 @@ public class PopupMenuFactory {
 					panel.add(new JLabel("Inverter Efficiency (%):"));
 					final JTextField inverterEfficiencyField = new JTextField(threeDecimalsFormat.format(solarPanel.getInverterEfficiency() * 100));
 					panel.add(inverterEfficiencyField);
-					SpringUtilities.makeCompactGrid(panel, 11, 2, 6, 6, 6, 6);
+					SpringUtilities.makeCompactGrid(panel, 9, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -6387,8 +6380,6 @@ public class PopupMenuFactory {
 								inverterEfficiency = Double.parseDouble(inverterEfficiencyField.getText());
 								pmax = Double.parseDouble(pmaxField.getText());
 								noct = Double.parseDouble(noctField.getText());
-								nx = Integer.parseInt(nxField.getText());
-								ny = Integer.parseInt(nyField.getText());
 							} catch (final NumberFormatException ex) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -6402,8 +6393,6 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (noct < 33 || noct > 58) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal Cell Operating Temperature must be between 33 and 58 Celsius degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (nx <= 0 || nx > 20 || ny <= 0 || ny > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of cells in X or Y direction must be between 1 and 20.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									setSolarPanels();
 									if (choice == options[0]) {
@@ -6439,8 +6428,6 @@ public class PopupMenuFactory {
 						break;
 					}
 					solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
-					solarPanel.setNumberOfCellsInX(nx);
-					solarPanel.setNumberOfCellsInY(ny);
 					solarPanel.setCellType(cellTypeComboBox.getSelectedIndex());
 					solarPanel.setColorOption(colorOptionComboBox.getSelectedIndex());
 					solarPanel.setCellEfficiency(cellEfficiency * 0.01);
