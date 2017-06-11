@@ -56,9 +56,9 @@ public class Updater {
 								});
 								messageShown = true;
 							}
-							downloadInProgress = false;
 						}
 					}
+					downloadInProgress = false;
 				};
 			}.start();
 		}

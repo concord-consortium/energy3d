@@ -7985,7 +7985,7 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(m.getHeliostatTarget().getId() + "");
+					final JTextField inputField = new JTextField(m.getHeliostatTarget() != null ? m.getHeliostatTarget().getId() + "" : "");
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final String title = "<html>Set the ID of the foundation of the target tower for " + partInfo + "</html>";

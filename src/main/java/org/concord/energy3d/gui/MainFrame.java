@@ -1051,7 +1051,7 @@ public class MainFrame extends JFrame {
 					miUpdate.setEnabled(true);
 				}
 			});
-			helpMenu.add(miUpdate);
+			// helpMenu.add(miUpdate); // TODO
 			miUpdate.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
