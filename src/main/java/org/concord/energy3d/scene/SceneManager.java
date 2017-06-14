@@ -1798,8 +1798,16 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 						EnergyPanel.getInstance().updateGraphs();
 						EnergyPanel.getInstance().updateProperties();
-						final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-						PopupMenuFactory.getPopupMenu(onLand(pickMouseState.getX(), pickMouseState.getY())).show(cp, mouseState.getX(), cp.getHeight() - mouseState.getY());
+						final int mouseStateX = mouseState.getX();
+						final int mouseStateY = mouseState.getY();
+						final boolean pickOnLand = onLand(pickMouseState.getX(), pickMouseState.getY());
+						EventQueue.invokeLater(new Runnable() { // seriously, our error log on 6/14/2017 showed that this caused deadlock if not invoked later!
+							@Override
+							public void run() {
+								final JPanel cp = MainPanel.getInstance().getCanvasPanel();
+								PopupMenuFactory.getPopupMenu(pickOnLand).show(cp, mouseStateX, cp.getHeight() - mouseStateY);
+							}
+						});
 					}
 				} catch (final Throwable t) {
 					t.printStackTrace();
@@ -2198,17 +2206,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			} else {
 				f = selectedPart.getTopContainer();
 			}
-			if (f.isGroupMaster()) {
-				final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
-				final Vector3 center = f.toRelative(f.getCenter().clone());
-				for (final Foundation x : g) {
-					x.rotate(angle, center, true);
+			if (!f.getLockEdit()) {
+				if (f.isGroupMaster()) {
+					final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
+					final Vector3 center = f.toRelative(f.getCenter().clone());
+					for (final Foundation x : g) {
+						x.rotate(angle, center, true);
+					}
+				} else {
+					f.rotate(angle, null, true);
 				}
-			} else {
-				f.rotate(angle, null, true);
-			}
-			if (redraw) {
-				Scene.getInstance().redrawAll();
+				if (redraw) {
+					Scene.getInstance().redrawAll();
+				}
 			}
 		}
 	}
@@ -2218,7 +2228,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Vector3 origin = new Vector3();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
-				((Foundation) p).rotate(angle, origin, true);
+				final Foundation f = (Foundation) p;
+				if (!f.getLockEdit()) {
+					f.rotate(angle, origin, true);
+				}
 			}
 		}
 		Scene.getInstance().redrawAll();
