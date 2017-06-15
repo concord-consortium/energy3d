@@ -262,7 +262,7 @@ public class MapDialog extends JDialog {
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				if ((Integer) zoomSpinner.getValue() < 16) {
+				if ((Integer) zoomSpinner.getValue() < 14) {
 					JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large. Please zoom in and try again.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
