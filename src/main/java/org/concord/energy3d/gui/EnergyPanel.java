@@ -772,7 +772,11 @@ public class EnergyPanel extends JPanel {
 			}
 			final Map<String, int[]> sunshineHours = LocationData.getInstance().getSunshineHours();
 			final int month = Heliodon.getInstance().getCalendar().get(Calendar.MONTH);
-			sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + " hours");
+			try {
+				sunshineHoursField.setText(Math.round(sunshineHours.get(city)[month] / 30.0) + " hours");
+			} catch (final Exception e) {
+				Util.reportError(e);
+			}
 		}
 	}
 
