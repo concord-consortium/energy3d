@@ -54,18 +54,18 @@ public class MapDialog extends JDialog {
 	private final MapImageView mapImageView = new MapImageView();
 	private static MapDialog instance;
 	private volatile boolean lock;
-	private GoogleMapImageLoader mapImageLoader;
+	private MapLoader mapLoader;
 
-	class GoogleMapImageLoader extends SwingWorker<BufferedImage, Void> {
+	class MapLoader extends SwingWorker<BufferedImage, Void> {
 		private final boolean highResolution;
 		private final String googleMapUrl;
 
-		public GoogleMapImageLoader(final boolean highResolution) {
-			if (mapImageLoader != null) {
-				mapImageLoader.cancel(true);
+		public MapLoader(final boolean highResolution) {
+			if (mapLoader != null) {
+				mapLoader.cancel(true);
 			}
 			this.highResolution = highResolution;
-			googleMapUrl = getGoogleMapUrl(highResolution);
+			googleMapUrl = MapImageView.getGoogleMapUrl(highResolution, (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue());
 			mapImageView.setText("Loading...");
 			mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
@@ -108,7 +108,7 @@ public class MapDialog extends JDialog {
 			} finally {
 				mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 				mapImageView.setText(null);
-				mapImageLoader = null;
+				mapLoader = null;
 			}
 		}
 
@@ -120,7 +120,7 @@ public class MapDialog extends JDialog {
 			if (e.getCause() instanceof SSLKeyException) {
 				JOptionPane.showMessageDialog(MapDialog.this, "Missing feature! To use this feature you need to download and install the latest version of Energy3D.", getTitle(), JOptionPane.ERROR_MESSAGE);
 			} else {
-				JOptionPane.showMessageDialog(MapDialog.this, "Could not retrieve map from google!\nPlease check your internet connection and try again.", getTitle(), JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(MapDialog.this, "Couldn't download map from Google!\nPlease check your internet connection and try again.", getTitle(), JOptionPane.WARNING_MESSAGE);
 			}
 		}
 
@@ -266,8 +266,8 @@ public class MapDialog extends JDialog {
 					JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large. Please zoom in and try again.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				mapImageLoader = new GoogleMapImageLoader(true);
-				mapImageLoader.execute();
+				mapLoader = new MapLoader(true);
+				mapLoader.execute();
 			}
 		});
 		final JButton cancelButton = new JButton("Cancel");
@@ -296,16 +296,8 @@ public class MapDialog extends JDialog {
 	}
 
 	private void updateMap() {
-		mapImageLoader = new GoogleMapImageLoader(false);
-		mapImageLoader.execute();
-	}
-
-	private String getGoogleMapUrl(final boolean highResolution) {
-		final double x = (Double) latitudeSpinner.getValue();
-		final double y = (Double) longitudeSpinner.getValue();
-		final int zoom = (Integer) zoomSpinner.getValue();
-		final int scale = highResolution & zoom <= 20 ? 2 : 1;
-		return "https://maps.googleapis.com/maps/api/staticmap?maptype=satellite&center=" + x + "," + y + "&zoom=" + zoom + "&size=640x640&scale=" + scale + "&key=AIzaSyBEGiCg33CccHloDdPENWk1JDhwTEQaZQ0";
+		mapLoader = new MapLoader(false);
+		mapLoader.execute();
 	}
 
 	private double[] getGoogleMapAddressCoordinates() {

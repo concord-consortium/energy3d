@@ -72,12 +72,15 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualGraph;
 import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -643,6 +646,49 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenu weatherMenu = new JMenu("Weather");
+			JMenuItem mi = new JMenuItem("Monthly Sunshine Hours...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					new MonthlySunshineHours().showDialog();
+				}
+			});
+			weatherMenu.add(mi);
+
+			mi = new JMenuItem("Annual Environmental Temperature...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					new AnnualEnvironmentalTemperature().showDialog();
+				}
+			});
+			weatherMenu.add(mi);
+
+			mi = new JMenuItem("Daily Environmental Temperature...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					new DailyEnvironmentalTemperature().showDialog();
+				}
+			});
+			weatherMenu.add(mi);
+
 			final JMenu themeMenu = new JMenu("Theme");
 			final ButtonGroup themeButtonGroup = new ButtonGroup();
 
@@ -787,9 +833,10 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForSky.add(miInfo);
-			// popupMenuForSky.addSeparator();
 			popupMenuForSky.add(miDustLoss);
 			popupMenuForSky.add(miHeliodon);
+			popupMenuForSky.addSeparator();
+			popupMenuForSky.add(weatherMenu);
 			popupMenuForSky.add(themeMenu);
 
 		}

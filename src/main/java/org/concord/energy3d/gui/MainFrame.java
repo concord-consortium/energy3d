@@ -1068,7 +1068,17 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			JMenuItem mi = new JMenuItem("Download PDF User's Guide...");
+
+			JMenuItem mi = new JMenuItem("View Supported Locations...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new GlobalMap(MainFrame.this).setVisible(true);
+				}
+			});
+			helpMenu.add(mi);
+
+			mi = new JMenuItem("Download PDF User's Guide...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1227,9 +1237,6 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getGroupDailyAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
-			analysisMenu.add(getMonthlySunshineHoursMenuItem());
-			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
-			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getAnnualSensorMenuItem());
 			analysisMenu.add(getDailySensorMenuItem());
 			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
@@ -1452,6 +1459,11 @@ public class MainFrame extends JFrame {
 			solarHeatMapMenu.add(getMirrorReflectionHeatMapMenuItem());
 			solarHeatMapMenu.add(getShowSolarLandMenuItem());
 
+			final JMenu weatherMenu = new JMenu("Weather");
+			weatherMenu.add(getMonthlySunshineHoursMenuItem());
+			weatherMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
+			weatherMenu.add(getDailyEnvironmentalTemperatureMenuItem());
+
 			// viewMenu.add(getUnitsMenu()); // disable temporarily because it doesn't work to expectation
 			viewMenu.add(getOrbitMenuItem());
 			viewMenu.add(getFirstPersonMenuItem());
@@ -1464,6 +1476,7 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getZoomInMenuItem());
 			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
+			viewMenu.add(weatherMenu);
 			viewMenu.add(getTextureMenu());
 			viewMenu.add(getThemeMenu());
 			viewMenu.add(getGroundImageMenu());
@@ -1489,7 +1502,7 @@ public class MainFrame extends JFrame {
 		return viewMenu;
 	}
 
-	public JMenu getTextureMenu() {
+	private JMenu getTextureMenu() {
 
 		if (textureMenu == null) {
 			textureMenu = new JMenu("Texture");
@@ -1520,7 +1533,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	public JMenu getThemeMenu() {
+	private JMenu getThemeMenu() {
 
 		if (themeMenu == null) {
 			themeMenu = new JMenu("Theme");
@@ -2415,7 +2428,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getMonthlySunshineHoursMenuItem() {
 		if (monthlySunshineHoursMenuItem == null) {
-			monthlySunshineHoursMenuItem = new JMenuItem("Show Monthly Sunshine Hours...");
+			monthlySunshineHoursMenuItem = new JMenuItem("Monthly Sunshine Hours...");
 			monthlySunshineHoursMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2433,7 +2446,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualEnvironmentalTemperatureMenuItem() {
 		if (annualEnvironmentalTemperatureMenuItem == null) {
-			annualEnvironmentalTemperatureMenuItem = new JMenuItem("Show Annual Environmental Temperature...");
+			annualEnvironmentalTemperatureMenuItem = new JMenuItem("Annual Environmental Temperature...");
 			annualEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2451,7 +2464,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getDailyEnvironmentalTemperatureMenuItem() {
 		if (dailyEnvironmentalTemperatureMenuItem == null) {
-			dailyEnvironmentalTemperatureMenuItem = new JMenuItem("Show Daily Environmental Temperature...");
+			dailyEnvironmentalTemperatureMenuItem = new JMenuItem("Daily Environmental Temperature...");
 			dailyEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
