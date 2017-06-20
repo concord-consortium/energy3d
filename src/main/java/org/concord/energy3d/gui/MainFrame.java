@@ -99,6 +99,7 @@ import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -179,6 +180,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailySensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem constructionCostAnalysisMenuItem;
+	private JMenuItem monthlySunshineHoursMenuItem;
 	private JMenuItem annualEnvironmentalTemperatureMenuItem;
 	private JMenuItem dailyEnvironmentalTemperatureMenuItem;
 	private JCheckBoxMenuItem solarRadiationHeatMapMenuItem;
@@ -1225,6 +1227,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getGroupDailyAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
+			analysisMenu.add(getMonthlySunshineHoursMenuItem());
 			analysisMenu.add(getAnnualEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getDailyEnvironmentalTemperatureMenuItem());
 			analysisMenu.add(getAnnualSensorMenuItem());
@@ -2408,6 +2411,24 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return constructionCostAnalysisMenuItem;
+	}
+
+	private JMenuItem getMonthlySunshineHoursMenuItem() {
+		if (monthlySunshineHoursMenuItem == null) {
+			monthlySunshineHoursMenuItem = new JMenuItem("Show Monthly Sunshine Hours...");
+			monthlySunshineHoursMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					new MonthlySunshineHours().showDialog();
+				}
+			});
+		}
+		return monthlySunshineHoursMenuItem;
 	}
 
 	private JMenuItem getAnnualEnvironmentalTemperatureMenuItem() {
