@@ -382,7 +382,11 @@ public class Scene implements Serializable {
 			energyPanel.setLatitude(latitude); // already silent
 			Util.selectSilently(energyPanel.getCityComboBox(), city);
 			final LocationData ld = LocationData.getInstance();
-			energyPanel.getCityComboBox().setToolTipText("(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)");
+			if (ld.getLatitudes().get(city) != null) {
+				energyPanel.getCityComboBox().setToolTipText("(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)");
+			} else {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), city + " not supported. Please upgrade your Energy3D to the latest.", "Missing City", JOptionPane.ERROR_MESSAGE);
+			}
 			Scene.getInstance().updateTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();

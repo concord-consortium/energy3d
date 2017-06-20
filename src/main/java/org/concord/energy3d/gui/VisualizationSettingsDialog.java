@@ -72,8 +72,8 @@ class VisualizationSettingsDialog extends JDialog {
 					return;
 				}
 				// range check
-				if (cellSize < 0.01 || cellSize > 20) {
-					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Cell size must be in 0.01-20 meters (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (cellSize < 0.01 || cellSize > 50) {
+					JOptionPane.showMessageDialog(VisualizationSettingsDialog.this, "Cell size must be in 0.01-50 meters (with larger sizes for larger areas).", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				if (heatVectorLength < 1000) {

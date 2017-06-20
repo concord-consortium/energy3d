@@ -98,7 +98,7 @@ public class MainPanel extends JPanel {
 	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
-	private Operation solaCommand = SceneManager.Operation.DRAW_SOLAR_PANEL;
+	private Operation solaCommand = SceneManager.Operation.DRAW_RACK;
 	private final double rotationAngleAbsolute = 5 * Math.PI / 180;
 	private double rotationAngle = -rotationAngleAbsolute;
 	private String noteString = "";
@@ -350,10 +350,10 @@ public class MainPanel extends JPanel {
 				solarButton.setIcon(selected.getIcon());
 				if (selected == miSolarPanel) {
 					solaCommand = SceneManager.Operation.DRAW_SOLAR_PANEL;
-					solarButton.setToolTipText("Insert a solar panel");
+					solarButton.setToolTipText("Insert a single solar panel");
 				} else if (selected == miRack) {
 					solaCommand = SceneManager.Operation.DRAW_RACK;
-					solarButton.setToolTipText("Insert a rack");
+					solarButton.setToolTipText("Insert a rack of solar panels");
 				} else if (selected == miMirror) {
 					solaCommand = SceneManager.Operation.DRAW_MIRROR;
 					solarButton.setToolTipText("Insert a mirror (heliostat)");
@@ -371,8 +371,8 @@ public class MainPanel extends JPanel {
 		miMirror.addActionListener(solarAction);
 		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
-		solaMenu.add(miSolarPanel);
 		solaMenu.add(miRack);
+		solaMenu.add(miSolarPanel);
 		solaMenu.add(miMirror);
 		solaMenu.add(miSensor);
 		bg = new ButtonGroup();
@@ -915,8 +915,8 @@ public class MainPanel extends JPanel {
 	private JToggleButton getSolarButton() {
 		if (solarButton == null) {
 			solarButton = new JToggleButton("");
-			solarButton.setToolTipText("Add solar panel");
-			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+			solarButton.setToolTipText("Add solar panel rack");
+			solarButton.setIcon(new ImageIcon(getClass().getResource("icons/rack.png")));
 			solarButton.setFocusable(false);
 			solarButton.addActionListener(new ActionListener() {
 				@Override
