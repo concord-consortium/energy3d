@@ -51,7 +51,7 @@ public class MonthlySunshineHours extends JPanel {
 	private final BasicStroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	private final String city;
 	private final int[] sunshineHours;
-	private final int max = 400;
+	private final int max = 500;
 	private double dx, dy;
 
 	public MonthlySunshineHours() {
@@ -124,7 +124,7 @@ public class MonthlySunshineHours extends JPanel {
 		// draw horizontal lines across the graph window
 		double dataY;
 		g2.setStroke(thin);
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i <= max / 100; i++) {
 			dataY = getHeight() - bottom - i * 100 * dy;
 			s = Integer.toString(i * 100);
 			g2.setColor(Color.LIGHT_GRAY);

@@ -47,13 +47,13 @@ class MapImageViewWithLocations extends MapImageView {
 			y = height * 0.5 - width * Math.log(Math.tan(0.25 * Math.PI + 0.5 * latitude * Math.PI / 180.0)) / (2 * Math.PI);
 			ellipse.x = x + offsetX;
 			ellipse.y = y + offsetY;
-			ellipse.width = 2;
-			ellipse.height = 2;
+			ellipse.width = 1.5;
+			ellipse.height = 1.5;
 			g2.setColor(Color.YELLOW);
 			g2.fill(ellipse);
-			g2.setColor(Color.BLACK);
-			ellipse.width = 3;
-			ellipse.height = 3;
+			g2.setColor(Color.DARK_GRAY);
+			ellipse.width *= 2;
+			ellipse.height *= 2;
 			g2.draw(ellipse);
 		}
 	}

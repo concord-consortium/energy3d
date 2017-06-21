@@ -17,6 +17,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
+import org.concord.energy3d.simulation.LocationData;
+
 class GlobalMap extends JDialog {
 
 	private static final long serialVersionUID = 1L;
@@ -26,7 +28,7 @@ class GlobalMap extends JDialog {
 	public GlobalMap(final JFrame owner) {
 
 		super(owner);
-		setTitle("Global Map of Supported Locations");
+		setTitle("Global Map of Supported Locations (" + LocationData.getInstance().getCities().length + ")");
 		setResizable(false);
 		mapImageView = new MapImageViewWithLocations();
 		mapImageView.setAlignmentX(0.5f);
