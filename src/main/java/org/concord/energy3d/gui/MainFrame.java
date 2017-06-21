@@ -1069,16 +1069,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			JMenuItem mi = new JMenuItem("View Supported Locations...");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new GlobalMap(MainFrame.this).setVisible(true);
-				}
-			});
-			helpMenu.add(mi);
-
-			mi = new JMenuItem("Download PDF User's Guide...");
+			JMenuItem mi = new JMenuItem("Download PDF User's Guide...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1091,6 +1082,14 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Util.openBrowser("http://energy.concord.org/energy3d");
+				}
+			});
+			helpMenu.add(mi);
+			mi = new JMenuItem("View Supported Locations on Map...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new GlobalMap(MainFrame.this).setVisible(true);
 				}
 			});
 			helpMenu.add(mi);

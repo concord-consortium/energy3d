@@ -43,7 +43,7 @@ import org.concord.energy3d.simulation.LocationData;
 
 import com.ardor3d.math.MathUtils;
 
-public class MapDialog extends JDialog {
+class MapDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
@@ -65,7 +65,7 @@ public class MapDialog extends JDialog {
 				mapLoader.cancel(true);
 			}
 			this.highResolution = highResolution;
-			googleMapUrl = MapImageView.getGoogleMapUrl(highResolution, (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue());
+			googleMapUrl = MapImageView.getGoogleMapUrl("satellite", highResolution, (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue());
 			mapImageView.setText("Loading...");
 			mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}

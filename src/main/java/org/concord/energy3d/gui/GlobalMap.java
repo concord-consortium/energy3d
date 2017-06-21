@@ -2,7 +2,6 @@ package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 
-public class GlobalMap extends JDialog {
+class GlobalMap extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,9 +28,8 @@ public class GlobalMap extends JDialog {
 		super(owner);
 		setTitle("Global Map of Supported Locations");
 		setResizable(false);
-		mapImageView = new MapImageView();
+		mapImageView = new MapImageViewWithLocations();
 		mapImageView.setAlignmentX(0.5f);
-		mapImageView.setPreferredSize(new Dimension(600, 600));
 		mapImageView.setText("Loading...");
 		mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		getContentPane().setLayout(new BorderLayout());
@@ -53,7 +51,7 @@ public class GlobalMap extends JDialog {
 
 			@Override
 			protected BufferedImage doInBackground() throws Exception {
-				return ImageIO.read(new URL(MapImageView.getGoogleMapUrl(false, 0, 0, 1)));
+				return ImageIO.read(new URL(MapImageView.getGoogleMapUrl("roadmap", false, 0, 0, 1)));
 			}
 
 			@Override
