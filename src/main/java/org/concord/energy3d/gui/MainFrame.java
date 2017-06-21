@@ -231,9 +231,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem exportImageMenuItem;
 	private JMenuItem copyImageMenuItem;
 	private JMenuItem exportLogMenuItem;
-	private JMenuItem lockAllMenuItem;
-	private JMenuItem enableAllFoundationEditsMenuItem;
-	private JMenuItem disableAllFoundationEditsMenuItem;
+	private JMenuItem enableAllEditPointsMenuItem;
+	private JMenuItem disableAllEditPointsMenuItem;
 	private JMenuItem specificationsMenuItem;
 	private JMenuItem propertiesMenuItem;
 	private JMenuItem customPricesMenuItem;
@@ -2502,7 +2501,6 @@ public class MainFrame extends JFrame {
 					cutMenuItem.setEnabled(true);
 					copyMenuItem.setEnabled(true);
 					pasteMenuItem.setEnabled(true);
-					lockAllMenuItem.setEnabled(true);
 					removeAllLocksMenuItem.setEnabled(true);
 					specificationsMenuItem.setEnabled(true);
 					autoRecomputeEnergyMenuItem.setEnabled(true);
@@ -2535,7 +2533,6 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(snapToGridsMenuItem, Scene.getInstance().isSnapToGrids());
 					MainPanel.getInstance().defaultTool();
 					if (Scene.getInstance().isStudentMode()) {
-						lockAllMenuItem.setEnabled(false);
 						removeAllLocksMenuItem.setEnabled(false);
 						specificationsMenuItem.setEnabled(false);
 						autoRecomputeEnergyMenuItem.setEnabled(false);
@@ -2584,13 +2581,12 @@ public class MainFrame extends JFrame {
 			editMenu.add(rotateMenu);
 			editMenu.add(clearMenu);
 			editMenu.addSeparator();
+			editMenu.add(getEnableAllEditPointsMenuItem());
+			editMenu.add(getDisableAllEditPointsMenuItem());
 			editMenu.add(getFixProblemsMenuItem());
 			editMenu.add(getSnapToGridsMenuItem());
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
-			editMenu.add(getLockAllMenuItem());
-			editMenu.add(getEnableAllFoundationEditsMenuItem());
-			editMenu.add(getDisableAllFoundationEditsMenuItem());
 			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getCustomPricesMenuItem());
@@ -4004,29 +4000,10 @@ public class MainFrame extends JFrame {
 		return removeAllLocksMenuItem;
 	}
 
-	private JMenuItem getLockAllMenuItem() {
-		if (lockAllMenuItem == null) {
-			lockAllMenuItem = new JMenuItem("Lock All");
-			lockAllMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().lockAll(true);
-							return null;
-						}
-					});
-				}
-			});
-		}
-		return lockAllMenuItem;
-	}
-
-	private JMenuItem getEnableAllFoundationEditsMenuItem() {
-		if (enableAllFoundationEditsMenuItem == null) {
-			enableAllFoundationEditsMenuItem = new JMenuItem("Enable All Foundation Edits");
-			enableAllFoundationEditsMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getEnableAllEditPointsMenuItem() {
+		if (enableAllEditPointsMenuItem == null) {
+			enableAllEditPointsMenuItem = new JMenuItem("Enable All Edit Points");
+			enableAllEditPointsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
@@ -4037,13 +4014,13 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return enableAllFoundationEditsMenuItem;
+		return enableAllEditPointsMenuItem;
 	}
 
-	private JMenuItem getDisableAllFoundationEditsMenuItem() {
-		if (disableAllFoundationEditsMenuItem == null) {
-			disableAllFoundationEditsMenuItem = new JMenuItem("Disable All Foundation Edits");
-			disableAllFoundationEditsMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getDisableAllEditPointsMenuItem() {
+		if (disableAllEditPointsMenuItem == null) {
+			disableAllEditPointsMenuItem = new JMenuItem("Disable All Edit Points");
+			disableAllEditPointsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
@@ -4054,7 +4031,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return disableAllFoundationEditsMenuItem;
+		return disableAllEditPointsMenuItem;
 	}
 
 	public JColorChooser getColorChooser() {

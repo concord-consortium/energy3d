@@ -28,6 +28,10 @@ public class CustomRoof extends Roof {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final Foundation foundation = getTopContainer();
+		if (foundation != null && foundation.getLockEdit()) {
+			return;
+		}
 		final EditState editState = new EditState();
 		if (editPointIndex == -1) {
 			recalculateEditPoints = true;
@@ -35,13 +39,15 @@ public class CustomRoof extends Roof {
 		} else if (editPointIndex == 0) {
 			final ReadOnlyVector3 base = getCenter();
 			final Vector3 p = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
-			if (p == null)
+			if (p == null) {
 				return;
+			}
 			snapToGrid(p, getAbsPoint(editPointIndex), getGridSize());
 			height = Math.max(0, p.getZ() - container.getPoints().get(1).getZ());
 			final double z = container.getPoints().get(1).getZ() + height;
-			for (final Vector3 v : points)
+			for (final Vector3 v : points) {
 				v.setZ(z);
+			}
 		} else {
 			final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 			final Vector3 p = new Vector3();
@@ -107,7 +113,8 @@ public class CustomRoof extends Roof {
 	@Override
 	protected void setHeight(final double newHeight, final boolean finalize) {
 		super.setHeight(newHeight, finalize);
-		for (final Vector3 p : points)
+		for (final Vector3 p : points) {
 			p.setZ(container.getPoints().get(1).getZ() + newHeight);
+		}
 	}
 }

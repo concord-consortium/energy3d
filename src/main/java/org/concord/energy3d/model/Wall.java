@@ -215,6 +215,10 @@ public class Wall extends HousePart implements Thermalizable {
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		Snap.clearAnnotationDrawn();
+		final Foundation foundation = getTopContainer();
+		if (foundation != null && foundation.getLockEdit()) {
+			return;
+		}
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final HousePart previousContainer = container;
 			PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });

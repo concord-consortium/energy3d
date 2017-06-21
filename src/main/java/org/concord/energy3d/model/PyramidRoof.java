@@ -19,8 +19,11 @@ public class PyramidRoof extends Roof {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final Foundation foundation = getTopContainer();
+		if (foundation != null && foundation.getLockEdit()) {
+			return;
+		}
 		final EditState editState = new EditState();
-
 		if (editPointIndex == -1) {
 			pickContainer(x, y, Wall.class);
 			recalculateEditPoints = true;

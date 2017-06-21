@@ -163,6 +163,10 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final Foundation foundation = getTopContainer();
+		if (foundation != null && foundation.getLockEdit()) {
+			return;
+		}
 		int index = editPointIndex;
 		if (index == -1) {
 			if (isFirstPointInserted()) {

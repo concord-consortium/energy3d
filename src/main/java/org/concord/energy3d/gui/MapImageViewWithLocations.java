@@ -45,15 +45,36 @@ class MapImageViewWithLocations extends MapImageView {
 			longitude = LocationData.getInstance().getLongitudes().get(s);
 			x = (longitude + 180.0) * (width / 360.0);
 			y = height * 0.5 - width * Math.log(Math.tan(0.25 * Math.PI + 0.5 * latitude * Math.PI / 180.0)) / (2 * Math.PI);
-			ellipse.x = x + offsetX;
-			ellipse.y = y + offsetY;
-			ellipse.width = 1.5;
-			ellipse.height = 1.5;
+			ellipse.width = 1;
+			ellipse.height = 1;
+			ellipse.x = x + offsetX - ellipse.width * 0.5;
+			ellipse.y = y + offsetY - ellipse.height * 0.5;
 			g2.setColor(Color.YELLOW);
 			g2.fill(ellipse);
 			g2.setColor(Color.DARK_GRAY);
-			ellipse.width *= 2;
-			ellipse.height *= 2;
+			ellipse.width += 1;
+			ellipse.height += 1;
+			ellipse.x = x + offsetX - ellipse.width * 0.5;
+			ellipse.y = y + offsetY - ellipse.height * 0.5;
+			g2.draw(ellipse);
+		}
+		final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		if (!current.equals("")) {
+			latitude = LocationData.getInstance().getLatitudes().get(current);
+			longitude = LocationData.getInstance().getLongitudes().get(current);
+			x = (longitude + 180.0) * (width / 360.0);
+			y = height * 0.5 - width * Math.log(Math.tan(0.25 * Math.PI + 0.5 * latitude * Math.PI / 180.0)) / (2 * Math.PI);
+			ellipse.width = 5;
+			ellipse.height = 5;
+			ellipse.x = x + offsetX - ellipse.width * 0.5;
+			ellipse.y = y + offsetY - ellipse.height * 0.5;
+			g2.setColor(Color.RED);
+			g2.fill(ellipse);
+			g2.setColor(Color.BLACK);
+			ellipse.width += 1;
+			ellipse.height += 1;
+			ellipse.x = x + offsetX - ellipse.width * 0.5;
+			ellipse.y = y + offsetY - ellipse.height * 0.5;
 			g2.draw(ellipse);
 		}
 	}

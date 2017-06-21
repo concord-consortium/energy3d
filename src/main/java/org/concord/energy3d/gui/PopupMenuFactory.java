@@ -3362,38 +3362,13 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Lock");
-			miLock.addItemListener(new ItemListener() {
+			final JCheckBoxMenuItem miDisableEditPoints = new JCheckBoxMenuItem("Disable Edit Points");
+			miDisableEditPoints.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						final Foundation foundation = (Foundation) selectedPart;
-						SceneManager.getInstance().getUndoManager().addEdit(new LockPartCommand(foundation));
-						final boolean lock = miLock.isSelected();
-						foundation.setFreeze(lock);
-						for (final HousePart p : Scene.getInstance().getParts()) {
-							if (p.getTopContainer() == foundation) {
-								p.setFreeze(lock);
-							}
-						}
-						if (lock) {
-							SceneManager.getInstance().hideAllEditPoints();
-						}
-						foundation.draw();
-						foundation.drawChildren();
-						Scene.getInstance().setEdited(true);
-					}
-				}
-			});
-
-			final JCheckBoxMenuItem miDisableEdits = new JCheckBoxMenuItem("Disable Edits");
-			miDisableEdits.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation) {
-						((Foundation) selectedPart).setLockEdit(miDisableEdits.isSelected());
+						((Foundation) selectedPart).setLockEdit(miDisableEditPoints.isSelected());
 						Scene.getInstance().setEdited(true);
 					}
 				}
@@ -3799,18 +3774,15 @@ public class PopupMenuFactory {
 					if (p instanceof Foundation) {
 						final Foundation f = (Foundation) p;
 						if (Scene.getInstance().isStudentMode()) {
-							miLock.setEnabled(false);
-							miDisableEdits.setEnabled(false);
+							miDisableEditPoints.setEnabled(false);
 							miThermostat.setEnabled(false);
 						} else {
-							miLock.setEnabled(true);
-							miDisableEdits.setEnabled(true);
+							miDisableEditPoints.setEnabled(true);
 							miThermostat.setEnabled(true);
 						}
 						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
 						Util.selectSilently(miGroupMaster, f.isGroupMaster());
-						Util.selectSilently(miLock, f.isFrozen());
-						Util.selectSilently(miDisableEdits, f.getLockEdit());
+						Util.selectSilently(miDisableEditPoints, f.getLockEdit());
 						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
 						Util.selectSilently(miLabelNone, !f.isLabelVisible());
 						Util.selectSilently(miLabelCustom, f.getLabelCustom());
@@ -3853,10 +3825,9 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(clearMenu);
 			popupMenuForFoundation.add(layoutMenu);
 			popupMenuForFoundation.addSeparator();
+			popupMenuForFoundation.add(miDisableEditPoints);
 			popupMenuForFoundation.add(miGroupMaster);
 			popupMenuForFoundation.add(miBorderLine);
-			popupMenuForFoundation.add(miLock);
-			popupMenuForFoundation.add(miDisableEdits);
 			popupMenuForFoundation.add(optionsMenu);
 			popupMenuForFoundation.add(labelMenu);
 			popupMenuForFoundation.addSeparator();

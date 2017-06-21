@@ -63,6 +63,10 @@ public class Door extends HousePart implements Thermalizable {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		final Foundation foundation = getTopContainer();
+		if (foundation != null && foundation.getLockEdit()) {
+			return;
+		}
 		if (editPointIndex == -1 || editPointIndex == 0 || editPointIndex == 2) {
 			final PickedHousePart picked = pickContainer(x, y, Wall.class);
 			if (picked != null) {
