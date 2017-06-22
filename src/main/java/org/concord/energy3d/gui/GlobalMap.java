@@ -28,7 +28,7 @@ class GlobalMap extends JDialog {
 	public GlobalMap(final JFrame owner) {
 
 		super(owner);
-		setTitle("Global Map of Supported Locations (" + LocationData.getInstance().getCities().length + ")");
+		setTitle(LocationData.getInstance().getCities().length + " Supported Locations");
 		setResizable(false);
 		mapImageView = new MapImageViewWithLocations();
 		mapImageView.setAlignmentX(0.5f);
