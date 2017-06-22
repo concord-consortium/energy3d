@@ -557,6 +557,10 @@ public class Window extends HousePart implements Thermalizable {
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMoveStartPoints) {
+		final Foundation foundation = getTopContainer();
+		if (foundation != null && foundation.getLockEdit()) {
+			return;
+		}
 		final Vector3 p0 = getAbsPoint(0);
 		final Vector3 p = toAbsolute(houseMoveStartPoints.get(0)).addLocal(d);
 		snapToGrid(p, p0, getGridSize(), false);

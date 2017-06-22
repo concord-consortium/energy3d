@@ -4007,9 +4007,15 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-					for (final Foundation f : foundations) {
-						f.setLockEdit(false);
-					}
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							for (final Foundation f : foundations) {
+								f.setLockEdit(false);
+							}
+							return null;
+						}
+					});
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -4024,9 +4030,15 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
-					for (final Foundation f : foundations) {
-						f.setLockEdit(true);
-					}
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							for (final Foundation f : foundations) {
+								f.setLockEdit(true);
+							}
+							return null;
+						}
+					});
 					Scene.getInstance().setEdited(true);
 				}
 			});

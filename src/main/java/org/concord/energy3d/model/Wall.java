@@ -245,7 +245,7 @@ public class Wall extends HousePart implements Thermalizable {
 			if (container != null) {
 				p.setZ(container.height);
 			}
-			final int index = (editPointIndex == -1) ? points.size() - 2 : editPointIndex;
+			final int index = editPointIndex == -1 ? points.size() - 2 : editPointIndex;
 			boolean snappedToWall = snapToWall(p, index);
 			if (!snappedToWall) {
 				snapToGrid(p, getAbsPoint(index), getGridSize(), false);
@@ -263,7 +263,7 @@ public class Wall extends HousePart implements Thermalizable {
 			points.get(index).set(p_rel);
 			points.get(index + 1).set(p_rel).setZ(p.getZ() + height);
 		} else if (editPointIndex == 1 || editPointIndex == 3) {
-			final int lower = (editPointIndex == 1) ? 0 : 2;
+			final int lower = editPointIndex == 1 ? 0 : 2;
 			final Vector3 base = getAbsPoint(lower);
 			final Vector3 closestPoint = Util.closestPoint(base, Vector3.UNIT_Z, x, y);
 			if (closestPoint == null) {

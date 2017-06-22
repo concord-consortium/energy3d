@@ -1576,6 +1576,7 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public void setLockEdit(final boolean b) {
 		lockEdit = b;
+		updateHandles();
 	}
 
 	public boolean getLockEdit() {
@@ -1818,13 +1819,14 @@ public class Foundation extends HousePart implements Thermalizable {
 		updateHandle(points.get(9), u.negateLocal());
 		updateHandle(points.get(10), v);
 		updateHandle(points.get(11), v.negateLocal());
-		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE;
+		final ColorRGBA disabledColor = new ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f);
+		final ReadOnlyColorRGBA c = lockEdit ? disabledColor : (Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE);
 		for (int i = 0; i < 8; i++) {
 			getEditPointShape(i).setDefaultColor(c);
 		}
 		if (pointsRoot.getNumberOfChildren() > 8) {
 			for (int i = 8; i < 12; i++) {
-				getEditPointShape(i).setDefaultColor(ColorRGBA.ORANGE);
+				getEditPointShape(i).setDefaultColor(lockEdit ? disabledColor : ColorRGBA.ORANGE);
 			}
 		}
 	}

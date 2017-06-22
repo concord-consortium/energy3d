@@ -197,9 +197,12 @@ public class SelectUtil {
 			}
 		}
 		if (data != null && data.isEditPoint() && currentEditPointMesh != data.getHousePart().getEditPointShape(data.getEditPointIndex())) {
-			currentEditPointMesh = data.getHousePart().getEditPointShape(data.getEditPointIndex());
-			currentEditPointOriginalColor.set(currentEditPointMesh.getDefaultColor());
-			currentEditPointMesh.setDefaultColor(ColorRGBA.RED);
+			final Foundation foundation = data.getHousePart() instanceof Foundation ? (Foundation) data.getHousePart() : data.getHousePart().getTopContainer();
+			if (foundation != null && !foundation.getLockEdit()) {
+				currentEditPointMesh = data.getHousePart().getEditPointShape(data.getEditPointIndex());
+				currentEditPointOriginalColor.set(currentEditPointMesh.getDefaultColor());
+				currentEditPointMesh.setDefaultColor(ColorRGBA.RED);
+			}
 		}
 
 		if (data == null) {
