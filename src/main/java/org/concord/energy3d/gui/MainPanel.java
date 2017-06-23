@@ -269,12 +269,12 @@ public class MainPanel extends JPanel {
 		// create misc menu
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
 		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
-		final JCheckBoxMenuItem miJane = new JCheckBoxMenuItem("Jane", new ImageIcon(getClass().getResource("icons/jane.png")), true);
-		final JCheckBoxMenuItem miJeni = new JCheckBoxMenuItem("Jeni", new ImageIcon(getClass().getResource("icons/jenny.png")), true);
-		final JCheckBoxMenuItem miJill = new JCheckBoxMenuItem("Jill", new ImageIcon(getClass().getResource("icons/jill.png")), true);
-		final JCheckBoxMenuItem miJack = new JCheckBoxMenuItem("Jack", new ImageIcon(getClass().getResource("icons/jack.png")), true);
-		final JCheckBoxMenuItem miJohn = new JCheckBoxMenuItem("John", new ImageIcon(getClass().getResource("icons/john.png")), true);
-		final JCheckBoxMenuItem miJose = new JCheckBoxMenuItem("Jose", new ImageIcon(getClass().getResource("icons/jose.png")), true);
+		final JCheckBoxMenuItem miJane = new JCheckBoxMenuItem("Jane", new ImageIcon(getClass().getResource("icons/jane.png")));
+		final JCheckBoxMenuItem miJeni = new JCheckBoxMenuItem("Jeni", new ImageIcon(getClass().getResource("icons/jenny.png")));
+		final JCheckBoxMenuItem miJill = new JCheckBoxMenuItem("Jill", new ImageIcon(getClass().getResource("icons/jill.png")));
+		final JCheckBoxMenuItem miJack = new JCheckBoxMenuItem("Jack", new ImageIcon(getClass().getResource("icons/jack.png")));
+		final JCheckBoxMenuItem miJohn = new JCheckBoxMenuItem("John", new ImageIcon(getClass().getResource("icons/john.png")));
+		final JCheckBoxMenuItem miJose = new JCheckBoxMenuItem("Jose", new ImageIcon(getClass().getResource("icons/jose.png")));
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -339,10 +339,11 @@ public class MainPanel extends JPanel {
 		bg.add(miJose);
 
 		// create solar menu
-		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")), true);
 		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
-		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Mirror (Heliostat)", new ImageIcon(getClass().getResource("icons/mirror.png")), true);
-		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")), true);
+		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Mirror (Heliostat)", new ImageIcon(getClass().getResource("icons/mirror.png")));
+		final JCheckBoxMenuItem miParabolicTrough = new JCheckBoxMenuItem("Parabolic Trough", new ImageIcon(getClass().getResource("icons/parabolic_trough.png")));
+		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
 		final ActionListener solarAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -357,6 +358,9 @@ public class MainPanel extends JPanel {
 				} else if (selected == miMirror) {
 					solaCommand = SceneManager.Operation.DRAW_MIRROR;
 					solarButton.setToolTipText("Insert a mirror (heliostat)");
+				} else if (selected == miParabolicTrough) {
+					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_TROUGH;
+					solarButton.setToolTipText("Insert a parabolic trough");
 				} else if (selected == miSensor) {
 					solaCommand = SceneManager.Operation.DRAW_SENSOR;
 					solarButton.setToolTipText("Insert a sensor module");
@@ -369,16 +373,21 @@ public class MainPanel extends JPanel {
 		miSolarPanel.addActionListener(solarAction);
 		miRack.addActionListener(solarAction);
 		miMirror.addActionListener(solarAction);
+		miParabolicTrough.addActionListener(solarAction);
 		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
 		solaMenu.add(miRack);
 		solaMenu.add(miSolarPanel);
+		solaMenu.addSeparator();
 		solaMenu.add(miMirror);
+		solaMenu.add(miParabolicTrough);
+		solaMenu.addSeparator();
 		solaMenu.add(miSensor);
 		bg = new ButtonGroup();
 		bg.add(miSolarPanel);
 		bg.add(miRack);
 		bg.add(miMirror);
+		bg.add(miParabolicTrough);
 		bg.add(miSensor);
 
 		System.out.println("done");

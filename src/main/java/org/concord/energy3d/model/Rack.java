@@ -635,7 +635,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		polesRoot.attachChild(pole);
 	}
 
-	// ensure that a mirror in special cases (on a flat roof or at a tilt angle) will have correct orientation
+	// ensure that a rack in special cases (on a flat roof or at a tilt angle) will have correct orientation
 	private void setNormal(final double angle, final double azimuth) {
 		final Foundation foundation = getTopContainer();
 		Vector3 v = foundation.getAbsPoint(0);
@@ -795,7 +795,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		rack.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
 		final boolean isOutside = !roof.insideWallsPolygon(rack.getAbsCenter());
 		if (isOutside) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel outside a roof or rack.", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel rack outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		final double o = rack.copyOverlap(); // TODO
