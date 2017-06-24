@@ -34,6 +34,7 @@ import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.MeshLocator;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -2562,6 +2563,55 @@ public class Scene implements Serializable {
 			if (p instanceof Mirror) {
 				((Mirror) p).setMirrorWidth(width);
 				((Mirror) p).setMirrorHeight(height);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public List<ParabolicTrough> getAllParabolicTroughs() {
+		final List<ParabolicTrough> list = new ArrayList<ParabolicTrough>();
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				list.add((ParabolicTrough) p);
+			}
+		}
+		return list;
+	}
+
+	public void setAzimuthForAllParabolicTroughs(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setReflectivityForAllParabolicTroughs(final double reflectivity) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setReflectivity(reflectivity);
+			}
+		}
+	}
+
+	public void setBaseHeightForAllParabolicTroughs(final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForAllParabolicTroughs(final double width, final double height) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setTroughWidth(width);
+				((ParabolicTrough) p).setTroughHeight(height);
 				p.draw();
 			}
 		}

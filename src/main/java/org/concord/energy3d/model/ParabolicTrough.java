@@ -9,7 +9,6 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
@@ -43,18 +42,16 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Node polesRoot;
-	private transient Node angles;
-	private transient AngleAnnotation sunAngle;
+	private transient Line sunBeam;
 	private transient BMText label;
 	private transient double copyLayoutGap = 1;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double troughWidth = 4.95;
-	private double troughHeight = 1.65;
+	private double troughWidth = 10;
+	private double troughHeight = 3;
 	private double relativeAzimuth = 0;
-	private double tiltAngle = 0;
-	private double baseHeight = 15;
+	private double baseHeight = 5;
 	private double poleDistanceX = 4;
 	private double poleDistanceY = 2;
 	private boolean poleInvisible;
@@ -63,9 +60,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldTroughCenter;
 	private transient double oldTroughWidth, oldTroughHeight;
-	private transient Line sunBeam;
-	private transient Line normalVector;
-	private static double normalVectorLength = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double baseZ;
 
@@ -102,7 +96,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		surround.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
-		offset.setFactor(0.2f); // set a smaller value than solar panel so that the texture doesn't show up on the underside
+		offset.setFactor(1);
 		offset.setUnits(1);
 		surround.setRenderState(offset);
 		root.attachChild(surround);
@@ -121,27 +115,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		sunBeam.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
 		sunBeam.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
 		root.attachChild(sunBeam);
-
-		normalVector = new Line("Normal Vector");
-		normalVector.setLineWidth(0.01f);
-		normalVector.setStipplePattern((short) 0xffff);
-		normalVector.setModelBound(null);
-		Util.disablePickShadowLight(normalVector);
-		normalVector.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		normalVector.setDefaultColor(new ColorRGBA(1f, 1f, 0f, 1f));
-		root.attachChild(normalVector);
-
-		angles = new Node("Angles");
-		angles.getSceneHints().setAllPickingHints(false);
-		Util.disablePickShadowLight(angles);
-		root.attachChild(angles);
-
-		sunAngle = new AngleAnnotation(); // the angle between the sun beam and the normal vector
-		sunAngle.setColor(ColorRGBA.WHITE);
-		sunAngle.setLineWidth(1);
-		sunAngle.setFontSize(1);
-		sunAngle.setCustomRadius(normalVectorLength * 0.8);
-		angles.attachChild(sunAngle);
 
 		label = new BMText("Label", "#" + id, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 		Util.initHousePartLabel(label);
@@ -164,7 +137,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	public void setPreviewPoint(final int x, final int y) {
 		if (editPointIndex <= 0) {
 			// isBaseZ = true;
-			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class, Wall.class });
+			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 				final Vector3 p = picked.getPoint().clone();
 				// isBaseZ = Util.isEqual(p.getZ(), baseZ);
@@ -377,9 +350,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 		if (labelId) {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
-		}
-		if (labelTiltAngle) {
-			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(tiltAngle) + " \u00B0";
 		}
 		if (labelEnergyOutput) {
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday) + " kWh");
@@ -644,14 +614,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return relativeAzimuth;
 	}
 
-	public void setTiltAngle(final double tiltAngle) {
-		this.tiltAngle = tiltAngle;
-	}
-
-	public double getTiltAngle() {
-		return tiltAngle;
-	}
-
 	public void move(final Vector3 v, final double steplength) {
 		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 v_rel = toRelativeVector(v);
@@ -737,15 +699,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 	public void drawSunBeam() {
 		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
 			sunBeam.setVisible(false);
-			normalVector.setVisible(false);
-			sunAngle.setVisible(false);
 			return;
 		}
 		final Vector3 o = getAbsPoint(0);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
-		Vector3 r = o.clone(); // draw sun vector
+		final Vector3 r = o.clone(); // draw sun vector
 		r.addLocal(sunLocation.multiply(10000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
@@ -760,43 +720,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (!bloomRenderPass.contains(sunBeam)) {
 			bloomRenderPass.add(sunBeam);
 		}
-		final FloatBuffer normalVertices = normalVector.getMeshData().getVertexBuffer();
-		normalVertices.rewind();
-		r = o.clone(); // draw normal vector
-		r.addLocal(normal.multiply(normalVectorLength, null));
-		normalVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-
-		// draw arrows of the normal vector
-		final double arrowLength = 0.75;
-		final double arrowAngle = Math.toRadians(20);
-		final Matrix3 matrix = new Matrix3();
-		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-		final ReadOnlyTransform trans = mesh.getWorldTransform();
-		final Vector3 v1 = new Vector3();
-		final Vector3 v2 = new Vector3();
-		BufferUtils.populateFromBuffer(v1, buf, 1);
-		BufferUtils.populateFromBuffer(v2, buf, 2);
-		Vector3 a = trans.applyForward(v1).subtract(trans.applyForward(v2), null).normalizeLocal();
-		a = a.crossLocal(normal);
-		Vector3 s = normal.clone();
-		s = matrix.fromAngleNormalAxis(arrowAngle, a).applyPost(s, null).multiplyLocal(arrowLength);
-		s = r.subtract(s, null);
-		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
-		s = normal.clone();
-		s = matrix.fromAngleNormalAxis(-arrowAngle, a).applyPost(s, null).multiplyLocal(arrowLength);
-		s = r.subtract(s, null);
-		normalVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		normalVertices.put(s.getXf()).put(s.getYf()).put(s.getZf());
-
-		// draw the angle between the sun beam and the normal vector
-		normal.cross(sunLocation, a);
-		sunAngle.setRange(o, o.add(sunLocation, null), o.add(normal, null), a);
-		sunAngle.setVisible(true);
-
-		normalVector.updateModelBound();
-		normalVector.setVisible(true);
 	}
 
 	@Override

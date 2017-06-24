@@ -1792,9 +1792,19 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public List<Mirror> getMirrors() {
 		final List<Mirror> list = new ArrayList<Mirror>();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Mirror && p.getTopContainer() == this) {
+		for (final HousePart p : children) {
+			if (p instanceof Mirror) {
 				list.add((Mirror) p);
+			}
+		}
+		return list;
+	}
+
+	public List<ParabolicTrough> getParabolicTroughs() {
+		final List<ParabolicTrough> list = new ArrayList<ParabolicTrough>();
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				list.add((ParabolicTrough) p);
 			}
 		}
 		return list;
@@ -2734,6 +2744,48 @@ public class Foundation extends HousePart implements Thermalizable {
 				m.setMirrorWidth(width);
 				m.setMirrorHeight(height);
 				m.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all the parabolic troughs on this foundation
+
+	public void setAzimuthForParabolicTroughs(final double angle) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setReflectivityForParabolicTroughs(final double reflectivity) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setReflectivity(reflectivity);
+			}
+		}
+	}
+
+	public void setBaseHeightForParabolicTroughs(final double baseHeight) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForParabolicTroughs(final double width, final double height) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				final ParabolicTrough t = (ParabolicTrough) p;
+				t.setTroughWidth(width);
+				t.setTroughHeight(height);
+				t.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();

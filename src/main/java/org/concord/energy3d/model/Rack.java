@@ -49,6 +49,9 @@ public class Rack extends HousePart implements Trackable, Meshable {
 	private transient Node polesRoot;
 	private transient Node angles;
 	private transient AngleAnnotation sunAngle;
+	private transient Line sunBeam;
+	private transient Line normalVector;
+	private transient Line solarPanelOutlines;
 	private transient BMText label;
 	private transient Vector3 moveStartPoint;
 	private transient double copyLayoutGap = 1;
@@ -75,9 +78,6 @@ public class Rack extends HousePart implements Trackable, Meshable {
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldRackCenter;
 	private transient double oldRackWidth, oldRackHeight;
-	private transient Line sunBeam;
-	private transient Line normalVector;
-	private transient Line solarPanelOutlines;
 	private static double normalVectorLength = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double baseZ;

@@ -9003,14 +9003,14 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
-										// foundation.setSizeForMirrors(w, h);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetSizeForParabolicTroughsOnFoundationCommand c = new SetSizeForParabolicTroughsOnFoundationCommand(foundation);
+										foundation.setSizeForParabolicTroughs(w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
-										// Scene.getInstance().setSizeForAllMirrors(w, h);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetSizeForAllParabolicTroughsCommand c = new SetSizeForAllParabolicTroughsCommand();
+										Scene.getInstance().setSizeForAllParabolicTroughs(w, h);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
@@ -9097,14 +9097,14 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									// final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
-									// foundation.setBaseHeightForMirrors(val);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									final ChangeFoundationParabolicTroughBaseHeightCommand c = new ChangeFoundationParabolicTroughBaseHeightCommand(foundation);
+									foundation.setBaseHeightForParabolicTroughs(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									// final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
-									// Scene.getInstance().setBaseHeightForAllMirrors(val);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									final ChangeBaseHeightForAllParabolicTroughsCommand c = new ChangeBaseHeightForAllParabolicTroughsCommand();
+									Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 2;
 								}
 								updateAfterEdit();
@@ -9128,10 +9128,10 @@ public class PopupMenuFactory {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof ParabolicTrough) {
 							final ParabolicTrough t = (ParabolicTrough) selectedPart;
-							// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+							final SetParabolicTroughLabelCommand c = new SetParabolicTroughLabelCommand(t);
 							t.clearLabels();
 							t.draw();
-							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 							Scene.getInstance().setEdited(true);
 							SceneManager.getInstance().refresh();
 						}
@@ -9147,13 +9147,13 @@ public class PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof ParabolicTrough) {
 						final ParabolicTrough t = (ParabolicTrough) selectedPart;
-						// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(f);
+						final SetParabolicTroughLabelCommand c = new SetParabolicTroughLabelCommand(t);
 						t.setLabelCustom(miLabelCustom.isSelected());
 						if (t.getLabelCustom()) {
 							t.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", t.getLabelCustomText()));
 						}
 						t.draw();
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
 					}
@@ -9168,10 +9168,10 @@ public class PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof ParabolicTrough) {
 						final ParabolicTrough t = (ParabolicTrough) selectedPart;
-						// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+						final SetParabolicTroughLabelCommand c = new SetParabolicTroughLabelCommand(t);
 						t.setLabelId(miLabelId.isSelected());
 						t.draw();
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
 					}
@@ -9186,10 +9186,10 @@ public class PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof ParabolicTrough) {
 						final ParabolicTrough t = (ParabolicTrough) selectedPart;
-						// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+						final SetParabolicTroughLabelCommand c = new SetParabolicTroughLabelCommand(t);
 						t.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
 						t.draw();
-						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
 					}
@@ -9281,20 +9281,20 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough reflectivity must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										// final ChangeMirrorReflectivityCommand c = new ChangeMirrorReflectivityCommand(t);
+										final ChangeParabolicTroughReflectivityCommand c = new ChangeParabolicTroughReflectivityCommand(t);
 										t.setReflectivity(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final Foundation foundation = t.getTopContainer();
-										// final ChangeFoundationMirrorReflectivityCommand c = new ChangeFoundationMirrorReflectivityCommand(foundation);
-										// foundation.setReflectivityForMirrors(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final Foundation foundation = t.getTopContainer();
+										final ChangeFoundationParabolicTroughReflectivityCommand c = new ChangeFoundationParabolicTroughReflectivityCommand(foundation);
+										foundation.setReflectivityForParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final ChangeReflectivityForAllMirrorsCommand c = new ChangeReflectivityForAllMirrorsCommand();
-										// Scene.getInstance().setReflectivityForAllMirrors(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final ChangeReflectivityForAllParabolicTroughsCommand c = new ChangeReflectivityForAllParabolicTroughsCommand();
+										Scene.getInstance().setReflectivityForAllParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
