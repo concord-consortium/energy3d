@@ -60,6 +60,7 @@ import org.concord.energy3d.model.MirrorCircularFieldLayout;
 import org.concord.energy3d.model.MirrorRectangularFieldLayout;
 import org.concord.energy3d.model.MirrorSpiralFieldLayout;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -130,6 +131,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForSolarPanel;
 	private static JPopupMenu popupMenuForRack;
 	private static JPopupMenu popupMenuForMirror;
+	private static JPopupMenu popupMenuForParabolicTrough;
 	private static JPopupMenu popupMenuForSensor;
 	private static JPopupMenu popupMenuForLand;
 	private static JPopupMenu popupMenuForSky;
@@ -205,6 +207,9 @@ public class PopupMenuFactory {
 		}
 		if (selectedPart instanceof Mirror) {
 			return getPopupMenuForMirror();
+		}
+		if (selectedPart instanceof ParabolicTrough) {
+			return getPopupMenuForParabolicTrough();
 		}
 		if (selectedPart instanceof Sensor) {
 			return getPopupMenuForSensor();
@@ -8561,10 +8566,10 @@ public class PopupMenuFactory {
 					if (miLabelNone.isSelected()) {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Mirror) {
-							final Mirror r = (Mirror) selectedPart;
-							final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
-							r.clearLabels();
-							r.draw();
+							final Mirror m = (Mirror) selectedPart;
+							final SetMirrorLabelCommand c = new SetMirrorLabelCommand(m);
+							m.clearLabels();
+							m.draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 							Scene.getInstance().setEdited(true);
 							SceneManager.getInstance().refresh();
@@ -8580,13 +8585,13 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Mirror) {
-						final Mirror f = (Mirror) selectedPart;
-						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(f);
-						f.setLabelCustom(miLabelCustom.isSelected());
-						if (f.getLabelCustom()) {
-							f.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", f.getLabelCustomText()));
+						final Mirror m = (Mirror) selectedPart;
+						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(m);
+						m.setLabelCustom(miLabelCustom.isSelected());
+						if (m.getLabelCustom()) {
+							m.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", m.getLabelCustomText()));
 						}
-						f.draw();
+						m.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
@@ -8601,10 +8606,10 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Mirror) {
-						final Mirror r = (Mirror) selectedPart;
-						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
-						r.setLabelId(miLabelId.isSelected());
-						r.draw();
+						final Mirror m = (Mirror) selectedPart;
+						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(m);
+						m.setLabelId(miLabelId.isSelected());
+						m.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
@@ -8619,10 +8624,10 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Mirror) {
-						final Mirror r = (Mirror) selectedPart;
-						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
-						r.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
-						r.draw();
+						final Mirror m = (Mirror) selectedPart;
+						final SetMirrorLabelCommand c = new SetMirrorLabelCommand(m);
+						m.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						m.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
@@ -8792,6 +8797,553 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenuForMirror;
+
+	}
+
+	private static JPopupMenu getPopupMenuForParabolicTrough() {
+
+		if (popupMenuForParabolicTrough == null) {
+
+			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
+			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					// m.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
+					t.draw();
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
+			miAzimuth.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicTrough trough = (ParabolicTrough) selectedPart;
+					final Foundation foundation = trough.getTopContainer();
+					final String title = "<html>Azimuth Angle (&deg;) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					double a = trough.getRelativeAzimuth() + foundation.getAzimuth();
+					if (a > 360) {
+						a -= 360;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(a));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Azimuth");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								a = val - foundation.getAzimuth();
+								if (a < 0) {
+									a += 360;
+								}
+								if (rb1.isSelected()) {
+									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(trough);
+									trough.setRelativeAzimuth(a);
+									trough.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
+								} else if (rb2.isSelected()) {
+									// final ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
+									// foundation.setAzimuthForMirrors(a);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
+								} else if (rb3.isSelected()) {
+									// final ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
+									// Scene.getInstance().setAzimuthForAllMirrors(a);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
+								}
+								updateAfterEdit();
+								if (choice == options[0]) {
+									break;
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miSize = new JMenuItem("Size...");
+			miSize.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					final Foundation foundation = t.getTopContainer();
+					final String partInfo = t.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Width: "));
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(t.getTroughWidth()));
+					inputPanel.add(widthField);
+					inputPanel.add(new JLabel("Length: "));
+					final JTextField heightField = new JTextField(threeDecimalsFormat.format(t.getTroughHeight()));
+					inputPanel.add(heightField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Size");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double w = 0, h = 0;
+							boolean ok = true;
+							try {
+								w = Double.parseDouble(widthField.getText());
+								h = Double.parseDouble(heightField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (w < 1 || w > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (h < 1 || h > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetPartSizeCommand c = new SetPartSizeCommand(t);
+										t.setTroughWidth(w);
+										t.setTroughHeight(h);
+										t.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
+										// foundation.setSizeForMirrors(w, h);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
+										// Scene.getInstance().setSizeForAllMirrors(w, h);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
+			miBaseHeight.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					final Foundation foundation = t.getTopContainer();
+					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getBaseHeight() * Scene.getInstance().getAnnotationScale()));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Base Height");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getAnnotationScale();
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (rb1.isSelected()) {
+									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(t);
+									t.setBaseHeight(val);
+									t.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
+								} else if (rb2.isSelected()) {
+									// final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
+									// foundation.setBaseHeightForMirrors(val);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
+								} else if (rb3.isSelected()) {
+									// final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
+									// Scene.getInstance().setBaseHeightForAllMirrors(val);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
+								}
+								updateAfterEdit();
+								if (choice == options[0]) {
+									break;
+								}
+							}
+						}
+					}
+
+				}
+			});
+
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof ParabolicTrough) {
+							final ParabolicTrough t = (ParabolicTrough) selectedPart;
+							// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+							t.clearLabels();
+							t.draw();
+							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().refresh();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
+			miLabelCustom.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof ParabolicTrough) {
+						final ParabolicTrough t = (ParabolicTrough) selectedPart;
+						// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(f);
+						t.setLabelCustom(miLabelCustom.isSelected());
+						if (t.getLabelCustom()) {
+							t.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", t.getLabelCustomText()));
+						}
+						t.draw();
+						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCustom);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof ParabolicTrough) {
+						final ParabolicTrough t = (ParabolicTrough) selectedPart;
+						// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+						t.setLabelId(miLabelId.isSelected());
+						t.draw();
+						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelEnergyOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof ParabolicTrough) {
+						final ParabolicTrough t = (ParabolicTrough) selectedPart;
+						// final SetMirrorLabelCommand c = new SetMirrorLabelCommand(r);
+						t.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						t.draw();
+						// SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelEnergyOutput);
+
+			popupMenuForParabolicTrough = createPopupMenu(true, true, new Runnable() {
+				@Override
+				public void run() {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					Util.selectSilently(miLabelNone, !t.isLabelVisible());
+					Util.selectSilently(miLabelCustom, t.getLabelCustom());
+					Util.selectSilently(miLabelId, t.getLabelId());
+					Util.selectSilently(miLabelEnergyOutput, t.getLabelEnergyOutput());
+				}
+			});
+
+			final JMenuItem miReflectivity = new JMenuItem("Reflectivity...");
+			miReflectivity.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					final String title = "<html>Reflectivity (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Reflectivity can be affected by pollen and dust.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getReflectivity() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Reflectivity");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 50 || val > 99) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough reflectivity must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final ChangeMirrorReflectivityCommand c = new ChangeMirrorReflectivityCommand(t);
+										t.setReflectivity(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final Foundation foundation = t.getTopContainer();
+										// final ChangeFoundationMirrorReflectivityCommand c = new ChangeFoundationMirrorReflectivityCommand(foundation);
+										// foundation.setReflectivityForMirrors(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final ChangeReflectivityForAllMirrorsCommand c = new ChangeReflectivityForAllMirrorsCommand();
+										// Scene.getInstance().setReflectivityForAllMirrors(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			popupMenuForParabolicTrough.addSeparator();
+			popupMenuForParabolicTrough.add(miAzimuth);
+			popupMenuForParabolicTrough.addSeparator();
+			popupMenuForParabolicTrough.add(cbmiDrawSunBeam);
+			popupMenuForParabolicTrough.add(labelMenu);
+			popupMenuForParabolicTrough.addSeparator();
+			popupMenuForParabolicTrough.add(miSize);
+			popupMenuForParabolicTrough.add(miBaseHeight);
+			popupMenuForParabolicTrough.add(miReflectivity);
+			popupMenuForParabolicTrough.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicTrough) {
+						// new MirrorDailyAnalysis().show();
+					}
+				}
+			});
+			popupMenuForParabolicTrough.add(mi);
+
+			mi = new JMenuItem("Annual Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicTrough) {
+						// new MirrorAnnualAnalysis().show();
+					}
+				}
+			});
+			popupMenuForParabolicTrough.add(mi);
+
+		}
+
+		return popupMenuForParabolicTrough;
 
 	}
 

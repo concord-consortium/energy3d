@@ -6,6 +6,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Window;
 
@@ -22,6 +23,10 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			final Mirror m = (Mirror) part;
 			oldWidth = m.getMirrorWidth();
 			oldHeight = m.getMirrorHeight();
+		} else if (part instanceof ParabolicTrough) {
+			final ParabolicTrough t = (ParabolicTrough) part;
+			oldWidth = t.getTroughWidth();
+			oldHeight = t.getTroughHeight();
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			oldWidth = r.getRackWidth();
@@ -54,6 +59,12 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			newHeight = m.getMirrorHeight();
 			m.setMirrorWidth(oldWidth);
 			m.setMirrorHeight(oldHeight);
+		} else if (part instanceof ParabolicTrough) {
+			final ParabolicTrough t = (ParabolicTrough) part;
+			newWidth = t.getTroughWidth();
+			newHeight = t.getTroughHeight();
+			t.setTroughWidth(oldWidth);
+			t.setTroughHeight(oldHeight);
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			newWidth = r.getRackWidth();
@@ -78,6 +89,10 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			final Mirror m = (Mirror) part;
 			m.setMirrorWidth(newWidth);
 			m.setMirrorHeight(newHeight);
+		} else if (part instanceof ParabolicTrough) {
+			final ParabolicTrough t = (ParabolicTrough) part;
+			t.setTroughWidth(newWidth);
+			t.setTroughHeight(newHeight);
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			r.setRackWidth(newWidth);
@@ -95,6 +110,9 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 	public String getPresentationName() {
 		if (part instanceof Mirror) {
 			return "Set Size for Selected Mirror";
+		}
+		if (part instanceof ParabolicTrough) {
+			return "Set Size for Selected Parabolic Trough";
 		}
 		if (part instanceof Rack) {
 			return "Set Size for Selected Rack";

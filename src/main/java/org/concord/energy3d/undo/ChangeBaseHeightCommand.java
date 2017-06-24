@@ -6,6 +6,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
@@ -23,6 +24,8 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 			oldValue = ((Rack) part).getBaseHeight();
 		} else if (part instanceof Mirror) {
 			oldValue = ((Mirror) part).getBaseHeight();
+		} else if (part instanceof ParabolicTrough) {
+			oldValue = ((ParabolicTrough) part).getBaseHeight();
 		}
 	}
 
@@ -41,6 +44,8 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 			newValue = ((Rack) part).getBaseHeight();
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getBaseHeight();
+		} else if (part instanceof ParabolicTrough) {
+			newValue = ((ParabolicTrough) part).getBaseHeight();
 		}
 		return newValue;
 	}
@@ -57,6 +62,9 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getBaseHeight();
 			((Mirror) part).setBaseHeight(oldValue);
+		} else if (part instanceof ParabolicTrough) {
+			newValue = ((ParabolicTrough) part).getBaseHeight();
+			((ParabolicTrough) part).setBaseHeight(oldValue);
 		}
 		part.draw();
 	}
@@ -70,6 +78,8 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 			((Rack) part).setBaseHeight(newValue);
 		} else if (part instanceof Mirror) {
 			((Mirror) part).setBaseHeight(newValue);
+		} else if (part instanceof ParabolicTrough) {
+			((ParabolicTrough) part).setBaseHeight(newValue);
 		}
 		part.draw();
 	}

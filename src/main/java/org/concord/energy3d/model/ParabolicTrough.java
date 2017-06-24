@@ -47,10 +47,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient AngleAnnotation sunAngle;
 	private transient BMText label;
 	private transient double copyLayoutGap = 1;
-	private transient boolean allowAzimuthLargeRotation;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
-	private ReadOnlyVector3 previousNormal;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double troughWidth = 4.95;
 	private double troughHeight = 1.65;
@@ -273,35 +271,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 			return;
 		}
 
-		final boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 
-		final double dotE = 0.9999;
 		normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalize(null);
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
-
-		if (previousNormal == null) {
-			previousNormal = normal;
-		}
-		if (previousNormal != null && normal.dot(previousNormal) < dotE) {
-			// azimuth rotation
-			Matrix3 matrix = null;
-			if (allowAzimuthLargeRotation && Util.isEqual(normal.multiply(1, 1, 0, null).normalizeLocal(), previousNormal.multiply(1, 1, 0, null).negateLocal().normalizeLocal())) {
-				matrix = new Matrix3().fromAngleAxis(Math.PI, Vector3.UNIT_Z);
-			} else if (normal.multiply(1, 1, 0, null).normalizeLocal().dot(previousNormal.multiply(1, 1, 0, null).normalizeLocal()) > -dotE) {
-				matrix = findRotationMatrix(previousNormal.multiply(1, 1, 0, null).normalizeLocal(), normal.multiply(1, 1, 0, null).normalizeLocal());
-			}
-			if (matrix != null) {
-				rotateSolarPanels(matrix);
-				previousNormal = matrix.applyPost(previousNormal, null);
-			}
-			// tilt rotation
-			rotateSolarPanels(findRotationMatrix(previousNormal, normal));
-			previousNormal = normal;
-		}
-		allowAzimuthLargeRotation = false;
 
 		if (container instanceof Foundation) {
 			baseZ = container.getHeight();
@@ -377,13 +352,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 				addPole(position, baseHeight, baseZ);
 			}
 		}
-		polesRoot.getSceneHints().setCullHint(onFlatSurface ? CullHint.Inherit : CullHint.Always);
+		polesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		if (drawSunBeam) {
 			drawSunBeam();
 		}
 
-		drawFloatingLabel(onFlatSurface);
+		drawFloatingLabel();
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
@@ -392,10 +367,10 @@ public class ParabolicTrough extends HousePart implements Solar {
 	}
 
 	public void updateLabel() {
-		drawFloatingLabel(onFlatSurface());
+		drawFloatingLabel();
 	}
 
-	private void drawFloatingLabel(final boolean onFlatSurface) {
+	private void drawFloatingLabel() {
 		String text = "";
 		if (labelCustom && labelCustomText != null) {
 			text += labelCustomText;
@@ -404,7 +379,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelTiltAngle) {
-			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(onFlatSurface ? tiltAngle : Math.toDegrees(Math.asin(normal.getY()))) + " \u00B0";
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(tiltAngle) + " \u00B0";
 		}
 		if (labelEnergyOutput) {
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday) + " kWh");
@@ -663,7 +638,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		} else {
 			oldRelativeAzimuth = this.relativeAzimuth;
 		}
-		allowAzimuthLargeRotation = true;
 	}
 
 	public double getRelativeAzimuth() {
@@ -672,23 +646,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	public void setTiltAngle(final double tiltAngle) {
 		this.tiltAngle = tiltAngle;
-	}
-
-	private void rotateSolarPanels(final Matrix3 matrix) {
-		final Vector3 center = getAbsPoint(0);
-		for (final HousePart child : children) {
-			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);
-			matrix.applyPost(v, v);
-			v.addLocal(center);
-			child.getPoints().get(0).set(child.toRelative(v));
-		}
-	}
-
-	private Matrix3 findRotationMatrix(final ReadOnlyVector3 v1, final ReadOnlyVector3 v2) {
-		final double angle = v1.smallestAngleBetween(v2);
-		final Vector3 axis = v1.cross(v2, null).normalizeLocal();
-		final Matrix3 matrix = new Matrix3().fromAngleAxis(angle, axis);
-		return matrix;
 	}
 
 	public double getTiltAngle() {
@@ -738,20 +695,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	public boolean isPoleVisible() {
 		return !poleInvisible;
-	}
-
-	private boolean onFlatSurface() {
-		if (container instanceof Roof) {
-			if (Util.isZero(container.getHeight())) {
-				return true;
-			}
-		} else if (container instanceof Foundation) {
-			if (pickedNormal != null) {
-				return Util.isEqualFaster(pickedNormal, Vector3.UNIT_Z);
-			}
-			return true;
-		}
-		return false;
 	}
 
 	@Override

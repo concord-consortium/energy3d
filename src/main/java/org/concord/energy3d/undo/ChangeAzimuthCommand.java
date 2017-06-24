@@ -6,6 +6,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
@@ -23,6 +24,8 @@ public class ChangeAzimuthCommand extends AbstractUndoableEdit {
 			oldValue = ((Rack) part).getRelativeAzimuth();
 		} else if (part instanceof Mirror) {
 			oldValue = ((Mirror) part).getRelativeAzimuth();
+		} else if (part instanceof ParabolicTrough) {
+			oldValue = ((ParabolicTrough) part).getRelativeAzimuth();
 		}
 	}
 
@@ -41,6 +44,8 @@ public class ChangeAzimuthCommand extends AbstractUndoableEdit {
 			newValue = ((Rack) part).getRelativeAzimuth();
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getRelativeAzimuth();
+		} else if (part instanceof ParabolicTrough) {
+			newValue = ((ParabolicTrough) part).getRelativeAzimuth();
 		}
 		return newValue;
 	}
@@ -57,6 +62,9 @@ public class ChangeAzimuthCommand extends AbstractUndoableEdit {
 		} else if (part instanceof Mirror) {
 			newValue = ((Mirror) part).getRelativeAzimuth();
 			((Mirror) part).setRelativeAzimuth(oldValue);
+		} else if (part instanceof ParabolicTrough) {
+			newValue = ((ParabolicTrough) part).getRelativeAzimuth();
+			((ParabolicTrough) part).setRelativeAzimuth(oldValue);
 		}
 		part.draw();
 	}
@@ -70,6 +78,8 @@ public class ChangeAzimuthCommand extends AbstractUndoableEdit {
 			((Rack) part).setRelativeAzimuth(newValue);
 		} else if (part instanceof Mirror) {
 			((Mirror) part).setRelativeAzimuth(newValue);
+		} else if (part instanceof ParabolicTrough) {
+			((ParabolicTrough) part).setRelativeAzimuth(newValue);
 		}
 		part.draw();
 	}
