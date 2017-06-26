@@ -458,6 +458,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								m.draw();
 							}
 						}
+					} else if (part instanceof ParabolicTrough) {
+						final ParabolicTrough t = (ParabolicTrough) part;
+						if (night) {
+							t.drawLightBeams(); // call this so that the light beams can be set invisible
+						} else {
+							t.draw();
+						}
 					} else if (part instanceof SolarPanel) {
 						final SolarPanel sp = (SolarPanel) part;
 						if (!night && sp.getTracker() != Trackable.NO_TRACKER) {

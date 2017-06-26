@@ -42,7 +42,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient Mesh outlineMesh;
 	private transient Box surround;
 	private transient Node polesRoot;
-	private transient Line sunBeam;
+	private transient Line lightBeams;
 	private transient BMText label;
 	private transient double copyLayoutGap = 1;
 	private transient double yieldNow; // solar output at current hour
@@ -56,7 +56,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private double poleDistanceY = 2;
 	private boolean poleInvisible;
 	private boolean drawSunBeam;
-	private boolean labelTiltAngle;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldTroughCenter;
 	private transient double oldTroughWidth, oldTroughHeight;
@@ -107,14 +106,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		sunBeam = new Line("Sun Beam");
-		sunBeam.setLineWidth(0.01f);
-		sunBeam.setStipplePattern((short) 0xffff);
-		sunBeam.setModelBound(null);
-		Util.disablePickShadowLight(sunBeam);
-		sunBeam.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		sunBeam.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
-		root.attachChild(sunBeam);
+		lightBeams = new Line("Light Beams");
+		lightBeams.setLineWidth(0.01f);
+		lightBeams.setStipplePattern((short) 0xffff);
+		lightBeams.setModelBound(null);
+		Util.disablePickShadowLight(lightBeams);
+		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		lightBeams.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
+		root.attachChild(lightBeams);
 
 		label = new BMText("Label", "#" + id, FontManager.getInstance().getPartNumberFont(), Align.Center, Justify.Center);
 		Util.initHousePartLabel(label);
@@ -131,16 +130,15 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 		oldTroughWidth = troughWidth;
 		oldTroughHeight = troughHeight;
+
 	}
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
 		if (editPointIndex <= 0) {
-			// isBaseZ = true;
 			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 				final Vector3 p = picked.getPoint().clone();
-				// isBaseZ = Util.isEqual(p.getZ(), baseZ);
 				final UserData ud = picked.getUserData();
 				snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
 				points.get(0).set(toRelative(p));
@@ -220,20 +218,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 					return true;
 				}
 			}
-		} else if (container instanceof Roof) {
-			final Roof roof = (Roof) container;
-			final int n = Math.round(mesh.getMeshData().getVertexBuffer().limit() / 3);
-			boolean init = true;
-			for (int i = 0; i < n; i++) {
-				final Vector3 a = getVertex(i);
-				if (!roof.insideWalls(a.getX(), a.getY(), init)) {
-					return true;
-				}
-				if (init) {
-					init = false;
-				}
-			}
-
 		}
 		return false;
 	}
@@ -251,15 +235,11 @@ public class ParabolicTrough extends HousePart implements Solar {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
 
-		if (container instanceof Foundation) {
-			baseZ = container.getHeight();
-		} else {
-			baseZ = container.getPoints().get(0).getZ();
-		}
+		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0), troughWidth / 2.0 / annotationScale, troughHeight / 2.0 / annotationScale, 0.15);
+		surround.setData(new Vector3(0, 0, 0), troughWidth / (2.0 * annotationScale), troughHeight / (2.0 * annotationScale), 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -269,12 +249,9 @@ public class ParabolicTrough extends HousePart implements Solar {
 		vertexBuffer.rewind();
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
-		// when the heat map is on, use a single texture from the radiation calculation, don't repeat
-		final float spw = 1;
-		final float sph = 1;
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(spw).put(0);
+		textureBuffer.put(1).put(0);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
@@ -284,18 +261,18 @@ public class ParabolicTrough extends HousePart implements Solar {
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(0).put(sph);
-		textureBuffer.put(0).put(sph);
+		textureBuffer.put(0).put(1);
+		textureBuffer.put(0).put(1);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i += 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(spw).put(sph);
+		textureBuffer.put(1).put(1);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		textureBuffer.put(spw).put(0);
+		textureBuffer.put(1).put(0);
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 
 		mesh.updateModelBound();
@@ -303,7 +280,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
 		mesh.setTranslation(getAbsPoint(0));
-
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());
 		outlineMesh.setTranslation(mesh.getTranslation());
@@ -328,10 +304,10 @@ public class ParabolicTrough extends HousePart implements Solar {
 		polesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		if (drawSunBeam) {
-			drawSunBeam();
+			drawLightBeams();
 		}
 
-		drawFloatingLabel();
+		updateLabel();
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
@@ -340,10 +316,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 	}
 
 	public void updateLabel() {
-		drawFloatingLabel();
-	}
-
-	private void drawFloatingLabel() {
 		String text = "";
 		if (labelCustom && labelCustomText != null) {
 			text += labelCustomText;
@@ -447,24 +419,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return true;
 	}
 
-	private double copyOverlap() { // assume that we copy in the direction of shorter side
-		final double w1 = Math.min(troughWidth, troughHeight) / Scene.getInstance().getAnnotationScale();
-		final Vector3 center = getAbsCenter();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.container == container && p != this) {
-				if (p instanceof ParabolicTrough) {
-					final ParabolicTrough s2 = (ParabolicTrough) p;
-					final double w2 = Math.min(s2.troughWidth, s2.troughHeight) / Scene.getInstance().getAnnotationScale();
-					final double distance = p.getAbsCenter().distance(center);
-					if (distance < (w1 + w2) * 0.499) {
-						return distance;
-					}
-				}
-			}
-		}
-		return -1;
-	}
-
 	private double copyOverlapInDirectionOfHeight() { // copy only in the direction of trough height
 		final double w1 = troughHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
@@ -489,11 +443,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (check) {
 			normal = container.getNormal();
 			if (container instanceof Foundation) {
-				if (!isPositionLegal(c, (Foundation) container, false)) {
-					return null;
-				}
-			} else if (container instanceof Roof) {
-				if (!isPositionLegal(c, (Roof) container, !Util.isZero(container.getHeight()))) {
+				if (!isPositionLegal(c, (Foundation) container)) {
 					return null;
 				}
 			}
@@ -501,42 +451,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return c;
 	}
 
-	private boolean isPositionLegal(final ParabolicTrough trough, final Roof roof, final boolean nonFlatRoof) {
-		if (!nonFlatRoof) { // flat roof
-			return isPositionLegal(trough, getTopContainer(), nonFlatRoof);
-		}
-		final Vector3 d = normal.cross(Vector3.UNIT_Z, null);
-		d.normalizeLocal();
-		if (Util.isZero(d.length())) {
-			d.set(1, 0, 0);
-		}
-		final double s = Math.signum(roof.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(d));
-		d.multiplyLocal((1 + (nonFlatRoof ? 0 : copyLayoutGap)) * troughWidth / Scene.getInstance().getAnnotationScale());
-		d.addLocal(getContainerRelative().getPoints().get(0));
-		final Vector3 v = toRelative(d);
-		trough.points.get(0).setX(points.get(0).getX() + s * v.getX());
-		trough.points.get(0).setY(points.get(0).getY() + s * v.getY());
-		trough.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
-		final boolean isOutside = !roof.insideWallsPolygon(trough.getAbsCenter());
-		if (isOutside) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		final double o = trough.copyOverlap(); // TODO
-		if (o >= 0) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new trough is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
-		return true;
-	}
-
-	private boolean isPositionLegal(final ParabolicTrough trough, final Foundation foundation, final boolean nonFlatRoof) {
+	private boolean isPositionLegal(final ParabolicTrough trough, final Foundation foundation) {
 		final Vector3 p0 = foundation.getAbsPoint(0);
 		final Vector3 p1 = foundation.getAbsPoint(1);
 		final Vector3 p2 = foundation.getAbsPoint(2);
 		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
-		final double length = (1 + (nonFlatRoof ? 0 : copyLayoutGap)) * troughHeight / Scene.getInstance().getAnnotationScale();
+		final double length = (1 + copyLayoutGap) * troughHeight / Scene.getInstance().getAnnotationScale();
 		final double s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		final double tx = length / p0.distance(p2);
 		final double ty = length / p0.distance(p1);
@@ -696,29 +617,29 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return mesh.getWorldTransform().applyForward(v);
 	}
 
-	public void drawSunBeam() {
+	public void drawLightBeams() {
 		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
-			sunBeam.setVisible(false);
+			lightBeams.setVisible(false);
 			return;
 		}
 		final Vector3 o = getAbsPoint(0);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
+		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 		final Vector3 r = o.clone(); // draw sun vector
 		r.addLocal(sunLocation.multiply(10000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		sunBeam.updateModelBound();
-		sunBeam.setVisible(true);
+		lightBeams.updateModelBound();
+		lightBeams.setVisible(true);
 		if (bloomRenderPass == null) {
 			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
 			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
 			bloomRenderPass.setNrBlurPasses(2);
 			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
 		}
-		if (!bloomRenderPass.contains(sunBeam)) {
-			bloomRenderPass.add(sunBeam);
+		if (!bloomRenderPass.contains(lightBeams)) {
+			bloomRenderPass.add(lightBeams);
 		}
 	}
 
@@ -726,8 +647,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 	public void delete() {
 		super.delete();
 		if (bloomRenderPass != null) {
-			if (bloomRenderPass.contains(sunBeam)) {
-				bloomRenderPass.remove(sunBeam);
+			if (bloomRenderPass.contains(lightBeams)) {
+				bloomRenderPass.remove(lightBeams);
 			}
 		}
 	}
@@ -759,20 +680,11 @@ public class ParabolicTrough extends HousePart implements Solar {
 	@Override
 	public void clearLabels() {
 		super.clearLabels();
-		labelTiltAngle = false;
 		labelEnergyOutput = false;
 	}
 
 	public boolean isLabelVisible() {
 		return label.isVisible();
-	}
-
-	public void setLabelTiltAngle(final boolean labelTiltAngle) {
-		this.labelTiltAngle = labelTiltAngle;
-	}
-
-	public boolean getLabelTiltAngle() {
-		return labelTiltAngle;
 	}
 
 	public void setLabelEnergyOutput(final boolean labelEnergyOutput) {

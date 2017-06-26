@@ -2882,6 +2882,8 @@ public class Scene implements Serializable {
 						((Rack) p).updateLabel();
 					} else if (p instanceof Mirror) {
 						((Mirror) p).updateLabel();
+					} else if (p instanceof ParabolicTrough) {
+						((ParabolicTrough) p).updateLabel();
 					} else if (p instanceof Foundation) {
 						((Foundation) p).updateLabel();
 					}
@@ -2903,6 +2905,13 @@ public class Scene implements Serializable {
 							mirror.drawLightBeams(); // call this so that the light beams can be set invisible
 						} else {
 							mirror.draw();
+						}
+					} else if (part instanceof ParabolicTrough) {
+						final ParabolicTrough trough = (ParabolicTrough) part;
+						if (night) {
+							trough.drawLightBeams(); // call this so that the light beams can be set invisible
+						} else {
+							trough.draw();
 						}
 					} else if (part instanceof SolarPanel) {
 						final SolarPanel panel = (SolarPanel) part;
