@@ -28,7 +28,6 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
-import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -40,7 +39,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
-	private transient Box surround;
+	private transient ParabolicCylinder surround;
 	private transient Node polesRoot;
 	private transient Line lightBeams;
 	private transient BMText label;
@@ -91,7 +90,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		surround = new Box("Parabolic Trough (Surround)");
+		surround = new ParabolicCylinder("Parabolic Trough (Surround)", 10, 10, 1, 1, 10);
 		surround.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
@@ -239,10 +238,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		points.get(0).setZ(baseZ + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0), troughWidth / (2.0 * annotationScale), troughHeight / (2.0 * annotationScale), 0.15);
+		// surround.setData(new Vector3(0, 0, 0), troughWidth / (2.0 * annotationScale), troughHeight / (2.0 * annotationScale), 0.15);
+		surround.setRadius(troughHeight / (2.0 * annotationScale));
+		surround.setHeight(troughWidth / annotationScale);
 		surround.updateModelBound();
 
-		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
+		final FloatBuffer troughVertexBuffer = surround.getMeshData().getVertexBuffer();
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
@@ -250,35 +251,36 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
 		int i = 8 * 3;
-		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		i += 3;
-		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		textureBuffer.put(0).put(0);
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		i += 3;
-		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
+		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		textureBuffer.put(0).put(1);
 		textureBuffer.put(0).put(1);
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		i += 3;
-		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(1);
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		i = 8 * 3;
-		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
-		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
+		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		mesh.setRotation(new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
+		final Vector3 lookat = normal.cross(Vector3.UNIT_X, null);
+		mesh.setRotation(new Matrix3().lookAt(lookat, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
 		mesh.setTranslation(getAbsPoint(0));
 		surround.setTranslation(mesh.getTranslation());
 		surround.setRotation(mesh.getRotation());

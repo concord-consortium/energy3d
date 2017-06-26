@@ -32,6 +32,13 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
+/**
+ * Mirror for solar power towers
+ * 
+ * @author Charles Xie
+ *
+ */
+
 public class Mirror extends HousePart implements Solar {
 
 	private static final long serialVersionUID = 1L;
