@@ -90,7 +90,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 
-		surround = new ParabolicCylinder("Parabolic Trough (Surround)", 10, 10, 1, 1, 10);
+		surround = new ParabolicCylinder("Parabolic Trough (Surround)", 10, 1, 1, 10);
 		surround.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		surround.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
@@ -250,6 +250,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		vertexBuffer.rewind();
 		outlineBuffer.rewind();
 		textureBuffer.rewind();
+		System.out.println("***" + troughVertexBuffer.limit());
 		int i = 8 * 3;
 		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
