@@ -243,10 +243,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		final Matrix3 rotation = new Matrix3();
-		rotation.applyRotationX(-Math.PI / 2);
-		final Matrix3 mat = new Matrix3(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
-		rotation.multiplyLocal(mat);
+		final Matrix3 rotation = new Matrix3().lookAt(new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal(), Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(getAbsPoint(0));
 		outlineMesh.setTranslation(mesh.getTranslation());

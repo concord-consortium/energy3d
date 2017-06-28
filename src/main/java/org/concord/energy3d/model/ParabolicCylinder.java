@@ -12,7 +12,7 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * @author Charles Xie
  *
- *         A parabolic cylinder is defined by its height, semilatus rectum, and depth. Its center is the origin.
+ *         A parabolic cylinder is defined by its height, semilatus rectum, and depth. Its center is the origin and its axis is along the Y-axis.
  */
 public class ParabolicCylinder extends Mesh {
 
@@ -136,12 +136,12 @@ public class ParabolicCylinder extends Mesh {
 
 		// generate the cylinder itself
 		final Vector3 tempNormal = new Vector3();
-		final Vector3 faceCenter = new Vector3(0, 0, -halfHeight); // compute the center of the lower end
+		final Vector3 faceCenter = new Vector3(0, -halfHeight, 0); // compute the center of the lower end
 
 		// compute lower end vertices with duplication at end point
 		for (int radialCount = 0; radialCount < radialSamples + 1; radialCount++) {
 			final double radialFraction = radialCount * inverseRadial; // in [0,1)
-			tempNormal.set(cos[radialCount], sin[radialCount], 0);
+			tempNormal.set(cos[radialCount], 0, sin[radialCount]);
 			_meshData.getNormalBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
 			tempNormal.multiplyLocal(radius).addLocal(faceCenter);
 			_meshData.getVertexBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
@@ -149,10 +149,10 @@ public class ParabolicCylinder extends Mesh {
 		}
 
 		// compute upper end vertices with duplication at end point
-		faceCenter.setZ(halfHeight);
+		faceCenter.setY(halfHeight);
 		for (int radialCount = 0; radialCount < radialSamples + 1; radialCount++) {
 			final double radialFraction = radialCount * inverseRadial; // in [0,1)
-			tempNormal.set(cos[radialCount], sin[radialCount], 0);
+			tempNormal.set(cos[radialCount], 0, sin[radialCount]);
 			_meshData.getNormalBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
 			tempNormal.multiplyLocal(radius).addLocal(faceCenter);
 			_meshData.getVertexBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
