@@ -23,7 +23,6 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
-import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
@@ -37,9 +36,10 @@ import com.ardor3d.util.geom.BufferUtils;
 public class ParabolicTrough extends HousePart implements Solar {
 
 	private static final long serialVersionUID = 1L;
+	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
 	private transient ReadOnlyVector3 normal;
+	private transient ParabolicCylinder cylinder;
 	private transient Mesh outlineMesh;
-	private transient ParabolicCylinder surround;
 	private transient Node polesRoot;
 	private transient Line lightBeams;
 	private transient BMText label;
@@ -82,25 +82,15 @@ public class ParabolicTrough extends HousePart implements Solar {
 			reflectivity = 0.9;
 		}
 
-		mesh = new Mesh("Parabolic Trough");
-		mesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
-		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
+		mesh = new ParabolicCylinder("Parabolic Cylinder", 20, 1, 1, 10);
+		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
-
-		surround = new ParabolicCylinder("Parabolic Trough (Surround)", 10, 1, 1, 10);
-		surround.setDefaultColor(ColorRGBA.LIGHT_GRAY);
-		surround.setModelBound(new OrientedBoundingBox());
-		final OffsetState offset = new OffsetState();
-		offset.setFactor(1);
-		offset.setUnits(1);
-		surround.setRenderState(offset);
-		root.attachChild(surround);
+		cylinder = (ParabolicCylinder) mesh;
 
 		outlineMesh = new Line("Parabolic Trough (Outline)");
-		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (cylinder.getRadialSamples() + 1)));
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
@@ -234,57 +224,31 @@ public class ParabolicTrough extends HousePart implements Solar {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
 
-		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
-		points.get(0).setZ(baseZ + baseHeight);
-
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		// surround.setData(new Vector3(0, 0, 0), troughWidth / (2.0 * annotationScale), troughHeight / (2.0 * annotationScale), 0.15);
-		surround.setRadius(troughHeight / (2.0 * annotationScale));
-		surround.setHeight(troughWidth / annotationScale);
-		surround.updateModelBound();
+		cylinder.setRadius(troughHeight / (2.0 * annotationScale));
+		cylinder.setHeight(troughWidth / annotationScale);
+		cylinder.updateModelBound();
+		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
+		points.get(0).setZ(baseZ + baseHeight + cylinder.getRadius() * 0.9);
 
-		final FloatBuffer troughVertexBuffer = surround.getMeshData().getVertexBuffer();
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
 		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		outlineBuffer.rewind();
-		textureBuffer.rewind();
-		System.out.println("***" + troughVertexBuffer.limit());
-		int i = 8 * 3;
-		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		textureBuffer.put(1).put(0);
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		i += 3;
-		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		textureBuffer.put(0).put(0);
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		i += 3;
-		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		textureBuffer.put(0).put(1);
-		textureBuffer.put(0).put(1);
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		i += 3;
-		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		textureBuffer.put(1).put(1);
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		i = 8 * 3;
-		vertexBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
-		textureBuffer.put(1).put(0);
-		outlineBuffer.put(troughVertexBuffer.get(i)).put(troughVertexBuffer.get(i + 1)).put(troughVertexBuffer.get(i + 2));
+		System.out.println("***" + vertexBuffer.limit() + "," + outlineBuffer.capacity());
+		for (int j = 0; j < vertexBuffer.limit(); j++) {
+			// outlineBuffer.put(vertexBuffer.get(j));
+		}
 
 		mesh.updateModelBound();
 		outlineMesh.updateModelBound();
 
-		final Vector3 lookat = normal.cross(Vector3.UNIT_X, null);
-		mesh.setRotation(new Matrix3().lookAt(lookat, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z));
+		final Matrix3 rotation = new Matrix3();
+		rotation.applyRotationX(-Math.PI / 2);
+		final Matrix3 mat = new Matrix3(new Matrix3().lookAt(normal, Vector3.UNIT_Z));
+		rotation.multiplyLocal(mat);
+		mesh.setRotation(rotation);
 		mesh.setTranslation(getAbsPoint(0));
-		surround.setTranslation(mesh.getTranslation());
-		surround.setRotation(mesh.getRotation());
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
@@ -313,7 +277,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		updateLabel();
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
-		CollisionTreeManager.INSTANCE.removeCollisionTree(surround);
 		root.updateGeometricState(0);
 		drawChildren();
 	}

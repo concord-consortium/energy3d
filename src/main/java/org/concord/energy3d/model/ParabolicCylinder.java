@@ -128,20 +128,18 @@ public class ParabolicCylinder extends Mesh {
 		final double[] sin = new double[radialSamples + 1];
 		final double[] cos = new double[radialSamples + 1];
 
-		for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
-			final double angle = MathUtils.TWO_PI * inverseRadial * radialCount;
+		for (int radialCount = 0; radialCount < radialSamples + 1; radialCount++) {
+			final double angle = -0.5 * MathUtils.TWO_PI * inverseRadial * radialCount;
 			cos[radialCount] = MathUtils.cos(angle);
 			sin[radialCount] = MathUtils.sin(angle);
 		}
-		sin[radialSamples] = sin[0];
-		cos[radialSamples] = cos[0];
 
 		// generate the cylinder itself
 		final Vector3 tempNormal = new Vector3();
 		final Vector3 faceCenter = new Vector3(0, 0, -halfHeight); // compute the center of the lower end
 
 		// compute lower end vertices with duplication at end point
-		for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+		for (int radialCount = 0; radialCount < radialSamples + 1; radialCount++) {
 			final double radialFraction = radialCount * inverseRadial; // in [0,1)
 			tempNormal.set(cos[radialCount], sin[radialCount], 0);
 			_meshData.getNormalBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
@@ -150,16 +148,9 @@ public class ParabolicCylinder extends Mesh {
 			_meshData.getTextureCoords(0).getBuffer().put((float) radialFraction).put(0);
 		}
 
-		BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), 0, radialSamples);
-		BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), 0, radialSamples);
-
-		_meshData.getTextureCoords(0).getBuffer().put(1).put(0);
-
-		// draw the upper end of the cylinder
-		faceCenter.setZ(halfHeight);
-
 		// compute upper end vertices with duplication at end point
-		for (int radialCount = 0; radialCount < radialSamples; radialCount++) {
+		faceCenter.setZ(halfHeight);
+		for (int radialCount = 0; radialCount < radialSamples + 1; radialCount++) {
 			final double radialFraction = radialCount * inverseRadial; // in [0,1)
 			tempNormal.set(cos[radialCount], sin[radialCount], 0);
 			_meshData.getNormalBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
@@ -167,11 +158,6 @@ public class ParabolicCylinder extends Mesh {
 			_meshData.getVertexBuffer().put(tempNormal.getXf()).put(tempNormal.getYf()).put(tempNormal.getZf());
 			_meshData.getTextureCoords(0).getBuffer().put((float) radialFraction).put(1);
 		}
-
-		BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), radialSamples + 1, 2 * radialSamples + 1);
-		BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), radialSamples + 1, 2 * radialSamples + 1);
-
-		_meshData.getTextureCoords(0).getBuffer().put(1f).put(1);
 
 	}
 
