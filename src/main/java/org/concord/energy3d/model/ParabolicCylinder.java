@@ -116,13 +116,11 @@ public class ParabolicCylinder extends Mesh {
 		final double tmin = -halfWidth / semilatusRectum;
 		final double delta = width / (numberOfSamples * semilatusRectum);
 
-		System.out.println("%%% " + semilatusRectum + ", " + width + ", " + height + ", " + delta + ", " + tmin);
-
 		// Generate points of the parabola under the limit to be used in computing the mesh points on a cylinder end.
 		final double[] x = new double[numberOfSamples + 1];
 		final double[] y = new double[numberOfSamples + 1];
 
-		for (int i = 0; i < numberOfSamples + 1; i++) {
+		for (int i = 0; i < numberOfSamples + 1; i++) { // use the parametric equation to compute the points (no need to use Lissajous Curve)
 			final double t = i * delta + tmin;
 			x[i] = semilatusRectum * t;
 			y[i] = semilatusRectum * t * t * 0.5;
@@ -178,7 +176,7 @@ public class ParabolicCylinder extends Mesh {
 		super.write(capsule);
 		capsule.write(numberOfSamples, "numberOfSamples", 0);
 		capsule.write(semilatusRectum, "semilatusRectum", 0);
-		capsule.write(width, "limit", 0);
+		capsule.write(width, "width", 0);
 		capsule.write(height, "height", 0);
 	}
 
@@ -187,7 +185,7 @@ public class ParabolicCylinder extends Mesh {
 		super.read(capsule);
 		numberOfSamples = capsule.readInt("numberOfSamples", 0);
 		semilatusRectum = capsule.readDouble("semilatusRectum", 0);
-		width = capsule.readDouble("limit", 0);
+		width = capsule.readDouble("width", 0);
 		height = capsule.readDouble("height", 0);
 	}
 

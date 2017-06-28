@@ -24,7 +24,6 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.Line;
-import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -39,7 +38,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
 	private transient ReadOnlyVector3 normal;
 	private transient ParabolicCylinder cylinder;
-	private transient Mesh outlineMesh;
+	private transient Line outlines;
 	private transient Node polesRoot;
 	private transient Line lightBeams;
 	private transient BMText label;
@@ -47,9 +46,9 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double troughWidth = 5;
-	private double troughHeight = 2;
-	private double semilatusRectum = 4;
+	private double troughLength = 5;
+	private double troughWidth = 2;
+	private double semilatusRectum = 2;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 5;
 	private double poleDistanceX = 4;
@@ -58,7 +57,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private boolean drawSunBeam;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldTroughCenter;
-	private transient double oldTroughWidth, oldTroughHeight;
+	private transient double oldTroughLength, oldTroughWidth;
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double baseZ;
 
@@ -73,31 +72,34 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (Util.isZero(copyLayoutGap)) { // FIXME: Why is a transient member evaluated to zero?
 			copyLayoutGap = 1;
 		}
-		if (Util.isZero(troughWidth)) {
-			troughWidth = 5;
+		if (Util.isZero(troughLength)) {
+			troughLength = 5;
 		}
-		if (Util.isZero(troughHeight)) {
-			troughHeight = 2;
+		if (Util.isZero(troughWidth)) {
+			troughWidth = 2;
 		}
 		if (Util.isZero(semilatusRectum)) {
-			semilatusRectum = 4;
+			semilatusRectum = 2;
 		}
 		if (Util.isZero(reflectivity)) {
 			reflectivity = 0.9;
 		}
 
-		mesh = new ParabolicCylinder("Parabolic Cylinder", 10, semilatusRectum, troughHeight, troughWidth);
+		mesh = new ParabolicCylinder("Parabolic Cylinder", 10, semilatusRectum, troughWidth, troughLength);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
 		cylinder = (ParabolicCylinder) mesh;
 
-		outlineMesh = new Line("Parabolic Trough (Outline)");
-		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (cylinder.getNumberOfSamples() + 1)));
-		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
-		outlineMesh.setModelBound(new OrientedBoundingBox());
-		root.attachChild(outlineMesh);
+		outlines = new Line("Parabolic Trough (Outline)");
+		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 * (cylinder.getNumberOfSamples() + 2)));
+		outlines.setDefaultColor(ColorRGBA.BLACK);
+		outlines.setModelBound(new OrientedBoundingBox());
+		outlines.setLineWidth(0.01f);
+		outlines.setStipplePattern((short) 0xffff);
+		Util.disablePickShadowLight(outlines);
+		root.attachChild(outlines);
 
 		lightBeams = new Line("Light Beams");
 		lightBeams.setLineWidth(0.01f);
@@ -121,8 +123,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (!points.isEmpty()) {
 			oldTroughCenter = points.get(0).clone();
 		}
+		oldTroughLength = troughLength;
 		oldTroughWidth = troughWidth;
-		oldTroughHeight = troughHeight;
 
 	}
 
@@ -157,15 +159,15 @@ public class ParabolicTrough extends HousePart implements Solar {
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setTroughWidth(rw);
+					setTroughLength(rw);
 					if (outOfBound()) {
 						if (oldTroughCenter != null) {
 							points.get(0).set(oldTroughCenter);
 						}
-						setTroughWidth(oldTroughWidth);
+						setTroughLength(oldTroughLength);
 					} else {
 						oldTroughCenter = points.get(0).clone();
-						oldTroughWidth = troughWidth;
+						oldTroughLength = troughLength;
 					}
 				}
 			} else {
@@ -176,15 +178,15 @@ public class ParabolicTrough extends HousePart implements Solar {
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setTroughHeight(rh);
+					setTroughWidth(rh);
 					if (outOfBound()) {
 						if (oldTroughCenter != null) {
 							points.get(0).set(oldTroughCenter);
 						}
-						setTroughHeight(oldTroughHeight);
+						setTroughWidth(oldTroughWidth);
 					} else {
 						oldTroughCenter = points.get(0).clone();
-						oldTroughHeight = troughHeight;
+						oldTroughWidth = troughWidth;
 					}
 				}
 			}
@@ -229,37 +231,47 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		cylinder.setSize(troughHeight / annotationScale, troughWidth / annotationScale);
+		cylinder.setSize(troughWidth / annotationScale, troughLength / annotationScale);
+		cylinder.setSemilatusRectum(semilatusRectum / annotationScale);
 		cylinder.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
-		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
-		vertexBuffer.rewind();
+		final FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
 		outlineBuffer.rewind();
-		// System.out.println("***" + vertexBuffer.limit() + "," + outlineBuffer.capacity());
-		for (int j = 0; j < vertexBuffer.limit(); j++) {
-			// outlineBuffer.put(vertexBuffer.get(j));
+		final int vertexCount = vertexBuffer.limit() / 6;
+		for (int i = 0; i < vertexCount - 1; i++) {
+			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2));
+			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5));
 		}
+		final int j = (vertexCount - 2) * 3 + 6;
+		for (int i = 0; i < vertexCount - 1; i++) {
+			outlineBuffer.put(vertexBuffer.get(j + i * 3)).put(vertexBuffer.get(j + i * 3 + 1)).put(vertexBuffer.get(j + i * 3 + 2));
+			outlineBuffer.put(vertexBuffer.get(j + i * 3 + 3)).put(vertexBuffer.get(j + i * 3 + 4)).put(vertexBuffer.get(j + i * 3 + 5));
+		}
+		outlineBuffer.put(vertexBuffer.get(0)).put(vertexBuffer.get(1)).put(vertexBuffer.get(2));
+		outlineBuffer.put(vertexBuffer.get(j)).put(vertexBuffer.get(j + 1)).put(vertexBuffer.get(j + 2));
+		outlineBuffer.put(vertexBuffer.get(j - 3)).put(vertexBuffer.get(j - 2)).put(vertexBuffer.get(j - 1));
+		outlineBuffer.put(vertexBuffer.get(2 * j - 3)).put(vertexBuffer.get(2 * j - 2)).put(vertexBuffer.get(2 * j - 1));
 
 		mesh.updateModelBound();
-		outlineMesh.updateModelBound();
+		outlines.updateModelBound();
 
 		final Matrix3 rotation = new Matrix3().lookAt(new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal(), Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(getAbsPoint(0));
-		outlineMesh.setTranslation(mesh.getTranslation());
-		outlineMesh.setRotation(mesh.getRotation());
+		outlines.setTranslation(mesh.getTranslation());
+		outlines.setRotation(mesh.getRotation());
 
 		polesRoot.detachAllChildren();
 		if (!poleInvisible) {
 			final Vector3 center = getAbsPoint(0);
-			final double halfWidth = troughWidth * 0.5;
+			final double halfWidth = troughLength * 0.5;
 			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
 			final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
 			final Vector3 pd = p2.subtract(p0, null).normalizeLocal();
-			for (double u = halfWidth; u < troughWidth; u += poleDistanceX) {
+			for (double u = halfWidth; u < troughLength; u += poleDistanceX) {
 				final Vector3 position = pd.multiply((u - halfWidth) / annotationScale, null).addLocal(center);
 				addPole(position, baseHeight, baseZ);
 			}
@@ -343,7 +355,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	@Override
 	protected String getTextureFileName() {
-		return "mirror.png";
+		return "trough_mirror.png";
 	}
 
 	@Override
@@ -358,12 +370,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	@Override
 	public double getGridSize() {
-		return Math.min(troughWidth, troughHeight) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
+		return Math.min(troughLength, troughWidth) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
 	}
 
 	@Override
 	protected void computeArea() {
-		area = troughWidth * troughHeight;
+		area = troughLength * troughWidth;
 	}
 
 	@Override
@@ -386,13 +398,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 	}
 
 	private double copyOverlapInDirectionOfHeight() { // copy only in the direction of trough height
-		final double w1 = troughHeight / Scene.getInstance().getAnnotationScale();
+		final double w1 = troughWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof ParabolicTrough) {
 					final ParabolicTrough s2 = (ParabolicTrough) p;
-					final double w2 = s2.troughHeight / Scene.getInstance().getAnnotationScale();
+					final double w2 = s2.troughWidth / Scene.getInstance().getAnnotationScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -423,7 +435,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final Vector3 p2 = foundation.getAbsPoint(2);
 		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
-		final double length = (1 + copyLayoutGap) * troughHeight / Scene.getInstance().getAnnotationScale();
+		final double length = (1 + copyLayoutGap) * troughWidth / Scene.getInstance().getAnnotationScale();
 		final double s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		final double tx = length / p0.distance(p2);
 		final double ty = length / p0.distance(p1);
@@ -457,6 +469,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return reflectivity;
 	}
 
+	public void setTroughLength(final double troughLength) {
+		this.troughLength = troughLength;
+	}
+
+	public double getTroughLength() {
+		return troughLength;
+	}
+
 	public void setTroughWidth(final double troughWidth) {
 		this.troughWidth = troughWidth;
 	}
@@ -465,12 +485,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return troughWidth;
 	}
 
-	public void setTroughHeight(final double troughHeight) {
-		this.troughHeight = troughHeight;
+	public void setSemilatusRectum(final double semilatusRectum) {
+		this.semilatusRectum = semilatusRectum;
 	}
 
-	public double getTroughHeight() {
-		return troughHeight;
+	public double getSemilatusRectum() {
+		return semilatusRectum;
 	}
 
 	public void setBaseHeight(final double baseHeight) {
@@ -517,8 +537,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	public void set(final Vector3 center, final double width, final double height) {
 		points.get(0).set(toRelative(center));
-		setTroughWidth(width);
-		setTroughHeight(height);
+		setTroughLength(width);
+		setTroughWidth(height);
 		draw();
 	}
 

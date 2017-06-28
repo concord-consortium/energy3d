@@ -1477,7 +1477,7 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0.1 and " + (int) hmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(window);
+										final SetPartShapeCommand c = new SetPartShapeCommand(window);
 										window.setWindowWidth(w);
 										window.setWindowHeight(h);
 										window.draw();
@@ -6085,7 +6085,7 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(rack);
+										final SetPartShapeCommand c = new SetPartShapeCommand(rack);
 										rack.setRackWidth(w);
 										rack.setRackHeight(h);
 										rack.ensureFullSolarPanels(false);
@@ -8435,7 +8435,7 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(m);
+										final SetPartShapeCommand c = new SetPartShapeCommand(m);
 										m.setMirrorWidth(w);
 										m.setMirrorHeight(h);
 										m.draw();
@@ -8920,8 +8920,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miSize = new JMenuItem("Size...");
-			miSize.addActionListener(new ActionListener() {
+			final JMenuItem miShape = new JMenuItem("Shape...");
+			miShape.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -8935,14 +8935,17 @@ public class PopupMenuFactory {
 					final Foundation foundation = t.getTopContainer();
 					final String partInfo = t.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					final JPanel inputPanel = new JPanel(new GridLayout(3, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Length: "));
+					final JTextField lengthField = new JTextField(threeDecimalsFormat.format(t.getTroughLength()));
+					inputPanel.add(lengthField);
 					inputPanel.add(new JLabel("Width: "));
 					final JTextField widthField = new JTextField(threeDecimalsFormat.format(t.getTroughWidth()));
 					inputPanel.add(widthField);
-					inputPanel.add(new JLabel("Length: "));
-					final JTextField heightField = new JTextField(threeDecimalsFormat.format(t.getTroughHeight()));
-					inputPanel.add(heightField);
+					inputPanel.add(new JLabel("Semilatus Rectum: "));
+					final JTextField semilatusRectumField = new JTextField(threeDecimalsFormat.format(t.getSemilatusRectum()));
+					inputPanel.add(semilatusRectumField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -8971,8 +8974,8 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Size");
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set shape for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabola Shape");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -8980,36 +8983,40 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
-							double w = 0, h = 0;
+							double w = 0, l = 0, p = 0;
 							boolean ok = true;
 							try {
 								w = Double.parseDouble(widthField.getText());
-								h = Double.parseDouble(heightField.getText());
+								l = Double.parseDouble(lengthField.getText());
+								p = Double.parseDouble(semilatusRectumField.getText());
 							} catch (final NumberFormatException x) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (w < 1 || w > 50) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (h < 1 || h > 50) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (w < 1 || w > 20) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (l < 1 || l > 1000) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (p < 1 || p > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Semilatus rectum must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(t);
+										final SetPartShapeCommand c = new SetPartShapeCommand(t);
+										t.setTroughLength(l);
 										t.setTroughWidth(w);
-										t.setTroughHeight(h);
+										t.setSemilatusRectum(p);
 										t.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetSizeForParabolicTroughsOnFoundationCommand c = new SetSizeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSizeForParabolicTroughs(w, h);
+										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+										foundation.setShapeForParabolicTroughs(l, w, p);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSizeForAllParabolicTroughsCommand c = new SetSizeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSizeForAllParabolicTroughs(w, h);
+										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+										Scene.getInstance().setShapeForAllParabolicTroughs(l, w, p);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -9314,7 +9321,7 @@ public class PopupMenuFactory {
 			popupMenuForParabolicTrough.add(cbmiDrawSunBeam);
 			popupMenuForParabolicTrough.add(labelMenu);
 			popupMenuForParabolicTrough.addSeparator();
-			popupMenuForParabolicTrough.add(miSize);
+			popupMenuForParabolicTrough.add(miShape);
 			popupMenuForParabolicTrough.add(miBaseHeight);
 			popupMenuForParabolicTrough.add(miReflectivity);
 			popupMenuForParabolicTrough.addSeparator();

@@ -6,43 +6,56 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.ParabolicTrough;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSizeForAllParabolicTroughsCommand extends AbstractUndoableEdit {
+public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
+	private final double[] oldLengths;
+	private double[] newLengths;
 	private final double[] oldWidths;
 	private double[] newWidths;
-	private final double[] oldHeights;
-	private double[] newHeights;
+	private final double[] oldSemilatusRecta;
+	private double[] newSemilatusRecta;
+	private final Foundation foundation;
 	private final List<ParabolicTrough> troughs;
 
-	public SetSizeForAllParabolicTroughsCommand() {
-		troughs = Scene.getInstance().getAllParabolicTroughs();
+	public SetShapeForParabolicTroughsOnFoundationCommand(final Foundation foundation) {
+		this.foundation = foundation;
+		troughs = foundation.getParabolicTroughs();
 		final int n = troughs.size();
+		oldLengths = new double[n];
 		oldWidths = new double[n];
-		oldHeights = new double[n];
+		oldSemilatusRecta = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
+			oldLengths[i] = t.getTroughLength();
 			oldWidths[i] = t.getTroughWidth();
-			oldHeights[i] = t.getTroughHeight();
+			oldSemilatusRecta[i] = t.getSemilatusRectum();
 		}
+	}
+
+	public Foundation getFoundation() {
+		return foundation;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
 		final int n = troughs.size();
+		newLengths = new double[n];
 		newWidths = new double[n];
-		newHeights = new double[n];
+		newSemilatusRecta = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
+			newLengths[i] = t.getTroughLength();
 			newWidths[i] = t.getTroughWidth();
+			newSemilatusRecta[i] = t.getSemilatusRectum();
+			t.setTroughLength(oldLengths[i]);
 			t.setTroughWidth(oldWidths[i]);
-			newHeights[i] = t.getTroughHeight();
-			t.setTroughHeight(oldHeights[i]);
+			t.setSemilatusRectum(oldSemilatusRecta[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -54,8 +67,9 @@ public class SetSizeForAllParabolicTroughsCommand extends AbstractUndoableEdit {
 		final int n = troughs.size();
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
+			t.setTroughLength(newLengths[i]);
 			t.setTroughWidth(newWidths[i]);
-			t.setTroughHeight(newHeights[i]);
+			t.setSemilatusRectum(newSemilatusRecta[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -63,7 +77,7 @@ public class SetSizeForAllParabolicTroughsCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Set Size for All Parabolic Troughs";
+		return "Set Shape for All Parabolic Troughs on Selected Foundation";
 	}
 
 }

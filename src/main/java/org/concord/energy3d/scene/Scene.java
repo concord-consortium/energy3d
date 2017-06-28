@@ -2607,12 +2607,14 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForAllParabolicTroughs(final double width, final double height) {
+	public void setShapeForAllParabolicTroughs(final double length, final double width, final double semilatusRectum) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setTroughWidth(width);
-				((ParabolicTrough) p).setTroughHeight(height);
-				p.draw();
+				final ParabolicTrough t = (ParabolicTrough) p;
+				t.setTroughLength(length);
+				t.setTroughWidth(width);
+				t.setSemilatusRectum(semilatusRectum);
+				t.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
