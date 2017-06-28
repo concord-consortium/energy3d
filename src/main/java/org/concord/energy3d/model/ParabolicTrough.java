@@ -47,8 +47,9 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double troughWidth = 10;
-	private double troughHeight = 3;
+	private double troughWidth = 5;
+	private double troughHeight = 2;
+	private double semilatusRectum = 4;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 5;
 	private double poleDistanceX = 4;
@@ -73,16 +74,19 @@ public class ParabolicTrough extends HousePart implements Solar {
 			copyLayoutGap = 1;
 		}
 		if (Util.isZero(troughWidth)) {
-			troughWidth = 4.95;
+			troughWidth = 5;
 		}
 		if (Util.isZero(troughHeight)) {
-			troughHeight = 1.65;
+			troughHeight = 2;
+		}
+		if (Util.isZero(semilatusRectum)) {
+			semilatusRectum = 4;
 		}
 		if (Util.isZero(reflectivity)) {
 			reflectivity = 0.9;
 		}
 
-		mesh = new ParabolicCylinder("Parabolic Cylinder", 20, 1, 1, 10);
+		mesh = new ParabolicCylinder("Parabolic Cylinder", 10, semilatusRectum, troughHeight, troughWidth);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -90,7 +94,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		cylinder = (ParabolicCylinder) mesh;
 
 		outlineMesh = new Line("Parabolic Trough (Outline)");
-		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (cylinder.getRadialSamples() + 1)));
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (cylinder.getNumberOfSamples() + 1)));
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
@@ -225,17 +229,16 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		cylinder.setRadius(troughHeight / (2.0 * annotationScale));
-		cylinder.setHeight(troughWidth / annotationScale);
+		cylinder.setSize(troughHeight / annotationScale, troughWidth / annotationScale);
 		cylinder.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
-		points.get(0).setZ(baseZ + baseHeight + cylinder.getRadius() * 0.9);
+		points.get(0).setZ(baseZ + baseHeight);
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
 		outlineBuffer.rewind();
-		System.out.println("***" + vertexBuffer.limit() + "," + outlineBuffer.capacity());
+		// System.out.println("***" + vertexBuffer.limit() + "," + outlineBuffer.capacity());
 		for (int j = 0; j < vertexBuffer.limit(); j++) {
 			// outlineBuffer.put(vertexBuffer.get(j));
 		}
