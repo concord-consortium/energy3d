@@ -270,13 +270,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlines.updateModelBound();
 		absorber.updateModelBound();
 
-		final Matrix3 rotation = new Matrix3().lookAt(new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal(), Vector3.UNIT_Y);
+		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
+		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(getAbsPoint(0));
 		outlines.setRotation(rotation);
 		outlines.setTranslation(mesh.getTranslation());
-		absorber.setTranslation(mesh.getTranslation().add(0, 0, 2, null));
 		absorber.setRotation(new Matrix3().applyRotationX(Math.PI / 2));
+		absorber.setTranslation(mesh.getTranslation().add(n.multiply(0.5 * reflector.getSemilatusRectum(), null), null));
 
 		polesRoot.detachAllChildren();
 		if (!poleInvisible) {
@@ -586,21 +587,25 @@ public class ParabolicTrough extends HousePart implements Solar {
 	public void updateEditShapes() {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final ReadOnlyVector3 n = normal == null ? Vector3.UNIT_Z : new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
+		final double halfWidth = 0.5 * troughWidth / Scene.getInstance().getAnnotationScale();
+		final double dy = halfWidth * halfWidth / (2 * (semilatusRectum / Scene.getInstance().getAnnotationScale()));
+		final Vector3 shift = new Vector3(n.getX() * dy, 0, n.getZ() * dy);
 		final int j = buf.limit() / 6;
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		BufferUtils.populateFromBuffer(v1, buf, 0);
 		BufferUtils.populateFromBuffer(v2, buf, j);
-		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
 		BufferUtils.populateFromBuffer(v1, buf, 0);
 		BufferUtils.populateFromBuffer(v2, buf, j - 1);
-		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
 		BufferUtils.populateFromBuffer(v1, buf, j);
 		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
-		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
 		BufferUtils.populateFromBuffer(v1, buf, j - 1);
 		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
-		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
 		int i = 1;
 		getEditPointShape(i++).setTranslation(p1);
 		getEditPointShape(i++).setTranslation(p2);
