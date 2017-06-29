@@ -37,7 +37,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
 	private transient ReadOnlyVector3 normal;
-	private transient ParabolicCylinder cylinder;
+	private transient ParabolicCylinder reflector;
+	private transient Cylinder absorber;
 	private transient Line outlines;
 	private transient Node polesRoot;
 	private transient Line lightBeams;
@@ -90,10 +91,16 @@ public class ParabolicTrough extends HousePart implements Solar {
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		root.attachChild(mesh);
-		cylinder = (ParabolicCylinder) mesh;
+		reflector = (ParabolicCylinder) mesh;
+
+		absorber = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
+		absorber.setRadius(0.2);
+		absorber.setDefaultColor(ColorRGBA.GRAY);
+		absorber.setModelBound(new OrientedBoundingBox());
+		root.attachChild(absorber);
 
 		outlines = new Line("Parabolic Trough (Outline)");
-		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 * (cylinder.getNumberOfSamples() + 2)));
+		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 * (reflector.getNumberOfSamples() + 3)));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
 		outlines.setLineWidth(0.01f);
@@ -231,11 +238,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		cylinder.setSize(troughWidth / annotationScale, troughLength / annotationScale);
-		cylinder.setSemilatusRectum(semilatusRectum / annotationScale);
-		cylinder.updateModelBound();
+		reflector.setSize(troughWidth / annotationScale, troughLength / annotationScale);
+		reflector.setSemilatusRectum(semilatusRectum / annotationScale);
+		reflector.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
+		absorber.setHeight(reflector.getHeight());
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
@@ -255,28 +263,36 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlineBuffer.put(vertexBuffer.get(j - 3)).put(vertexBuffer.get(j - 2)).put(vertexBuffer.get(j - 1));
 		outlineBuffer.put(vertexBuffer.get(2 * j - 3)).put(vertexBuffer.get(2 * j - 2)).put(vertexBuffer.get(2 * j - 1));
 
+		final int j1 = (j - 3) / 2; // index of middle point on one end
+		final int j2 = (3 * j - 3) / 2; // index of middle point on the other end
+
 		mesh.updateModelBound();
 		outlines.updateModelBound();
+		absorber.updateModelBound();
 
 		final Matrix3 rotation = new Matrix3().lookAt(new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal(), Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(getAbsPoint(0));
+		outlines.setRotation(rotation);
 		outlines.setTranslation(mesh.getTranslation());
-		outlines.setRotation(mesh.getRotation());
+		absorber.setTranslation(mesh.getTranslation().add(0, 0, 2, null));
+		absorber.setRotation(new Matrix3().applyRotationX(Math.PI / 2));
 
 		polesRoot.detachAllChildren();
 		if (!poleInvisible) {
 			final Vector3 center = getAbsPoint(0);
-			final double halfWidth = troughLength * 0.5;
-			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
-			final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
-			final Vector3 pd = p2.subtract(p0, null).normalizeLocal();
-			for (double u = halfWidth; u < troughLength; u += poleDistanceX) {
-				final Vector3 position = pd.multiply((u - halfWidth) / annotationScale, null).addLocal(center);
+			final double halfLength = troughLength * 0.5;
+			outlineBuffer.put(vertexBuffer.get(j1)).put(vertexBuffer.get(j1 + 1)).put(vertexBuffer.get(j1 + 2));
+			outlineBuffer.put(vertexBuffer.get(j2)).put(vertexBuffer.get(j2 + 1)).put(vertexBuffer.get(j2 + 2));
+			final Vector3 p0 = new Vector3(vertexBuffer.get(j1), vertexBuffer.get(j1 + 1), vertexBuffer.get(j1 + 2));
+			final Vector3 p1 = new Vector3(vertexBuffer.get(j2), vertexBuffer.get(j2 + 1), vertexBuffer.get(j2 + 2));
+			final Vector3 pd = p1.subtract(p0, null).normalizeLocal();
+			for (double u = halfLength; u < troughLength; u += poleDistanceX) {
+				final Vector3 position = pd.multiply((u - halfLength) / annotationScale, null).addLocal(center);
 				addPole(position, baseHeight, baseZ);
 			}
-			for (double u = halfWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
-				final Vector3 position = pd.multiply((u - halfWidth) / annotationScale, null).addLocal(center);
+			for (double u = halfLength - poleDistanceX; u > 0; u -= poleDistanceX) {
+				final Vector3 position = pd.multiply((u - halfLength) / annotationScale, null).addLocal(center);
 				addPole(position, baseHeight, baseZ);
 			}
 		}
@@ -290,7 +306,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		root.updateGeometricState(0);
-		drawChildren();
+
 	}
 
 	public void updateLabel() {
@@ -570,19 +586,20 @@ public class ParabolicTrough extends HousePart implements Solar {
 	public void updateEditShapes() {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final int j = buf.limit() / 6;
 		final Vector3 v1 = new Vector3();
 		final Vector3 v2 = new Vector3();
 		BufferUtils.populateFromBuffer(v1, buf, 0);
-		BufferUtils.populateFromBuffer(v2, buf, 1);
+		BufferUtils.populateFromBuffer(v2, buf, j);
 		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
-		BufferUtils.populateFromBuffer(v1, buf, 1);
-		BufferUtils.populateFromBuffer(v2, buf, 2);
+		BufferUtils.populateFromBuffer(v1, buf, 0);
+		BufferUtils.populateFromBuffer(v2, buf, j - 1);
 		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
-		BufferUtils.populateFromBuffer(v1, buf, 2);
-		BufferUtils.populateFromBuffer(v2, buf, 4);
+		BufferUtils.populateFromBuffer(v1, buf, j);
+		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
 		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
-		BufferUtils.populateFromBuffer(v1, buf, 4);
-		BufferUtils.populateFromBuffer(v2, buf, 0);
+		BufferUtils.populateFromBuffer(v1, buf, j - 1);
+		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
 		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
 		int i = 1;
 		getEditPointShape(i++).setTranslation(p1);
@@ -594,7 +611,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			getEditPointShape(i).setDefaultColor(c);
 		}
 		super.updateEditShapes();
-		getEditPointShape(0).setTranslation(p1.addLocal(p3).multiplyLocal(0.5).addLocal(0, 0, 0.15));
+		getEditPointShape(0).setTranslation(p1.addLocal(p4).multiplyLocal(0.5).addLocal(0, 0, 0.15));
 	}
 
 	private Vector3 getVertex(final int i) {
