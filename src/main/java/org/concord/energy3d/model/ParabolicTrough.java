@@ -100,19 +100,19 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 		absorber = new Cylinder("Absorber Tube", 10, 10, 10, 0);
 		absorber.setRadius(0.5);
-		absorber.setDefaultColor(ColorRGBA.GRAY);
+		absorber.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		absorber.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorber);
 
 		absorberEnd1 = new Cylinder("Absorber End Tube 1", 10, 10, 10, 0);
 		absorberEnd1.setRadius(0.5);
-		absorberEnd1.setDefaultColor(ColorRGBA.GRAY);
+		absorberEnd1.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		absorberEnd1.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd1);
 
 		absorberEnd2 = new Cylinder("Absorber End Tube 2", 10, 10, 10, 0);
 		absorberEnd2.setRadius(0.5);
-		absorberEnd2.setDefaultColor(ColorRGBA.GRAY);
+		absorberEnd2.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		absorberEnd2.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd2);
 
@@ -347,10 +347,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 		unitsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		if (beamsVisible) {
-			drawLightBeams();
-		}
-
 		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
@@ -374,6 +370,10 @@ public class ParabolicTrough extends HousePart implements Solar {
 		absorberEnd1.updateModelBound();
 		absorberEnd2.updateModelBound();
 
+		if (beamsVisible) {
+			drawLightBeams();
+		}
+
 		updateLabel();
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
@@ -386,14 +386,37 @@ public class ParabolicTrough extends HousePart implements Solar {
 			lightBeams.setVisible(false);
 			return;
 		}
-		final Vector3 o = getAbsPoint(0);
+		final int nBeams = 10;
+		FloatBuffer beamsBuffer = lightBeams.getMeshData().getVertexBuffer();
+		final int beamsBufferSize = (nBeams + 1) * 12;
+		if (beamsBuffer.capacity() < beamsBufferSize) {
+			beamsBuffer = BufferUtils.createFloatBuffer(beamsBufferSize);
+			lightBeams.getMeshData().setVertexBuffer(beamsBuffer);
+		} else {
+			beamsBuffer.rewind();
+		}
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
-		beamsVertices.rewind();
-		final Vector3 r = o.clone(); // draw sun vector
-		r.addLocal(sunLocation.multiply(10000, null));
-		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		double dx, dy, dz;
+		final double ny = sunLocation.getY();
+		sunLocation.multiplyLocal(10000);
+		final double focus = 0.5 * reflector.getSemilatusRectum();
+		for (int i = 0; i <= nBeams; i++) {
+			dx = reflector.getWidth() * (0.5 - (double) i / nBeams);
+			dz = 0.5 * dx * dx / reflector.getSemilatusRectum();
+			Vector3 d = mesh.getRotation().applyPost(new Vector3(dx, 0, dz), null);
+			final Vector3 o = getAbsPoint(0).addLocal(d);
+			// draw line to sun
+			final Vector3 r = o.clone();
+			r.addLocal(sunLocation);
+			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
+			beamsBuffer.put(r.getXf()).put(r.getYf()).put(r.getZf());
+			// draw line to focus
+			dy = ny * (dz - focus);
+			d = mesh.getRotation().applyPost(new Vector3(0, 0, focus), null);
+			final Vector3 f = getAbsPoint(0).addLocal(d).addLocal(0, dy, 0);
+			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
+			beamsBuffer.put(f.getXf()).put(f.getYf()).put(f.getZf());
+		}
 		lightBeams.updateModelBound();
 		lightBeams.setVisible(true);
 		if (bloomRenderPass == null) {
