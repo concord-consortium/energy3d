@@ -8804,8 +8804,8 @@ public class PopupMenuFactory {
 
 		if (popupMenuForParabolicTrough == null) {
 
-			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
-			cbmiDrawSunBeam.addItemListener(new ItemListener() {
+			final JCheckBoxMenuItem cbmiDrawSunBeams = new JCheckBoxMenuItem("Draw Sun Beams");
+			cbmiDrawSunBeams.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -8813,7 +8813,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final ParabolicTrough t = (ParabolicTrough) selectedPart;
-					// m.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
+					t.setBeamsVisible(cbmiDrawSunBeams.isSelected());
 					t.draw();
 					Scene.getInstance().setEdited(true);
 				}
@@ -8834,17 +8834,20 @@ public class PopupMenuFactory {
 					final Foundation foundation = t.getTopContainer();
 					final String partInfo = t.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel inputPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+					final JPanel inputPanel = new JPanel(new GridLayout(4, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Length: "));
+					inputPanel.add(new JLabel("Length (m): "));
 					final JTextField lengthField = new JTextField(threeDecimalsFormat.format(t.getTroughLength()));
 					inputPanel.add(lengthField);
-					inputPanel.add(new JLabel("Width: "));
+					inputPanel.add(new JLabel("Width (m): "));
 					final JTextField widthField = new JTextField(threeDecimalsFormat.format(t.getTroughWidth()));
 					inputPanel.add(widthField);
-					inputPanel.add(new JLabel("Semilatus Rectum: "));
+					inputPanel.add(new JLabel("Semilatus Rectum (m): "));
 					final JTextField semilatusRectumField = new JTextField(threeDecimalsFormat.format(t.getSemilatusRectum()));
 					inputPanel.add(semilatusRectumField);
+					inputPanel.add(new JLabel("Unit Length (m): "));
+					final JTextField unitLengthField = new JTextField(threeDecimalsFormat.format(t.getUnitLength()));
+					inputPanel.add(unitLengthField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -8882,12 +8885,13 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
-							double w = 0, l = 0, p = 0;
+							double w = 0, l = 0, p = 0, u = 0;
 							boolean ok = true;
 							try {
 								w = Double.parseDouble(widthField.getText());
 								l = Double.parseDouble(lengthField.getText());
 								p = Double.parseDouble(semilatusRectumField.getText());
+								u = Double.parseDouble(unitLengthField.getText());
 							} catch (final NumberFormatException x) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -8899,23 +8903,26 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (p < 1 || p > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Semilatus rectum must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (u < 1 || u > 5) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Unit length must be between 1 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartShapeCommand c = new SetPartShapeCommand(t);
 										t.setTroughLength(l);
 										t.setTroughWidth(w);
 										t.setSemilatusRectum(p);
+										t.setUnitLength(u);
 										t.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setShapeForParabolicTroughs(l, w, p);
+										foundation.setShapeForParabolicTroughs(l, w, p, u);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setShapeForAllParabolicTroughs(l, w, p);
+										Scene.getInstance().setShapeForAllParabolicTroughs(l, w, p, u);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -9115,6 +9122,7 @@ public class PopupMenuFactory {
 					Util.selectSilently(miLabelCustom, t.getLabelCustom());
 					Util.selectSilently(miLabelId, t.getLabelId());
 					Util.selectSilently(miLabelEnergyOutput, t.getLabelEnergyOutput());
+					Util.selectSilently(cbmiDrawSunBeams, t.areBeamsVisible());
 				}
 			});
 
@@ -9215,7 +9223,7 @@ public class PopupMenuFactory {
 			});
 
 			popupMenuForParabolicTrough.addSeparator();
-			popupMenuForParabolicTrough.add(cbmiDrawSunBeam);
+			popupMenuForParabolicTrough.add(cbmiDrawSunBeams);
 			popupMenuForParabolicTrough.add(labelMenu);
 			popupMenuForParabolicTrough.addSeparator();
 			popupMenuForParabolicTrough.add(miShape);

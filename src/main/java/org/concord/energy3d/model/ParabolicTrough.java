@@ -56,10 +56,11 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private double semilatusRectum = 2;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 5;
-	private boolean drawSunBeam;
+	private boolean beamsVisible;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldTroughCenter;
 	private transient double oldTroughLength, oldTroughWidth;
+	private transient double oldRelativeAzimuth;
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double baseZ;
 
@@ -291,6 +292,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
 		} else {
 			outlineBuffer.rewind();
+			outlineBuffer.limit(outlineBufferSize);
 		}
 		// draw parabolic lines of the two end faces
 		for (int i = 0; i < vertexCount - 1; i++) {
@@ -345,7 +347,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 		unitsRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		if (drawSunBeam) {
+		if (beamsVisible) {
 			drawLightBeams();
 		}
 
@@ -377,6 +379,32 @@ public class ParabolicTrough extends HousePart implements Solar {
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		root.updateGeometricState(0);
 
+	}
+
+	public void drawLightBeams() {
+		if (Heliodon.getInstance().isNightTime() || !beamsVisible) {
+			lightBeams.setVisible(false);
+			return;
+		}
+		final Vector3 o = getAbsPoint(0);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
+		beamsVertices.rewind();
+		final Vector3 r = o.clone(); // draw sun vector
+		r.addLocal(sunLocation.multiply(10000, null));
+		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		lightBeams.updateModelBound();
+		lightBeams.setVisible(true);
+		if (bloomRenderPass == null) {
+			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
+			bloomRenderPass.setNrBlurPasses(2);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+		}
+		if (!bloomRenderPass.contains(lightBeams)) {
+			bloomRenderPass.add(lightBeams);
+		}
 	}
 
 	public void updateLabel() {
@@ -587,8 +615,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return baseHeight;
 	}
 
-	private transient double oldRelativeAzimuth;
-
 	public void setRelativeAzimuth(double relativeAzimuth) {
 		if (relativeAzimuth < 0) {
 			relativeAzimuth += 360;
@@ -678,32 +704,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return mesh.getWorldTransform().applyForward(v);
 	}
 
-	public void drawLightBeams() {
-		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
-			lightBeams.setVisible(false);
-			return;
-		}
-		final Vector3 o = getAbsPoint(0);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
-		beamsVertices.rewind();
-		final Vector3 r = o.clone(); // draw sun vector
-		r.addLocal(sunLocation.multiply(10000, null));
-		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		lightBeams.updateModelBound();
-		lightBeams.setVisible(true);
-		if (bloomRenderPass == null) {
-			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
-			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
-			bloomRenderPass.setNrBlurPasses(2);
-			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
-		}
-		if (!bloomRenderPass.contains(lightBeams)) {
-			bloomRenderPass.add(lightBeams);
-		}
-	}
-
 	@Override
 	public void delete() {
 		super.delete();
@@ -714,12 +714,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 	}
 
-	public void setSunBeamVisible(final boolean drawSunBeam) {
-		this.drawSunBeam = drawSunBeam;
+	public void setBeamsVisible(final boolean beamsVisible) {
+		this.beamsVisible = beamsVisible;
 	}
 
-	public boolean isDrawSunBeamVisible() {
-		return drawSunBeam;
+	public boolean areBeamsVisible() {
+		return beamsVisible;
 	}
 
 	public double getYieldNow() {

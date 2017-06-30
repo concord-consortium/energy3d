@@ -19,6 +19,8 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 	private double[] newWidths;
 	private final double[] oldSemilatusRecta;
 	private double[] newSemilatusRecta;
+	private final double[] oldUnitLengths;
+	private double[] newUnitLengths;
 	private final Foundation foundation;
 	private final List<ParabolicTrough> troughs;
 
@@ -29,11 +31,13 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 		oldLengths = new double[n];
 		oldWidths = new double[n];
 		oldSemilatusRecta = new double[n];
+		oldUnitLengths = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
 			oldLengths[i] = t.getTroughLength();
 			oldWidths[i] = t.getTroughWidth();
 			oldSemilatusRecta[i] = t.getSemilatusRectum();
+			oldUnitLengths[i] = t.getUnitLength();
 		}
 	}
 
@@ -48,14 +52,17 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 		newLengths = new double[n];
 		newWidths = new double[n];
 		newSemilatusRecta = new double[n];
+		newUnitLengths = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
 			newLengths[i] = t.getTroughLength();
 			newWidths[i] = t.getTroughWidth();
 			newSemilatusRecta[i] = t.getSemilatusRectum();
+			newUnitLengths[i] = t.getUnitLength();
 			t.setTroughLength(oldLengths[i]);
 			t.setTroughWidth(oldWidths[i]);
 			t.setSemilatusRectum(oldSemilatusRecta[i]);
+			t.setUnitLength(oldUnitLengths[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -70,6 +77,7 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 			t.setTroughLength(newLengths[i]);
 			t.setTroughWidth(newWidths[i]);
 			t.setSemilatusRectum(newSemilatusRecta[i]);
+			t.setUnitLength(newUnitLengths[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();
