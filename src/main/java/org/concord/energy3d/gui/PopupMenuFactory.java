@@ -8814,6 +8814,7 @@ public class PopupMenuFactory {
 					}
 					final ParabolicTrough t = (ParabolicTrough) selectedPart;
 					t.setBeamsVisible(cbmiDrawSunBeams.isSelected());
+					t.drawLightBeams();
 					t.draw();
 					Scene.getInstance().setEdited(true);
 				}
