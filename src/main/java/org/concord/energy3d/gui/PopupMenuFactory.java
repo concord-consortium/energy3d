@@ -3816,7 +3816,7 @@ public class PopupMenuFactory {
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					final Node copyNode = Scene.getInstance().getCopyNode();
-					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Mirror || copyBuffer instanceof Rack || copyNode != null);
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Mirror || copyBuffer instanceof Rack || copyBuffer instanceof ParabolicTrough || copyNode != null);
 				}
 			});
 
@@ -8819,107 +8819,6 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
-			miAzimuth.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof ParabolicTrough)) {
-						return;
-					}
-					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final ParabolicTrough trough = (ParabolicTrough) selectedPart;
-					final Foundation foundation = trough.getTopContainer();
-					final String title = "<html>Azimuth Angle (&deg;) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
-					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel panel = new JPanel();
-					gui.add(panel, BorderLayout.CENTER);
-					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
-					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
-					panel.add(rb1);
-					panel.add(rb2);
-					panel.add(rb3);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					switch (selectedScopeIndex) {
-					case 0:
-						rb1.setSelected(true);
-						break;
-					case 1:
-						rb2.setSelected(true);
-						break;
-					case 2:
-						rb3.setSelected(true);
-						break;
-					}
-					double a = trough.getRelativeAzimuth() + foundation.getAzimuth();
-					if (a > 360) {
-						a -= 360;
-					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(a));
-					gui.add(inputField, BorderLayout.SOUTH);
-
-					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Azimuth");
-
-					while (true) {
-						inputField.selectAll();
-						inputField.requestFocusInWindow();
-						dialog.setVisible(true);
-						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
-							break;
-						} else {
-							double val = 0;
-							boolean ok = true;
-							try {
-								val = Double.parseDouble(inputField.getText());
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-								ok = false;
-							}
-							if (ok) {
-								a = val - foundation.getAzimuth();
-								if (a < 0) {
-									a += 360;
-								}
-								if (rb1.isSelected()) {
-									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(trough);
-									trough.setRelativeAzimuth(a);
-									trough.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									// final ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
-									// foundation.setAzimuthForMirrors(a);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									// final ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
-									// Scene.getInstance().setAzimuthForAllMirrors(a);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
-									selectedScopeIndex = 2;
-								}
-								updateAfterEdit();
-								if (choice == options[0]) {
-									break;
-								}
-							}
-						}
-					}
-				}
-			});
-
 			final JMenuItem miShape = new JMenuItem("Shape...");
 			miShape.addActionListener(new ActionListener() {
 
@@ -9315,8 +9214,6 @@ public class PopupMenuFactory {
 				}
 			});
 
-			popupMenuForParabolicTrough.addSeparator();
-			popupMenuForParabolicTrough.add(miAzimuth);
 			popupMenuForParabolicTrough.addSeparator();
 			popupMenuForParabolicTrough.add(cbmiDrawSunBeam);
 			popupMenuForParabolicTrough.add(labelMenu);
