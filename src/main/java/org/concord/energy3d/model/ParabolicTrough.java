@@ -111,7 +111,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		reflectorBack.clearRenderState(StateType.Texture);
 		reflectorBack.setDefaultColor(ColorRGBA.WHITE);
 		cullState = new CullState();
-		cullState.setCullFace(Face.Front);
+		cullState.setCullFace(Face.None);
 		reflectorBack.setRenderState(cullState);
 		root.attachChild(reflectorBack);
 
@@ -361,12 +361,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 
 		// draw steel frame lines
-		final int steelBufferSize = (nUnits * 2 + 2) * 3;
+		final int steelBufferSize = nUnits * 6;
 		if (steelFrameBuffer.capacity() < steelBufferSize) {
 			steelFrameBuffer = BufferUtils.createFloatBuffer(steelBufferSize);
 			steelFrame.getMeshData().setVertexBuffer(steelFrameBuffer);
 		} else {
 			steelFrameBuffer.rewind();
+			steelFrameBuffer.limit(steelBufferSize);
 		}
 		steelFrameBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
 		steelFrameBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());

@@ -435,8 +435,8 @@ public class TimeSeriesLogger {
 					final ChangeBaseHeightCommand c = (ChangeBaseHeightCommand) lastEdit;
 					final HousePart p = c.getPart();
 					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
-				} else if (lastEdit instanceof SetPartShapeCommand) {
-					final SetPartShapeCommand c = (SetPartShapeCommand) lastEdit;
+				} else if (lastEdit instanceof SetPartSizeCommand) {
+					final SetPartSizeCommand c = (SetPartSizeCommand) lastEdit;
 					if (c.getPart() instanceof Mirror) {
 						final Mirror m = (Mirror) c.getPart();
 						stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();

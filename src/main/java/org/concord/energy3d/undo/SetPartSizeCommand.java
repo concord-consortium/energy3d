@@ -10,15 +10,15 @@ import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Window;
 
-public class SetPartShapeCommand extends AbstractUndoableEdit {
+public class SetPartSizeCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldWidth, newWidth;
 	private double oldHeight, newHeight;
-	private double oldSemilatusRectum, newSemilatusRectum;
+	private double oldUnitLength, newUnitLength;
 	private final HousePart part;
 
-	public SetPartShapeCommand(final HousePart part) {
+	public SetPartSizeCommand(final HousePart part) {
 		this.part = part;
 		if (part instanceof Mirror) {
 			final Mirror m = (Mirror) part;
@@ -26,9 +26,9 @@ public class SetPartShapeCommand extends AbstractUndoableEdit {
 			oldHeight = m.getMirrorHeight();
 		} else if (part instanceof ParabolicTrough) {
 			final ParabolicTrough t = (ParabolicTrough) part;
-			oldWidth = t.getTroughLength();
-			oldHeight = t.getTroughWidth();
-			oldSemilatusRectum = t.getSemilatusRectum();
+			oldWidth = t.getTroughWidth();
+			oldHeight = t.getTroughLength();
+			oldUnitLength = t.getUnitLength();
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			oldWidth = r.getRackWidth();
@@ -63,12 +63,12 @@ public class SetPartShapeCommand extends AbstractUndoableEdit {
 			m.setMirrorHeight(oldHeight);
 		} else if (part instanceof ParabolicTrough) {
 			final ParabolicTrough t = (ParabolicTrough) part;
-			newWidth = t.getTroughLength();
-			newHeight = t.getTroughWidth();
-			newSemilatusRectum = t.getSemilatusRectum();
-			t.setTroughLength(oldWidth);
-			t.setTroughWidth(oldHeight);
-			t.setSemilatusRectum(oldSemilatusRectum);
+			newWidth = t.getTroughWidth();
+			newHeight = t.getTroughLength();
+			newUnitLength = t.getUnitLength();
+			t.setTroughWidth(oldWidth);
+			t.setTroughLength(oldHeight);
+			t.setUnitLength(oldUnitLength);
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			newWidth = r.getRackWidth();
@@ -95,9 +95,9 @@ public class SetPartShapeCommand extends AbstractUndoableEdit {
 			m.setMirrorHeight(newHeight);
 		} else if (part instanceof ParabolicTrough) {
 			final ParabolicTrough t = (ParabolicTrough) part;
-			t.setTroughLength(newWidth);
-			t.setTroughWidth(newHeight);
-			t.setSemilatusRectum(newSemilatusRectum);
+			t.setTroughWidth(newWidth);
+			t.setTroughLength(newHeight);
+			t.setUnitLength(newUnitLength);
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			r.setRackWidth(newWidth);
@@ -117,7 +117,7 @@ public class SetPartShapeCommand extends AbstractUndoableEdit {
 			return "Set Size for Selected Mirror";
 		}
 		if (part instanceof ParabolicTrough) {
-			return "Set Shape for Selected Parabolic Trough";
+			return "Set Size for Selected Parabolic Trough";
 		}
 		if (part instanceof Rack) {
 			return "Set Size for Selected Rack";
@@ -125,7 +125,7 @@ public class SetPartShapeCommand extends AbstractUndoableEdit {
 		if (part instanceof Window) {
 			return "Set Size for Selected Window";
 		}
-		return "Set Shape";
+		return "Set Size";
 	}
 
 }
