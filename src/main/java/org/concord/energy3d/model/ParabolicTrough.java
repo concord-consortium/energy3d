@@ -23,7 +23,13 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.CullState;
+import com.ardor3d.renderer.state.CullState.Face;
+import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Line;
+import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -38,9 +44,10 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
 	private transient ReadOnlyVector3 normal;
 	private transient ParabolicCylinder reflector;
-	private transient Cylinder absorber;
-	private transient Cylinder absorberEnd1;
-	private transient Cylinder absorberEnd2;
+	private transient Mesh reflectorBack;
+	private transient Cylinder absorber, absorberCore;
+	private transient Cylinder absorberEnd1, absorberEnd1Core;
+	private transient Cylinder absorberEnd2, absorberEnd2Core;
 	private transient Line outlines;
 	private transient Line steelFrame;
 	private transient Node unitsRoot;
@@ -95,26 +102,57 @@ public class ParabolicTrough extends HousePart implements Solar {
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
+		CullState cullState = new CullState();
+		cullState.setCullFace(Face.Back);
+		mesh.setRenderState(cullState);
 		root.attachChild(mesh);
 		reflector = (ParabolicCylinder) mesh;
+		reflectorBack = mesh.makeCopy(true);
+		reflectorBack.clearRenderState(StateType.Texture);
+		reflectorBack.setDefaultColor(ColorRGBA.WHITE);
+		cullState = new CullState();
+		cullState.setCullFace(Face.Front);
+		reflectorBack.setRenderState(cullState);
+		root.attachChild(reflectorBack);
 
-		absorber = new Cylinder("Absorber Tube", 10, 10, 10, 0);
-		absorber.setRadius(0.5);
-		absorber.setDefaultColor(ColorRGBA.LIGHT_GRAY);
+		final ColorRGBA tubeColor = new ColorRGBA(0.8f, 0.8f, 0.8f, 0.8f);
+		absorber = new Cylinder("Absorber Tube", 2, 10, 0.5, 0, true);
+		final BlendState blend = new BlendState();
+		blend.setBlendEnabled(true);
+		absorber.setRenderState(blend);
+		absorber.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		absorber.setDefaultColor(tubeColor);
 		absorber.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorber);
 
-		absorberEnd1 = new Cylinder("Absorber End Tube 1", 10, 10, 10, 0);
-		absorberEnd1.setRadius(0.5);
-		absorberEnd1.setDefaultColor(ColorRGBA.LIGHT_GRAY);
+		absorberCore = new Cylinder("Absorber Tube Core", 2, 4, 0.4, 0, true);
+		absorberCore.setDefaultColor(ColorRGBA.BROWN);
+		absorberCore.setModelBound(new OrientedBoundingBox());
+		root.attachChild(absorberCore);
+
+		absorberEnd1 = new Cylinder("Absorber End Tube 1", 2, 10, 0.5, 0, true);
+		absorberEnd1.setRenderState(blend);
+		absorberEnd1.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		absorberEnd1.setDefaultColor(tubeColor);
 		absorberEnd1.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd1);
 
-		absorberEnd2 = new Cylinder("Absorber End Tube 2", 10, 10, 10, 0);
-		absorberEnd2.setRadius(0.5);
-		absorberEnd2.setDefaultColor(ColorRGBA.LIGHT_GRAY);
+		absorberEnd1Core = new Cylinder("Absorber End Tube 1 Core", 2, 4, 0.4, 0, true);
+		absorberEnd1Core.setDefaultColor(ColorRGBA.BROWN);
+		absorberEnd1Core.setModelBound(new OrientedBoundingBox());
+		root.attachChild(absorberEnd1Core);
+
+		absorberEnd2 = new Cylinder("Absorber End Tube 2", 2, 10, 0.5, 0, true);
+		absorberEnd2.setRenderState(blend);
+		absorberEnd2.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		absorberEnd2.setDefaultColor(tubeColor);
 		absorberEnd2.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd2);
+
+		absorberEnd2Core = new Cylinder("Absorber End Tube 2 Core", 2, 4, 0.4, 0, true);
+		absorberEnd2Core.setDefaultColor(ColorRGBA.BROWN);
+		absorberEnd2Core.setModelBound(new OrientedBoundingBox());
+		root.attachChild(absorberEnd2Core);
 
 		final int nUnits = (int) Math.round(troughLength / unitLength);
 		outlines = new Line("Parabolic Trough (Outline)");
@@ -270,8 +308,11 @@ public class ParabolicTrough extends HousePart implements Solar {
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
 		absorber.setHeight(reflector.getHeight());
+		absorberCore.setHeight(reflector.getHeight() - 1);
 		absorberEnd1.setHeight(0.5 * reflector.getSemilatusRectum());
 		absorberEnd2.setHeight(absorberEnd1.getHeight());
+		absorberEnd1Core.setHeight(absorberEnd1.getHeight() - 1);
+		absorberEnd2Core.setHeight(absorberEnd2.getHeight() - 1);
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
@@ -351,15 +392,23 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(getAbsPoint(0));
+		reflectorBack.setRotation(rotation);
+		reflectorBack.setTranslation(mesh.getTranslation());
 		outlines.setRotation(rotation);
 		outlines.setTranslation(mesh.getTranslation());
 		absorber.setRotation(new Matrix3().applyRotationX(Math.PI / 2));
 		absorber.setTranslation(mesh.getTranslation().add(n.multiply(0.5 * reflector.getSemilatusRectum(), null), null));
+		absorberCore.setRotation(absorber.getRotation());
+		absorberCore.setTranslation(absorber.getTranslation());
 		final Vector3 endShift = n.multiply(0.5 * absorberEnd1.getHeight(), null);
 		absorberEnd1.setTranslation(mesh.getTranslation().add(p1.add(endShift, null), null));
 		absorberEnd2.setTranslation(mesh.getTranslation().add(p2.add(endShift, null), null));
 		absorberEnd1.setRotation(rotation);
 		absorberEnd2.setRotation(rotation);
+		absorberEnd1Core.setTranslation(absorberEnd1.getTranslation());
+		absorberEnd2Core.setTranslation(absorberEnd2.getTranslation());
+		absorberEnd1Core.setRotation(rotation);
+		absorberEnd2Core.setRotation(rotation);
 		steelFrame.setRotation(rotation);
 		steelFrame.setTranslation(mesh.getTranslation());
 
