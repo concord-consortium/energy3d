@@ -28,8 +28,8 @@ public class ParabolicCylinder extends Mesh {
 	 * 
 	 * @param name
 	 *            The name of this parabolic cylinder.
-	 * @param radialSamples
-	 *            Number of triangle samples along the radial.
+	 * @param numberOfSamples
+	 *            Number of sample points for the parabola.
 	 * @param semilatusRectum
 	 *            The semilatus rectum of the parabolic cylinder.
 	 * @param width
@@ -37,9 +37,9 @@ public class ParabolicCylinder extends Mesh {
 	 * @param height
 	 *            The height of the parabolic cylinder.
 	 */
-	public ParabolicCylinder(final String name, final int radialSamples, final double semilatusRectum, final double width, final double height) {
+	public ParabolicCylinder(final String name, final int numberOfSamples, final double semilatusRectum, final double width, final double height) {
 		super(name);
-		this.numberOfSamples = radialSamples;
+		this.numberOfSamples = numberOfSamples;
 		this.width = width;
 		this.height = height;
 		setSemilatusRectum(semilatusRectum);

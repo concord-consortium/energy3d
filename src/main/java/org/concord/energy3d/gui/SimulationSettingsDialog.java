@@ -44,6 +44,8 @@ class SimulationSettingsDialog extends JDialog {
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final Scene s = Scene.getInstance();
+		final JTextField parabolaNxTextField = new JTextField(s.getParabolaNx() + "", 6);
+		final JTextField parabolaNyTextField = new JTextField(s.getParabolaNy() + "", 6);
 		final JTextField mirrorNxTextField = new JTextField(s.getMirrorNx() + "", 6);
 		final JTextField mirrorNyTextField = new JTextField(s.getMirrorNy() + "", 6);
 		final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(Scene.getInstance().getRackCellSize()));
@@ -71,11 +73,15 @@ class SimulationSettingsDialog extends JDialog {
 		final ActionListener okListener = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				int parabolaNx;
+				int parabolaNy;
 				int mirrorNx;
 				int mirrorNy;
 				double rackCellSize;
 				int timeStep;
 				try {
+					parabolaNx = Integer.parseInt(parabolaNxTextField.getText());
+					parabolaNy = Integer.parseInt(parabolaNyTextField.getText());
 					mirrorNx = Integer.parseInt(mirrorNxTextField.getText());
 					mirrorNy = Integer.parseInt(mirrorNyTextField.getText());
 					rackCellSize = Double.parseDouble(rackCellSizeTextField.getText());
@@ -98,10 +104,16 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if (parabolaNx < 5 || parabolaNy < 5) {
+					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of parabola steps in x or y direction must be at least five.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (!Util.isPowerOfTwo(mirrorNx) || !Util.isPowerOfTwo(mirrorNy)) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				s.setParabolaNx(parabolaNx);
+				s.setParabolaNy(parabolaNy);
 				s.setMirrorNx(mirrorNx);
 				s.setMirrorNy(mirrorNy);
 				s.setRackModelExact(rackModelComboBox.getSelectedIndex() == 1);
@@ -116,12 +128,21 @@ class SimulationSettingsDialog extends JDialog {
 
 		// set number of grid points for a mirror, used in both heat map generation and energy calculation
 		panel.add(new JLabel("Mirror mesh: "));
-		final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		p1.add(mirrorNxTextField);
 		p1.add(new JLabel("  \u00D7  "));
 		p1.add(mirrorNyTextField);
 		panel.add(p1);
 		panel.add(new JLabel("Must be power of 2"));
+
+		// set number of sample points for parabolic troughs, used in parabola rendering, heat map generation, and energy calculation
+		panel.add(new JLabel("Parabolic trough mesh: "));
+		p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		p1.add(parabolaNxTextField);
+		p1.add(new JLabel("  \u00D7  "));
+		p1.add(parabolaNyTextField);
+		panel.add(p1);
+		panel.add(new JLabel("Cross-section \u00D7 cylinder"));
 
 		// select the model for racks
 		panel.add(new JLabel("Rack model:"));
@@ -144,7 +165,7 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
 
-		SpringUtilities.makeCompactGrid(panel, 5, 3, 8, 8, 8, 8);
+		SpringUtilities.makeCompactGrid(panel, 6, 3, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

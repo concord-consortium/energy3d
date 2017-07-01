@@ -98,7 +98,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			reflectivity = 0.9;
 		}
 
-		mesh = new ParabolicCylinder("Parabolic Cylinder", 10, semilatusRectum, troughWidth, troughLength);
+		mesh = new ParabolicCylinder("Parabolic Cylinder", Scene.getInstance().getParabolaNx() == 0 ? 20 : Scene.getInstance().getParabolaNx(), semilatusRectum, troughWidth, troughLength);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -361,7 +361,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 
 		// draw steel frame lines
-		final int steelBufferSize = nUnits * 6;
+		final int steelBufferSize = (nUnits + 1) * 6;
 		if (steelFrameBuffer.capacity() < steelBufferSize) {
 			steelFrameBuffer = BufferUtils.createFloatBuffer(steelBufferSize);
 			steelFrame.getMeshData().setVertexBuffer(steelFrameBuffer);

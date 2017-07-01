@@ -1407,6 +1407,7 @@ public class MainFrame extends JFrame {
 
 			final JMenu cspMenu = new JMenu("Concentrated Solar Power");
 			tutorialsMenu.add(cspMenu);
+			addModel(cspMenu, "Parabolic Trough Focal Line", "tutorials/parabolic-trough-focal-line.ng3");
 			addModel(cspMenu, "Parabolic Trough Curvature", "tutorials/parabolic-trough-curvature.ng3");
 			addModel(cspMenu, "Parabolic Trough Arrays", "tutorials/parabolic-trough-array.ng3");
 			cspMenu.addSeparator();
