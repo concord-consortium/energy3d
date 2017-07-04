@@ -55,7 +55,7 @@ class MapImageViewWithLocations extends MapImageView {
 			ellipse.width += 1;
 			ellipse.height += 1;
 			ellipse.x = x + offsetX - ellipse.width * 0.5;
-			ellipse.y = y + offsetY - ellipse.height * 0.5;
+			ellipse.y = (s.equals("South Pole") ? height : y) + offsetY - ellipse.height * 0.5;
 			g2.draw(ellipse);
 		}
 		final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
