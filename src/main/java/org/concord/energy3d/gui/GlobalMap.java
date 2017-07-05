@@ -3,6 +3,7 @@ package org.concord.energy3d.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -23,6 +24,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 
 import org.concord.energy3d.simulation.LocationData;
@@ -153,6 +156,39 @@ class GlobalMap extends JDialog {
 				}
 			}
 		}
+
+		final JButton listButton = new JButton("List");
+		listButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				String s = "<html><body><table>";
+				int i = 0;
+				for (final String country : countries.keySet()) {
+					switch (i % 3) {
+					case 0:
+						s += "<tr>";
+						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
+						break;
+					case 1:
+						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
+						break;
+					case 2:
+						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
+						s += "</tr>";
+						break;
+					}
+					i++;
+				}
+				s += "</table></body></html>";
+				final JTextPane textPane = new JTextPane();
+				textPane.setContentType("text/html");
+				textPane.setText(s);
+				final JScrollPane scroller = new JScrollPane(textPane);
+				scroller.setPreferredSize(new Dimension(400, 400));
+				JOptionPane.showMessageDialog(GlobalMap.this, scroller, "List of Countries and Numbers of Regions", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		topPanel.add(listButton);
 
 		pack();
 		setLocationRelativeTo(owner);

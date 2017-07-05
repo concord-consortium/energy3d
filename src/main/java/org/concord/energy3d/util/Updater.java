@@ -19,7 +19,7 @@ public class Updater {
 	public static void download() {
 		System.out.println("Updater.download()");
 		if (!Config.isWebStart() && !Config.isEclipse()) {
-			new Thread("Energy3D Update Downloader") {
+			final Thread t = new Thread("Energy3D Update Downloader") {
 				@Override
 				public void run() {
 					downloadInProgress = true;
@@ -60,7 +60,9 @@ public class Updater {
 					}
 					downloadInProgress = false;
 				};
-			}.start();
+			};
+			t.setPriority(Thread.MIN_PRIORITY);
+			t.start();
 		}
 	}
 
