@@ -36,12 +36,11 @@ class GlobalMap extends JDialog {
 	public GlobalMap(final JFrame owner) {
 
 		super(owner);
-		setTitle((LocationData.getInstance().getCities().length - 1) + " Supported Locations");
+		setTitle("Total Supported Regions: " + (LocationData.getInstance().getCities().length - 1));
 		setResizable(false);
 		mapImageView = new MapImageViewWithLocations();
-		final int m = 5;
-		mapImageView.setMargin(m);
-		mapImageView.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(m, m, m, m), BorderFactory.createLineBorder(Color.GRAY)));
+		final int m = 1;
+		mapImageView.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(m, m, m, m), BorderFactory.createLineBorder(Color.LIGHT_GRAY)));
 		mapImageView.setAlignmentX(0.5f);
 		mapImageView.setText("Loading...");
 		mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -89,9 +88,26 @@ class GlobalMap extends JDialog {
 		final JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		getContentPane().add(topPanel, BorderLayout.NORTH);
 
-		final JComboBox<String> locationsComboBox = new JComboBox<String>();
+		final JComboBox<String> regionsComboBox = new JComboBox<String>();
 		final JComboBox<String> countriesComboBox = new JComboBox<String>();
-		final JLabel locationsInCountryLabel = new JLabel();
+		final JLabel regionsLabel = new JLabel("Regions:");
+		final ActionListener listener = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				if (regionsComboBox.getSelectedItem() != null) {
+					if ("United States".equals(countriesComboBox.getSelectedItem())) {
+						EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
+					} else {
+						if (regionsComboBox.getSelectedItem().equals(countriesComboBox.getSelectedItem())) {
+							EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
+						} else {
+							EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem() + ", " + countriesComboBox.getSelectedItem());
+						}
+					}
+				}
+				mapImageView.repaint();
+			}
+		};
 
 		topPanel.add(new JLabel(countries.size() + " Countries:"));
 		for (final String s : countries.keySet()) {
@@ -100,51 +116,40 @@ class GlobalMap extends JDialog {
 		countriesComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				locationsComboBox.removeAllItems();
-				final ArrayList<String> locations = countries.get(countriesComboBox.getSelectedItem());
-				for (final String s : locations) {
-					locationsComboBox.addItem(s);
+				regionsComboBox.removeAllItems();
+				final ArrayList<String> locationsInCountry = countries.get(countriesComboBox.getSelectedItem());
+				for (final String s : locationsInCountry) {
+					regionsComboBox.addItem(s);
 				}
-				locationsInCountryLabel.setText(locations.size() + " locations found");
+				regionsLabel.setText("Regions (" + locationsInCountry.size() + "):");
 			}
 		});
 		topPanel.add(countriesComboBox);
 
-		topPanel.add(new JLabel("Areas:"));
-		final ArrayList<String> locations = countries.get(countriesComboBox.getSelectedItem());
-		for (final String s : locations) {
-			locationsComboBox.addItem(s);
-		}
-		locationsComboBox.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final String s = (String) countriesComboBox.getSelectedItem();
-				if (s.equals("United States")) {
-					if (locationsComboBox.getSelectedItem() != null) {
-						EnergyPanel.getInstance().getCityComboBox().setSelectedItem(locationsComboBox.getSelectedItem());
-					}
-				}
-				mapImageView.repaint();
-			}
-		});
-		topPanel.add(locationsComboBox);
-		topPanel.add(locationsInCountryLabel);
+		topPanel.add(regionsLabel);
+		regionsComboBox.addActionListener(listener);
+		topPanel.add(regionsComboBox);
 
 		final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-		if (!current.equals("")) {
+		if (current.equals("")) {
+			final ArrayList<String> regionsInCountries = countries.get(countriesComboBox.getSelectedItem());
+			for (final String s : regionsInCountries) {
+				regionsComboBox.addItem(s);
+			}
+		} else {
 			final String[] t = current.split(",");
 			t[0] = t[0].trim();
 			if (t.length == 1) {
 				countriesComboBox.setSelectedItem(t[0]);
-				locationsComboBox.setSelectedItem(t[0]);
+				regionsComboBox.setSelectedItem(t[0]);
 			} else {
 				t[1] = t[1].trim();
 				if (t[1].length() == 2) {
 					countriesComboBox.setSelectedItem("United States");
-					locationsComboBox.setSelectedItem(current);
+					regionsComboBox.setSelectedItem(current);
 				} else {
 					countriesComboBox.setSelectedItem(t[1]);
-					locationsComboBox.setSelectedItem(t[0]);
+					regionsComboBox.setSelectedItem(t[0]);
 				}
 			}
 		}
@@ -163,7 +168,7 @@ class GlobalMap extends JDialog {
 			protected void done() {
 				try {
 					final BufferedImage mapImage = get();
-					final int w = mapImageView.getPreferredSize().width - mapImageView.getMargin() * 2;
+					final int w = mapImageView.getPreferredSize().width;
 					mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
 					mapImageView.repaint();
 				} catch (final Exception e) {

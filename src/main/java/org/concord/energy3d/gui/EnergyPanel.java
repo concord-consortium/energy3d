@@ -109,7 +109,7 @@ public class EnergyPanel extends JPanel {
 	};
 
 	private final JPanel dataPanel;
-	private final JComboBox<String> cityComboBox;
+	private final JComboBox<String> regionComboBox;
 	private final JTextField outsideTemperatureField;
 	private final JTextField sunshineHoursField;
 	private final JSpinner dateSpinner;
@@ -219,32 +219,32 @@ public class EnergyPanel extends JPanel {
 		latitudeChangeListener = new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
-				cityComboBox.setSelectedItem("");
+				regionComboBox.setSelectedItem("");
 			}
 		};
 
 		Arrays.sort(LocationData.getInstance().getCities());
-		cityComboBox = new JComboBox<String>();
-		cityComboBox.setFont(new Font(cityComboBox.getFont().getName(), Font.PLAIN, cityComboBox.getFont().getSize() - 2));
-		cityComboBox.setModel(new DefaultComboBoxModel<String>(LocationData.getInstance().getCities()));
-		cityComboBox.setSelectedItem("Boston, MA");
-		cityComboBox.setMaximumRowCount(15);
-		cityComboBox.addActionListener(new ActionListener() {
+		regionComboBox = new JComboBox<String>();
+		regionComboBox.setFont(new Font(regionComboBox.getFont().getName(), Font.PLAIN, regionComboBox.getFont().getSize() - 2));
+		regionComboBox.setModel(new DefaultComboBoxModel<String>(LocationData.getInstance().getCities()));
+		regionComboBox.setSelectedItem("Boston, MA");
+		regionComboBox.setMaximumRowCount(15);
+		regionComboBox.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				final String city = (String) cityComboBox.getSelectedItem();
+				final String city = (String) regionComboBox.getSelectedItem();
 				if (city.equals("")) {
 					clearRadiationHeatMap();
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No city is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No region is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
 					Scene.getInstance().setCity(city);
 				} else {
 					final ChangeCityCommand c = new ChangeCityCommand();
-					setLatitude((int) LocationData.getInstance().getLatitudes().get(cityComboBox.getSelectedItem()).floatValue());
+					setLatitude((int) LocationData.getInstance().getLatitudes().get(regionComboBox.getSelectedItem()).floatValue());
 					clearRadiationHeatMap();
 					Scene.getInstance().setCity(city);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 					final LocationData ld = LocationData.getInstance();
-					cityComboBox.setToolTipText("(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)");
+					regionComboBox.setToolTipText("<html>(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)<br>Use Edit>Set Region... to select country and region.</html>");
 				}
 				Scene.getInstance().updateTrackables();
 				Scene.getInstance().updateTreeLeaves();
@@ -257,7 +257,7 @@ public class EnergyPanel extends JPanel {
 		gbc_cityComboBox.fill = GridBagConstraints.HORIZONTAL;
 		gbc_cityComboBox.gridx = 2;
 		gbc_cityComboBox.gridy = 0;
-		timeAndLocationPanel.add(cityComboBox, gbc_cityComboBox);
+		timeAndLocationPanel.add(regionComboBox, gbc_cityComboBox);
 
 		final GridBagConstraints gbc_timeLabel = new GridBagConstraints();
 		gbc_timeLabel.gridx = 0;
@@ -751,7 +751,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void updateWeatherData() {
-		final String city = (String) cityComboBox.getSelectedItem();
+		final String city = (String) regionComboBox.getSelectedItem();
 		if (city.equals("")) {
 			switch (Scene.getInstance().getUnit()) {
 			case InternationalSystemOfUnits:
@@ -868,8 +868,8 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public void setCity(final String city) {
-		cityComboBox.setSelectedItem(city);
-		cityComboBox.repaint(); // in some cases, this must be called in order to update the view
+		regionComboBox.setSelectedItem(city);
+		regionComboBox.repaint(); // in some cases, this must be called in order to update the view
 	}
 
 	public void setLatitude(final int latitude) {
@@ -1587,7 +1587,7 @@ public class EnergyPanel extends JPanel {
 	}
 
 	public JComboBox<String> getCityComboBox() {
-		return cityComboBox;
+		return regionComboBox;
 	}
 
 	public void showHeatMapContrastSlider(final boolean b) {

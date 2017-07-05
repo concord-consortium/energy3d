@@ -236,6 +236,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem specificationsMenuItem;
 	private JMenuItem propertiesMenuItem;
 	private JMenuItem customPricesMenuItem;
+	private JMenuItem setRegionMenuItem;
 	private JCheckBoxMenuItem noteCheckBoxMenuItem;
 	private JCheckBoxMenuItem infoPanelCheckBoxMenuItem;
 	private JMenu examplesMenu;
@@ -1081,14 +1082,6 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Util.openBrowser("http://energy.concord.org/energy3d");
-				}
-			});
-			helpMenu.add(mi);
-			mi = new JMenuItem("View Supported Locations on Map...");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					new GlobalMap(MainFrame.this).setVisible(true);
 				}
 			});
 			helpMenu.add(mi);
@@ -2593,6 +2586,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
 			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
+			editMenu.add(getSetRegionMenuItem());
 			editMenu.add(getCustomPricesMenuItem());
 			editMenu.add(getSpecificationsMenuItem());
 			editMenu.add(getOverallUtilityBillMenuItem());
@@ -3447,6 +3441,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return overallUtilityBillMenuItem;
+	}
+
+	private JMenuItem getSetRegionMenuItem() {
+		if (setRegionMenuItem == null) {
+			setRegionMenuItem = new JMenuItem("Set Region...");
+			setRegionMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new GlobalMap(MainFrame.this).setVisible(true);
+				}
+			});
+		}
+		return setRegionMenuItem;
 	}
 
 	private JMenuItem getCustomPricesMenuItem() {
