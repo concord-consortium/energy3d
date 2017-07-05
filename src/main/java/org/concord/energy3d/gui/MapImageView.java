@@ -27,6 +27,7 @@ class MapImageView extends JComponent {
 	private String text;
 	private Color textColor = Color.WHITE;
 	private final Point point;
+	private int margin;
 
 	MapImageView() {
 		super();
@@ -52,6 +53,14 @@ class MapImageView extends JComponent {
 		return point;
 	}
 
+	int getMargin() {
+		return margin;
+	}
+
+	void setMargin(final int margin) {
+		this.margin = margin;
+	}
+
 	void setText(final String text) {
 		this.text = text;
 	}
@@ -71,7 +80,7 @@ class MapImageView extends JComponent {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		if (image != null) {
-			g2.drawImage(image, 0, 0, this);
+			g2.drawImage(image, margin, margin, this);
 		}
 		if (text != null) {
 			final FontMetrics fm = g2.getFontMetrics();
