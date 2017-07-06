@@ -226,11 +226,11 @@ public class ParabolicTrough extends HousePart implements Solar {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rl = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setTroughLength(rw);
+					setTroughLength(rl);
 					if (outOfBound()) {
 						if (oldTroughCenter != null) {
 							points.get(0).set(oldTroughCenter);
@@ -245,11 +245,11 @@ public class ParabolicTrough extends HousePart implements Solar {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rh = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setTroughWidth(rh);
+					setTroughWidth(rw);
 					if (outOfBound()) {
 						if (oldTroughCenter != null) {
 							points.get(0).set(oldTroughCenter);
@@ -327,7 +327,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final Vector3 pd = p2.subtract(p1, null).normalizeLocal(); // normal in the direction of cylinder axis
 
 		final int nUnits = (int) Math.round(troughLength / unitLength);
-		final int outlineBufferSize = 6 * vertexCount * (nUnits + 1) + 4; // 4 is for the two lateral lines
+		final int outlineBufferSize = 6 * vertexCount * (nUnits + 2) + 4; // 4 is for the two lateral lines
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
@@ -361,7 +361,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 
 		// draw steel frame lines
-		final int steelBufferSize = (nUnits + 1) * 6;
+		final int steelBufferSize = (nUnits + 2) * 6;
 		if (steelFrameBuffer.capacity() < steelBufferSize) {
 			steelFrameBuffer = BufferUtils.createFloatBuffer(steelBufferSize);
 			steelFrame.getMeshData().setVertexBuffer(steelFrameBuffer);
@@ -752,12 +752,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		BufferUtils.populateFromBuffer(v1, buf, 0);
 		BufferUtils.populateFromBuffer(v2, buf, j - 1);
 		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
-		BufferUtils.populateFromBuffer(v1, buf, j);
-		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
-		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
 		BufferUtils.populateFromBuffer(v1, buf, j - 1);
 		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
-		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
+		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
+		BufferUtils.populateFromBuffer(v1, buf, j);
+		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
+		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
 		int i = 1;
 		getEditPointShape(i++).setTranslation(p1);
 		getEditPointShape(i++).setTranslation(p2);
@@ -768,7 +768,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			getEditPointShape(i).setDefaultColor(c);
 		}
 		super.updateEditShapes();
-		getEditPointShape(0).setTranslation(p1.addLocal(p4).multiplyLocal(0.5).addLocal(0, 0, 0.15));
+		getEditPointShape(0).setTranslation(p1.addLocal(p3).multiplyLocal(0.5).addLocal(0, 0, 0.15));
 	}
 
 	private Vector3 getVertex(final int i) {

@@ -154,7 +154,9 @@ public class SelectUtil {
 					pointDist_i = p.distance(intersectionPoint);
 					double adjust = 0;
 					if (userData.getHousePart().isFirstPointInserted()) { // to avoid IndexOutOfBoundsException: Index: 2, Size: 2
-						adjust -= Math.abs(userData.getHousePart().getNormal().negate(null).dot(pickRay.getDirection()) / 10.0);
+						if (userData.getHousePart().getNormal() != null) {
+							adjust -= Math.abs(userData.getHousePart().getNormal().negate(null).dot(pickRay.getDirection()) / 10.0);
+						}
 					}
 					if (userData.getHousePart() == SceneManager.getInstance().getSelectedPart()) {
 						adjust -= 0.1; // give more priority because the object is selected

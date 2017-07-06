@@ -185,7 +185,7 @@ class GlobalMap extends JDialog {
 				textPane.setText(s);
 				final JScrollPane scroller = new JScrollPane(textPane);
 				scroller.setPreferredSize(new Dimension(400, 400));
-				JOptionPane.showMessageDialog(GlobalMap.this, scroller, "List of Countries and Numbers of Regions", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(GlobalMap.this, scroller, "Numbers of Supported Regions in Each Country", JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
 		topPanel.add(listButton);
