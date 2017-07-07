@@ -507,8 +507,8 @@ public class SolarRadiation {
 	// the mesh is a curvy parabolic surface
 	private void computeOnParabolicTrough(final int minute, final ReadOnlyVector3 directionTowardSun, final ParabolicTrough trough) {
 
-		final int nx = Scene.getInstance().getParabolaNx();
-		final int ny = Scene.getInstance().getParabolaNy();
+		final int nx = Scene.getInstance().getParabolaTroughNx();
+		final int ny = Scene.getInstance().getParabolaTroughNy();
 		final Calendar calendar = Heliodon.getInstance().getCalendar();
 		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 		calendar.set(Calendar.MINUTE, minute % 60);

@@ -98,7 +98,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			reflectivity = 0.9;
 		}
 
-		mesh = new ParabolicCylinder("Parabolic Cylinder", Scene.getInstance().getParabolaNx() == 0 ? 20 : Scene.getInstance().getParabolaNx(), semilatusRectum, troughWidth, troughLength);
+		mesh = new ParabolicCylinder("Parabolic Cylinder", Scene.getInstance().getParabolaTroughNx() == 0 ? 20 : Scene.getInstance().getParabolaTroughNx(), semilatusRectum, troughWidth, troughLength);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));

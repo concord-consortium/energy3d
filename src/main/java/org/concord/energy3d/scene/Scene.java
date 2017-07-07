@@ -183,8 +183,8 @@ public class Scene implements Serializable {
 	// used in both radiation calculation and heat map visualization for reflecting mirrors (which are closer to square, except parabolic troughs)
 	private int mirrorNx = 4, mirrorNy = 4;
 
-	private int parabolaNx = 20; // number of sample points for the parabola cross section of a parabolic trough
-	private int parabolaNy = 10; // number of sample points in the axis of a parabolic trough
+	private int parabolaTroughNx = 20; // number of sample points for the parabola cross section of a parabolic trough
+	private int parabolaTroughNy = 10; // number of sample points in the axis of a parabolic trough
 
 	// the step length of the discretized grid on any part that is not a plate
 	private double solarStep = 2.0;
@@ -465,11 +465,11 @@ public class Scene implements Serializable {
 		if (Util.isZero(mirrorNy)) {
 			mirrorNy = 4;
 		}
-		if (Util.isZero(parabolaNx)) {
-			parabolaNx = 20;
+		if (Util.isZero(parabolaTroughNx)) {
+			parabolaTroughNx = 20;
 		}
-		if (Util.isZero(parabolaNy)) {
-			parabolaNy = 10;
+		if (Util.isZero(parabolaTroughNy)) {
+			parabolaTroughNy = 10;
 		}
 		if (Util.isZero(rackCellSize)) {
 			rackCellSize = 1;
@@ -3112,20 +3112,20 @@ public class Scene implements Serializable {
 		return mirrorNy;
 	}
 
-	public void setParabolaNx(final int parabolaNx) {
-		this.parabolaNx = parabolaNx;
+	public void setParabolaTroughNx(final int parabolaTroughNx) {
+		this.parabolaTroughNx = parabolaTroughNx;
 	}
 
-	public int getParabolaNx() {
-		return parabolaNx;
+	public int getParabolaTroughNx() {
+		return parabolaTroughNx;
 	}
 
-	public void setParabolaNy(final int parabolaNy) {
-		this.parabolaNy = parabolaNy;
+	public void setParabolaTroughNy(final int parabolaTroughNy) {
+		this.parabolaTroughNy = parabolaTroughNy;
 	}
 
-	public int getParabolaNy() {
-		return parabolaNy;
+	public int getParabolaTroughNy() {
+		return parabolaTroughNy;
 	}
 
 	public void setSolarStep(final double solarStep) {

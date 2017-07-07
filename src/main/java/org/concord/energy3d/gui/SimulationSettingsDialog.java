@@ -44,8 +44,8 @@ class SimulationSettingsDialog extends JDialog {
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final Scene s = Scene.getInstance();
-		final JTextField parabolaNxTextField = new JTextField(s.getParabolaNx() + "", 6);
-		final JTextField parabolaNyTextField = new JTextField(s.getParabolaNy() + "", 6);
+		final JTextField parabolaNxTextField = new JTextField(s.getParabolaTroughNx() + "", 6);
+		final JTextField parabolaNyTextField = new JTextField(s.getParabolaTroughNy() + "", 6);
 		final JTextField mirrorNxTextField = new JTextField(s.getMirrorNx() + "", 6);
 		final JTextField mirrorNyTextField = new JTextField(s.getMirrorNy() + "", 6);
 		final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(Scene.getInstance().getRackCellSize()));
@@ -112,8 +112,8 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be power of two.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				s.setParabolaNx(parabolaNx);
-				s.setParabolaNy(parabolaNy);
+				s.setParabolaTroughNx(parabolaNx);
+				s.setParabolaTroughNy(parabolaNy);
 				s.setMirrorNx(mirrorNx);
 				s.setMirrorNy(mirrorNy);
 				s.setRackModelExact(rackModelComboBox.getSelectedIndex() == 1);
