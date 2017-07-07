@@ -52,6 +52,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 	public static final int MAX_INVERTER_EFFICIENCY_PERCENTAGE = 100;
 	public static final int COLOR_OPTION_BLUE = 0;
 	public static final int COLOR_OPTION_BLACK = 1;
+	public static final int COLOR_OPTION_GRAY = 2;
 	public static final int MONOCRYSTALLINE = 0;
 	public static final int POLYCRYSTALLINE = 1;
 	public static final int THIN_FILM = 2;
@@ -658,6 +659,13 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 				return rotated ? "solarpanel-black-landscape.png" : "solarpanel-black-portrait.png";
 			case POLYCRYSTALLINE:
 				return rotated ? "polycrystal-solarpanel-black-landscape.png" : "polycrystal-solarpanel-black-portrait.png";
+			}
+		case COLOR_OPTION_GRAY:
+			switch (cellType) {
+			case MONOCRYSTALLINE:
+				return rotated ? "solarpanel-gray-landscape.png" : "solarpanel-gray-portrait.png";
+			case POLYCRYSTALLINE:
+				return rotated ? "polycrystal-solarpanel-gray-landscape.png" : "polycrystal-solarpanel-gray-portrait.png";
 			}
 		default:
 			switch (cellType) {

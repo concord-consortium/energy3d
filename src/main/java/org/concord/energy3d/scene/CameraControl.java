@@ -182,7 +182,7 @@ public abstract class CameraControl {
 			final double extent1 = Math.abs(e1.cross(cameraDirection, null).length());
 			final Vector3 e2 = new Matrix3().applyRotationZ(Math.PI / 2).applyPost(e1, null);
 			final double extent2 = Math.abs(e2.cross(cameraDirection, null).length());
-			extent = 0.5 * (extent1 + extent2);
+			extent = 0.45 * (extent1 + extent2);
 		}
 		return extent;
 	}

@@ -451,6 +451,7 @@ public class SolarRadiation {
 		final ReadOnlyVector3 normal = userData.getRotatedNormal() == null ? userData.getNormal() : userData.getRotatedNormal();
 		final MeshDataStore data = onMesh.get(mesh);
 		final int timeStep = Scene.getInstance().getTimeStep();
+		final int iMinute = minute / timeStep;
 
 		final double dot = normal.dot(directionTowardSun);
 		final double directRadiation = dot > 0 ? calculateDirectRadiation(directionTowardSun, normal) : 0;
@@ -496,15 +497,15 @@ public class SolarRadiation {
 				}
 				data.dailySolarIntensity[row][col] += Scene.getInstance().getOnlyAbsorptionInSolarMap() ? absorption * radiation : radiation;
 				if (data.solarPotential != null) {
-					data.solarPotential[minute / timeStep] += radiation * scaledArea;
+					data.solarPotential[iMinute] += radiation * scaledArea;
 				}
-				foundation.getSolarPotential()[minute / timeStep] += radiation * scaledArea; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
+				foundation.getSolarPotential()[iMinute] += radiation * scaledArea; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
 			}
 		}
 
 	}
 
-	// the mesh is a curvy parabolic surface
+	// the mesh is a parabolic surface
 	private void computeOnParabolicTrough(final int minute, final ReadOnlyVector3 directionTowardSun, final ParabolicTrough trough) {
 
 		final int nx = Scene.getInstance().getParabolaTroughNx();
@@ -519,6 +520,62 @@ public class SolarRadiation {
 		}
 		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
 		final double a = trough.getTroughWidth() * trough.getTroughLength() * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
+		final Mesh mesh = trough.getRadiationMesh();
+		MeshDataStore data = onMesh.get(mesh);
+		if (data == null) {
+			data = initMeshTextureDataOnRectangle(mesh, nx, ny);
+		}
+
+		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
+
+		final double dot = normal.dot(directionTowardSun);
+		double directRadiation = 0;
+		if (dot > 0) {
+			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
+		}
+
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final int j = vertexBuffer.limit() / 2; // number of vertex coordinates on each end
+		final Vector3 p0 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 0)
+		final Vector3 p1 = new Vector3(vertexBuffer.get(j - 3), vertexBuffer.get(j - 2), vertexBuffer.get(j - 1)); // (1, 0)
+		final Vector3 p2 = new Vector3(vertexBuffer.get(j), vertexBuffer.get(j + 1), vertexBuffer.get(j + 2)); // (0, 1)
+		// final Vector3 q0 = drawMesh.localToWorld(p0, null);
+		// final Vector3 q1 = drawMesh.localToWorld(p1, null);
+		// final Vector3 q2 = drawMesh.localToWorld(p2, null);
+		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
+		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is perpendicular to the direction of the cylinder axis
+		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is parallel to the direction of the cylinder axis
+		final double xSpacing = p1.distance(p0) / nx;
+		final double ySpacing = p2.distance(p0) / ny;
+
+		final int iMinute = minute / Scene.getInstance().getTimeStep();
+		for (int x = 0; x < nx; x++) {
+			for (int y = 0; y < ny; y++) {
+				if (EnergyPanel.getInstance().isCancelled()) {
+					throw new CancellationException();
+				}
+				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
+				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
+				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final Ray3 pickRay = new Ray3(p, directionTowardSun);
+				if (dot > 0) {
+					final PickResults pickResults = new PrimitivePickResults();
+					for (final Spatial spatial : collidables) {
+						if (spatial != mesh) {
+							PickingUtil.findPick(spatial, pickRay, pickResults, false);
+							if (pickResults.getNumber() != 0) {
+								break;
+							}
+						}
+					}
+					if (pickResults.getNumber() == 0) {
+						// for heat map generation
+						data.dailySolarIntensity[x][y] += directRadiation;
+						trough.getSolarPotential()[iMinute] += directRadiation * a; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
+					}
+				}
+			}
+		}
 
 	}
 
@@ -542,11 +599,10 @@ public class SolarRadiation {
 			throw new RuntimeException("Normal is null");
 		}
 
-		final Mesh drawMesh = mirror.getRadiationMesh();
-		final Mesh collisionMesh = (Mesh) mirror.getRadiationCollisionSpatial();
-		MeshDataStore data = onMesh.get(drawMesh);
+		final Mesh mesh = mirror.getRadiationMesh();
+		MeshDataStore data = onMesh.get(mesh);
 		if (data == null) {
-			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(mesh, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -557,7 +613,7 @@ public class SolarRadiation {
 			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
 		}
 
-		final FloatBuffer vertexBuffer = drawMesh.getMeshData().getVertexBuffer();
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 
 		final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
 		final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
@@ -596,12 +652,12 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final ReadOnlyVector3 p = drawMesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
+				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2)).addLocal(offset);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				if (dot > 0) {
 					final PickResults pickResults = new PrimitivePickResults();
 					for (final Spatial spatial : collidables) {
-						if (spatial != collisionMesh) {
+						if (spatial != mesh) {
 							PickingUtil.findPick(spatial, pickRay, pickResults, false);
 							if (pickResults.getNumber() != 0) {
 								break;
@@ -621,7 +677,7 @@ public class SolarRadiation {
 							final Ray3 rayToReceiver = new Ray3(p, toReceiver.normalize(null));
 							final PickResults pickResultsToReceiver = new PrimitivePickResults();
 							for (final Spatial spatial : collidables) {
-								if (spatial != collisionMesh) {
+								if (spatial != mesh) {
 									if (towerCollisionMeshes == null || (towerCollisionMeshes != null && !towerCollisionMeshes.contains(spatial))) {
 										PickingUtil.findPick(spatial, rayToReceiver, pickResultsToReceiver, false);
 										if (pickResultsToReceiver.getNumber() != 0) {
@@ -661,7 +717,7 @@ public class SolarRadiation {
 		final Mesh collisionMesh = (Mesh) sensor.getRadiationCollisionSpatial();
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
-			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(drawMesh, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -737,7 +793,7 @@ public class SolarRadiation {
 		final Mesh collisionMesh = (Mesh) panel.getRadiationCollisionSpatial();
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
-			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(drawMesh, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -946,7 +1002,7 @@ public class SolarRadiation {
 		final Mesh collisionMesh = (Mesh) rack.getRadiationCollisionSpatial();
 		MeshDataStore data = onMesh.get(drawMesh);
 		if (data == null) {
-			data = initMeshTextureDataOnRectangle(drawMesh, collisionMesh, normal, nx, ny);
+			data = initMeshTextureDataOnRectangle(drawMesh, nx, ny);
 		}
 
 		final ReadOnlyVector3 offset = directionTowardSun.multiply(1, null);
@@ -1340,12 +1396,12 @@ public class SolarRadiation {
 		return data;
 	}
 
-	private MeshDataStore initMeshTextureDataOnRectangle(final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal, final int rows, final int cols) {
+	private MeshDataStore initMeshTextureDataOnRectangle(final Mesh mesh, final int rows, final int cols) {
 		final MeshDataStore data = new MeshDataStore();
 		data.rows = rows;
 		data.cols = cols;
 		data.dailySolarIntensity = new double[Util.roundToPowerOfTwo(data.rows)][Util.roundToPowerOfTwo(data.cols)];
-		onMesh.put(drawMesh, data);
+		onMesh.put(mesh, data);
 		return data;
 	}
 

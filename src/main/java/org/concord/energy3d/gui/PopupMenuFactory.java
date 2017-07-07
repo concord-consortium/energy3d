@@ -2556,7 +2556,7 @@ public class PopupMenuFactory {
 						panel.add(cellTypeComboBox);
 
 						panel.add(new JLabel("Color:"));
-						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black", "Gray" });
 						colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
 						panel.add(colorOptionComboBox);
 
@@ -2767,7 +2767,7 @@ public class PopupMenuFactory {
 						panel.add(cellTypeComboBox);
 
 						panel.add(new JLabel("Solar Panel Color:"));
-						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+						colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black", "Gray" });
 						colorOptionComboBox.setSelectedIndex(solarPanelColorOption);
 						panel.add(colorOptionComboBox);
 
@@ -5392,10 +5392,8 @@ public class PopupMenuFactory {
 					inputPanel.add(typeComboBox);
 					label = new JLabel("Color: ", JLabel.LEFT);
 					inputPanel.add(label);
-					final JComboBox<String> colorComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
-					if (solarPanel.getColorOption() == SolarPanel.COLOR_OPTION_BLACK) {
-						colorComboBox.setSelectedIndex(1);
-					}
+					final JComboBox<String> colorComboBox = new JComboBox<String>(new String[] { "Blue", "Black", "Gray" });
+					colorComboBox.setSelectedIndex(solarPanel.getColorOption());
 					label.setLabelFor(colorComboBox);
 					inputPanel.add(colorComboBox);
 					label = new JLabel("Efficiency (%): ", JLabel.LEFT);
@@ -6366,7 +6364,7 @@ public class PopupMenuFactory {
 					cellTypeComboBox.setSelectedIndex(solarPanel.getCellType());
 					panel.add(cellTypeComboBox);
 					panel.add(new JLabel("Color:"));
-					colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+					colorOptionComboBox = new JComboBox<String>(new String[] { "Blue", "Black", "Gray" });
 					colorOptionComboBox.setSelectedIndex(solarPanel.getColorOption());
 					panel.add(colorOptionComboBox);
 					panel.add(new JLabel("Solar Cell Efficiency (%):"));
@@ -6889,7 +6887,7 @@ public class PopupMenuFactory {
 					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
 					gui.setBorder(BorderFactory.createTitledBorder("Choose Color for " + partInfo));
-					final JComboBox<String> colorComboBox = new JComboBox<String>(new String[] { "Blue", "Black" });
+					final JComboBox<String> colorComboBox = new JComboBox<String>(new String[] { "Blue", "Black", "Gray" });
 					colorComboBox.setSelectedIndex(s.getColorOption());
 					gui.add(colorComboBox, BorderLayout.NORTH);
 					final JPanel scopePanel = new JPanel();
