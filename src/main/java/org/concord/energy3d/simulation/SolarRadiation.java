@@ -14,6 +14,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
@@ -129,6 +130,10 @@ public class SolarRadiation {
 		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof SolarPanel || part instanceof Mirror || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
+				final Spatial s = part.getRadiationCollisionSpatial();
+				collidables.add(s);
+				collidablesToParts.put(s, part);
+			} else if (part instanceof ParabolicTrough) {
 				final Spatial s = part.getRadiationCollisionSpatial();
 				collidables.add(s);
 				collidablesToParts.put(s, part);
@@ -248,6 +253,8 @@ public class SolarRadiation {
 							computeOnRack(minute, directionTowardSun, (Rack) part);
 						} else if (part instanceof Mirror) {
 							computeOnMirror(minute, directionTowardSun, (Mirror) part);
+						} else if (part instanceof ParabolicTrough) {
+							computeOnParabolicTrough(minute, directionTowardSun, (ParabolicTrough) part);
 						} else if (part instanceof Sensor) {
 							computeOnSensor(minute, directionTowardSun, (Sensor) part);
 						}
@@ -494,6 +501,24 @@ public class SolarRadiation {
 				foundation.getSolarPotential()[minute / timeStep] += radiation * scaledArea; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
 			}
 		}
+
+	}
+
+	// the mesh is a curvy parabolic surface
+	private void computeOnParabolicTrough(final int minute, final ReadOnlyVector3 directionTowardSun, final ParabolicTrough trough) {
+
+		final int nx = Scene.getInstance().getParabolaNx();
+		final int ny = Scene.getInstance().getParabolaNy();
+		final Calendar calendar = Heliodon.getInstance().getCalendar();
+		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+		calendar.set(Calendar.MINUTE, minute % 60);
+		trough.draw();
+		final ReadOnlyVector3 normal = trough.getNormal();
+		if (normal == null) {
+			throw new RuntimeException("Normal is null");
+		}
+		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
+		final double a = trough.getTroughWidth() * trough.getTroughLength() * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
 
 	}
 

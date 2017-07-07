@@ -325,13 +325,16 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final Vector3 p1 = new Vector3(vertexBuffer.get(j1), vertexBuffer.get(j1 + 1), vertexBuffer.get(j1 + 2)); // middle point on end 1
 		final Vector3 p2 = new Vector3(vertexBuffer.get(j2), vertexBuffer.get(j2 + 1), vertexBuffer.get(j2 + 2)); // middle point on end 2
 		final Vector3 pd = p2.subtract(p1, null).normalizeLocal(); // normal in the direction of cylinder axis
+		final double halfLength = troughLength * 0.5;
+		final Vector3 center = getAbsPoint(0);
 
 		final int nUnits = (int) Math.round(troughLength / unitLength);
-		final int outlineBufferSize = 6 * vertexCount * (nUnits + 2) + 4; // 4 is for the two lateral lines
+		final int outlineBufferSize = 6 * (vertexCount - 1) * (nUnits + 3) + 12; // 12 is for the two lateral lines
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
 		} else {
+			outlineBuffer.clear();
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
@@ -348,13 +351,22 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlineBuffer.put(vertexBuffer.get(j - 3)).put(vertexBuffer.get(j - 2)).put(vertexBuffer.get(j - 1));
 		outlineBuffer.put(vertexBuffer.get(2 * j - 3)).put(vertexBuffer.get(2 * j - 2)).put(vertexBuffer.get(2 * j - 1));
 		// draw seam lines between units
-		final double unit = unitLength / annotationScale;
-		for (int m = 1; m < nUnits; m++) {
+		for (double u = halfLength; u < troughLength; u += unitLength) {
 			for (int i = 0; i < vertexCount - 1; i++) {
 				final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
 				final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
-				v1.addLocal(0, unit * m, 0);
-				v2.addLocal(0, unit * m, 0);
+				v1.addLocal(0, u / annotationScale, 0);
+				v2.addLocal(0, u / annotationScale, 0);
+				outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
+				outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
+			}
+		}
+		for (double u = halfLength - unitLength; u > 0; u -= unitLength) {
+			for (int i = 0; i < vertexCount - 1; i++) {
+				final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
+				final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
+				v1.addLocal(0, u / annotationScale, 0);
+				v2.addLocal(0, u / annotationScale, 0);
 				outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
 				outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
 			}
@@ -366,6 +378,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			steelFrameBuffer = BufferUtils.createFloatBuffer(steelBufferSize);
 			steelFrame.getMeshData().setVertexBuffer(steelFrameBuffer);
 		} else {
+			steelFrameBuffer.clear();
 			steelFrameBuffer.rewind();
 			steelFrameBuffer.limit(steelBufferSize);
 		}
@@ -373,8 +386,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		steelFrameBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 
 		unitsRoot.detachAllChildren();
-		final double halfLength = troughLength * 0.5;
-		final Vector3 center = getAbsPoint(0);
 		for (double u = halfLength; u < troughLength; u += unitLength) {
 			final Vector3 p = pd.multiply((u - halfLength) / annotationScale, null);
 			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
