@@ -68,7 +68,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient Vector3 oldTroughCenter;
 	private transient double oldTroughLength, oldTroughWidth;
 	private transient double oldRelativeAzimuth;
-	private static transient BloomRenderPass bloomRenderPass;
+	private static transient BloomRenderPass bloomRenderPassLight, bloomRenderPassTube;
 	private transient double baseZ;
 
 	public ParabolicTrough() {
@@ -431,6 +431,16 @@ public class ParabolicTrough extends HousePart implements Solar {
 		absorberEnd1.updateModelBound();
 		absorberEnd2.updateModelBound();
 
+		if (bloomRenderPassTube == null) {
+			bloomRenderPassTube = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPassTube.setBlurIntensityMultiplier(0.75f);
+			// bloomRenderPassTube.setNrBlurPasses(2);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPassTube);
+		}
+		if (!bloomRenderPassTube.contains(absorber)) {
+			bloomRenderPassTube.add(absorber);
+		}
+
 		if (beamsVisible) {
 			drawLightBeams();
 		}
@@ -480,14 +490,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 		lightBeams.updateModelBound();
 		lightBeams.setVisible(true);
-		if (bloomRenderPass == null) {
-			bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
-			bloomRenderPass.setBlurIntensityMultiplier(0.5f);
-			bloomRenderPass.setNrBlurPasses(2);
-			SceneManager.getInstance().getPassManager().add(bloomRenderPass);
+		if (bloomRenderPassLight == null) {
+			bloomRenderPassLight = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
+			bloomRenderPassLight.setBlurIntensityMultiplier(0.5f);
+			bloomRenderPassLight.setNrBlurPasses(2);
+			SceneManager.getInstance().getPassManager().add(bloomRenderPassLight);
 		}
-		if (!bloomRenderPass.contains(lightBeams)) {
-			bloomRenderPass.add(lightBeams);
+		if (!bloomRenderPassLight.contains(lightBeams)) {
+			bloomRenderPassLight.add(lightBeams);
 		}
 	}
 
@@ -504,7 +514,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = 1;
+			final double shift = 0.6 * reflector.getSemilatusRectum();
 			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -791,9 +801,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 	@Override
 	public void delete() {
 		super.delete();
-		if (bloomRenderPass != null) {
-			if (bloomRenderPass.contains(lightBeams)) {
-				bloomRenderPass.remove(lightBeams);
+		if (bloomRenderPassLight != null) {
+			if (bloomRenderPassLight.contains(lightBeams)) {
+				bloomRenderPassLight.remove(lightBeams);
+			}
+		}
+		if (bloomRenderPassTube != null) {
+			if (bloomRenderPassTube.contains(absorber)) {
+				bloomRenderPassTube.remove(absorber);
 			}
 		}
 	}
