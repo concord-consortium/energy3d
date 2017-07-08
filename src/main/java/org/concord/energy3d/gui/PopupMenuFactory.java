@@ -8802,6 +8802,112 @@ public class PopupMenuFactory {
 
 		if (popupMenuForParabolicTrough == null) {
 
+			final JMenuItem miMesh = new JMenuItem("Mesh...");
+			miMesh.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					final Foundation foundation = t.getTopContainer();
+					final String partInfo = t.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Parabolic sections: "));
+					final JTextField nxField = new JTextField("" + t.getNSectionX());
+					inputPanel.add(nxField);
+					inputPanel.add(new JLabel("Axial sections: "));
+					final JTextField nyField = new JTextField("" + t.getNSectionY());
+					inputPanel.add(nyField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set mesh for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Mesh");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							int nx = 0, ny = 0;
+							boolean ok = true;
+							try {
+								nx = Integer.parseInt(nyField.getText());
+								ny = Integer.parseInt(nxField.getText());
+							} catch (final NumberFormatException nfe) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (nx < 4) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (ny < 4) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axial sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (!Util.isPowerOfTwo(nx) || !Util.isPowerOfTwo(ny)) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of parabolic trough mesh sections in x or y direction must be power of two.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
+										t.setNSectionX(ny);
+										t.setNSectionY(nx);
+										t.draw();
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+										foundation.setSectionsForParabolicTroughs(nx, ny);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+										Scene.getInstance().setSectionsForAllParabolicTroughs(nx, ny);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
 			final JCheckBoxMenuItem cbmiDrawSunBeams = new JCheckBoxMenuItem("Draw Sun Beams");
 			cbmiDrawSunBeams.addItemListener(new ItemListener() {
 				@Override
@@ -9318,6 +9424,7 @@ public class PopupMenuFactory {
 			popupMenuForParabolicTrough.add(miSize);
 			popupMenuForParabolicTrough.add(miSemilatusRectum);
 			popupMenuForParabolicTrough.add(miBaseHeight);
+			popupMenuForParabolicTrough.add(miMesh);
 			popupMenuForParabolicTrough.add(miReflectivity);
 			popupMenuForParabolicTrough.addSeparator();
 

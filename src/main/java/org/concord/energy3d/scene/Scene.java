@@ -183,9 +183,6 @@ public class Scene implements Serializable {
 	// used in both radiation calculation and heat map visualization for reflecting mirrors (which are closer to square, except parabolic troughs)
 	private int mirrorNx = 4, mirrorNy = 4;
 
-	private int parabolaTroughNx = 20; // number of sample points for the parabola cross section of a parabolic trough
-	private int parabolaTroughNy = 10; // number of sample points in the axis of a parabolic trough
-
 	// the step length of the discretized grid on any part that is not a plate
 	private double solarStep = 2.0;
 
@@ -464,12 +461,6 @@ public class Scene implements Serializable {
 		}
 		if (Util.isZero(mirrorNy)) {
 			mirrorNy = 4;
-		}
-		if (Util.isZero(parabolaTroughNx)) {
-			parabolaTroughNx = 20;
-		}
-		if (Util.isZero(parabolaTroughNy)) {
-			parabolaTroughNy = 10;
 		}
 		if (Util.isZero(rackCellSize)) {
 			rackCellSize = 1;
@@ -2629,6 +2620,18 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSectionsForAllParabolicTroughs(final int nx, final int ny) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				final ParabolicTrough t = (ParabolicTrough) p;
+				t.setNSectionX(nx);
+				t.setNSectionY(ny);
+				t.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setSemilatusRectumForAllParabolicTroughs(final double semilatusRectum) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicTrough) {
@@ -3110,22 +3113,6 @@ public class Scene implements Serializable {
 
 	public int getMirrorNy() {
 		return mirrorNy;
-	}
-
-	public void setParabolaTroughNx(final int parabolaTroughNx) {
-		this.parabolaTroughNx = parabolaTroughNx;
-	}
-
-	public int getParabolaTroughNx() {
-		return parabolaTroughNx;
-	}
-
-	public void setParabolaTroughNy(final int parabolaTroughNy) {
-		this.parabolaTroughNy = parabolaTroughNy;
-	}
-
-	public int getParabolaTroughNy() {
-		return parabolaTroughNy;
 	}
 
 	public void setSolarStep(final double solarStep) {

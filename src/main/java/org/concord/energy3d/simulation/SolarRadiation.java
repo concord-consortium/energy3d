@@ -276,6 +276,9 @@ public class SolarRadiation {
 				if (m.getHeliostatTarget() != null) {
 					m.draw();
 				}
+			} else if (part instanceof ParabolicTrough) {
+				final ParabolicTrough pt = (ParabolicTrough) part;
+				pt.draw();
 			} else if (part instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) part;
 				if (sp.getTracker() != Trackable.NO_TRACKER) {
@@ -508,8 +511,8 @@ public class SolarRadiation {
 	// the mesh is a parabolic surface
 	private void computeOnParabolicTrough(final int minute, final ReadOnlyVector3 directionTowardSun, final ParabolicTrough trough) {
 
-		final int nx = Scene.getInstance().getParabolaTroughNx();
-		final int ny = Scene.getInstance().getParabolaTroughNy();
+		final int nx = trough.getNSectionX();
+		final int ny = trough.getNSectionY();
 		final Calendar calendar = Heliodon.getInstance().getCalendar();
 		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 		calendar.set(Calendar.MINUTE, minute % 60);
@@ -1753,7 +1756,7 @@ public class SolarRadiation {
 
 	private void applyTexture(final Mesh mesh) {
 		if (onMesh.get(mesh) == null) {
-			mesh.setDefaultColor(ColorRGBA.BLUE);
+			mesh.setDefaultColor(ColorRGBA.BLACK);
 			mesh.clearRenderState(StateType.Texture);
 			return;
 		}
