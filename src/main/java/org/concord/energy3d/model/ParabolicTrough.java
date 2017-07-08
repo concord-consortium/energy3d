@@ -70,8 +70,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient double oldRelativeAzimuth;
 	private static transient BloomRenderPass bloomRenderPassLight, bloomRenderPassTube;
 	private transient double baseZ;
-	private int nSectionX = 16; // number of sections for the parabola cross section of a parabolic trough (must be power of 2)
-	private int nSectionY = 32; // number of sections in the axis of a parabolic trough (must be power of 2)
+	private int nSectionParabola = 16; // number of sections for the parabola cross section of a parabolic trough (must be power of 2)
+	private int nSectionAxis = 32; // number of sections in the axis of a parabolic trough (must be power of 2)
 
 	public ParabolicTrough() {
 		super(1, 1, 0);
@@ -99,14 +99,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (Util.isZero(reflectivity)) {
 			reflectivity = 0.9;
 		}
-		if (Util.isZero(nSectionX)) {
-			nSectionX = 16;
+		if (Util.isZero(nSectionParabola)) {
+			nSectionParabola = 16;
 		}
-		if (Util.isZero(nSectionY)) {
-			nSectionY = 32;
+		if (Util.isZero(nSectionAxis)) {
+			nSectionAxis = 32;
 		}
 
-		mesh = new ParabolicCylinder("Parabolic Cylinder", nSectionX, semilatusRectum, troughWidth, troughLength);
+		mesh = new ParabolicCylinder("Parabolic Cylinder", nSectionParabola, semilatusRectum, troughWidth, troughLength);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -863,20 +863,20 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return labelEnergyOutput;
 	}
 
-	public void setNSectionX(final int nx) {
-		nSectionX = nx;
+	public void setNSectionParabola(final int parabolaSectionCount) {
+		nSectionParabola = parabolaSectionCount;
 	}
 
-	public int getNSectionX() {
-		return nSectionX;
+	public int getNSectionParabola() {
+		return nSectionParabola;
 	}
 
-	public void setNSectionY(final int ny) {
-		nSectionY = ny;
+	public void setNSectionAxis(final int axisSectionCount) {
+		nSectionAxis = axisSectionCount;
 	}
 
-	public int getNSectionY() {
-		return nSectionY;
+	public int getNSectionAxis() {
+		return nSectionAxis;
 	}
 
 }

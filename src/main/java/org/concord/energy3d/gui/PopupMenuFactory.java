@@ -8820,11 +8820,11 @@ public class PopupMenuFactory {
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
 					inputPanel.add(new JLabel("Parabolic sections: "));
-					final JTextField nxField = new JTextField("" + t.getNSectionX());
-					inputPanel.add(nxField);
+					final JTextField nParabolaField = new JTextField("" + t.getNSectionParabola());
+					inputPanel.add(nParabolaField);
 					inputPanel.add(new JLabel("Axial sections: "));
-					final JTextField nyField = new JTextField("" + t.getNSectionY());
-					inputPanel.add(nyField);
+					final JTextField nAxisField = new JTextField("" + t.getNSectionAxis());
+					inputPanel.add(nAxisField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -8862,38 +8862,38 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
-							int nx = 0, ny = 0;
+							int nSectionParabola = 0, nSectionAxis = 0;
 							boolean ok = true;
 							try {
-								nx = Integer.parseInt(nxField.getText());
-								ny = Integer.parseInt(nyField.getText());
+								nSectionParabola = Integer.parseInt(nParabolaField.getText());
+								nSectionAxis = Integer.parseInt(nAxisField.getText());
 							} catch (final NumberFormatException nfe) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (nx < 4) {
+								if (nSectionParabola < 4) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (ny < 4) {
+								} else if (nSectionAxis < 4) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axial sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (!Util.isPowerOfTwo(nx) || !Util.isPowerOfTwo(ny)) {
+								} else if (!Util.isPowerOfTwo(nSectionParabola) || !Util.isPowerOfTwo(nSectionAxis)) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of parabolic trough mesh sections in x or y direction must be power of two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setNSectionX(nx);
-										t.setNSectionY(ny);
+										t.setNSectionParabola(nSectionParabola);
+										t.setNSectionAxis(nSectionAxis);
 										t.draw();
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSectionsForParabolicTroughs(nx, ny);
+										foundation.setSectionsForParabolicTroughs(nSectionParabola, nSectionAxis);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSectionsForAllParabolicTroughs(nx, ny);
+										Scene.getInstance().setSectionsForAllParabolicTroughs(nSectionParabola, nSectionAxis);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}

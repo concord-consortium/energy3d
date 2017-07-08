@@ -511,8 +511,8 @@ public class SolarRadiation {
 	// the mesh is a parabolic surface
 	private void computeOnParabolicTrough(final int minute, final ReadOnlyVector3 directionTowardSun, final ParabolicTrough trough) {
 
-		final int nx = trough.getNSectionX();
-		final int ny = trough.getNSectionY();
+		final int nAxis = trough.getNSectionAxis();
+		final int nPara = trough.getNSectionParabola();
 		final Calendar calendar = Heliodon.getInstance().getCalendar();
 		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 		calendar.set(Calendar.MINUTE, minute % 60);
@@ -522,11 +522,11 @@ public class SolarRadiation {
 			throw new RuntimeException("Normal is null");
 		}
 		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
-		final double a = trough.getTroughWidth() * trough.getTroughLength() * Scene.getInstance().getTimeStep() / (nx * ny * 60.0);
+		final double a = trough.getTroughWidth() * trough.getTroughLength() * Scene.getInstance().getTimeStep() / (nAxis * nPara * 60.0);
 		final Mesh mesh = trough.getRadiationMesh();
 		MeshDataStore data = onMesh.get(mesh);
 		if (data == null) {
-			data = initMeshTextureDataOnRectangle(mesh, nx, ny);
+			data = initMeshTextureDataOnRectangle(mesh, nAxis, nPara); // axis is row and parabola is column
 		}
 
 		final double dot = normal.dot(directionTowardSun);
@@ -538,28 +538,27 @@ public class SolarRadiation {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final int j = vertexBuffer.limit() / 2; // number of vertex coordinates on each end
 		final Vector3 p0 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 0)
-		final Vector3 p2 = new Vector3(vertexBuffer.get(j - 3), vertexBuffer.get(j - 2), vertexBuffer.get(j - 1)); // (1, 0)
-		final Vector3 p1 = new Vector3(vertexBuffer.get(j), vertexBuffer.get(j + 1), vertexBuffer.get(j + 2)); // (0, 1)
-		// ABOVE: x and y must be swapped to have correct heat map texture, because nx represents rows and ny columns as we call initMeshTextureDataOnRectangle(mesh, nx, ny)
+		final Vector3 p1 = new Vector3(vertexBuffer.get(j - 3), vertexBuffer.get(j - 2), vertexBuffer.get(j - 1)); // (1, 0)
+		final Vector3 p2 = new Vector3(vertexBuffer.get(j), vertexBuffer.get(j + 1), vertexBuffer.get(j + 2)); // (0, 1)
 		// final Vector3 q0 = mesh.localToWorld(p0, null);
 		// final Vector3 q1 = mesh.localToWorld(p1, null);
 		// final Vector3 q2 = mesh.localToWorld(p2, null);
 		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
-		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is perpendicular to the direction of the cylinder axis
-		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is parallel to the direction of the cylinder axis
-		final double xSpacing = p1.distance(p0) / nx;
-		final double ySpacing = p2.distance(p0) / ny;
+		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is perpendicular to the direction of the cylinder axis (nPara)
+		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is parallel to the direction of the cylinder axis (nAxis)
+		final double xSpacing = p1.distance(p0) / nPara;
+		final double ySpacing = p2.distance(p0) / nAxis;
 
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
-		for (int x = 0; x < nx; x++) {
-			for (int y = 0; y < ny; y++) {
+		for (int x = 0; x < nPara; x++) {
+			for (int y = 0; y < nAxis; y++) {
 				if (EnergyPanel.getInstance().isCancelled()) {
 					throw new CancellationException();
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				// final ReadOnlyVector3 p = mesh.localToWorld(p0.add(v2, null).addLocal(u2), null);
-				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
+				final Vector3 q = p0.add(v2, null).addLocal(u2); // on the plane of the mouth of the parabolic trough
+				final ReadOnlyVector3 p = mesh.localToWorld(q, null);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				if (dot > 0) {
 					final PickResults pickResults = new PrimitivePickResults();
@@ -573,7 +572,7 @@ public class SolarRadiation {
 					}
 					if (pickResults.getNumber() == 0) {
 						// for heat map generation
-						data.dailySolarIntensity[x][y] += directRadiation;
+						data.dailySolarIntensity[y][x] += directRadiation;
 						trough.getSolarPotential()[iMinute] += directRadiation * a; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
 					}
 				}

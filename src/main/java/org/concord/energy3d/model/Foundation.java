@@ -2792,12 +2792,12 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSectionsForParabolicTroughs(final int nx, final int ny) {
+	public void setSectionsForParabolicTroughs(final int nParabola, final int nAxis) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicTrough) {
 				final ParabolicTrough t = (ParabolicTrough) p;
-				t.setNSectionX(nx);
-				t.setNSectionY(ny);
+				t.setNSectionParabola(nParabola);
+				t.setNSectionAxis(nAxis);
 				t.draw();
 			}
 		}

@@ -2620,12 +2620,12 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSectionsForAllParabolicTroughs(final int nx, final int ny) {
+	public void setSectionsForAllParabolicTroughs(final int nParabola, final int nAxis) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicTrough) {
 				final ParabolicTrough t = (ParabolicTrough) p;
-				t.setNSectionX(nx);
-				t.setNSectionY(ny);
+				t.setNSectionParabola(nParabola);
+				t.setNSectionAxis(nAxis);
 				t.draw();
 			}
 		}

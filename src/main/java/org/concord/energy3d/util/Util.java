@@ -452,14 +452,18 @@ public class Util {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				final JPanel panel = new JPanel(new BorderLayout(10, 10));
-				final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
-				scrollPane.setPreferredSize(new Dimension(400, 400));
-				panel.add(scrollPane, BorderLayout.CENTER);
-				final boolean corrupted = msg.indexOf("java.io.EOFException") != -1;
-				panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
-				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
-					new ReportUploader(text, currentFile).execute();
+				if (msg.indexOf("java.lang.OutOfMemoryError") != -1) { // in this case, we may not have enough resource to send error report. just advise user to restart
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy3D has run out of memory. Please restart.", "Out of Memory", JOptionPane.ERROR_MESSAGE);
+				} else {
+					final JPanel panel = new JPanel(new BorderLayout(10, 10));
+					final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
+					scrollPane.setPreferredSize(new Dimension(400, 400));
+					panel.add(scrollPane, BorderLayout.CENTER);
+					final boolean corrupted = msg.indexOf("java.io.EOFException") != -1;
+					panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
+						new ReportUploader(text, currentFile).execute();
+					}
 				}
 			}
 		});
