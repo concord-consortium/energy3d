@@ -8865,8 +8865,8 @@ public class PopupMenuFactory {
 							int nx = 0, ny = 0;
 							boolean ok = true;
 							try {
-								nx = Integer.parseInt(nyField.getText());
-								ny = Integer.parseInt(nxField.getText());
+								nx = Integer.parseInt(nxField.getText());
+								ny = Integer.parseInt(nyField.getText());
 							} catch (final NumberFormatException nfe) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -8881,8 +8881,8 @@ public class PopupMenuFactory {
 								} else {
 									if (rb1.isSelected()) {
 										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setNSectionX(ny);
-										t.setNSectionY(nx);
+										t.setNSectionX(nx);
+										t.setNSectionY(ny);
 										t.draw();
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;

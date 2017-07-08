@@ -538,8 +538,9 @@ public class SolarRadiation {
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final int j = vertexBuffer.limit() / 2; // number of vertex coordinates on each end
 		final Vector3 p0 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 0)
-		final Vector3 p1 = new Vector3(vertexBuffer.get(j - 3), vertexBuffer.get(j - 2), vertexBuffer.get(j - 1)); // (1, 0)
-		final Vector3 p2 = new Vector3(vertexBuffer.get(j), vertexBuffer.get(j + 1), vertexBuffer.get(j + 2)); // (0, 1)
+		final Vector3 p2 = new Vector3(vertexBuffer.get(j - 3), vertexBuffer.get(j - 2), vertexBuffer.get(j - 1)); // (1, 0)
+		final Vector3 p1 = new Vector3(vertexBuffer.get(j), vertexBuffer.get(j + 1), vertexBuffer.get(j + 2)); // (0, 1)
+		// ABOVE: x and y must be swapped to have correct heat map texture, because nx represents rows and ny columns as we call initMeshTextureDataOnRectangle(mesh, nx, ny)
 		// final Vector3 q0 = mesh.localToWorld(p0, null);
 		// final Vector3 q1 = mesh.localToWorld(p1, null);
 		// final Vector3 q2 = mesh.localToWorld(p2, null);
@@ -557,7 +558,8 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final ReadOnlyVector3 p = mesh.localToWorld(p0.add(v2, null).addLocal(u2), null);
+				// final ReadOnlyVector3 p = mesh.localToWorld(p0.add(v2, null).addLocal(u2), null);
+				final ReadOnlyVector3 p = mesh.getWorldTransform().applyForward(p0.add(v2, null).addLocal(u2));
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				if (dot > 0) {
 					final PickResults pickResults = new PrimitivePickResults();
@@ -625,7 +627,7 @@ public class SolarRadiation {
 		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
 		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is the longer side (supposed to be y)
 		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is the shorter side (supposed to be x)
-		final double xSpacing = p1.distance(p0) / nx; // FIXME: for some reason, x and y must be swapped in order to have correct heat map texture
+		final double xSpacing = p1.distance(p0) / nx; // x and y must be swapped to have correct heat map texture, because nx represents rows and ny columns as we call initMeshTextureDataOnRectangle(mesh, nx, ny)
 		final double ySpacing = p2.distance(p0) / ny;
 
 		final Vector3 receiver = target != null ? target.getSolarReceiverCenter() : null;
@@ -737,7 +739,7 @@ public class SolarRadiation {
 		final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
 		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is the longer side (supposed to be y)
 		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is the shorter side (supposed to be x)
-		final double xSpacing = p1.distance(p0) / nx; // FIXME: for some reason, x and y must be swapped in order to have correct heat map texture
+		final double xSpacing = p1.distance(p0) / nx; // x and y must be swapped to have correct heat map texture, because nx represents rows and ny columns as we call initMeshTextureDataOnRectangle(mesh, nx, ny)
 		final double ySpacing = p2.distance(p0) / ny;
 
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
@@ -818,7 +820,7 @@ public class SolarRadiation {
 
 		// generate the heat map first. this doesn't affect the energy calculation, it just shows the distribution of solar radiation on the panel.
 
-		double xSpacing = d10 / nx; // FIXME: for some reason, x and y must be swapped in order to have correct heat map texture
+		double xSpacing = d10 / nx; // x and y must be swapped to have correct heat map texture, because nx represents rows and ny columns as we call initMeshTextureDataOnRectangle(mesh, nx, ny)
 		double ySpacing = d20 / ny;
 		Vector3 u = p10;
 		Vector3 v = p20;
@@ -1027,7 +1029,7 @@ public class SolarRadiation {
 
 		// generate the heat map first. this doesn't affect the energy calculation, it just shows the distribution of solar radiation on the rack.
 
-		double xSpacing = d10 / nx; // FIXME: for some reason, x and y must be swapped in order to have correct heat map texture
+		double xSpacing = d10 / nx; // x and y must be swapped to have correct heat map texture, because nx represents rows and ny columns as we call initMeshTextureDataOnRectangle(mesh, nx, ny)
 		double ySpacing = d20 / ny;
 		Vector3 u = p10;
 		Vector3 v = p20;

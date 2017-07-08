@@ -99,6 +99,9 @@ public class Util {
 	}
 
 	public static int roundToPowerOfTwo(final int n) {
+		if (isPowerOfTwo(n)) {
+			return n;
+		}
 		return (int) Math.pow(2.0, Math.ceil(Math.log(n) / Math.log(2)));
 	}
 
