@@ -190,7 +190,7 @@ public class EnergyDailyAnalysis extends Analysis {
 					cost = Cost.getInstance().getTotalCost();
 					s = s.replaceAll("Foundation", "Building");
 					if (selectedPart.getChildren().isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 					if (!isBuildingComplete((Foundation) selectedPart)) {

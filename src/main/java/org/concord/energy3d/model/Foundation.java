@@ -2357,7 +2357,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				if (p instanceof SolarPanel || p instanceof Rack) {
 					return TYPE_PV_STATION;
 				}
-				if (p instanceof Mirror) {
+				if (p instanceof Mirror || p instanceof ParabolicTrough) {
 					return TYPE_CSP_STATION;
 				}
 			}

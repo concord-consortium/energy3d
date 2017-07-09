@@ -20,9 +20,11 @@ import javax.swing.JPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.Graph;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PartEnergyDailyGraph;
 import org.concord.energy3d.simulation.SolarRadiation;
 
@@ -73,10 +75,17 @@ public class CspStationDailyEnergyGraph extends JPanel {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
-						final MirrorDailyAnalysis analysis = new MirrorDailyAnalysis();
-						analysis.updateGraph();
-						analysis.show();
+					final Foundation f = SceneManager.getInstance().autoSelectBuilding(true);
+					if (f != null) {
+						if (f.countParts(ParabolicTrough.class) > 0) {
+							final ParabolicTroughDailyAnalysis analysis = new ParabolicTroughDailyAnalysis();
+							analysis.updateGraph();
+							analysis.show();
+						} else if (f.countParts(Mirror.class) > 0) {
+							final MirrorDailyAnalysis analysis = new MirrorDailyAnalysis();
+							analysis.updateGraph();
+							analysis.show();
+						}
 					}
 				}
 			}
@@ -117,15 +126,27 @@ public class CspStationDailyEnergyGraph extends JPanel {
 			return;
 		}
 		graph.clearData();
-		final List<Mirror> panels = base.getMirrors();
-		if (!panels.isEmpty()) {
+		final List<ParabolicTrough> troughs = base.getParabolicTroughs();
+		if (!troughs.isEmpty()) { // favor parabolic troughs if there are also mirrors
 			for (int i = 0; i < 24; i++) {
 				SolarRadiation.getInstance().computeEnergyAtHour(i);
 				double output = 0;
-				for (final Mirror sp : panels) {
-					output += sp.getSolarPotentialNow() * sp.getSystemEfficiency();
+				for (final ParabolicTrough t : troughs) {
+					output += t.getSolarPotentialNow() * t.getSystemEfficiency();
 				}
 				graph.addData("Solar", output);
+			}
+		} else {
+			final List<Mirror> mirrors = base.getMirrors();
+			if (!mirrors.isEmpty()) {
+				for (int i = 0; i < 24; i++) {
+					SolarRadiation.getInstance().computeEnergyAtHour(i);
+					double output = 0;
+					for (final Mirror m : mirrors) {
+						output += m.getSolarPotentialNow() * m.getSystemEfficiency();
+					}
+					graph.addData("Solar", output);
+				}
 			}
 		}
 		repaint();

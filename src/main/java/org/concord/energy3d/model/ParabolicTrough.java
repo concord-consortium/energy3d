@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.Calendar;
 
 import javax.swing.JOptionPane;
 
@@ -10,6 +11,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.Atmosphere;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
@@ -673,6 +675,15 @@ public class ParabolicTrough extends HousePart implements Solar {
 			return false;
 		}
 		return true;
+	}
+
+	public double getSystemEfficiency() {
+		double e = reflectivity;
+		final Atmosphere atm = Scene.getInstance().getAtmosphere();
+		if (atm != null) {
+			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
+		}
+		return e;
 	}
 
 	/** a number between 0 and 1 */

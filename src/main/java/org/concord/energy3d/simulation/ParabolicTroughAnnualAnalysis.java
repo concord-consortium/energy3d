@@ -37,7 +37,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
@@ -50,9 +50,9 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-public class MirrorAnnualAnalysis extends Analysis {
+public class ParabolicTroughAnnualAnalysis extends Analysis {
 
-	public MirrorAnnualAnalysis() {
+	public ParabolicTroughAnnualAnalysis() {
 		super();
 		graph = new PartEnergyAnnualGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
@@ -165,24 +165,24 @@ public class MirrorAnnualAnalysis extends Analysis {
 	public void updateGraph() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
-			if (selectedPart instanceof Mirror) {
-				final Mirror m = (Mirror) selectedPart;
-				graph.addData("Solar", m.getSolarPotentialToday() * m.getSystemEfficiency());
+			if (selectedPart instanceof ParabolicTrough) {
+				final ParabolicTrough t = (ParabolicTrough) selectedPart;
+				graph.addData("Solar", t.getSolarPotentialToday() * t.getSystemEfficiency());
 			} else if (selectedPart instanceof Foundation) {
 				double output = 0;
 				for (final HousePart p : Scene.getInstance().getParts()) {
-					if (p instanceof Mirror && p.getTopContainer() == selectedPart) {
-						final Mirror m = (Mirror) p;
-						output += m.getSolarPotentialToday() * m.getSystemEfficiency();
+					if (p instanceof ParabolicTrough && p.getTopContainer() == selectedPart) {
+						final ParabolicTrough t = (ParabolicTrough) p;
+						output += t.getSolarPotentialToday() * t.getSystemEfficiency();
 					}
 				}
 				graph.addData("Solar", output);
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
 				double output = 0;
 				for (final HousePart p : Scene.getInstance().getParts()) {
-					if (p instanceof Mirror && p.getTopContainer() == selectedPart.getTopContainer()) {
-						final Mirror m = (Mirror) p;
-						output += m.getSolarPotentialToday() * m.getSystemEfficiency();
+					if (p instanceof ParabolicTrough && p.getTopContainer() == selectedPart.getTopContainer()) {
+						final ParabolicTrough t = (ParabolicTrough) p;
+						output += t.getSolarPotentialToday() * t.getSystemEfficiency();
 					}
 				}
 				graph.addData("Solar", output);
@@ -190,9 +190,9 @@ public class MirrorAnnualAnalysis extends Analysis {
 		} else {
 			double output = 0;
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p instanceof Mirror) {
-					final Mirror m = (Mirror) p;
-					output += m.getSolarPotentialToday() * m.getSystemEfficiency();
+				if (p instanceof ParabolicTrough) {
+					final ParabolicTrough t = (ParabolicTrough) p;
+					output += t.getSolarPotentialToday() * t.getSystemEfficiency();
 				}
 			}
 			graph.addData("Solar", output);
@@ -206,9 +206,9 @@ public class MirrorAnnualAnalysis extends Analysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Annual Yield of All Mirrors";
+		String title = "Annual Yield of All Parabolic Troughs";
 		if (selectedPart != null) {
-			if (selectedPart instanceof Mirror) {
+			if (selectedPart instanceof ParabolicTrough) {
 				cost = Cost.getInstance().getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield";
@@ -401,15 +401,15 @@ public class MirrorAnnualAnalysis extends Analysis {
 		String s = "{\"Months\": " + getNumberOfDataPoints();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
-			if (selectedPart instanceof Mirror) {
-				s += ", \"Mirror\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			if (selectedPart instanceof ParabolicTrough) {
+				s += ", \"Parabolic Trough\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart instanceof Foundation) {
 				s += ", \"Foundation\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
 				s += ", \"Foundation\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
 			}
 		} else {
-			s += ", \"Mirror\": \"All\"";
+			s += ", \"Parabolic Trough\": \"All\"";
 		}
 		final String name = "Solar";
 		final List<Double> data = graph.getData(name);

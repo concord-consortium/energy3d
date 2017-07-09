@@ -74,6 +74,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
@@ -100,6 +101,8 @@ import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
+import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
+import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -176,6 +179,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyPvAnalysisMenuItem;
 	private JMenuItem annualMirrorAnalysisMenuItem;
 	private JMenuItem dailyMirrorAnalysisMenuItem;
+	private JMenuItem annualParabolicTroughAnalysisMenuItem;
+	private JMenuItem dailyParabolicTroughAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
@@ -1224,6 +1229,9 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getAnnualMirrorAnalysisMenuItem());
 			analysisMenu.add(getDailyMirrorAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getAnnualParabolicTroughAnalysisMenuItem());
+			analysisMenu.add(getDailyParabolicTroughAnalysisMenuItem());
+			analysisMenu.addSeparator();
 			analysisMenu.add(getGroupAnnualAnalysisMenuItem());
 			analysisMenu.add(getGroupDailyAnalysisMenuItem());
 			analysisMenu.addSeparator();
@@ -2107,6 +2115,89 @@ public class MainFrame extends JFrame {
 		return annualMirrorAnalysisMenuItem;
 	}
 
+	private JMenuItem getDailyParabolicTroughAnalysisMenuItem() {
+		if (dailyParabolicTroughAnalysisMenuItem == null) {
+			dailyParabolicTroughAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Parabolic Troughs...");
+			dailyParabolicTroughAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().countParts(new Class[] { ParabolicTrough.class });
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(ParabolicTrough.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					final ParabolicTroughDailyAnalysis a = new ParabolicTroughDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						a.updateGraph();
+					}
+					a.show();
+				}
+			});
+		}
+		return dailyParabolicTroughAnalysisMenuItem;
+	}
+
+	private JMenuItem getAnnualParabolicTroughAnalysisMenuItem() {
+		if (annualParabolicTroughAnalysisMenuItem == null) {
+			annualParabolicTroughAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Parabolic Troughs...");
+			annualParabolicTroughAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().countParts(new Class[] { ParabolicTrough.class });
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final ParabolicTroughAnnualAnalysis a = new ParabolicTroughAnnualAnalysis();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(ParabolicTrough.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					a.show();
+				}
+			});
+		}
+		return annualParabolicTroughAnalysisMenuItem;
+	}
+
 	private JMenuItem getGroupDailyAnalysisMenuItem() {
 		if (groupDailyAnalysisMenuItem == null) {
 			groupDailyAnalysisMenuItem = new JMenuItem("Daily Analysis for Group...");
@@ -2178,6 +2269,8 @@ public class MainFrame extends JFrame {
 			c = Rack.class;
 		} else if ("Mirror".equals(currentGroupType)) {
 			c = Mirror.class;
+		} else if ("Parabolic Trough".equals(currentGroupType)) {
+			c = ParabolicTrough.class;
 		} else if ("Foundation".equals(currentGroupType) || currentGroupType.startsWith("Foundation")) {
 			c = Foundation.class;
 		}
@@ -2188,7 +2281,7 @@ public class MainFrame extends JFrame {
 		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Parabolic Trough", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
 		if (currentGroupType != null) {
 			typeComboBox.setSelectedItem(currentGroupType);
 		}

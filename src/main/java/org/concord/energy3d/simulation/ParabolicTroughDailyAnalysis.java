@@ -14,7 +14,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -31,30 +30,25 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
-import org.concord.energy3d.gui.CspStationDailyEnergyGraph;
-import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
 /**
- * For fast feedback, only 12 days are calculated.
- *
  * @author Charles Xie
  *
  */
-public class MirrorAnnualAnalysis extends Analysis {
+public class ParabolicTroughDailyAnalysis extends Analysis {
 
-	public MirrorAnnualAnalysis() {
+	public ParabolicTroughDailyAnalysis() {
 		super();
-		graph = new PartEnergyAnnualGraph();
+		graph = new PartEnergyDailyGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.WHITE);
 	}
@@ -63,67 +57,22 @@ public class MirrorAnnualAnalysis extends Analysis {
 		graph.info = "Calculating...";
 		graph.repaint();
 		onStart();
-		final EnergyPanel e = EnergyPanel.getInstance();
-		for (final int m : MONTHS) {
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() {
-					if (!analysisStopped) {
-						final Calendar c = Heliodon.getInstance().getCalendar();
-						c.set(Calendar.MONTH, m);
-						final Calendar today = (Calendar) c.clone();
-						Scene.getInstance().updateTrackables();
-						final Throwable t = compute();
-						if (t != null) {
-							stopAnalysis();
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() {
-									Util.reportError(t);
-								}
-							});
-						}
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Foundation) { // synchronize with daily graph
-							final CspStationDailyEnergyGraph g = e.getCspStationDailyEnergyGraph();
-							if (g.hasGraph()) {
-								g.setCalendar(today);
-								g.updateGraph();
-							}
-						}
-						final Calendar today2 = today;
-						EventQueue.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								e.getDateSpinner().setValue(c.getTime());
-								if (selectedPart instanceof Foundation) {
-									final CspStationDailyEnergyGraph g = e.getCspStationDailyEnergyGraph();
-									e.getCspStationTabbedPane().setSelectedComponent(g);
-									if (!g.hasGraph()) {
-										g.setCalendar(today2);
-										g.addGraph((Foundation) selectedPart);
-									}
-								}
-							}
-						});
-					}
-					return null;
-				}
-			});
-
-		}
-
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
 			public Object call() {
+				final Throwable t = compute();
+				if (t != null) {
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							Util.reportError(t);
+						}
+					});
+				}
 				EventQueue.invokeLater(new Runnable() {
-
 					@Override
 					public void run() {
 						onCompletion();
-						if (Heliodon.getInstance().getCalendar().get(Calendar.MONTH) != Calendar.DECEMBER) {
-							return; // annual calculation aborted
-						}
 						final String current = Graph.TWO_DECIMALS.format(getResult("Solar"));
 						final Map<String, Double> recordedResults = getRecordedResults("Solar");
 						final int n = recordedResults.size();
@@ -131,18 +80,18 @@ public class MirrorAnnualAnalysis extends Analysis {
 							String previousRuns = "";
 							final Object[] keys = recordedResults.keySet().toArray();
 							for (int i = n - 1; i >= 0; i--) {
-								previousRuns += keys[i] + " : " + Graph.TWO_DECIMALS.format(recordedResults.get(keys[i]) * 365.0 / 12.0) + " kWh<br>";
+								previousRuns += keys[i] + " : " + Graph.TWO_DECIMALS.format(recordedResults.get(keys[i])) + " kWh<br>";
 							}
 							final Object[] options = new Object[] { "OK", "Copy Data" };
-							final String msg = "<html>The calculated annual output is <b>" + current + " kWh</b>.<br><hr>Results from previously recorded tests:<br>" + previousRuns + "</html>";
+							final String msg = "<html>The calculated daily output is <b>" + current + " kWh</b>.<br><hr>Results from previously recorded tests:<br>" + previousRuns + "</html>";
 							final JOptionPane optionPane = new JOptionPane(msg, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[0]);
-							final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Annual Output");
+							final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Daily Output");
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
 							if (choice == options[1]) {
 								String output = "";
 								for (int i = 0; i < n; i++) {
-									output += Graph.TWO_DECIMALS.format(recordedResults.get(keys[i]) * 365.0 / 12.0) + "\n";
+									output += Graph.TWO_DECIMALS.format(recordedResults.get(keys[i])) + "\n";
 								}
 								output += current;
 								final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -150,55 +99,55 @@ public class MirrorAnnualAnalysis extends Analysis {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + (n + 1) + " data points copied to system clipboard.<br><hr>" + output, "Confirmation", JOptionPane.INFORMATION_MESSAGE);
 							}
 						} else {
-							JOptionPane.showMessageDialog(parent, "<html>The calculated annual output is <b>" + current + " kWh</b>.</html>", "Annual Output", JOptionPane.INFORMATION_MESSAGE);
+							JOptionPane.showMessageDialog(parent, "<html>The calculated daily output is <b>" + current + " kWh</b>.</html>", "Daily Output", JOptionPane.INFORMATION_MESSAGE);
 						}
 					}
-
 				});
 				return null;
 			}
 		});
-
 	}
 
 	@Override
 	public void updateGraph() {
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		if (selectedPart != null) {
-			if (selectedPart instanceof Mirror) {
-				final Mirror m = (Mirror) selectedPart;
-				graph.addData("Solar", m.getSolarPotentialToday() * m.getSystemEfficiency());
-			} else if (selectedPart instanceof Foundation) {
-				double output = 0;
-				for (final HousePart p : Scene.getInstance().getParts()) {
-					if (p instanceof Mirror && p.getTopContainer() == selectedPart) {
-						final Mirror m = (Mirror) p;
-						output += m.getSolarPotentialToday() * m.getSystemEfficiency();
+		for (int i = 0; i < 24; i++) {
+			SolarRadiation.getInstance().computeEnergyAtHour(i);
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart != null) {
+				if (selectedPart instanceof ParabolicTrough) {
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					graph.addData("Solar", t.getSolarPotentialNow() * t.getSystemEfficiency());
+				} else if (selectedPart instanceof Foundation) {
+					double output = 0;
+					for (final HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof ParabolicTrough && p.getTopContainer() == selectedPart) {
+							final ParabolicTrough t = (ParabolicTrough) p;
+							output += t.getSolarPotentialNow() * t.getSystemEfficiency();
+						}
 					}
+					graph.addData("Solar", output);
+				} else if (selectedPart.getTopContainer() instanceof Foundation) {
+					double output = 0;
+					for (final HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof ParabolicTrough && p.getTopContainer() == selectedPart.getTopContainer()) {
+							final ParabolicTrough t = (ParabolicTrough) p;
+							output += t.getSolarPotentialNow() * t.getSystemEfficiency();
+						}
+					}
+					graph.addData("Solar", output);
 				}
-				graph.addData("Solar", output);
-			} else if (selectedPart.getTopContainer() instanceof Foundation) {
+			} else {
 				double output = 0;
 				for (final HousePart p : Scene.getInstance().getParts()) {
-					if (p instanceof Mirror && p.getTopContainer() == selectedPart.getTopContainer()) {
-						final Mirror m = (Mirror) p;
-						output += m.getSolarPotentialToday() * m.getSystemEfficiency();
+					if (p instanceof ParabolicTrough) {
+						final ParabolicTrough t = (ParabolicTrough) p;
+						output += t.getSolarPotentialNow() * t.getSystemEfficiency();
 					}
 				}
 				graph.addData("Solar", output);
 			}
-		} else {
-			double output = 0;
-			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p instanceof Mirror) {
-					final Mirror m = (Mirror) p;
-					output += m.getSolarPotentialToday() * m.getSystemEfficiency();
-				}
-			}
-			graph.addData("Solar", output);
 		}
 		graph.repaint();
-
 	}
 
 	public void show() {
@@ -206,14 +155,14 @@ public class MirrorAnnualAnalysis extends Analysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Annual Yield of All Mirrors";
+		String title = "Daily Yield of All Parabolic Troughs";
 		if (selectedPart != null) {
-			if (selectedPart instanceof Mirror) {
+			if (selectedPart instanceof ParabolicTrough) {
 				cost = Cost.getInstance().getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-				title = "Annual Yield";
+				title = "Daily Yield";
 			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
-				title = "Annual Yield of Selected Foundation";
+				title = "Daily Yield of Selected Foundation";
 			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);
@@ -280,12 +229,12 @@ public class MirrorAnnualAnalysis extends Analysis {
 			@Override
 			public void menuSelected(final MenuEvent e) {
 				showRunsMenu.removeAll();
-				if (!AnnualGraph.records.isEmpty()) {
+				if (!DailyGraph.records.isEmpty()) {
 					JMenuItem mi = new JMenuItem("Show All");
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
-							for (final Results r : AnnualGraph.records) {
+							for (final Results r : DailyGraph.records) {
 								graph.hideRun(r.getID(), false);
 							}
 							graph.repaint();
@@ -297,7 +246,7 @@ public class MirrorAnnualAnalysis extends Analysis {
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
-							for (final Results r : AnnualGraph.records) {
+							for (final Results r : DailyGraph.records) {
 								graph.hideRun(r.getID(), true);
 							}
 							graph.repaint();
@@ -307,10 +256,10 @@ public class MirrorAnnualAnalysis extends Analysis {
 					showRunsMenu.add(mi);
 					showRunsMenu.addSeparator();
 					final Map<String, Double> recordedResults = getRecordedResults("Net");
-					for (final Results r : AnnualGraph.records) {
+					for (final Results r : DailyGraph.records) {
 						final String key = r.getID() + (r.getFileName() == null ? "" : " (file: " + r.getFileName() + ")");
 						final Double result = recordedResults.get(key);
-						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key) * 365.0 / 12.0) + " kWh"), !graph.isRunHidden(r.getID()));
+						final JCheckBoxMenuItem cbmi = new JCheckBoxMenuItem(r.getID() + ":" + r.getFileName() + (result == null ? "" : " - " + Math.round(recordedResults.get(key)) + " kWh"), !graph.isRunHidden(r.getID()));
 						cbmi.addItemListener(new ItemListener() {
 							@Override
 							public void itemStateChanged(final ItemEvent e) {
@@ -398,25 +347,25 @@ public class MirrorAnnualAnalysis extends Analysis {
 
 	@Override
 	public String toJson() {
-		String s = "{\"Months\": " + getNumberOfDataPoints();
+		String s = "{";
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
-			if (selectedPart instanceof Mirror) {
-				s += ", \"Mirror\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+			if (selectedPart instanceof ParabolicTrough) {
+				s += "\"Parabolic Trough\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart instanceof Foundation) {
-				s += ", \"Foundation\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+				s += "\"Foundation\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
-				s += ", \"Foundation\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
+				s += "\"Foundation\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
 			}
 		} else {
-			s += ", \"Mirror\": \"All\"";
+			s += "\"Parabolic Trough\": \"All\"";
 		}
 		final String name = "Solar";
 		final List<Double> data = graph.getData(name);
 		s += ", \"" + name + "\": {";
-		s += "\"Monthly\": [";
+		s += "\"Hourly\": [";
 		for (final Double x : data) {
-			s += Graph.ENERGY_FORMAT.format(x) + ",";
+			s += Graph.FIVE_DECIMALS.format(x) + ",";
 		}
 		s = s.substring(0, s.length() - 1);
 		s += "]\n";

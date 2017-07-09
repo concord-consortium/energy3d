@@ -11,6 +11,7 @@ public class CspCustomPrice implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private double mirrorUnitPrice = 100;
+	private double parabolicTroughUnitPrice = 100;
 	private double heliostatPrice = 100;
 	private double towerUnitPrice = 500;
 	private int lifespan = 50;
@@ -26,6 +27,9 @@ public class CspCustomPrice implements Serializable {
 		}
 		if (mirrorUnitPrice == 0) {
 			mirrorUnitPrice = 100;
+		}
+		if (parabolicTroughUnitPrice == 0) {
+			parabolicTroughUnitPrice = 100;
 		}
 		if (heliostatPrice == 0) {
 			heliostatPrice = 1000;
@@ -49,6 +53,14 @@ public class CspCustomPrice implements Serializable {
 
 	public double getLandUnitPrice() {
 		return landUnitPrice;
+	}
+
+	public void setParabolicTroughUnitPrice(final double parabolicTroughUnitPrice) {
+		this.parabolicTroughUnitPrice = parabolicTroughUnitPrice;
+	}
+
+	public double getParabolicTroughUnitPrice() {
+		return parabolicTroughUnitPrice;
 	}
 
 	public void setMirrorUnitPrice(final double mirrorUnitPrice) {

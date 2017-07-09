@@ -116,12 +116,19 @@ class SpecsDialog extends JDialog {
 		final JCheckBox numberOfMirrorsCheckBox;
 		final JTextField maximumNumberOfMirrorsField;
 
+		final JCheckBox numberOfParabolicTroughsCheckBox;
+		final JTextField maximumNumberOfParabolicTroughsField;
+
 		private void enableBudgetItems(final boolean b) {
 			budgetField.setEnabled(b);
 		}
 
 		private void enableMirrorItems(final boolean b) {
 			maximumNumberOfMirrorsField.setEnabled(b);
+		}
+
+		private void enableParabolicTroughItems(final boolean b) {
+			maximumNumberOfParabolicTroughsField.setEnabled(b);
 		}
 
 		CspSpecsPanel() {
@@ -171,6 +178,25 @@ class SpecsDialog extends JDialog {
 				}
 			});
 			enableMirrorItems(specs.isNumberOfMirrorsEnabled());
+
+			// set the maximum number of parabolic troughs allowed
+
+			p = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			p.setBorder(BorderFactory.createTitledBorder("Number of Parabolic Troughs"));
+			panel.add(p);
+			numberOfParabolicTroughsCheckBox = new JCheckBox("", specs.isNumberOfParabolicTroughsEnabled());
+			numberOfParabolicTroughsCheckBox.setToolTipText("Select to apply a requirement of the number of parabolic troughs");
+			p.add(numberOfParabolicTroughsCheckBox);
+			p.add(new JLabel("<"));
+			maximumNumberOfParabolicTroughsField = new JTextField("" + specs.getMaximumNumberOfParabolicTroughs(), 10);
+			p.add(maximumNumberOfParabolicTroughsField);
+			numberOfParabolicTroughsCheckBox.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					enableParabolicTroughItems(numberOfParabolicTroughsCheckBox.isSelected());
+				}
+			});
+			enableParabolicTroughItems(specs.isNumberOfParabolicTroughsEnabled());
 
 		}
 

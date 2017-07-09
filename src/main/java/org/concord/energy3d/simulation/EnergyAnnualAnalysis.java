@@ -1,18 +1,5 @@
 package org.concord.energy3d.simulation;
 
-import static java.util.Calendar.APRIL;
-import static java.util.Calendar.AUGUST;
-import static java.util.Calendar.DECEMBER;
-import static java.util.Calendar.FEBRUARY;
-import static java.util.Calendar.JANUARY;
-import static java.util.Calendar.JULY;
-import static java.util.Calendar.JUNE;
-import static java.util.Calendar.MARCH;
-import static java.util.Calendar.MAY;
-import static java.util.Calendar.NOVEMBER;
-import static java.util.Calendar.OCTOBER;
-import static java.util.Calendar.SEPTEMBER;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -71,8 +58,6 @@ import org.concord.energy3d.util.Util;
  *
  */
 public class EnergyAnnualAnalysis extends Analysis {
-
-	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	public EnergyAnnualAnalysis() {
 		super();
@@ -238,7 +223,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 					cost = Cost.getInstance().getTotalCost();
 					s = s.replaceAll("Foundation", "Building");
 					if (selectedPart.getChildren().isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
 						return;
 					}
 					if (!isBuildingComplete((Foundation) selectedPart)) {

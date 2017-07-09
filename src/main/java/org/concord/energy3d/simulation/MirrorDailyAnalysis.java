@@ -162,7 +162,7 @@ public class MirrorDailyAnalysis extends Analysis {
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Daily Yield";
 			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
-				title = "Daily Yield of Selected Platform";
+				title = "Daily Yield of Selected Foundation";
 			}
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);

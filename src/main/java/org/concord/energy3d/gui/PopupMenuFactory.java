@@ -82,6 +82,8 @@ import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
+import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
+import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
@@ -3950,6 +3952,43 @@ public class PopupMenuFactory {
 							return;
 						}
 						new MirrorAnnualAnalysis().show();
+					}
+				}
+			});
+			analysisMenu.add(mi);
+
+			mi = new JMenuItem("Daily Parabolic Trough Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
+						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
+						if (f.countParts(ParabolicTrough.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic trough on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						final ParabolicTroughDailyAnalysis a = new ParabolicTroughDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
+					}
+				}
+			});
+			analysisMenu.add(mi);
+
+			mi = new JMenuItem("Annual Parabolic Trough Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						if (f.countParts(ParabolicTrough.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic trough on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						new ParabolicTroughAnnualAnalysis().show();
 					}
 				}
 			});
@@ -9433,7 +9472,7 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicTrough) {
-						// new MirrorDailyAnalysis().show();
+						new ParabolicTroughDailyAnalysis().show();
 					}
 				}
 			});
@@ -9444,7 +9483,7 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicTrough) {
-						// new MirrorAnnualAnalysis().show();
+						new ParabolicTroughAnnualAnalysis().show();
 					}
 				}
 			});

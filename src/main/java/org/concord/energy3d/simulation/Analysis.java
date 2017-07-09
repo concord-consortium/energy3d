@@ -1,5 +1,18 @@
 package org.concord.energy3d.simulation;
 
+import static java.util.Calendar.APRIL;
+import static java.util.Calendar.AUGUST;
+import static java.util.Calendar.DECEMBER;
+import static java.util.Calendar.FEBRUARY;
+import static java.util.Calendar.JANUARY;
+import static java.util.Calendar.JULY;
+import static java.util.Calendar.JUNE;
+import static java.util.Calendar.MARCH;
+import static java.util.Calendar.MAY;
+import static java.util.Calendar.NOVEMBER;
+import static java.util.Calendar.OCTOBER;
+import static java.util.Calendar.SEPTEMBER;
+
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Point;
@@ -23,6 +36,8 @@ import org.concord.energy3d.util.Util;
  *
  */
 public abstract class Analysis {
+
+	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	Graph graph;
 	volatile boolean analysisStopped;

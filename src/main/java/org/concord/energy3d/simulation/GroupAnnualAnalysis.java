@@ -1,18 +1,5 @@
 package org.concord.energy3d.simulation;
 
-import static java.util.Calendar.APRIL;
-import static java.util.Calendar.AUGUST;
-import static java.util.Calendar.DECEMBER;
-import static java.util.Calendar.FEBRUARY;
-import static java.util.Calendar.JANUARY;
-import static java.util.Calendar.JULY;
-import static java.util.Calendar.JUNE;
-import static java.util.Calendar.MARCH;
-import static java.util.Calendar.MAY;
-import static java.util.Calendar.NOVEMBER;
-import static java.util.Calendar.OCTOBER;
-import static java.util.Calendar.SEPTEMBER;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,6 +37,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
@@ -67,8 +55,6 @@ import org.concord.energy3d.util.Util;
  *
  */
 public class GroupAnnualAnalysis extends Analysis {
-
-	final static int[] MONTHS = { JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER };
 
 	private final List<HousePart> selectedParts;
 	private final PartGroup group;
@@ -201,6 +187,14 @@ public class GroupAnnualAnalysis extends Analysis {
 				} else {
 					graph.addData("Solar " + p.getId(), solar);
 				}
+			} else if (p instanceof ParabolicTrough) {
+				final ParabolicTrough trough = (ParabolicTrough) p;
+				final double solar = trough.getSolarPotentialToday() * trough.getSystemEfficiency();
+				if (customText != null) {
+					graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+				} else {
+					graph.addData("Solar " + p.getId(), solar);
+				}
 			} else if (p instanceof Foundation) {
 				final boolean mean = group.getType().endsWith("(Mean)");
 				final Foundation foundation = (Foundation) p;
@@ -226,7 +220,7 @@ public class GroupAnnualAnalysis extends Analysis {
 				case Foundation.TYPE_CSP_STATION:
 					double csp = foundation.getCspToday();
 					if (mean) {
-						csp /= foundation.countParts(Mirror.class);
+						csp /= foundation.countParts(new Class[] { Mirror.class, ParabolicTrough.class });
 						if (customText != null) {
 							graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", csp);
 						} else {
@@ -503,6 +497,9 @@ public class GroupAnnualAnalysis extends Analysis {
 			} else if (p instanceof Mirror) {
 				names.add("Solar " + p.getId());
 				type = "Mirror";
+			} else if (p instanceof ParabolicTrough) {
+				names.add("Solar " + p.getId());
+				type = "Parabolic Trough";
 			} else if (p instanceof Wall) {
 				names.add("Heat Gain " + p.getId());
 				type = "Wall";

@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.CspCustomPrice;
 import org.concord.energy3d.simulation.CspDesignSpecs;
@@ -55,7 +56,7 @@ public class CspStationInfoPanel extends JPanel {
 		// total solar panel area on the selected base
 
 		packingDensityPanel = new JPanel(new BorderLayout());
-		packingDensityPanel.setBorder(EnergyPanel.createTitledBorder("<html>Packing density (mirror area / field area)</html>", true));
+		packingDensityPanel.setBorder(EnergyPanel.createTitledBorder("<html>Packing density (reflecting area / field area)</html>", true));
 		container.add(packingDensityPanel);
 		packingDensityBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		packingDensityBar.setUnit("");
@@ -84,38 +85,64 @@ public class CspStationInfoPanel extends JPanel {
 	}
 
 	void update(final Foundation foundation) {
-		final List<Mirror> mirrors = foundation.getMirrors();
-		countBar.setValue(mirrors.size());
-		double cost = 0;
-		double reflectingArea = 0;
-		double mirrorArea = 0;
-		final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
-		final ArrayList<Foundation> towers = new ArrayList<Foundation>();
-		for (final Mirror m : mirrors) {
-			mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
-			cost += price.getMirrorUnitPrice() * mirrorArea;
-			cost += price.getHeliostatPrice() * mirrorArea;
-			reflectingArea += mirrorArea;
-			if (m.getHeliostatTarget() != null) {
-				if (!towers.contains(m.getHeliostatTarget())) {
-					towers.add(m.getHeliostatTarget());
+
+		final List<ParabolicTrough> troughs = foundation.getParabolicTroughs();
+		if (!troughs.isEmpty()) {
+			countBar.setValue(troughs.size());
+			countPanel.setBorder(EnergyPanel.createTitledBorder("Number of parabolic troughs", true));
+			double cost = 0;
+			double reflectingArea = 0;
+			double troughArea = 0;
+			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+			for (final ParabolicTrough m : troughs) {
+				troughArea = m.getTroughLength() * m.getTroughWidth();
+				cost += price.getParabolicTroughUnitPrice() * troughArea;
+				reflectingArea += troughArea;
+			}
+			cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+			costBar.setValue(Math.round(cost));
+			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+			String t = "Total cost over " + price.getLifespan() + " years";
+			if (specs.isBudgetEnabled()) {
+				t += " (" + "<$" + specs.getMaximumBudget() + ")";
+			}
+			costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+			packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+		} else {
+			final List<Mirror> mirrors = foundation.getMirrors();
+			countBar.setValue(mirrors.size());
+			countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
+			double cost = 0;
+			double reflectingArea = 0;
+			double mirrorArea = 0;
+			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+			final ArrayList<Foundation> towers = new ArrayList<Foundation>();
+			for (final Mirror m : mirrors) {
+				mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
+				cost += price.getMirrorUnitPrice() * mirrorArea;
+				cost += price.getHeliostatPrice() * mirrorArea;
+				reflectingArea += mirrorArea;
+				if (m.getHeliostatTarget() != null) {
+					if (!towers.contains(m.getHeliostatTarget())) {
+						towers.add(m.getHeliostatTarget());
+					}
 				}
 			}
-		}
-		if (!towers.isEmpty()) {
-			for (final Foundation tower : towers) {
-				cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+			if (!towers.isEmpty()) {
+				for (final Foundation tower : towers) {
+					cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+				}
 			}
+			cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+			costBar.setValue(Math.round(cost));
+			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+			String t = "Total cost over " + price.getLifespan() + " years";
+			if (specs.isBudgetEnabled()) {
+				t += " (" + "<$" + specs.getMaximumBudget() + ")";
+			}
+			costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+			packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
 		}
-		cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
-		costBar.setValue(Math.round(cost));
-		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
-		String t = "Total cost over " + price.getLifespan() + " years";
-		if (specs.isBudgetEnabled()) {
-			t += " (" + "<$" + specs.getMaximumBudget() + ")";
-		}
-		costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-		packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
 	}
 
 	public void updateBudgetMaximum() {
@@ -140,6 +167,18 @@ public class CspStationInfoPanel extends JPanel {
 		countBar.setMaximum(specs.getMaximumNumberOfMirrors());
 		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 		countBar.setEnabled(specs.isNumberOfMirrorsEnabled());
+		countBar.repaint();
+	}
+
+	public void updateParabolicTroughNumberMaximum() {
+		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+		String t = "Number of parabolic troughs";
+		if (specs.isNumberOfParabolicTroughsEnabled()) {
+			t += " (" + "<" + specs.getMaximumNumberOfParabolicTroughs() + ")";
+		}
+		countBar.setMaximum(specs.getMaximumNumberOfParabolicTroughs());
+		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+		countBar.setEnabled(specs.isNumberOfParabolicTroughsEnabled());
 		countBar.repaint();
 	}
 
