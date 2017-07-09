@@ -52,10 +52,10 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient Cylinder absorberEnd2, absorberEnd2Core;
 	private transient Line outlines;
 	private transient Line steelFrame;
-	private transient Node unitsRoot;
+	private transient Node modulesRoot;
 	private transient Line lightBeams;
 	private transient BMText label;
-	private transient double copyLayoutGap = 1;
+	private transient double copyLayoutGap = 0.2;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
@@ -84,7 +84,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		super.init();
 
 		if (Util.isZero(copyLayoutGap)) { // FIXME: Why is a transient member evaluated to zero?
-			copyLayoutGap = 1;
+			copyLayoutGap = 0.2;
 		}
 		if (Util.isZero(moduleLength)) {
 			moduleLength = 3;
@@ -197,8 +197,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 		label.setVisible(false);
 		root.attachChild(label);
 
-		unitsRoot = new Node("Units Root");
-		root.attachChild(unitsRoot);
+		modulesRoot = new Node("Modules Root");
+		root.attachChild(modulesRoot);
 		updateTextureAndColor();
 
 		if (!points.isEmpty()) {
@@ -338,13 +338,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final double halfLength = troughLength * 0.5;
 		final Vector3 center = getAbsPoint(0);
 
-		final int nUnits = (int) Math.round(troughLength / moduleLength);
-		final int outlineBufferSize = 6 * (vertexCount - 1) * (nUnits + 3) + 12; // 12 is for the two lateral lines
+		final int nModules = (int) Math.max(1, Math.round(troughLength / moduleLength));
+		final int outlineBufferSize = 6 * (vertexCount - 1) * (nModules + 2) + 12; // 12 is for the two lateral lines
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
 		} else {
-			outlineBuffer.clear();
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
@@ -361,54 +360,46 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlineBuffer.put(vertexBuffer.get(j - 3)).put(vertexBuffer.get(j - 2)).put(vertexBuffer.get(j - 1));
 		outlineBuffer.put(vertexBuffer.get(2 * j - 3)).put(vertexBuffer.get(2 * j - 2)).put(vertexBuffer.get(2 * j - 1));
 		// draw seam lines between units
-		for (double u = halfLength; u < troughLength; u += moduleLength) {
-			for (int i = 0; i < vertexCount - 1; i++) {
-				final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
-				final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
-				v1.addLocal(0, u / annotationScale, 0);
-				v2.addLocal(0, u / annotationScale, 0);
-				outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
-				outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
+		if (nModules > 1) { // if there is only one module, don't draw
+			for (int k = 1; k < nModules; k++) {
+				final double ua = k * moduleLength / annotationScale;
+				for (int i = 0; i < vertexCount - 1; i++) {
+					final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
+					final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
+					v1.addLocal(0, ua, 0);
+					v2.addLocal(0, ua, 0);
+					outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
+					outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
+				}
 			}
 		}
-		for (double u = halfLength - moduleLength; u > 0; u -= moduleLength) {
-			for (int i = 0; i < vertexCount - 1; i++) {
-				final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
-				final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
-				v1.addLocal(0, u / annotationScale, 0);
-				v2.addLocal(0, u / annotationScale, 0);
-				outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
-				outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
-			}
-		}
+		outlineBuffer.limit(vertexCount * 12 + (vertexCount - 1) * 6 * (nModules - 1));
 
 		// draw steel frame lines
-		final int steelBufferSize = (nUnits + 2) * 6;
+		final int steelBufferSize = nModules * 6;
 		if (steelFrameBuffer.capacity() < steelBufferSize) {
 			steelFrameBuffer = BufferUtils.createFloatBuffer(steelBufferSize);
 			steelFrame.getMeshData().setVertexBuffer(steelFrameBuffer);
 		} else {
-			steelFrameBuffer.clear();
 			steelFrameBuffer.rewind();
 			steelFrameBuffer.limit(steelBufferSize);
 		}
-		steelFrameBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-		steelFrameBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 
-		unitsRoot.detachAllChildren();
-		for (double u = halfLength; u < troughLength; u += moduleLength) {
-			final Vector3 p = pd.multiply((u - halfLength) / annotationScale, null);
-			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put((float) (p.getZ() + 0.5 * reflector.getSemilatusRectum()));
-			addPole(p.addLocal(center), baseHeight, baseZ);
+		modulesRoot.detachAllChildren();
+		if (nModules > 1) {
+			for (double u = moduleLength; u < troughLength; u += moduleLength) {
+				final Vector3 p = pd.multiply((u - halfLength) / annotationScale, null);
+				steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+				steelFrameBuffer.put(p.getXf()).put(p.getYf()).put((float) (p.getZ() + 0.5 * reflector.getSemilatusRectum()));
+				addPole(p.addLocal(center), baseHeight, baseZ);
+			}
+			steelFrameBuffer.limit((nModules - 1) * 6);
+			steelFrame.getSceneHints().setCullHint(CullHint.Inherit);
+		} else {
+			addPole(center, baseHeight, baseZ);
+			steelFrame.getSceneHints().setCullHint(CullHint.Always); // if there is only one module, don't draw frames
 		}
-		for (double u = halfLength - moduleLength; u > 0; u -= moduleLength) {
-			final Vector3 p = pd.multiply((u - halfLength) / annotationScale, null);
-			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
-			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put((float) (p.getZ() + 0.5 * reflector.getSemilatusRectum()));
-			addPole(p.addLocal(center), baseHeight, baseZ);
-		}
-		unitsRoot.getSceneHints().setCullHint(CullHint.Inherit);
+		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
@@ -541,7 +532,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		pole.updateModelBound();
 		position.setZ(baseZ + pole.getHeight() / 2);
 		pole.setTranslation(position);
-		unitsRoot.attachChild(pole);
+		modulesRoot.attachChild(pole);
 	}
 
 	@Override
@@ -615,7 +606,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return true;
 	}
 
-	private double copyOverlapInDirectionOfHeight() { // copy only in the direction of trough height
+	private double copyOverlapInDirectionOfParabola() { // copy only in the direction of trough width (parabola width)
 		final double w1 = troughWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -647,29 +638,20 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return c;
 	}
 
+	// troughs align with the north-south axis, so copy and paste only in the x-direction (east-west axis)
 	private boolean isPositionLegal(final ParabolicTrough trough, final Foundation foundation) {
 		final Vector3 p0 = foundation.getAbsPoint(0);
-		final Vector3 p1 = foundation.getAbsPoint(1);
 		final Vector3 p2 = foundation.getAbsPoint(2);
-		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
-		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
+		final ReadOnlyVector3 v = Vector3.UNIT_X;
 		final double length = (1 + copyLayoutGap) * troughWidth / Scene.getInstance().getAnnotationScale();
-		final double s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		final double tx = length / p0.distance(p2);
-		final double ty = length / p0.distance(p1);
-		final double lx = s * v.getX() * tx;
-		final double ly = s * v.getY() * ty;
+		final double lx = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX()) * v.getX() * tx;
 		final double newX = points.get(0).getX() + lx;
 		if (newX > 1 - tx || newX < tx) {
 			return false;
 		}
-		final double newY = points.get(0).getY() + ly;
-		if (newY > 1 - ty || newY < ty) {
-			return false;
-		}
 		trough.points.get(0).setX(newX);
-		trough.points.get(0).setY(newY);
-		final double o = trough.copyOverlapInDirectionOfHeight(); // TODO
+		final double o = trough.copyOverlapInDirectionOfParabola(); // TODO
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new trough is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
