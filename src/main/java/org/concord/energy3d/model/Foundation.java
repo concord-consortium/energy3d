@@ -2784,7 +2784,7 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (p instanceof ParabolicTrough) {
 				final ParabolicTrough t = (ParabolicTrough) p;
 				t.setTroughLength(length);
-				t.setTroughWidth(width);
+				t.setApertureWidth(width);
 				t.setModuleLength(unitLength);
 				t.ensureFullModules(false);
 				t.draw();

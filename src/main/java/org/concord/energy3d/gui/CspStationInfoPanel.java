@@ -95,7 +95,7 @@ public class CspStationInfoPanel extends JPanel {
 			double troughArea = 0;
 			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 			for (final ParabolicTrough t : troughs) {
-				troughArea = t.getTroughLength() * t.getTroughWidth();
+				troughArea = t.getTroughLength() * t.getApertureWidth();
 				cost += price.getParabolicTroughUnitPrice() * troughArea;
 				reflectingArea += troughArea;
 			}

@@ -8985,8 +8985,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miLength = new JMenuItem("Length...");
-			miLength.addActionListener(new ActionListener() {
+			final JMenuItem miTroughLength = new JMenuItem("Trough Length...");
+			miTroughLength.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -9002,7 +9002,7 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Length (m): "));
+					inputPanel.add(new JLabel("Trough Length (m): "));
 					final JTextField lengthField = new JTextField(threeDecimalsFormat.format(t.getTroughLength()));
 					inputPanel.add(lengthField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -9063,12 +9063,12 @@ public class PopupMenuFactory {
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSizeForParabolicTroughs(l, t.getTroughWidth(), t.getModuleLength());
+										foundation.setSizeForParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSizeForAllParabolicTroughs(l, t.getTroughWidth(), t.getModuleLength());
+										Scene.getInstance().setSizeForAllParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -9083,8 +9083,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miWidth = new JMenuItem("Width...");
-			miWidth.addActionListener(new ActionListener() {
+			final JMenuItem miApertureWidth = new JMenuItem("Aperture Width...");
+			miApertureWidth.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -9100,8 +9100,8 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Width (m): "));
-					final JTextField widthField = new JTextField(threeDecimalsFormat.format(t.getTroughWidth()));
+					inputPanel.add(new JLabel("Aperture Width (m): "));
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(t.getApertureWidth()));
 					inputPanel.add(widthField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
@@ -9131,8 +9131,8 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set width for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Width");
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set aperture width for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Aperture Width");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -9150,11 +9150,11 @@ public class PopupMenuFactory {
 							}
 							if (ok) {
 								if (w < 1 || w > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough aperture width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setTroughWidth(w);
+										t.setApertureWidth(w);
 										t.ensureFullModules(false);
 										t.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -9259,12 +9259,12 @@ public class PopupMenuFactory {
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSizeForParabolicTroughs(t.getTroughLength(), t.getTroughWidth(), u);
+										foundation.setSizeForParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), t.getTroughWidth(), u);
+										Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -9665,8 +9665,8 @@ public class PopupMenuFactory {
 			popupMenuForParabolicTrough.add(cbmiDrawSunBeams);
 			popupMenuForParabolicTrough.add(labelMenu);
 			popupMenuForParabolicTrough.addSeparator();
-			popupMenuForParabolicTrough.add(miLength);
-			popupMenuForParabolicTrough.add(miWidth);
+			popupMenuForParabolicTrough.add(miTroughLength);
+			popupMenuForParabolicTrough.add(miApertureWidth);
 			popupMenuForParabolicTrough.add(miModuleLength);
 			popupMenuForParabolicTrough.add(miSemilatusRectum);
 			popupMenuForParabolicTrough.add(miBaseHeight);

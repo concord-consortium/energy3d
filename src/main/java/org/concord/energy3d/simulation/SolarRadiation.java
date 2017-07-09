@@ -522,7 +522,7 @@ public class SolarRadiation {
 			throw new RuntimeException("Normal is null");
 		}
 		// nx*ny*60: nx*ny is to get the unit cell area of the nx*ny grid; 60 is to convert the unit of timeStep from minute to kWh
-		final double a = trough.getTroughWidth() * trough.getTroughLength() * Scene.getInstance().getTimeStep() / (nAxis * nPara * 60.0);
+		final double a = trough.getApertureWidth() * trough.getTroughLength() * Scene.getInstance().getTimeStep() / (nAxis * nPara * 60.0);
 		final Mesh mesh = trough.getRadiationMesh();
 		MeshDataStore data = onMesh.get(mesh);
 		if (data == null) {

@@ -107,6 +107,7 @@ class CustomPricesDialog extends JDialog {
 		final JTextField towerField;
 		JTextField lifespanField;
 		JTextField landCostField;
+		final JTextField troughField;
 
 		CspStationPricesPanel() {
 
@@ -139,7 +140,12 @@ class CustomPricesDialog extends JDialog {
 			add(towerField);
 			add(new JLabel("<html>$ per meter</html>"));
 
-			SpringUtilities.makeCompactGrid(this, 5, 3, 6, 6, 6, 6);
+			add(new JLabel("Parabolic Trough Module: "));
+			troughField = new JTextField(FORMAT.format(price.getParabolicTroughUnitPrice()), 6);
+			add(troughField);
+			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
+
+			SpringUtilities.makeCompactGrid(this, 6, 3, 6, 6, 6, 6);
 
 		}
 
@@ -188,6 +194,7 @@ class CustomPricesDialog extends JDialog {
 				double cspLandUnitPrice;
 				double mirrorUnitPrice;
 				double heliostatPrice;
+				double troughUnitPrice;
 				try {
 					pvLifespan = Integer.parseInt(pvStationPricesPanel.lifespanField.getText());
 					pvLandUnitPrice = Double.parseDouble(pvStationPricesPanel.landCostField.getText());
@@ -202,6 +209,7 @@ class CustomPricesDialog extends JDialog {
 					cspLandUnitPrice = Double.parseDouble(cspStationPricesPanel.landCostField.getText());
 					mirrorUnitPrice = Double.parseDouble(cspStationPricesPanel.mirrorField.getText());
 					heliostatPrice = Double.parseDouble(cspStationPricesPanel.heliostatField.getText());
+					troughUnitPrice = Double.parseDouble(cspStationPricesPanel.troughField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -261,6 +269,10 @@ class CustomPricesDialog extends JDialog {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your heliostat price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if (troughUnitPrice < 0 && troughUnitPrice > 10000) {
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 
 				final PvCustomPrice pvPrice = Scene.getInstance().getPvCustomPrice();
 				pvPrice.setLifespan(pvLifespan);
@@ -277,6 +289,7 @@ class CustomPricesDialog extends JDialog {
 				cspPrice.setLandUnitPrice(cspLandUnitPrice);
 				cspPrice.setMirrorUnitPrice(mirrorUnitPrice);
 				cspPrice.setHeliostatPrice(heliostatPrice);
+				cspPrice.setParabolicTroughUnitPrice(troughUnitPrice);
 
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart != null) {

@@ -17,7 +17,7 @@ public class EditParabolicTroughCommand extends EditPartCommand {
 
 	public EditParabolicTroughCommand(final ParabolicTrough trough) {
 		super(trough);
-		oldTroughWidth = trough.getTroughWidth();
+		oldTroughWidth = trough.getApertureWidth();
 		oldTroughLength = trough.getTroughLength();
 		oldTroughCenter = trough.getPoints().get(0).clone();
 	}
@@ -26,10 +26,10 @@ public class EditParabolicTroughCommand extends EditPartCommand {
 	public void undo() throws CannotUndoException {
 		final ParabolicTrough trough = (ParabolicTrough) housePart;
 		newTroughCenter = trough.getPoints().get(0).clone();
-		newTroughWidth = trough.getTroughWidth();
+		newTroughWidth = trough.getApertureWidth();
 		newTroughLength = trough.getTroughLength();
 		trough.getPoints().get(0).set(oldTroughCenter);
-		trough.setTroughWidth(oldTroughWidth);
+		trough.setApertureWidth(oldTroughWidth);
 		trough.setTroughLength(oldTroughLength);
 		super.undo();
 	}
@@ -38,7 +38,7 @@ public class EditParabolicTroughCommand extends EditPartCommand {
 	public void redo() throws CannotRedoException {
 		final ParabolicTrough trough = (ParabolicTrough) housePart;
 		trough.getPoints().get(0).set(newTroughCenter);
-		trough.setTroughWidth(newTroughWidth);
+		trough.setApertureWidth(newTroughWidth);
 		trough.setTroughLength(newTroughLength);
 		super.redo();
 	}

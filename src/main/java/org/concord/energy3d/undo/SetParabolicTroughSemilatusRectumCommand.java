@@ -15,7 +15,7 @@ public class SetParabolicTroughSemilatusRectumCommand extends AbstractUndoableEd
 
 	public SetParabolicTroughSemilatusRectumCommand(final ParabolicTrough trough) {
 		this.trough = trough;
-		oldSemilatusRectum = trough.getTroughWidth();
+		oldSemilatusRectum = trough.getApertureWidth();
 	}
 
 	public ParabolicTrough getParabolicTrough() {

@@ -61,14 +61,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double moduleLength = 3;
 	private double troughLength = 2 * moduleLength;
-	private double troughWidth = 2;
+	private double apertureWidth = 2;
 	private double semilatusRectum = 2;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 5;
 	private boolean beamsVisible;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldTroughCenter;
-	private transient double oldTroughLength, oldTroughWidth;
+	private transient double oldTroughLength, oldApertureWidth;
 	private transient double oldRelativeAzimuth;
 	private static transient BloomRenderPass bloomRenderPassLight, bloomRenderPassTube;
 	private transient double baseZ;
@@ -92,8 +92,8 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (Util.isZero(troughLength)) {
 			troughLength = 2 * moduleLength;
 		}
-		if (Util.isZero(troughWidth)) {
-			troughWidth = 2;
+		if (Util.isZero(apertureWidth)) {
+			apertureWidth = 2;
 		}
 		if (Util.isZero(semilatusRectum)) {
 			semilatusRectum = 2;
@@ -108,7 +108,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			nSectionAxis = 32;
 		}
 
-		mesh = new ParabolicCylinder("Parabolic Cylinder", nSectionParabola, semilatusRectum, troughWidth, troughLength);
+		mesh = new ParabolicCylinder("Parabolic Cylinder", nSectionParabola, semilatusRectum, apertureWidth, troughLength);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -205,7 +205,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			oldTroughCenter = points.get(0).clone();
 		}
 		oldTroughLength = troughLength;
-		oldTroughWidth = troughWidth;
+		oldApertureWidth = apertureWidth;
 
 	}
 
@@ -259,15 +259,15 @@ public class ParabolicTrough extends HousePart implements Solar {
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setTroughWidth(rw);
+					setApertureWidth(rw);
 					if (outOfBound()) {
 						if (oldTroughCenter != null) {
 							points.get(0).set(oldTroughCenter);
 						}
-						setTroughWidth(oldTroughWidth);
+						setApertureWidth(oldApertureWidth);
 					} else {
 						oldTroughCenter = points.get(0).clone();
-						oldTroughWidth = troughWidth;
+						oldApertureWidth = apertureWidth;
 					}
 				}
 			}
@@ -312,7 +312,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		reflector.setSize(troughWidth / annotationScale, troughLength / annotationScale);
+		reflector.setSize(apertureWidth / annotationScale, troughLength / annotationScale);
 		reflector.setSemilatusRectum(semilatusRectum / annotationScale);
 		reflector.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
@@ -579,12 +579,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	@Override
 	public double getGridSize() {
-		return Math.min(troughLength, troughWidth) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
+		return Math.min(troughLength, apertureWidth) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
 	}
 
 	@Override
 	protected void computeArea() {
-		area = troughLength * troughWidth;
+		area = troughLength * apertureWidth;
 	}
 
 	@Override
@@ -607,13 +607,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 	}
 
 	private double copyOverlapInDirectionOfParabola() { // copy only in the direction of trough width (parabola width)
-		final double w1 = troughWidth / Scene.getInstance().getAnnotationScale();
+		final double w1 = apertureWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof ParabolicTrough) {
 					final ParabolicTrough s2 = (ParabolicTrough) p;
-					final double w2 = s2.troughWidth / Scene.getInstance().getAnnotationScale();
+					final double w2 = s2.apertureWidth / Scene.getInstance().getAnnotationScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -643,7 +643,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final Vector3 p0 = foundation.getAbsPoint(0);
 		final Vector3 p2 = foundation.getAbsPoint(2);
 		final ReadOnlyVector3 v = Vector3.UNIT_X;
-		final double length = (1 + copyLayoutGap) * troughWidth / Scene.getInstance().getAnnotationScale();
+		final double length = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
 		final double tx = length / p0.distance(p2);
 		final double lx = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX()) * v.getX() * tx;
 		final double newX = points.get(0).getX() + lx;
@@ -721,7 +721,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	public void set(final Vector3 center, final double width, final double height) {
 		points.get(0).set(toRelative(center));
 		setTroughLength(width);
-		setTroughWidth(height);
+		setApertureWidth(height);
 		draw();
 	}
 
@@ -741,12 +741,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return troughLength;
 	}
 
-	public void setTroughWidth(final double troughWidth) {
-		this.troughWidth = troughWidth;
+	public void setApertureWidth(final double apertureWidth) {
+		this.apertureWidth = apertureWidth;
 	}
 
-	public double getTroughWidth() {
-		return troughWidth;
+	public double getApertureWidth() {
+		return apertureWidth;
 	}
 
 	public void setSemilatusRectum(final double semilatusRectum) {
@@ -781,7 +781,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
 		final ReadOnlyVector3 n = normal == null ? Vector3.UNIT_Z : new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
-		final double halfWidth = 0.5 * troughWidth / Scene.getInstance().getAnnotationScale();
+		final double halfWidth = 0.5 * apertureWidth / Scene.getInstance().getAnnotationScale();
 		final double dy = halfWidth * halfWidth / (2 * (semilatusRectum / Scene.getInstance().getAnnotationScale()));
 		final Vector3 shift = new Vector3(n.getX() * dy, 0, n.getZ() * dy);
 		final int j = buf.limit() / 6;
