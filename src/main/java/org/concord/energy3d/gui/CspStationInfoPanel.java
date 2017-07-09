@@ -94,8 +94,8 @@ public class CspStationInfoPanel extends JPanel {
 			double reflectingArea = 0;
 			double troughArea = 0;
 			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
-			for (final ParabolicTrough m : troughs) {
-				troughArea = m.getTroughLength() * m.getTroughWidth();
+			for (final ParabolicTrough t : troughs) {
+				troughArea = t.getTroughLength() * t.getTroughWidth();
 				cost += price.getParabolicTroughUnitPrice() * troughArea;
 				reflectingArea += troughArea;
 			}
@@ -159,27 +159,31 @@ public class CspStationInfoPanel extends JPanel {
 	}
 
 	public void updateMirrorNumberMaximum() {
-		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
-		String t = "Number of mirrors";
-		if (specs.isNumberOfMirrorsEnabled()) {
-			t += " (" + "<" + specs.getMaximumNumberOfMirrors() + ")";
+		if (Scene.getInstance().countParts(new Class[] { Mirror.class }) > 0) {
+			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+			String t = "Number of mirrors";
+			if (specs.isNumberOfMirrorsEnabled()) {
+				t += " (" + "<" + specs.getMaximumNumberOfMirrors() + ")";
+			}
+			countBar.setMaximum(specs.getMaximumNumberOfMirrors());
+			countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+			countBar.setEnabled(specs.isNumberOfMirrorsEnabled());
+			countBar.repaint();
 		}
-		countBar.setMaximum(specs.getMaximumNumberOfMirrors());
-		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-		countBar.setEnabled(specs.isNumberOfMirrorsEnabled());
-		countBar.repaint();
 	}
 
 	public void updateParabolicTroughNumberMaximum() {
-		final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
-		String t = "Number of parabolic troughs";
-		if (specs.isNumberOfParabolicTroughsEnabled()) {
-			t += " (" + "<" + specs.getMaximumNumberOfParabolicTroughs() + ")";
+		if (Scene.getInstance().countParts(new Class[] { ParabolicTrough.class }) > 0) {
+			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+			String t = "Number of parabolic troughs";
+			if (specs.isNumberOfParabolicTroughsEnabled()) {
+				t += " (" + "<" + specs.getMaximumNumberOfParabolicTroughs() + ")";
+			}
+			countBar.setMaximum(specs.getMaximumNumberOfParabolicTroughs());
+			countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+			countBar.setEnabled(specs.isNumberOfParabolicTroughsEnabled());
+			countBar.repaint();
 		}
-		countBar.setMaximum(specs.getMaximumNumberOfParabolicTroughs());
-		countPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-		countBar.setEnabled(specs.isNumberOfParabolicTroughsEnabled());
-		countBar.repaint();
 	}
 
 }

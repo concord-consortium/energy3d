@@ -62,6 +62,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.undo.AddPartCommand;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.EditFoundationCommand;
+import org.concord.energy3d.undo.EditParabolicTroughCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.EditRackCommand;
 import org.concord.energy3d.undo.MovePartCommand;
@@ -1100,6 +1101,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Rack r = (Rack) selectedPart;
 			r.move(v, selectedPart.getGridSize());
 			r.draw();
+		} else if (selectedPart instanceof ParabolicTrough) {
+			final ParabolicTrough t = (ParabolicTrough) selectedPart;
+			t.move(v, selectedPart.getGridSize());
+			t.draw();
 		} else if (selectedPart instanceof Tree) {
 			final Tree t = (Tree) selectedPart;
 			t.move(v, selectedPart.getGridSize());
@@ -1943,6 +1948,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										editPartCommand = new EditFoundationCommand((Foundation) selectedPart, !pick.isEditPoint());
 									} else if (selectedPart instanceof Rack) {
 										editPartCommand = new EditRackCommand((Rack) selectedPart);
+									} else if (selectedPart instanceof ParabolicTrough) {
+										editPartCommand = new EditParabolicTroughCommand((ParabolicTrough) selectedPart);
 									} else {
 										editPartCommand = new EditPartCommand(selectedPart);
 									}
@@ -2057,6 +2064,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						Scene.getInstance().updateTrackables();
 					} else if (selectedPart instanceof Rack) {
 						((Rack) selectedPart).ensureFullSolarPanels(true);
+					} else if (selectedPart instanceof ParabolicTrough) {
+						((ParabolicTrough) selectedPart).ensureFullModules(true);
 					}
 					EnergyPanel.getInstance().update();
 				} catch (final Throwable t) {

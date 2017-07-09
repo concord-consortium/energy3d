@@ -35,7 +35,7 @@ public class SetShapeForAllParabolicTroughsCommand extends AbstractUndoableEdit 
 			oldLengths[i] = t.getTroughLength();
 			oldWidths[i] = t.getTroughWidth();
 			oldSemilatusRecta[i] = t.getSemilatusRectum();
-			oldUnitLengths[i] = t.getUnitLength();
+			oldUnitLengths[i] = t.getModuleLength();
 		}
 	}
 
@@ -52,11 +52,11 @@ public class SetShapeForAllParabolicTroughsCommand extends AbstractUndoableEdit 
 			newLengths[i] = t.getTroughLength();
 			newWidths[i] = t.getTroughWidth();
 			newSemilatusRecta[i] = t.getSemilatusRectum();
-			newUnitLengths[i] = t.getUnitLength();
+			newUnitLengths[i] = t.getModuleLength();
 			t.setTroughLength(oldLengths[i]);
 			t.setTroughWidth(oldWidths[i]);
 			t.setSemilatusRectum(oldSemilatusRecta[i]);
-			t.setUnitLength(oldUnitLengths[i]);
+			t.setModuleLength(oldUnitLengths[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -71,7 +71,7 @@ public class SetShapeForAllParabolicTroughsCommand extends AbstractUndoableEdit 
 			t.setTroughLength(newLengths[i]);
 			t.setTroughWidth(newWidths[i]);
 			t.setSemilatusRectum(newSemilatusRecta[i]);
-			t.setUnitLength(newUnitLengths[i]);
+			t.setModuleLength(newUnitLengths[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();

@@ -1086,18 +1086,16 @@ public class EnergyPanel extends JPanel {
 						if (a >= 360) {
 							a -= 360;
 						}
-						final double az = a;
-						final boolean flat = t.getContainer() instanceof Foundation;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
 								partPanelBorder.setTitle("Parabolic Trough (" + t.getId() + ")");
 								partProperty1Label.setText("  Size & Position:");
 								partProperty1TextField.setText(TWO_DECIMALS.format(t.getTroughLength() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(t.getTroughWidth() * meterToFoot) + " m, (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ") m");
-								partProperty2Label.setText(" Others:");
-								partProperty2TextField.setText(flat ? "Latus rectum: " + ONE_DECIMAL.format(t.getSemilatusRectum() * 2) + "m, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
+								partProperty2Label.setText(" Parameters:");
+								partProperty2TextField.setText("Latus rectum: " + ONE_DECIMAL.format(t.getSemilatusRectum() * 2) + "m, module length: " + ONE_DECIMAL.format(t.getModuleLength()) + "m");
 								partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the parabolic trough");
-								partProperty2TextField.setToolTipText("Other info of the parabolic trough");
+								partProperty2TextField.setToolTipText("Other parameters of the parabolic trough");
 								final String reflectivity = ONE_DECIMAL.format(t.getReflectivity() * 100) + "%";
 								if (energyViewShown) {
 									partProperty3Label.setText("  Reflectivity & Yield:");
@@ -1418,29 +1416,43 @@ public class EnergyPanel extends JPanel {
 							partProperty3TextField.setText("");
 							partProperty3TextField.setToolTipText(null);
 						} else {
-							final int numberOfNodes = Scene.getInstance().countNodes();
-							if (numberOfNodes > 0) {
-								partPanelBorder.setTitle("Structures");
-								partProperty1Label.setText("  Total Nodes:");
-								partProperty1TextField.setText("" + numberOfNodes);
-								partProperty1TextField.setToolTipText("Total number of structure nodes");
-								partProperty2Label.setText("  Total Meshes:");
-								partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
-								partProperty2TextField.setToolTipText("Total number of structure meshes");
-								partProperty3Label.setText("  -");
-								partProperty3TextField.setText("");
-								partProperty3TextField.setToolTipText(null);
-							} else {
-								partPanelBorder.setTitle("Part");
-								partProperty1Label.setText("  -");
-								partProperty1TextField.setText("");
-								partProperty1TextField.setToolTipText(null);
+							final int numberOfParabolicTroughs = Scene.getInstance().countParts(new Class[] { ParabolicTrough.class });
+							if (numberOfParabolicTroughs > 0) {
+								partPanelBorder.setTitle("Parabolic Troughs");
+								partProperty1Label.setText("  Total Number:");
+								partProperty1TextField.setText("" + numberOfParabolicTroughs);
+								partProperty1TextField.setToolTipText("Total number of parabolic troughs");
 								partProperty2Label.setText("  -");
 								partProperty2TextField.setText("");
 								partProperty2TextField.setToolTipText(null);
 								partProperty3Label.setText("  -");
 								partProperty3TextField.setText("");
 								partProperty3TextField.setToolTipText(null);
+							} else {
+								final int numberOfNodes = Scene.getInstance().countNodes();
+								if (numberOfNodes > 0) {
+									partPanelBorder.setTitle("Structures");
+									partProperty1Label.setText("  Total Nodes:");
+									partProperty1TextField.setText("" + numberOfNodes);
+									partProperty1TextField.setToolTipText("Total number of structure nodes");
+									partProperty2Label.setText("  Total Meshes:");
+									partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
+									partProperty2TextField.setToolTipText("Total number of structure meshes");
+									partProperty3Label.setText("  -");
+									partProperty3TextField.setText("");
+									partProperty3TextField.setToolTipText(null);
+								} else {
+									partPanelBorder.setTitle("Part");
+									partProperty1Label.setText("  -");
+									partProperty1TextField.setText("");
+									partProperty1TextField.setToolTipText(null);
+									partProperty2Label.setText("  -");
+									partProperty2TextField.setText("");
+									partProperty2TextField.setToolTipText(null);
+									partProperty3Label.setText("  -");
+									partProperty3TextField.setText("");
+									partProperty3TextField.setToolTipText(null);
+								}
 							}
 						}
 					}
@@ -1566,6 +1578,7 @@ public class EnergyPanel extends JPanel {
 				pvStationInfoPanel.updateSolarPanelNumberMaximum();
 				pvStationInfoPanel.updateBudgetMaximum();
 				cspStationInfoPanel.updateMirrorNumberMaximum();
+				cspStationInfoPanel.updateParabolicTroughNumberMaximum();
 				cspStationInfoPanel.updateBudgetMaximum();
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override

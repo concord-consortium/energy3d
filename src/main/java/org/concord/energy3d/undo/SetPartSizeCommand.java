@@ -28,7 +28,7 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			final ParabolicTrough t = (ParabolicTrough) part;
 			oldWidth = t.getTroughWidth();
 			oldHeight = t.getTroughLength();
-			oldUnitLength = t.getUnitLength();
+			oldUnitLength = t.getModuleLength();
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			oldWidth = r.getRackWidth();
@@ -65,10 +65,10 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			final ParabolicTrough t = (ParabolicTrough) part;
 			newWidth = t.getTroughWidth();
 			newHeight = t.getTroughLength();
-			newUnitLength = t.getUnitLength();
+			newUnitLength = t.getModuleLength();
 			t.setTroughWidth(oldWidth);
 			t.setTroughLength(oldHeight);
-			t.setUnitLength(oldUnitLength);
+			t.setModuleLength(oldUnitLength);
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			newWidth = r.getRackWidth();
@@ -97,7 +97,7 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			final ParabolicTrough t = (ParabolicTrough) part;
 			t.setTroughWidth(newWidth);
 			t.setTroughLength(newHeight);
-			t.setUnitLength(newUnitLength);
+			t.setModuleLength(newUnitLength);
 		} else if (part instanceof Rack) {
 			final Rack r = (Rack) part;
 			r.setRackWidth(newWidth);

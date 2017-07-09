@@ -253,6 +253,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllSolarPanelsMenuItem;
 	private JMenuItem removeAllRacksMenuItem;
 	private JMenuItem removeAllMirrorsMenuItem;
+	private JMenuItem removeAllParabolicTroughsMenuItem;
 	private JMenuItem removeAllSensorsMenuItem;
 	private JMenuItem removeAllWallsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
@@ -2641,6 +2642,7 @@ public class MainFrame extends JFrame {
 			clearMenu.add(getRemoveAllSolarPanelsMenuItem());
 			clearMenu.add(getRemoveAllRacksMenuItem());
 			clearMenu.add(getRemoveAllMirrorsMenuItem());
+			clearMenu.add(getRemoveAllParabolicTroughsMenuItem());
 			clearMenu.add(getRemoveAllTreesMenuItem());
 			clearMenu.add(getRemoveAllHumansMenuItem());
 			clearMenu.add(getRemoveAllRoofsMenuItem());
@@ -3740,6 +3742,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllMirrorsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllParabolicTroughsMenuItem() {
+		if (removeAllParabolicTroughsMenuItem == null) {
+			removeAllParabolicTroughsMenuItem = new JMenuItem("Remove All Parabolic Troughs");
+			removeAllParabolicTroughsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllParabolicTroughs();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+		}
+		return removeAllParabolicTroughsMenuItem;
 	}
 
 	private JMenuItem getRemoveAllSensorsMenuItem() {

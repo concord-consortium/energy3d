@@ -549,6 +549,8 @@ public class SolarRadiation {
 		final double xSpacing = p1.distance(p0) / nPara;
 		final double ySpacing = p2.distance(p0) / nAxis;
 
+		// as the parabolic trough always faces the sun, we only have to deal with its "mouth plane"
+
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
 		for (int x = 0; x < nPara; x++) {
 			for (int y = 0; y < nAxis; y++) {

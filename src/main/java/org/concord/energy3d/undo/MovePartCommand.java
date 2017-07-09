@@ -11,6 +11,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Window;
@@ -89,6 +90,10 @@ public class MovePartCommand extends AbstractUndoableEdit {
 					final Rack r = (Rack) part;
 					r.move(v, part.getGridSize());
 					r.draw();
+				} else if (part instanceof ParabolicTrough) {
+					final ParabolicTrough t = (ParabolicTrough) part;
+					t.move(v, part.getGridSize());
+					t.draw();
 				}
 				return null;
 			}

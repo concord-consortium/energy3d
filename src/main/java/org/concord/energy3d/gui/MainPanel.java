@@ -39,6 +39,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
@@ -1091,34 +1092,36 @@ public class MainPanel extends JPanel {
 								SceneManager.getTaskManager().update(new Callable<Object>() {
 									@Override
 									public Object call() throws Exception {
-										final HousePart hp = SceneManager.getInstance().getSelectedPart();
-										if (hp == null) {
+										final HousePart part = SceneManager.getInstance().getSelectedPart();
+										if (part == null) {
 											final RotateBuildingCommand c = new RotateBuildingCommand(null, rotationAngle);
 											SceneManager.getInstance().rotateAllBuildings(rotationAngle);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										} else {
-											if (hp instanceof Foundation) {
-												final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) hp, rotationAngle);
+											if (part instanceof Foundation) {
+												final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) part, rotationAngle);
 												SceneManager.getInstance().rotateBuilding(rotationAngle, true);
 												SceneManager.getInstance().getUndoManager().addEdit(c);
-											} else if (hp instanceof SolarPanel) {
-												final SolarPanel solarPanel = (SolarPanel) hp;
+											} else if (part instanceof SolarPanel) {
+												final SolarPanel solarPanel = (SolarPanel) part;
 												final ChangeAzimuthCommand c = new ChangeAzimuthCommand(solarPanel);
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												solarPanel.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
-											} else if (hp instanceof Rack) {
-												final Rack rack = (Rack) hp;
+											} else if (part instanceof Rack) {
+												final Rack rack = (Rack) part;
 												final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
 												rack.setRelativeAzimuth(rack.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												rack.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
-											} else if (hp instanceof Mirror) {
-												final Mirror mirror = (Mirror) hp;
+											} else if (part instanceof Mirror) {
+												final Mirror mirror = (Mirror) part;
 												final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 												mirror.setRelativeAzimuth(mirror.getRelativeAzimuth() + Math.toDegrees(rotationAngle));
 												mirror.draw();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
+											} else if (part instanceof ParabolicTrough) {
+												// parabolic trough can't be rotated, but we can't use a popup message to remind the user
 											}
 										}
 										Scene.getInstance().setEdited(true);

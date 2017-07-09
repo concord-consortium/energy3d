@@ -2449,6 +2449,28 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllMirrors);
 
+			final JMenuItem miRemoveAllParabolicTroughs = new JMenuItem("Remove All Parabolic Troughs");
+			miRemoveAllParabolicTroughs.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllParabolicTroughs();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									Scene.getInstance().setEdited(true);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllParabolicTroughs);
+
 			final JMenuItem miRemoveAllSensors = new JMenuItem("Remove All Sensors");
 			miRemoveAllSensors.addActionListener(new ActionListener() {
 				@Override
@@ -8858,10 +8880,10 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Parabolic sections: "));
+					inputPanel.add(new JLabel("Parabolic cross-section: "));
 					final JTextField nParabolaField = new JTextField("" + t.getNSectionParabola());
 					inputPanel.add(nParabolaField);
-					inputPanel.add(new JLabel("Axial sections: "));
+					inputPanel.add(new JLabel("Axial direction: "));
 					final JTextField nAxisField = new JTextField("" + t.getNSectionAxis());
 					inputPanel.add(nAxisField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -8914,7 +8936,7 @@ public class PopupMenuFactory {
 								if (nSectionParabola < 4) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (nSectionAxis < 4) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axial sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis mesh must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (!Util.isPowerOfTwo(nSectionParabola) || !Util.isPowerOfTwo(nSectionAxis)) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of parabolic trough mesh sections in x or y direction must be power of two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
@@ -8980,14 +9002,14 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(3, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Length (m): "));
+					inputPanel.add(new JLabel("Assembly Length (m): "));
 					final JTextField lengthField = new JTextField(threeDecimalsFormat.format(t.getTroughLength()));
 					inputPanel.add(lengthField);
-					inputPanel.add(new JLabel("Width (m): "));
+					inputPanel.add(new JLabel("Module Width (m): "));
 					final JTextField widthField = new JTextField(threeDecimalsFormat.format(t.getTroughWidth()));
 					inputPanel.add(widthField);
-					inputPanel.add(new JLabel("Unit Length (m): "));
-					final JTextField unitLengthField = new JTextField(threeDecimalsFormat.format(t.getUnitLength()));
+					inputPanel.add(new JLabel("Module Length (m): "));
+					final JTextField unitLengthField = new JTextField(threeDecimalsFormat.format(t.getModuleLength()));
 					inputPanel.add(unitLengthField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
@@ -9017,8 +9039,8 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set shape for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabola Shape");
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Size");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -9038,17 +9060,18 @@ public class PopupMenuFactory {
 							}
 							if (ok) {
 								if (w < 1 || w > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar collector module width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (l < 1 || l > 1000) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (u < 1 || u > 5) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Unit length must be between 1 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar collector assembly length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (u < 1 || u > 20) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar collector module length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(t);
 										t.setTroughLength(l);
 										t.setTroughWidth(w);
-										t.setUnitLength(u);
+										t.setModuleLength(u);
+										t.ensureFullModules(false);
 										t.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;

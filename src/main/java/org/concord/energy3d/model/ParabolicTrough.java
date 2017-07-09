@@ -59,9 +59,9 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
 	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double troughLength = 6;
+	private double moduleLength = 3;
+	private double troughLength = 2 * moduleLength;
 	private double troughWidth = 2;
-	private double unitLength = 2;
 	private double semilatusRectum = 2;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 5;
@@ -86,14 +86,14 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (Util.isZero(copyLayoutGap)) { // FIXME: Why is a transient member evaluated to zero?
 			copyLayoutGap = 1;
 		}
+		if (Util.isZero(moduleLength)) {
+			moduleLength = 3;
+		}
 		if (Util.isZero(troughLength)) {
-			troughLength = 6;
+			troughLength = 2 * moduleLength;
 		}
 		if (Util.isZero(troughWidth)) {
 			troughWidth = 2;
-		}
-		if (Util.isZero(unitLength)) {
-			unitLength = 2;
 		}
 		if (Util.isZero(semilatusRectum)) {
 			semilatusRectum = 2;
@@ -164,7 +164,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		absorberEnd2Core.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd2Core);
 
-		final int nUnits = (int) Math.round(troughLength / unitLength);
+		final int nUnits = (int) Math.round(troughLength / moduleLength);
 		outlines = new Line("Parabolic Trough (Outline)");
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 + 2 * (reflector.getNumberOfSamples() + 1) * (nUnits + 1)));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
@@ -338,7 +338,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final double halfLength = troughLength * 0.5;
 		final Vector3 center = getAbsPoint(0);
 
-		final int nUnits = (int) Math.round(troughLength / unitLength);
+		final int nUnits = (int) Math.round(troughLength / moduleLength);
 		final int outlineBufferSize = 6 * (vertexCount - 1) * (nUnits + 3) + 12; // 12 is for the two lateral lines
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
@@ -361,7 +361,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlineBuffer.put(vertexBuffer.get(j - 3)).put(vertexBuffer.get(j - 2)).put(vertexBuffer.get(j - 1));
 		outlineBuffer.put(vertexBuffer.get(2 * j - 3)).put(vertexBuffer.get(2 * j - 2)).put(vertexBuffer.get(2 * j - 1));
 		// draw seam lines between units
-		for (double u = halfLength; u < troughLength; u += unitLength) {
+		for (double u = halfLength; u < troughLength; u += moduleLength) {
 			for (int i = 0; i < vertexCount - 1; i++) {
 				final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
 				final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
@@ -371,7 +371,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 				outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
 			}
 		}
-		for (double u = halfLength - unitLength; u > 0; u -= unitLength) {
+		for (double u = halfLength - moduleLength; u > 0; u -= moduleLength) {
 			for (int i = 0; i < vertexCount - 1; i++) {
 				final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
 				final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
@@ -396,13 +396,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 		steelFrameBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
 
 		unitsRoot.detachAllChildren();
-		for (double u = halfLength; u < troughLength; u += unitLength) {
+		for (double u = halfLength; u < troughLength; u += moduleLength) {
 			final Vector3 p = pd.multiply((u - halfLength) / annotationScale, null);
 			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put((float) (p.getZ() + 0.5 * reflector.getSemilatusRectum()));
 			addPole(p.addLocal(center), baseHeight, baseZ);
 		}
-		for (double u = halfLength - unitLength; u > 0; u -= unitLength) {
+		for (double u = halfLength - moduleLength; u > 0; u -= moduleLength) {
 			final Vector3 p = pd.multiply((u - halfLength) / annotationScale, null);
 			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			steelFrameBuffer.put(p.getXf()).put(p.getYf()).put((float) (p.getZ() + 0.5 * reflector.getSemilatusRectum()));
@@ -696,30 +696,6 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return reflectivity;
 	}
 
-	public void setTroughLength(final double troughLength) {
-		this.troughLength = troughLength;
-	}
-
-	public double getTroughLength() {
-		return troughLength;
-	}
-
-	public void setTroughWidth(final double troughWidth) {
-		this.troughWidth = troughWidth;
-	}
-
-	public double getTroughWidth() {
-		return troughWidth;
-	}
-
-	public void setSemilatusRectum(final double semilatusRectum) {
-		this.semilatusRectum = semilatusRectum;
-	}
-
-	public double getSemilatusRectum() {
-		return semilatusRectum;
-	}
-
 	public void setBaseHeight(final double baseHeight) {
 		this.baseHeight = baseHeight;
 	}
@@ -767,12 +743,55 @@ public class ParabolicTrough extends HousePart implements Solar {
 		draw();
 	}
 
-	public double getUnitLength() {
-		return unitLength;
+	public double getModuleLength() {
+		return moduleLength;
 	}
 
-	public void setUnitLength(final double unitLength) {
-		this.unitLength = unitLength;
+	public void setModuleLength(final double moduleLength) {
+		this.moduleLength = moduleLength;
+	}
+
+	public void setTroughLength(final double troughLength) {
+		this.troughLength = troughLength;
+	}
+
+	public double getTroughLength() {
+		return troughLength;
+	}
+
+	public void setTroughWidth(final double troughWidth) {
+		this.troughWidth = troughWidth;
+	}
+
+	public double getTroughWidth() {
+		return troughWidth;
+	}
+
+	public void setSemilatusRectum(final double semilatusRectum) {
+		this.semilatusRectum = semilatusRectum;
+	}
+
+	public double getSemilatusRectum() {
+		return semilatusRectum;
+	}
+
+	public void ensureFullModules(final boolean dragged) {
+		boolean ok = false;
+		if (dragged) {
+			if (editPointIndex > 0) { // the trough has been resized
+				ok = true;
+			}
+		} else {
+			ok = true;
+		}
+		if (ok) {
+			int n = (int) Math.round(troughLength / moduleLength);
+			if (n <= 0) {
+				n = 1;
+			}
+			setTroughLength(n * moduleLength);
+			drawMesh();
+		}
 	}
 
 	@Override
