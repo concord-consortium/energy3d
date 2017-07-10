@@ -84,6 +84,7 @@ public class Wall extends HousePart implements Thermalizable {
 	private transient Mesh steelFrame;
 	private double columnRadius = 1;
 	private double railRadius = 0.1;
+	private boolean hideOutline;
 	private transient Floor floor;
 
 	public static void resetDefaultWallHeight() {
@@ -492,7 +493,7 @@ public class Wall extends HousePart implements Thermalizable {
 			drawSteelFrame(0.25, 10);
 			break;
 		default:
-			outlineMesh.getSceneHints().setCullHint(drawable ? CullHint.Inherit : CullHint.Always);
+			outlineMesh.getSceneHints().setCullHint(drawable && !hideOutline ? CullHint.Inherit : CullHint.Always);
 			columns.getSceneHints().setCullHint(CullHint.Always);
 			rails.getSceneHints().setCullHint(CullHint.Always);
 			steelFrame.getSceneHints().setCullHint(CullHint.Always);
@@ -1810,6 +1811,14 @@ public class Wall extends HousePart implements Thermalizable {
 
 	public double getThickness() {
 		return wallThickness;
+	}
+
+	public void showOutline(final boolean b) {
+		hideOutline = !b;
+	}
+
+	public boolean outlineShown() {
+		return !hideOutline;
 	}
 
 	public double getWallWidth() {

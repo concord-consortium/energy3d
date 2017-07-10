@@ -2698,10 +2698,31 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void showOutlineOfConnectedWalls(final Wall w, final boolean b) {
+		w.visitNeighbors(new WallVisitor() {
+			@Override
+			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+				currentWall.showOutline(b);
+				currentWall.draw();
+			}
+		});
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setHeightForAllWalls(final double height) {
 		for (final HousePart p : parts) {
 			if (p instanceof Wall) {
 				((Wall) p).setHeight(height, true);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void showOutlineForAllWalls(final boolean b) {
+		for (final HousePart p : parts) {
+			if (p instanceof Wall) {
+				((Wall) p).showOutline(b);
 				p.draw();
 			}
 		}

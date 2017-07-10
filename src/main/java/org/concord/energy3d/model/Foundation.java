@@ -2838,6 +2838,16 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void showOutlineOfWalls(final boolean b) {
+		for (final HousePart p : children) {
+			if (p instanceof Wall) {
+				((Wall) p).showOutline(b);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	// change properties of all windows on this foundation
 
 	public void setSizeForWindows(final double width, final double height) {

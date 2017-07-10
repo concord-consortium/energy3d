@@ -108,7 +108,7 @@ public class Mirror extends HousePart implements Solar {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		post = Scene.getInstance().getAllMirrors().size() < 500 ? new Cylinder("Post Cylinder", 10, 10, 10, 0) : new Cylinder("Post Cylinder", 2, 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		post = Scene.getInstance().getAllMirrors().size() < 500 ? new Cylinder("Post Cylinder", 2, 10, 10, 0) : new Cylinder("Post Cylinder", 2, 2, 10, 0); // if there are many mirrors, reduce the solution of post
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRenderState(offsetState);
 		post.setModelBound(new BoundingBox());
