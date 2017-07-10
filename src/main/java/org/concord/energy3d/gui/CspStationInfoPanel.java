@@ -26,8 +26,8 @@ public class CspStationInfoPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private final DecimalFormat noDecimals = new DecimalFormat();
-	private final JPanel countPanel, costPanel, packingDensityPanel;
-	private final ColorBar countBar, costBar, packingDensityBar;
+	private final JPanel countPanel, costPanel, packingDensityPanel, moduleCountPanel;
+	private final ColorBar countBar, costBar, packingDensityBar, moduleCountBar;
 
 	public CspStationInfoPanel() {
 
@@ -39,7 +39,7 @@ public class CspStationInfoPanel extends JPanel {
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		add(container, BorderLayout.NORTH);
 
-		// mirror count on the selected base
+		// mirror/trough count on the selected base
 
 		countPanel = new JPanel(new BorderLayout());
 		countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
@@ -53,7 +53,19 @@ public class CspStationInfoPanel extends JPanel {
 		countBar.setPreferredSize(new Dimension(100, 16));
 		countPanel.add(countBar, BorderLayout.CENTER);
 
-		// total solar panel area on the selected base
+		moduleCountPanel = new JPanel(new BorderLayout());
+		moduleCountPanel.setBorder(EnergyPanel.createTitledBorder("Number of modules", true));
+		container.add(moduleCountPanel);
+		moduleCountBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
+		moduleCountBar.setUnit("");
+		moduleCountBar.setUnitPrefix(false);
+		moduleCountBar.setVerticalLineRepresentation(false);
+		moduleCountBar.setDecimalDigits(0);
+		moduleCountBar.setToolTipText(moduleCountPanel.getToolTipText());
+		moduleCountBar.setPreferredSize(new Dimension(100, 16));
+		moduleCountPanel.add(moduleCountBar, BorderLayout.CENTER);
+
+		// total reflector area on the selected base
 
 		packingDensityPanel = new JPanel(new BorderLayout());
 		packingDensityPanel.setBorder(EnergyPanel.createTitledBorder("<html>Packing density (reflecting area / field area)</html>", true));
@@ -67,7 +79,7 @@ public class CspStationInfoPanel extends JPanel {
 		packingDensityBar.setPreferredSize(new Dimension(100, 16));
 		packingDensityPanel.add(packingDensityBar, BorderLayout.CENTER);
 
-		// mirror cost on the selected base
+		// mirror/trough cost on the selected base
 
 		costPanel = new JPanel(new BorderLayout());
 		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost", true));
@@ -89,6 +101,11 @@ public class CspStationInfoPanel extends JPanel {
 		final List<ParabolicTrough> troughs = foundation.getParabolicTroughs();
 		if (!troughs.isEmpty()) {
 			countBar.setValue(troughs.size());
+			int totalModules = 0;
+			for (final ParabolicTrough t : troughs) {
+				totalModules += t.getNumberOfModules();
+			}
+			moduleCountBar.setValue(totalModules);
 			countPanel.setBorder(EnergyPanel.createTitledBorder("Number of parabolic troughs", true));
 			double cost = 0;
 			double reflectingArea = 0;
@@ -111,6 +128,7 @@ public class CspStationInfoPanel extends JPanel {
 		} else {
 			final List<Mirror> mirrors = foundation.getMirrors();
 			countBar.setValue(mirrors.size());
+			moduleCountBar.setValue(mirrors.size());
 			countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
 			double cost = 0;
 			double reflectingArea = 0;

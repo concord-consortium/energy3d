@@ -164,9 +164,9 @@ public class ParabolicTrough extends HousePart implements Solar {
 		absorberEnd2Core.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd2Core);
 
-		final int nUnits = (int) Math.round(troughLength / moduleLength);
+		final int nModules = getNumberOfModules();
 		outlines = new Line("Parabolic Trough (Outline)");
-		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 + 2 * (reflector.getNumberOfSamples() + 1) * (nUnits + 1)));
+		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 + 2 * (reflector.getNumberOfSamples() + 1) * (nModules + 1)));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
 		outlines.setLineWidth(0.01f);
@@ -338,7 +338,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		final double halfLength = troughLength * 0.5;
 		final Vector3 center = getAbsPoint(0);
 
-		final int nModules = (int) Math.max(1, Math.round(troughLength / moduleLength));
+		final int nModules = Math.max(1, getNumberOfModules());
 		final int outlineBufferSize = 6 * (vertexCount - 1) * (nModules + 2) + 12; // 12 is for the two lateral lines
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
@@ -767,7 +767,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			ok = true;
 		}
 		if (ok) {
-			int n = (int) Math.round(troughLength / moduleLength);
+			int n = getNumberOfModules();
 			if (n <= 0) {
 				n = 1;
 			}
@@ -873,6 +873,10 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	public boolean getLabelEnergyOutput() {
 		return labelEnergyOutput;
+	}
+
+	public int getNumberOfModules() {
+		return (int) Math.round(troughLength / moduleLength);
 	}
 
 	public void setNSectionParabola(final int parabolaSectionCount) {
