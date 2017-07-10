@@ -177,7 +177,7 @@ public class CspStationInfoPanel extends JPanel {
 	}
 
 	public void updateMirrorNumberMaximum() {
-		if (Scene.getInstance().countParts(new Class[] { Mirror.class }) > 0) {
+		if (Scene.getInstance().countParts(Mirror.class) > 0) {
 			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
 			String t = "Number of mirrors";
 			if (specs.isNumberOfMirrorsEnabled()) {
@@ -191,7 +191,7 @@ public class CspStationInfoPanel extends JPanel {
 	}
 
 	public void updateParabolicTroughNumberMaximum() {
-		if (Scene.getInstance().countParts(new Class[] { ParabolicTrough.class }) > 0) {
+		if (Scene.getInstance().countParts(ParabolicTrough.class) > 0) {
 			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
 			String t = "Number of parabolic troughs";
 			if (specs.isNumberOfParabolicTroughsEnabled()) {

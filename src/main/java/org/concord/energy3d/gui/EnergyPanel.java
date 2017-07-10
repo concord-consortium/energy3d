@@ -1390,7 +1390,7 @@ public class EnergyPanel extends JPanel {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					final int numberOfSolarPanels = Scene.getInstance().getNumberOfSolarPanels();
+					final int numberOfSolarPanels = Scene.getInstance().countSolarPanels();
 					if (numberOfSolarPanels > 0) {
 						partPanelBorder.setTitle("Solar Panels");
 						partProperty1Label.setText("  Total Number:");
@@ -1403,7 +1403,7 @@ public class EnergyPanel extends JPanel {
 						partProperty3TextField.setText("");
 						partProperty3TextField.setToolTipText(null);
 					} else {
-						final int numberOfMirrors = Scene.getInstance().countParts(new Class[] { Mirror.class });
+						final int numberOfMirrors = Scene.getInstance().countParts(Mirror.class);
 						if (numberOfMirrors > 0) {
 							partPanelBorder.setTitle("Mirrors");
 							partProperty1Label.setText("  Total Number:");
@@ -1416,7 +1416,7 @@ public class EnergyPanel extends JPanel {
 							partProperty3TextField.setText("");
 							partProperty3TextField.setToolTipText(null);
 						} else {
-							final int numberOfParabolicTroughs = Scene.getInstance().countParts(new Class[] { ParabolicTrough.class });
+							final int numberOfParabolicTroughs = Scene.getInstance().countParts(ParabolicTrough.class);
 							if (numberOfParabolicTroughs > 0) {
 								partPanelBorder.setTitle("Parabolic Troughs");
 								partProperty1Label.setText("  Total Number:");

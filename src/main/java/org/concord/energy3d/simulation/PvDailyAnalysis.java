@@ -164,7 +164,7 @@ public class PvDailyAnalysis extends Analysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Daily Yield of All Solar Panels (" + Scene.getInstance().getNumberOfSolarPanels() + " Solar Panels)";
+		String title = "Daily Yield of All Solar Panels (" + Scene.getInstance().countSolarPanels() + " Solar Panels)";
 		if (selectedPart != null) {
 			if (selectedPart instanceof SolarPanel) {
 				cost = Cost.getInstance().getPartCost(selectedPart);

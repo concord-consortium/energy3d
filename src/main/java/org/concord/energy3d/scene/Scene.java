@@ -2866,6 +2866,16 @@ public class Scene implements Serializable {
 		return solarContrast;
 	}
 
+	public int countParts(final Class<?> c) {
+		int count = 0;
+		for (final HousePart p : parts) {
+			if (c.isInstance(p)) {
+				count++;
+			}
+		}
+		return count;
+	}
+
 	public int countParts(final Class<?>[] clazz) {
 		int count = 0;
 		for (final HousePart p : parts) {
@@ -2873,6 +2883,19 @@ public class Scene implements Serializable {
 				if (c.isInstance(p)) {
 					count++;
 				}
+			}
+		}
+		return count;
+	}
+
+	// special treatment of counting solar panels that include individual solar panels and solar panels on racks
+	public int countSolarPanels() {
+		int count = 0;
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				count++;
+			} else if (p instanceof Rack) {
+				count += ((Rack) p).getNumberOfSolarPanels();
 			}
 		}
 		return count;
@@ -2900,19 +2923,6 @@ public class Scene implements Serializable {
 			}
 		}
 		return count;
-	}
-
-	public int getNumberOfSolarPanels() {
-		int count = 0;
-		for (final HousePart p : parts) {
-			if (p instanceof SolarPanel) {
-				count++;
-			} else if (p instanceof Rack) {
-				count += ((Rack) p).getNumberOfSolarPanels();
-			}
-		}
-		return count;
-
 	}
 
 	// XIE: This needs to be called for trees to change texture when the month changes

@@ -2044,7 +2044,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int n = Scene.getInstance().countParts(new Class[] { Mirror.class });
+					int n = Scene.getInstance().countParts(Mirror.class);
 					if (n <= 0) {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -2087,7 +2087,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int n = Scene.getInstance().countParts(new Class[] { Mirror.class });
+					int n = Scene.getInstance().countParts(Mirror.class);
 					if (n <= 0) {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -2127,7 +2127,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int n = Scene.getInstance().countParts(new Class[] { ParabolicTrough.class });
+					int n = Scene.getInstance().countParts(ParabolicTrough.class);
 					if (n <= 0) {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -2170,7 +2170,7 @@ public class MainFrame extends JFrame {
 						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					int n = Scene.getInstance().countParts(new Class[] { ParabolicTrough.class });
+					int n = Scene.getInstance().countParts(ParabolicTrough.class);
 					if (n <= 0) {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;

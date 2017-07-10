@@ -74,6 +74,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient double baseZ;
 	private int nSectionParabola = 16; // number of sections for the parabola cross section of a parabolic trough (must be power of 2)
 	private int nSectionAxis = 32; // number of sections in the axis of a parabolic trough (must be power of 2)
+	private boolean detailed; // allows us to draw more details when there are fewer troughs in the scene
 
 	public ParabolicTrough() {
 		super(1, 1, 0);
@@ -107,6 +108,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (Util.isZero(nSectionAxis)) {
 			nSectionAxis = 32;
 		}
+		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
 		mesh = new ParabolicCylinder("Parabolic Cylinder", nSectionParabola, semilatusRectum, apertureWidth, troughLength);
 		mesh.setDefaultColor(SKY_BLUE);
@@ -126,7 +128,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		root.attachChild(reflectorBack);
 
 		final ColorRGBA tubeColor = new ColorRGBA(0.8f, 0.8f, 0.8f, 0.8f);
-		absorber = new Cylinder("Absorber Tube", 2, 10, 0.5, 0, true);
+		absorber = new Cylinder("Absorber Tube", 2, detailed ? 10 : 4, 0.5, 0, true);
 		final BlendState blend = new BlendState();
 		blend.setBlendEnabled(true);
 		absorber.setRenderState(blend);
@@ -135,34 +137,34 @@ public class ParabolicTrough extends HousePart implements Solar {
 		absorber.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorber);
 
-		absorberCore = new Cylinder("Absorber Tube Core", 2, 4, 0.4, 0, true);
-		absorberCore.setDefaultColor(ColorRGBA.BROWN);
-		absorberCore.setModelBound(new OrientedBoundingBox());
-		root.attachChild(absorberCore);
-
-		absorberEnd1 = new Cylinder("Absorber End Tube 1", 2, 10, 0.5, 0, true);
+		absorberEnd1 = new Cylinder("Absorber End Tube 1", 2, detailed ? 10 : 4, 0.5, 0, true);
 		absorberEnd1.setRenderState(blend);
 		absorberEnd1.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		absorberEnd1.setDefaultColor(tubeColor);
 		absorberEnd1.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd1);
 
-		absorberEnd1Core = new Cylinder("Absorber End Tube 1 Core", 2, 4, 0.4, 0, true);
-		absorberEnd1Core.setDefaultColor(ColorRGBA.BROWN);
-		absorberEnd1Core.setModelBound(new OrientedBoundingBox());
-		root.attachChild(absorberEnd1Core);
-
-		absorberEnd2 = new Cylinder("Absorber End Tube 2", 2, 10, 0.5, 0, true);
+		absorberEnd2 = new Cylinder("Absorber End Tube 2", 2, detailed ? 10 : 4, 0.5, 0, true);
 		absorberEnd2.setRenderState(blend);
 		absorberEnd2.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
 		absorberEnd2.setDefaultColor(tubeColor);
 		absorberEnd2.setModelBound(new OrientedBoundingBox());
 		root.attachChild(absorberEnd2);
 
-		absorberEnd2Core = new Cylinder("Absorber End Tube 2 Core", 2, 4, 0.4, 0, true);
-		absorberEnd2Core.setDefaultColor(ColorRGBA.BROWN);
-		absorberEnd2Core.setModelBound(new OrientedBoundingBox());
-		root.attachChild(absorberEnd2Core);
+		if (detailed) {
+			absorberCore = new Cylinder("Absorber Tube Core", 2, 4, 0.4, 0, true);
+			absorberCore.setDefaultColor(ColorRGBA.BROWN);
+			absorberCore.setModelBound(new OrientedBoundingBox());
+			root.attachChild(absorberCore);
+			absorberEnd1Core = new Cylinder("Absorber End Tube 1 Core", 2, 4, 0.4, 0, true);
+			absorberEnd1Core.setDefaultColor(ColorRGBA.BROWN);
+			absorberEnd1Core.setModelBound(new OrientedBoundingBox());
+			root.attachChild(absorberEnd1Core);
+			absorberEnd2Core = new Cylinder("Absorber End Tube 2 Core", 2, 4, 0.4, 0, true);
+			absorberEnd2Core.setDefaultColor(ColorRGBA.BROWN);
+			absorberEnd2Core.setModelBound(new OrientedBoundingBox());
+			root.attachChild(absorberEnd2Core);
+		}
 
 		final int nModules = getNumberOfModules();
 		outlines = new Line("Parabolic Trough (Outline)");
@@ -318,11 +320,13 @@ public class ParabolicTrough extends HousePart implements Solar {
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
 		absorber.setHeight(reflector.getHeight());
-		absorberCore.setHeight(reflector.getHeight() - 1);
 		absorberEnd1.setHeight(0.5 * reflector.getSemilatusRectum());
 		absorberEnd2.setHeight(absorberEnd1.getHeight());
-		absorberEnd1Core.setHeight(absorberEnd1.getHeight() - 1);
-		absorberEnd2Core.setHeight(absorberEnd2.getHeight() - 1);
+		if (detailed) {
+			absorberCore.setHeight(reflector.getHeight() - 1);
+			absorberEnd1Core.setHeight(absorberEnd1.getHeight() - 1);
+			absorberEnd2Core.setHeight(absorberEnd2.getHeight() - 1);
+		}
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
@@ -411,19 +415,21 @@ public class ParabolicTrough extends HousePart implements Solar {
 		outlines.setTranslation(mesh.getTranslation());
 		absorber.setRotation(new Matrix3().applyRotationX(Math.PI / 2));
 		absorber.setTranslation(mesh.getTranslation().add(n.multiply(0.5 * reflector.getSemilatusRectum(), null), null));
-		absorberCore.setRotation(absorber.getRotation());
-		absorberCore.setTranslation(absorber.getTranslation());
 		final Vector3 endShift = n.multiply(0.5 * absorberEnd1.getHeight(), null);
 		absorberEnd1.setTranslation(mesh.getTranslation().add(p1.add(endShift, null), null));
 		absorberEnd2.setTranslation(mesh.getTranslation().add(p2.add(endShift, null), null));
 		absorberEnd1.setRotation(rotation);
 		absorberEnd2.setRotation(rotation);
-		absorberEnd1Core.setTranslation(absorberEnd1.getTranslation());
-		absorberEnd2Core.setTranslation(absorberEnd2.getTranslation());
-		absorberEnd1Core.setRotation(rotation);
-		absorberEnd2Core.setRotation(rotation);
 		steelFrame.setRotation(rotation);
 		steelFrame.setTranslation(mesh.getTranslation());
+		if (detailed) {
+			absorberCore.setRotation(absorber.getRotation());
+			absorberCore.setTranslation(absorber.getTranslation());
+			absorberEnd1Core.setTranslation(absorberEnd1.getTranslation());
+			absorberEnd2Core.setTranslation(absorberEnd2.getTranslation());
+			absorberEnd1Core.setRotation(rotation);
+			absorberEnd2Core.setRotation(rotation);
+		}
 
 		mesh.updateModelBound();
 		outlines.updateModelBound();
@@ -524,7 +530,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	}
 
 	private void addPole(final Vector3 position, final double poleHeight, final double baseZ) {
-		final Cylinder pole = new Cylinder("Pole Cylinder", 10, 10, 10, 0);
+		final Cylinder pole = new Cylinder("Pole Cylinder", 2, detailed ? 10 : 2, 10, 0);
 		pole.setRadius(0.6);
 		pole.setRenderState(offsetState);
 		pole.setHeight(poleHeight - 0.5 * pole.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the trough
