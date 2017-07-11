@@ -294,7 +294,7 @@ public class Mirror extends HousePart implements Solar {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(getOutputToday()) + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.ONE_DECIMAL.format(getOutputToday()) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);

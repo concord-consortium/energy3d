@@ -529,7 +529,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
 		if (labelEnergyOutput) {
-			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.TWO_DECIMALS.format(solarPotentialToday) + " kWh");
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(solarPotentialToday) ? "Output" : EnergyPanel.ONE_DECIMAL.format(solarPotentialToday * getSystemEfficiency()) + " kWh");
 		}
 		if (!text.equals("")) {
 			label.setText(text);

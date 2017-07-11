@@ -1069,7 +1069,7 @@ public class EnergyPanel extends JPanel {
 								final String reflectance = ONE_DECIMAL.format(m.getReflectance() * 100) + "%";
 								if (energyViewShown) {
 									partProperty3Label.setText("  Reflectance & Yield:");
-									partProperty3TextField.setText(reflectance + ", " + TWO_DECIMALS.format(m.getSolarPotentialToday() * m.getReflectance()) + " kWh");
+									partProperty3TextField.setText(reflectance + ", " + ONE_DECIMAL.format(m.getSolarPotentialToday() * m.getSystemEfficiency()) + " kWh");
 									partProperty3TextField.setToolTipText("The reflectance and yield of this mirror");
 								} else {
 									partProperty3Label.setText("  Reflectance:");
@@ -1109,7 +1109,7 @@ public class EnergyPanel extends JPanel {
 								final String reflect = "R=" + ONE_DECIMAL.format(t.getReflectance() * 100) + "%, s=" + ONE_DECIMAL.format(s * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2, a=" + ONE_DECIMAL.format(d * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2";
 								if (energyViewShown) {
 									partProperty3Label.setText("  Reflection & Yield:");
-									partProperty3TextField.setText(reflect + ", " + TWO_DECIMALS.format(t.getSolarPotentialToday() * t.getReflectance()) + " kWh");
+									partProperty3TextField.setText(reflect + ", " + ONE_DECIMAL.format(t.getSolarPotentialToday() * t.getSystemEfficiency()) + " kWh");
 									partProperty3TextField.setToolTipText("The reflectance and yield of this parabolic trough");
 								} else {
 									partProperty3Label.setText("  Reflection:");
