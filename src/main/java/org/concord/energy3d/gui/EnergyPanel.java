@@ -1066,15 +1066,15 @@ public class EnergyPanel extends JPanel {
 								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(m.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
 								partProperty1TextField.setToolTipText("The length, width, and (x, y, z) coordinates of the mirror");
 								partProperty2TextField.setToolTipText("The angles of the mirror");
-								final String reflectivity = ONE_DECIMAL.format(m.getReflectivity() * 100) + "%";
+								final String reflectance = ONE_DECIMAL.format(m.getReflectance() * 100) + "%";
 								if (energyViewShown) {
-									partProperty3Label.setText("  Reflectivity & Yield:");
-									partProperty3TextField.setText(reflectivity + ", " + TWO_DECIMALS.format(m.getSolarPotentialToday() * m.getReflectivity()) + " kWh");
-									partProperty3TextField.setToolTipText("The reflectivity and yield of this mirror");
+									partProperty3Label.setText("  Reflectance & Yield:");
+									partProperty3TextField.setText(reflectance + ", " + TWO_DECIMALS.format(m.getSolarPotentialToday() * m.getReflectance()) + " kWh");
+									partProperty3TextField.setToolTipText("The reflectance and yield of this mirror");
 								} else {
-									partProperty3Label.setText("  Reflectivity:");
-									partProperty3TextField.setText(reflectivity);
-									partProperty3TextField.setToolTipText("The reflectivity of this mirror");
+									partProperty3Label.setText("  Reflectance:");
+									partProperty3TextField.setText(reflectance);
+									partProperty3TextField.setToolTipText("The reflectance of this mirror");
 								}
 							}
 						});
@@ -1106,15 +1106,15 @@ public class EnergyPanel extends JPanel {
 								partProperty2TextField.setText("f=" + ONE_DECIMAL.format(focalLength * meterToFoot) + lengthUnit + ", d=" + ONE_DECIMAL.format(t.getApertureWidth() * meterToFoot) + lengthUnit + ", h=" + ONE_DECIMAL.format(h * meterToFoot) + lengthUnit + ", \u03C6=" + ONE_DECIMAL.format(rimAngle >= 0 ? rimAngle : 180 + rimAngle) + "\u00B0");
 								partProperty1TextField.setToolTipText("Assembly length, module length, and (x, y, z) coordinates of the parabolic trough");
 								partProperty2TextField.setToolTipText("Parameters of the parabolic shape");
-								final String reflect = "R=" + ONE_DECIMAL.format(t.getReflectivity() * 100) + "%, s=" + ONE_DECIMAL.format(s * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2, a=" + ONE_DECIMAL.format(d * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2";
+								final String reflect = "R=" + ONE_DECIMAL.format(t.getReflectance() * 100) + "%, s=" + ONE_DECIMAL.format(s * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2, a=" + ONE_DECIMAL.format(d * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2";
 								if (energyViewShown) {
 									partProperty3Label.setText("  Reflection & Yield:");
-									partProperty3TextField.setText(reflect + ", " + TWO_DECIMALS.format(t.getSolarPotentialToday() * t.getReflectivity()) + " kWh");
-									partProperty3TextField.setToolTipText("The reflectivity and yield of this parabolic trough");
+									partProperty3TextField.setText(reflect + ", " + TWO_DECIMALS.format(t.getSolarPotentialToday() * t.getReflectance()) + " kWh");
+									partProperty3TextField.setToolTipText("The reflectance and yield of this parabolic trough");
 								} else {
 									partProperty3Label.setText("  Reflection:");
 									partProperty3TextField.setText(reflect);
-									partProperty3TextField.setToolTipText("The reflectivity of this parabolic trough");
+									partProperty3TextField.setToolTipText("The reflectance of this parabolic trough");
 								}
 							}
 						});

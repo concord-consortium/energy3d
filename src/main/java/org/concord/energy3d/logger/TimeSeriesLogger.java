@@ -656,17 +656,17 @@ public class TimeSeriesLogger {
 					stateValue = "{\"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
 				}
 
-				else if (lastEdit instanceof ChangeMirrorReflectivityCommand) {
-					final ChangeMirrorReflectivityCommand c = (ChangeMirrorReflectivityCommand) lastEdit;
+				else if (lastEdit instanceof ChangeMirrorReflectanceCommand) {
+					final ChangeMirrorReflectanceCommand c = (ChangeMirrorReflectanceCommand) lastEdit;
 					final Mirror m = c.getMirror();
-					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + m.getReflectivity() + "}";
-				} else if (lastEdit instanceof ChangeFoundationMirrorReflectivityCommand) {
-					final Foundation f = ((ChangeFoundationMirrorReflectivityCommand) lastEdit).getFoundation();
+					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + m.getReflectance() + "}";
+				} else if (lastEdit instanceof ChangeFoundationMirrorReflectanceCommand) {
+					final Foundation f = ((ChangeFoundationMirrorReflectanceCommand) lastEdit).getFoundation();
 					final List<Mirror> mirrors = f.getMirrors();
-					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectivity()) + "}";
-				} else if (lastEdit instanceof ChangeReflectivityForAllMirrorsCommand) {
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectance()) + "}";
+				} else if (lastEdit instanceof ChangeReflectanceForAllMirrorsCommand) {
 					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
-					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectivity()) + "}";
+					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getReflectance()) + "}";
 				}
 
 				else if (lastEdit instanceof ChangeMirrorTargetCommand) {

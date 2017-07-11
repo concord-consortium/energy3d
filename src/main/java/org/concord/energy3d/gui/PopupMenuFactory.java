@@ -8818,8 +8818,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miReflectivity = new JMenuItem("Reflectivity...");
-			miReflectivity.addActionListener(new ActionListener() {
+			final JMenuItem miReflectance = new JMenuItem("Reflectance...");
+			miReflectance.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -8831,8 +8831,8 @@ public class PopupMenuFactory {
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Mirror m = (Mirror) selectedPart;
-					final String title = "<html>Reflectivity (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>Reflectivity can be affected by pollen and dust.<hr></html>";
+					final String title = "<html>Reflectance (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Reflectance can be affected by pollen and dust.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
 					gui.add(panel, BorderLayout.CENTER);
@@ -8859,12 +8859,12 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getReflectivity() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getReflectance() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Mirror Reflectivity");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Mirror Reflectance");
 
 					while (true) {
 						inputField.selectAll();
@@ -8884,22 +8884,22 @@ public class PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 50 || val > 99) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror reflectivity must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final ChangeMirrorReflectivityCommand c = new ChangeMirrorReflectivityCommand(m);
-										m.setReflectivity(val * 0.01);
+										final ChangeMirrorReflectanceCommand c = new ChangeMirrorReflectanceCommand(m);
+										m.setReflectance(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = m.getTopContainer();
-										final ChangeFoundationMirrorReflectivityCommand c = new ChangeFoundationMirrorReflectivityCommand(foundation);
-										foundation.setReflectivityForMirrors(val * 0.01);
+										final ChangeFoundationMirrorReflectanceCommand c = new ChangeFoundationMirrorReflectanceCommand(foundation);
+										foundation.setReflectanceForMirrors(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeReflectivityForAllMirrorsCommand c = new ChangeReflectivityForAllMirrorsCommand();
-										Scene.getInstance().setReflectivityForAllMirrors(val * 0.01);
+										final ChangeReflectanceForAllMirrorsCommand c = new ChangeReflectanceForAllMirrorsCommand();
+										Scene.getInstance().setReflectanceForAllMirrors(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -8926,7 +8926,7 @@ public class PopupMenuFactory {
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSize);
 			popupMenuForMirror.add(miBaseHeight);
-			popupMenuForMirror.add(miReflectivity);
+			popupMenuForMirror.add(miReflectance);
 			popupMenuForMirror.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
@@ -9663,8 +9663,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miReflectivity = new JMenuItem("Reflectivity...");
-			miReflectivity.addActionListener(new ActionListener() {
+			final JMenuItem miReflectance = new JMenuItem("Mirror Reflectance...");
+			miReflectance.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -9676,8 +9676,8 @@ public class PopupMenuFactory {
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final ParabolicTrough t = (ParabolicTrough) selectedPart;
-					final String title = "<html>Reflectivity (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>Reflectivity can be affected by pollen and dust.<hr></html>";
+					final String title = "<html>Reflectance (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Reflectance can be affected by pollen and dust.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
 					gui.add(panel, BorderLayout.CENTER);
@@ -9704,12 +9704,12 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getReflectivity() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getReflectance() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Reflectivity");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Mirror Reflectance");
 
 					while (true) {
 						inputField.selectAll();
@@ -9729,22 +9729,310 @@ public class PopupMenuFactory {
 							}
 							if (ok) {
 								if (val < 50 || val > 99) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough reflectivity must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final ChangeParabolicTroughReflectivityCommand c = new ChangeParabolicTroughReflectivityCommand(t);
-										t.setReflectivity(val * 0.01);
+										final ChangeParabolicTroughReflectanceCommand c = new ChangeParabolicTroughReflectanceCommand(t);
+										t.setReflectance(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = t.getTopContainer();
-										final ChangeFoundationParabolicTroughReflectivityCommand c = new ChangeFoundationParabolicTroughReflectivityCommand(foundation);
-										foundation.setReflectivityForParabolicTroughs(val * 0.01);
+										final ChangeFoundationParabolicTroughReflectanceCommand c = new ChangeFoundationParabolicTroughReflectanceCommand(foundation);
+										foundation.setReflectanceForParabolicTroughs(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeReflectivityForAllParabolicTroughsCommand c = new ChangeReflectivityForAllParabolicTroughsCommand();
-										Scene.getInstance().setReflectivityForAllParabolicTroughs(val * 0.01);
+										final ChangeReflectanceForAllParabolicTroughsCommand c = new ChangeReflectanceForAllParabolicTroughsCommand();
+										Scene.getInstance().setReflectanceForAllParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miAbsorptance = new JMenuItem("Receiver Absorptance...");
+			miAbsorptance.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					final String title = "<html>Absorptance (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getAbsorptance() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Receiver Absorptance");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 50 || val > 99) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final ChangeParabolicTroughAbsorptanceCommand c = new ChangeParabolicTroughAbsorptanceCommand(t);
+										t.setAbsorptance(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = t.getTopContainer();
+										final ChangeFoundationParabolicTroughAbsorptanceCommand c = new ChangeFoundationParabolicTroughAbsorptanceCommand(foundation);
+										foundation.setAbsorptanceForParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final ChangeAbsorptanceForAllParabolicTroughsCommand c = new ChangeAbsorptanceForAllParabolicTroughsCommand();
+										Scene.getInstance().setAbsorptanceForAllParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miOpticalEfficiency = new JMenuItem("Optical Efficiency...");
+			miOpticalEfficiency.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					final String title = "<html>Opitical efficiency (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getOpticalEfficiency() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Optical Efficiency");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 20 || val > 80) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough optical efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final ChangeParabolicTroughOpticalEfficiencyCommand c = new ChangeParabolicTroughOpticalEfficiencyCommand(t);
+										t.setOpticalEfficiency(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = t.getTopContainer();
+										final ChangeFoundationParabolicTroughOpticalEfficiencyCommand c = new ChangeFoundationParabolicTroughOpticalEfficiencyCommand(foundation);
+										foundation.setOpticalEfficiencyForParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final ChangeOpticalEfficiencyForAllParabolicTroughsCommand c = new ChangeOpticalEfficiencyForAllParabolicTroughsCommand();
+										Scene.getInstance().setOpticalEfficiencyForAllParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miThermalEfficiency = new JMenuItem("Thermal Efficiency...");
+			miThermalEfficiency.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicTrough)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicTrough t = (ParabolicTrough) selectedPart;
+					final String title = "<html>Thermal efficiency (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Trough", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Troughs on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Troughs");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getThermalEfficiency() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Trough Thermal Efficiency");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 20 || val > 80) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough thermal efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final ChangeParabolicTroughThermalEfficiencyCommand c = new ChangeParabolicTroughThermalEfficiencyCommand(t);
+										t.setThermalEfficiency(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = t.getTopContainer();
+										final ChangeFoundationParabolicTroughThermalEfficiencyCommand c = new ChangeFoundationParabolicTroughThermalEfficiencyCommand(foundation);
+										foundation.setThermalEfficiencyForParabolicTroughs(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final ChangeThermalEfficiencyForAllParabolicTroughsCommand c = new ChangeThermalEfficiencyForAllParabolicTroughsCommand();
+										Scene.getInstance().setThermalEfficiencyForAllParabolicTroughs(val * 0.01);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -9769,7 +10057,11 @@ public class PopupMenuFactory {
 			popupMenuForParabolicTrough.add(miModuleLength);
 			popupMenuForParabolicTrough.add(miBaseHeight);
 			popupMenuForParabolicTrough.add(miMesh);
-			popupMenuForParabolicTrough.add(miReflectivity);
+			popupMenuForParabolicTrough.addSeparator();
+			popupMenuForParabolicTrough.add(miReflectance);
+			popupMenuForParabolicTrough.add(miAbsorptance);
+			popupMenuForParabolicTrough.add(miOpticalEfficiency);
+			popupMenuForParabolicTrough.add(miThermalEfficiency);
 			popupMenuForParabolicTrough.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");

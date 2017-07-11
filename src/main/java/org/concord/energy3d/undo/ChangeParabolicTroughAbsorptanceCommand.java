@@ -6,16 +6,16 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.ParabolicTrough;
 
-public class ChangeParabolicTroughReflectivityCommand extends AbstractUndoableEdit {
+public class ChangeParabolicTroughAbsorptanceCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;
 	private double newValue;
 	private final ParabolicTrough trough;
 
-	public ChangeParabolicTroughReflectivityCommand(final ParabolicTrough trough) {
+	public ChangeParabolicTroughAbsorptanceCommand(final ParabolicTrough trough) {
 		this.trough = trough;
-		oldValue = trough.getReflectivity();
+		oldValue = trough.getAbsorptance();
 	}
 
 	public ParabolicTrough getParabolicTrough() {
@@ -29,19 +29,19 @@ public class ChangeParabolicTroughReflectivityCommand extends AbstractUndoableEd
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = trough.getReflectivity();
-		trough.setReflectivity(oldValue);
+		newValue = trough.getAbsorptance();
+		trough.setAbsorptance(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		trough.setReflectivity(newValue);
+		trough.setAbsorptance(newValue);
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Reflectivity Change for Selected Parabolic Trough";
+		return "Absorptance Change for Selected Parabolic Trough";
 	}
 
 }

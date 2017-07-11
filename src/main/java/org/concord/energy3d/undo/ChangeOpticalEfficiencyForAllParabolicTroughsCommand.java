@@ -9,19 +9,19 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeReflectivityForAllParabolicTroughsCommand extends AbstractUndoableEdit {
+public class ChangeOpticalEfficiencyForAllParabolicTroughsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final List<ParabolicTrough> troughs;
 
-	public ChangeReflectivityForAllParabolicTroughsCommand() {
+	public ChangeOpticalEfficiencyForAllParabolicTroughsCommand() {
 		troughs = Scene.getInstance().getAllParabolicTroughs();
 		final int n = troughs.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = troughs.get(i).getReflectivity();
+			oldValues[i] = troughs.get(i).getOpticalEfficiency();
 		}
 	}
 
@@ -31,8 +31,8 @@ public class ChangeReflectivityForAllParabolicTroughsCommand extends AbstractUnd
 		final int n = troughs.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newValues[i] = troughs.get(i).getReflectivity();
-			troughs.get(i).setReflectivity(oldValues[i]);
+			newValues[i] = troughs.get(i).getOpticalEfficiency();
+			troughs.get(i).setOpticalEfficiency(oldValues[i]);
 		}
 	}
 
@@ -41,13 +41,13 @@ public class ChangeReflectivityForAllParabolicTroughsCommand extends AbstractUnd
 		super.redo();
 		final int n = troughs.size();
 		for (int i = 0; i < n; i++) {
-			troughs.get(i).setReflectivity(newValues[i]);
+			troughs.get(i).setOpticalEfficiency(newValues[i]);
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Reflectivity Change for All Parabolic Troughs";
+		return "Optical Efficiency Change for All Parabolic Troughs";
 	}
 
 }

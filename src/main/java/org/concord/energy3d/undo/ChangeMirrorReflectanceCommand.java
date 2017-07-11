@@ -6,15 +6,16 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Mirror;
 
-public class ChangeMirrorReflectivityCommand extends AbstractUndoableEdit {
+public class ChangeMirrorReflectanceCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
-	private Mirror mirror;
+	private final double oldValue;
+	private double newValue;
+	private final Mirror mirror;
 
-	public ChangeMirrorReflectivityCommand(Mirror mirror) {
+	public ChangeMirrorReflectanceCommand(final Mirror mirror) {
 		this.mirror = mirror;
-		oldValue = mirror.getReflectivity();
+		oldValue = mirror.getReflectance();
 	}
 
 	public Mirror getMirror() {
@@ -28,19 +29,19 @@ public class ChangeMirrorReflectivityCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = mirror.getReflectivity();
-		mirror.setReflectivity(oldValue);
+		newValue = mirror.getReflectance();
+		mirror.setReflectance(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		mirror.setReflectivity(newValue);
+		mirror.setReflectance(newValue);
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Reflectivity Change for Selected Mirror";
+		return "Reflectance Change for Selected Mirror";
 	}
 
 }

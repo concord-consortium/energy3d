@@ -2695,10 +2695,10 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setReflectivityForMirrors(final double reflectivity) {
+	public void setReflectanceForMirrors(final double reflectance) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
-				((Mirror) p).setReflectivity(reflectivity);
+				((Mirror) p).setReflectance(reflectance);
 			}
 		}
 	}
@@ -2761,10 +2761,34 @@ public class Foundation extends HousePart implements Thermalizable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setReflectivityForParabolicTroughs(final double reflectivity) {
+	public void setReflectanceForParabolicTroughs(final double reflectance) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setReflectivity(reflectivity);
+				((ParabolicTrough) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForParabolicTroughs(final double absorptance) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForParabolicTroughs(final double efficiency) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setThermalEfficiencyForParabolicTroughs(final double efficiency) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setThermalEfficiency(efficiency);
 			}
 		}
 	}

@@ -2549,10 +2549,10 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setReflectivityForAllMirrors(final double reflectivity) {
+	public void setReflectanceForAllMirrors(final double reflectance) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
-				((Mirror) p).setReflectivity(reflectivity);
+				((Mirror) p).setReflectance(reflectance);
 			}
 		}
 	}
@@ -2622,10 +2622,34 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setReflectivityForAllParabolicTroughs(final double reflectivity) {
+	public void setReflectanceForAllParabolicTroughs(final double reflectance) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setReflectivity(reflectivity);
+				((ParabolicTrough) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForAllParabolicTroughs(final double absorptance) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForAllParabolicTroughs(final double efficiency) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setThermalEfficiencyForAllParabolicTroughs(final double efficiency) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setThermalEfficiency(efficiency);
 			}
 		}
 	}

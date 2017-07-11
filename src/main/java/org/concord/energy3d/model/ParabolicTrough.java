@@ -58,7 +58,10 @@ public class ParabolicTrough extends HousePart implements Solar {
 	private transient double copyLayoutGap = 0.2;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
-	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
+	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
+	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
+	private double opticalEfficiency = 0.7;
+	private double thermalEfficiency = 0.6;
 	private double moduleLength = 3;
 	private double troughLength = 2 * moduleLength;
 	private double apertureWidth = 2;
@@ -99,8 +102,17 @@ public class ParabolicTrough extends HousePart implements Solar {
 		if (Util.isZero(semilatusRectum)) {
 			semilatusRectum = 2;
 		}
-		if (Util.isZero(reflectivity)) {
-			reflectivity = 0.9;
+		if (Util.isZero(reflectance)) {
+			reflectance = 0.9;
+		}
+		if (Util.isZero(absorptance)) {
+			absorptance = 0.95;
+		}
+		if (Util.isZero(opticalEfficiency)) {
+			opticalEfficiency = 0.7;
+		}
+		if (Util.isZero(thermalEfficiency)) {
+			thermalEfficiency = 0.6;
 		}
 		if (Util.isZero(nSectionParabola)) {
 			nSectionParabola = 16;
@@ -666,7 +678,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 	}
 
 	public double getSystemEfficiency() {
-		double e = reflectivity;
+		double e = reflectance * absorptance * opticalEfficiency * thermalEfficiency;
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
@@ -675,13 +687,43 @@ public class ParabolicTrough extends HousePart implements Solar {
 	}
 
 	/** a number between 0 and 1 */
-	public void setReflectivity(final double efficiency) {
-		this.reflectivity = efficiency;
+	public void setOpticalEfficiency(final double opticalEfficiency) {
+		this.opticalEfficiency = opticalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
-	public double getReflectivity() {
-		return reflectivity;
+	public double getOpticalEfficiency() {
+		return opticalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	public void setThermalEfficiency(final double thermalEfficiency) {
+		this.thermalEfficiency = thermalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	public double getThermalEfficiency() {
+		return thermalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	public void setReflectance(final double reflectance) {
+		this.reflectance = reflectance;
+	}
+
+	/** a number between 0 and 1 */
+	public double getReflectance() {
+		return reflectance;
+	}
+
+	/** a number between 0 and 1 */
+	public void setAbsorptance(final double absorptance) {
+		this.absorptance = absorptance;
+	}
+
+	/** a number between 0 and 1 */
+	public double getAbsorptance() {
+		return absorptance;
 	}
 
 	public void setBaseHeight(final double baseHeight) {

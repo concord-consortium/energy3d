@@ -9,44 +9,45 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeReflectivityForAllMirrorsCommand extends AbstractUndoableEdit {
+public class ChangeReflectanceForAllMirrorsCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double[] oldValues, newValues;
-	private List<Mirror> mirrors;
+	private final double[] oldValues;
+	private double[] newValues;
+	private final List<Mirror> mirrors;
 
-	public ChangeReflectivityForAllMirrorsCommand() {
+	public ChangeReflectanceForAllMirrorsCommand() {
 		mirrors = Scene.getInstance().getAllMirrors();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = mirrors.get(i).getReflectivity();
+			oldValues[i] = mirrors.get(i).getReflectance();
 		}
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newValues[i] = mirrors.get(i).getReflectivity();
-			mirrors.get(i).setReflectivity(oldValues[i]);
+			newValues[i] = mirrors.get(i).getReflectance();
+			mirrors.get(i).setReflectance(oldValues[i]);
 		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
-			mirrors.get(i).setReflectivity(newValues[i]);
+			mirrors.get(i).setReflectance(newValues[i]);
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Reflectivity Change for All Mirrors";
+		return "Reflectance Change for All Mirrors";
 	}
 
 }

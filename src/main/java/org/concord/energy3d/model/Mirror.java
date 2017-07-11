@@ -48,7 +48,7 @@ public class Mirror extends HousePart implements Solar {
 	private transient Line lightBeams;
 	private transient Cylinder post;
 	private transient BMText label;
-	private double reflectivity = 0.9; // a number in (0, 1), iron glass has a reflectivity of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
+	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double mirrorWidth = 5;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
@@ -76,8 +76,8 @@ public class Mirror extends HousePart implements Solar {
 		if (Util.isZero(mirrorHeight)) {
 			mirrorHeight = 3;
 		}
-		if (Util.isZero(reflectivity)) {
-			reflectivity = 0.9;
+		if (Util.isZero(reflectance)) {
+			reflectance = 0.9;
 		}
 		if (Util.isZero(baseHeight)) {
 			baseHeight = 10;
@@ -443,13 +443,13 @@ public class Mirror extends HousePart implements Solar {
 	}
 
 	/** a number between 0 and 1 */
-	public void setReflectivity(final double efficiency) {
-		this.reflectivity = efficiency;
+	public void setReflectance(final double reflectance) {
+		this.reflectance = reflectance;
 	}
 
 	/** a number between 0 and 1 */
-	public double getReflectivity() {
-		return reflectivity;
+	public double getReflectance() {
+		return reflectance;
 	}
 
 	public void setMirrorWidth(final double mirrorWidth) {
@@ -531,7 +531,7 @@ public class Mirror extends HousePart implements Solar {
 	}
 
 	public double getSystemEfficiency() {
-		double e = reflectivity;
+		double e = reflectance;
 		if (heliostatTarget != null) {
 			e *= heliostatTarget.getSolarReceiverEfficiency();
 		}
