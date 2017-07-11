@@ -340,10 +340,14 @@ public class MainPanel extends JPanel {
 		bg.add(miJose);
 
 		// create solar menu
-		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
-		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")));
-		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Mirror (Heliostat)", new ImageIcon(getClass().getResource("icons/mirror.png")));
+		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Panel Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
+		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Single Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Planar Mirror (Heliostat)", new ImageIcon(getClass().getResource("icons/mirror.png")));
 		final JCheckBoxMenuItem miParabolicTrough = new JCheckBoxMenuItem("Parabolic Trough", new ImageIcon(getClass().getResource("icons/parabolic_trough.png")));
+		final JCheckBoxMenuItem miParabolicDish = new JCheckBoxMenuItem("Parabolic Dish", new ImageIcon(getClass().getResource("icons/parabolic_dish.png")));
+		miParabolicDish.setEnabled(false);
+		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
+		miSolarWaterHeater.setEnabled(false);
 		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
 		final ActionListener solarAction = new ActionListener() {
 			@Override
@@ -362,6 +366,12 @@ public class MainPanel extends JPanel {
 				} else if (selected == miParabolicTrough) {
 					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_TROUGH;
 					solarButton.setToolTipText("Insert a parabolic trough");
+				} else if (selected == miParabolicDish) {
+					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_DISH;
+					solarButton.setToolTipText("Insert a parabolic dish");
+				} else if (selected == miSolarWaterHeater) {
+					solaCommand = SceneManager.Operation.DRAW_SOLAR_WATER_HEATER;
+					solarButton.setToolTipText("Insert a solar water heater");
 				} else if (selected == miSensor) {
 					solaCommand = SceneManager.Operation.DRAW_SENSOR;
 					solarButton.setToolTipText("Insert a sensor module");
@@ -375,6 +385,8 @@ public class MainPanel extends JPanel {
 		miRack.addActionListener(solarAction);
 		miMirror.addActionListener(solarAction);
 		miParabolicTrough.addActionListener(solarAction);
+		miParabolicDish.addActionListener(solarAction);
+		miSolarWaterHeater.addActionListener(solarAction);
 		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
 		solaMenu.add(miRack);
@@ -382,13 +394,17 @@ public class MainPanel extends JPanel {
 		solaMenu.addSeparator();
 		solaMenu.add(miMirror);
 		solaMenu.add(miParabolicTrough);
+		solaMenu.add(miParabolicDish);
 		solaMenu.addSeparator();
+		solaMenu.add(miSolarWaterHeater);
 		solaMenu.add(miSensor);
 		bg = new ButtonGroup();
 		bg.add(miSolarPanel);
 		bg.add(miRack);
 		bg.add(miMirror);
 		bg.add(miParabolicTrough);
+		bg.add(miParabolicDish);
+		bg.add(miSolarWaterHeater);
 		bg.add(miSensor);
 
 		System.out.println("done");
