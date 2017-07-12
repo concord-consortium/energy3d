@@ -348,6 +348,8 @@ public class MainPanel extends JPanel {
 		miParabolicDish.setEnabled(false);
 		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
 		miSolarWaterHeater.setEnabled(false);
+		final JCheckBoxMenuItem miFresnelReflector = new JCheckBoxMenuItem("Fresnel Reflector", new ImageIcon(getClass().getResource("icons/fresnel_reflector.png")));
+		miFresnelReflector.setEnabled(false);
 		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
 		final ActionListener solarAction = new ActionListener() {
 			@Override
@@ -369,6 +371,9 @@ public class MainPanel extends JPanel {
 				} else if (selected == miParabolicDish) {
 					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_DISH;
 					solarButton.setToolTipText("Insert a parabolic dish");
+				} else if (selected == miFresnelReflector) {
+					solaCommand = SceneManager.Operation.DRAW_FRESNEL_REFLECTOR;
+					solarButton.setToolTipText("Insert a Fresnel reflector");
 				} else if (selected == miSolarWaterHeater) {
 					solaCommand = SceneManager.Operation.DRAW_SOLAR_WATER_HEATER;
 					solarButton.setToolTipText("Insert a solar water heater");
@@ -386,6 +391,7 @@ public class MainPanel extends JPanel {
 		miMirror.addActionListener(solarAction);
 		miParabolicTrough.addActionListener(solarAction);
 		miParabolicDish.addActionListener(solarAction);
+		miFresnelReflector.addActionListener(solarAction);
 		miSolarWaterHeater.addActionListener(solarAction);
 		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
@@ -395,6 +401,7 @@ public class MainPanel extends JPanel {
 		solaMenu.add(miMirror);
 		solaMenu.add(miParabolicTrough);
 		solaMenu.add(miParabolicDish);
+		solaMenu.add(miFresnelReflector);
 		solaMenu.addSeparator();
 		solaMenu.add(miSolarWaterHeater);
 		solaMenu.add(miSensor);
@@ -404,6 +411,7 @@ public class MainPanel extends JPanel {
 		bg.add(miMirror);
 		bg.add(miParabolicTrough);
 		bg.add(miParabolicDish);
+		bg.add(miFresnelReflector);
 		bg.add(miSolarWaterHeater);
 		bg.add(miSensor);
 
