@@ -41,6 +41,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Rack extends HousePart implements Trackable, Meshable {
+
 	private static final long serialVersionUID = 1L;
 	private transient ArrayList<Vector3> solarOrgPoints;
 	private transient ReadOnlyVector3 normal;

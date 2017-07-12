@@ -40,6 +40,11 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
+/**
+ * @author Charles Xie
+ *
+ */
+
 public class ParabolicTrough extends HousePart implements Solar {
 
 	private static final long serialVersionUID = 1L;
@@ -230,7 +235,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 				final Vector3 p = picked.getPoint().clone();
 				final UserData ud = picked.getUserData();
-				snapToGrid(p, getAbsPoint(0), getGridSize(), container instanceof Wall);
+				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
 				points.get(0).set(toRelative(p));
 				pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
 			} else {
@@ -602,7 +607,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 
 	@Override
 	protected void computeArea() {
-		area = troughLength * apertureWidth;
+		final double focalLength = semilatusRectum * 0.5;
+		final double h = apertureWidth * apertureWidth / (16 * focalLength);
+		final double b = 4 * h / apertureWidth;
+		final double c = Math.sqrt(b * b + 1);
+		final double s = 0.5 * apertureWidth * c + 2 * focalLength * Math.log(b + c);
+		area = troughLength * s;
 	}
 
 	@Override

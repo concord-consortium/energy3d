@@ -163,7 +163,7 @@ public class Mirror extends HousePart implements Solar {
 		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0), mirrorWidth / 2.0 / annotationScale, mirrorHeight / 2.0 / annotationScale, 0.15);
+		surround.setData(new Vector3(0, 0, 0), 0.5 * mirrorWidth / annotationScale, 0.5 * mirrorHeight / annotationScale, 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();

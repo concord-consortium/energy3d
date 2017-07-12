@@ -349,7 +349,6 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
 		miSolarWaterHeater.setEnabled(false);
 		final JCheckBoxMenuItem miFresnelReflector = new JCheckBoxMenuItem("Fresnel Reflector", new ImageIcon(getClass().getResource("icons/fresnel_reflector.png")));
-		miFresnelReflector.setEnabled(false);
 		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
 		final ActionListener solarAction = new ActionListener() {
 			@Override

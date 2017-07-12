@@ -38,6 +38,7 @@ import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.GambrelRoof;
 import org.concord.energy3d.model.HipRoof;
 import org.concord.energy3d.model.HousePart;
@@ -1331,6 +1332,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Mirror();
 		} else if (operation == Operation.DRAW_PARABOLIC_TROUGH) {
 			drawn = new ParabolicTrough();
+		} else if (operation == Operation.DRAW_FRESNEL_REFLECTOR) {
+			drawn = new FresnelReflector();
 		} else if (operation == Operation.DRAW_SENSOR) {
 			drawn = new Sensor();
 		} else if (operation == Operation.DRAW_FOUNDATION) {
