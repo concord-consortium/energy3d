@@ -1810,6 +1810,16 @@ public class Foundation extends HousePart implements Thermalizable {
 		return list;
 	}
 
+	public List<FresnelReflector> getFresnelReflectors() {
+		final List<FresnelReflector> list = new ArrayList<FresnelReflector>();
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				list.add((FresnelReflector) p);
+			}
+		}
+		return list;
+	}
+
 	public void updateHandlesOfAllFoudations() {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Foundation) {
@@ -2751,16 +2761,6 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	// change properties of all the parabolic troughs on this foundation
 
-	public void setAzimuthForParabolicTroughs(final double angle) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setRelativeAzimuth(angle);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setReflectanceForParabolicTroughs(final double reflectance) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicTrough) {
@@ -2835,6 +2835,78 @@ public class Foundation extends HousePart implements Thermalizable {
 				final ParabolicTrough t = (ParabolicTrough) p;
 				t.setSemilatusRectum(semilatusRectum);
 				t.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all the Fresnel reflectors on this foundation
+
+	public void setReflectanceForFresnelReflectors(final double reflectance) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForFresnelReflectors(final double absorptance) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForFresnelReflectors(final double efficiency) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setBaseHeightForFresnelReflectors(final double baseHeight) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setAbsorberForFresnelReflectors(final Foundation target) {
+		final List<Foundation> oldTargets = new ArrayList<Foundation>();
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				final Foundation t = r.getAbsorber();
+				if (t != null && !oldTargets.contains(t)) {
+					oldTargets.add(t);
+				}
+				r.setAbsorber(target);
+				r.draw();
+			}
+		}
+		if (target != null) {
+			target.drawSolarReceiver();
+		}
+		if (!oldTargets.isEmpty()) {
+			for (final Foundation t : oldTargets) {
+				t.drawSolarReceiver();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForFresnelReflectors(final double width, final double length) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				r.setModuleWidth(width);
+				r.setLength(length);
+				r.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();

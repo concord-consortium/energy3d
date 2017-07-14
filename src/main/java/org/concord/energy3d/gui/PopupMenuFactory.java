@@ -10191,24 +10191,24 @@ public class PopupMenuFactory {
 										final Foundation target = (Foundation) p;
 										if (rb1.isSelected()) {
 											final Foundation oldTarget = r.getAbsorber();
-											// final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(r);
+											final ChangeFresnelReflectorAbsorberCommand c = new ChangeFresnelReflectorAbsorberCommand(r);
 											r.setAbsorber(target);
 											r.draw();
 											if (oldTarget != null) {
 												oldTarget.drawSolarReceiver();
 											}
-											// SceneManager.getInstance().getUndoManager().addEdit(c);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
 											selectedScopeIndex = 0;
 										} else if (rb2.isSelected()) {
-											// final Foundation foundation = r.getTopContainer();
-											// final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-											// foundation.setTargetForMirrors(target);
-											// SceneManager.getInstance().getUndoManager().addEdit(c);
+											final Foundation foundation = r.getTopContainer();
+											final ChangeFoundationFresnelReflectorAbsorberCommand c = new ChangeFoundationFresnelReflectorAbsorberCommand(foundation);
+											foundation.setAbsorberForFresnelReflectors(target);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
 											selectedScopeIndex = 1;
 										} else if (rb3.isSelected()) {
-											// final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-											// Scene.getInstance().setTargetForAllMirrors(target);
-											// SceneManager.getInstance().getUndoManager().addEdit(c);
+											final ChangeAbsorberForAllFresnelReflectorsCommand c = new ChangeAbsorberForAllFresnelReflectorsCommand();
+											Scene.getInstance().setAbsorberForAllFresnelReflectors(target);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
 											selectedScopeIndex = 2;
 										}
 										target.drawSolarReceiver();
@@ -10300,21 +10300,21 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 100 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										// final SetPartSizeCommand c = new SetPartSizeCommand(m);
+										final SetPartSizeCommand c = new SetPartSizeCommand(r);
 										r.setModuleWidth(w);
 										r.setLength(l);
 										r.draw();
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
-										// foundation.setSizeForMirrors(w, l);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
+										foundation.setSizeForFresnelReflectors(w, l);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
-										// Scene.getInstance().setSizeForAllMirrors(w, l);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
+										Scene.getInstance().setSizeForAllFresnelReflectors(w, l);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
@@ -10401,14 +10401,14 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									// final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
-									// foundation.setBaseHeightForMirrors(val);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									final ChangeFoundationFresnelReflectorBaseHeightCommand c = new ChangeFoundationFresnelReflectorBaseHeightCommand(foundation);
+									foundation.setBaseHeightForFresnelReflectors(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									// final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
-									// Scene.getInstance().setBaseHeightForAllMirrors(val);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									final ChangeBaseHeightForAllFresnelReflectorsCommand c = new ChangeBaseHeightForAllFresnelReflectorsCommand();
+									Scene.getInstance().setBaseHeightForAllFresnelReflectors(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 2;
 								}
 								updateAfterEdit();
@@ -10529,7 +10529,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final FresnelReflector m = (FresnelReflector) selectedPart;
+					final FresnelReflector r = (FresnelReflector) selectedPart;
 					final String title = "<html>Reflectance (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Reflectance can be affected by pollen and dust.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
@@ -10558,7 +10558,7 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getReflectance() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(r.getReflectance() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -10586,20 +10586,20 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Fresnel reflector reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										// final ChangeMirrorReflectanceCommand c = new ChangeMirrorReflectanceCommand(m);
-										m.setReflectance(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final ChangeFresnelReflectorReflectanceCommand c = new ChangeFresnelReflectorReflectanceCommand(r);
+										r.setReflectance(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final Foundation foundation = m.getTopContainer();
-										// final ChangeFoundationMirrorReflectanceCommand c = new ChangeFoundationMirrorReflectanceCommand(foundation);
-										// foundation.setReflectanceForMirrors(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final Foundation foundation = r.getTopContainer();
+										final ChangeFoundationFresnelReflectorReflectanceCommand c = new ChangeFoundationFresnelReflectorReflectanceCommand(foundation);
+										foundation.setReflectanceForFresnelReflectors(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final ChangeReflectanceForAllMirrorsCommand c = new ChangeReflectanceForAllMirrorsCommand();
-										// Scene.getInstance().setReflectanceForAllMirrors(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final ChangeReflectanceForAllFresnelReflectorsCommand c = new ChangeReflectanceForAllFresnelReflectorsCommand();
+										Scene.getInstance().setReflectanceForAllFresnelReflectors(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();

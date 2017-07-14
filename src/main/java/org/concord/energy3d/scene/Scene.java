@@ -2228,6 +2228,8 @@ public class Scene implements Serializable {
 		}
 	}
 
+	// solar panels
+
 	public List<SolarPanel> getAllSolarPanels() {
 		final List<SolarPanel> list = new ArrayList<SolarPanel>();
 		for (final HousePart p : parts) {
@@ -2353,6 +2355,8 @@ public class Scene implements Serializable {
 			}
 		}
 	}
+
+	// solar panel racks
 
 	public List<Rack> getAllRacks() {
 		final List<Rack> list = new ArrayList<Rack>();
@@ -2520,6 +2524,8 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	// mirrors
+
 	public List<Mirror> getAllMirrors() {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : parts) {
@@ -2603,6 +2609,8 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	// parabolic troughs
+
 	public List<ParabolicTrough> getAllParabolicTroughs() {
 		final List<ParabolicTrough> list = new ArrayList<ParabolicTrough>();
 		for (final HousePart p : parts) {
@@ -2665,13 +2673,13 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForAllParabolicTroughs(final double length, final double width, final double unitLength) {
+	public void setSizeForAllParabolicTroughs(final double length, final double width, final double moduleLength) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicTrough) {
 				final ParabolicTrough t = (ParabolicTrough) p;
 				t.setTroughLength(length);
 				t.setApertureWidth(width);
-				t.setModuleLength(unitLength);
+				t.setModuleLength(moduleLength);
 				t.ensureFullModules(false);
 				t.draw();
 			}
@@ -2701,6 +2709,91 @@ public class Scene implements Serializable {
 		}
 		SceneManager.getInstance().refresh();
 	}
+
+	// Fresnel reflectors
+
+	public List<FresnelReflector> getAllFresnelReflectors() {
+		final List<FresnelReflector> list = new ArrayList<FresnelReflector>();
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				list.add((FresnelReflector) p);
+			}
+		}
+		return list;
+	}
+
+	public void setReflectanceForAllFresnelReflectors(final double reflectance) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForAllFresnelReflectors(final double absorptance) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForAllFresnelReflectors(final double efficiency) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setAbsorberForAllFresnelReflectors(final Foundation target) {
+		final List<Foundation> oldTargets = new ArrayList<Foundation>();
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				final Foundation t = r.getAbsorber();
+				if (t != null && !oldTargets.contains(t)) {
+					oldTargets.add(t);
+				}
+				r.setAbsorber(target);
+				r.draw();
+			}
+		}
+		if (target != null) {
+			target.drawSolarReceiver();
+		}
+		if (!oldTargets.isEmpty()) {
+			for (final Foundation t : oldTargets) {
+				t.drawSolarReceiver();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setBaseHeightForAllFresnelReflectors(final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForAllFresnelReflectors(final double width, final double length) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				r.setLength(length);
+				r.setModuleWidth(width);
+				r.ensureFullModules(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// walls
 
 	public void setThicknessForAllWalls(final double thickness) {
 		for (final HousePart p : parts) {

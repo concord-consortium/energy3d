@@ -20,6 +20,7 @@ import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Solar;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Trackable;
@@ -433,8 +434,11 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
 				} else if (lastEdit instanceof ChangeBaseHeightCommand) {
 					final ChangeBaseHeightCommand c = (ChangeBaseHeightCommand) lastEdit;
-					final HousePart p = c.getPart();
-					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
+					final Solar s = c.getPart();
+					if (s instanceof HousePart) {
+						final HousePart p = (HousePart) s;
+						stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
+					}
 				} else if (lastEdit instanceof SetPartSizeCommand) {
 					final SetPartSizeCommand c = (SetPartSizeCommand) lastEdit;
 					if (c.getPart() instanceof Mirror) {

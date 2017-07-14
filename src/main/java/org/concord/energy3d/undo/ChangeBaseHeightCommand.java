@@ -4,35 +4,22 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.model.ParabolicTrough;
-import org.concord.energy3d.model.Rack;
-import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Solar;
 
 public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
-	private final HousePart part;
+	private final double oldValue;
+	private double newValue;
+	private final Solar part;
 
-	public ChangeBaseHeightCommand(final HousePart part) {
+	public ChangeBaseHeightCommand(final Solar part) {
 		this.part = part;
-		if (part instanceof SolarPanel) {
-			oldValue = ((SolarPanel) part).getBaseHeight();
-		} else if (part instanceof Rack) {
-			oldValue = ((Rack) part).getBaseHeight();
-		} else if (part instanceof Mirror) {
-			oldValue = ((Mirror) part).getBaseHeight();
-		} else if (part instanceof ParabolicTrough) {
-			oldValue = ((ParabolicTrough) part).getBaseHeight();
-		} else if (part instanceof FresnelReflector) {
-			oldValue = ((FresnelReflector) part).getBaseHeight();
-		}
+		oldValue = part.getBaseHeight();
 	}
 
-	public HousePart getPart() {
+	public Solar getPart() {
 		return part;
 	}
 
@@ -41,57 +28,27 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 	}
 
 	public double getNewValue() {
-		if (part instanceof SolarPanel) {
-			newValue = ((SolarPanel) part).getBaseHeight();
-		} else if (part instanceof Rack) {
-			newValue = ((Rack) part).getBaseHeight();
-		} else if (part instanceof Mirror) {
-			newValue = ((Mirror) part).getBaseHeight();
-		} else if (part instanceof ParabolicTrough) {
-			newValue = ((ParabolicTrough) part).getBaseHeight();
-		} else if (part instanceof FresnelReflector) {
-			newValue = ((FresnelReflector) part).getBaseHeight();
-		}
+		newValue = part.getBaseHeight();
 		return newValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		if (part instanceof SolarPanel) {
-			newValue = ((SolarPanel) part).getBaseHeight();
-			((SolarPanel) part).setBaseHeight(oldValue);
-		} else if (part instanceof Rack) {
-			newValue = ((Rack) part).getBaseHeight();
-			((Rack) part).setBaseHeight(oldValue);
-		} else if (part instanceof Mirror) {
-			newValue = ((Mirror) part).getBaseHeight();
-			((Mirror) part).setBaseHeight(oldValue);
-		} else if (part instanceof ParabolicTrough) {
-			newValue = ((ParabolicTrough) part).getBaseHeight();
-			((ParabolicTrough) part).setBaseHeight(oldValue);
-		} else if (part instanceof FresnelReflector) {
-			newValue = ((FresnelReflector) part).getBaseHeight();
-			((FresnelReflector) part).setBaseHeight(oldValue);
+		newValue = part.getBaseHeight();
+		part.setBaseHeight(oldValue);
+		if (part instanceof HousePart) {
+			((HousePart) part).draw();
 		}
-		part.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		if (part instanceof SolarPanel) {
-			((SolarPanel) part).setBaseHeight(newValue);
-		} else if (part instanceof Rack) {
-			((Rack) part).setBaseHeight(newValue);
-		} else if (part instanceof Mirror) {
-			((Mirror) part).setBaseHeight(newValue);
-		} else if (part instanceof ParabolicTrough) {
-			((ParabolicTrough) part).setBaseHeight(newValue);
-		} else if (part instanceof FresnelReflector) {
-			((FresnelReflector) part).setBaseHeight(newValue);
+		part.setBaseHeight(newValue);
+		if (part instanceof HousePart) {
+			((HousePart) part).draw();
 		}
-		part.draw();
 	}
 
 	@Override

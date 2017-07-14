@@ -269,4 +269,14 @@ public class Sensor extends HousePart implements Solar {
 		return heatFluxOff;
 	}
 
+	// Not implemented
+	@Override
+	public void setBaseHeight(final double baseHeight) {
+	}
+
+	// Not implemented
+	@Override
+	public double getBaseHeight() {
+		return 0;
+	}
 }

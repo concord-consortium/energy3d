@@ -8,4 +8,8 @@ package org.concord.energy3d.model;
  */
 public interface Solar {
 
+	public void setBaseHeight(final double baseHeight);
+
+	public double getBaseHeight();
+
 }

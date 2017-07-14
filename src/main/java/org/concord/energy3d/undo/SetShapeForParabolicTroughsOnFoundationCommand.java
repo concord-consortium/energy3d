@@ -19,8 +19,8 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 	private double[] newWidths;
 	private final double[] oldSemilatusRecta;
 	private double[] newSemilatusRecta;
-	private final double[] oldUnitLengths;
-	private double[] newUnitLengths;
+	private final double[] oldModuleLengths;
+	private double[] newModuleLengths;
 	private final Foundation foundation;
 	private final List<ParabolicTrough> troughs;
 
@@ -31,13 +31,13 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 		oldLengths = new double[n];
 		oldWidths = new double[n];
 		oldSemilatusRecta = new double[n];
-		oldUnitLengths = new double[n];
+		oldModuleLengths = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
 			oldLengths[i] = t.getTroughLength();
 			oldWidths[i] = t.getApertureWidth();
 			oldSemilatusRecta[i] = t.getSemilatusRectum();
-			oldUnitLengths[i] = t.getModuleLength();
+			oldModuleLengths[i] = t.getModuleLength();
 		}
 	}
 
@@ -52,17 +52,17 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 		newLengths = new double[n];
 		newWidths = new double[n];
 		newSemilatusRecta = new double[n];
-		newUnitLengths = new double[n];
+		newModuleLengths = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
 			newLengths[i] = t.getTroughLength();
 			newWidths[i] = t.getApertureWidth();
 			newSemilatusRecta[i] = t.getSemilatusRectum();
-			newUnitLengths[i] = t.getModuleLength();
+			newModuleLengths[i] = t.getModuleLength();
 			t.setTroughLength(oldLengths[i]);
 			t.setApertureWidth(oldWidths[i]);
 			t.setSemilatusRectum(oldSemilatusRecta[i]);
-			t.setModuleLength(oldUnitLengths[i]);
+			t.setModuleLength(oldModuleLengths[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -77,7 +77,7 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends AbstractUndo
 			t.setTroughLength(newLengths[i]);
 			t.setApertureWidth(newWidths[i]);
 			t.setSemilatusRectum(newSemilatusRecta[i]);
-			t.setModuleLength(newUnitLengths[i]);
+			t.setModuleLength(newModuleLengths[i]);
 			t.draw();
 		}
 		SceneManager.getInstance().refresh();

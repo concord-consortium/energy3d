@@ -59,7 +59,6 @@ public class FresnelReflector extends HousePart implements Solar {
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
 	private double opticalEfficiency = 0.7;
-	private double thermalEfficiency = 0.6;
 	private double moduleLength = 3;
 	private double moduleWidth = 2;
 	private double length = 2 * moduleLength;
@@ -102,9 +101,6 @@ public class FresnelReflector extends HousePart implements Solar {
 		}
 		if (Util.isZero(opticalEfficiency)) {
 			opticalEfficiency = 0.7;
-		}
-		if (Util.isZero(thermalEfficiency)) {
-			thermalEfficiency = 0.6;
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
@@ -547,7 +543,7 @@ public class FresnelReflector extends HousePart implements Solar {
 	}
 
 	public double getSystemEfficiency() {
-		double e = reflectance * absorptance * opticalEfficiency * thermalEfficiency;
+		double e = reflectance * absorptance * opticalEfficiency;
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
@@ -563,16 +559,6 @@ public class FresnelReflector extends HousePart implements Solar {
 	/** a number between 0 and 1 */
 	public double getOpticalEfficiency() {
 		return opticalEfficiency;
-	}
-
-	/** a number between 0 and 1 */
-	public void setThermalEfficiency(final double thermalEfficiency) {
-		this.thermalEfficiency = thermalEfficiency;
-	}
-
-	/** a number between 0 and 1 */
-	public double getThermalEfficiency() {
-		return thermalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
@@ -595,10 +581,12 @@ public class FresnelReflector extends HousePart implements Solar {
 		return absorptance;
 	}
 
+	@Override
 	public void setBaseHeight(final double baseHeight) {
 		this.baseHeight = baseHeight;
 	}
 
+	@Override
 	public double getBaseHeight() {
 		return baseHeight;
 	}
