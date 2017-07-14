@@ -467,6 +467,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						} else {
 							t.draw();
 						}
+					} else if (part instanceof FresnelReflector) {
+						final FresnelReflector f = (FresnelReflector) part;
+						if (night) {
+							f.drawLightBeams(); // call this so that the light beams can be set invisible
+						} else {
+							f.draw();
+						}
 					} else if (part instanceof SolarPanel) {
 						final SolarPanel sp = (SolarPanel) part;
 						if (!night && sp.getTracker() != Trackable.NO_TRACKER) {
@@ -1106,6 +1113,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final ParabolicTrough t = (ParabolicTrough) selectedPart;
 			t.move(v, selectedPart.getGridSize());
 			t.draw();
+		} else if (selectedPart instanceof FresnelReflector) {
+			final FresnelReflector f = (FresnelReflector) selectedPart;
+			f.move(v, selectedPart.getGridSize());
+			f.draw();
 		} else if (selectedPart instanceof Tree) {
 			final Tree t = (Tree) selectedPart;
 			t.move(v, selectedPart.getGridSize());
@@ -1653,7 +1664,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
 						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 					} else {
-						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof ParabolicTrough || hoveredPart instanceof FresnelReflector || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
 							canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 						}
 					}

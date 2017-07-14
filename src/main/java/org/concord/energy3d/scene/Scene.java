@@ -28,6 +28,7 @@ import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -648,7 +649,7 @@ public class Scene implements Serializable {
 			if (!p.isValid()) { // remove invalid parts
 				toBeRemoved.add(p);
 			} else if (p.getContainer() == null) { // remove orphan parts without a container
-				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Rack || p instanceof Mirror || p instanceof Sensor || p instanceof Floor) {
+				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Rack || p instanceof ParabolicTrough || p instanceof FresnelReflector || p instanceof Mirror || p instanceof Sensor || p instanceof Floor) {
 					toBeRemoved.add(p);
 				}
 			} else if (!parts.contains(p.getContainer())) { // remove parts whose container doesn't exist in the scene
@@ -2998,6 +2999,8 @@ public class Scene implements Serializable {
 						((Mirror) p).updateLabel();
 					} else if (p instanceof ParabolicTrough) {
 						((ParabolicTrough) p).updateLabel();
+					} else if (p instanceof FresnelReflector) {
+						((FresnelReflector) p).updateLabel();
 					} else if (p instanceof Foundation) {
 						((Foundation) p).updateLabel();
 					}
@@ -3026,6 +3029,13 @@ public class Scene implements Serializable {
 							trough.drawLightBeams(); // call this so that the light beams can be set invisible
 						} else {
 							trough.draw();
+						}
+					} else if (part instanceof FresnelReflector) {
+						final FresnelReflector fresnel = (FresnelReflector) part;
+						if (night) {
+							fresnel.drawLightBeams(); // call this so that the light beams can be set invisible
+						} else {
+							fresnel.draw();
 						}
 					} else if (part instanceof SolarPanel) {
 						final SolarPanel panel = (SolarPanel) part;

@@ -107,14 +107,15 @@ public class FresnelReflector extends HousePart implements Solar {
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
-		mesh = new Mesh("Reflector Face");
+		mesh = new Mesh("Fresnel Reflector Face");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
+		root.attachChild(mesh);
 
-		reflector = new Box("Reflector Box");
+		reflector = new Box("Fresnel Reflector Box");
 		reflector.setModelBound(new OrientedBoundingBox());
 		final OffsetState offset = new OffsetState();
 		offset.setFactor(1);
@@ -185,16 +186,16 @@ public class FresnelReflector extends HousePart implements Solar {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rl = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setLength(rl);
+					setModuleWidth(rw);
 					if (outOfBound()) {
 						if (oldReflectorCenter != null) {
 							points.get(0).set(oldReflectorCenter);
 						}
-						setLength(oldLength);
+						setModuleWidth(oldLength);
 					} else {
 						oldReflectorCenter = points.get(0).clone();
 						oldLength = length;
@@ -204,16 +205,16 @@ public class FresnelReflector extends HousePart implements Solar {
 				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
 				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
 				if (p != null) {
-					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
+					final double rl = p.distance(p1) * Scene.getInstance().getAnnotationScale();
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setModuleeWidth(rw);
+					setLength(rl);
 					if (outOfBound()) {
 						if (oldReflectorCenter != null) {
 							points.get(0).set(oldReflectorCenter);
 						}
-						setModuleeWidth(oldModuleWidth);
+						setLength(oldModuleWidth);
 					} else {
 						oldReflectorCenter = points.get(0).clone();
 						oldModuleWidth = moduleWidth;
@@ -264,7 +265,7 @@ public class FresnelReflector extends HousePart implements Solar {
 
 		final Vector3 center = getAbsPoint(0);
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		reflector.setData(new Vector3(0, 0, 0), 0.5 * length / annotationScale, 0.5 * moduleWidth / annotationScale, 0.15);
+		reflector.setData(new Vector3(0, 0, 0), 0.5 * moduleWidth / annotationScale, 0.5 * length / annotationScale, 0.15);
 		reflector.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = reflector.getMeshData().getVertexBuffer();
@@ -306,9 +307,9 @@ public class FresnelReflector extends HousePart implements Solar {
 		modulesRoot.detachAllChildren();
 		final int nModules = Math.max(1, getNumberOfModules());
 		if (nModules > 1) {
-			final Vector3 p1 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (1, 0)
-			final Vector3 p2 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
-			final Vector3 pd = p2.subtract(p1, null).normalizeLocal();
+			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
+			final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
+			final Vector3 pd = p1.subtract(p0, null).normalizeLocal();
 			for (double u = moduleLength; u < length; u += moduleLength) {
 				final Vector3 p = pd.multiply((u - 0.5 * length) / annotationScale, null);
 				addPole(p.addLocal(center), baseHeight, baseZ);
@@ -321,11 +322,14 @@ public class FresnelReflector extends HousePart implements Solar {
 		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
-		mesh.setTranslation(getAbsPoint(0));
-		outlines.setRotation(rotation);
+		mesh.setTranslation(center);
+		reflector.setRotation(mesh.getRotation());
+		reflector.setTranslation(mesh.getTranslation());
+		outlines.setRotation(mesh.getRotation());
 		outlines.setTranslation(mesh.getTranslation());
 
 		mesh.updateModelBound();
+		reflector.updateModelBound();
 		outlines.updateModelBound();
 
 		if (beamsVisible) {
@@ -335,6 +339,7 @@ public class FresnelReflector extends HousePart implements Solar {
 		updateLabel();
 
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
+		CollisionTreeManager.INSTANCE.removeCollisionTree(reflector);
 		root.updateGeometricState(0);
 
 	}
@@ -619,10 +624,10 @@ public class FresnelReflector extends HousePart implements Solar {
 		}
 	}
 
-	public void set(final Vector3 center, final double width, final double height) {
+	public void set(final Vector3 center, final double length, final double width) {
 		points.get(0).set(toRelative(center));
-		setLength(width);
-		setModuleeWidth(height);
+		setLength(length);
+		setModuleWidth(width);
 		draw();
 	}
 
@@ -642,7 +647,7 @@ public class FresnelReflector extends HousePart implements Solar {
 		return length;
 	}
 
-	public void setModuleeWidth(final double moduleWidth) {
+	public void setModuleWidth(final double moduleWidth) {
 		this.moduleWidth = moduleWidth;
 	}
 
