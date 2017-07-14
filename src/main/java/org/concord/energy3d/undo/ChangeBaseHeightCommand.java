@@ -4,6 +4,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicTrough;
@@ -26,6 +27,8 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 			oldValue = ((Mirror) part).getBaseHeight();
 		} else if (part instanceof ParabolicTrough) {
 			oldValue = ((ParabolicTrough) part).getBaseHeight();
+		} else if (part instanceof FresnelReflector) {
+			oldValue = ((FresnelReflector) part).getBaseHeight();
 		}
 	}
 
@@ -46,6 +49,8 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 			newValue = ((Mirror) part).getBaseHeight();
 		} else if (part instanceof ParabolicTrough) {
 			newValue = ((ParabolicTrough) part).getBaseHeight();
+		} else if (part instanceof FresnelReflector) {
+			newValue = ((FresnelReflector) part).getBaseHeight();
 		}
 		return newValue;
 	}
@@ -65,6 +70,9 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 		} else if (part instanceof ParabolicTrough) {
 			newValue = ((ParabolicTrough) part).getBaseHeight();
 			((ParabolicTrough) part).setBaseHeight(oldValue);
+		} else if (part instanceof FresnelReflector) {
+			newValue = ((FresnelReflector) part).getBaseHeight();
+			((FresnelReflector) part).setBaseHeight(oldValue);
 		}
 		part.draw();
 	}
@@ -80,6 +88,8 @@ public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 			((Mirror) part).setBaseHeight(newValue);
 		} else if (part instanceof ParabolicTrough) {
 			((ParabolicTrough) part).setBaseHeight(newValue);
+		} else if (part instanceof FresnelReflector) {
+			((FresnelReflector) part).setBaseHeight(newValue);
 		}
 		part.draw();
 	}

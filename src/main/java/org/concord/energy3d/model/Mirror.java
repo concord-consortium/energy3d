@@ -252,10 +252,7 @@ public class Mirror extends HousePart implements Solar {
 			return;
 		}
 		final Vector3 o = getAbsPoint(0);
-		double length = 100;
-		if (heliostatTarget != null) {
-			length = heliostatTarget.getSolarReceiverCenter().distance(o);
-		}
+		final double length = heliostatTarget.getSolarReceiverCenter().distance(o);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();

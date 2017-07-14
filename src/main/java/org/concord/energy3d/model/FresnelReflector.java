@@ -55,6 +55,7 @@ public class FresnelReflector extends HousePart implements Solar {
 	private transient double copyLayoutGap = 0.2;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
+	private Foundation absorber;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
 	private double opticalEfficiency = 0.7;
@@ -319,8 +320,16 @@ public class FresnelReflector extends HousePart implements Solar {
 		}
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
+		if (absorber != null) {
+			final Vector3 o = absorber.getSolarReceiverCenter();
+			o.setY(center.getY());
+			final Vector3 p = center.clone().subtractLocal(o).negateLocal().normalizeLocal();
+			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
+		}
 		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
+
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
 		reflector.setRotation(mesh.getRotation());
@@ -345,12 +354,14 @@ public class FresnelReflector extends HousePart implements Solar {
 	}
 
 	public void drawLightBeams() {
-		if (Heliodon.getInstance().isNightTime() || !Scene.getInstance().areLightBeamsVisible()) {
+		if (Heliodon.getInstance().isNightTime() || absorber == null || !beamsVisible) {
 			lightBeams.setVisible(false);
 			return;
 		}
 		final Vector3 o = getAbsPoint(0);
-		final double length = 100;
+		final Vector3 c = absorber.getSolarReceiverCenter();
+		c.setY(o.getY());
+		final double length = c.distance(o);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
@@ -711,7 +722,7 @@ public class FresnelReflector extends HousePart implements Solar {
 		return mesh.getWorldTransform().applyForward(v);
 	}
 
-	public void setBeamsVisible(final boolean beamsVisible) {
+	public void setBeamVisible(final boolean beamsVisible) {
 		this.beamsVisible = beamsVisible;
 	}
 
@@ -755,6 +766,14 @@ public class FresnelReflector extends HousePart implements Solar {
 
 	public int getNumberOfModules() {
 		return (int) Math.round(length / moduleLength);
+	}
+
+	public void setAbsorber(final Foundation absorber) {
+		this.absorber = absorber;
+	}
+
+	public Foundation getAbsorber() {
+		return absorber;
 	}
 
 	@Override
