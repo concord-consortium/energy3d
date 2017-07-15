@@ -978,9 +978,11 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 			double xmax = -Double.MAX_VALUE;
 			double ymin = Double.MAX_VALUE;
 			double ymax = -Double.MAX_VALUE;
+			double lmax = -1;
 			int count = 0;
 			for (final HousePart p : children) {
 				if (p instanceof Wall) {
+					final Wall wall = (Wall) p;
 					final Vector3 c = p.getAbsCenter();
 					rx += c.getX();
 					ry += c.getY();
@@ -995,6 +997,10 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 						ymax = c.getY();
 					}
 					count++;
+					final double wallLength = wall.getAbsPoint(0).distance(wall.getAbsPoint(2));
+					if (wallLength > lmax) {
+						lmax = wallLength;
+					}
 				}
 			}
 			if (countMirrors > 0) {
@@ -1015,8 +1021,11 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 			} else if (countFresnelReflectors > 0) {
 				bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.1f * countFresnelReflectors, 0.8f));
 				solarReceiver.setRadius(1);
-				solarReceiver.setHeight(Math.max(xmax - xmin, ymax - ymin));
-				solarReceiver.setRotation(new Matrix3().applyRotationX(Math.PI * 0.5));
+				solarReceiver.setHeight(lmax);
+				final double az = getAzimuth();
+				final Matrix3 rotateAroundZ = new Matrix3().applyRotationZ(-Math.toRadians(az));
+				final Matrix3 rotateAroundX = new Matrix3().applyRotationX(Math.PI * 0.5);
+				solarReceiver.setRotation(rotateAroundZ.multiplyLocal(rotateAroundX));
 				final Vector3 o = new Vector3((xmin + xmax) * 0.5, (ymin + ymax) * 0.5, getSolarReceiverHeight(solarReceiver.getRadius() * 1.2));
 				solarReceiver.setTranslation(o);
 			}
