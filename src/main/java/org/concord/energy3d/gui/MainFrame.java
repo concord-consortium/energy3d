@@ -72,6 +72,7 @@ import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicTrough;
@@ -96,6 +97,8 @@ import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
+import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
@@ -181,6 +184,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyMirrorAnalysisMenuItem;
 	private JMenuItem annualParabolicTroughAnalysisMenuItem;
 	private JMenuItem dailyParabolicTroughAnalysisMenuItem;
+	private JMenuItem annualFresnelReflectorAnalysisMenuItem;
+	private JMenuItem dailyFresnelReflectorAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
 	private JMenuItem orientationalEnergyAnalysisMenuItem;
@@ -1233,6 +1238,9 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getAnnualParabolicTroughAnalysisMenuItem());
 			analysisMenu.add(getDailyParabolicTroughAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getAnnualFresnelReflectorAnalysisMenuItem());
+			analysisMenu.add(getDailyFresnelReflectorAnalysisMenuItem());
+			analysisMenu.addSeparator();
 			analysisMenu.add(getGroupAnnualAnalysisMenuItem());
 			analysisMenu.add(getGroupDailyAnalysisMenuItem());
 			analysisMenu.addSeparator();
@@ -2202,6 +2210,89 @@ public class MainFrame extends JFrame {
 		return annualParabolicTroughAnalysisMenuItem;
 	}
 
+	private JMenuItem getDailyFresnelReflectorAnalysisMenuItem() {
+		if (dailyFresnelReflectorAnalysisMenuItem == null) {
+			dailyFresnelReflectorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Fresnel Reflectors...");
+			dailyFresnelReflectorAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().countParts(FresnelReflector.class);
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(FresnelReflector.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					final FresnelReflectorDailyAnalysis a = new FresnelReflectorDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						a.updateGraph();
+					}
+					a.show();
+				}
+			});
+		}
+		return dailyFresnelReflectorAnalysisMenuItem;
+	}
+
+	private JMenuItem getAnnualFresnelReflectorAnalysisMenuItem() {
+		if (annualFresnelReflectorAnalysisMenuItem == null) {
+			annualFresnelReflectorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Fresnel Reflectors...");
+			annualFresnelReflectorAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().countParts(FresnelReflector.class);
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final FresnelReflectorAnnualAnalysis a = new FresnelReflectorAnnualAnalysis();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(FresnelReflector.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					a.show();
+				}
+			});
+		}
+		return annualFresnelReflectorAnalysisMenuItem;
+	}
+
 	private JMenuItem getGroupDailyAnalysisMenuItem() {
 		if (groupDailyAnalysisMenuItem == null) {
 			groupDailyAnalysisMenuItem = new JMenuItem("Daily Analysis for Group...");
@@ -2275,6 +2366,8 @@ public class MainFrame extends JFrame {
 			c = Mirror.class;
 		} else if ("Parabolic Trough".equals(currentGroupType)) {
 			c = ParabolicTrough.class;
+		} else if ("Fresnel Reflector".equals(currentGroupType)) {
+			c = FresnelReflector.class;
 		} else if ("Foundation".equals(currentGroupType) || currentGroupType.startsWith("Foundation")) {
 			c = Foundation.class;
 		}
@@ -2285,7 +2378,7 @@ public class MainFrame extends JFrame {
 		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Parabolic Trough", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Parabolic Trough", "Fresnel Reflector", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
 		if (currentGroupType != null) {
 			typeComboBox.setSelectedItem(currentGroupType);
 		}

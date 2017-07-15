@@ -23,6 +23,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.simulation.Graph;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
@@ -82,6 +83,10 @@ public class CspStationDailyEnergyGraph extends JPanel {
 							final ParabolicTroughDailyAnalysis analysis = new ParabolicTroughDailyAnalysis();
 							analysis.updateGraph();
 							analysis.show();
+						} else if (f.countParts(FresnelReflector.class) > 0) {
+							final FresnelReflectorDailyAnalysis analysis = new FresnelReflectorDailyAnalysis();
+							analysis.updateGraph();
+							analysis.show();
 						} else if (f.countParts(Mirror.class) > 0) {
 							final MirrorDailyAnalysis analysis = new MirrorDailyAnalysis();
 							analysis.updateGraph();
@@ -128,7 +133,7 @@ public class CspStationDailyEnergyGraph extends JPanel {
 		}
 		graph.clearData();
 		final List<ParabolicTrough> troughs = base.getParabolicTroughs();
-		if (!troughs.isEmpty()) { // favor parabolic troughs if there are also mirrors
+		if (!troughs.isEmpty()) { // favor parabolic troughs if there are also mirrors or Fresnel reflectors
 			for (int i = 0; i < 24; i++) {
 				SolarRadiation.getInstance().computeEnergyAtHour(i);
 				double output = 0;

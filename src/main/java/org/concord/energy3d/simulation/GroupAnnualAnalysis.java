@@ -35,6 +35,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicTrough;
@@ -190,6 +191,14 @@ public class GroupAnnualAnalysis extends Analysis {
 			} else if (p instanceof ParabolicTrough) {
 				final ParabolicTrough trough = (ParabolicTrough) p;
 				final double solar = trough.getSolarPotentialToday() * trough.getSystemEfficiency();
+				if (customText != null) {
+					graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+				} else {
+					graph.addData("Solar " + p.getId(), solar);
+				}
+			} else if (p instanceof FresnelReflector) {
+				final FresnelReflector reflector = (FresnelReflector) p;
+				final double solar = reflector.getSolarPotentialToday() * reflector.getSystemEfficiency();
 				if (customText != null) {
 					graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
 				} else {
@@ -500,6 +509,9 @@ public class GroupAnnualAnalysis extends Analysis {
 			} else if (p instanceof ParabolicTrough) {
 				names.add("Solar " + p.getId());
 				type = "Parabolic Trough";
+			} else if (p instanceof FresnelReflector) {
+				names.add("Solar " + p.getId());
+				type = "Fresnel Reflector";
 			} else if (p instanceof Wall) {
 				names.add("Heat Gain " + p.getId());
 				type = "Wall";

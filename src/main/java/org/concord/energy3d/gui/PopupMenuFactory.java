@@ -80,6 +80,8 @@ import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
+import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
@@ -4114,6 +4116,43 @@ public class PopupMenuFactory {
 							return;
 						}
 						new ParabolicTroughAnnualAnalysis().show();
+					}
+				}
+			});
+			analysisMenu.add(mi);
+
+			mi = new JMenuItem("Daily Fresnel Reflector Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
+						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
+						if (f.countParts(FresnelReflector.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no Fresnel reflector on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						final FresnelReflectorDailyAnalysis a = new FresnelReflectorDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
+					}
+				}
+			});
+			analysisMenu.add(mi);
+
+			mi = new JMenuItem("Annual Fresnel Reflector Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						if (f.countParts(FresnelReflector.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no Fresnel reflector on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						new FresnelReflectorAnnualAnalysis().show();
 					}
 				}
 			});
@@ -10733,7 +10772,7 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof FresnelReflector) {
-						// new FresnelReflectorDailyAnalysis().show();
+						new FresnelReflectorDailyAnalysis().show();
 					}
 				}
 			});
@@ -10744,7 +10783,7 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof FresnelReflector) {
-						// new FresnelReflectorAnnualAnalysis().show();
+						new FresnelReflectorAnnualAnalysis().show();
 					}
 				}
 			});
