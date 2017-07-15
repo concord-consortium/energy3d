@@ -104,6 +104,10 @@ public class FresnelReflector extends HousePart implements Solar {
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
+		if (absorber != null) { // FIXME: Somehow the absorber foundation, when copied, doesn't point to the right object. This is not a prefect solution, but it fixes the problem.
+			absorber = (Foundation) Scene.getInstance().getPart(absorber.getId());
+		}
+
 		mesh = new Mesh("Fresnel Reflector Face");
 		mesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
 		mesh.getMeshData().setTextureBuffer(BufferUtils.createVector2Buffer(6), 0);
