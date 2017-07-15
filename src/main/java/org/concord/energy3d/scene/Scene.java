@@ -32,6 +32,7 @@ import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Labelable;
 import org.concord.energy3d.model.MeshLocator;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.NodeState;
@@ -2793,6 +2794,18 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setSectionsForAllFresnelReflectors(final int nLength, final int nWidth) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				r.setNSectionLength(nLength);
+				r.setNSectionWidth(nWidth);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	// walls
 
 	public void setThicknessForAllWalls(final double thickness) {
@@ -3084,18 +3097,8 @@ public class Scene implements Serializable {
 			@Override
 			public Object call() throws Exception {
 				for (final HousePart p : parts) { // update the parts that support floating labels
-					if (p instanceof SolarPanel) {
-						((SolarPanel) p).updateLabel();
-					} else if (p instanceof Rack) {
-						((Rack) p).updateLabel();
-					} else if (p instanceof Mirror) {
-						((Mirror) p).updateLabel();
-					} else if (p instanceof ParabolicTrough) {
-						((ParabolicTrough) p).updateLabel();
-					} else if (p instanceof FresnelReflector) {
-						((FresnelReflector) p).updateLabel();
-					} else if (p instanceof Foundation) {
-						((Foundation) p).updateLabel();
+					if (p instanceof Labelable) {
+						((Labelable) p).updateLabel();
 					}
 				}
 				return null;

@@ -69,7 +69,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.URLResourceSource;
 
-public class Foundation extends HousePart implements Thermalizable {
+public class Foundation extends HousePart implements Thermalizable, Labelable {
 	private static final long serialVersionUID = 1L;
 	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
@@ -122,6 +122,8 @@ public class Foundation extends HousePart implements Thermalizable {
 	private boolean labelNumberOfMirrors;
 	private boolean labelPowerTowerOutput;
 	private boolean labelPowerTowerHeight;
+	private boolean labelNumberOfFresnelReflectors;
+	private boolean labelFresnelReflectorOutput;
 	private boolean labelPvEnergy;
 	private boolean labelNumberOfSolarPanels;
 	private boolean labelSolarPotential;
@@ -831,6 +833,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		}
 	}
 
+	@Override
 	public void updateLabel() {
 		String text = "";
 		if (labelCustom && labelCustomText != null) {
@@ -843,12 +846,20 @@ public class Foundation extends HousePart implements Thermalizable {
 			text += (text.equals("") ? "" : "\n") + EnergyPanel.NO_DECIMAL.format(getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale()) + " m";
 		}
 		if (labelPowerTowerOutput) {
-			final double output = getSolarReceiverOutputToday();
+			final double output = getPowerTowerOutputToday();
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(output) ? "Output" : EnergyPanel.NO_DECIMAL.format(output) + " kWh");
 		}
 		if (labelNumberOfMirrors) {
 			final int n = getNumberOfTargetingMirrors();
 			text += n == 0 ? "" : "\n" + n + " Mirrors";
+		}
+		if (labelNumberOfFresnelReflectors) {
+			final int n = getNumberOfTargetingFresnelReflectors();
+			text += n == 0 ? "" : "\n" + n + " Fresnel Reflectors";
+		}
+		if (labelFresnelReflectorOutput) {
+			final double output = getFresnelAbsorberOutputToday();
+			text += (text.equals("") ? "" : "\n") + (Util.isZero(output) ? "Output" : EnergyPanel.NO_DECIMAL.format(output) + " kWh");
 		}
 		if (labelBuildingEnergy) {
 			final String s = totalEnergyToday > 100 ? EnergyPanel.NO_DECIMAL.format(totalEnergyToday) : EnergyPanel.ONE_DECIMAL.format(totalEnergyToday);
@@ -890,13 +901,39 @@ public class Foundation extends HousePart implements Thermalizable {
 		return count;
 	}
 
-	private double getSolarReceiverOutputToday() {
+	private double getPowerTowerOutputToday() {
 		double output = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
 				if (m.getHeliostatTarget() == this) {
 					output += m.getOutputToday();
+				}
+			}
+		}
+		return output;
+	}
+
+	private int getNumberOfTargetingFresnelReflectors() {
+		int count = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				if (r.getAbsorber() == this) {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
+
+	private double getFresnelAbsorberOutputToday() {
+		double output = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				if (r.getAbsorber() == this) {
+					output += r.getOutputToday();
 				}
 			}
 		}
@@ -916,7 +953,16 @@ public class Foundation extends HousePart implements Thermalizable {
 				}
 			}
 		}
-		solarReceiver.setVisible(countMirrors > 0);
+		int countFresnelReflectors = 0;
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				if (r.getAbsorber() == this) {
+					countFresnelReflectors++;
+				}
+			}
+		}
+		solarReceiver.setVisible(countMirrors > 0 || countFresnelReflectors > 0);
 		if (solarReceiver.isVisible()) {
 			if (bloomRenderPass == null) {
 				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
@@ -926,7 +972,6 @@ public class Foundation extends HousePart implements Thermalizable {
 			if (!bloomRenderPass.contains(solarReceiver)) {
 				bloomRenderPass.add(solarReceiver);
 			}
-			bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countMirrors, 0.8f));
 			double rx = 0;
 			double ry = 0;
 			double xmin = Double.MAX_VALUE;
@@ -952,19 +997,29 @@ public class Foundation extends HousePart implements Thermalizable {
 					count++;
 				}
 			}
-			solarReceiver.setHeight(getSolarReceiverHeight(0.1) * 0.15);
-			Vector3 o;
-			if (count == 0) {
-				o = getAbsCenter();
-				o.setZ(getSolarReceiverHeight(0.1) - solarReceiver.getHeight() * 0.5);
-				solarReceiver.setRadius(10);
-			} else {
-				o = new Vector3(rx / count, ry / count, getSolarReceiverHeight(0.1) - solarReceiver.getHeight() * 0.5);
-				final double r1 = Math.max((xmax - xmin), (ymax - ymin)) / 2;
-				final double r2 = Math.max(r1 * 0.4, 4);
-				solarReceiver.setRadius(r1 + r2);
+			if (countMirrors > 0) {
+				bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countMirrors, 0.8f));
+				solarReceiver.setHeight(getSolarReceiverHeight(0.1) * 0.15);
+				Vector3 o;
+				if (count == 0) {
+					o = getAbsCenter();
+					o.setZ(getSolarReceiverHeight(0.1) - solarReceiver.getHeight() * 0.5);
+					solarReceiver.setRadius(10);
+				} else {
+					o = new Vector3(rx / count, ry / count, getSolarReceiverHeight(0.1) - solarReceiver.getHeight() * 0.5);
+					final double r1 = Math.max((xmax - xmin), (ymax - ymin)) / 2;
+					final double r2 = Math.max(r1 * 0.4, 4);
+					solarReceiver.setRadius(r1 + r2);
+				}
+				solarReceiver.setTranslation(o);
+			} else if (countFresnelReflectors > 0) {
+				bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.1f * countFresnelReflectors, 0.8f));
+				solarReceiver.setRadius(1);
+				solarReceiver.setHeight(Math.max(xmax - xmin, ymax - ymin));
+				solarReceiver.setRotation(new Matrix3().applyRotationX(Math.PI * 0.5));
+				final Vector3 o = new Vector3((xmin + xmax) * 0.5, (ymin + ymax) * 0.5, getSolarReceiverHeight(solarReceiver.getRadius() * 1.2));
+				solarReceiver.setTranslation(o);
 			}
-			solarReceiver.setTranslation(o);
 		}
 	}
 
@@ -1414,12 +1469,17 @@ public class Foundation extends HousePart implements Thermalizable {
 			movePoints.add(p.clone());
 		}
 		move(v, movePoints);
-		if (solarReceiver.isVisible()) { // when the foundation with a solar receiver moves, update the mirrors that link with it
+		if (solarReceiver.isVisible()) { // when the foundation with a solar receiver moves, update the reflectors that link with it
 			for (final HousePart x : Scene.getInstance().getParts()) {
 				if (x instanceof Mirror) {
 					final Mirror m = (Mirror) x;
 					if (m.getHeliostatTarget() == this) {
 						m.draw();
+					}
+				} else if (x instanceof FresnelReflector) {
+					final FresnelReflector r = (FresnelReflector) x;
+					if (r.getAbsorber() == this) {
+						r.draw();
 					}
 				}
 			}
@@ -2367,7 +2427,7 @@ public class Foundation extends HousePart implements Thermalizable {
 				if (p instanceof SolarPanel || p instanceof Rack) {
 					return TYPE_PV_STATION;
 				}
-				if (p instanceof Mirror || p instanceof ParabolicTrough) {
+				if (p instanceof Mirror || p instanceof ParabolicTrough || p instanceof FresnelReflector) {
 					return TYPE_CSP_STATION;
 				}
 			}
@@ -2906,6 +2966,19 @@ public class Foundation extends HousePart implements Thermalizable {
 				final FresnelReflector r = (FresnelReflector) p;
 				r.setModuleWidth(width);
 				r.setLength(length);
+				r.ensureFullModules(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSectionsForFresnelReflectors(final int nLength, final int nWidth) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				r.setNSectionLength(nLength);
+				r.setNSectionWidth(nWidth);
 				r.draw();
 			}
 		}
@@ -3376,6 +3449,7 @@ public class Foundation extends HousePart implements Thermalizable {
 		labelSolarPotential = false;
 		labelBuildingEnergy = false;
 		labelNumberOfMirrors = false;
+		labelNumberOfFresnelReflectors = false;
 		labelNumberOfSolarPanels = false;
 	}
 
@@ -3405,6 +3479,22 @@ public class Foundation extends HousePart implements Thermalizable {
 
 	public boolean getLabelPowerTowerHeight() {
 		return labelPowerTowerHeight;
+	}
+
+	public void setLabelNumberOfFresnelReflectors(final boolean labelNumberOfFresnelReflectors) {
+		this.labelNumberOfFresnelReflectors = labelNumberOfFresnelReflectors;
+	}
+
+	public boolean getLabelNumberOfFresnelReflectors() {
+		return labelNumberOfFresnelReflectors;
+	}
+
+	public void setLabelFresnelReflectorOutput(final boolean labelFresnelReflectorOutput) {
+		this.labelFresnelReflectorOutput = labelFresnelReflectorOutput;
+	}
+
+	public boolean getLabelFresnelReflectorOutput() {
+		return labelFresnelReflectorOutput;
 	}
 
 	public void setLabelPvEnergy(final boolean labelPvEnergy) {

@@ -45,7 +45,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class ParabolicTrough extends HousePart implements Solar {
+public class ParabolicTrough extends HousePart implements Solar, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
@@ -525,6 +525,7 @@ public class ParabolicTrough extends HousePart implements Solar {
 		}
 	}
 
+	@Override
 	public void updateLabel() {
 		String text = "";
 		if (labelCustom && labelCustomText != null) {
@@ -736,10 +737,12 @@ public class ParabolicTrough extends HousePart implements Solar {
 		return absorptance;
 	}
 
+	@Override
 	public void setBaseHeight(final double baseHeight) {
 		this.baseHeight = baseHeight;
 	}
 
+	@Override
 	public double getBaseHeight() {
 		return baseHeight;
 	}

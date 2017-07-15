@@ -40,7 +40,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class SolarPanel extends HousePart implements Trackable, Meshable {
+public class SolarPanel extends HousePart implements Trackable, Meshable, Labelable {
 	private static final long serialVersionUID = 1L;
 
 	public static final int PARTIAL_SHADE_TOLERANCE = 0;
@@ -404,6 +404,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 
 	}
 
+	@Override
 	public void updateLabel() {
 		drawFloatingLabel(onFlatSurface());
 	}
@@ -911,10 +912,12 @@ public class SolarPanel extends HousePart implements Trackable, Meshable {
 		return panelHeight;
 	}
 
+	@Override
 	public void setBaseHeight(final double baseHeight) {
 		this.baseHeight = baseHeight;
 	}
 
+	@Override
 	public double getBaseHeight() {
 		return baseHeight;
 	}

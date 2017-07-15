@@ -53,6 +53,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FoundationPolygon;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
@@ -1115,6 +1116,39 @@ public class EnergyPanel extends JPanel {
 									partProperty3Label.setText("  Reflection:");
 									partProperty3TextField.setText(reflect);
 									partProperty3TextField.setToolTipText("The reflectance of this parabolic trough");
+								}
+							}
+						});
+					}
+				}
+			} else if (selectedPart instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) selectedPart;
+				if (r.isDrawable()) {
+					final Foundation f = r.getTopContainer();
+					if (f != null) {
+						double a = r.getRelativeAzimuth() + f.getAzimuth();
+						if (a >= 360) {
+							a -= 360;
+						}
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								partPanelBorder.setTitle("Fresnel Reflector (" + r.getId() + ")");
+								partProperty1Label.setText("  Length & Position:");
+								partProperty1TextField.setText(TWO_DECIMALS.format(r.getLength() * meterToFoot) + lengthUnit + ", module:" + TWO_DECIMALS.format(r.getModuleLength() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
+								partProperty2Label.setText("  Width:");
+								partProperty2TextField.setText(ONE_DECIMAL.format(r.getModuleWidth() * meterToFoot) + lengthUnit);
+								partProperty1TextField.setToolTipText("Assembly length, module length, and (x, y, z) coordinates of the parabolic trough");
+								partProperty2TextField.setToolTipText("Parameters of the Fresnel reflector");
+								final String reflect = "R=" + ONE_DECIMAL.format(r.getReflectance() * 100) + "%, a=" + ONE_DECIMAL.format(r.getModuleWidth() * r.getLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2";
+								if (energyViewShown) {
+									partProperty3Label.setText("  Reflection & Yield:");
+									partProperty3TextField.setText(reflect + ", " + ONE_DECIMAL.format(r.getSolarPotentialToday() * r.getSystemEfficiency()) + " kWh");
+									partProperty3TextField.setToolTipText("The reflectance and yield of this Fresnel reflector");
+								} else {
+									partProperty3Label.setText("  Reflection:");
+									partProperty3TextField.setText(reflect);
+									partProperty3TextField.setToolTipText("The reflectance of this Fresnel reflector");
 								}
 							}
 						});

@@ -279,4 +279,5 @@ public class Sensor extends HousePart implements Solar {
 	public double getBaseHeight() {
 		return 0;
 	}
+
 }

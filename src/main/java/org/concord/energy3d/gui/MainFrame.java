@@ -190,7 +190,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyEnvironmentalTemperatureMenuItem;
 	private JCheckBoxMenuItem solarRadiationHeatMapMenuItem;
 	private JCheckBoxMenuItem solarAbsorptionHeatMapMenuItem;
-	private JCheckBoxMenuItem mirrorReflectionHeatMapMenuItem;
+	private JCheckBoxMenuItem onlyReflectionHeatMapMenuItem;
 	private JCheckBoxMenuItem showSolarLandMenuItem;
 	private JCheckBoxMenuItem onlySolarComponentsInSolarMapMenuItem;
 	private JCheckBoxMenuItem showHeatFluxVectorsMenuItem;
@@ -1413,6 +1413,8 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Parabolic Trough Rim Angle", "tutorials/parabolic-trough-curvature.ng3");
 			addModel(cspMenu, "Parabolic Trough Arrays", "tutorials/parabolic-trough-array.ng3");
 			cspMenu.addSeparator();
+			addModel(cspMenu, "Linear Fresnel Reflectors", "tutorials/linear-fresnel-reflectors.ng3");
+			cspMenu.addSeparator();
 			addModel(cspMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
 			addModel(cspMenu, "Cosine Efficiency", "tutorials/csp-cosine-efficiency.ng3");
 			addModel(cspMenu, "Shadowing and Blocking", "tutorials/csp-shadowing-blocking.ng3");
@@ -1444,7 +1446,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(onlySolarComponentsInSolarMapMenuItem, Scene.getInstance().getOnlySolarComponentsInSolarMap());
 					Util.selectSilently(solarRadiationHeatMapMenuItem, SceneManager.getInstance().getSolarHeatMap());
 					Util.selectSilently(solarAbsorptionHeatMapMenuItem, Scene.getInstance().getOnlyAbsorptionInSolarMap());
-					Util.selectSilently(mirrorReflectionHeatMapMenuItem, Scene.getInstance().getOnlyReflectedEnergyInMirrorSolarMap());
+					Util.selectSilently(onlyReflectionHeatMapMenuItem, Scene.getInstance().getOnlyReflectedEnergyInMirrorSolarMap());
 					Util.selectSilently(showHeatFluxVectorsMenuItem, Scene.getInstance().getAlwaysComputeHeatFluxVectors());
 					Util.selectSilently(shadowMenuItem, SceneManager.getInstance().isShadowEnabled());
 					Util.selectSilently(axesMenuItem, SceneManager.getInstance().areAxesVisible());
@@ -1460,7 +1462,7 @@ public class MainFrame extends JFrame {
 			final JMenu solarHeatMapMenu = new JMenu("Solar Irradiance Heat Map Options");
 			solarHeatMapMenu.add(getOnlySolarComponentsInSolarMapMenuItem());
 			solarHeatMapMenu.add(getSolarAbsorptionHeatMapMenuItem());
-			solarHeatMapMenu.add(getMirrorReflectionHeatMapMenuItem());
+			solarHeatMapMenu.add(getOnlyReflectionHeatMapMenuItem());
 			solarHeatMapMenu.add(getShowSolarLandMenuItem());
 
 			final JMenu weatherMenu = new JMenu("Weather");
@@ -2434,20 +2436,20 @@ public class MainFrame extends JFrame {
 		return solarAbsorptionHeatMapMenuItem;
 	}
 
-	private JCheckBoxMenuItem getMirrorReflectionHeatMapMenuItem() {
-		if (mirrorReflectionHeatMapMenuItem == null) {
-			mirrorReflectionHeatMapMenuItem = new JCheckBoxMenuItem("Show Only Reflected Energy (Mirrors)");
-			mirrorReflectionHeatMapMenuItem.addActionListener(new ActionListener() {
+	private JCheckBoxMenuItem getOnlyReflectionHeatMapMenuItem() {
+		if (onlyReflectionHeatMapMenuItem == null) {
+			onlyReflectionHeatMapMenuItem = new JCheckBoxMenuItem("Show Only Reflected Energy (Mirrors and Fresnel Reflectors)");
+			onlyReflectionHeatMapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Scene.getInstance().setOnlyReflectedEnergyInMirrorSolarMap(mirrorReflectionHeatMapMenuItem.isSelected());
+					Scene.getInstance().setOnlyReflectedEnergyInMirrorSolarMap(onlyReflectionHeatMapMenuItem.isSelected());
 					if (SceneManager.getInstance().getSolarHeatMap()) {
 						SceneManager.getInstance().setSolarHeatMap(true);
 					}
 				}
 			});
 		}
-		return mirrorReflectionHeatMapMenuItem;
+		return onlyReflectionHeatMapMenuItem;
 	}
 
 	public JCheckBoxMenuItem getHeatFluxMenuItem() {

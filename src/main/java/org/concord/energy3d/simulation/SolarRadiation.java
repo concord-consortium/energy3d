@@ -713,8 +713,8 @@ public class SolarRadiation {
 	// unlike PV solar panels, no indirect (ambient or diffuse) radiation should be included in reflection calculation
 	private void computeOnFresnelReflector(final int minute, final ReadOnlyVector3 directionTowardSun, final FresnelReflector reflector) {
 
-		final int nx = Scene.getInstance().getMirrorNx();
-		final int ny = Scene.getInstance().getMirrorNy();
+		final int nx = reflector.getNSectionLength();
+		final int ny = reflector.getNSectionWidth();
 		final Foundation target = reflector.getAbsorber();
 		if (target != null) {
 			final Calendar calendar = Heliodon.getInstance().getCalendar();
@@ -813,7 +813,7 @@ public class SolarRadiation {
 								if (spatial != mesh) {
 									if (absorberCollisionMeshes == null || (absorberCollisionMeshes != null && !absorberCollisionMeshes.contains(spatial))) {
 										PickingUtil.findPick(spatial, rayToAbsorber, pickResultsToAbsorber, false);
-										if (pickResultsToAbsorber.getNumber() != 0) {
+										if (pickResultsToAbsorber.getNumber() != 0) { // FIXME: how to stop the ray when it hits the absorber?
 											break;
 										}
 									}

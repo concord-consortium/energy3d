@@ -2080,6 +2080,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						((Rack) selectedPart).ensureFullSolarPanels(true);
 					} else if (selectedPart instanceof ParabolicTrough) {
 						((ParabolicTrough) selectedPart).ensureFullModules(true);
+					} else if (selectedPart instanceof FresnelReflector) {
+						((FresnelReflector) selectedPart).ensureFullModules(true);
 					}
 					EnergyPanel.getInstance().update();
 				} catch (final Throwable t) {

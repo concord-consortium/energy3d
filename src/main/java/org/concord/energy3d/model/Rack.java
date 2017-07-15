@@ -40,7 +40,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Rack extends HousePart implements Trackable, Meshable {
+public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private transient ArrayList<Vector3> solarOrgPoints;
@@ -571,6 +571,7 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		drawChildren();
 	}
 
+	@Override
 	public void updateLabel() {
 		drawFloatingLabel(onFlatSurface());
 	}
@@ -853,10 +854,12 @@ public class Rack extends HousePart implements Trackable, Meshable {
 		return rackHeight;
 	}
 
+	@Override
 	public void setBaseHeight(final double baseHeight) {
 		this.baseHeight = baseHeight;
 	}
 
+	@Override
 	public double getBaseHeight() {
 		return baseHeight;
 	}

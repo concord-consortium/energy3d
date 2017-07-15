@@ -39,7 +39,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class Mirror extends HousePart implements Solar {
+public class Mirror extends HousePart implements Solar, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
@@ -282,6 +282,7 @@ public class Mirror extends HousePart implements Solar {
 		}
 	}
 
+	@Override
 	public void updateLabel() {
 		String text = "";
 		if (labelCustom && labelCustomText != null) {
@@ -465,10 +466,12 @@ public class Mirror extends HousePart implements Solar {
 		return mirrorHeight;
 	}
 
+	@Override
 	public void setBaseHeight(final double baseHeight) {
 		this.baseHeight = baseHeight;
 	}
 
+	@Override
 	public double getBaseHeight() {
 		return baseHeight;
 	}

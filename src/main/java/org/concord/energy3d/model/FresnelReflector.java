@@ -42,7 +42,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class FresnelReflector extends HousePart implements Solar {
+public class FresnelReflector extends HousePart implements Solar, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
@@ -70,6 +70,8 @@ public class FresnelReflector extends HousePart implements Solar {
 	private transient double oldLength, oldModuleWidth;
 	private transient double oldRelativeAzimuth;
 	private transient double baseZ;
+	private int nSectionLength = 16; // number of sections in the direction of length (must be power of 2)
+	private int nSectionWidth = 4; // number of sections in the direction of width (must be power of 2)
 	private boolean detailed; // allows us to draw more details when there are fewer reflectors in the scene
 	private static transient BloomRenderPass bloomRenderPass;
 
@@ -101,6 +103,12 @@ public class FresnelReflector extends HousePart implements Solar {
 		}
 		if (Util.isZero(opticalEfficiency)) {
 			opticalEfficiency = 0.7;
+		}
+		if (Util.isZero(nSectionLength)) {
+			nSectionLength = 16;
+		}
+		if (Util.isZero(nSectionWidth)) {
+			nSectionWidth = 4;
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
@@ -389,6 +397,7 @@ public class FresnelReflector extends HousePart implements Solar {
 		}
 	}
 
+	@Override
 	public void updateLabel() {
 		String text = "";
 		if (labelCustom && labelCustomText != null) {
@@ -738,6 +747,10 @@ public class FresnelReflector extends HousePart implements Solar {
 		this.yieldToday = yieldToday;
 	}
 
+	public double getOutputToday() {
+		return solarPotentialToday * getSystemEfficiency();
+	}
+
 	@Override
 	public void clearLabels() {
 		super.clearLabels();
@@ -777,4 +790,21 @@ public class FresnelReflector extends HousePart implements Solar {
 			}
 		}
 	}
+
+	public void setNSectionLength(final int nSelectionLength) {
+		this.nSectionLength = nSelectionLength;
+	}
+
+	public int getNSectionLength() {
+		return nSectionLength;
+	}
+
+	public void setNSectionWidth(final int nSelectionWidth) {
+		this.nSectionWidth = nSelectionWidth;
+	}
+
+	public int getNSectionWidth() {
+		return nSectionWidth;
+	}
+
 }
