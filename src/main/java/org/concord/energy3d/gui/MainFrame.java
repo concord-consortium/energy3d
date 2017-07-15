@@ -1414,6 +1414,7 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Parabolic Trough Arrays", "tutorials/parabolic-trough-array.ng3");
 			cspMenu.addSeparator();
 			addModel(cspMenu, "Linear Fresnel Reflectors", "tutorials/linear-fresnel-reflectors.ng3");
+			addModel(cspMenu, "Compact Linear Fresnel Reflectors", "tutorials/compact-linear-fresnel-reflectors.ng3");
 			cspMenu.addSeparator();
 			addModel(cspMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
 			addModel(cspMenu, "Cosine Efficiency", "tutorials/csp-cosine-efficiency.ng3");

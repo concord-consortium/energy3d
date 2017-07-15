@@ -18,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicTrough;
@@ -137,13 +138,25 @@ public class CspStationDailyEnergyGraph extends JPanel {
 				graph.addData("Solar", output);
 			}
 		} else {
-			final List<Mirror> mirrors = base.getMirrors();
-			if (!mirrors.isEmpty()) {
+			final List<FresnelReflector> fresnels = base.getFresnelReflectors();
+			if (fresnels.isEmpty()) {
+				final List<Mirror> mirrors = base.getMirrors();
+				if (!mirrors.isEmpty()) {
+					for (int i = 0; i < 24; i++) {
+						SolarRadiation.getInstance().computeEnergyAtHour(i);
+						double output = 0;
+						for (final Mirror m : mirrors) {
+							output += m.getSolarPotentialNow() * m.getSystemEfficiency();
+						}
+						graph.addData("Solar", output);
+					}
+				}
+			} else {
 				for (int i = 0; i < 24; i++) {
 					SolarRadiation.getInstance().computeEnergyAtHour(i);
 					double output = 0;
-					for (final Mirror m : mirrors) {
-						output += m.getSolarPotentialNow() * m.getSystemEfficiency();
+					for (final FresnelReflector r : fresnels) {
+						output += r.getSolarPotentialNow() * r.getSystemEfficiency();
 					}
 					graph.addData("Solar", output);
 				}

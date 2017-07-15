@@ -11,6 +11,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.Scene;
@@ -39,7 +40,7 @@ public class CspStationInfoPanel extends JPanel {
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		add(container, BorderLayout.NORTH);
 
-		// mirror/trough count on the selected base
+		// mirror/trough/Fresnel reflector count on the selected base
 
 		countPanel = new JPanel(new BorderLayout());
 		countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
@@ -126,40 +127,70 @@ public class CspStationInfoPanel extends JPanel {
 			costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 			packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
 		} else {
-			final List<Mirror> mirrors = foundation.getMirrors();
-			countBar.setValue(mirrors.size());
-			moduleCountBar.setValue(mirrors.size());
-			countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
-			double cost = 0;
-			double reflectingArea = 0;
-			double mirrorArea = 0;
-			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
-			final ArrayList<Foundation> towers = new ArrayList<Foundation>();
-			for (final Mirror m : mirrors) {
-				mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
-				cost += price.getMirrorUnitPrice() * mirrorArea;
-				cost += price.getHeliostatPrice() * mirrorArea;
-				reflectingArea += mirrorArea;
-				if (m.getHeliostatTarget() != null) {
-					if (!towers.contains(m.getHeliostatTarget())) {
-						towers.add(m.getHeliostatTarget());
+			final List<FresnelReflector> fresnels = foundation.getFresnelReflectors();
+			if (fresnels.isEmpty()) {
+				final List<Mirror> mirrors = foundation.getMirrors();
+				countBar.setValue(mirrors.size());
+				moduleCountBar.setValue(mirrors.size());
+				countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
+				double cost = 0;
+				double reflectingArea = 0;
+				double mirrorArea = 0;
+				final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+				final ArrayList<Foundation> towers = new ArrayList<Foundation>();
+				for (final Mirror m : mirrors) {
+					mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
+					cost += price.getMirrorUnitPrice() * mirrorArea;
+					cost += price.getHeliostatPrice() * mirrorArea;
+					reflectingArea += mirrorArea;
+					if (m.getHeliostatTarget() != null) {
+						if (!towers.contains(m.getHeliostatTarget())) {
+							towers.add(m.getHeliostatTarget());
+						}
 					}
 				}
-			}
-			if (!towers.isEmpty()) {
-				for (final Foundation tower : towers) {
-					cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+				if (!towers.isEmpty()) {
+					for (final Foundation tower : towers) {
+						cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+					}
 				}
+				cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+				costBar.setValue(Math.round(cost));
+				final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+				String t = "Total cost over " + price.getLifespan() + " years";
+				if (specs.isBudgetEnabled()) {
+					t += " (" + "<$" + specs.getMaximumBudget() + ")";
+				}
+				costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+				packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+			} else {
+				countBar.setValue(fresnels.size());
+				int totalModules = 0;
+				for (final FresnelReflector r : fresnels) {
+					totalModules += r.getNumberOfModules();
+				}
+				moduleCountBar.setValue(totalModules);
+				countPanel.setBorder(EnergyPanel.createTitledBorder("Number of Fresnel reflectors", true));
+				double cost = 0;
+				double reflectingArea = 0;
+				double unitArea = 0;
+				final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+				for (final FresnelReflector r : fresnels) {
+					unitArea = r.getLength() * r.getModuleWidth();
+					cost += price.getFresnelReflectorUnitPrice() * unitArea;
+					reflectingArea += unitArea;
+				}
+				cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+				costBar.setValue(Math.round(cost));
+				final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
+				String t = "Total cost over " + price.getLifespan() + " years";
+				if (specs.isBudgetEnabled()) {
+					t += " (" + "<$" + specs.getMaximumBudget() + ")";
+				}
+				costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
+				packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
+
 			}
-			cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
-			costBar.setValue(Math.round(cost));
-			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
-			String t = "Total cost over " + price.getLifespan() + " years";
-			if (specs.isBudgetEnabled()) {
-				t += " (" + "<$" + specs.getMaximumBudget() + ")";
-			}
-			costPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
-			packingDensityBar.setValue((float) (reflectingArea / foundation.getArea()));
 		}
 	}
 
