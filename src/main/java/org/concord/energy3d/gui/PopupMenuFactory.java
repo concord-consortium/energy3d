@@ -6521,8 +6521,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miSolarPanelArray = new JMenuItem("Solar Panel Array...");
-			miSolarPanelArray.addActionListener(new ActionListener() {
+			final JMenuItem miSolarPanels = new JMenuItem("Solar Panels...");
+			miSolarPanels.addActionListener(new ActionListener() {
 
 				private Rack rack;
 				private JComboBox<String> sizeComboBox;
@@ -6590,7 +6590,7 @@ public class PopupMenuFactory {
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Array Options");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panels on this Rack");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -8109,7 +8109,7 @@ public class PopupMenuFactory {
 			popupMenuForRack.add(miPaste);
 			popupMenuForRack.add(miClear);
 			popupMenuForRack.addSeparator();
-			popupMenuForRack.add(miSolarPanelArray);
+			popupMenuForRack.add(miSolarPanels);
 			popupMenuForRack.add(solarPanelMenu);
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miTiltAngle);

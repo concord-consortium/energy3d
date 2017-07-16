@@ -814,8 +814,35 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		final Vector3 p2 = foundation.getAbsPoint(2);
 		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
 		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
-		final double length = (1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackHeight / Scene.getInstance().getAnnotationScale();
-		final double s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+		double length;
+		double s;
+		final Rack nearest = foundation.getNearestRack(this);
+		if (nearest != null) { // use the nearest rack as the reference to infer next position
+			final double vx = v.getX();
+			final double vy = v.getY();
+			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
+			if (Math.abs(d.getX()) > Math.abs(d.getY())) {
+				if (Math.abs(vx) < Math.abs(vy)) {
+					v.setX(vy);
+					v.setY(vx);
+				}
+			} else {
+				if (Math.abs(vx) > Math.abs(vy)) {
+					v.setX(vy);
+					v.setY(vx);
+				}
+			}
+			length = d.length();
+			if (length > Math.min(rackWidth, rackHeight) * 5 / Scene.getInstance().getAnnotationScale()) {
+				length = (1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackHeight / Scene.getInstance().getAnnotationScale();
+				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+			} else {
+				s = Math.signum(d.dot(v));
+			}
+		} else {
+			length = (1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackHeight / Scene.getInstance().getAnnotationScale();
+			s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+		}
 		final double tx = length / p0.distance(p2);
 		final double ty = length / p0.distance(p1);
 		final double lx = s * v.getX() * tx;

@@ -671,11 +671,24 @@ public class ParabolicTrough extends HousePart implements Solar, Labelable {
 	private boolean isPositionLegal(final ParabolicTrough trough, final Foundation foundation) {
 		final Vector3 p0 = foundation.getAbsPoint(0);
 		final Vector3 p2 = foundation.getAbsPoint(2);
-		final ReadOnlyVector3 v = Vector3.UNIT_X;
-		final double length = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
-		final double tx = length / p0.distance(p2);
-		final double lx = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX()) * v.getX() * tx;
-		final double newX = points.get(0).getX() + lx;
+		double dx;
+		double s;
+		final ParabolicTrough nearest = foundation.getNearestParabolicTrough(this);
+		if (nearest != null) { // use the nearest trough as the reference to infer next position
+			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
+			dx = Math.abs(d.getX());
+			if (dx > apertureWidth * 5 / Scene.getInstance().getAnnotationScale()) {
+				dx = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
+				s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+			} else {
+				s = Math.signum(d.getX());
+			}
+		} else {
+			dx = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
+			s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+		}
+		final double tx = dx / p0.distance(p2);
+		final double newX = points.get(0).getX() + s * tx;
 		if (newX > 1 - tx || newX < tx) {
 			return false;
 		}

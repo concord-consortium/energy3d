@@ -1844,6 +1844,30 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		return list;
 	}
 
+	public Rack getNearestRack(final Rack rack) {
+		if (rack.getTopContainer() != this) {
+			return null;
+		}
+		final List<Rack> racks = getRacks();
+		if (racks.isEmpty() || (racks.size() == 1 && racks.get(0) == rack)) {
+			return null;
+		}
+		Rack nearest = null;
+		double dmin = Double.MAX_VALUE;
+		final Vector3 o = rack.getAbsCenter();
+		double d;
+		for (final Rack r : racks) {
+			if (r != rack) {
+				d = r.getAbsCenter().distanceSquared(o);
+				if (d < dmin) {
+					dmin = d;
+					nearest = r;
+				}
+			}
+		}
+		return nearest;
+	}
+
 	/** return the total number of solar panels including those built into racks */
 	public int getNumberOfSolarPanels() {
 		int count = 0;
@@ -1879,6 +1903,30 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		return list;
 	}
 
+	public ParabolicTrough getNearestParabolicTrough(final ParabolicTrough trough) {
+		if (trough.getTopContainer() != this) {
+			return null;
+		}
+		final List<ParabolicTrough> troughs = getParabolicTroughs();
+		if (troughs.isEmpty() || (troughs.size() == 1 && troughs.get(0) == trough)) {
+			return null;
+		}
+		ParabolicTrough nearest = null;
+		double dmin = Double.MAX_VALUE;
+		final Vector3 o = trough.getAbsCenter();
+		double d;
+		for (final ParabolicTrough t : troughs) {
+			if (t != trough) {
+				d = t.getAbsCenter().distanceSquared(o);
+				if (d < dmin) {
+					dmin = d;
+					nearest = t;
+				}
+			}
+		}
+		return nearest;
+	}
+
 	public List<FresnelReflector> getFresnelReflectors() {
 		final List<FresnelReflector> list = new ArrayList<FresnelReflector>();
 		for (final HousePart p : children) {
@@ -1887,6 +1935,30 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 			}
 		}
 		return list;
+	}
+
+	public FresnelReflector getNearestFresnelReflector(final FresnelReflector reflector) {
+		if (reflector.getTopContainer() != this) {
+			return null;
+		}
+		final List<FresnelReflector> reflectors = getFresnelReflectors();
+		if (reflectors.isEmpty() || (reflectors.size() == 1 && reflectors.get(0) == reflector)) {
+			return null;
+		}
+		FresnelReflector nearest = null;
+		double dmin = Double.MAX_VALUE;
+		final Vector3 o = reflector.getAbsCenter();
+		double d;
+		for (final FresnelReflector r : reflectors) {
+			if (r != reflector) {
+				d = r.getAbsCenter().distanceSquared(o);
+				if (d < dmin) {
+					dmin = d;
+					nearest = r;
+				}
+			}
+		}
+		return nearest;
 	}
 
 	public void updateHandlesOfAllFoudations() {
