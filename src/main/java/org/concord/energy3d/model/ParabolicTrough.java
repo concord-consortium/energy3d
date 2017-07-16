@@ -635,7 +635,7 @@ public class ParabolicTrough extends HousePart implements Solar, Labelable {
 		return true;
 	}
 
-	private double copyOverlapInDirectionOfParabola() { // copy only in the direction of trough width (parabola width)
+	private double checkCopyOverlap() { // copy only in the direction of trough width (parabola width)
 		final double w1 = apertureWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -693,7 +693,7 @@ public class ParabolicTrough extends HousePart implements Solar, Labelable {
 			return false;
 		}
 		trough.points.get(0).setX(newX);
-		final double o = trough.copyOverlapInDirectionOfParabola(); // TODO
+		final double o = trough.checkCopyOverlap();
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new trough is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;

@@ -502,7 +502,7 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		return true;
 	}
 
-	private double copyOverlapInDirectionOfParabola() { // copy only in the direction of reflector width (shorter side)
+	private double checkCopyOverlap() { // copy only in the direction of reflector width (shorter side)
 		final double w1 = moduleWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -538,18 +538,31 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 	private boolean isPositionLegal(final FresnelReflector reflector, final Foundation foundation) {
 		final Vector3 p0 = foundation.getAbsPoint(0);
 		final Vector3 p2 = foundation.getAbsPoint(2);
-		final ReadOnlyVector3 v = Vector3.UNIT_X;
-		final double length = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
-		final double tx = length / p0.distance(p2);
-		final double lx = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX()) * v.getX() * tx;
-		final double newX = points.get(0).getX() + lx;
+		double dx;
+		double s;
+		final FresnelReflector nearest = foundation.getNearestFresnelReflector(this);
+		if (nearest != null) { // use the nearest reflector as the reference to infer next position
+			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
+			dx = Math.abs(d.getX());
+			if (dx > moduleWidth * 5 / Scene.getInstance().getAnnotationScale()) {
+				dx = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
+				s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+			} else {
+				s = Math.signum(d.getX());
+			}
+		} else {
+			dx = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
+			s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+		}
+		final double tx = dx / p0.distance(p2);
+		final double newX = points.get(0).getX() + s * tx;
 		if (newX > 1 - tx || newX < tx) {
 			return false;
 		}
 		reflector.points.get(0).setX(newX);
-		final double o = reflector.copyOverlapInDirectionOfParabola(); // TODO
+		final double o = reflector.checkCopyOverlap();
 		if (o >= 0) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new reflector is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new Fresnel reflector is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;

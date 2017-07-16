@@ -742,7 +742,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		return -1;
 	}
 
-	private double copyOverlapInDirectionOfHeight() { // copy only in the direction of rack height
+	private double checkCopyOverlap() { // copy only in the direction of rack height
 		final double w1 = rackHeight / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -857,7 +857,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 		rack.points.get(0).setX(newX);
 		rack.points.get(0).setY(newY);
-		final double o = rack.copyOverlapInDirectionOfHeight(); // TODO
+		final double o = rack.checkCopyOverlap();
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
