@@ -1724,6 +1724,39 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllFresnelReflectors() {
+		final ArrayList<HousePart> reflectors = new ArrayList<HousePart>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof FresnelReflector && part.getTopContainer() == foundation) {
+					reflectors.add(part);
+				}
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof FresnelReflector) {
+					reflectors.add(part);
+				}
+			}
+		}
+		if (reflectors.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no Fresnel reflector to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + reflectors.size() + " Fresnel reflectors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+			return;
+		}
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(reflectors);
+		for (final HousePart part : reflectors) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
 	public void removeAllSensors() {
 		final ArrayList<HousePart> sensors = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

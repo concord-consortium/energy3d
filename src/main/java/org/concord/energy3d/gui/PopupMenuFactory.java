@@ -2576,6 +2576,28 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllParabolicTroughs);
 
+			final JMenuItem miRemoveAllFresnelReflectors = new JMenuItem("Remove All Fresnel Reflectors");
+			miRemoveAllFresnelReflectors.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllFresnelReflectors();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									Scene.getInstance().setEdited(true);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllFresnelReflectors);
+
 			final JMenuItem miRemoveAllSensors = new JMenuItem("Remove All Sensors");
 			miRemoveAllSensors.addActionListener(new ActionListener() {
 				@Override
@@ -10436,8 +10458,8 @@ public class PopupMenuFactory {
 							if (ok) {
 								if (w < 1 || w > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module width must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (l < 1 || l > 100) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 100 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (l < 1 || l > 1000) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(r);

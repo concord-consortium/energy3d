@@ -259,6 +259,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllRacksMenuItem;
 	private JMenuItem removeAllMirrorsMenuItem;
 	private JMenuItem removeAllParabolicTroughsMenuItem;
+	private JMenuItem removeAllFresnelReflectorsMenuItem;
 	private JMenuItem removeAllSensorsMenuItem;
 	private JMenuItem removeAllWallsMenuItem;
 	private JMenuItem removeAllWindowsMenuItem;
@@ -2739,6 +2740,7 @@ public class MainFrame extends JFrame {
 			clearMenu.add(getRemoveAllRacksMenuItem());
 			clearMenu.add(getRemoveAllMirrorsMenuItem());
 			clearMenu.add(getRemoveAllParabolicTroughsMenuItem());
+			clearMenu.add(getRemoveAllFresnelReflectorsMenuItem());
 			clearMenu.add(getRemoveAllTreesMenuItem());
 			clearMenu.add(getRemoveAllHumansMenuItem());
 			clearMenu.add(getRemoveAllRoofsMenuItem());
@@ -3863,6 +3865,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllParabolicTroughsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllFresnelReflectorsMenuItem() {
+		if (removeAllFresnelReflectorsMenuItem == null) {
+			removeAllFresnelReflectorsMenuItem = new JMenuItem("Remove All Fresnel Reflectors");
+			removeAllFresnelReflectorsMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllFresnelReflectors();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+		}
+		return removeAllFresnelReflectorsMenuItem;
 	}
 
 	private JMenuItem getRemoveAllSensorsMenuItem() {

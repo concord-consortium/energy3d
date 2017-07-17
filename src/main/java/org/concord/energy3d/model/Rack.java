@@ -404,7 +404,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0), rackWidth / 2.0 / annotationScale, rackHeight / 2.0 / annotationScale, 0.15);
+		surround.setData(new Vector3(0, 0, 0), 0.5 * rackWidth / annotationScale, 0.5 * rackHeight / annotationScale, 0.15);
 		surround.updateModelBound();
 
 		final boolean heatMap = SceneManager.getInstance().getSolarHeatMap();
@@ -818,25 +818,25 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		double s;
 		final Rack nearest = foundation.getNearestRack(this);
 		if (nearest != null) { // use the nearest rack as the reference to infer next position
-			final double vx = v.getX();
-			final double vy = v.getY();
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
-			if (Math.abs(d.getX()) > Math.abs(d.getY())) {
-				if (Math.abs(vx) < Math.abs(vy)) {
-					v.setX(vy);
-					v.setY(vx);
-				}
-			} else {
-				if (Math.abs(vx) > Math.abs(vy)) {
-					v.setX(vy);
-					v.setY(vx);
-				}
-			}
 			length = d.length();
 			if (length > Math.min(rackWidth, rackHeight) * 5 / Scene.getInstance().getAnnotationScale()) {
 				length = (1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackHeight / Scene.getInstance().getAnnotationScale();
 				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			} else {
+				final double vx = v.getX();
+				final double vy = v.getY();
+				if (Math.abs(d.getX()) > Math.abs(d.getY())) {
+					if (Math.abs(vx) < Math.abs(vy)) {
+						v.setX(vy);
+						v.setY(vx);
+					}
+				} else {
+					if (Math.abs(vx) > Math.abs(vy)) {
+						v.setX(vy);
+						v.setY(vx);
+					}
+				}
 				s = Math.signum(d.dot(v));
 			}
 		} else {

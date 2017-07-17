@@ -567,8 +567,8 @@ public class Wall extends HousePart implements Thermalizable {
 
 	private void drawColumns(final double distance) {
 		columns.setDefaultColor(getColor());
-		final FloatBuffer vertexBuffer = columns.getMeshData().getVertexBuffer();
-		final FloatBuffer normalBuffer = columns.getMeshData().getNormalBuffer();
+		FloatBuffer vertexBuffer = columns.getMeshData().getVertexBuffer();
+		FloatBuffer normalBuffer = columns.getMeshData().getNormalBuffer();
 		vertexBuffer.rewind();
 		normalBuffer.rewind();
 		vertexBuffer.limit(vertexBuffer.capacity());
@@ -578,6 +578,16 @@ public class Wall extends HousePart implements Thermalizable {
 		final ReadOnlyVector3 u = getAbsPoint(2).subtract(o, null);
 		final ReadOnlyVector3 v = getAbsPoint(1).subtract(o, null);
 		final int cols = (int) Math.max(2, u.length() / distance);
+		final int bufferSize = 12 * (cols + 1);
+		if (bufferSize > vertexBuffer.capacity()) {
+			vertexBuffer = BufferUtils.createFloatBuffer(bufferSize);
+			columns.getMeshData().setVertexBuffer(vertexBuffer);
+			normalBuffer = BufferUtils.createFloatBuffer(bufferSize);
+			columns.getMeshData().setNormalBuffer(normalBuffer);
+		} else {
+			vertexBuffer.rewind();
+			normalBuffer.rewind();
+		}
 
 		// Vector3 dir = new Vector3(v).normalizeLocal().multiplyLocal(columnRadius);
 		// addPointToQuad(getAbsPoint(1), getAbsPoint(3), dir, vertexBuffer, normalBuffer);
