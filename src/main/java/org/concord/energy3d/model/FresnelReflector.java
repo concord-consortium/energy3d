@@ -391,17 +391,18 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		c.setY(o.getY());
 		final double length = c.distance(o);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final double dy = sunLocation.getY();
 		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 
-		final Vector3 r = new Vector3(o);
+		final Vector3 r = o.clone();
 		r.addLocal(sunLocation.multiply(5000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 
 		final Vector3 s = sunLocation.multiplyLocal(length);
 		final Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
-		p.addLocal(o);
+		p.addLocal(o).addLocal(0, -length * dy, 0);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		lightBeams.updateModelBound();
