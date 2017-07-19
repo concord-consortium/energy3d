@@ -3041,11 +3041,12 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForFresnelReflectors(final double width, final double length) {
+	public void setSizeForFresnelReflectors(final double length, final double width, final double moduleLength) {
 		for (final HousePart p : children) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
 				r.setModuleWidth(width);
+				r.setModuleLength(moduleLength);
 				r.setLength(length);
 				r.ensureFullModules(false);
 				r.draw();

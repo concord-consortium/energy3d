@@ -10386,8 +10386,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miSize = new JMenuItem("Size...");
-			miSize.addActionListener(new ActionListener() {
+			final JMenuItem miLength = new JMenuItem("Length...");
+			miLength.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -10401,11 +10401,8 @@ public class PopupMenuFactory {
 					final Foundation foundation = r.getTopContainer();
 					final String partInfo = r.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Width: "));
-					final JTextField widthField = new JTextField(threeDecimalsFormat.format(r.getModuleWidth()));
-					inputPanel.add(widthField);
 					inputPanel.add(new JLabel("Length: "));
 					final JTextField lengthField = new JTextField(threeDecimalsFormat.format(r.getLength()));
 					inputPanel.add(lengthField);
@@ -10437,8 +10434,8 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Size");
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set length for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Length");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -10446,37 +10443,229 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
-							double w = 0, l = 0;
+							double length = 0;
 							boolean ok = true;
 							try {
-								w = Double.parseDouble(widthField.getText());
-								l = Double.parseDouble(lengthField.getText());
+								length = Double.parseDouble(lengthField.getText());
 							} catch (final NumberFormatException x) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (w < 1 || w > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module width must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (l < 1 || l > 1000) {
+								if (length < 1 || length > 1000) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(r);
-										r.setModuleWidth(w);
-										r.setLength(l);
+										r.setLength(length);
 										r.ensureFullModules(false);
 										r.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-										foundation.setSizeForFresnelReflectors(w, l);
+										foundation.setSizeForFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-										Scene.getInstance().setSizeForAllFresnelReflectors(w, l);
+										Scene.getInstance().setSizeForAllFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miModuleWidth = new JMenuItem("Module Width...");
+			miModuleWidth.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof FresnelReflector)) {
+						return;
+					}
+					final FresnelReflector r = (FresnelReflector) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final String partInfo = r.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Module Width: "));
+					final JTextField moduleWidthField = new JTextField(threeDecimalsFormat.format(r.getModuleWidth()));
+					inputPanel.add(moduleWidthField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Fresnel Reflector", true);
+					final JRadioButton rb2 = new JRadioButton("All Fresnel Reflectors on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Fresnel Reflectors");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set module width for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Module Width");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double moduleWidth = 0;
+							boolean ok = true;
+							try {
+								moduleWidth = Double.parseDouble(moduleWidthField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (moduleWidth < 1 || moduleWidth > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module width must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetPartSizeCommand c = new SetPartSizeCommand(r);
+										r.setModuleWidth(moduleWidth);
+										r.ensureFullModules(false);
+										r.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
+										foundation.setSizeForFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
+										Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miModuleLength = new JMenuItem("Module Length...");
+			miModuleLength.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof FresnelReflector)) {
+						return;
+					}
+					final FresnelReflector r = (FresnelReflector) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final String partInfo = r.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Module Length: "));
+					final JTextField moduleLengthField = new JTextField(threeDecimalsFormat.format(r.getModuleLength()));
+					inputPanel.add(moduleLengthField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Fresnel Reflector", true);
+					final JRadioButton rb2 = new JRadioButton("All Fresnel Reflectors on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Fresnel Reflectors");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set module length for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Module Length");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double moduleLength = 0;
+							boolean ok = true;
+							try {
+								moduleLength = Double.parseDouble(moduleLengthField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (moduleLength < 1 || moduleLength > 20) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetPartSizeCommand c = new SetPartSizeCommand(r);
+										r.setModuleLength(moduleLength);
+										r.ensureFullModules(false);
+										r.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
+										foundation.setSizeForFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
+										Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -10776,15 +10965,115 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miAbsorptance = new JMenuItem("Absorptance...");
+			miAbsorptance.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof FresnelReflector)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final FresnelReflector r = (FresnelReflector) selectedPart;
+					final String title = "<html>Absorptance (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Fresnel Reflector", true);
+					final JRadioButton rb2 = new JRadioButton("All Fresnel Reflectors on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Fresnel Reflectors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(r.getAbsorptance() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Absorber Tube Absorptance");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 50 || val > 99) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Fresnel reflector absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final ChangeFresnelReflectorReflectanceCommand c = new ChangeFresnelReflectorReflectanceCommand(r);
+										r.setAbsorptance(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = r.getTopContainer();
+										// final ChangeFoundationFresnelReflectorReflectanceCommand c = new ChangeFoundationFresnelReflectorReflectanceCommand(foundation);
+										foundation.setAbsorptanceForFresnelReflectors(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final ChangeReflectanceForAllFresnelReflectorsCommand c = new ChangeReflectanceForAllFresnelReflectorsCommand();
+										Scene.getInstance().setAbsorptanceForAllFresnelReflectors(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miSetAbsorber);
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(cbmiDrawBeam);
 			popupMenuForFresnelReflector.add(labelMenu);
 			popupMenuForFresnelReflector.addSeparator();
-			popupMenuForFresnelReflector.add(miSize);
+			popupMenuForFresnelReflector.add(miLength);
+			popupMenuForFresnelReflector.add(miModuleWidth);
+			popupMenuForFresnelReflector.add(miModuleLength);
 			popupMenuForFresnelReflector.add(miBaseHeight);
+			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miReflectance);
+			popupMenuForFresnelReflector.add(miAbsorptance);
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miMesh);
 			popupMenuForFresnelReflector.addSeparator();

@@ -57,7 +57,7 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 	private transient double yieldToday;
 	private Foundation absorber;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
+	private double absorptance = 0.95; // the percentage of energy absorbed by the absorber tube
 	private double opticalEfficiency = 0.7;
 	private double moduleLength = 3;
 	private double moduleWidth = 2;
@@ -132,8 +132,9 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		reflector.setRenderState(offset);
 		root.attachChild(reflector);
 
+		final int nModules = Math.max(1, getNumberOfModules());
 		outlines = new Line("Fresnel Reflector (Outline)");
-		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8));
+		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8 + (nModules - 1) * 2));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
 		outlines.setLineWidth(0.01f);
@@ -280,10 +281,20 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		final FloatBuffer boxVertexBuffer = reflector.getMeshData().getVertexBuffer();
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		final FloatBuffer textureBuffer = mesh.getMeshData().getTextureBuffer(0);
-		final FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
+		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
 		vertexBuffer.rewind();
-		outlineBuffer.rewind();
 		textureBuffer.rewind();
+
+		final int nModules = Math.max(1, getNumberOfModules());
+		final int outlineBufferSize = 24 + nModules * 6;
+		if (outlineBuffer.capacity() < outlineBufferSize) {
+			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
+			outlines.getMeshData().setVertexBuffer(outlineBuffer);
+		} else {
+			outlineBuffer.rewind();
+			outlineBuffer.limit(outlineBufferSize);
+		}
+
 		int i = 8 * 3;
 		vertexBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 		textureBuffer.put(1).put(0);
@@ -311,10 +322,8 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		outlineBuffer.put(boxVertexBuffer.get(i)).put(boxVertexBuffer.get(i + 1)).put(boxVertexBuffer.get(i + 2));
 
 		mesh.updateModelBound();
-		outlines.updateModelBound();
 
 		modulesRoot.detachAllChildren();
-		final int nModules = Math.max(1, getNumberOfModules());
 		if (nModules > 1) {
 			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
 			final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
@@ -323,9 +332,20 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 				final Vector3 p = pd.multiply((u - 0.5 * length) / annotationScale, null);
 				addPole(p.addLocal(center), baseHeight, baseZ);
 			}
+			final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
+			final Vector3 pm = p2.add(p0, null).multiplyLocal(0.5);
+			final Vector3 pn = p2.subtract(p0, null).multiplyLocal(0.5);
+			for (double u = moduleLength; u < length; u += moduleLength) {
+				final Vector3 p = pd.multiply(u / annotationScale, null).addLocal(pm);
+				Vector3 q = p.add(pn, null);
+				outlineBuffer.put(q.getXf()).put(q.getYf()).put(q.getZf());
+				q = p.subtract(pn, null);
+				outlineBuffer.put(q.getXf()).put(q.getYf()).put(q.getZf());
+			}
 		} else {
 			addPole(center, baseHeight, baseZ);
 		}
+		outlines.updateModelBound();
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		if (absorber != null) {
@@ -506,14 +526,12 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		final double w1 = moduleWidth / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.container == container && p != this) {
-				if (p instanceof FresnelReflector) {
-					final FresnelReflector s2 = (FresnelReflector) p;
-					final double w2 = s2.moduleWidth / Scene.getInstance().getAnnotationScale();
-					final double distance = p.getAbsCenter().distance(center);
-					if (distance < (w1 + w2) * 0.499) {
-						return distance;
-					}
+			if (p.container == container && p != this && p instanceof FresnelReflector) {
+				final FresnelReflector s2 = (FresnelReflector) p;
+				final double w2 = s2.moduleWidth / Scene.getInstance().getAnnotationScale();
+				final double distance = p.getAbsCenter().distance(center);
+				if (distance < (w1 + w2) * 0.499) {
+					return distance;
 				}
 			}
 		}
@@ -554,6 +572,7 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 			dx = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
 			s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
 		}
+		s *= -Math.signum(Math.cos(Math.toRadians(foundation.getAzimuth())));
 		final double tx = dx / p0.distance(p2);
 		final double newX = points.get(0).getX() + s * tx;
 		if (newX > 1 - tx || newX < tx) {

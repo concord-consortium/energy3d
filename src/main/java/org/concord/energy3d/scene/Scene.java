@@ -2814,12 +2814,13 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForAllFresnelReflectors(final double width, final double length) {
+	public void setSizeForAllFresnelReflectors(final double length, final double width, final double moduleLength) {
 		for (final HousePart p : parts) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
 				r.setLength(length);
 				r.setModuleWidth(width);
+				r.setModuleLength(moduleLength);
 				r.ensureFullModules(false);
 				r.draw();
 			}
