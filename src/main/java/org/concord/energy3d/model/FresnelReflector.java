@@ -63,7 +63,7 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 	private double moduleWidth = 2;
 	private double length = 2 * moduleLength;
 	private double relativeAzimuth = 0;
-	private double baseHeight = 5;
+	private double baseHeight = 15;
 	private boolean beamsVisible;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldReflectorCenter;

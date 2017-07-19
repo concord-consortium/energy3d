@@ -72,7 +72,7 @@ public class ParabolicTrough extends HousePart implements Solar, Labelable {
 	private double apertureWidth = 2;
 	private double semilatusRectum = 2;
 	private double relativeAzimuth = 0;
-	private double baseHeight = 5;
+	private double baseHeight = 15;
 	private boolean beamsVisible;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldTroughCenter;

@@ -10550,8 +10550,8 @@ public class PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (moduleWidth < 1 || moduleWidth > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module width must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (moduleWidth < 1 || moduleWidth > 20) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(r);
@@ -10648,8 +10648,8 @@ public class PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (moduleLength < 1 || moduleLength > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (moduleLength < 1 || moduleLength > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module length must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(r);
@@ -11034,20 +11034,20 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Fresnel reflector absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										// final ChangeFresnelReflectorReflectanceCommand c = new ChangeFresnelReflectorReflectanceCommand(r);
+										final ChangeFresnelReflectorAbsorptanceCommand c = new ChangeFresnelReflectorAbsorptanceCommand(r);
 										r.setAbsorptance(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = r.getTopContainer();
-										// final ChangeFoundationFresnelReflectorReflectanceCommand c = new ChangeFoundationFresnelReflectorReflectanceCommand(foundation);
+										final ChangeFoundationFresnelReflectorAbsorptanceCommand c = new ChangeFoundationFresnelReflectorAbsorptanceCommand(foundation);
 										foundation.setAbsorptanceForFresnelReflectors(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final ChangeReflectanceForAllFresnelReflectorsCommand c = new ChangeReflectanceForAllFresnelReflectorsCommand();
+										final ChangeAbsorptanceForAllFresnelReflectorsCommand c = new ChangeAbsorptanceForAllFresnelReflectorsCommand();
 										Scene.getInstance().setAbsorptanceForAllFresnelReflectors(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
