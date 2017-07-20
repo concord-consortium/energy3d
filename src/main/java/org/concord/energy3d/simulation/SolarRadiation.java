@@ -803,8 +803,10 @@ public class SolarRadiation {
 							data.dailySolarIntensity[x][y] += directRadiation;
 						}
 
+						// TODO: Edge losses are not considered yet
 						if (absorber != null) {
-							// for concentrated energy calculation
+							// TODO: This calculation is not exactly accurate as the collision detection assumes that the ray emits from a grid point on the reflector to
+							// the parallel position on the absorber tube -- without considering the actual direction of the reflected light
 							final Vector3 toAbsorber = absorber.subtract(p, null);
 							toAbsorber.setY(0);
 							final Ray3 rayToAbsorber = new Ray3(p, toAbsorber.normalize(null));
