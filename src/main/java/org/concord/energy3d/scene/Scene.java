@@ -107,7 +107,7 @@ public class Scene implements Serializable {
 	private transient boolean avoidSavingGroundImage;
 	private final List<HousePart> parts = new ArrayList<HousePart>();
 	private final Calendar calendar = Calendar.getInstance();
-	private TextureMode textureMode = TextureMode.Full;
+	private TextureMode textureMode = TextureMode.None;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
 	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1, 0, 0.5f);

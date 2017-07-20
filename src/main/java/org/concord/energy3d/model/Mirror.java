@@ -159,7 +159,6 @@ public class Mirror extends HousePart implements Solar, Labelable {
 			return;
 		}
 
-		normal = computeNormalAndKeepOnSurface();
 		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
@@ -265,7 +264,7 @@ public class Mirror extends HousePart implements Solar, Labelable {
 		}
 
 		final Vector3 s = sunLocation.multiplyLocal(length);
-		final Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
+		final Vector3 p = new Matrix3().fromAngleNormalAxis(Math.PI, normal).applyPost(s, null);
 		p.addLocal(o);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());

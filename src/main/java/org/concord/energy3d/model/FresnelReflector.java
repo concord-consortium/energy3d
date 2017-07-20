@@ -267,10 +267,6 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 
-		normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalize(null);
-		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
-			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
-		}
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
 
@@ -350,12 +346,20 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		if (absorber != null) {
-			final Vector3 o = absorber.getSolarReceiverCenter();
-			o.setY(center.getY());
-			final Vector3 p = center.clone().subtractLocal(o).negateLocal().normalizeLocal();
-			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
+			final Vector3 s = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			final Vector3 r = absorber.getSolarReceiverCenter();
+			// how much the reflected light should shift in the direction of the absorber tube?
+			final double shift = s.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (center.getZ() - r.getZ()) * s.getY() / s.getZ();
+			r.setY(center.getY() + shift);
+			final Vector3 p = r.subtractLocal(center).normalizeLocal();
+			normal = p.add(s, null).multiplyLocal(0.5).normalizeLocal();
+		} else {
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalize(null);
 		}
+		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
+		}
+
 		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
 
@@ -389,10 +393,11 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		}
 		final Vector3 o = getAbsPoint(0);
 		final Vector3 c = absorber.getSolarReceiverCenter();
-		c.setY(o.getY());
-		final double length = c.distance(o);
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-		final double shift = sunLocation.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (o.getZ() - c.getZ()) * sunLocation.getY() / sunLocation.getZ(); // this is how much the reflected light should shift in the direction of the absorber tube
+		// how much the reflected light should shift in the direction of the absorber tube?
+		final double shift = sunLocation.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (o.getZ() - c.getZ()) * sunLocation.getY() / sunLocation.getZ();
+		c.setY(o.getY() + shift);
+		final double length = c.distance(o);
 		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 
@@ -402,8 +407,8 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 
 		final Vector3 s = sunLocation.multiplyLocal(length);
-		final Vector3 p = new Matrix3().fromAngleAxis(Math.PI, normal).applyPost(s, null);
-		p.addLocal(o).addLocal(0, shift, 0);
+		final Vector3 p = new Matrix3().fromAngleNormalAxis(Math.PI, normal).applyPost(s, null);
+		p.addLocal(o).addLocal(0, shift * 0, 0);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		lightBeams.updateModelBound();
