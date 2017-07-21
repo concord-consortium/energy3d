@@ -10273,6 +10273,7 @@ public class PopupMenuFactory {
 					}
 					final FresnelReflector r = (FresnelReflector) selectedPart;
 					r.setBeamVisible(cbmiDrawBeam.isSelected());
+					r.drawLightBeams();
 					r.draw();
 					Scene.getInstance().setEdited(true);
 				}

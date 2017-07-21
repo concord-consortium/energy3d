@@ -387,7 +387,7 @@ public class FresnelReflector extends HousePart implements Solar, Labelable {
 	}
 
 	public void drawLightBeams() {
-		if (Heliodon.getInstance().isNightTime() || absorber == null || !beamsVisible) {
+		if (Heliodon.getInstance().isNightTime() || absorber == null || !beamsVisible || !Scene.getInstance().areLightBeamsVisible()) {
 			lightBeams.setVisible(false);
 			return;
 		}

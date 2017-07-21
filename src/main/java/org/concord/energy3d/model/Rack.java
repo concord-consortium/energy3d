@@ -742,14 +742,14 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		return -1;
 	}
 
-	private double checkCopyOverlap() { // copy only in the direction of rack height
-		final double w1 = rackHeight / Scene.getInstance().getAnnotationScale();
+	private double checkCopyOverlap(final boolean inHeight) { // copy only in the direction of rack height
+		final double w1 = (inHeight ? rackHeight : rackWidth) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof Rack) {
 					final Rack s2 = (Rack) p;
-					final double w2 = s2.rackHeight / Scene.getInstance().getAnnotationScale();
+					final double w2 = (inHeight ? s2.rackHeight : s2.rackWidth) / Scene.getInstance().getAnnotationScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -816,10 +816,14 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
 		double length;
 		double s;
+		boolean inHeight = true;
 		final Rack nearest = foundation.getNearestRack(this);
 		if (nearest != null) { // use the nearest rack as the reference to infer next position
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
 			length = d.length();
+			if (rackHeight > length) {
+				inHeight = false;
+			}
 			if (length > Math.min(rackWidth, rackHeight) * 5 / Scene.getInstance().getAnnotationScale()) {
 				length = (1 + (nonFlatRoof ? 0 : copyLayoutGap)) * rackHeight / Scene.getInstance().getAnnotationScale();
 				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
@@ -857,7 +861,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 		rack.points.get(0).setX(newX);
 		rack.points.get(0).setY(newY);
-		final double o = rack.checkCopyOverlap();
+		final double o = rack.checkCopyOverlap(inHeight);
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
