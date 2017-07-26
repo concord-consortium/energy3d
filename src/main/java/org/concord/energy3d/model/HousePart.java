@@ -226,6 +226,8 @@ public abstract class HousePart implements Serializable {
 				color = Scene.getInstance().getRoofColor();
 			} else if (this instanceof Wall) {
 				color = Scene.getInstance().getWallColor();
+			} else {
+				color = ColorRGBA.LIGHT_GRAY;
 			}
 		}
 
@@ -1033,7 +1035,7 @@ public abstract class HousePart implements Serializable {
 			} else if (this instanceof Wall) {
 				c = Scene.getInstance().getWallColor();
 			} else {
-				c = ColorRGBA.WHITE;
+				c = ColorRGBA.LIGHT_GRAY;
 			}
 		}
 		float min = Math.min(c.getRed(), c.getGreen());

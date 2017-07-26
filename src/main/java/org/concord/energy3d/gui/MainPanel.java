@@ -344,7 +344,7 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Single Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")));
 		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Planar Mirror (Heliostat)", new ImageIcon(getClass().getResource("icons/mirror.png")));
 		final JCheckBoxMenuItem miParabolicTrough = new JCheckBoxMenuItem("Parabolic Trough", new ImageIcon(getClass().getResource("icons/parabolic_trough.png")));
-		final JCheckBoxMenuItem miParabolicDish = new JCheckBoxMenuItem("Parabolic Dish", new ImageIcon(getClass().getResource("icons/parabolic_dish.png")));
+		final JCheckBoxMenuItem miParabolicDish = new JCheckBoxMenuItem("Parabolic Dish Stirling Engine", new ImageIcon(getClass().getResource("icons/parabolic_dish.png")));
 		miParabolicDish.setEnabled(false);
 		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
 		miSolarWaterHeater.setEnabled(false);
@@ -369,7 +369,7 @@ public class MainPanel extends JPanel {
 					solarButton.setToolTipText("Insert a parabolic trough");
 				} else if (selected == miParabolicDish) {
 					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_DISH;
-					solarButton.setToolTipText("Insert a parabolic dish");
+					solarButton.setToolTipText("Insert a parabolic dish Stirling engine");
 				} else if (selected == miFresnelReflector) {
 					solaCommand = SceneManager.Operation.DRAW_FRESNEL_REFLECTOR;
 					solarButton.setToolTipText("Insert a Fresnel reflector");
