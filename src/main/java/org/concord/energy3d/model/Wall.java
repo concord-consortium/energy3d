@@ -1628,6 +1628,9 @@ public class Wall extends HousePart implements Thermalizable {
 	}
 
 	public void applyXYTransform(final List<Vector3> hole) {
+		if (toXY == null) {
+			computeNormalAndXYTransform();
+		}
 		for (final Vector3 p : hole) {
 			final Point point = new ArdorVector3Point(p);
 			toXY.transform(point);

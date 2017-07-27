@@ -348,7 +348,7 @@ public class MainPanel extends JPanel {
 		miParabolicDish.setEnabled(false);
 		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
 		miSolarWaterHeater.setEnabled(false);
-		final JCheckBoxMenuItem miFresnelReflector = new JCheckBoxMenuItem("Fresnel Reflector", new ImageIcon(getClass().getResource("icons/fresnel_reflector.png")));
+		final JCheckBoxMenuItem miFresnelReflector = new JCheckBoxMenuItem("Linear Fresnel Reflector", new ImageIcon(getClass().getResource("icons/fresnel_reflector.png")));
 		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
 		final ActionListener solarAction = new ActionListener() {
 			@Override
@@ -372,7 +372,7 @@ public class MainPanel extends JPanel {
 					solarButton.setToolTipText("Insert a parabolic dish Stirling engine");
 				} else if (selected == miFresnelReflector) {
 					solaCommand = SceneManager.Operation.DRAW_FRESNEL_REFLECTOR;
-					solarButton.setToolTipText("Insert a Fresnel reflector");
+					solarButton.setToolTipText("Insert a linear Fresnel reflector");
 				} else if (selected == miSolarWaterHeater) {
 					solaCommand = SceneManager.Operation.DRAW_SOLAR_WATER_HEATER;
 					solarButton.setToolTipText("Insert a solar water heater");

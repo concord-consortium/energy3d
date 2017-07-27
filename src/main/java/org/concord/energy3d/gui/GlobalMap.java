@@ -8,6 +8,8 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
@@ -112,7 +114,39 @@ class GlobalMap extends JDialog {
 			}
 		};
 
-		topPanel.add(new JLabel(countries.size() + " Countries:"));
+		final JLabel countriesLabel = new JLabel("<html><font color=blue size=2><u>" + countries.size() + " Countries</u>:</html>");
+		countriesLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		countriesLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				String s = "<html><body><table>";
+				int i = 0;
+				for (final String country : countries.keySet()) {
+					switch (i % 3) {
+					case 0:
+						s += "<tr>";
+						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
+						break;
+					case 1:
+						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
+						break;
+					case 2:
+						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
+						s += "</tr>";
+						break;
+					}
+					i++;
+				}
+				s += "</table></body></html>";
+				final JTextPane textPane = new JTextPane();
+				textPane.setContentType("text/html");
+				textPane.setText(s);
+				final JScrollPane scroller = new JScrollPane(textPane);
+				scroller.setPreferredSize(new Dimension(400, 400));
+				JOptionPane.showMessageDialog(GlobalMap.this, scroller, "Numbers of Supported Regions in Each Country", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		topPanel.add(countriesLabel);
 		for (final String s : countries.keySet()) {
 			countriesComboBox.addItem(s);
 		}
@@ -124,7 +158,7 @@ class GlobalMap extends JDialog {
 				for (final String s : locationsInCountry) {
 					regionsComboBox.addItem(s);
 				}
-				regionsLabel.setText("Regions (" + locationsInCountry.size() + "):");
+				regionsLabel.setText("<html><font size=2>Regions (" + locationsInCountry.size() + "):</html>");
 			}
 		});
 		topPanel.add(countriesComboBox);
@@ -156,39 +190,6 @@ class GlobalMap extends JDialog {
 				}
 			}
 		}
-
-		final JButton listButton = new JButton("List");
-		listButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				String s = "<html><body><table>";
-				int i = 0;
-				for (final String country : countries.keySet()) {
-					switch (i % 3) {
-					case 0:
-						s += "<tr>";
-						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
-						break;
-					case 1:
-						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
-						break;
-					case 2:
-						s += "<td bgcolor=87CEEB><font size=3>" + country + "</td><td width=40 bgcolor=98FB98><font size=3>" + countries.get(country).size() + "</td>";
-						s += "</tr>";
-						break;
-					}
-					i++;
-				}
-				s += "</table></body></html>";
-				final JTextPane textPane = new JTextPane();
-				textPane.setContentType("text/html");
-				textPane.setText(s);
-				final JScrollPane scroller = new JScrollPane(textPane);
-				scroller.setPreferredSize(new Dimension(400, 400));
-				JOptionPane.showMessageDialog(GlobalMap.this, scroller, "Numbers of Supported Regions in Each Country", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		topPanel.add(listButton);
 
 		pack();
 		setLocationRelativeTo(owner);

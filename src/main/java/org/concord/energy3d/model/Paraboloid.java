@@ -12,37 +12,38 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
+ * This models an elliptical paraboloid z = x^2 / a^2 + y^2 / b^2
+ * 
  * @author Charles Xie
  * 
  */
 
 public class Paraboloid extends Mesh {
 
-	public enum TextureMode {
-		Linear, Projected, Polar;
-	}
-
-	protected int _zSamples;
-	protected int _radialSamples;
-	protected TextureMode _textureMode = TextureMode.Linear;
-	public double _radius; // the distance from the center point each point falls on
-	public final Vector3 _center = new Vector3(); // the center of the paraboloid
+	private double _a, _b, _apertureRadius;
+	private int _zSamples;
+	private int _radialSamples;
+	private final Vector3 _center = new Vector3(); // the center of the paraboloid
 
 	/**
-	 * Constructs a paraboloid with center at the origin. For details, see the other constructor.
+	 * Constructs a paraboloid with center at the origin.
 	 * 
 	 * @param name
 	 *            Name of paraboloid.
+	 * @param apertureRadius
+	 *            The radius of the aperture of the paraboloid.
+	 * @param a
+	 *            parameter a of the elliptical paraboloid.
+	 * @param b
+	 *            parameter b of the elliptical paraboloid.
 	 * @param zSamples
 	 *            The samples along the Z.
 	 * @param radialSamples
 	 *            The samples along the radial.
-	 * @param radius
-	 *            Radius of the paraboloid.
 	 */
-	public Paraboloid(final String name, final int zSamples, final int radialSamples, final double radius) {
+	public Paraboloid(final String name, final double apertureRadius, final double a, final double b, final int zSamples, final int radialSamples) {
 		super(name);
-		setData(new Vector3(0, 0, 0), zSamples, radialSamples, radius);
+		setData(new Vector3(), apertureRadius, a, b, zSamples, radialSamples);
 	}
 
 	/**
@@ -50,29 +51,34 @@ public class Paraboloid extends Mesh {
 	 * 
 	 * @param center
 	 *            The new center of the paraboloid.
+	 * @param apertureRadius
+	 *            The new radius of the paraboloid.
+	 * @param a
+	 *            parameter a of the elliptical paraboloid.
+	 * @param b
+	 *            parameter b of the elliptical paraboloid.
 	 * @param zSamples
 	 *            The new number of zSamples of the paraboloid.
 	 * @param radialSamples
 	 *            The new number of radial samples of the paraboloid.
-	 * @param radius
-	 *            The new radius of the paraboloid.
 	 */
-	public void setData(final ReadOnlyVector3 center, final int zSamples, final int radialSamples, final double radius) {
+	public void setData(final ReadOnlyVector3 center, final double apertureRadius, final double a, final double b, final int zSamples, final int radialSamples) {
 		_center.set(center);
+		_apertureRadius = apertureRadius;
+		_a = a;
+		_b = b;
 		_zSamples = zSamples;
 		_radialSamples = radialSamples;
-		_radius = radius;
-
 		setGeometryData();
 		setIndexData();
 	}
 
 	/**
-	 * builds the vertices based on the radius, center and radial and zSamples.
+	 * builds the vertices based on the aperture radius, a, b, center and radial and zSamples.
 	 */
 	private void setGeometryData() {
 		// allocate vertices
-		final int verts = (_zSamples - 2) * (_radialSamples + 1) + 2;
+		final int verts = (_zSamples - 1) * (_radialSamples + 1) + 1;
 		final FloatBufferData vertsData = _meshData.getVertexCoords();
 		if (vertsData == null) {
 			_meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
@@ -100,41 +106,40 @@ public class Paraboloid extends Mesh {
 		final double fInvRS = 1.0 / _radialSamples;
 		final double fZFactor = 2.0 / (_zSamples - 1);
 
-		// Generate points on the unit circle to be used in computing the mesh
-		// points on a paraboloid slice.
-		final double[] afSin = new double[(_radialSamples + 1)];
-		final double[] afCos = new double[(_radialSamples + 1)];
+		// Generate points on the unit circle to be used in computing the mesh points on a paraboloid slice.
+		final double[] sin = new double[(_radialSamples + 1)];
+		final double[] cos = new double[(_radialSamples + 1)];
 		for (int iR = 0; iR < _radialSamples; iR++) {
-			final double fAngle = MathUtils.TWO_PI * fInvRS * iR;
-			afCos[iR] = MathUtils.cos(fAngle);
-			afSin[iR] = MathUtils.sin(fAngle);
+			final double angle = MathUtils.TWO_PI * fInvRS * iR;
+			cos[iR] = MathUtils.cos(angle);
+			sin[iR] = MathUtils.sin(angle);
 		}
-		afSin[_radialSamples] = afSin[0];
-		afCos[_radialSamples] = afCos[0];
+		sin[_radialSamples] = sin[0];
+		cos[_radialSamples] = cos[0];
 
 		// generate the paraboloid itself
 		int i = 0;
 		final Vector3 tempVa = Vector3.fetchTempInstance();
 		final Vector3 tempVb = Vector3.fetchTempInstance();
 		final Vector3 tempVc = Vector3.fetchTempInstance();
-		for (int iZ = 1; iZ < (_zSamples - 1); iZ++) {
+		for (int iZ = 1; iZ < _zSamples; iZ++) {
 			final double fAFraction = MathUtils.HALF_PI * (-1.0f + fZFactor * iZ); // in (-pi/2, pi/2)
 			final double fZFraction = MathUtils.sin(fAFraction); // in (-1,1)
-			final double fZ = _radius * fZFraction;
+			final double fZ = _apertureRadius * fZFraction;
 
 			// compute center of slice
 			final Vector3 kSliceCenter = tempVb.set(_center);
 			kSliceCenter.setZ(kSliceCenter.getZ() + fZ);
 
 			// compute radius of slice
-			final double fSliceRadius = Math.sqrt(Math.abs(_radius * _radius - fZ * fZ));
+			final double fSliceRadius = Math.sqrt(Math.abs(_apertureRadius * _apertureRadius - fZ * fZ));
 
 			// compute slice vertices with duplication at end point
 			Vector3 kNormal;
 			final int iSave = i;
 			for (int iR = 0; iR < _radialSamples; iR++) {
 				final double fRadialFraction = iR * fInvRS; // in [0,1)
-				final Vector3 kRadial = tempVc.set(afCos[iR], afSin[iR], 0);
+				final Vector3 kRadial = tempVc.set(cos[iR], sin[iR], 0);
 				kRadial.multiply(fSliceRadius, tempVa);
 				_meshData.getVertexBuffer().put((float) (kSliceCenter.getX() + tempVa.getX())).put((float) (kSliceCenter.getY() + tempVa.getY())).put((float) (kSliceCenter.getZ() + tempVa.getZ()));
 
@@ -143,16 +148,7 @@ public class Paraboloid extends Mesh {
 				kNormal.normalizeLocal();
 				_meshData.getNormalBuffer().put(kNormal.getXf()).put(kNormal.getYf()).put(kNormal.getZf());
 
-				if (_textureMode == TextureMode.Linear) {
-					_meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) (0.5 * (fZFraction + 1.0)));
-				} else if (_textureMode == TextureMode.Projected) {
-					_meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) (MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(fZFraction))));
-				} else if (_textureMode == TextureMode.Polar) {
-					final double r = (MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI;
-					final double u = r * afCos[iR] + 0.5;
-					final double v = r * afSin[iR] + 0.5;
-					_meshData.getTextureCoords(0).getBuffer().put((float) u).put((float) v);
-				}
+				_meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) (0.5 * (fZFraction + 1.0)));
 
 				i++;
 			}
@@ -160,48 +156,23 @@ public class Paraboloid extends Mesh {
 			BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
 			BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-			if (_textureMode == TextureMode.Linear) {
-				_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
-			} else if (_textureMode == TextureMode.Projected) {
-				_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (MathUtils.INV_PI * (MathUtils.HALF_PI + Math.asin(fZFraction))));
-			} else if (_textureMode == TextureMode.Polar) {
-				final float r = (float) ((MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI);
-				_meshData.getTextureCoords(0).getBuffer().put(r + 0.5f).put(0.5f);
-			}
+			_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
 
 			i++;
 		}
 
-		// south pole
+		// the center is at the bottom of the paraboloid
 		_meshData.getVertexBuffer().position(i * 3);
-		_meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put((float) (_center.getZ() - _radius));
-
+		_meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put(_center.getZf());
 		_meshData.getNormalBuffer().position(i * 3);
-		// TODO: allow for inner texture orientation later.
 		_meshData.getNormalBuffer().put(0).put(0).put(-1);
-
 		_meshData.getTextureCoords(0).getBuffer().position(i * 2);
-		if (_textureMode == TextureMode.Polar) {
-			_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.5f);
-		} else {
-			_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.0f);
-		}
+		_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.0f);
 
-		i++;
-
-		// north pole
-		_meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put((float) (_center.getZ() + _radius));
-
-		_meshData.getNormalBuffer().put(0).put(0).put(1);
-
-		if (_textureMode == TextureMode.Polar) {
-			_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.5f);
-		} else {
-			_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(1.0f);
-		}
 		Vector3.releaseTempInstance(tempVa);
 		Vector3.releaseTempInstance(tempVb);
 		Vector3.releaseTempInstance(tempVc);
+
 	}
 
 	/**
@@ -255,44 +226,38 @@ public class Paraboloid extends Mesh {
 		return _center;
 	}
 
-	/**
-	 * @return Returns the textureMode.
-	 */
-	public TextureMode getTextureMode() {
-		return _textureMode;
+	public double getApertureRadius() {
+		return _apertureRadius;
 	}
 
-	/**
-	 * @param textureMode
-	 *            The textureMode to set.
-	 */
-	public void setTextureMode(final TextureMode textureMode) {
-		_textureMode = textureMode;
-		setGeometryData();
-		setIndexData();
+	public double getA() {
+		return _a;
 	}
 
-	public double getRadius() {
-		return _radius;
+	public double getB() {
+		return _b;
 	}
 
 	@Override
 	public void write(final OutputCapsule capsule) throws IOException {
 		super.write(capsule);
+		capsule.write(_a, "a", 0);
+		capsule.write(_b, "b", 0);
+		capsule.write(_apertureRadius, "apertureRadius", 0);
 		capsule.write(_zSamples, "zSamples", 0);
 		capsule.write(_radialSamples, "radialSamples", 0);
-		capsule.write(_radius, "radius", 0);
 		capsule.write(_center, "center", new Vector3(Vector3.ZERO));
-		capsule.write(_textureMode, "textureMode", TextureMode.Linear);
 	}
 
 	@Override
 	public void read(final InputCapsule capsule) throws IOException {
 		super.read(capsule);
+		_a = capsule.readDouble("a", 0);
+		_b = capsule.readDouble("b", 0);
+		_apertureRadius = capsule.readDouble("apertureRadius", 0);
 		_zSamples = capsule.readInt("zSamples", 0);
 		_radialSamples = capsule.readInt("radialSamples", 0);
-		_radius = capsule.readDouble("radius", 0);
 		_center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
-		_textureMode = capsule.readEnum("textureMode", TextureMode.class, TextureMode.Linear);
 	}
+
 }
