@@ -44,9 +44,9 @@ public class Paraboloid extends Mesh {
 	 * @param radialSamples
 	 *            The samples along the radial.
 	 */
-	public Paraboloid(final String name, final double apertureRadius, final double a, final double b, final int zSamples, final int radialSamples) {
+	public Paraboloid(final String name, final Vector3 center, final double apertureRadius, final double a, final double b, final int zSamples, final int radialSamples) {
 		super(name);
-		setData(new Vector3(), apertureRadius, a, b, zSamples, radialSamples);
+		setData(center, apertureRadius, a, b, zSamples, radialSamples);
 	}
 
 	/**
@@ -132,9 +132,9 @@ public class Paraboloid extends Mesh {
 		final Vector3 tempVb = Vector3.fetchTempInstance();
 		final Vector3 tempVc = Vector3.fetchTempInstance();
 		for (int iZ = 1; iZ < _zSamples; iZ++) {
-			final double fAFraction = MathUtils.HALF_PI * (-1.0f + fZFactor * iZ); // in (-pi/2, pi/2)
+			final double fAFraction = MathUtils.HALF_PI * fZFactor * iZ; // in (-pi/2, pi/2)
 			final double fZFraction = MathUtils.sin(fAFraction); // in (-1,1)
-			final double fZ = _apertureRadius * fZFraction;
+			final double fZ = -_apertureRadius * fZFraction;
 
 			// compute center of slice
 			final Vector3 kSliceCenter = tempVb.set(_center);
@@ -157,7 +157,11 @@ public class Paraboloid extends Mesh {
 				kNormal.normalizeLocal();
 				_meshData.getNormalBuffer().put(kNormal.getXf()).put(kNormal.getYf()).put(kNormal.getZf());
 
-				_meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) (0.5 * (fZFraction + 1.0)));
+				_meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) fZFraction);
+				// final double r = (MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI;
+				// final double u = r * cos[iR] + 0.5;
+				// final double v = r * sin[iR] + 0.5;
+				// _meshData.getTextureCoords(0).getBuffer().put((float) u).put((float) v);
 
 				i++;
 			}
@@ -165,7 +169,9 @@ public class Paraboloid extends Mesh {
 			BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
 			BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-			_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) (0.5 * (fZFraction + 1.0)));
+			_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) fZFraction);
+			// final float r = (float) ((MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI);
+			// _meshData.getTextureCoords(0).getBuffer().put(r + 0.5f).put(0.5f);
 
 			i++;
 		}

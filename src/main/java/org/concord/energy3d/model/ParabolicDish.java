@@ -62,7 +62,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
 	private double opticalEfficiency = 0.7;
 	private double thermalEfficiency = 0.6;
-	private double apertureRadius = 2;
+	private double apertureRadius = 3;
 	private double dishA = 2;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 15;
@@ -89,7 +89,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 			copyLayoutGap = 0.2;
 		}
 		if (Util.isZero(apertureRadius)) {
-			apertureRadius = 2;
+			apertureRadius = 3;
 		}
 		if (Util.isZero(dishA)) {
 			dishA = 2;
@@ -114,7 +114,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
-		mesh = new Paraboloid("Paraboloid", apertureRadius, dishA, dishA, nSectionAxis, nSectionParabola);
+		mesh = new Paraboloid("Paraboloid", new Vector3(0, 0, baseHeight), apertureRadius, dishA, dishA, nSectionAxis, nSectionParabola);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -132,7 +132,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		root.attachChild(dishBack);
 
 		outlines = new Line("Parabolic Dish (Outline)");
-		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4 + 2 * (dish.getRSamples() + 1)));
+		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (dish.getRSamples() + 1)));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
 		outlines.setLineWidth(0.01f);
@@ -287,15 +287,9 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		FloatBuffer steelFrameBuffer = steelFrame.getMeshData().getVertexBuffer();
 
 		final int vertexCount = vertexBuffer.limit() / 6;
-		final int j = vertexCount * 3; // number of vertex coordinates on each end
-		final int j1 = (j - 3) / 2; // start index of middle point on end 1
-		final int j2 = j + j1; // start index of middle point on end 2
-		final Vector3 p1 = new Vector3(vertexBuffer.get(j1), vertexBuffer.get(j1 + 1), vertexBuffer.get(j1 + 2)); // middle point on end 1
-		final Vector3 p2 = new Vector3(vertexBuffer.get(j2), vertexBuffer.get(j2 + 1), vertexBuffer.get(j2 + 2)); // middle point on end 2
-		final Vector3 pd = p2.subtract(p1, null).normalizeLocal(); // normal in the direction of cylinder axis
 		final Vector3 center = getAbsPoint(0);
 
-		final int outlineBufferSize = 6 * (vertexCount - 1) * 3 + 12; // 12 is for the two lateral lines
+		final int outlineBufferSize = 6 * (dish.getRSamples() + 1);
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
@@ -304,18 +298,10 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 			outlineBuffer.limit(outlineBufferSize);
 		}
 		// draw parabolic lines of the two end faces
-		for (int i = 0; i < vertexCount - 1; i++) {
+		for (int i = 0; i < dish.getRSamples(); i++) {
 			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2));
 			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5));
-			outlineBuffer.put(vertexBuffer.get(j + i * 3)).put(vertexBuffer.get(j + i * 3 + 1)).put(vertexBuffer.get(j + i * 3 + 2));
-			outlineBuffer.put(vertexBuffer.get(j + i * 3 + 3)).put(vertexBuffer.get(j + i * 3 + 4)).put(vertexBuffer.get(j + i * 3 + 5));
 		}
-		// draw lateral lines connecting the two end faces
-		outlineBuffer.put(vertexBuffer.get(0)).put(vertexBuffer.get(1)).put(vertexBuffer.get(2));
-		outlineBuffer.put(vertexBuffer.get(j)).put(vertexBuffer.get(j + 1)).put(vertexBuffer.get(j + 2));
-		outlineBuffer.put(vertexBuffer.get(j - 3)).put(vertexBuffer.get(j - 2)).put(vertexBuffer.get(j - 1));
-		outlineBuffer.put(vertexBuffer.get(2 * j - 3)).put(vertexBuffer.get(2 * j - 2)).put(vertexBuffer.get(2 * j - 1));
-		outlineBuffer.limit(vertexCount * 12);
 
 		// draw steel frame lines
 		final int steelBufferSize = 6;
@@ -336,7 +322,6 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
-		System.out.println("***" + center);
 		dishBack.setRotation(rotation);
 		dishBack.setTranslation(mesh.getTranslation());
 		outlines.setRotation(rotation);
