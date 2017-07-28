@@ -36,6 +36,7 @@ import org.concord.energy3d.model.Labelable;
 import org.concord.energy3d.model.MeshLocator;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
@@ -650,7 +651,7 @@ public class Scene implements Serializable {
 			if (!p.isValid()) { // remove invalid parts
 				toBeRemoved.add(p);
 			} else if (p.getContainer() == null) { // remove orphan parts without a container
-				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Rack || p instanceof ParabolicTrough || p instanceof FresnelReflector || p instanceof Mirror || p instanceof Sensor || p instanceof Floor) {
+				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Rack || p instanceof ParabolicTrough || p instanceof ParabolicDish || p instanceof FresnelReflector || p instanceof Mirror || p instanceof Sensor || p instanceof Floor) {
 					toBeRemoved.add(p);
 				}
 			} else if (!parts.contains(p.getContainer())) { // remove parts whose container doesn't exist in the scene
@@ -3159,6 +3160,13 @@ public class Scene implements Serializable {
 							trough.drawLightBeams(); // call this so that the light beams can be set invisible
 						} else {
 							trough.draw();
+						}
+					} else if (part instanceof ParabolicDish) {
+						final ParabolicDish dish = (ParabolicDish) part;
+						if (night) {
+							dish.drawLightBeams(); // call this so that the light beams can be set invisible
+						} else {
+							dish.draw();
 						}
 					} else if (part instanceof FresnelReflector) {
 						final FresnelReflector fresnel = (FresnelReflector) part;

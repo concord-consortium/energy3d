@@ -1927,6 +1927,16 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		return nearest;
 	}
 
+	public List<ParabolicDish> getParabolicDishes() {
+		final List<ParabolicDish> list = new ArrayList<ParabolicDish>();
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				list.add((ParabolicDish) p);
+			}
+		}
+		return list;
+	}
+
 	public List<FresnelReflector> getFresnelReflectors() {
 		final List<FresnelReflector> list = new ArrayList<FresnelReflector>();
 		for (final HousePart p : children) {
@@ -2508,7 +2518,7 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 				if (p instanceof SolarPanel || p instanceof Rack) {
 					return TYPE_PV_STATION;
 				}
-				if (p instanceof Mirror || p instanceof ParabolicTrough || p instanceof FresnelReflector) {
+				if (p instanceof Mirror || p instanceof ParabolicTrough || p instanceof ParabolicDish || p instanceof FresnelReflector) {
 					return TYPE_CSP_STATION;
 				}
 			}

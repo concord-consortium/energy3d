@@ -45,6 +45,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Meshable;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.PickedHousePart;
 import org.concord.energy3d.model.PyramidRoof;
@@ -466,6 +467,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							t.drawLightBeams(); // call this so that the light beams can be set invisible
 						} else {
 							t.draw();
+						}
+					} else if (part instanceof ParabolicDish) {
+						final ParabolicDish d = (ParabolicDish) part;
+						if (night) {
+							d.drawLightBeams(); // call this so that the light beams can be set invisible
+						} else {
+							d.draw();
 						}
 					} else if (part instanceof FresnelReflector) {
 						final FresnelReflector f = (FresnelReflector) part;
@@ -1113,6 +1121,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final ParabolicTrough t = (ParabolicTrough) selectedPart;
 			t.move(v, selectedPart.getGridSize());
 			t.draw();
+		} else if (selectedPart instanceof ParabolicDish) {
+			final ParabolicDish d = (ParabolicDish) selectedPart;
+			d.move(v, selectedPart.getGridSize());
+			d.draw();
 		} else if (selectedPart instanceof FresnelReflector) {
 			final FresnelReflector f = (FresnelReflector) selectedPart;
 			f.move(v, selectedPart.getGridSize());
@@ -1343,6 +1355,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Mirror();
 		} else if (operation == Operation.DRAW_PARABOLIC_TROUGH) {
 			drawn = new ParabolicTrough();
+		} else if (operation == Operation.DRAW_PARABOLIC_DISH) {
+			drawn = new ParabolicDish();
 		} else if (operation == Operation.DRAW_FRESNEL_REFLECTOR) {
 			drawn = new FresnelReflector();
 		} else if (operation == Operation.DRAW_SENSOR) {
@@ -1664,7 +1678,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
 						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 					} else {
-						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof ParabolicTrough || hoveredPart instanceof FresnelReflector || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof ParabolicTrough || hoveredPart instanceof ParabolicDish || hoveredPart instanceof FresnelReflector || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
 							canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 						}
 					}
