@@ -61,6 +61,7 @@ import org.concord.energy3d.model.MirrorCircularFieldLayout;
 import org.concord.energy3d.model.MirrorRectangularFieldLayout;
 import org.concord.energy3d.model.MirrorSpiralFieldLayout;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
@@ -137,6 +138,7 @@ public class PopupMenuFactory {
 	private static JPopupMenu popupMenuForRack;
 	private static JPopupMenu popupMenuForMirror;
 	private static JPopupMenu popupMenuForParabolicTrough;
+	private static JPopupMenu popupMenuForParabolicDish;
 	private static JPopupMenu popupMenuForFresnelReflector;
 	private static JPopupMenu popupMenuForSensor;
 	private static JPopupMenu popupMenuForLand;
@@ -216,6 +218,9 @@ public class PopupMenuFactory {
 		}
 		if (selectedPart instanceof ParabolicTrough) {
 			return getPopupMenuForParabolicTrough();
+		}
+		if (selectedPart instanceof ParabolicDish) {
+			return getPopupMenuForParabolicDish();
 		}
 		if (selectedPart instanceof FresnelReflector) {
 			return getPopupMenuForFresnelReflector();
@@ -10156,6 +10161,943 @@ public class PopupMenuFactory {
 		}
 
 		return popupMenuForParabolicTrough;
+
+	}
+
+	private static JPopupMenu getPopupMenuForParabolicDish() {
+
+		if (popupMenuForParabolicDish == null) {
+
+			final JMenuItem miMesh = new JMenuItem("Mesh...");
+			miMesh.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final Foundation foundation = t.getTopContainer();
+					final String partInfo = t.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Parabolic cross-section: "));
+					final JTextField nParabolaField = new JTextField("" + t.getNSectionParabola());
+					inputPanel.add(nParabolaField);
+					inputPanel.add(new JLabel("Axial direction: "));
+					final JTextField nAxisField = new JTextField("" + t.getNSectionAxis());
+					inputPanel.add(nAxisField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set mesh for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Mesh");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							int nSectionParabola = 0, nSectionAxis = 0;
+							boolean ok = true;
+							try {
+								nSectionParabola = Integer.parseInt(nParabolaField.getText());
+								nSectionAxis = Integer.parseInt(nAxisField.getText());
+							} catch (final NumberFormatException nfe) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (nSectionParabola < 4) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (nSectionAxis < 4) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis mesh must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (!Util.isPowerOfTwo(nSectionParabola) || !Util.isPowerOfTwo(nSectionAxis)) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of parabolic dish mesh sections in x or y direction must be power of two.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
+										t.setNSectionParabola(nSectionParabola);
+										t.setNSectionAxis(nSectionAxis);
+										t.draw();
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+										foundation.setSectionsForParabolicTroughs(nSectionParabola, nSectionAxis);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+										Scene.getInstance().setSectionsForAllParabolicTroughs(nSectionParabola, nSectionAxis);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JCheckBoxMenuItem cbmiDrawSunBeams = new JCheckBoxMenuItem("Draw Sun Beams");
+			cbmiDrawSunBeams.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final ParabolicDish t = (ParabolicDish) selectedPart;
+					t.setBeamsVisible(cbmiDrawSunBeams.isSelected());
+					t.drawLightBeams();
+					t.draw();
+					Scene.getInstance().setEdited(true);
+				}
+			});
+
+			final JMenuItem miApertureRadius = new JMenuItem("Aperture Radius...");
+			miApertureRadius.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					final Foundation foundation = d.getTopContainer();
+					final String partInfo = d.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Aperture Radius (m): "));
+					final JTextField widthField = new JTextField(threeDecimalsFormat.format(d.getApertureRadius()));
+					inputPanel.add(widthField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set aperture radius for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Aperture Radius");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double r = 0;
+							boolean ok = true;
+							try {
+								r = Double.parseDouble(widthField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (r < 1 || r > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish aperture radius must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										final SetPartSizeCommand c = new SetPartSizeCommand(d);
+										d.setApertureRadius(r);
+										d.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+										// foundation.setSizeForParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+										// Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miCurvature = new JMenuItem("Curvature Parameter...");
+			miCurvature.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					final Foundation foundation = d.getTopContainer();
+					final String partInfo = d.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Curvature Parameter (m): "));
+					final JTextField curvatureParameterField = new JTextField(threeDecimalsFormat.format(d.getCurvatureParameter()));
+					inputPanel.add(curvatureParameterField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set curvature parameter for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Curvature Parameter");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double cp = 0;
+							boolean ok = true;
+							try {
+								cp = Double.parseDouble(curvatureParameterField.getText());
+							} catch (final NumberFormatException nfe) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (cp < 0.5 || cp > 5) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Curvature parameter must be between 0.5 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final SetParabolicTroughSemilatusRectumCommand c = new SetParabolicTroughSemilatusRectumCommand(t);
+										d.setCurvatureParameter(cp);
+										d.draw();
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+										// foundation.setSemilatusRectumForParabolicTroughs(2 * cp);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+										// Scene.getInstance().setSemilatusRectumForAllParabolicTroughs(2 * cp);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miBaseHeight = new JMenuItem("Base Height...");
+			miBaseHeight.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					final Foundation foundation = d.getTopContainer();
+					final String title = "<html>Base Height (m) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(d.getBaseHeight() * Scene.getInstance().getAnnotationScale()));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Base Height");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText()) / Scene.getInstance().getAnnotationScale();
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (rb1.isSelected()) {
+									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(d);
+									d.setBaseHeight(val);
+									d.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 0;
+								} else if (rb2.isSelected()) {
+									// final ChangeFoundationParabolicTroughBaseHeightCommand c = new ChangeFoundationParabolicTroughBaseHeightCommand(foundation);
+									// foundation.setBaseHeightForParabolicTroughs(val);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 1;
+								} else if (rb3.isSelected()) {
+									// final ChangeBaseHeightForAllParabolicTroughsCommand c = new ChangeBaseHeightForAllParabolicTroughsCommand();
+									// Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
+									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									selectedScopeIndex = 2;
+								}
+								updateAfterEdit();
+								if (choice == options[0]) {
+									break;
+								}
+							}
+						}
+					}
+
+				}
+			});
+
+			final JMenu labelMenu = new JMenu("Label");
+
+			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
+			miLabelNone.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (miLabelNone.isSelected()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof ParabolicDish) {
+							final ParabolicDish t = (ParabolicDish) selectedPart;
+							final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
+							t.clearLabels();
+							t.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().refresh();
+						}
+					}
+				}
+			});
+			labelMenu.add(miLabelNone);
+
+			final JCheckBoxMenuItem miLabelCustom = new JCheckBoxMenuItem("Custom");
+			miLabelCustom.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof ParabolicDish) {
+						final ParabolicDish t = (ParabolicDish) selectedPart;
+						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
+						t.setLabelCustom(miLabelCustom.isSelected());
+						if (t.getLabelCustom()) {
+							t.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", t.getLabelCustomText()));
+						}
+						t.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelCustom);
+
+			final JCheckBoxMenuItem miLabelId = new JCheckBoxMenuItem("ID");
+			miLabelId.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof ParabolicDish) {
+						final ParabolicDish t = (ParabolicDish) selectedPart;
+						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
+						t.setLabelId(miLabelId.isSelected());
+						t.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelId);
+
+			final JCheckBoxMenuItem miLabelEnergyOutput = new JCheckBoxMenuItem("Energy Output");
+			miLabelEnergyOutput.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof ParabolicDish) {
+						final ParabolicDish t = (ParabolicDish) selectedPart;
+						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
+						t.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						t.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelEnergyOutput);
+
+			popupMenuForParabolicDish = createPopupMenu(true, true, new Runnable() {
+				@Override
+				public void run() {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final ParabolicDish t = (ParabolicDish) selectedPart;
+					Util.selectSilently(miLabelNone, !t.isLabelVisible());
+					Util.selectSilently(miLabelCustom, t.getLabelCustom());
+					Util.selectSilently(miLabelId, t.getLabelId());
+					Util.selectSilently(miLabelEnergyOutput, t.getLabelEnergyOutput());
+					Util.selectSilently(cbmiDrawSunBeams, t.areBeamsVisible());
+				}
+			});
+
+			final JMenuItem miReflectance = new JMenuItem("Mirror Reflectance...");
+			miReflectance.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final String title = "<html>Reflectance (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Reflectance can be affected by pollen and dust.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getReflectance() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Mirror Reflectance");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 50 || val > 99) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final ChangeParabolicTroughReflectanceCommand c = new ChangeParabolicTroughReflectanceCommand(t);
+										t.setReflectance(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final Foundation foundation = t.getTopContainer();
+										// final ChangeFoundationParabolicTroughReflectanceCommand c = new ChangeFoundationParabolicTroughReflectanceCommand(foundation);
+										// foundation.setReflectanceForParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final ChangeReflectanceForAllParabolicTroughsCommand c = new ChangeReflectanceForAllParabolicTroughsCommand();
+										// Scene.getInstance().setReflectanceForAllParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miAbsorptance = new JMenuItem("Receiver Absorptance...");
+			miAbsorptance.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final String title = "<html>Absorptance (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getAbsorptance() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Receiver Absorptance");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 50 || val > 99) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final ChangeParabolicTroughAbsorptanceCommand c = new ChangeParabolicTroughAbsorptanceCommand(t);
+										t.setAbsorptance(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final Foundation foundation = t.getTopContainer();
+										// final ChangeFoundationParabolicTroughAbsorptanceCommand c = new ChangeFoundationParabolicTroughAbsorptanceCommand(foundation);
+										// foundation.setAbsorptanceForParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final ChangeAbsorptanceForAllParabolicTroughsCommand c = new ChangeAbsorptanceForAllParabolicTroughsCommand();
+										// Scene.getInstance().setAbsorptanceForAllParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miOpticalEfficiency = new JMenuItem("Optical Efficiency...");
+			miOpticalEfficiency.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final String title = "<html>Opitical efficiency (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getOpticalEfficiency() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Optical Efficiency");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 20 || val > 80) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish optical efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final ChangeParabolicTroughOpticalEfficiencyCommand c = new ChangeParabolicTroughOpticalEfficiencyCommand(t);
+										t.setOpticalEfficiency(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final Foundation foundation = t.getTopContainer();
+										// final ChangeFoundationParabolicTroughOpticalEfficiencyCommand c = new ChangeFoundationParabolicTroughOpticalEfficiencyCommand(foundation);
+										// foundation.setOpticalEfficiencyForParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final ChangeOpticalEfficiencyForAllParabolicTroughsCommand c = new ChangeOpticalEfficiencyForAllParabolicTroughsCommand();
+										// Scene.getInstance().setOpticalEfficiencyForAllParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miThermalEfficiency = new JMenuItem("Thermal Efficiency...");
+			miThermalEfficiency.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final String title = "<html>Thermal efficiency (%) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getThermalEfficiency() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Thermal Efficiency");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 20 || val > 80) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish thermal efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final ChangeParabolicTroughThermalEfficiencyCommand c = new ChangeParabolicTroughThermalEfficiencyCommand(t);
+										t.setThermalEfficiency(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										/// final Foundation foundation = t.getTopContainer();
+										// final ChangeFoundationParabolicTroughThermalEfficiencyCommand c = new ChangeFoundationParabolicTroughThermalEfficiencyCommand(foundation);
+										// foundation.setThermalEfficiencyForParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final ChangeThermalEfficiencyForAllParabolicTroughsCommand c = new ChangeThermalEfficiencyForAllParabolicTroughsCommand();
+										// Scene.getInstance().setThermalEfficiencyForAllParabolicTroughs(val * 0.01);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			popupMenuForParabolicDish.addSeparator();
+			popupMenuForParabolicDish.add(cbmiDrawSunBeams);
+			popupMenuForParabolicDish.add(labelMenu);
+			popupMenuForParabolicDish.addSeparator();
+			popupMenuForParabolicDish.add(miApertureRadius);
+			popupMenuForParabolicDish.add(miCurvature);
+			popupMenuForParabolicDish.add(miBaseHeight);
+			popupMenuForParabolicDish.addSeparator();
+			popupMenuForParabolicDish.add(miReflectance);
+			popupMenuForParabolicDish.add(miAbsorptance);
+			popupMenuForParabolicDish.add(miOpticalEfficiency);
+			popupMenuForParabolicDish.add(miThermalEfficiency);
+			popupMenuForParabolicDish.addSeparator();
+			popupMenuForParabolicDish.add(miMesh);
+			popupMenuForParabolicDish.addSeparator();
+
+			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicDish) {
+						// new ParabolicDishDailyAnalysis().show();
+					}
+				}
+			});
+			popupMenuForParabolicDish.add(mi);
+
+			mi = new JMenuItem("Annual Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicDish) {
+						// new ParabolicDishAnnualAnalysis().show();
+					}
+				}
+			});
+			popupMenuForParabolicDish.add(mi);
+
+		}
+
+		return popupMenuForParabolicDish;
 
 	}
 

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.scenegraph.FloatBufferData;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.export.InputCapsule;
@@ -12,7 +11,7 @@ import com.ardor3d.util.export.OutputCapsule;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * This models an elliptical paraboloid z = x^2 / a^2 + y^2 / b^2
+ * This models a paraboloid z = x^2 / a^2 + y^2 / a^2
  * 
  * @author Charles Xie
  * 
@@ -20,7 +19,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Paraboloid extends Mesh {
 
-	private double _a, _b, _apertureRadius;
+	private double _a, _apertureRadius;
 	private int _zSamples;
 	private int _rSamples;
 	private final Vector3 _center = new Vector3(); // the center of the paraboloid
@@ -36,40 +35,32 @@ public class Paraboloid extends Mesh {
 	 * @param apertureRadius
 	 *            The radius of the aperture of the paraboloid.
 	 * @param a
-	 *            parameter a of the elliptical paraboloid.
-	 * @param b
-	 *            parameter b of the elliptical paraboloid.
+	 *            parameter a of the round paraboloid.
 	 * @param zSamples
 	 *            The samples along the Z.
 	 * @param radialSamples
 	 *            The samples along the radial.
 	 */
-	public Paraboloid(final String name, final Vector3 center, final double apertureRadius, final double a, final double b, final int zSamples, final int radialSamples) {
+	public Paraboloid(final String name, final double apertureRadius, final double a, final int zSamples, final int radialSamples) {
 		super(name);
-		setData(center, apertureRadius, a, b, zSamples, radialSamples);
+		setData(apertureRadius, a, zSamples, radialSamples);
 	}
 
 	/**
 	 * Changes the information of the paraboloid into the given values.
 	 * 
-	 * @param center
-	 *            The new center of the paraboloid.
 	 * @param apertureRadius
 	 *            The new radius of the paraboloid.
 	 * @param a
 	 *            parameter a of the elliptical paraboloid.
-	 * @param b
-	 *            parameter b of the elliptical paraboloid.
 	 * @param zSamples
 	 *            The new number of zSamples of the paraboloid.
 	 * @param radialSamples
 	 *            The new number of radial samples of the paraboloid.
 	 */
-	public void setData(final ReadOnlyVector3 center, final double apertureRadius, final double a, final double b, final int zSamples, final int radialSamples) {
-		_center.set(center);
+	public void setData(final double apertureRadius, final double a, final int zSamples, final int radialSamples) {
 		_apertureRadius = apertureRadius;
 		_a = a;
-		_b = b;
 		_zSamples = zSamples;
 		_rSamples = radialSamples;
 		setGeometryData();
@@ -87,7 +78,7 @@ public class Paraboloid extends Mesh {
 	 */
 	private void setGeometryData() {
 		// allocate vertices
-		final int verts = (_zSamples - 1) * (_rSamples + 1) + 1;
+		final int verts = (_zSamples - 1) * (_rSamples + 1);
 		final FloatBufferData vertsData = _meshData.getVertexCoords();
 		if (vertsData == null) {
 			_meshData.setVertexBuffer(BufferUtils.createVector3Buffer(verts));
@@ -112,14 +103,16 @@ public class Paraboloid extends Mesh {
 		}
 
 		// generate geometry
-		final double fInvRS = 1.0 / _rSamples;
-		final double fZFactor = 2.0 / (_zSamples - 1);
+		double zmax = _apertureRadius / _a;
+		zmax *= zmax;
+		final double inverseRSamples = 1.0 / _rSamples;
+		final double zSteplength = zmax / (_zSamples - 1);
 
 		// Generate points on the unit circle to be used in computing the mesh points on a paraboloid slice.
 		final double[] sin = new double[(_rSamples + 1)];
 		final double[] cos = new double[(_rSamples + 1)];
 		for (int iR = 0; iR < _rSamples; iR++) {
-			final double angle = MathUtils.TWO_PI * fInvRS * iR;
+			final double angle = MathUtils.TWO_PI * inverseRSamples * iR;
 			cos[iR] = MathUtils.cos(angle);
 			sin[iR] = MathUtils.sin(angle);
 		}
@@ -131,33 +124,27 @@ public class Paraboloid extends Mesh {
 		final Vector3 tempVa = Vector3.fetchTempInstance();
 		final Vector3 tempVb = Vector3.fetchTempInstance();
 		final Vector3 tempVc = Vector3.fetchTempInstance();
-		for (int iZ = 1; iZ < _zSamples; iZ++) {
-			final double fAFraction = MathUtils.HALF_PI * fZFactor * iZ; // in (-pi/2, pi/2)
-			final double fZFraction = MathUtils.sin(fAFraction); // in (-1,1)
-			final double fZ = -_apertureRadius * fZFraction;
-
-			// compute center of slice
-			final Vector3 kSliceCenter = tempVb.set(_center);
-			kSliceCenter.setZ(kSliceCenter.getZ() + fZ);
-
-			// compute radius of slice
-			final double fSliceRadius = Math.sqrt(Math.abs(_apertureRadius * _apertureRadius - fZ * fZ));
+		for (int iZ = 1; iZ < _zSamples - 1; iZ++) {
+			final float zFraction = iZ / (_zSamples - 1.0f);
+			final double z = zSteplength * iZ;
+			final Vector3 sliceCenter = tempVb.set(_center);
+			sliceCenter.setZ(sliceCenter.getZ() + z);
+			final double sliceRadius = Math.sqrt(z * _a * _a);
 
 			// compute slice vertices with duplication at end point
 			Vector3 kNormal;
 			final int iSave = i;
 			for (int iR = 0; iR < _rSamples; iR++) {
-				final double fRadialFraction = iR * fInvRS; // in [0,1)
-				final Vector3 kRadial = tempVc.set(cos[iR], sin[iR], 0);
-				kRadial.multiply(fSliceRadius, tempVa);
-				_meshData.getVertexBuffer().put((float) (kSliceCenter.getX() + tempVa.getX())).put((float) (kSliceCenter.getY() + tempVa.getY())).put((float) (kSliceCenter.getZ() + tempVa.getZ()));
+				final double radialFraction = iR * inverseRSamples; // in [0,1)
+				tempVc.set(cos[iR], sin[iR], 0).multiply(sliceRadius, tempVa);
+				_meshData.getVertexBuffer().put((float) (sliceCenter.getX() + tempVa.getX())).put((float) (sliceCenter.getY() + tempVa.getY())).put((float) (sliceCenter.getZ() + tempVa.getZ()));
 
 				BufferUtils.populateFromBuffer(tempVa, _meshData.getVertexBuffer(), i);
 				kNormal = tempVa.subtractLocal(_center);
 				kNormal.normalizeLocal();
 				_meshData.getNormalBuffer().put(kNormal.getXf()).put(kNormal.getYf()).put(kNormal.getZf());
 
-				_meshData.getTextureCoords(0).getBuffer().put((float) fRadialFraction).put((float) fZFraction);
+				_meshData.getTextureCoords(0).getBuffer().put((float) radialFraction).put(zFraction);
 				// final double r = (MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI;
 				// final double u = r * cos[iR] + 0.5;
 				// final double v = r * sin[iR] + 0.5;
@@ -169,20 +156,12 @@ public class Paraboloid extends Mesh {
 			BufferUtils.copyInternalVector3(_meshData.getVertexBuffer(), iSave, i);
 			BufferUtils.copyInternalVector3(_meshData.getNormalBuffer(), iSave, i);
 
-			_meshData.getTextureCoords(0).getBuffer().put(1.0f).put((float) fZFraction);
+			_meshData.getTextureCoords(0).getBuffer().put(1f).put(zFraction);
 			// final float r = (float) ((MathUtils.HALF_PI - Math.abs(fAFraction)) / MathUtils.PI);
 			// _meshData.getTextureCoords(0).getBuffer().put(r + 0.5f).put(0.5f);
 
 			i++;
 		}
-
-		// the center is at the bottom of the paraboloid
-		_meshData.getVertexBuffer().position(i * 3);
-		_meshData.getVertexBuffer().put(_center.getXf()).put(_center.getYf()).put(_center.getZf());
-		_meshData.getNormalBuffer().position(i * 3);
-		_meshData.getNormalBuffer().put(0).put(0).put(-1);
-		_meshData.getTextureCoords(0).getBuffer().position(i * 2);
-		_meshData.getTextureCoords(0).getBuffer().put(0.5f).put(0.0f);
 
 		Vector3.releaseTempInstance(tempVa);
 		Vector3.releaseTempInstance(tempVb);
@@ -249,10 +228,6 @@ public class Paraboloid extends Mesh {
 		return _a;
 	}
 
-	public double getB() {
-		return _b;
-	}
-
 	public int getZSamples() {
 		return _zSamples;
 	}
@@ -265,7 +240,6 @@ public class Paraboloid extends Mesh {
 	public void write(final OutputCapsule capsule) throws IOException {
 		super.write(capsule);
 		capsule.write(_a, "a", 0);
-		capsule.write(_b, "b", 0);
 		capsule.write(_apertureRadius, "apertureRadius", 0);
 		capsule.write(_zSamples, "zSamples", 0);
 		capsule.write(_rSamples, "rSamples", 0);
@@ -276,7 +250,6 @@ public class Paraboloid extends Mesh {
 	public void read(final InputCapsule capsule) throws IOException {
 		super.read(capsule);
 		_a = capsule.readDouble("a", 0);
-		_b = capsule.readDouble("b", 0);
 		_apertureRadius = capsule.readDouble("apertureRadius", 0);
 		_zSamples = capsule.readInt("zSamples", 0);
 		_rSamples = capsule.readInt("rSamples", 0);

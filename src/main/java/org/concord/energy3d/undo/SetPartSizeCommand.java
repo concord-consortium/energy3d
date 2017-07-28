@@ -7,6 +7,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Window;
@@ -30,6 +31,9 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			oldWidth = t.getApertureWidth();
 			oldHeight = t.getTroughLength();
 			oldModuleLength = t.getModuleLength();
+		} else if (part instanceof ParabolicDish) {
+			final ParabolicDish d = (ParabolicDish) part;
+			oldWidth = d.getApertureRadius();
 		} else if (part instanceof FresnelReflector) {
 			final FresnelReflector r = (FresnelReflector) part;
 			oldWidth = r.getModuleWidth();
@@ -75,6 +79,10 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			t.setApertureWidth(oldWidth);
 			t.setTroughLength(oldHeight);
 			t.setModuleLength(oldModuleLength);
+		} else if (part instanceof ParabolicDish) {
+			final ParabolicDish d = (ParabolicDish) part;
+			newWidth = d.getApertureRadius();
+			d.setApertureRadius(oldWidth);
 		} else if (part instanceof FresnelReflector) {
 			final FresnelReflector r = (FresnelReflector) part;
 			newWidth = r.getModuleWidth();
@@ -112,6 +120,9 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			t.setApertureWidth(newWidth);
 			t.setTroughLength(newHeight);
 			t.setModuleLength(newModuleLength);
+		} else if (part instanceof ParabolicDish) {
+			final ParabolicDish d = (ParabolicDish) part;
+			d.setApertureRadius(newWidth);
 		} else if (part instanceof FresnelReflector) {
 			final FresnelReflector t = (FresnelReflector) part;
 			t.setModuleWidth(newWidth);
@@ -137,6 +148,9 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 		}
 		if (part instanceof ParabolicTrough) {
 			return "Set Size for Selected Parabolic Trough";
+		}
+		if (part instanceof ParabolicDish) {
+			return "Set Size for Selected Parabolic Dish";
 		}
 		if (part instanceof FresnelReflector) {
 			return "Set Size for Selected Fresnel Reflector";

@@ -63,7 +63,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 	private double opticalEfficiency = 0.7;
 	private double thermalEfficiency = 0.6;
 	private double apertureRadius = 3;
-	private double dishA = 2;
+	private double curvatureParameter = 6;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 15;
 	private boolean beamsVisible;
@@ -91,8 +91,8 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		if (Util.isZero(apertureRadius)) {
 			apertureRadius = 3;
 		}
-		if (Util.isZero(dishA)) {
-			dishA = 2;
+		if (Util.isZero(curvatureParameter)) {
+			curvatureParameter = 6;
 		}
 		if (Util.isZero(reflectance)) {
 			reflectance = 0.9;
@@ -114,7 +114,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
-		mesh = new Paraboloid("Paraboloid", new Vector3(0, 0, baseHeight), apertureRadius, dishA, dishA, nSectionAxis, nSectionParabola);
+		mesh = new Paraboloid("Paraboloid", apertureRadius, curvatureParameter, nSectionAxis, nSectionParabola);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -286,7 +286,6 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
 		FloatBuffer steelFrameBuffer = steelFrame.getMeshData().getVertexBuffer();
 
-		final int vertexCount = vertexBuffer.limit() / 6;
 		final Vector3 center = getAbsPoint(0);
 
 		final int outlineBufferSize = 6 * (dish.getRSamples() + 1);
@@ -297,8 +296,11 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
+		final int vertexCount = vertexBuffer.limit() / 6;
+
 		// draw parabolic lines of the two end faces
-		for (int i = 0; i < dish.getRSamples(); i++) {
+		final int i0 = vertexCount - dish.getRSamples();
+		for (int i = i0; i < vertexCount; i++) {
 			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2));
 			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5));
 		}
@@ -678,12 +680,12 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		return apertureRadius;
 	}
 
-	public void setSemilatusRectum(final double semilatusRectum) {
-		this.dishA = semilatusRectum;
+	public void setCurvatureParameter(final double curvatureParameter) {
+		this.curvatureParameter = curvatureParameter;
 	}
 
-	public double getSemilatusRectum() {
-		return dishA;
+	public double getCurvatureParameter() {
+		return curvatureParameter;
 	}
 
 	@Override
@@ -692,7 +694,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
 		final ReadOnlyVector3 n = normal == null ? Vector3.UNIT_Z : new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
 		final double halfWidth = 0.5 * apertureRadius / Scene.getInstance().getAnnotationScale();
-		final double dy = halfWidth * halfWidth / (2 * (dishA / Scene.getInstance().getAnnotationScale()));
+		final double dy = halfWidth * halfWidth / (2 * (curvatureParameter / Scene.getInstance().getAnnotationScale()));
 		final Vector3 shift = new Vector3(n.getX() * dy, 0, n.getZ() * dy);
 		final int j = buf.limit() / 6;
 		final Vector3 v1 = new Vector3();
