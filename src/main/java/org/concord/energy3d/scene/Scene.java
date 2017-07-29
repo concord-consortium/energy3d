@@ -1725,6 +1725,39 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
+	public void removeAllParabolicDishes() {
+		final ArrayList<HousePart> dishes = new ArrayList<HousePart>();
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (selectedPart != null) {
+			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+			for (final HousePart part : parts) {
+				if (part instanceof ParabolicDish && part.getTopContainer() == foundation) {
+					dishes.add(part);
+				}
+			}
+		} else {
+			for (final HousePart part : parts) {
+				if (part instanceof ParabolicDish) {
+					dishes.add(part);
+				}
+			}
+		}
+		if (dishes.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic dish to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + dishes.size() + " parabolic dishes" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+			return;
+		}
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(dishes);
+		for (final HousePart part : dishes) {
+			remove(part, false);
+		}
+		redrawAll();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+		edited = true;
+	}
+
 	public void removeAllFresnelReflectors() {
 		final ArrayList<HousePart> reflectors = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

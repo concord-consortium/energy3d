@@ -603,7 +603,7 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 
 	@Override
 	public double getGridSize() {
-		return Math.min(troughLength, apertureWidth) / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
+		return Math.min(troughLength, apertureWidth) / (Scene.getInstance().getAnnotationScale() * (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0));
 	}
 
 	@Override

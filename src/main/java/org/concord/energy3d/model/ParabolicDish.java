@@ -22,15 +22,12 @@ import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
-import com.ardor3d.math.type.ReadOnlyColorRGBA;
-import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.state.CullState;
 import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
@@ -49,9 +46,8 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private transient ReadOnlyVector3 normal;
 	private transient Paraboloid dish;
 	private transient Mesh dishBack;
-	private transient Cylinder post;
 	private transient Line outlines;
-	private transient Line steelFrame;
+	private transient Cylinder post;
 	private transient Cylinder duct;
 	private transient Cylinder receiver;
 	private transient Line lightBeams;
@@ -167,14 +163,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		Util.disablePickShadowLight(outlines);
 		root.attachChild(outlines);
 
-		steelFrame = new Line("Parabolic Dish Steel Frame");
-		steelFrame.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
-		steelFrame.setDefaultColor(ColorRGBA.GRAY);
-		steelFrame.setModelBound(new OrientedBoundingBox());
-		steelFrame.setLineWidth(3);
-		steelFrame.setStipplePattern((short) 0xffff);
-		root.attachChild(steelFrame);
-
 		lightBeams = new Line("Light Beams");
 		lightBeams.setLineWidth(0.01f);
 		lightBeams.setStipplePattern((short) 0xffff);
@@ -201,70 +189,21 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
-		if (editPointIndex <= 0) {
-			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
-			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
-				final Vector3 p = picked.getPoint().clone();
-				final UserData ud = picked.getUserData();
-				snapToGrid(p, getAbsPoint(0), getGridSize(), false);
-				points.get(0).set(toRelative(p));
-				pickedNormal = ud.getRotatedNormal() == null ? ud.getNormal() : ud.getRotatedNormal();
-			} else {
-				pickedNormal = null;
-			}
-			if (outOfBound()) {
-				if (oldDishCenter != null) {
-					points.get(0).set(oldDishCenter);
-				}
-			} else {
-				oldDishCenter = points.get(0).clone();
+		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
+		if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
+			final Vector3 p = picked.getPoint().clone();
+			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
+			points.get(0).set(toRelative(p));
+		}
+		if (outOfBound()) {
+			if (oldDishCenter != null) {
+				points.get(0).set(oldDishCenter);
 			}
 		} else {
-			final ReadOnlyVector3 pEdit = getEditPointShape(editPointIndex).getTranslation();
-			final Vector3 p;
-			if (editPointIndex % 2 == 0) {
-				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 2 ? 4 : 2).getTranslation();
-				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
-				if (p != null) {
-					final double rl = p.distance(p1) * Scene.getInstance().getAnnotationScale();
-					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
-					points.get(0).addLocal(delta);
-					getEditPointShape(editPointIndex).setTranslation(p);
-					setRimRadius(rl);
-					if (outOfBound()) {
-						if (oldDishCenter != null) {
-							points.get(0).set(oldDishCenter);
-						}
-						setRimRadius(oldRimRadius);
-					} else {
-						oldDishCenter = points.get(0).clone();
-						oldRimRadius = rimRadius;
-					}
-				}
-			} else {
-				final ReadOnlyVector3 p1 = getEditPointShape(editPointIndex == 1 ? 3 : 1).getTranslation();
-				p = Util.closestPoint(pEdit, pEdit.subtract(p1, null).normalizeLocal(), x, y);
-				if (p != null) {
-					final double rw = p.distance(p1) * Scene.getInstance().getAnnotationScale();
-					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
-					points.get(0).addLocal(delta);
-					getEditPointShape(editPointIndex).setTranslation(p);
-					setRimRadius(rw);
-					if (outOfBound()) {
-						if (oldDishCenter != null) {
-							points.get(0).set(oldDishCenter);
-						}
-						setRimRadius(oldRimRadius);
-					} else {
-						oldDishCenter = points.get(0).clone();
-						oldRimRadius = rimRadius;
-					}
-				}
-			}
+			oldDishCenter = points.get(0).clone();
 		}
 		if (container != null) {
 			draw();
-			drawChildren();
 			setEditPointsVisible(true);
 			setHighlight(!isDrawable());
 		}
@@ -309,7 +248,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
-		FloatBuffer steelFrameBuffer = steelFrame.getMeshData().getVertexBuffer();
 
 		final int vertexCount = vertexBuffer.limit() / 3;
 		final Vector3 center = getAbsPoint(0);
@@ -330,18 +268,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5) + zOffset);
 		}
 
-		// draw steel frame lines
-		final int steelBufferSize = 6;
-		if (steelFrameBuffer.capacity() < steelBufferSize) {
-			steelFrameBuffer = BufferUtils.createFloatBuffer(steelBufferSize);
-			steelFrame.getMeshData().setVertexBuffer(steelFrameBuffer);
-		} else {
-			steelFrameBuffer.rewind();
-			steelFrameBuffer.limit(steelBufferSize);
-		}
-
-		steelFrame.getSceneHints().setCullHint(CullHint.Always); // if there is only one module, don't draw frames
-
 		final Matrix3 rotation = new Matrix3().lookAt(normal, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
@@ -349,11 +275,8 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		dishBack.setTranslation(mesh.getTranslation());
 		outlines.setRotation(rotation);
 		outlines.setTranslation(mesh.getTranslation());
-		steelFrame.setRotation(rotation);
-		steelFrame.setTranslation(mesh.getTranslation());
 		mesh.updateModelBound();
 		outlines.updateModelBound();
-		steelFrame.updateModelBound();
 
 		post.setHeight(baseHeight - 0.5 * post.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the dish
 		final Vector3 p = center.clone();
@@ -431,7 +354,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = 0.6 * dish.getCurvatureParameter();
+			final double shift = duct.getHeight() + receiver.getHeight();
 			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -488,7 +411,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	@Override
 	protected void computeArea() {
-		area = 0; // TODO
+		area = rimRadius * rimRadius * Math.PI;
 	}
 
 	@Override
@@ -543,33 +466,30 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	}
 
 	private boolean isPositionLegal(final ParabolicDish dish, final Foundation foundation) {
-		final Vector3 p0 = foundation.getAbsPoint(0);
-		final Vector3 p2 = foundation.getAbsPoint(2);
-		final double dx = 0;
-		final double s = 0;
-		// final ParabolicDish nearest = foundation.getNearestParabolicTrough(this);
-		// if (nearest != null) { // use the nearest trough as the reference to infer next position
-		// final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
-		// dx = Math.abs(d.getX());
-		// if (dx > apertureWidth * 5 / Scene.getInstance().getAnnotationScale()) {
-		// dx = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
-		// s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
-		// } else {
-		// s = Math.signum(d.getX());
-		// }
-		// } else {
-		// dx = (1 + copyLayoutGap) * apertureWidth / Scene.getInstance().getAnnotationScale();
-		// s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
-		// }
-		final double tx = dx / p0.distance(p2);
-		final double newX = points.get(0).getX() + s * tx;
+		final Vector3 p0 = container.getAbsPoint(0);
+		final Vector3 p1 = container.getAbsPoint(1);
+		final Vector3 p2 = container.getAbsPoint(2);
+		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
+		final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
+		final double length = (1 + copyLayoutGap) * rimRadius * 2 / Scene.getInstance().getAnnotationScale();
+		final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+		final double tx = length / p0.distance(p2);
+		final double ty = length / p0.distance(p1);
+		final double lx = s * v.getX() * tx;
+		final double ly = s * v.getY() * ty;
+		final double newX = points.get(0).getX() + lx;
 		if (newX > 1 - tx || newX < tx) {
 			return false;
 		}
+		final double newY = points.get(0).getY() + ly;
+		if (newY > 1 - ty || newY < ty) {
+			return false;
+		}
 		dish.points.get(0).setX(newX);
+		dish.points.get(0).setY(newY);
 		final double o = dish.checkCopyOverlap();
 		if (o >= 0) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new dish is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new parabolic dish is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;
@@ -681,42 +601,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	public double getFocalLength() {
 		return focalLength;
-	}
-
-	@Override
-	public void updateEditShapes() {
-		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
-		final ReadOnlyTransform trans = mesh.getWorldTransform();
-		final ReadOnlyVector3 n = normal == null ? Vector3.UNIT_Z : new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
-		final double halfWidth = 0.5 * rimRadius / Scene.getInstance().getAnnotationScale();
-		final double dy = halfWidth * halfWidth / (2 * (focalLength / Scene.getInstance().getAnnotationScale()));
-		final Vector3 shift = new Vector3(n.getX() * dy, 0, n.getZ() * dy);
-		final int j = buf.limit() / 6;
-		final Vector3 v1 = new Vector3();
-		final Vector3 v2 = new Vector3();
-		BufferUtils.populateFromBuffer(v1, buf, 0);
-		BufferUtils.populateFromBuffer(v2, buf, j);
-		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
-		BufferUtils.populateFromBuffer(v1, buf, 0);
-		BufferUtils.populateFromBuffer(v2, buf, j - 1);
-		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
-		BufferUtils.populateFromBuffer(v1, buf, j - 1);
-		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
-		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5); // along the direction of length
-		BufferUtils.populateFromBuffer(v1, buf, j);
-		BufferUtils.populateFromBuffer(v2, buf, 2 * j - 1);
-		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5).subtractLocal(shift); // along the direction of width
-		int i = 1;
-		getEditPointShape(i++).setTranslation(p1);
-		getEditPointShape(i++).setTranslation(p2);
-		getEditPointShape(i++).setTranslation(p3);
-		getEditPointShape(i++).setTranslation(p4);
-		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE;
-		for (i = 1; i < 5; i++) {
-			getEditPointShape(i).setDefaultColor(c);
-		}
-		super.updateEditShapes();
-		getEditPointShape(0).setTranslation(p1.addLocal(p3).multiplyLocal(0.5).addLocal(0, 0, 0.15));
 	}
 
 	private Vector3 getVertex(final int i) {

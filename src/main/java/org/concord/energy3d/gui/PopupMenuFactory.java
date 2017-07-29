@@ -66,6 +66,7 @@ import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
+import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Trackable;
@@ -2581,6 +2582,28 @@ public class PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllParabolicTroughs);
 
+			final JMenuItem miRemoveAllParabolicDishes = new JMenuItem("Remove All Parabolic Dishes");
+			miRemoveAllParabolicDishes.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllParabolicDishes();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									Scene.getInstance().setEdited(true);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllParabolicDishes);
+
 			final JMenuItem miRemoveAllFresnelReflectors = new JMenuItem("Remove All Fresnel Reflectors");
 			miRemoveAllFresnelReflectors.addActionListener(new ActionListener() {
 				@Override
@@ -3972,7 +3995,7 @@ public class PopupMenuFactory {
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					final Node copyNode = Scene.getInstance().getCopyNode();
-					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Mirror || copyBuffer instanceof Rack || copyBuffer instanceof ParabolicTrough || copyBuffer instanceof FresnelReflector || copyNode != null);
+					miPaste.setEnabled(copyBuffer instanceof SolarCollector || copyNode != null);
 				}
 			});
 

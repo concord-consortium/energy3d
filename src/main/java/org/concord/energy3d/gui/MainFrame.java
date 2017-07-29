@@ -75,6 +75,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Rack;
@@ -259,6 +260,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllRacksMenuItem;
 	private JMenuItem removeAllMirrorsMenuItem;
 	private JMenuItem removeAllParabolicTroughsMenuItem;
+	private JMenuItem removeAllParabolicDishesMenuItem;
 	private JMenuItem removeAllFresnelReflectorsMenuItem;
 	private JMenuItem removeAllSensorsMenuItem;
 	private JMenuItem removeAllWallsMenuItem;
@@ -2367,6 +2369,8 @@ public class MainFrame extends JFrame {
 			c = Mirror.class;
 		} else if ("Parabolic Trough".equals(currentGroupType)) {
 			c = ParabolicTrough.class;
+		} else if ("Parabolic Dish".equals(currentGroupType)) {
+			c = ParabolicDish.class;
 		} else if ("Fresnel Reflector".equals(currentGroupType)) {
 			c = FresnelReflector.class;
 		} else if ("Foundation".equals(currentGroupType) || currentGroupType.startsWith("Foundation")) {
@@ -2379,7 +2383,7 @@ public class MainFrame extends JFrame {
 		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Parabolic Trough", "Fresnel Reflector", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
+		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Parabolic Trough", "Parabolic Dish", "Fresnel Reflector", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
 		if (currentGroupType != null) {
 			typeComboBox.setSelectedItem(currentGroupType);
 		}
@@ -2740,6 +2744,7 @@ public class MainFrame extends JFrame {
 			clearMenu.add(getRemoveAllRacksMenuItem());
 			clearMenu.add(getRemoveAllMirrorsMenuItem());
 			clearMenu.add(getRemoveAllParabolicTroughsMenuItem());
+			clearMenu.add(getRemoveAllParabolicDishesMenuItem());
 			clearMenu.add(getRemoveAllFresnelReflectorsMenuItem());
 			clearMenu.add(getRemoveAllTreesMenuItem());
 			clearMenu.add(getRemoveAllHumansMenuItem());
@@ -3865,6 +3870,31 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return removeAllParabolicTroughsMenuItem;
+	}
+
+	private JMenuItem getRemoveAllParabolicDishesMenuItem() {
+		if (removeAllParabolicDishesMenuItem == null) {
+			removeAllParabolicDishesMenuItem = new JMenuItem("Remove All Parabolic Dishes");
+			removeAllParabolicDishesMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							Scene.getInstance().removeAllParabolicDishes();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+		}
+		return removeAllParabolicDishesMenuItem;
 	}
 
 	private JMenuItem getRemoveAllFresnelReflectorsMenuItem() {
