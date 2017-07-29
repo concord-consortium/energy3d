@@ -9,19 +9,19 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.Scene;
 
-public class SetCurvatureParameterForAllParabolicDishesCommand extends AbstractUndoableEdit {
+public class SetFocalLengthForAllParabolicDishesCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final List<ParabolicDish> dishes;
 
-	public SetCurvatureParameterForAllParabolicDishesCommand() {
+	public SetFocalLengthForAllParabolicDishesCommand() {
 		dishes = Scene.getInstance().getAllParabolicDishes();
 		final int n = dishes.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = dishes.get(i).getCurvatureParameter();
+			oldValues[i] = dishes.get(i).getFocalLength();
 		}
 	}
 
@@ -32,8 +32,8 @@ public class SetCurvatureParameterForAllParabolicDishesCommand extends AbstractU
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			newValues[i] = d.getCurvatureParameter();
-			d.setCurvatureParameter(oldValues[i]);
+			newValues[i] = d.getFocalLength();
+			d.setFocalLength(oldValues[i]);
 		}
 	}
 
@@ -42,13 +42,13 @@ public class SetCurvatureParameterForAllParabolicDishesCommand extends AbstractU
 		super.redo();
 		final int n = dishes.size();
 		for (int i = 0; i < n; i++) {
-			dishes.get(i).setCurvatureParameter(newValues[i]);
+			dishes.get(i).setFocalLength(newValues[i]);
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Set Curvature Parameter for All Parabolic Dishes";
+		return "Set Focal Length for All Parabolic Dishes";
 	}
 
 }

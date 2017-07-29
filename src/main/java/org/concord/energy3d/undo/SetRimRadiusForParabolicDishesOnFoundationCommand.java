@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetApertureRadiusForParabolicDishesOnFoundationCommand extends AbstractUndoableEdit {
+public class SetRimRadiusForParabolicDishesOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldRadii;
@@ -18,14 +18,14 @@ public class SetApertureRadiusForParabolicDishesOnFoundationCommand extends Abst
 	private final Foundation foundation;
 	private final List<ParabolicDish> dishes;
 
-	public SetApertureRadiusForParabolicDishesOnFoundationCommand(final Foundation foundation) {
+	public SetRimRadiusForParabolicDishesOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		dishes = foundation.getParabolicDishes();
 		final int n = dishes.size();
 		oldRadii = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			oldRadii[i] = d.getApertureRadius();
+			oldRadii[i] = d.getRimRadius();
 		}
 	}
 
@@ -40,8 +40,8 @@ public class SetApertureRadiusForParabolicDishesOnFoundationCommand extends Abst
 		newRadii = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			newRadii[i] = d.getApertureRadius();
-			d.setApertureRadius(oldRadii[i]);
+			newRadii[i] = d.getRimRadius();
+			d.setRimRadius(oldRadii[i]);
 			d.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -53,7 +53,7 @@ public class SetApertureRadiusForParabolicDishesOnFoundationCommand extends Abst
 		final int n = dishes.size();
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			d.setApertureRadius(newRadii[i]);
+			d.setRimRadius(newRadii[i]);
 			d.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -61,7 +61,7 @@ public class SetApertureRadiusForParabolicDishesOnFoundationCommand extends Abst
 
 	@Override
 	public String getPresentationName() {
-		return "Set Aperture Radius for All Parabolic Dishes on Selected Foundation";
+		return "Set Rim Radius for All Parabolic Dishes on Selected Foundation";
 	}
 
 }

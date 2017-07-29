@@ -3044,20 +3044,20 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setApertureRadiusForParabolicDishes(final double apertureRadius) {
+	public void setRimRadiusForParabolicDishes(final double apertureRadius) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setApertureRadius(apertureRadius);
+				((ParabolicDish) p).setRimRadius(apertureRadius);
 				p.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setCurvatureParameterForParabolicDishes(final double curvatureParameter) {
+	public void setFocalLengthForParabolicDishes(final double curvatureParameter) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setCurvatureParameter(curvatureParameter);
+				((ParabolicDish) p).setFocalLength(curvatureParameter);
 				p.draw();
 			}
 		}
@@ -3068,8 +3068,8 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicDish) {
 				final ParabolicDish d = (ParabolicDish) p;
-				d.setNSectionParabola(nParabola);
-				d.setNSectionAxis(nAxis);
+				d.setNRadialSections(nParabola);
+				d.setNAxialSections(nAxis);
 				d.draw();
 			}
 		}

@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetCurvatureParameterForParabolicDishesOnFoundationCommand extends AbstractUndoableEdit {
+public class SetFocalLengthForParabolicDishesOnFoundationCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldCurvatureParameters;
@@ -18,14 +18,14 @@ public class SetCurvatureParameterForParabolicDishesOnFoundationCommand extends 
 	private final Foundation foundation;
 	private final List<ParabolicDish> dishes;
 
-	public SetCurvatureParameterForParabolicDishesOnFoundationCommand(final Foundation foundation) {
+	public SetFocalLengthForParabolicDishesOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		dishes = foundation.getParabolicDishes();
 		final int n = dishes.size();
 		oldCurvatureParameters = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			oldCurvatureParameters[i] = d.getCurvatureParameter();
+			oldCurvatureParameters[i] = d.getFocalLength();
 		}
 	}
 
@@ -40,8 +40,8 @@ public class SetCurvatureParameterForParabolicDishesOnFoundationCommand extends 
 		newCurvatureParameters = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			newCurvatureParameters[i] = d.getCurvatureParameter();
-			d.setCurvatureParameter(oldCurvatureParameters[i]);
+			newCurvatureParameters[i] = d.getFocalLength();
+			d.setFocalLength(oldCurvatureParameters[i]);
 			d.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -53,7 +53,7 @@ public class SetCurvatureParameterForParabolicDishesOnFoundationCommand extends 
 		final int n = dishes.size();
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			d.setCurvatureParameter(newCurvatureParameters[i]);
+			d.setFocalLength(newCurvatureParameters[i]);
 			d.draw();
 		}
 		SceneManager.getInstance().refresh();
@@ -61,7 +61,7 @@ public class SetCurvatureParameterForParabolicDishesOnFoundationCommand extends 
 
 	@Override
 	public String getPresentationName() {
-		return "Set Curvature Parameter for All Parabolic Dishes on Selected Foundation";
+		return "Set Focal Length for All Parabolic Dishes on Selected Foundation";
 	}
 
 }

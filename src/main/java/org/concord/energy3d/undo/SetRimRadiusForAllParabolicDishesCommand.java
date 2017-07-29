@@ -9,19 +9,19 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.Scene;
 
-public class SetApertureRadiusForAllParabolicDishesCommand extends AbstractUndoableEdit {
+public class SetRimRadiusForAllParabolicDishesCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final List<ParabolicDish> dishes;
 
-	public SetApertureRadiusForAllParabolicDishesCommand() {
+	public SetRimRadiusForAllParabolicDishesCommand() {
 		dishes = Scene.getInstance().getAllParabolicDishes();
 		final int n = dishes.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = dishes.get(i).getApertureRadius();
+			oldValues[i] = dishes.get(i).getRimRadius();
 		}
 	}
 
@@ -32,8 +32,8 @@ public class SetApertureRadiusForAllParabolicDishesCommand extends AbstractUndoa
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicDish d = dishes.get(i);
-			newValues[i] = d.getApertureRadius();
-			d.setApertureRadius(oldValues[i]);
+			newValues[i] = d.getRimRadius();
+			d.setRimRadius(oldValues[i]);
 		}
 	}
 
@@ -42,13 +42,13 @@ public class SetApertureRadiusForAllParabolicDishesCommand extends AbstractUndoa
 		super.redo();
 		final int n = dishes.size();
 		for (int i = 0; i < n; i++) {
-			dishes.get(i).setApertureRadius(newValues[i]);
+			dishes.get(i).setRimRadius(newValues[i]);
 		}
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Set Aperture Radius for All Parabolic Dishes";
+		return "Set Rim Radius for All Parabolic Dishes";
 	}
 
 }

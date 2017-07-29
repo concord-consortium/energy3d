@@ -6,16 +6,16 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.ParabolicDish;
 
-public class SetParabolicDishCurvatureParameterCommand extends AbstractUndoableEdit {
+public class SetParabolicDishFocalLengthCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldCurvatureParameter;
 	private double newCurvatureParameter;
 	private final ParabolicDish dish;
 
-	public SetParabolicDishCurvatureParameterCommand(final ParabolicDish dish) {
+	public SetParabolicDishFocalLengthCommand(final ParabolicDish dish) {
 		this.dish = dish;
-		oldCurvatureParameter = dish.getCurvatureParameter();
+		oldCurvatureParameter = dish.getFocalLength();
 	}
 
 	public ParabolicDish getParabolicDish() {
@@ -29,21 +29,21 @@ public class SetParabolicDishCurvatureParameterCommand extends AbstractUndoableE
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newCurvatureParameter = dish.getCurvatureParameter();
-		dish.setCurvatureParameter(oldCurvatureParameter);
+		newCurvatureParameter = dish.getFocalLength();
+		dish.setFocalLength(oldCurvatureParameter);
 		dish.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		dish.setCurvatureParameter(newCurvatureParameter);
+		dish.setFocalLength(newCurvatureParameter);
 		dish.draw();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Set Curvature Parameter for Selected Parabolic Dish";
+		return "Set Focal Length for Selected Parabolic Dish";
 	}
 
 }

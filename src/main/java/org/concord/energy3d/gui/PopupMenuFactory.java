@@ -10185,12 +10185,12 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Parabolic cross-section: "));
-					final JTextField nParabolaField = new JTextField("" + t.getNSectionParabola());
-					inputPanel.add(nParabolaField);
+					inputPanel.add(new JLabel("Radial direction: "));
+					final JTextField nRadialField = new JTextField("" + t.getNRadialSections());
+					inputPanel.add(nRadialField);
 					inputPanel.add(new JLabel("Axial direction: "));
-					final JTextField nAxisField = new JTextField("" + t.getNSectionAxis());
-					inputPanel.add(nAxisField);
+					final JTextField nAxialField = new JTextField("" + t.getNAxialSections());
+					inputPanel.add(nAxialField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -10228,38 +10228,38 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
-							int nSectionParabola = 0, nSectionAxis = 0;
+							int nRadialSections = 0, nAxialSections = 0;
 							boolean ok = true;
 							try {
-								nSectionParabola = Integer.parseInt(nParabolaField.getText());
-								nSectionAxis = Integer.parseInt(nAxisField.getText());
+								nRadialSections = Integer.parseInt(nRadialField.getText());
+								nAxialSections = Integer.parseInt(nAxialField.getText());
 							} catch (final NumberFormatException nfe) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (nSectionParabola < 4) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (nSectionAxis < 4) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis mesh must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (!Util.isPowerOfTwo(nSectionParabola) || !Util.isPowerOfTwo(nSectionAxis)) {
+								if (nRadialSections < 4) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of radial sections must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (nAxialSections < 4) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of axial sections mesh must be at least 4.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (!Util.isPowerOfTwo(nRadialSections) || !Util.isPowerOfTwo(nAxialSections)) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of parabolic dish mesh sections in x or y direction must be power of two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setNSectionParabola(nSectionParabola);
-										t.setNSectionAxis(nSectionAxis);
+										t.setNRadialSections(nRadialSections);
+										t.setNAxialSections(nAxialSections);
 										t.draw();
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSectionsForParabolicTroughs(nSectionParabola, nSectionAxis);
+										foundation.setSectionsForParabolicDishes(nRadialSections, nAxialSections);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSectionsForAllParabolicTroughs(nSectionParabola, nSectionAxis);
+										Scene.getInstance().setSectionsForAllParabolicDishes(nRadialSections, nAxialSections);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -10290,8 +10290,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miApertureRadius = new JMenuItem("Aperture Radius...");
-			miApertureRadius.addActionListener(new ActionListener() {
+			final JMenuItem miRimRadius = new JMenuItem("Rim Radius...");
+			miRimRadius.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -10307,8 +10307,8 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Aperture Radius (m): "));
-					final JTextField apertureRadiusField = new JTextField(threeDecimalsFormat.format(d.getApertureRadius()));
+					inputPanel.add(new JLabel("Rim Radius (m): "));
+					final JTextField apertureRadiusField = new JTextField(threeDecimalsFormat.format(d.getRimRadius()));
 					inputPanel.add(apertureRadiusField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
@@ -10338,8 +10338,8 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set aperture radius for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Aperture Radius");
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set rim radius for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Rim Radius");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -10357,22 +10357,22 @@ public class PopupMenuFactory {
 							}
 							if (ok) {
 								if (r < 1 || r > 10) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish aperture radius must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish rim radius must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
 										final SetPartSizeCommand c = new SetPartSizeCommand(d);
-										d.setApertureRadius(r);
+										d.setRimRadius(r);
 										d.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetApertureRadiusForParabolicDishesOnFoundationCommand c = new SetApertureRadiusForParabolicDishesOnFoundationCommand(foundation);
-										foundation.setApertureRadiusForParabolicDishes(r);
+										final SetRimRadiusForParabolicDishesOnFoundationCommand c = new SetRimRadiusForParabolicDishesOnFoundationCommand(foundation);
+										foundation.setRimRadiusForParabolicDishes(r);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetApertureRadiusForAllParabolicDishesCommand c = new SetApertureRadiusForAllParabolicDishesCommand();
-										Scene.getInstance().setApertureRadiusForAllParabolicDishes(r);
+										final SetRimRadiusForAllParabolicDishesCommand c = new SetRimRadiusForAllParabolicDishesCommand();
+										Scene.getInstance().setRimRadiusForAllParabolicDishes(r);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -10387,8 +10387,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miCurvature = new JMenuItem("Curvature Parameter...");
-			miCurvature.addActionListener(new ActionListener() {
+			final JMenuItem miFocalLength = new JMenuItem("Focal Length...");
+			miFocalLength.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -10404,9 +10404,9 @@ public class PopupMenuFactory {
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Curvature Parameter (m): "));
-					final JTextField curvatureParameterField = new JTextField(threeDecimalsFormat.format(d.getCurvatureParameter()));
-					inputPanel.add(curvatureParameterField);
+					inputPanel.add(new JLabel("Focal Length (m): "));
+					final JTextField focalLengthField = new JTextField(threeDecimalsFormat.format(d.getFocalLength()));
+					inputPanel.add(focalLengthField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -10435,8 +10435,8 @@ public class PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set curvature parameter for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Curvature Parameter");
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set focal length for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Focal Length");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -10444,32 +10444,32 @@ public class PopupMenuFactory {
 						if (choice == options[1]) {
 							break;
 						} else {
-							double cp = 0;
+							double fl = 0;
 							boolean ok = true;
 							try {
-								cp = Double.parseDouble(curvatureParameterField.getText());
+								fl = Double.parseDouble(focalLengthField.getText());
 							} catch (final NumberFormatException nfe) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (cp < 0.5 || cp > 5) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Curvature parameter must be between 0.5 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (fl < 0.5 || fl > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Focal length must be between 0.5 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										final SetParabolicDishCurvatureParameterCommand c = new SetParabolicDishCurvatureParameterCommand(d);
-										d.setCurvatureParameter(cp);
+										final SetParabolicDishFocalLengthCommand c = new SetParabolicDishFocalLengthCommand(d);
+										d.setFocalLength(fl);
 										d.draw();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetCurvatureParameterForParabolicDishesOnFoundationCommand c = new SetCurvatureParameterForParabolicDishesOnFoundationCommand(foundation);
-										foundation.setCurvatureParameterForParabolicDishes(cp);
+										final SetFocalLengthForParabolicDishesOnFoundationCommand c = new SetFocalLengthForParabolicDishesOnFoundationCommand(foundation);
+										foundation.setFocalLengthForParabolicDishes(fl);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetCurvatureParameterForAllParabolicDishesCommand c = new SetCurvatureParameterForAllParabolicDishesCommand();
-										Scene.getInstance().setCurvatureParameterForAllParabolicDishes(cp);
+										final SetFocalLengthForAllParabolicDishesCommand c = new SetFocalLengthForAllParabolicDishesCommand();
+										Scene.getInstance().setFocalLengthForAllParabolicDishes(fl);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
@@ -11061,8 +11061,8 @@ public class PopupMenuFactory {
 			popupMenuForParabolicDish.add(cbmiDrawSunBeams);
 			popupMenuForParabolicDish.add(labelMenu);
 			popupMenuForParabolicDish.addSeparator();
-			popupMenuForParabolicDish.add(miApertureRadius);
-			popupMenuForParabolicDish.add(miCurvature);
+			popupMenuForParabolicDish.add(miRimRadius);
+			popupMenuForParabolicDish.add(miFocalLength);
 			popupMenuForParabolicDish.add(miBaseHeight);
 			popupMenuForParabolicDish.addSeparator();
 			popupMenuForParabolicDish.add(miReflectance);

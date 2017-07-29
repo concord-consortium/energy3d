@@ -13,6 +13,8 @@ import com.ardor3d.util.geom.BufferUtils;
 /**
  * This models a paraboloid z = x^2 / a^2 + y^2 / a^2
  * 
+ * The focal length f = a^2 / 4. So a = 2 * sqrt(f)
+ * 
  * @author Charles Xie
  * 
  */
@@ -23,7 +25,7 @@ public class Paraboloid extends Mesh {
 		Linear, Polar;
 	}
 
-	private double _a, _apertureRadius;
+	private double _a, _rimRadius;
 	private int _zSamples;
 	private int _rSamples;
 	private final Vector3 _center = new Vector3(); // the center of the paraboloid
@@ -37,49 +39,63 @@ public class Paraboloid extends Mesh {
 	 * 
 	 * @param name
 	 *            Name of paraboloid.
-	 * @param apertureRadius
-	 *            The radius of the aperture of the paraboloid.
+	 * @param rimRadius
+	 *            The radius of the paraboloid rim.
 	 * @param a
-	 *            parameter a of the round paraboloid.
+	 *            parameter a of the round paraboloid, related to the focal length(f) by a = 2 * sqrt(f).
 	 * @param zSamples
-	 *            The samples along the Z.
-	 * @param radialSamples
+	 *            The samples along the axis.
+	 * @param rSamples
 	 *            The samples along the radial.
 	 */
-	public Paraboloid(final String name, final double apertureRadius, final double a, final int zSamples, final int radialSamples) {
+	public Paraboloid(final String name, final double rimRadius, final double a, final int zSamples, final int rSamples) {
 		super(name);
-		setData(apertureRadius, a, zSamples, radialSamples);
+		setData(rimRadius, a, zSamples, rSamples);
 	}
 
 	/**
 	 * Changes the information of the paraboloid into the given values.
 	 * 
-	 * @param apertureRadius
-	 *            The new radius of the paraboloid.
+	 * @param rimRadius
+	 *            The rim radius of the paraboloid.
 	 * @param a
-	 *            parameter a of the elliptical paraboloid.
+	 *            curvature parameter a of the paraboloid.
 	 * @param zSamples
 	 *            The new number of zSamples of the paraboloid.
-	 * @param radialSamples
+	 * @param rSamples
 	 *            The new number of radial samples of the paraboloid.
 	 */
-	public void setData(final double apertureRadius, final double a, final int zSamples, final int radialSamples) {
-		_apertureRadius = apertureRadius;
+	public void setData(final double rimRadius, final double a, final int zSamples, final int rSamples) {
+		_rimRadius = rimRadius;
 		_a = a;
 		_zSamples = zSamples;
-		_rSamples = radialSamples;
+		_rSamples = rSamples;
 		setGeometryData();
 		setIndexData();
 	}
 
-	public void setApertureRadius(final double apertureRadius) {
-		_apertureRadius = apertureRadius;
+	public double getRimRadius() {
+		return _rimRadius;
+	}
+
+	public void setRimRadius(final double rimRadius) {
+		_rimRadius = rimRadius;
+		setGeometryData();
+		setIndexData();
+	}
+
+	public double getCurvatureParameter() {
+		return _a;
+	}
+
+	public void setCurvatureParameter(final double a) {
+		_a = a;
 		setGeometryData();
 		setIndexData();
 	}
 
 	/**
-	 * builds the vertices based on the aperture radius, a, b, center and radial and zSamples.
+	 * builds the vertices based on the rim radius, a, center, radial, and axial samples.
 	 */
 	private void setGeometryData() {
 		// allocate vertices
@@ -107,11 +123,11 @@ public class Paraboloid extends Mesh {
 			texData.setBuffer(BufferUtils.createVector2Buffer(texData.getBuffer(), verts));
 		}
 
-		// generate geometry
-		double zmax = _apertureRadius / _a;
-		zmax *= zmax;
+		// generate geometry: Depth = R^2/a^2
+		double depth = _rimRadius / _a;
+		depth *= depth;
 		final double inverseRSamples = 1.0 / _rSamples;
-		final double zSteplength = zmax / (_zSamples - 1);
+		final double zSteplength = depth / (_zSamples - 1);
 
 		// Generate points on the unit circle to be used in computing the mesh points on a paraboloid slice.
 		final double[] sin = new double[(_rSamples + 1)];
@@ -180,7 +196,7 @@ public class Paraboloid extends Mesh {
 
 	}
 
-	/**
+	/*
 	 * sets the indices for rendering the paraboloid.
 	 */
 	private void setIndexData() {
@@ -222,14 +238,6 @@ public class Paraboloid extends Mesh {
 		}
 	}
 
-	public double getApertureRadius() {
-		return _apertureRadius;
-	}
-
-	public double getCurvatureParameter() {
-		return _a;
-	}
-
 	public int getZSamples() {
 		return _zSamples;
 	}
@@ -242,22 +250,22 @@ public class Paraboloid extends Mesh {
 	public void write(final OutputCapsule capsule) throws IOException {
 		super.write(capsule);
 		capsule.write(_a, "a", 0);
-		capsule.write(_apertureRadius, "apertureRadius", 0);
+		capsule.write(_rimRadius, "rimRadius", 0);
 		capsule.write(_zSamples, "zSamples", 0);
 		capsule.write(_rSamples, "rSamples", 0);
 		capsule.write(_center, "center", new Vector3(Vector3.ZERO));
-		capsule.write(_textureMode, "textureMode", TextureMode.Linear);
+		capsule.write(_textureMode, "textureMode", TextureMode.Polar);
 	}
 
 	@Override
 	public void read(final InputCapsule capsule) throws IOException {
 		super.read(capsule);
 		_a = capsule.readDouble("a", 0);
-		_apertureRadius = capsule.readDouble("apertureRadius", 0);
+		_rimRadius = capsule.readDouble("rimRadius", 0);
 		_zSamples = capsule.readInt("zSamples", 0);
 		_rSamples = capsule.readInt("rSamples", 0);
 		_center.set((Vector3) capsule.readSavable("center", new Vector3(Vector3.ZERO)));
-		_textureMode = capsule.readEnum("textureMode", TextureMode.class, TextureMode.Linear);
+		_textureMode = capsule.readEnum("textureMode", TextureMode.class, TextureMode.Polar);
 	}
 
 }

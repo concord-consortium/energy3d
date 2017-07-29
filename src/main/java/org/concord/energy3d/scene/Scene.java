@@ -2799,20 +2799,20 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setApertureRadiusForAllParabolicDishes(final double apertureRadius) {
+	public void setRimRadiusForAllParabolicDishes(final double apertureRadius) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setApertureRadius(apertureRadius);
+				((ParabolicDish) p).setRimRadius(apertureRadius);
 				p.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setCurvatureParameterForAllParabolicDishes(final double curvatureParameter) {
+	public void setFocalLengthForAllParabolicDishes(final double curvatureParameter) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setCurvatureParameter(curvatureParameter);
+				((ParabolicDish) p).setFocalLength(curvatureParameter);
 				p.draw();
 			}
 		}
@@ -2823,8 +2823,8 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicDish) {
 				final ParabolicDish d = (ParabolicDish) p;
-				d.setNSectionParabola(nParabola);
-				d.setNSectionAxis(nAxis);
+				d.setNRadialSections(nParabola);
+				d.setNAxialSections(nAxis);
 				d.draw();
 			}
 		}

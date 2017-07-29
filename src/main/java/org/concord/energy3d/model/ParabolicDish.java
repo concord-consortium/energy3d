@@ -62,19 +62,19 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
 	private double opticalEfficiency = 0.7;
 	private double thermalEfficiency = 0.6;
-	private double apertureRadius = 3;
-	private double curvatureParameter = 6;
+	private double rimRadius = 3;
+	private double focalLength = 2;
 	private double relativeAzimuth = 0;
-	private double baseHeight = 20;
+	private double baseHeight = 18;
 	private boolean beamsVisible;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldDishCenter;
-	private transient double oldApertureRadius;
+	private transient double oldRimRadius;
 	private transient double oldRelativeAzimuth;
 	private static transient BloomRenderPass bloomRenderPassLight, bloomRenderPassReceiver;
 	private transient double baseZ;
-	private int nSectionParabola = 32; // number of sections for the parabola cross section of a parabolic dish (must be power of 2)
-	private int nSectionAxis = 32; // number of sections in the axis of a parabolic dish (must be power of 2)
+	private int nRadialSections = 32; // number of sections in the radial direction of a parabolic dish (must be power of 2)
+	private int nAxialSections = 32; // number of sections in the axial direction of a parabolic dish (must be power of 2)
 	private boolean detailed; // allows us to draw more details when there are fewer dishes in the scene
 
 	public ParabolicDish() {
@@ -88,11 +88,11 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		if (Util.isZero(copyLayoutGap)) { // FIXME: Why is a transient member evaluated to zero?
 			copyLayoutGap = 0.2;
 		}
-		if (Util.isZero(apertureRadius)) {
-			apertureRadius = 3;
+		if (Util.isZero(rimRadius)) {
+			rimRadius = 3;
 		}
-		if (Util.isZero(curvatureParameter)) {
-			curvatureParameter = 6;
+		if (Util.isZero(focalLength)) {
+			focalLength = 2;
 		}
 		if (Util.isZero(reflectance)) {
 			reflectance = 0.9;
@@ -106,15 +106,16 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		if (Util.isZero(thermalEfficiency)) {
 			thermalEfficiency = 0.6;
 		}
-		if (Util.isZero(nSectionParabola)) {
-			nSectionParabola = 32;
+		if (Util.isZero(nRadialSections)) {
+			nRadialSections = 32;
 		}
-		if (Util.isZero(nSectionAxis)) {
-			nSectionAxis = 32;
+		if (Util.isZero(nAxialSections)) {
+			nAxialSections = 32;
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
-		mesh = new Paraboloid("Paraboloid", apertureRadius, curvatureParameter, nSectionAxis, nSectionParabola);
+		final double annotationScale = Scene.getInstance().getAnnotationScale();
+		mesh = new Paraboloid("Paraboloid", rimRadius / annotationScale, 2.0 * Math.sqrt(focalLength / annotationScale), nAxialSections, nRadialSections);
 		mesh.setDefaultColor(SKY_BLUE);
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
@@ -170,7 +171,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		if (!points.isEmpty()) {
 			oldDishCenter = points.get(0).clone();
 		}
-		oldApertureRadius = apertureRadius;
+		oldRimRadius = rimRadius;
 
 	}
 
@@ -205,15 +206,15 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setApertureRadius(rl);
+					setRimRadius(rl);
 					if (outOfBound()) {
 						if (oldDishCenter != null) {
 							points.get(0).set(oldDishCenter);
 						}
-						setApertureRadius(oldApertureRadius);
+						setRimRadius(oldRimRadius);
 					} else {
 						oldDishCenter = points.get(0).clone();
-						oldApertureRadius = apertureRadius;
+						oldRimRadius = rimRadius;
 					}
 				}
 			} else {
@@ -224,15 +225,15 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 					final Vector3 delta = toRelativeVector(p.subtract(pEdit, null)).multiplyLocal(0.5);
 					points.get(0).addLocal(delta);
 					getEditPointShape(editPointIndex).setTranslation(p);
-					setApertureRadius(rw);
+					setRimRadius(rw);
 					if (outOfBound()) {
 						if (oldDishCenter != null) {
 							points.get(0).set(oldDishCenter);
 						}
-						setApertureRadius(oldApertureRadius);
+						setRimRadius(oldRimRadius);
 					} else {
 						oldDishCenter = points.get(0).clone();
-						oldApertureRadius = apertureRadius;
+						oldRimRadius = rimRadius;
 					}
 				}
 			}
@@ -277,7 +278,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		dish.setApertureRadius(apertureRadius / annotationScale);
+		dish.setRimRadius(rimRadius / annotationScale);
 		dish.updateModelBound();
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
@@ -298,7 +299,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
-		// draw the rim
+		// draw the rim line
 		final float zOffset = 0.01f;
 		for (int i = vertexCount - rSamples * 2; i < vertexCount - 1 - rSamples; i++) {
 			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2) + zOffset);
@@ -462,7 +463,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	@Override
 	public double getGridSize() {
-		return apertureRadius / Scene.getInstance().getAnnotationScale() / (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0);
+		return rimRadius / (Scene.getInstance().getAnnotationScale() * (SceneManager.getInstance().isFineGrid() ? 100.0 : 20.0));
 	}
 
 	@Override
@@ -490,13 +491,13 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	}
 
 	private double checkCopyOverlap() {
-		final double w1 = apertureRadius / Scene.getInstance().getAnnotationScale();
+		final double w1 = rimRadius / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.container == container && p != this) {
 				if (p instanceof ParabolicDish) {
 					final ParabolicDish s2 = (ParabolicDish) p;
-					final double w2 = s2.apertureRadius / Scene.getInstance().getAnnotationScale();
+					final double w2 = s2.rimRadius / Scene.getInstance().getAnnotationScale();
 					final double distance = p.getAbsCenter().distance(center);
 					if (distance < (w1 + w2) * 0.499) {
 						return distance;
@@ -645,26 +646,21 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 	}
 
-	public void set(final Vector3 center, final double width, final double height) {
-		points.get(0).set(toRelative(center));
-		setApertureRadius(height);
-		draw();
+	public void setRimRadius(final double rimRadius) {
+		this.rimRadius = rimRadius;
 	}
 
-	public void setApertureRadius(final double apertureRadius) {
-		this.apertureRadius = apertureRadius;
+	public double getRimRadius() {
+		return rimRadius;
 	}
 
-	public double getApertureRadius() {
-		return apertureRadius;
+	public void setFocalLength(final double focalLength) {
+		this.focalLength = focalLength;
+		dish.setCurvatureParameter(2.0 * Math.sqrt(focalLength / Scene.getInstance().getAnnotationScale()));
 	}
 
-	public void setCurvatureParameter(final double curvatureParameter) {
-		this.curvatureParameter = curvatureParameter;
-	}
-
-	public double getCurvatureParameter() {
-		return curvatureParameter;
+	public double getFocalLength() {
+		return focalLength;
 	}
 
 	@Override
@@ -672,8 +668,8 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
 		final ReadOnlyVector3 n = normal == null ? Vector3.UNIT_Z : new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
-		final double halfWidth = 0.5 * apertureRadius / Scene.getInstance().getAnnotationScale();
-		final double dy = halfWidth * halfWidth / (2 * (curvatureParameter / Scene.getInstance().getAnnotationScale()));
+		final double halfWidth = 0.5 * rimRadius / Scene.getInstance().getAnnotationScale();
+		final double dy = halfWidth * halfWidth / (2 * (focalLength / Scene.getInstance().getAnnotationScale()));
 		final Vector3 shift = new Vector3(n.getX() * dy, 0, n.getZ() * dy);
 		final int j = buf.limit() / 6;
 		final Vector3 v1 = new Vector3();
@@ -766,20 +762,20 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		return labelEnergyOutput;
 	}
 
-	public void setNSectionParabola(final int parabolaSectionCount) {
-		nSectionParabola = parabolaSectionCount;
+	public void setNRadialSections(final int nRadialSections) {
+		this.nRadialSections = nRadialSections;
 	}
 
-	public int getNSectionParabola() {
-		return nSectionParabola;
+	public int getNRadialSections() {
+		return nRadialSections;
 	}
 
-	public void setNSectionAxis(final int axisSectionCount) {
-		nSectionAxis = axisSectionCount;
+	public void setNAxialSections(final int nAxialSections) {
+		this.nAxialSections = nAxialSections;
 	}
 
-	public int getNSectionAxis() {
-		return nSectionAxis;
+	public int getNAxialSections() {
+		return nAxialSections;
 	}
 
 }

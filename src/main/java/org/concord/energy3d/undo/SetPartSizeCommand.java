@@ -33,7 +33,7 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			oldModuleLength = t.getModuleLength();
 		} else if (part instanceof ParabolicDish) {
 			final ParabolicDish d = (ParabolicDish) part;
-			oldWidth = d.getApertureRadius();
+			oldWidth = d.getRimRadius();
 		} else if (part instanceof FresnelReflector) {
 			final FresnelReflector r = (FresnelReflector) part;
 			oldWidth = r.getModuleWidth();
@@ -81,8 +81,8 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			t.setModuleLength(oldModuleLength);
 		} else if (part instanceof ParabolicDish) {
 			final ParabolicDish d = (ParabolicDish) part;
-			newWidth = d.getApertureRadius();
-			d.setApertureRadius(oldWidth);
+			newWidth = d.getRimRadius();
+			d.setRimRadius(oldWidth);
 		} else if (part instanceof FresnelReflector) {
 			final FresnelReflector r = (FresnelReflector) part;
 			newWidth = r.getModuleWidth();
@@ -122,7 +122,7 @@ public class SetPartSizeCommand extends AbstractUndoableEdit {
 			t.setModuleLength(newModuleLength);
 		} else if (part instanceof ParabolicDish) {
 			final ParabolicDish d = (ParabolicDish) part;
-			d.setApertureRadius(newWidth);
+			d.setRimRadius(newWidth);
 		} else if (part instanceof FresnelReflector) {
 			final FresnelReflector t = (FresnelReflector) part;
 			t.setModuleWidth(newWidth);
