@@ -1775,6 +1775,16 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		return utilityBill;
 	}
 
+	public List<SolarCollector> getSolarCollectors() {
+		final List<SolarCollector> list = new ArrayList<SolarCollector>();
+		for (final HousePart p : children) {
+			if (p instanceof SolarCollector) {
+				list.add((SolarCollector) p);
+			}
+		}
+		return list;
+	}
+
 	// assuming that there may be multiple roofs on this foundation, return a list of them
 	public List<Roof> getRoofs() {
 		final List<Roof> roofs = new ArrayList<Roof>();
@@ -2983,9 +2993,84 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 	public void setSemilatusRectumForParabolicTroughs(final double semilatusRectum) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicTrough) {
-				final ParabolicTrough t = (ParabolicTrough) p;
-				t.setSemilatusRectum(semilatusRectum);
-				t.draw();
+				((ParabolicTrough) p).setSemilatusRectum(semilatusRectum);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// change properties of all the parabolic dishes on this foundation
+
+	public void setReflectanceForParabolicDishes(final double reflectance) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForParabolicDishes(final double absorptance) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForParabolicDishes(final double efficiency) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setThermalEfficiencyForParabolicDishes(final double efficiency) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setThermalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setBaseHeightForParabolicDishes(final double baseHeight) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setApertureRadiusForParabolicDishes(final double apertureRadius) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setApertureRadius(apertureRadius);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setCurvatureParameterForParabolicDishes(final double curvatureParameter) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setCurvatureParameter(curvatureParameter);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSectionsForParabolicDishes(final int nParabola, final int nAxis) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				final ParabolicDish d = (ParabolicDish) p;
+				d.setNSectionParabola(nParabola);
+				d.setNSectionAxis(nAxis);
+				d.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();

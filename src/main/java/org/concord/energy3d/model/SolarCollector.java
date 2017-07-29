@@ -1,12 +1,12 @@
 package org.concord.energy3d.model;
 
 /**
- * An interface that defines a component that utilizes solar energy, such as solar panels and mirrors
+ * A component that collects solar energy, such as solar panels and mirrors
  * 
  * @author Charles Xie
  *
  */
-public interface Solar {
+public interface SolarCollector {
 
 	public void setBaseHeight(final double baseHeight);
 

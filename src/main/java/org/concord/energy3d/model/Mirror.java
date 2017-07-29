@@ -39,7 +39,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class Mirror extends HousePart implements Solar, Labelable {
+public class Mirror extends HousePart implements SolarCollector, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;

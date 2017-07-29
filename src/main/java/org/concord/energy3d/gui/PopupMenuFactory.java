@@ -10308,8 +10308,8 @@ public class PopupMenuFactory {
 					final JPanel inputPanel = new JPanel(new GridLayout(1, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
 					inputPanel.add(new JLabel("Aperture Radius (m): "));
-					final JTextField widthField = new JTextField(threeDecimalsFormat.format(d.getApertureRadius()));
-					inputPanel.add(widthField);
+					final JTextField apertureRadiusField = new JTextField(threeDecimalsFormat.format(d.getApertureRadius()));
+					inputPanel.add(apertureRadiusField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
@@ -10350,7 +10350,7 @@ public class PopupMenuFactory {
 							double r = 0;
 							boolean ok = true;
 							try {
-								r = Double.parseDouble(widthField.getText());
+								r = Double.parseDouble(apertureRadiusField.getText());
 							} catch (final NumberFormatException x) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
@@ -10366,14 +10366,14 @@ public class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										// foundation.setSizeForParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetApertureRadiusForParabolicDishesOnFoundationCommand c = new SetApertureRadiusForParabolicDishesOnFoundationCommand(foundation);
+										foundation.setApertureRadiusForParabolicDishes(r);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										// Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetApertureRadiusForAllParabolicDishesCommand c = new SetApertureRadiusForAllParabolicDishesCommand();
+										Scene.getInstance().setApertureRadiusForAllParabolicDishes(r);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
@@ -10457,20 +10457,20 @@ public class PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Curvature parameter must be between 0.5 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									if (rb1.isSelected()) {
-										// final SetParabolicTroughSemilatusRectumCommand c = new SetParabolicTroughSemilatusRectumCommand(t);
+										final SetParabolicDishCurvatureParameterCommand c = new SetParabolicDishCurvatureParameterCommand(d);
 										d.setCurvatureParameter(cp);
 										d.draw();
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										// foundation.setSemilatusRectumForParabolicTroughs(2 * cp);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetCurvatureParameterForParabolicDishesOnFoundationCommand c = new SetCurvatureParameterForParabolicDishesOnFoundationCommand(foundation);
+										foundation.setCurvatureParameterForParabolicDishes(cp);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										// Scene.getInstance().setSemilatusRectumForAllParabolicTroughs(2 * cp);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final SetCurvatureParameterForAllParabolicDishesCommand c = new SetCurvatureParameterForAllParabolicDishesCommand();
+										Scene.getInstance().setCurvatureParameterForAllParabolicDishes(cp);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
@@ -10557,14 +10557,14 @@ public class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									// final ChangeFoundationParabolicTroughBaseHeightCommand c = new ChangeFoundationParabolicTroughBaseHeightCommand(foundation);
-									// foundation.setBaseHeightForParabolicTroughs(val);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									final ChangeFoundationParabolicDishBaseHeightCommand c = new ChangeFoundationParabolicDishBaseHeightCommand(foundation);
+									foundation.setBaseHeightForParabolicDishes(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									// final ChangeBaseHeightForAllParabolicTroughsCommand c = new ChangeBaseHeightForAllParabolicTroughsCommand();
-									// Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
-									// SceneManager.getInstance().getUndoManager().addEdit(c);
+									final ChangeBaseHeightForAllParabolicDishesCommand c = new ChangeBaseHeightForAllParabolicDishesCommand();
+									Scene.getInstance().setBaseHeightForAllParabolicDishes(val);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 									selectedScopeIndex = 2;
 								}
 								updateAfterEdit();

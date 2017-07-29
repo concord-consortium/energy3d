@@ -6,7 +6,7 @@ package org.concord.energy3d.model;
  * @author Charles Xie
  *
  */
-public interface Trackable extends Solar {
+public interface Trackable extends SolarCollector {
 
 	public static final int NO_TRACKER = 0;
 	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;

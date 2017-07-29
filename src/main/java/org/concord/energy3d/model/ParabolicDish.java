@@ -43,7 +43,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class ParabolicDish extends HousePart implements Solar, Labelable {
+public class ParabolicDish extends HousePart implements SolarCollector, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
@@ -153,7 +153,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		lightBeams.setStipplePattern((short) 0xffff);
 		lightBeams.setModelBound(null);
 		Util.disablePickShadowLight(lightBeams);
-		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		lightBeams.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
 		lightBeams.setDefaultColor(new ColorRGBA(1f, 1f, 1f, 1f));
 		root.attachChild(lightBeams);
 
@@ -271,7 +271,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 
-		normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalize(null);
+		normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
@@ -320,8 +320,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		steelFrame.getSceneHints().setCullHint(CullHint.Always); // if there is only one module, don't draw frames
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
-		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
+		final Matrix3 rotation = new Matrix3().lookAt(normal, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
 		dishBack.setRotation(rotation);
@@ -361,37 +360,16 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 			lightBeams.setVisible(false);
 			return;
 		}
-		final int nBeams = 10;
-		FloatBuffer beamsBuffer = lightBeams.getMeshData().getVertexBuffer();
-		final int beamsBufferSize = (nBeams + 1) * 12;
-		if (beamsBuffer.capacity() < beamsBufferSize) {
-			beamsBuffer = BufferUtils.createFloatBuffer(beamsBufferSize);
-			lightBeams.getMeshData().setVertexBuffer(beamsBuffer);
-		} else {
-			beamsBuffer.rewind();
-		}
+		final FloatBuffer beamsBuffer = lightBeams.getMeshData().getVertexBuffer();
+		beamsBuffer.rewind();
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-		final double dx, dy, dz;
-		final double ny = sunLocation.getY();
 		sunLocation.multiplyLocal(10000);
-		// final double focus = 0.5 * dish.getSemilatusRectum();
-		// for (int i = 0; i <= nBeams; i++) {
-		// dx = dish.getWidth() * (0.5 - (double) i / nBeams);
-		// dz = 0.5 * dx * dx / dish.getSemilatusRectum();
-		// Vector3 d = mesh.getRotation().applyPost(new Vector3(dx, 0, dz), null);
-		// final Vector3 o = getAbsPoint(0).addLocal(d);
-		// // draw line to sun
-		// final Vector3 r = o.clone();
-		// r.addLocal(sunLocation);
-		// beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		// beamsBuffer.put(r.getXf()).put(r.getYf()).put(r.getZf());
-		// // draw line to focus
-		// dy = ny * (dz - focus);
-		// d = mesh.getRotation().applyPost(new Vector3(0, 0, focus), null);
-		// final Vector3 f = getAbsPoint(0).addLocal(d).addLocal(0, dy, 0);
-		// beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		// beamsBuffer.put(f.getXf()).put(f.getYf()).put(f.getZf());
-		// }
+		final Vector3 o = getAbsPoint(0);
+		// draw line to sun
+		final Vector3 r = o.clone();
+		r.addLocal(sunLocation);
+		beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
+		beamsBuffer.put(r.getXf()).put(r.getYf()).put(r.getZf());
 		lightBeams.updateModelBound();
 		lightBeams.setVisible(true);
 		if (bloomRenderPassLight == null) {

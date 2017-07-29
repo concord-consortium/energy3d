@@ -27,7 +27,7 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Sensor extends HousePart implements Solar {
+public class Sensor extends HousePart implements SolarCollector {
 
 	private static final long serialVersionUID = 1L;
 

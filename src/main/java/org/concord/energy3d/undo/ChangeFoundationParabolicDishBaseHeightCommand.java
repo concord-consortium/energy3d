@@ -7,24 +7,24 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
-import org.concord.energy3d.model.ParabolicTrough;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationParabolicTroughBaseHeightCommand extends AbstractUndoableEdit {
+public class ChangeFoundationParabolicDishBaseHeightCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final Foundation foundation;
-	private final List<ParabolicTrough> troughs;
+	private final List<ParabolicDish> dishes;
 
-	public ChangeFoundationParabolicTroughBaseHeightCommand(final Foundation foundation) {
+	public ChangeFoundationParabolicDishBaseHeightCommand(final Foundation foundation) {
 		this.foundation = foundation;
-		troughs = foundation.getParabolicTroughs();
-		final int n = troughs.size();
+		dishes = foundation.getParabolicDishes();
+		final int n = dishes.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = troughs.get(i).getBaseHeight();
+			oldValues[i] = dishes.get(i).getBaseHeight();
 		}
 	}
 
@@ -35,13 +35,13 @@ public class ChangeFoundationParabolicTroughBaseHeightCommand extends AbstractUn
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		final int n = troughs.size();
+		final int n = dishes.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			final ParabolicTrough t = troughs.get(i);
-			newValues[i] = t.getBaseHeight();
-			t.setBaseHeight(oldValues[i]);
-			t.draw();
+			final ParabolicDish d = dishes.get(i);
+			newValues[i] = d.getBaseHeight();
+			d.setBaseHeight(oldValues[i]);
+			d.draw();
 		}
 		SceneManager.getInstance().refresh();
 	}
@@ -49,18 +49,18 @@ public class ChangeFoundationParabolicTroughBaseHeightCommand extends AbstractUn
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		final int n = troughs.size();
+		final int n = dishes.size();
 		for (int i = 0; i < n; i++) {
-			final ParabolicTrough t = troughs.get(i);
-			t.setBaseHeight(newValues[i]);
-			t.draw();
+			final ParabolicDish d = dishes.get(i);
+			d.setBaseHeight(newValues[i]);
+			d.draw();
 		}
 		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Change Base Height for All Parabolic Troughs on Selected Foundation";
+		return "Change Base Height for All Parabolic Dishs on Selected Foundation";
 	}
 
 }

@@ -5,21 +5,21 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Solar;
+import org.concord.energy3d.model.SolarCollector;
 
 public class ChangeBaseHeightCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;
 	private double newValue;
-	private final Solar part;
+	private final SolarCollector part;
 
-	public ChangeBaseHeightCommand(final Solar part) {
+	public ChangeBaseHeightCommand(final SolarCollector part) {
 		this.part = part;
 		oldValue = part.getBaseHeight();
 	}
 
-	public Solar getPart() {
+	public SolarCollector getPart() {
 		return part;
 	}
 

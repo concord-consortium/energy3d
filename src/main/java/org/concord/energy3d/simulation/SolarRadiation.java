@@ -19,7 +19,7 @@ import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
-import org.concord.energy3d.model.Solar;
+import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
@@ -1877,7 +1877,7 @@ public class SolarRadiation {
 		final int totalMeshes = Scene.getInstance().getParts().size() + Scene.getInstance().countMeshes();
 		int countMesh = 0;
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Solar) {
+			if (part instanceof SolarCollector) {
 				applyTexture(part.getRadiationMesh());
 			} else {
 				if (!Scene.getInstance().getOnlySolarComponentsInSolarMap()) {

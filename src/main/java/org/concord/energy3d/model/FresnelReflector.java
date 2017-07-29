@@ -43,7 +43,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class FresnelReflector extends HousePart implements Solar, Labelable {
+public class FresnelReflector extends HousePart implements SolarCollector, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);

@@ -2745,6 +2745,92 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	// parabolic dishes
+
+	public List<ParabolicDish> getAllParabolicDishes() {
+		final List<ParabolicDish> list = new ArrayList<ParabolicDish>();
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				list.add((ParabolicDish) p);
+			}
+		}
+		return list;
+	}
+
+	public void setReflectanceForAllParabolicDishes(final double reflectance) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForAllParabolicDishes(final double absorptance) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForAllParabolicDishes(final double efficiency) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setThermalEfficiencyForAllParabolicDishes(final double efficiency) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setThermalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setBaseHeightForAllParabolicDishes(final double baseHeight) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setApertureRadiusForAllParabolicDishes(final double apertureRadius) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setApertureRadius(apertureRadius);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setCurvatureParameterForAllParabolicDishes(final double curvatureParameter) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setCurvatureParameter(curvatureParameter);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSectionsForAllParabolicDishes(final int nParabola, final int nAxis) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				final ParabolicDish d = (ParabolicDish) p;
+				d.setNSectionParabola(nParabola);
+				d.setNSectionAxis(nAxis);
+				d.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	// Fresnel reflectors
 
 	public List<FresnelReflector> getAllFresnelReflectors() {
