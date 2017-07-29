@@ -58,6 +58,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
@@ -1121,6 +1122,41 @@ public class EnergyPanel extends JPanel {
 						});
 					}
 				}
+			} else if (selectedPart instanceof ParabolicDish) {
+				final ParabolicDish d = (ParabolicDish) selectedPart;
+				if (d.isDrawable()) {
+					final Foundation f = d.getTopContainer();
+					if (f != null) {
+						double a = d.getRelativeAzimuth() + f.getAzimuth();
+						if (a >= 360) {
+							a -= 360;
+						}
+						final double focalLength = d.getFocalLength();
+						final double rimRadius = d.getRimRadius();
+						EventQueue.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								partPanelBorder.setTitle("Parabolic Dish (" + d.getId() + ")");
+								partProperty1Label.setText("  Size & Position:");
+								partProperty1TextField.setText("Rim radius=" + TWO_DECIMALS.format(rimRadius * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
+								partProperty2Label.setText("  Parabola Shape:");
+								partProperty2TextField.setText("Focal length=" + ONE_DECIMAL.format(focalLength * meterToFoot) + lengthUnit);
+								partProperty1TextField.setToolTipText("Rim radius and (x, y, z) coordinates of the parabolic dish");
+								partProperty2TextField.setToolTipText("Parameters of the parabolic shape");
+								final String reflect = "R=" + ONE_DECIMAL.format(d.getReflectance() * 100) + "%";
+								if (energyViewShown) {
+									partProperty3Label.setText("  Reflection & Yield:");
+									partProperty3TextField.setText(reflect + ", " + ONE_DECIMAL.format(d.getSolarPotentialToday() * d.getSystemEfficiency()) + " kWh");
+									partProperty3TextField.setToolTipText("The reflectance and yield of this parabolic dish");
+								} else {
+									partProperty3Label.setText("  Reflection:");
+									partProperty3TextField.setText(reflect);
+									partProperty3TextField.setToolTipText("The reflectance of this parabolic dish");
+								}
+							}
+						});
+					}
+				}
 			} else if (selectedPart instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) selectedPart;
 				if (r.isDrawable()) {
@@ -1473,29 +1509,43 @@ public class EnergyPanel extends JPanel {
 								partProperty3TextField.setText("");
 								partProperty3TextField.setToolTipText(null);
 							} else {
-								final int numberOfNodes = Scene.getInstance().countNodes();
-								if (numberOfNodes > 0) {
-									partPanelBorder.setTitle("Structures");
-									partProperty1Label.setText("  Total Nodes:");
-									partProperty1TextField.setText("" + numberOfNodes);
-									partProperty1TextField.setToolTipText("Total number of structure nodes");
-									partProperty2Label.setText("  Total Meshes:");
-									partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
-									partProperty2TextField.setToolTipText("Total number of structure meshes");
-									partProperty3Label.setText("  -");
-									partProperty3TextField.setText("");
-									partProperty3TextField.setToolTipText(null);
-								} else {
-									partPanelBorder.setTitle("Part");
-									partProperty1Label.setText("  -");
-									partProperty1TextField.setText("");
-									partProperty1TextField.setToolTipText(null);
+								final int numberOfParabolicDishes = Scene.getInstance().countParts(ParabolicDish.class);
+								if (numberOfParabolicDishes > 0) {
+									partPanelBorder.setTitle("Parabolic Dishes");
+									partProperty1Label.setText("  Total Number:");
+									partProperty1TextField.setText("" + numberOfParabolicDishes);
+									partProperty1TextField.setToolTipText("Total number of parabolic dishes");
 									partProperty2Label.setText("  -");
 									partProperty2TextField.setText("");
 									partProperty2TextField.setToolTipText(null);
 									partProperty3Label.setText("  -");
 									partProperty3TextField.setText("");
 									partProperty3TextField.setToolTipText(null);
+								} else {
+									final int numberOfNodes = Scene.getInstance().countNodes();
+									if (numberOfNodes > 0) {
+										partPanelBorder.setTitle("Structures");
+										partProperty1Label.setText("  Total Nodes:");
+										partProperty1TextField.setText("" + numberOfNodes);
+										partProperty1TextField.setToolTipText("Total number of structure nodes");
+										partProperty2Label.setText("  Total Meshes:");
+										partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
+										partProperty2TextField.setToolTipText("Total number of structure meshes");
+										partProperty3Label.setText("  -");
+										partProperty3TextField.setText("");
+										partProperty3TextField.setToolTipText(null);
+									} else {
+										partPanelBorder.setTitle("Part");
+										partProperty1Label.setText("  -");
+										partProperty1TextField.setText("");
+										partProperty1TextField.setToolTipText(null);
+										partProperty2Label.setText("  -");
+										partProperty2TextField.setText("");
+										partProperty2TextField.setToolTipText(null);
+										partProperty3Label.setText("  -");
+										partProperty3TextField.setText("");
+										partProperty3TextField.setToolTipText(null);
+									}
 								}
 							}
 						}

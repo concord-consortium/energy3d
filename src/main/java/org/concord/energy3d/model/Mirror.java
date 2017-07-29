@@ -108,7 +108,8 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		post = Scene.getInstance().getAllMirrors().size() < 500 ? new Cylinder("Post Cylinder", 2, 10, 10, 0) : new Cylinder("Post Cylinder", 2, 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		post = new Cylinder("Post Cylinder", 2, Scene.getInstance().getAllMirrors().size() < 200 ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		post.setRadius(0.6);
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRenderState(offsetState);
 		post.setModelBound(new BoundingBox());
@@ -219,7 +220,6 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 		outlineMesh.setTranslation(mesh.getTranslation());
 		outlineMesh.setRotation(mesh.getRotation());
 
-		post.setRadius(0.6);
 		post.setHeight(baseHeight - 0.5 * post.getRadius());
 		post.setTranslation(getAbsPoint(0).addLocal(0, 0, post.getHeight() / 2 - baseHeight));
 

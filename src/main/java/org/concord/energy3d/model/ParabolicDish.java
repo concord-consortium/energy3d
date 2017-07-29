@@ -30,7 +30,6 @@ import com.ardor3d.renderer.state.CullState.Face;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
-import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
@@ -50,9 +49,11 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private transient ReadOnlyVector3 normal;
 	private transient Paraboloid dish;
 	private transient Mesh dishBack;
+	private transient Cylinder post;
 	private transient Line outlines;
 	private transient Line steelFrame;
-	private transient Node modulesRoot;
+	private transient Cylinder duct;
+	private transient Cylinder receiver;
 	private transient Line lightBeams;
 	private transient BMText label;
 	private transient double copyLayoutGap = 0.2;
@@ -132,6 +133,31 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		dishBack.setRenderState(cullState);
 		root.attachChild(dishBack);
 
+		post = new Cylinder("Post Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		post.setDefaultColor(ColorRGBA.WHITE);
+		post.setRadius(0.6);
+		post.setRenderState(offsetState);
+		post.setModelBound(new BoundingBox());
+		post.updateModelBound();
+		root.attachChild(post);
+
+		duct = new Cylinder("Duct Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		duct.setDefaultColor(ColorRGBA.WHITE);
+		duct.setRadius(0.6);
+		duct.setRenderState(offsetState);
+		duct.setModelBound(new BoundingBox());
+		duct.updateModelBound();
+		root.attachChild(duct);
+
+		receiver = new Cylinder("Receiver Cylinder", 2, detailed ? 10 : 2, 10, 0, true); // if there are many mirrors, reduce the solution of post
+		receiver.setDefaultColor(ColorRGBA.WHITE);
+		receiver.setRadius(2);
+		receiver.setHeight(3);
+		receiver.setRenderState(offsetState);
+		receiver.setModelBound(new BoundingBox());
+		receiver.updateModelBound();
+		root.attachChild(receiver);
+
 		outlines = new Line("Parabolic Dish (Outline)");
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (dish.getRSamples() + 1)));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
@@ -164,8 +190,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		label.setVisible(false);
 		root.attachChild(label);
 
-		modulesRoot = new Node("Modules Root");
-		root.attachChild(modulesRoot);
 		updateTextureAndColor();
 
 		if (!points.isEmpty()) {
@@ -316,10 +340,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			steelFrameBuffer.limit(steelBufferSize);
 		}
 
-		modulesRoot.detachAllChildren();
-		addPole(center, baseHeight, baseZ);
 		steelFrame.getSceneHints().setCullHint(CullHint.Always); // if there is only one module, don't draw frames
-		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		final Matrix3 rotation = new Matrix3().lookAt(normal, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
@@ -330,20 +351,32 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		outlines.setTranslation(mesh.getTranslation());
 		steelFrame.setRotation(rotation);
 		steelFrame.setTranslation(mesh.getTranslation());
-
 		mesh.updateModelBound();
 		outlines.updateModelBound();
 		steelFrame.updateModelBound();
 
+		post.setHeight(baseHeight - 0.5 * post.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the dish
+		final Vector3 p = center.clone();
+		p.setZ(baseZ + post.getHeight() / 2);
+		post.setTranslation(p);
+
+		final double flScaled = focalLength / annotationScale;
+		duct.setHeight(flScaled + receiver.getHeight());
+		duct.setRotation(mesh.getRotation());
+		duct.setTranslation(center.clone().addLocal(normal.multiply(flScaled * 0.5, null)));
+
+		receiver.setRotation(mesh.getRotation());
+		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled + receiver.getHeight() * 0.5, null)));
+
 		if (bloomRenderPassReceiver == null) {
 			bloomRenderPassReceiver = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
-			bloomRenderPassReceiver.setBlurIntensityMultiplier(0.75f);
+			bloomRenderPassReceiver.setBlurIntensityMultiplier(0.5f);
 			// bloomRenderPassTube.setNrBlurPasses(2);
 			SceneManager.getInstance().getPassManager().add(bloomRenderPassReceiver);
 		}
-		// if (!bloomRenderPassReceiver.contains(absorber)) {
-		// bloomRenderPassReceiver.add(absorber);
-		// }
+		if (!bloomRenderPassReceiver.contains(receiver)) {
+			bloomRenderPassReceiver.add(receiver);
+		}
 
 		if (beamsVisible) {
 			drawLightBeams();
@@ -404,19 +437,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		} else {
 			label.setVisible(false);
 		}
-	}
-
-	private void addPole(final Vector3 position, final double poleHeight, final double baseZ) {
-		final Cylinder pole = new Cylinder("Pole Cylinder", 2, detailed ? 10 : 2, 10, 0);
-		pole.setRadius(0.6);
-		pole.setRenderState(offsetState);
-		pole.setHeight(poleHeight - 0.5 * pole.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the dish
-		pole.setModelBound(new BoundingBox());
-		pole.updateModelBound();
-		final Vector3 p = position.clone();
-		p.setZ(baseZ + pole.getHeight() / 2);
-		pole.setTranslation(p);
-		modulesRoot.attachChild(pole);
 	}
 
 	@Override
@@ -714,9 +734,9 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			}
 		}
 		if (bloomRenderPassReceiver != null) {
-			// if (bloomRenderPassReceiver.contains(absorber)) {
-			// bloomRenderPassReceiver.remove(absorber);
-			// }
+			if (bloomRenderPassReceiver.contains(receiver)) {
+				bloomRenderPassReceiver.remove(receiver);
+			}
 		}
 	}
 
