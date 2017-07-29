@@ -398,8 +398,8 @@ public class MainPanel extends JPanel {
 		solaMenu.addSeparator();
 		solaMenu.add(miMirror);
 		solaMenu.add(miParabolicTrough);
-		solaMenu.add(miFresnelReflector);
 		solaMenu.add(miParabolicDish);
+		solaMenu.add(miFresnelReflector);
 		solaMenu.addSeparator();
 		solaMenu.add(miSolarWaterHeater);
 		solaMenu.add(miSensor);

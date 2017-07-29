@@ -66,7 +66,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private boolean beamsVisible;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldDishCenter;
-	private transient double oldRimRadius;
 	private transient double oldRelativeAzimuth;
 	private static transient BloomRenderPass bloomRenderPassLight, bloomRenderPassReceiver;
 	private transient double baseZ;
@@ -183,7 +182,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		if (!points.isEmpty()) {
 			oldDishCenter = points.get(0).clone();
 		}
-		oldRimRadius = rimRadius;
 
 	}
 
@@ -317,16 +315,35 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			lightBeams.setVisible(false);
 			return;
 		}
-		final FloatBuffer beamsBuffer = lightBeams.getMeshData().getVertexBuffer();
-		beamsBuffer.rewind();
+		final int nBeams = 6;
+		FloatBuffer beamsBuffer = lightBeams.getMeshData().getVertexBuffer();
+		final int beamsBufferSize = (nBeams + 1) * 12;
+		if (beamsBuffer.capacity() < beamsBufferSize) {
+			beamsBuffer = BufferUtils.createFloatBuffer(beamsBufferSize);
+			lightBeams.getMeshData().setVertexBuffer(beamsBuffer);
+		} else {
+			beamsBuffer.rewind();
+		}
 		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		double dx;
+		double dz;
 		sunLocation.multiplyLocal(10000);
-		final Vector3 o = getAbsPoint(0);
-		// draw line to sun
-		final Vector3 r = o.clone();
-		r.addLocal(sunLocation);
-		beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
-		beamsBuffer.put(r.getXf()).put(r.getYf()).put(r.getZf());
+		final Vector3 f = getAbsPoint(0).addLocal(mesh.getRotation().applyPost(new Vector3(0, 0, focalLength / Scene.getInstance().getAnnotationScale()), null));
+		for (int i = 0; i <= nBeams; i++) {
+			dx = dish.getRimRadius() * (1 - 2.0 * i / nBeams) * 0.9;
+			dz = dx / dish.getCurvatureParameter();
+			dz *= dz;
+			final Vector3 o = getAbsPoint(0).addLocal(mesh.getRotation().applyPost(new Vector3(dx, 0, dz), null));
+			// draw line to sun
+			final Vector3 r = o.clone();
+			r.addLocal(sunLocation);
+			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
+			beamsBuffer.put(r.getXf()).put(r.getYf()).put(r.getZf());
+			// draw line to focus
+			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
+			beamsBuffer.put(f.getXf()).put(f.getYf()).put(f.getZf());
+		}
+
 		lightBeams.updateModelBound();
 		lightBeams.setVisible(true);
 		if (bloomRenderPassLight == null) {

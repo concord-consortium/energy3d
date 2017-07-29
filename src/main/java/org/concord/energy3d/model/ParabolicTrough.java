@@ -495,10 +495,11 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 		final double ny = sunLocation.getY();
 		sunLocation.multiplyLocal(10000);
 		final double focus = 0.5 * reflector.getSemilatusRectum();
+		final Vector3 focusPoint = mesh.getRotation().applyPost(new Vector3(0, 0, focus), null);
 		for (int i = 0; i <= nBeams; i++) {
 			dx = reflector.getWidth() * (0.5 - (double) i / nBeams);
 			dz = 0.5 * dx * dx / reflector.getSemilatusRectum();
-			Vector3 d = mesh.getRotation().applyPost(new Vector3(dx, 0, dz), null);
+			final Vector3 d = mesh.getRotation().applyPost(new Vector3(dx, 0, dz), null);
 			final Vector3 o = getAbsPoint(0).addLocal(d);
 			// draw line to sun
 			final Vector3 r = o.clone();
@@ -507,8 +508,7 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 			beamsBuffer.put(r.getXf()).put(r.getYf()).put(r.getZf());
 			// draw line to focus
 			dy = ny * (dz - focus);
-			d = mesh.getRotation().applyPost(new Vector3(0, 0, focus), null);
-			final Vector3 f = getAbsPoint(0).addLocal(d).addLocal(0, dy, 0);
+			final Vector3 f = getAbsPoint(0).addLocal(focusPoint).addLocal(0, dy, 0);
 			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
 			beamsBuffer.put(f.getXf()).put(f.getYf()).put(f.getZf());
 		}
