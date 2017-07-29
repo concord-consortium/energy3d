@@ -65,7 +65,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 	private double apertureRadius = 3;
 	private double curvatureParameter = 6;
 	private double relativeAzimuth = 0;
-	private double baseHeight = 15;
+	private double baseHeight = 20;
 	private boolean beamsVisible;
 	private boolean labelEnergyOutput;
 	private transient Vector3 oldDishCenter;
@@ -73,7 +73,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 	private transient double oldRelativeAzimuth;
 	private static transient BloomRenderPass bloomRenderPassLight, bloomRenderPassReceiver;
 	private transient double baseZ;
-	private int nSectionParabola = 16; // number of sections for the parabola cross section of a parabolic dish (must be power of 2)
+	private int nSectionParabola = 32; // number of sections for the parabola cross section of a parabolic dish (must be power of 2)
 	private int nSectionAxis = 32; // number of sections in the axis of a parabolic dish (must be power of 2)
 	private boolean detailed; // allows us to draw more details when there are fewer dishes in the scene
 
@@ -107,7 +107,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 			thermalEfficiency = 0.6;
 		}
 		if (Util.isZero(nSectionParabola)) {
-			nSectionParabola = 16;
+			nSectionParabola = 32;
 		}
 		if (Util.isZero(nSectionAxis)) {
 			nSectionAxis = 32;
@@ -286,9 +286,11 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
 		FloatBuffer steelFrameBuffer = steelFrame.getMeshData().getVertexBuffer();
 
+		final int vertexCount = vertexBuffer.limit() / 3;
 		final Vector3 center = getAbsPoint(0);
 
-		final int outlineBufferSize = 6 * (dish.getRSamples() + 1);
+		final int rSamples = dish.getRSamples() + 1;
+		final int outlineBufferSize = 6 * rSamples;
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
@@ -296,13 +298,11 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
-		final int vertexCount = vertexBuffer.limit() / 6;
-
-		// draw parabolic lines of the two end faces
-		final int i0 = vertexCount - dish.getRSamples();
-		for (int i = i0; i < vertexCount; i++) {
-			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2));
-			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5));
+		// draw the rim
+		final float zOffset = 0.01f;
+		for (int i = vertexCount - rSamples * 2; i < vertexCount - 1 - rSamples; i++) {
+			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2) + zOffset);
+			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5) + zOffset);
 		}
 
 		// draw steel frame lines
@@ -419,7 +419,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = 0.6 * dish.getA();
+			final double shift = 0.6 * dish.getCurvatureParameter();
 			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -434,8 +434,9 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 		pole.setHeight(poleHeight - 0.5 * pole.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the dish
 		pole.setModelBound(new BoundingBox());
 		pole.updateModelBound();
-		position.setZ(baseZ + pole.getHeight() / 2);
-		pole.setTranslation(position);
+		final Vector3 p = position.clone();
+		p.setZ(baseZ + pole.getHeight() / 2);
+		pole.setTranslation(p);
 		modulesRoot.attachChild(pole);
 	}
 
@@ -468,7 +469,7 @@ public class ParabolicDish extends HousePart implements Solar, Labelable {
 
 	@Override
 	protected String getTextureFileName() {
-		return "trough_mirror.png";
+		return "mirror.png";
 	}
 
 	@Override
