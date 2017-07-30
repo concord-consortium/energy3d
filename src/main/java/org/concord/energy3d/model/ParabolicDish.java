@@ -61,6 +61,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private double thermalEfficiency = 0.6;
 	private double rimRadius = 3;
 	private double focalLength = 2;
+	private int nrib = 6;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 18;
 	private boolean beamsVisible;
@@ -107,6 +108,9 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 		if (Util.isZero(nAxialSections)) {
 			nAxialSections = 32;
+		}
+		if (Util.isZero(nrib)) {
+			nrib = 6;
 		}
 		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
 
@@ -251,7 +255,8 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		final Vector3 center = getAbsPoint(0);
 
 		final int rSamples = dish.getRSamples() + 1;
-		final int outlineBufferSize = 6 * rSamples;
+		final int zSamples = dish.getZSamples() - 1;
+		final int outlineBufferSize = 6 * (rSamples * 3 + zSamples * nrib);
 		if (outlineBuffer.capacity() < outlineBufferSize) {
 			outlineBuffer = BufferUtils.createFloatBuffer(outlineBufferSize);
 			outlines.getMeshData().setVertexBuffer(outlineBuffer);
@@ -260,12 +265,36 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			outlineBuffer.limit(outlineBufferSize);
 		}
 		// draw the rim line
-		final float zOffset = 0.01f;
 		int i3;
 		for (int i = vertexCount - rSamples * 2; i < vertexCount - 1 - rSamples; i++) {
 			i3 = i * 3;
-			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + zOffset);
-			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + zOffset);
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
+		}
+		for (int i = (vertexCount - rSamples * 3) / 4; i < (vertexCount + rSamples) / 4; i++) {
+			i3 = i * 3;
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
+		}
+		// draw the rib lines
+		double xi, yi, zi;
+		final double offset = 0.05;
+		final double delta = dish.getRimRadius() * 2.0 / (zSamples + 1);
+		double cos, sin;
+		for (int i = 0; i < zSamples; i++) {
+			for (int j = 0; j < nrib; j++) {
+				final double angle = Math.PI / nrib * j;
+				cos = Math.cos(angle);
+				sin = Math.sin(angle);
+				xi = cos * (dish.getRimRadius() - delta * (i + 0.5));
+				yi = sin * (dish.getRimRadius() - delta * (i + 0.5));
+				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
+				outlineBuffer.put((float) xi).put((float) yi).put((float) (zi + offset));
+				xi -= cos * delta;
+				yi -= sin * delta;
+				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
+				outlineBuffer.put((float) xi).put((float) yi).put((float) (zi + offset));
+			}
 		}
 
 		final Matrix3 rotation = new Matrix3().lookAt(normal, Vector3.UNIT_Y);
@@ -683,6 +712,14 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	public boolean getLabelEnergyOutput() {
 		return labelEnergyOutput;
+	}
+
+	public void setNumberOfRibs(final int nrib) {
+		this.nrib = nrib;
+	}
+
+	public int getNumberOfRibs() {
+		return nrib;
 	}
 
 	public void setNRadialSections(final int nRadialSections) {
