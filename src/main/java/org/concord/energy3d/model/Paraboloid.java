@@ -221,9 +221,9 @@ public class Paraboloid extends Mesh {
 	 */
 	private void setIndexData() {
 		// allocate connectivity
-		final int verts = (_zSamples - 2) * (_rSamples + 1) + 2;
+		final int verts = (_zSamples - 2) * (_rSamples + 1);
 		final int tris = 2 * (_zSamples - 2) * _rSamples;
-		_meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
+		_meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts));
 
 		// generate connectivity
 		for (int iZ = 0, iZStart = 0; iZ < _zSamples - 3; iZ++) {
@@ -245,7 +245,7 @@ public class Paraboloid extends Mesh {
 		// vertex triangles
 		for (int i = 0; i < _rSamples; i++) {
 			_meshData.getIndices().put(i);
-			_meshData.getIndices().put(_meshData.getVertexCount() - 2);
+			_meshData.getIndices().put(_meshData.getVertexCount() - 1);
 			_meshData.getIndices().put(i + 1);
 		}
 	}

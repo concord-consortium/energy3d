@@ -85,8 +85,6 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.TextureKey;
 
 public class Scene implements Serializable {
-	public static final ReadOnlyColorRGBA WHITE = ColorRGBA.WHITE;
-	public static final ReadOnlyColorRGBA GRAY = ColorRGBA.LIGHT_GRAY;
 	public static final int CLOUDY_SKY_THEME = 0;
 	public static final int DESERT_THEME = 1;
 	public static final int GRASSLAND_THEME = 2;
@@ -224,7 +222,9 @@ public class Scene implements Serializable {
 			@Override
 			public Object call() throws Exception {
 				instance.add(new Human(Human.JACK, 1));
-				instance.add(new Foundation(xLength, yLength), true);
+				final Foundation f = new Foundation(xLength, yLength);
+				f.setColor(ColorRGBA.GRAY);
+				instance.add(f, true);
 				return null;
 			}
 		});
@@ -2073,7 +2073,7 @@ public class Scene implements Serializable {
 	/** get the default color for foundations */
 	public ReadOnlyColorRGBA getFoundationColor() {
 		if (foundationColor == null) {
-			return WHITE;
+			return ColorRGBA.WHITE;
 		}
 		return foundationColor;
 	}
@@ -2086,7 +2086,7 @@ public class Scene implements Serializable {
 	/** get the default color for walls */
 	public ReadOnlyColorRGBA getWallColor() {
 		if (wallColor == null) {
-			return GRAY;
+			return ColorRGBA.LIGHT_GRAY;
 		}
 		return wallColor;
 	}
@@ -2099,7 +2099,7 @@ public class Scene implements Serializable {
 	/** get the default color for doors */
 	public ReadOnlyColorRGBA getDoorColor() {
 		if (doorColor == null) {
-			return WHITE;
+			return ColorRGBA.WHITE;
 		}
 		return doorColor;
 	}
@@ -2112,7 +2112,7 @@ public class Scene implements Serializable {
 	/** get the default color for floors */
 	public ReadOnlyColorRGBA getFloorColor() {
 		if (floorColor == null) {
-			return WHITE;
+			return ColorRGBA.WHITE;
 		}
 		return floorColor;
 	}
@@ -2125,7 +2125,7 @@ public class Scene implements Serializable {
 	/** get the default color for roofs */
 	public ReadOnlyColorRGBA getRoofColor() {
 		if (roofColor == null) {
-			return WHITE;
+			return ColorRGBA.WHITE;
 		}
 		return roofColor;
 	}

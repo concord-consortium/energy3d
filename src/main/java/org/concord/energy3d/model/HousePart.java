@@ -754,7 +754,7 @@ public abstract class HousePart implements Serializable {
 				}
 			} else if (isFrozen()) {
 				mesh.clearRenderState(StateType.Texture);
-				mesh.setDefaultColor(Scene.GRAY);
+				mesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 			} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
 				mesh.clearRenderState(StateType.Texture);
 				mesh.setDefaultColor(defaultColor);

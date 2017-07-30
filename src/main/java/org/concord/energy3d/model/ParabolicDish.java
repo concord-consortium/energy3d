@@ -122,7 +122,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		dish = (Paraboloid) mesh;
 		dishBack = mesh.makeCopy(true);
 		dishBack.clearRenderState(StateType.Texture);
-		dishBack.setDefaultColor(ColorRGBA.WHITE);
+		dishBack.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 		cullState = new CullState();
 		cullState.setCullFace(Face.None);
 		dishBack.setRenderState(cullState);
@@ -410,7 +410,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	@Override
 	protected String getTextureFileName() {
-		return "mirror.png";
+		return "dish_mirror.png";
 	}
 
 	@Override

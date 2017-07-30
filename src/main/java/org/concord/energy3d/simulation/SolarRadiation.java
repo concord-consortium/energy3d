@@ -1942,7 +1942,7 @@ public class SolarRadiation {
 		// texture.setWrap(WrapMode.Clamp);
 		final TextureState textureState = new TextureState();
 		textureState.setTexture(texture);
-		mesh.setDefaultColor(Scene.WHITE);
+		mesh.setDefaultColor(ColorRGBA.WHITE);
 		mesh.setRenderState(textureState);
 	}
 

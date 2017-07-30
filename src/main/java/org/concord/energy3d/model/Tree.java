@@ -11,6 +11,7 @@ import org.concord.energy3d.util.SelectUtil;
 
 import com.ardor3d.bounding.BoundingBox;
 import com.ardor3d.bounding.BoundingSphere;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.renderer.queue.RenderBucketType;
@@ -296,7 +297,7 @@ public class Tree extends HousePart {
 
 	@Override
 	public void updateTextureAndColor() {
-		updateTextureAndColor(mesh, Scene.WHITE, TextureMode.Full);
+		updateTextureAndColor(mesh, ColorRGBA.WHITE, TextureMode.Full);
 	}
 
 	@Override
