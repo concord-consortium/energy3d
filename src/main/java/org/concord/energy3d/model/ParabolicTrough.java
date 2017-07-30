@@ -369,11 +369,13 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 			outlineBuffer.limit(outlineBufferSize);
 		}
 		// draw parabolic lines of the two end faces
+		int i3;
 		for (int i = 0; i < vertexCount - 1; i++) {
-			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2));
-			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5));
-			outlineBuffer.put(vertexBuffer.get(j + i * 3)).put(vertexBuffer.get(j + i * 3 + 1)).put(vertexBuffer.get(j + i * 3 + 2));
-			outlineBuffer.put(vertexBuffer.get(j + i * 3 + 3)).put(vertexBuffer.get(j + i * 3 + 4)).put(vertexBuffer.get(j + i * 3 + 5));
+			i3 = i * 3;
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
+			outlineBuffer.put(vertexBuffer.get(j + i3)).put(vertexBuffer.get(j + i3 + 1)).put(vertexBuffer.get(j + i3 + 2));
+			outlineBuffer.put(vertexBuffer.get(j + i3 + 3)).put(vertexBuffer.get(j + i3 + 4)).put(vertexBuffer.get(j + i3 + 5));
 		}
 		// draw lateral lines connecting the two end faces
 		outlineBuffer.put(vertexBuffer.get(0)).put(vertexBuffer.get(1)).put(vertexBuffer.get(2));
@@ -385,8 +387,9 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 			for (int k = 1; k < nModules; k++) {
 				final double ua = k * moduleLength / annotationScale;
 				for (int i = 0; i < vertexCount - 1; i++) {
-					final Vector3 v1 = new Vector3(vertexBuffer.get(i * 3), vertexBuffer.get(i * 3 + 1), vertexBuffer.get(i * 3 + 2));
-					final Vector3 v2 = new Vector3(vertexBuffer.get(i * 3 + 3), vertexBuffer.get(i * 3 + 4), vertexBuffer.get(i * 3 + 5));
+					i3 = i * 3;
+					final Vector3 v1 = new Vector3(vertexBuffer.get(i3), vertexBuffer.get(i3 + 1), vertexBuffer.get(i3 + 2));
+					final Vector3 v2 = new Vector3(vertexBuffer.get(i3 + 3), vertexBuffer.get(i3 + 4), vertexBuffer.get(i3 + 5));
 					v1.addLocal(0, ua, 0);
 					v2.addLocal(0, ua, 0);
 					outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());

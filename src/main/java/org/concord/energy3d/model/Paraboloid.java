@@ -94,6 +94,26 @@ public class Paraboloid extends Mesh {
 		setIndexData();
 	}
 
+	public void setZSamples(final int zSamples) {
+		_zSamples = zSamples;
+		setGeometryData();
+		setIndexData();
+	}
+
+	public int getZSamples() {
+		return _zSamples;
+	}
+
+	public void setRSamples(final int rSamples) {
+		_rSamples = rSamples;
+		setGeometryData();
+		setIndexData();
+	}
+
+	public int getRSamples() {
+		return _rSamples;
+	}
+
 	/**
 	 * builds the vertices based on the rim radius, a, center, radial, and axial samples.
 	 */
@@ -206,7 +226,7 @@ public class Paraboloid extends Mesh {
 		_meshData.setIndices(BufferUtils.createIndexBufferData(3 * tris, verts - 1));
 
 		// generate connectivity
-		for (int iZ = 0, iZStart = 0; iZ < (_zSamples - 3); iZ++) {
+		for (int iZ = 0, iZStart = 0; iZ < _zSamples - 3; iZ++) {
 			int i0 = iZStart;
 			int i1 = i0 + 1;
 			iZStart += (_rSamples + 1);
@@ -222,28 +242,12 @@ public class Paraboloid extends Mesh {
 			}
 		}
 
-		// south pole triangles
+		// vertex triangles
 		for (int i = 0; i < _rSamples; i++) {
 			_meshData.getIndices().put(i);
 			_meshData.getIndices().put(_meshData.getVertexCount() - 2);
 			_meshData.getIndices().put(i + 1);
 		}
-
-		// north pole triangles
-		final int iOffset = (_zSamples - 3) * (_rSamples + 1);
-		for (int i = 0; i < _rSamples; i++) {
-			_meshData.getIndices().put(i + iOffset);
-			_meshData.getIndices().put(i + 1 + iOffset);
-			_meshData.getIndices().put(_meshData.getVertexCount() - 1);
-		}
-	}
-
-	public int getZSamples() {
-		return _zSamples;
-	}
-
-	public int getRSamples() {
-		return _rSamples;
 	}
 
 	@Override

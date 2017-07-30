@@ -116,7 +116,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		mesh.setModelBound(new OrientedBoundingBox());
 		mesh.setUserData(new UserData(this));
 		CullState cullState = new CullState();
-		cullState.setCullFace(Face.Back);
+		cullState.setCullFace(Face.Front);
 		mesh.setRenderState(cullState);
 		root.attachChild(mesh);
 		dish = (Paraboloid) mesh;
@@ -261,9 +261,11 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 		// draw the rim line
 		final float zOffset = 0.01f;
+		int i3;
 		for (int i = vertexCount - rSamples * 2; i < vertexCount - 1 - rSamples; i++) {
-			outlineBuffer.put(vertexBuffer.get(i * 3)).put(vertexBuffer.get(i * 3 + 1)).put(vertexBuffer.get(i * 3 + 2) + zOffset);
-			outlineBuffer.put(vertexBuffer.get(i * 3 + 3)).put(vertexBuffer.get(i * 3 + 4)).put(vertexBuffer.get(i * 3 + 5) + zOffset);
+			i3 = i * 3;
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + zOffset);
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + zOffset);
 		}
 
 		final Matrix3 rotation = new Matrix3().lookAt(normal, Vector3.UNIT_Y);
@@ -287,7 +289,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		duct.setTranslation(center.clone().addLocal(normal.multiply(flScaled * 0.5, null)));
 
 		receiver.setRotation(mesh.getRotation());
-		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled + receiver.getHeight() * 0.5, null)));
+		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled, null)));
 
 		if (bloomRenderPassReceiver == null) {
 			bloomRenderPassReceiver = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
