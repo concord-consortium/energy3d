@@ -12,4 +12,12 @@ public interface SolarCollector {
 
 	public double getBaseHeight();
 
+	public double getYieldNow();
+
+	public void setYieldNow(final double yieldNow);
+
+	public double getYieldToday();
+
+	public void setYieldToday(final double yieldToday);
+
 }

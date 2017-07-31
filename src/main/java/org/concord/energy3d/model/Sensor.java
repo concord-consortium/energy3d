@@ -280,4 +280,26 @@ public class Sensor extends HousePart implements SolarCollector {
 		return 0;
 	}
 
+	// Not implemented
+	@Override
+	public double getYieldNow() {
+		return 0;
+	}
+
+	// Not implemented
+	@Override
+	public void setYieldNow(final double yieldNow) {
+	}
+
+	// Not implemented
+	@Override
+	public double getYieldToday() {
+		return 0;
+	}
+
+	// Not implemented
+	@Override
+	public void setYieldToday(final double yieldToday) {
+	}
+
 }

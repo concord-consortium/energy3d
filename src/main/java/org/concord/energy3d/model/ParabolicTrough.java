@@ -918,18 +918,22 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 		return beamsVisible;
 	}
 
+	@Override
 	public double getYieldNow() {
 		return yieldNow;
 	}
 
+	@Override
 	public void setYieldNow(final double yieldNow) {
 		this.yieldNow = yieldNow;
 	}
 
+	@Override
 	public double getYieldToday() {
 		return yieldToday;
 	}
 
+	@Override
 	public void setYieldToday(final double yieldToday) {
 		this.yieldToday = yieldToday;
 	}

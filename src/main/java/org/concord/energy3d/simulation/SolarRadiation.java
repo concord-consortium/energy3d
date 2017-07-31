@@ -15,6 +15,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
@@ -130,16 +131,18 @@ public class SolarRadiation {
 		collidables.clear();
 		collidablesToParts.clear();
 		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof SolarPanel || part instanceof Mirror || part instanceof ParabolicTrough || part instanceof FresnelReflector || part instanceof Tree || part instanceof Sensor || part instanceof Window) {
-				final Spatial s = part.getRadiationCollisionSpatial();
-				collidables.add(s);
-				collidablesToParts.put(s, part);
-			} else if (part instanceof Rack) {
-				final Rack rack = (Rack) part;
-				if (rack.isMonolithic()) {
+			if (part instanceof SolarCollector || part instanceof Tree || part instanceof Window) {
+				if (part instanceof Rack) {
+					final Rack rack = (Rack) part;
+					if (rack.isMonolithic()) {
+						final Spatial s = part.getRadiationCollisionSpatial();
+						collidables.add(s);
+						collidablesToParts.put(s, rack);
+					}
+				} else {
 					final Spatial s = part.getRadiationCollisionSpatial();
 					collidables.add(s);
-					collidablesToParts.put(s, rack);
+					collidablesToParts.put(s, part);
 				}
 			} else if (part instanceof Foundation) {
 				final Foundation foundation = (Foundation) part;
@@ -254,6 +257,8 @@ public class SolarRadiation {
 							computeOnFresnelReflector(minute, directionTowardSun, (FresnelReflector) part);
 						} else if (part instanceof ParabolicTrough) {
 							computeOnParabolicTrough(minute, directionTowardSun, (ParabolicTrough) part);
+						} else if (part instanceof ParabolicDish) {
+							computeOnParabolicDish(minute, directionTowardSun, (ParabolicDish) part);
 						} else if (part instanceof Sensor) {
 							computeOnSensor(minute, directionTowardSun, (Sensor) part);
 						}
@@ -283,6 +288,9 @@ public class SolarRadiation {
 			} else if (part instanceof ParabolicTrough) {
 				final ParabolicTrough pt = (ParabolicTrough) part;
 				pt.draw();
+			} else if (part instanceof ParabolicDish) {
+				final ParabolicDish pd = (ParabolicDish) part;
+				pd.draw();
 			} else if (part instanceof SolarPanel) {
 				final SolarPanel sp = (SolarPanel) part;
 				if (sp.getTracker() != Trackable.NO_TRACKER) {
@@ -553,7 +561,7 @@ public class SolarRadiation {
 		final double xSpacing = p1.distance(p0) / nPara;
 		final double ySpacing = p2.distance(p0) / nAxis;
 
-		// as the parabolic trough always faces the sun, we only have to deal with its "mouth plane"
+		// as the parabolic trough always faces the sun, we only have to deal with its aperture plane
 
 		final int iMinute = minute / Scene.getInstance().getTimeStep();
 		for (int x = 0; x < nPara; x++) {
@@ -563,7 +571,7 @@ public class SolarRadiation {
 				}
 				final Vector3 u2 = u.multiply(xSpacing * (x + 0.5), null);
 				final Vector3 v2 = v.multiply(ySpacing * (y + 0.5), null);
-				final Vector3 q = p0.add(v2, null).addLocal(u2); // on the plane of the mouth of the parabolic trough
+				final Vector3 q = p0.add(v2, null).addLocal(u2); // on the aperture plane of the parabolic trough
 				final ReadOnlyVector3 p = mesh.localToWorld(q, null);
 				final Ray3 pickRay = new Ray3(p, directionTowardSun);
 				if (dot > 0) {
@@ -580,6 +588,79 @@ public class SolarRadiation {
 						// for heat map generation
 						data.dailySolarIntensity[y][x] += directRadiation;
 						trough.getSolarPotential()[iMinute] += directRadiation * a; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
+					}
+				}
+			}
+		}
+
+	}
+
+	// Unlike PV solar panels, no indirect (ambient or diffuse) radiation should be included in reflection calculation. The mesh is a parabolic surface.
+	private void computeOnParabolicDish(final int minute, final ReadOnlyVector3 directionTowardSun, final ParabolicDish dish) {
+
+		final int n = dish.getNRadialSections();
+		final Calendar calendar = Heliodon.getInstance().getCalendar();
+		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
+		calendar.set(Calendar.MINUTE, minute % 60);
+		dish.draw();
+		final ReadOnlyVector3 normal = dish.getNormal();
+		if (normal == null) {
+			throw new RuntimeException("Normal is null");
+		}
+		// n*n*60: n*n is to get the unit cell area of the nxn grid; 60 is to convert the unit of timeStep from minute to kWh
+		final double a = 4 * dish.getRimRadius() * dish.getRimRadius() * Scene.getInstance().getTimeStep() / (n * n * 60.0);
+		final Mesh mesh = dish.getRadiationMesh();
+		MeshDataStore data = onMesh.get(mesh);
+		if (data == null) {
+			data = initMeshTextureDataOnRectangle(mesh, n, n);
+		}
+
+		final double dot = normal.dot(directionTowardSun);
+		double directRadiation = 0;
+		if (dot > 0) {
+			directRadiation += calculateDirectRadiation(directionTowardSun, normal);
+		}
+
+		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
+		final int j = vertexBuffer.limit() / 2; // number of vertex coordinates on each end
+		final Vector3 p0 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 0)
+		final Vector3 p1 = new Vector3(vertexBuffer.get(j - 3), vertexBuffer.get(j - 2), vertexBuffer.get(j - 1)); // (1, 0)
+		final Vector3 p2 = new Vector3(vertexBuffer.get(j), vertexBuffer.get(j + 1), vertexBuffer.get(j + 2)); // (0, 1)
+		// final Vector3 q0 = mesh.localToWorld(p0, null);
+		// final Vector3 q1 = mesh.localToWorld(p1, null);
+		// final Vector3 q2 = mesh.localToWorld(p2, null);
+		// System.out.println("***" + q0.distance(q1) * Scene.getInstance().getAnnotationScale() + "," + q0.distance(q2) * Scene.getInstance().getAnnotationScale());
+		final Vector3 u = p1.subtract(p0, null).normalizeLocal(); // this is perpendicular to the direction of the cylinder axis (nPara)
+		final Vector3 v = p2.subtract(p0, null).normalizeLocal(); // this is parallel to the direction of the cylinder axis (nAxis)
+		final double spacing = 2 * dish.getRimRadius() / (n * Scene.getInstance().getAnnotationScale());
+
+		// as the parabolic dish always faces the sun, we only have to deal with its aperture plane (rim circle)
+
+		final int iMinute = minute / Scene.getInstance().getTimeStep();
+		for (int x = 0; x < n; x++) {
+			for (int y = 0; y < n; y++) {
+				if (EnergyPanel.getInstance().isCancelled()) {
+					throw new CancellationException();
+				}
+				final Vector3 u2 = u.multiply(spacing * (x + 0.5), null);
+				final Vector3 v2 = v.multiply(spacing * (y + 0.5), null);
+				final Vector3 q = p0.add(v2, null).addLocal(u2); // on the aperture plane of the parabolic dish
+				final ReadOnlyVector3 p = mesh.localToWorld(q, null);
+				final Ray3 pickRay = new Ray3(p, directionTowardSun);
+				if (dot > 0) {
+					final PickResults pickResults = new PrimitivePickResults();
+					for (final Spatial spatial : collidables) {
+						if (spatial != mesh) {
+							PickingUtil.findPick(spatial, pickRay, pickResults, false);
+							if (pickResults.getNumber() != 0) {
+								break;
+							}
+						}
+					}
+					if (pickResults.getNumber() == 0) {
+						// for heat map generation
+						data.dailySolarIntensity[y][x] += directRadiation;
+						dish.getSolarPotential()[iMinute] += directRadiation * a; // sum all the solar energy up over all meshes and store in the foundation's solar potential array
 					}
 				}
 			}
@@ -1665,16 +1746,8 @@ public class SolarRadiation {
 				for (final HousePart child : Scene.getInstance().getParts()) {
 					if (child.getTopContainer() == foundation) {
 						child.setSolarPotentialToday(0);
-						if (child instanceof SolarPanel) {
-							((SolarPanel) child).setYieldToday(0);
-						} else if (child instanceof Rack) {
-							((Rack) child).setYieldToday(0);
-						} else if (child instanceof Mirror) {
-							((Mirror) child).setYieldToday(0);
-						} else if (child instanceof ParabolicTrough) {
-							((ParabolicTrough) child).setYieldToday(0);
-						} else if (child instanceof FresnelReflector) {
-							((FresnelReflector) child).setYieldToday(0);
+						if (child instanceof SolarCollector) {
+							((SolarCollector) child).setYieldToday(0);
 						}
 						for (int i = 0; i < n; i++) {
 							solarPotentialTotal += child.getSolarPotential()[i];
@@ -1704,6 +1777,11 @@ public class SolarRadiation {
 								final ParabolicTrough trough = (ParabolicTrough) child;
 								final double yield = trough.getSolarPotential()[i] * trough.getSystemEfficiency();
 								trough.setYieldToday(trough.getYieldToday() + yield);
+								csp[i] += yield;
+							} else if (child instanceof ParabolicDish) {
+								final ParabolicDish dish = (ParabolicDish) child;
+								final double yield = dish.getSolarPotential()[i] * dish.getSystemEfficiency();
+								dish.setYieldToday(dish.getYieldToday() + yield);
 								csp[i] += yield;
 							} else if (child instanceof FresnelReflector) {
 								final FresnelReflector reflector = (FresnelReflector) child;
@@ -1789,10 +1867,8 @@ public class SolarRadiation {
 				for (final HousePart child : Scene.getInstance().getParts()) {
 					if (child.getTopContainer() == foundation) {
 						child.setSolarPotentialNow(0);
-						if (child instanceof SolarPanel) {
-							((SolarPanel) child).setYieldNow(0);
-						} else if (child instanceof Rack) {
-							((Rack) child).setYieldNow(0);
+						if (child instanceof SolarCollector) {
+							((SolarCollector) child).setYieldNow(0);
 						}
 						for (int i = 0; i < n; i++) {
 							solarPotentialTotal += child.getSolarPotential()[t0 + i];
@@ -1813,6 +1889,11 @@ public class SolarRadiation {
 								final double yield = trough.getSolarPotential()[t0 + i] * trough.getSystemEfficiency();
 								csp[i] += yield;
 								trough.setYieldNow(trough.getYieldNow() + yield);
+							} else if (child instanceof ParabolicDish) {
+								final ParabolicDish dish = (ParabolicDish) child;
+								final double yield = dish.getSolarPotential()[t0 + i] * dish.getSystemEfficiency();
+								csp[i] += yield;
+								dish.setYieldNow(dish.getYieldNow() + yield);
 							} else if (child instanceof FresnelReflector) {
 								final FresnelReflector reflector = (FresnelReflector) child;
 								final double yield = reflector.getSolarPotential()[t0 + i] * reflector.getSystemEfficiency();

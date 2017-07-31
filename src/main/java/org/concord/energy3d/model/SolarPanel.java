@@ -840,18 +840,22 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		return c;
 	}
 
+	@Override
 	public double getYieldNow() {
 		return yieldNow;
 	}
 
+	@Override
 	public void setYieldNow(final double yieldNow) {
 		this.yieldNow = yieldNow;
 	}
 
+	@Override
 	public double getYieldToday() {
 		return yieldToday;
 	}
 
+	@Override
 	public void setYieldToday(final double yieldToday) {
 		this.yieldToday = yieldToday;
 	}
