@@ -513,29 +513,52 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		return c;
 	}
 
-	private boolean isPositionLegal(final ParabolicDish dish, final Foundation foundation) {
+	private boolean isPositionLegal(final ParabolicDish copy, final Foundation foundation) {
 		final Vector3 p0 = container.getAbsPoint(0);
 		final Vector3 p1 = container.getAbsPoint(1);
 		final Vector3 p2 = container.getAbsPoint(2);
-		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
-		final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-		final double length = (1 + copyLayoutGap) * rimRadius * 2 / Scene.getInstance().getAnnotationScale();
-		final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
-		final double tx = length / p0.distance(p2);
-		final double ty = length / p0.distance(p1);
-		final double lx = s * v.getX() * tx;
-		final double ly = s * v.getY() * ty;
-		final double newX = points.get(0).getX() + lx;
-		if (newX > 1 - tx || newX < tx) {
-			return false;
+		boolean defaultPositioning = true;
+		final ParabolicDish nearest = foundation.getNearestParabolicDish(this);
+		if (nearest != null) {
+			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
+			final double distance = d.length();
+			if (distance < rimRadius * 10 / Scene.getInstance().getAnnotationScale()) {
+				defaultPositioning = false;
+				final double tx = d.getX() / p0.distance(p2);
+				final double ty = d.getY() / p0.distance(p1);
+				final double newX = points.get(0).getX() + tx;
+				if (newX > 1 - tx || newX < tx) {
+					return false;
+				}
+				final double newY = points.get(0).getY() + ty;
+				if (newY > 1 - ty || newY < ty) {
+					return false;
+				}
+				copy.points.get(0).setX(newX);
+				copy.points.get(0).setY(newY);
+			}
 		}
-		final double newY = points.get(0).getY() + ly;
-		if (newY > 1 - ty || newY < ty) {
-			return false;
+		if (defaultPositioning) {
+			final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
+			final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
+			final double length = (1 + copyLayoutGap) * rimRadius * 2 / Scene.getInstance().getAnnotationScale();
+			final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+			final double tx = length / p0.distance(p2);
+			final double ty = length / p0.distance(p1);
+			final double lx = s * v.getX() * tx;
+			final double ly = s * v.getY() * ty;
+			final double newX = points.get(0).getX() + lx;
+			if (newX > 1 - tx || newX < tx) {
+				return false;
+			}
+			final double newY = points.get(0).getY() + ly;
+			if (newY > 1 - ty || newY < ty) {
+				return false;
+			}
+			copy.points.get(0).setX(newX);
+			copy.points.get(0).setY(newY);
 		}
-		dish.points.get(0).setX(newX);
-		dish.points.get(0).setY(newY);
-		final double o = dish.checkCopyOverlap();
+		final double o = copy.checkCopyOverlap();
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new parabolic dish is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;

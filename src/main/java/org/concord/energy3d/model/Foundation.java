@@ -1947,6 +1947,30 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		return list;
 	}
 
+	public ParabolicDish getNearestParabolicDish(final ParabolicDish dish) {
+		if (dish.getTopContainer() != this) {
+			return null;
+		}
+		final List<ParabolicDish> dishes = getParabolicDishes();
+		if (dishes.isEmpty() || (dishes.size() == 1 && dishes.get(0) == dish)) {
+			return null;
+		}
+		ParabolicDish nearest = null;
+		double dmin = Double.MAX_VALUE;
+		final Vector3 o = dish.getAbsCenter();
+		double d;
+		for (final ParabolicDish pd : dishes) {
+			if (pd != dish) {
+				d = pd.getAbsCenter().distanceSquared(o);
+				if (d < dmin) {
+					dmin = d;
+					nearest = pd;
+				}
+			}
+		}
+		return nearest;
+	}
+
 	public List<FresnelReflector> getFresnelReflectors() {
 		final List<FresnelReflector> list = new ArrayList<FresnelReflector>();
 		for (final HousePart p : children) {

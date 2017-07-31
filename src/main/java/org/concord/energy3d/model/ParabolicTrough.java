@@ -671,7 +671,7 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 	}
 
 	// troughs align with the north-south axis, so copy and paste only in the x-direction (east-west axis)
-	private boolean isPositionLegal(final ParabolicTrough trough, final Foundation foundation) {
+	private boolean isPositionLegal(final ParabolicTrough copy, final Foundation foundation) {
 		final Vector3 p0 = foundation.getAbsPoint(0);
 		final Vector3 p2 = foundation.getAbsPoint(2);
 		double dx;
@@ -695,8 +695,8 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 		if (newX > 1 - tx || newX < tx) {
 			return false;
 		}
-		trough.points.get(0).setX(newX);
-		final double o = trough.checkCopyOverlap();
+		copy.points.get(0).setX(newX);
+		final double o = copy.checkCopyOverlap();
 		if (o >= 0) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new trough is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;

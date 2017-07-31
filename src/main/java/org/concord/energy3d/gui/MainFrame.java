@@ -105,6 +105,8 @@ import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
+import org.concord.energy3d.simulation.ParabolicDishAnnualAnalysis;
+import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
@@ -185,6 +187,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyMirrorAnalysisMenuItem;
 	private JMenuItem annualParabolicTroughAnalysisMenuItem;
 	private JMenuItem dailyParabolicTroughAnalysisMenuItem;
+	private JMenuItem annualParabolicDishAnalysisMenuItem;
+	private JMenuItem dailyParabolicDishAnalysisMenuItem;
 	private JMenuItem annualFresnelReflectorAnalysisMenuItem;
 	private JMenuItem dailyFresnelReflectorAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
@@ -1241,6 +1245,9 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getAnnualParabolicTroughAnalysisMenuItem());
 			analysisMenu.add(getDailyParabolicTroughAnalysisMenuItem());
 			analysisMenu.addSeparator();
+			analysisMenu.add(getAnnualParabolicDishAnalysisMenuItem());
+			analysisMenu.add(getDailyParabolicDishAnalysisMenuItem());
+			analysisMenu.addSeparator();
 			analysisMenu.add(getAnnualFresnelReflectorAnalysisMenuItem());
 			analysisMenu.add(getDailyFresnelReflectorAnalysisMenuItem());
 			analysisMenu.addSeparator();
@@ -2214,6 +2221,89 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return annualParabolicTroughAnalysisMenuItem;
+	}
+
+	private JMenuItem getDailyParabolicDishAnalysisMenuItem() {
+		if (dailyParabolicDishAnalysisMenuItem == null) {
+			dailyParabolicDishAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Parabolic Dishes...");
+			dailyParabolicDishAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().countParts(ParabolicDish.class);
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(ParabolicDish.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					final ParabolicDishDailyAnalysis a = new ParabolicDishDailyAnalysis();
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						a.updateGraph();
+					}
+					a.show();
+				}
+			});
+		}
+		return dailyParabolicDishAnalysisMenuItem;
+	}
+
+	private JMenuItem getAnnualParabolicDishAnalysisMenuItem() {
+		if (annualParabolicDishAnalysisMenuItem == null) {
+			annualParabolicDishAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Parabolic Dishes...");
+			annualParabolicDishAnalysisMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					if ("".equals(city)) {
+						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					int n = Scene.getInstance().countParts(ParabolicDish.class);
+					if (n <= 0) {
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final ParabolicDishAnnualAnalysis a = new ParabolicDishAnnualAnalysis();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart != null) {
+						Foundation foundation;
+						if (selectedPart instanceof Foundation) {
+							foundation = (Foundation) selectedPart;
+						} else {
+							foundation = selectedPart.getTopContainer();
+						}
+						if (foundation != null) {
+							n = foundation.countParts(ParabolicDish.class);
+							if (n <= 0) {
+								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+						}
+					}
+					a.show();
+				}
+			});
+		}
+		return annualParabolicDishAnalysisMenuItem;
 	}
 
 	private JMenuItem getDailyFresnelReflectorAnalysisMenuItem() {

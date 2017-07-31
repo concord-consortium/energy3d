@@ -21,11 +21,13 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.simulation.Graph;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PartEnergyDailyGraph;
 import org.concord.energy3d.simulation.SolarRadiation;
@@ -81,6 +83,10 @@ public class CspStationDailyEnergyGraph extends JPanel {
 					if (f != null) {
 						if (f.countParts(ParabolicTrough.class) > 0) {
 							final ParabolicTroughDailyAnalysis analysis = new ParabolicTroughDailyAnalysis();
+							analysis.updateGraph();
+							analysis.show();
+						} else if (f.countParts(ParabolicDish.class) > 0) {
+							final ParabolicDishDailyAnalysis analysis = new ParabolicDishDailyAnalysis();
 							analysis.updateGraph();
 							analysis.show();
 						} else if (f.countParts(FresnelReflector.class) > 0) {
@@ -143,27 +149,39 @@ public class CspStationDailyEnergyGraph extends JPanel {
 				graph.addData("Solar", output);
 			}
 		} else {
-			final List<FresnelReflector> fresnels = base.getFresnelReflectors();
-			if (fresnels.isEmpty()) {
-				final List<Mirror> mirrors = base.getMirrors();
-				if (!mirrors.isEmpty()) {
-					for (int i = 0; i < 24; i++) {
-						SolarRadiation.getInstance().computeEnergyAtHour(i);
-						double output = 0;
-						for (final Mirror m : mirrors) {
-							output += m.getSolarPotentialNow() * m.getSystemEfficiency();
-						}
-						graph.addData("Solar", output);
-					}
-				}
-			} else {
+			final List<ParabolicDish> dishes = base.getParabolicDishes();
+			if (!dishes.isEmpty()) {
 				for (int i = 0; i < 24; i++) {
 					SolarRadiation.getInstance().computeEnergyAtHour(i);
 					double output = 0;
-					for (final FresnelReflector r : fresnels) {
-						output += r.getSolarPotentialNow() * r.getSystemEfficiency();
+					for (final ParabolicDish d : dishes) {
+						output += d.getSolarPotentialNow() * d.getSystemEfficiency();
 					}
 					graph.addData("Solar", output);
+				}
+			} else {
+				final List<FresnelReflector> fresnels = base.getFresnelReflectors();
+				if (!fresnels.isEmpty()) {
+					for (int i = 0; i < 24; i++) {
+						SolarRadiation.getInstance().computeEnergyAtHour(i);
+						double output = 0;
+						for (final FresnelReflector r : fresnels) {
+							output += r.getSolarPotentialNow() * r.getSystemEfficiency();
+						}
+						graph.addData("Solar", output);
+					}
+				} else {
+					final List<Mirror> mirrors = base.getMirrors();
+					if (!mirrors.isEmpty()) {
+						for (int i = 0; i < 24; i++) {
+							SolarRadiation.getInstance().computeEnergyAtHour(i);
+							double output = 0;
+							for (final Mirror m : mirrors) {
+								output += m.getSolarPotentialNow() * m.getSystemEfficiency();
+							}
+							graph.addData("Solar", output);
+						}
+					}
 				}
 			}
 		}

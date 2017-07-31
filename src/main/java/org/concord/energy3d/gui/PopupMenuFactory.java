@@ -87,6 +87,8 @@ import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
 import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
+import org.concord.energy3d.simulation.ParabolicDishAnnualAnalysis;
+import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
@@ -4133,6 +4135,7 @@ public class PopupMenuFactory {
 				}
 			});
 			analysisMenu.add(mi);
+			analysisMenu.addSeparator();
 
 			mi = new JMenuItem("Daily Parabolic Trough Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -4170,6 +4173,45 @@ public class PopupMenuFactory {
 				}
 			});
 			analysisMenu.add(mi);
+			analysisMenu.addSeparator();
+
+			mi = new JMenuItem("Daily Parabolic Dish Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
+						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
+						if (f.countParts(ParabolicDish.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic dish on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						final ParabolicDishDailyAnalysis a = new ParabolicDishDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
+					}
+				}
+			});
+			analysisMenu.add(mi);
+
+			mi = new JMenuItem("Annual Parabolic Dish Yield Analysis...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Foundation) {
+						final Foundation f = (Foundation) selectedPart;
+						if (f.countParts(ParabolicDish.class) <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic dish on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						new ParabolicDishAnnualAnalysis().show();
+					}
+				}
+			});
+			analysisMenu.add(mi);
+			analysisMenu.addSeparator();
 
 			mi = new JMenuItem("Daily Fresnel Reflector Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -11101,7 +11143,7 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicDish) {
-						// new ParabolicDishDailyAnalysis().show();
+						new ParabolicDishDailyAnalysis().show();
 					}
 				}
 			});
@@ -11112,7 +11154,7 @@ public class PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicDish) {
-						// new ParabolicDishAnnualAnalysis().show();
+						new ParabolicDishAnnualAnalysis().show();
 					}
 				}
 			});
