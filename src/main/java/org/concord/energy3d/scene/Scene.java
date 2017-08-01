@@ -2790,6 +2790,14 @@ public class Scene implements Serializable {
 		return list;
 	}
 
+	public void setStructureTypeForAllParabolicDishes(final int structureType) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setStructureType(structureType);
+			}
+		}
+	}
+
 	public void setReflectanceForAllParabolicDishes(final double reflectance) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicDish) {

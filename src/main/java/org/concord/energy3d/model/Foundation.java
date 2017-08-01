@@ -3026,6 +3026,14 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 
 	// change properties of all the parabolic dishes on this foundation
 
+	public void setStructureTypeForParabolicDishes(final int structureTyp) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				((ParabolicDish) p).setStructureType(structureTyp);
+			}
+		}
+	}
+
 	public void setReflectanceForParabolicDishes(final double reflectance) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicDish) {

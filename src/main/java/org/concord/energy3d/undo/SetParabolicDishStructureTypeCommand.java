@@ -6,16 +6,16 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.ParabolicDish;
 
-public class SetParabolicDishFocalLengthCommand extends AbstractUndoableEdit {
+public class SetParabolicDishStructureTypeCommand extends AbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private final double oldValue;
-	private double newValue;
+	private final int oldValue;
+	private int newValue;
 	private final ParabolicDish dish;
 
-	public SetParabolicDishFocalLengthCommand(final ParabolicDish dish) {
+	public SetParabolicDishStructureTypeCommand(final ParabolicDish dish) {
 		this.dish = dish;
-		oldValue = dish.getFocalLength();
+		oldValue = dish.getStructureType();
 	}
 
 	public ParabolicDish getParabolicDish() {
@@ -29,21 +29,21 @@ public class SetParabolicDishFocalLengthCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = dish.getFocalLength();
-		dish.setFocalLength(oldValue);
+		newValue = dish.getStructureType();
+		dish.setStructureType(oldValue);
 		dish.draw();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		dish.setFocalLength(newValue);
+		dish.setStructureType(newValue);
 		dish.draw();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Set Focal Length for Selected Parabolic Dish";
+		return "Set Structure Type for Selected Parabolic Dish";
 	}
 
 }

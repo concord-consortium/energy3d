@@ -10639,7 +10639,87 @@ public class PopupMenuFactory {
 							}
 						}
 					}
+				}
+			});
 
+			final JMenuItem miStructureType = new JMenuItem("Structure Type...");
+			miStructureType.addActionListener(new ActionListener() {
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					final Foundation foundation = d.getTopContainer();
+					final String title = "<html>Structure Type of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JComboBox<String> comboBox = new JComboBox<String>(new String[] { "Central Pole", "Tripod" });
+					gui.add(comboBox, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Structure Type");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							final int structureType = comboBox.getSelectedIndex();
+							if (rb1.isSelected()) {
+								final SetParabolicDishStructureTypeCommand c = new SetParabolicDishStructureTypeCommand(d);
+								d.setStructureType(structureType);
+								d.draw();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final ChangeFoundationParabolicDishStructureTypeCommand c = new ChangeFoundationParabolicDishStructureTypeCommand(foundation);
+								foundation.setStructureTypeForParabolicDishes(structureType);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final ChangeStructureTypeForAllParabolicDishesCommand c = new ChangeStructureTypeForAllParabolicDishesCommand();
+								Scene.getInstance().setStructureTypeForAllParabolicDishes(structureType);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (choice == options[0]) {
+								break;
+							}
+						}
+					}
 				}
 			});
 
@@ -11129,6 +11209,7 @@ public class PopupMenuFactory {
 			popupMenuForParabolicDish.add(miRimRadius);
 			popupMenuForParabolicDish.add(miFocalLength);
 			popupMenuForParabolicDish.add(miBaseHeight);
+			popupMenuForParabolicDish.add(miStructureType);
 			popupMenuForParabolicDish.addSeparator();
 			popupMenuForParabolicDish.add(miReflectance);
 			popupMenuForParabolicDish.add(miAbsorptance);

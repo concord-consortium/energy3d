@@ -41,12 +41,16 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class ParabolicDish extends HousePart implements SolarCollector, Labelable {
 
+	public static final int STRUCTURE_CENTRAL_POLE = 0;
+	public static final int STRUCTURE_TRIPOD = 1;
+
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
 	private transient ReadOnlyVector3 normal;
 	private transient Paraboloid dish;
 	private transient Mesh dishBack;
 	private transient Line outlines;
+	private transient Line supports;
 	private transient Cylinder post;
 	private transient Cylinder duct;
 	private transient Cylinder receiver;
@@ -62,6 +66,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private double rimRadius = 3;
 	private double focalLength = 2;
 	private int nrib = 6;
+	private int structureType = STRUCTURE_CENTRAL_POLE;
 	private double relativeAzimuth = 0;
 	private double baseHeight = 18;
 	private boolean beamsVisible;
@@ -70,6 +75,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private transient double oldRelativeAzimuth;
 	private static transient BloomRenderPass bloomRenderPassLight, bloomRenderPassReceiver;
 	private transient double baseZ;
+	private transient final float zOffset = 0.25f;
 	private int nRadialSections = 32; // number of sections in the radial direction of a parabolic dish (must be power of 2)
 	private int nAxialSections = 32; // number of sections in the axial direction of a parabolic dish (must be power of 2)
 	private boolean detailed; // allows us to draw more details when there are fewer dishes in the scene
@@ -161,10 +167,18 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (dish.getRSamples() + 1)));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
-		outlines.setLineWidth(0.01f);
+		outlines.setLineWidth(0.1f);
 		outlines.setStipplePattern((short) 0xffff);
 		Util.disablePickShadowLight(outlines);
 		root.attachChild(outlines);
+
+		supports = new Line("Parabolic Dish Supports");
+		supports.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
+		supports.setDefaultColor(ColorRGBA.WHITE);
+		supports.setModelBound(new OrientedBoundingBox());
+		supports.setLineWidth(5f);
+		supports.setStipplePattern((short) 0xffff);
+		root.attachChild(supports);
 
 		lightBeams = new Line("Light Beams");
 		lightBeams.setLineWidth(0.01f);
@@ -250,6 +264,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
+		final FloatBuffer supportBuffer = supports.getMeshData().getVertexBuffer();
 
 		final int vertexCount = vertexBuffer.limit() / 3;
 		final Vector3 center = getAbsPoint(0);
@@ -264,36 +279,35 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
-		final float offset = 0.5f;
 		// draw the rim line
 		int i3;
 		for (int i = vertexCount - rSamples * 2; i < vertexCount - 1 - rSamples; i++) {
 			i3 = i * 3;
-			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + offset);
-			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + offset);
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
 		}
 		for (int i = (vertexCount - rSamples * 3) / 4; i < (vertexCount + rSamples) / 4; i++) {
 			i3 = i * 3;
-			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + offset);
-			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + offset);
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + zOffset);
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + zOffset);
 		}
 		// draw the rib lines
 		double xi, yi, zi;
 		final double delta = dish.getRimRadius() * 2.0 / (zSamples + 1);
-		double cos, sin;
+		double cos, sin, angle;
 		for (int i = 0; i < zSamples; i++) {
 			for (int j = 0; j < nrib; j++) {
-				final double angle = Math.PI / nrib * j;
+				angle = Math.PI / nrib * j;
 				cos = Math.cos(angle);
 				sin = Math.sin(angle);
 				xi = cos * (dish.getRimRadius() - delta * (i + 0.5));
 				yi = sin * (dish.getRimRadius() - delta * (i + 0.5));
 				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
-				outlineBuffer.put((float) xi).put((float) yi).put((float) zi + offset);
+				outlineBuffer.put((float) xi).put((float) yi).put((float) zi + zOffset);
 				xi -= cos * delta;
 				yi -= sin * delta;
 				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
-				outlineBuffer.put((float) xi).put((float) yi).put((float) zi + offset);
+				outlineBuffer.put((float) xi).put((float) yi).put((float) zi + zOffset);
 			}
 		}
 
@@ -307,18 +321,38 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		mesh.updateModelBound();
 		outlines.updateModelBound();
 
+		final double flScaled = focalLength / annotationScale;
+		switch (structureType) {
+		case STRUCTURE_CENTRAL_POLE:
+			duct.setHeight(flScaled + receiver.getHeight());
+			duct.setRotation(mesh.getRotation());
+			duct.setTranslation(center.clone().addLocal(normal.multiply(flScaled * 0.5, null)));
+			break;
+		case STRUCTURE_TRIPOD:
+			for (int i = 0; i < 3; i++) {
+				angle = 2 * Math.PI / 3 * i;
+				xi = dish.getRimRadius() * 0.98 * Math.cos(angle);
+				yi = dish.getRimRadius() * 0.98 * Math.sin(angle);
+				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
+				supportBuffer.put((float) xi).put((float) yi).put((float) zi);
+				supportBuffer.put(0).put(0).put((float) flScaled);
+			}
+			duct.setHeight(receiver.getHeight());
+			duct.setRotation(mesh.getRotation());
+			duct.setTranslation(center.clone().subtractLocal(normal.multiply(duct.getHeight() * 0.5, null)));
+			break;
+		}
+
 		post.setHeight(baseHeight - 0.5 * post.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the dish
 		final Vector3 p = center.clone();
 		p.setZ(baseZ + post.getHeight() / 2);
 		post.setTranslation(p);
 
-		final double flScaled = focalLength / annotationScale;
-		duct.setHeight(flScaled + receiver.getHeight());
-		duct.setRotation(mesh.getRotation());
-		duct.setTranslation(center.clone().addLocal(normal.multiply(flScaled * 0.5, null)));
-
 		receiver.setRotation(mesh.getRotation());
 		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled, null)));
+
+		supports.setRotation(mesh.getRotation());
+		supports.setTranslation(mesh.getTranslation());
 
 		if (bloomRenderPassReceiver == null) {
 			bloomRenderPassReceiver = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
@@ -368,10 +402,10 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			// draw line to sun
 			final Vector3 r = o.clone();
 			r.addLocal(sunLocation);
-			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
+			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf() + zOffset);
 			beamsBuffer.put(r.getXf()).put(r.getYf()).put(r.getZf());
 			// draw line to focus
-			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf());
+			beamsBuffer.put(o.getXf()).put(o.getYf()).put(o.getZf() + zOffset);
 			beamsBuffer.put(f.getXf()).put(f.getYf()).put(f.getZf());
 		}
 
@@ -402,7 +436,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 		if (!text.equals("")) {
 			label.setText(text);
-			final double shift = duct.getHeight() + receiver.getHeight();
+			final double shift = focalLength / Scene.getInstance().getAnnotationScale() + receiver.getHeight() * 2;
 			label.setTranslation((getAbsCenter()).addLocal(normal.multiply(shift, null)));
 			label.setVisible(true);
 		} else {
@@ -747,6 +781,14 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	public int getNumberOfRibs() {
 		return nrib;
+	}
+
+	public void setStructureType(final int structureType) {
+		this.structureType = structureType;
+	}
+
+	public int getStructureType() {
+		return structureType;
 	}
 
 	public void setNRadialSections(final int nRadialSections) {
