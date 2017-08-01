@@ -3108,6 +3108,17 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setNumberOfRibsForParabolicDishes(final int nrib) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicDish) {
+				final ParabolicDish d = (ParabolicDish) p;
+				d.setNumberOfRibs(nrib);
+				d.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	// change properties of all the Fresnel reflectors on this foundation
 
 	public void setReflectanceForFresnelReflectors(final double reflectance) {

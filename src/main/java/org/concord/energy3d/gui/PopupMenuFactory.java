@@ -10244,17 +10244,17 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof ParabolicDish)) {
 						return;
 					}
-					final ParabolicDish t = (ParabolicDish) selectedPart;
-					final Foundation foundation = t.getTopContainer();
-					final String partInfo = t.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					final Foundation foundation = d.getTopContainer();
+					final String partInfo = d.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					inputPanel.add(new JLabel("Radial direction: "));
-					final JTextField nRadialField = new JTextField("" + t.getNRadialSections());
+					inputPanel.add(new JLabel("Radial Direction: "));
+					final JTextField nRadialField = new JTextField("" + d.getNRadialSections());
 					inputPanel.add(nRadialField);
-					inputPanel.add(new JLabel("Axial direction: "));
-					final JTextField nAxialField = new JTextField("" + t.getNAxialSections());
+					inputPanel.add(new JLabel("Axial Direction: "));
+					final JTextField nAxialField = new JTextField("" + d.getNAxialSections());
 					inputPanel.add(nAxialField);
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					final JPanel scopePanel = new JPanel();
@@ -10312,9 +10312,9 @@ public class PopupMenuFactory {
 								} else {
 									if (rb1.isSelected()) {
 										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setNRadialSections(nRadialSections);
-										t.setNAxialSections(nAxialSections);
-										t.draw();
+										d.setNRadialSections(nRadialSections);
+										d.setNAxialSections(nAxialSections);
+										d.draw();
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
@@ -10339,6 +10339,103 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miRib = new JMenuItem("Ribs...");
+			miRib.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					final Foundation foundation = d.getTopContainer();
+					final String partInfo = d.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					inputPanel.add(new JLabel("Rib Lines: "));
+					final JTextField nribField = new JTextField("" + d.getNumberOfRibs());
+					inputPanel.add(nribField);
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set rib lines for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Parabolic Dish Ribs");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							int nrib = 0;
+							boolean ok = true;
+							try {
+								nrib = Integer.parseInt(nribField.getText());
+							} catch (final NumberFormatException nfe) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (nrib < 0) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of ribs cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									if (rb1.isSelected()) {
+										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
+										d.setNumberOfRibs(nrib);
+										d.draw();
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+										foundation.setNumberOfRibsForParabolicDishes(nrib);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+										Scene.getInstance().setNumberOfRibsForAllParabolicDishes(nrib);
+										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										selectedScopeIndex = 2;
+									}
+									updateAfterEdit();
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
 			final JCheckBoxMenuItem cbmiDrawSunBeams = new JCheckBoxMenuItem("Draw Sun Beams");
 			cbmiDrawSunBeams.addItemListener(new ItemListener() {
 				@Override
@@ -10347,10 +10444,10 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof ParabolicDish)) {
 						return;
 					}
-					final ParabolicDish t = (ParabolicDish) selectedPart;
-					t.setBeamsVisible(cbmiDrawSunBeams.isSelected());
-					t.drawLightBeams();
-					t.draw();
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					d.setBeamsVisible(cbmiDrawSunBeams.isSelected());
+					d.drawLightBeams();
+					d.draw();
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -10732,10 +10829,10 @@ public class PopupMenuFactory {
 					if (miLabelNone.isSelected()) {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof ParabolicDish) {
-							final ParabolicDish t = (ParabolicDish) selectedPart;
-							final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
-							t.clearLabels();
-							t.draw();
+							final ParabolicDish d = (ParabolicDish) selectedPart;
+							final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(d);
+							d.clearLabels();
+							d.draw();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 							Scene.getInstance().setEdited(true);
 							SceneManager.getInstance().refresh();
@@ -10751,13 +10848,13 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof ParabolicDish) {
-						final ParabolicDish t = (ParabolicDish) selectedPart;
-						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
-						t.setLabelCustom(miLabelCustom.isSelected());
-						if (t.getLabelCustom()) {
-							t.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", t.getLabelCustomText()));
+						final ParabolicDish d = (ParabolicDish) selectedPart;
+						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(d);
+						d.setLabelCustom(miLabelCustom.isSelected());
+						if (d.getLabelCustom()) {
+							d.setLabelCustomText(JOptionPane.showInputDialog(MainFrame.getInstance(), "Custom Text", d.getLabelCustomText()));
 						}
-						t.draw();
+						d.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
@@ -10772,10 +10869,10 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof ParabolicDish) {
-						final ParabolicDish t = (ParabolicDish) selectedPart;
-						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
-						t.setLabelId(miLabelId.isSelected());
-						t.draw();
+						final ParabolicDish d = (ParabolicDish) selectedPart;
+						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(d);
+						d.setLabelId(miLabelId.isSelected());
+						d.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
@@ -10790,10 +10887,10 @@ public class PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof ParabolicDish) {
-						final ParabolicDish t = (ParabolicDish) selectedPart;
-						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(t);
-						t.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
-						t.draw();
+						final ParabolicDish d = (ParabolicDish) selectedPart;
+						final SetParabolicDishLabelCommand c = new SetParabolicDishLabelCommand(d);
+						d.setLabelEnergyOutput(miLabelEnergyOutput.isSelected());
+						d.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
 						SceneManager.getInstance().refresh();
@@ -10809,12 +10906,12 @@ public class PopupMenuFactory {
 					if (!(selectedPart instanceof ParabolicDish)) {
 						return;
 					}
-					final ParabolicDish t = (ParabolicDish) selectedPart;
-					Util.selectSilently(miLabelNone, !t.isLabelVisible());
-					Util.selectSilently(miLabelCustom, t.getLabelCustom());
-					Util.selectSilently(miLabelId, t.getLabelId());
-					Util.selectSilently(miLabelEnergyOutput, t.getLabelEnergyOutput());
-					Util.selectSilently(cbmiDrawSunBeams, t.areBeamsVisible());
+					final ParabolicDish d = (ParabolicDish) selectedPart;
+					Util.selectSilently(miLabelNone, !d.isLabelVisible());
+					Util.selectSilently(miLabelCustom, d.getLabelCustom());
+					Util.selectSilently(miLabelId, d.getLabelId());
+					Util.selectSilently(miLabelEnergyOutput, d.getLabelEnergyOutput());
+					Util.selectSilently(cbmiDrawSunBeams, d.areBeamsVisible());
 				}
 			});
 
@@ -10830,7 +10927,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final ParabolicDish d = (ParabolicDish) selectedPart;
 					final String title = "<html>Reflectance (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>Reflectance can be affected by pollen and dust.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
@@ -10859,7 +10956,7 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getReflectance() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(d.getReflectance() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -10888,7 +10985,7 @@ public class PopupMenuFactory {
 								} else {
 									if (rb1.isSelected()) {
 										// final ChangeParabolicTroughReflectanceCommand c = new ChangeParabolicTroughReflectanceCommand(t);
-										t.setReflectance(val * 0.01);
+										d.setReflectance(val * 0.01);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
@@ -10926,7 +11023,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final ParabolicDish d = (ParabolicDish) selectedPart;
 					final String title = "<html>Absorptance (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
@@ -10955,7 +11052,7 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getAbsorptance() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(d.getAbsorptance() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -10984,7 +11081,7 @@ public class PopupMenuFactory {
 								} else {
 									if (rb1.isSelected()) {
 										// final ChangeParabolicTroughAbsorptanceCommand c = new ChangeParabolicTroughAbsorptanceCommand(t);
-										t.setAbsorptance(val * 0.01);
+										d.setAbsorptance(val * 0.01);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
@@ -11022,7 +11119,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final ParabolicDish d = (ParabolicDish) selectedPart;
 					final String title = "<html>Opitical efficiency (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
@@ -11051,7 +11148,7 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getOpticalEfficiency() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(d.getOpticalEfficiency() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -11080,7 +11177,7 @@ public class PopupMenuFactory {
 								} else {
 									if (rb1.isSelected()) {
 										// final ChangeParabolicTroughOpticalEfficiencyCommand c = new ChangeParabolicTroughOpticalEfficiencyCommand(t);
-										t.setOpticalEfficiency(val * 0.01);
+										d.setOpticalEfficiency(val * 0.01);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
@@ -11118,7 +11215,7 @@ public class PopupMenuFactory {
 						return;
 					}
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final ParabolicDish t = (ParabolicDish) selectedPart;
+					final ParabolicDish d = (ParabolicDish) selectedPart;
 					final String title = "<html>Thermal efficiency (%) of " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
@@ -11147,7 +11244,7 @@ public class PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(t.getThermalEfficiency() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(d.getThermalEfficiency() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -11176,7 +11273,7 @@ public class PopupMenuFactory {
 								} else {
 									if (rb1.isSelected()) {
 										// final ChangeParabolicTroughThermalEfficiencyCommand c = new ChangeParabolicTroughThermalEfficiencyCommand(t);
-										t.setThermalEfficiency(val * 0.01);
+										d.setThermalEfficiency(val * 0.01);
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
@@ -11217,6 +11314,7 @@ public class PopupMenuFactory {
 			popupMenuForParabolicDish.add(miThermalEfficiency);
 			popupMenuForParabolicDish.addSeparator();
 			popupMenuForParabolicDish.add(miMesh);
+			popupMenuForParabolicDish.add(miRib);
 			popupMenuForParabolicDish.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");

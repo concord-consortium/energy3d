@@ -2872,6 +2872,16 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setNumberOfRibsForAllParabolicDishes(final int nrib) {
+		for (final HousePart p : parts) {
+			if (p instanceof ParabolicDish) {
+				final ParabolicDish d = (ParabolicDish) p;
+				d.setNumberOfRibs(nrib);
+				d.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
 	// Fresnel reflectors
 
 	public List<FresnelReflector> getAllFresnelReflectors() {
