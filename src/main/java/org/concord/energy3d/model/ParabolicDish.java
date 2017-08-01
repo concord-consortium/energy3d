@@ -264,21 +264,21 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			outlineBuffer.rewind();
 			outlineBuffer.limit(outlineBufferSize);
 		}
+		final float offset = 0.5f;
 		// draw the rim line
 		int i3;
 		for (int i = vertexCount - rSamples * 2; i < vertexCount - 1 - rSamples; i++) {
 			i3 = i * 3;
-			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
-			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + offset);
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + offset);
 		}
 		for (int i = (vertexCount - rSamples * 3) / 4; i < (vertexCount + rSamples) / 4; i++) {
 			i3 = i * 3;
-			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2));
-			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5));
+			outlineBuffer.put(vertexBuffer.get(i3)).put(vertexBuffer.get(i3 + 1)).put(vertexBuffer.get(i3 + 2) + offset);
+			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + offset);
 		}
 		// draw the rib lines
 		double xi, yi, zi;
-		final double offset = 0.05;
 		final double delta = dish.getRimRadius() * 2.0 / (zSamples + 1);
 		double cos, sin;
 		for (int i = 0; i < zSamples; i++) {
@@ -289,11 +289,11 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 				xi = cos * (dish.getRimRadius() - delta * (i + 0.5));
 				yi = sin * (dish.getRimRadius() - delta * (i + 0.5));
 				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
-				outlineBuffer.put((float) xi).put((float) yi).put((float) (zi + offset));
+				outlineBuffer.put((float) xi).put((float) yi).put((float) zi + offset);
 				xi -= cos * delta;
 				yi -= sin * delta;
 				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
-				outlineBuffer.put((float) xi).put((float) yi).put((float) (zi + offset));
+				outlineBuffer.put((float) xi).put((float) yi).put((float) zi + offset);
 			}
 		}
 
@@ -751,6 +751,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	public void setNRadialSections(final int nRadialSections) {
 		this.nRadialSections = nRadialSections;
+		// dish.setRSamples(nRadialSections);
 	}
 
 	public int getNRadialSections() {
@@ -759,6 +760,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	public void setNAxialSections(final int nAxialSections) {
 		this.nAxialSections = nAxialSections;
+		// dish.setZSamples(nAxialSections);
 	}
 
 	public int getNAxialSections() {

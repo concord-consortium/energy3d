@@ -1432,6 +1432,7 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Parabolic Trough Arrays", "tutorials/parabolic-trough-array.ng3");
 			cspMenu.addSeparator();
 			addModel(cspMenu, "Parabolic Dish Stirling Engine", "tutorials/parabolic-dish-single.ng3");
+			addModel(cspMenu, "Parabolic Dish Focal Length", "tutorials/parabolic-dish-focal-length.ng3");
 			addModel(cspMenu, "Parabolic Dish Array", "tutorials/parabolic-dish-array.ng3");
 			cspMenu.addSeparator();
 			addModel(cspMenu, "Linear Fresnel Reflectors", "tutorials/linear-fresnel-reflectors.ng3");
@@ -2059,7 +2060,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getDailyMirrorAnalysisMenuItem() {
 		if (dailyMirrorAnalysisMenuItem == null) {
-			dailyMirrorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Mirrors...");
+			dailyMirrorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Mirrors (Heliostats)...");
 			dailyMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2102,7 +2103,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualMirrorAnalysisMenuItem() {
 		if (annualMirrorAnalysisMenuItem == null) {
-			annualMirrorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Mirrors...");
+			annualMirrorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Mirrors (Heliostats)...");
 			annualMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

@@ -38,6 +38,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Rack;
@@ -196,6 +197,14 @@ public class GroupAnnualAnalysis extends Analysis {
 				} else {
 					graph.addData("Solar " + p.getId(), solar);
 				}
+			} else if (p instanceof ParabolicDish) {
+				final ParabolicDish dish = (ParabolicDish) p;
+				final double solar = dish.getSolarPotentialToday() * dish.getSystemEfficiency();
+				if (customText != null) {
+					graph.addData("Solar " + p.getId() + graph.getDataNameDelimiter() + customText, solar);
+				} else {
+					graph.addData("Solar " + p.getId(), solar);
+				}
 			} else if (p instanceof FresnelReflector) {
 				final FresnelReflector reflector = (FresnelReflector) p;
 				final double solar = reflector.getSolarPotentialToday() * reflector.getSystemEfficiency();
@@ -229,7 +238,7 @@ public class GroupAnnualAnalysis extends Analysis {
 				case Foundation.TYPE_CSP_STATION:
 					double csp = foundation.getCspToday();
 					if (mean) {
-						csp /= foundation.countParts(new Class[] { Mirror.class, ParabolicTrough.class });
+						csp /= foundation.countParts(new Class[] { Mirror.class, ParabolicTrough.class, ParabolicDish.class });
 						if (customText != null) {
 							graph.addData("CSP " + p.getId() + graph.getDataNameDelimiter() + customText + " mean", csp);
 						} else {
@@ -509,6 +518,9 @@ public class GroupAnnualAnalysis extends Analysis {
 			} else if (p instanceof ParabolicTrough) {
 				names.add("Solar " + p.getId());
 				type = "Parabolic Trough";
+			} else if (p instanceof ParabolicDish) {
+				names.add("Solar " + p.getId());
+				type = "Parabolic Dish";
 			} else if (p instanceof FresnelReflector) {
 				names.add("Solar " + p.getId());
 				type = "Fresnel Reflector";
