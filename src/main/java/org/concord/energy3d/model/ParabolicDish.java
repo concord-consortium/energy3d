@@ -50,7 +50,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private transient Paraboloid dish;
 	private transient Mesh dishBack;
 	private transient Line outlines;
-	private transient Line supports;
+	private transient Cylinder[] tripod;
 	private transient Cylinder post;
 	private transient Cylinder duct;
 	private transient Cylinder receiver;
@@ -172,13 +172,17 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		Util.disablePickShadowLight(outlines);
 		root.attachChild(outlines);
 
-		supports = new Line("Parabolic Dish Supports");
-		supports.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6));
-		supports.setDefaultColor(ColorRGBA.WHITE);
-		supports.setModelBound(new OrientedBoundingBox());
-		supports.setLineWidth(5f);
-		supports.setStipplePattern((short) 0xffff);
-		root.attachChild(supports);
+		tripod = new Cylinder[3];
+
+		for (int i = 0; i < 3; i++) {
+			tripod[i] = new Cylinder("Tripod Cylinder " + i, 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+			tripod[i].setDefaultColor(ColorRGBA.WHITE);
+			tripod[i].setRadius(0.2);
+			tripod[i].setRenderState(offsetState);
+			tripod[i].setModelBound(new BoundingBox());
+			tripod[i].updateModelBound();
+			root.attachChild(tripod[i]);
+		}
 
 		lightBeams = new Line("Light Beams");
 		lightBeams.setLineWidth(0.01f);
@@ -264,7 +268,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 		final FloatBuffer vertexBuffer = mesh.getMeshData().getVertexBuffer();
 		FloatBuffer outlineBuffer = outlines.getMeshData().getVertexBuffer();
-		final FloatBuffer supportBuffer = supports.getMeshData().getVertexBuffer();
 
 		final int vertexCount = vertexBuffer.limit() / 3;
 		final Vector3 center = getAbsPoint(0);
@@ -329,13 +332,19 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			duct.setTranslation(center.clone().addLocal(normal.multiply(flScaled * 0.5, null)));
 			break;
 		case STRUCTURE_TRIPOD:
+			final Vector3 vi = new Vector3();
+			final Vector3 v0 = new Vector3(0, 0, flScaled);
 			for (int i = 0; i < 3; i++) {
 				angle = 2 * Math.PI / 3 * i;
 				xi = dish.getRimRadius() * 0.98 * Math.cos(angle);
 				yi = dish.getRimRadius() * 0.98 * Math.sin(angle);
 				zi = (xi * xi + yi * yi) / (dish.getCurvatureParameter() * dish.getCurvatureParameter());
-				supportBuffer.put((float) xi).put((float) yi).put((float) zi);
-				supportBuffer.put(0).put(0).put((float) flScaled);
+				vi.set(xi, yi, zi);
+				tripod[i].setHeight(vi.distance(v0));
+				final Vector3 ui = rotation.applyPost(vi, null);
+				final Vector3 u0 = rotation.applyPost(v0, null);
+				tripod[i].setTranslation(center.add(ui.addLocal(u0).multiplyLocal(0.5), null));
+				tripod[i].setRotation(rotation.multiply(new Matrix3().fromStartEndLocal(Vector3.UNIT_Z, vi.subtract(v0, null).normalizeLocal()), null));
 			}
 			duct.setHeight(receiver.getHeight());
 			duct.setRotation(mesh.getRotation());
@@ -350,9 +359,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 		receiver.setRotation(mesh.getRotation());
 		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled, null)));
-
-		supports.setRotation(mesh.getRotation());
-		supports.setTranslation(mesh.getTranslation());
 
 		if (bloomRenderPassReceiver == null) {
 			bloomRenderPassReceiver = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
