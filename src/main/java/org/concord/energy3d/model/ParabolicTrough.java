@@ -82,7 +82,7 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 	private transient double baseZ;
 	private int nSectionParabola = 16; // number of sections for the parabola cross section of a parabolic trough (must be power of 2)
 	private int nSectionAxis = 32; // number of sections in the axis of a parabolic trough (must be power of 2)
-	private boolean detailed; // allows us to draw more details when there are fewer troughs in the scene
+	private transient boolean detailed; // allows us to draw more details when there are fewer troughs in the scene
 
 	public ParabolicTrough() {
 		super(1, 1, 0);

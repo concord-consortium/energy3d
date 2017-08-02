@@ -10781,6 +10781,7 @@ public class PopupMenuFactory {
 						break;
 					}
 					final JComboBox<String> comboBox = new JComboBox<String>(new String[] { "Central Pole", "Tripod" });
+					comboBox.setSelectedIndex(d.getStructureType());
 					gui.add(comboBox, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };

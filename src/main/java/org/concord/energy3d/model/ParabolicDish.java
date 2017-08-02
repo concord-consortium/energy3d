@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.Calendar;
+import java.util.concurrent.Callable;
 
 import javax.swing.JOptionPane;
 
@@ -78,7 +79,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	private transient final float zOffset = 0.25f;
 	private int nRadialSections = 32; // number of sections in the radial direction of a parabolic dish (must be power of 2)
 	private int nAxialSections = 32; // number of sections in the axial direction of a parabolic dish (must be power of 2)
-	private boolean detailed; // allows us to draw more details when there are fewer dishes in the scene
+	private transient boolean detailed; // allows us to draw more details when there are fewer dishes in the scene
 
 	public ParabolicDish() {
 		super(1, 1, 0);
@@ -181,7 +182,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			tripod[i].setRenderState(offsetState);
 			tripod[i].setModelBound(new BoundingBox());
 			tripod[i].updateModelBound();
-			root.attachChild(tripod[i]);
 		}
 
 		lightBeams = new Line("Light Beams");
@@ -295,9 +295,9 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			outlineBuffer.put(vertexBuffer.get(i3 + 3)).put(vertexBuffer.get(i3 + 4)).put(vertexBuffer.get(i3 + 5) + zOffset);
 		}
 		// draw the rib lines
-		double xi, yi, zi;
+		double xi, yi, zi, angle;
 		final double delta = dish.getRimRadius() * 2.0 / (zSamples + 1);
-		double cos, sin, angle;
+		double cos, sin;
 		for (int i = 0; i < zSamples; i++) {
 			for (int j = 0; j < nrib; j++) {
 				angle = Math.PI / nrib * j;
@@ -317,14 +317,22 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		final Matrix3 rotation = new Matrix3().lookAt(normal, Vector3.UNIT_Y);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
+		mesh.updateModelBound();
 		dishBack.setRotation(rotation);
 		dishBack.setTranslation(mesh.getTranslation());
 		outlines.setRotation(rotation);
 		outlines.setTranslation(mesh.getTranslation());
-		mesh.updateModelBound();
 		outlines.updateModelBound();
 
+		post.setHeight(baseHeight - 0.5 * post.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the dish
+		final Vector3 p = center.clone();
+		p.setZ(baseZ + post.getHeight() / 2);
+		post.setTranslation(p);
+
 		final double flScaled = focalLength / annotationScale;
+		receiver.setRotation(mesh.getRotation());
+		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled, null)));
+
 		switch (structureType) {
 		case STRUCTURE_CENTRAL_POLE:
 			duct.setHeight(flScaled + receiver.getHeight());
@@ -351,14 +359,6 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			duct.setTranslation(center.clone().subtractLocal(normal.multiply(duct.getHeight() * 0.5, null)));
 			break;
 		}
-
-		post.setHeight(baseHeight - 0.5 * post.getRadius()); // slightly shorter so that the pole won't penetrate the surface of the dish
-		final Vector3 p = center.clone();
-		p.setZ(baseZ + post.getHeight() / 2);
-		post.setTranslation(p);
-
-		receiver.setRotation(mesh.getRotation());
-		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled, null)));
 
 		if (bloomRenderPassReceiver == null) {
 			bloomRenderPassReceiver = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
@@ -791,6 +791,24 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	public void setStructureType(final int structureType) {
 		this.structureType = structureType;
+		SceneManager.getTaskManager().update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				switch (structureType) {
+				case STRUCTURE_CENTRAL_POLE:
+					for (int i = 0; i < 3; i++) {
+						root.detachChild(tripod[i]);
+					}
+					break;
+				case STRUCTURE_TRIPOD:
+					for (int i = 0; i < 3; i++) {
+						root.attachChild(tripod[i]);
+					}
+					break;
+				}
+				return null;
+			}
+		});
 	}
 
 	public int getStructureType() {

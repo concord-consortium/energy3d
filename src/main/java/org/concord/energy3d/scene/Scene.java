@@ -42,6 +42,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
+import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Thermalizable;
 import org.concord.energy3d.model.Tree;
@@ -651,7 +652,7 @@ public class Scene implements Serializable {
 			if (!p.isValid()) { // remove invalid parts
 				toBeRemoved.add(p);
 			} else if (p.getContainer() == null) { // remove orphan parts without a container
-				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarPanel || p instanceof Rack || p instanceof ParabolicTrough || p instanceof ParabolicDish || p instanceof FresnelReflector || p instanceof Mirror || p instanceof Sensor || p instanceof Floor) {
+				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarCollector || p instanceof Floor) {
 					toBeRemoved.add(p);
 				}
 			} else if (!parts.contains(p.getContainer())) { // remove parts whose container doesn't exist in the scene
