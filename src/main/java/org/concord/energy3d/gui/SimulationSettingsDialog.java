@@ -46,6 +46,7 @@ class SimulationSettingsDialog extends JDialog {
 		final Scene s = Scene.getInstance();
 		final JTextField mirrorNxTextField = new JTextField(s.getMirrorNx() + "", 6);
 		final JTextField mirrorNyTextField = new JTextField(s.getMirrorNy() + "", 6);
+		final JTextField parabolicDishNTextField = new JTextField(s.getParabolicDishN() + "", 6);
 		final JTextField rackCellSizeTextField = new JTextField(FORMAT2.format(Scene.getInstance().getRackCellSize()));
 		final JLabel rackCellSizeLabelLeft = new JLabel("Rack grid cell: ");
 		final JLabel rackCellSizeLabelRight = new JLabel("Meters");
@@ -73,11 +74,13 @@ class SimulationSettingsDialog extends JDialog {
 			public void actionPerformed(final ActionEvent e) {
 				int mirrorNx;
 				int mirrorNy;
+				int parabolicDishN;
 				double rackCellSize;
 				int timeStep;
 				try {
 					mirrorNx = Integer.parseInt(mirrorNxTextField.getText());
 					mirrorNy = Integer.parseInt(mirrorNyTextField.getText());
+					parabolicDishN = Integer.parseInt(parabolicDishNTextField.getText());
 					rackCellSize = Double.parseDouble(rackCellSizeTextField.getText());
 					timeStep = (int) Double.parseDouble(timeStepTextField.getText());
 				} catch (final NumberFormatException err) {
@@ -99,12 +102,13 @@ class SimulationSettingsDialog extends JDialog {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "The grid cell size of a rack must be in 0.5-50 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (mirrorNx < 2 || mirrorNy < 2) {
+				if (mirrorNx < 2 || mirrorNy < 2 || parabolicDishN < 2) {
 					JOptionPane.showMessageDialog(SimulationSettingsDialog.this, "Number of mirror grid cells in x or y direction must be at least two.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				s.setMirrorNx(mirrorNx);
 				s.setMirrorNy(mirrorNy);
+				s.setParabolicDishN(parabolicDishN);
 				s.setRackModelExact(rackModelComboBox.getSelectedIndex() == 1);
 				s.setRackCellSize(rackCellSize);
 				s.setTimeStep(timeStep);
@@ -116,7 +120,7 @@ class SimulationSettingsDialog extends JDialog {
 		};
 
 		// set number of grid points for a mirror, used in both heat map generation and energy calculation
-		panel.add(new JLabel("Mirror mesh: "));
+		panel.add(new JLabel("Heliostat mirror mesh: "));
 		final JPanel p1 = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		p1.add(mirrorNxTextField);
 		p1.add(new JLabel("  \u00D7  "));
@@ -124,8 +128,13 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(p1);
 		panel.add(new JLabel("Must be power of 2"));
 
+		// set number of grid points for a parabolic dish, used in both heat map generation and energy calculation
+		panel.add(new JLabel("Parabolic dish mesh: "));
+		panel.add(parabolicDishNTextField);
+		panel.add(new JLabel("Must be power of 2"));
+
 		// select the model for racks
-		panel.add(new JLabel("Rack model:"));
+		panel.add(new JLabel("Solar panel rack model:"));
 		panel.add(rackModelComboBox);
 		panel.add(rackModelLabelRight);
 
@@ -145,7 +154,7 @@ class SimulationSettingsDialog extends JDialog {
 		panel.add(airMassComboBox);
 		panel.add(new JLabel("Dimensionless"));
 
-		SpringUtilities.makeCompactGrid(panel, 5, 3, 8, 8, 8, 8);
+		SpringUtilities.makeCompactGrid(panel, 6, 3, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
