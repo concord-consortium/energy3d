@@ -597,7 +597,7 @@ public class SolarRadiation {
 	// Unlike PV solar panels, no indirect (ambient or diffuse) radiation should be included in reflection calculation. The mesh is a parabolic surface.
 	private void computeOnParabolicDish(final int minute, final ReadOnlyVector3 directionTowardSun, final ParabolicDish dish) {
 
-		final int n = 6;
+		final int n = Scene.getInstance().getParabolicDishN();
 		final Calendar calendar = Heliodon.getInstance().getCalendar();
 		calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
 		calendar.set(Calendar.MINUTE, minute % 60);
