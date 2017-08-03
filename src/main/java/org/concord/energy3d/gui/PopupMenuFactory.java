@@ -3733,12 +3733,12 @@ public class PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (lx1 <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (ly1 <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (lz1 < 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (lx1 <= 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (ly1 <= 1) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else if (lz1 < 0.01) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be greater than 0.01.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									f.rescale(lx1 / lx0, ly1 / ly0, 1);
 									f.setHeight(lz1 / Scene.getInstance().getAnnotationScale());
