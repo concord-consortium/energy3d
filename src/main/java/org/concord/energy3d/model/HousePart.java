@@ -585,6 +585,9 @@ public abstract class HousePart implements Serializable {
 		try {
 			for (int i = 0; i < points.size(); i++) {
 				getAbsPoint(i, p);
+				if (!Double.isFinite(p.getZ())) {
+					p.setZ(1000);
+				}
 				getEditPointShape(i).setTranslation(p);
 			}
 			for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {

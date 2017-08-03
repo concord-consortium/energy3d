@@ -2038,6 +2038,9 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 
 	private void updateHandle(final Vector3 p, final ReadOnlyVector3 dir) {
 		final ReadOnlyVector3 step = dir.normalize(null).multiplyLocal(3);
+		if (step.length() == 0) {
+			return;
+		}
 		final ReadOnlyVector3 center = getCenter();
 		p.set(center).addLocal(dir).addLocal(step);
 		final Point2D p2D = new Point2D.Double();
