@@ -1346,11 +1346,17 @@ public class EnergyPanel extends JPanel {
 				if (window.isDrawable()) {
 					final double lx = window.getWindowWidth();
 					final double ly = window.getWindowHeight();
+					final Vector3 v1 = window.getAbsPoint(1);
+					final Vector3 v2 = window.getAbsPoint(2);
+					final Vector3 v3 = window.getAbsPoint(3);
+					final double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
+					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double cz = 0.25 * (v.getZ() + v1.getZ() + v2.getZ() + v3.getZ());
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							partProperty1Label.setText("  Size:");
-							partProperty1TextField.setText(TWO_DECIMALS.format(lx) + "\u00d7" + (TWO_DECIMALS.format(ly)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly) + lengthUnit + "\u00B2");
+							partProperty1Label.setText("  Size & Center:");
+							partProperty1TextField.setText(TWO_DECIMALS.format(lx) + "\u00d7" + (TWO_DECIMALS.format(ly)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly) + lengthUnit + "\u00B2, (" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ", " + TWO_DECIMALS.format(cz * scale) + ")" + lengthUnit);
 							partProperty2Label.setText("  U-value:");
 							partProperty2TextField.setText(TWO_DECIMALS.format(Util.toUsUValue(window.getUValue())) + " (US system)");
 							partProperty1TextField.setToolTipText("The width and height of the window");

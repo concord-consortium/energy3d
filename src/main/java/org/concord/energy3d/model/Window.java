@@ -543,7 +543,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public double getGridSize() {
-		return SceneManager.getInstance().isFineGrid() ? 1.0 : 2.0;
+		return SceneManager.getInstance().isFineGrid() ? 0.4 : 2.0;
 	}
 
 	@Override

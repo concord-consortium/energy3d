@@ -3733,9 +3733,9 @@ public class PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (lx1 <= 1) {
+								if (lx1 < 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (ly1 <= 1) {
+								} else if (ly1 < 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be greater than one.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else if (lz1 < 0.01) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be greater than 0.01.", "Range Error", JOptionPane.ERROR_MESSAGE);
