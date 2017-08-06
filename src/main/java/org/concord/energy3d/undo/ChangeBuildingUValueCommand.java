@@ -7,7 +7,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.scene.Scene;
 
 public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
@@ -19,13 +19,13 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 
 	public ChangeBuildingUValueCommand(HousePart part) {
 		this.part = part;
-		if (!(part instanceof Thermalizable))
+		if (!(part instanceof Thermal))
 			throw new IllegalArgumentException(part + "is not thermalizable!");
 		parts = Scene.getInstance().getPartsOfSameTypeInBuilding(part);
 		int n = parts.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = ((Thermalizable) parts.get(i)).getUValue();
+			oldValues[i] = ((Thermal) parts.get(i)).getUValue();
 		}
 	}
 
@@ -39,8 +39,8 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 		int n = parts.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			newValues[i] = ((Thermalizable) parts.get(i)).getUValue();
-			((Thermalizable) parts.get(i)).setUValue(oldValues[i]);
+			newValues[i] = ((Thermal) parts.get(i)).getUValue();
+			((Thermal) parts.get(i)).setUValue(oldValues[i]);
 		}
 	}
 
@@ -49,7 +49,7 @@ public class ChangeBuildingUValueCommand extends AbstractUndoableEdit {
 		super.redo();
 		int n = parts.size();
 		for (int i = 0; i < n; i++) {
-			((Thermalizable) parts.get(i)).setUValue(newValues[i]);
+			((Thermal) parts.get(i)).setUValue(newValues[i]);
 		}
 	}
 

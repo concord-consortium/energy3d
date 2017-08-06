@@ -7,7 +7,7 @@ package org.concord.energy3d.model;
  * 
  */
 
-public interface Thermalizable {
+public interface Thermal {
 
 	public void setUValue(double uValue);
 

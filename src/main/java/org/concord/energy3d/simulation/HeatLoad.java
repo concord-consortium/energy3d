@@ -12,12 +12,10 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
-import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
-import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.SolarCollector;
+import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -40,20 +38,8 @@ public class HeatLoad {
 	}
 
 	private double getUValue(final HousePart part) {
-		if (part instanceof Foundation) {
-			return ((Foundation) part).getUValue();
-		}
-		if (part instanceof Wall) {
-			return ((Wall) part).getUValue();
-		}
-		if (part instanceof Door) {
-			return ((Door) part).getUValue();
-		}
-		if (part instanceof Roof) {
-			return ((Roof) part).getUValue();
-		}
-		if (part instanceof Window) {
-			return ((Window) part).getUValue();
+		if (part instanceof Thermal) {
+			return ((Thermal) part).getUValue();
 		}
 		if (part instanceof Sensor) {
 			final HousePart container = part.getContainer();
@@ -95,7 +81,7 @@ public class HeatLoad {
 			iMinute = minute / timeStep;
 			final double outsideTemperature = Weather.getInstance().getOutsideTemperatureAtMinute(outsideTemperatureRange[1], outsideTemperatureRange[0], minute);
 			for (final HousePart part : Scene.getInstance().getParts()) {
-				if (part instanceof Human || part instanceof Tree || part instanceof Floor || part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror) {
+				if (part instanceof Human || part instanceof Tree || part instanceof Floor || (part instanceof SolarCollector && !(part instanceof Sensor))) {
 					continue;
 				}
 				final float absorption = part instanceof Window ? 0 : 1 - part.getAlbedo();
@@ -150,8 +136,8 @@ public class HeatLoad {
 					}
 				} else {
 					double solarHeat = part.getSolarPotential()[iMinute] * absorption;
-					if (part instanceof Thermalizable) {
-						solarHeat /= ((Thermalizable) part).getVolumetricHeatCapacity();
+					if (part instanceof Thermal) {
+						solarHeat /= ((Thermal) part).getVolumetricHeatCapacity();
 					}
 					final double insideTemperature = part.getTopContainer().getThermostat().getTemperature(today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY, minute / 60);
 					final double deltaT = insideTemperature - (outsideTemperature + solarHeat);

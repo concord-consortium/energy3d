@@ -68,7 +68,7 @@ import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
@@ -12805,11 +12805,11 @@ public class PopupMenuFactory {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (!(selectedPart instanceof Thermalizable)) {
+				if (!(selectedPart instanceof Thermal)) {
 					return;
 				}
 				final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-				final Thermalizable t = (Thermalizable) selectedPart;
+				final Thermal t = (Thermal) selectedPart;
 
 				final JPanel panel = new JPanel();
 				panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -13048,11 +13048,11 @@ public class PopupMenuFactory {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-				if (!(selectedPart instanceof Thermalizable)) {
+				if (!(selectedPart instanceof Thermal)) {
 					return;
 				}
 				final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-				final Thermalizable t = (Thermalizable) selectedPart;
+				final Thermal t = (Thermal) selectedPart;
 				final String title = "<html>Volumeric Heat Capacity of " + partInfo + " [kWh/(m<sup>3</sup>&middot;&deg;C)]<hr><font size=2>Examples:<br>0.03 (fiberglass), 0.18 (asphalt), 0.25(oak wood), 0.33 (concrete), 0.37 (brick), 0.58 (stone)</html>";
 				while (true) {
 					// final String newValue = JOptionPane.showInputDialog(MainFrame.getInstance(), title, t.getVolumetricHeatCapacity());

@@ -53,7 +53,7 @@ import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
-public abstract class Roof extends HousePart implements Thermalizable {
+public abstract class Roof extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
 	public static final double OVERHANG_MIN = 0.01;

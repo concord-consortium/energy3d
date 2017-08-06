@@ -22,7 +22,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.Wall;
@@ -394,31 +394,31 @@ public class TimeSeriesLogger {
 				else if (lastEdit instanceof ChangePartUValueCommand) {
 					final ChangePartUValueCommand c = (ChangePartUValueCommand) lastEdit;
 					final HousePart p = c.getPart();
-					if (p instanceof Thermalizable) {
+					if (p instanceof Thermal) {
 						final Foundation f = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
 						stateValue = "{\"Building\":" + f.getId() + ", \"ID\":" + p.getId();
 						stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
 						stateValue += ", \"Old Value\": " + c.getOldValue();
-						stateValue += ", \"New Value\": " + ((Thermalizable) p).getUValue() + "}";
+						stateValue += ", \"New Value\": " + ((Thermal) p).getUValue() + "}";
 					}
 				} else if (lastEdit instanceof ChangeBuildingUValueCommand) {
 					final ChangeBuildingUValueCommand c = (ChangeBuildingUValueCommand) lastEdit;
 					final HousePart p = c.getPart();
-					if (p instanceof Thermalizable) {
+					if (p instanceof Thermal) {
 						final Foundation f = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
 						stateValue = "{\"Building\":" + f.getId();
 						stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
-						stateValue += ", \"New Value\": " + ((Thermalizable) p).getUValue() + "}";
+						stateValue += ", \"New Value\": " + ((Thermal) p).getUValue() + "}";
 					}
 				} else if (lastEdit instanceof ChangeVolumetricHeatCapacityCommand) {
 					final ChangeVolumetricHeatCapacityCommand c = (ChangeVolumetricHeatCapacityCommand) lastEdit;
 					final HousePart p = c.getPart();
-					if (p instanceof Thermalizable) {
+					if (p instanceof Thermal) {
 						final Foundation f = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
 						stateValue = "{\"Building\":" + f.getId() + ", \"ID\":" + p.getId();
 						stateValue += ", \"Type\": \"" + p.getClass().getSimpleName() + "\"";
 						stateValue += ", \"Old Value\": " + c.getOldValue();
-						stateValue += ", \"New Value\": " + ((Thermalizable) p).getVolumetricHeatCapacity() + "}";
+						stateValue += ", \"New Value\": " + ((Thermal) p).getVolumetricHeatCapacity() + "}";
 					}
 				}
 
