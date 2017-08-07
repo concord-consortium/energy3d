@@ -332,15 +332,17 @@ public abstract class Graph extends JPanel {
 	}
 
 	public double getSum(final String name) {
-		final List<Double> x = getData(name);
-		if (x == null || x.isEmpty()) {
-			return 0;
+		synchronized (data) {
+			final List<Double> x = getData(name);
+			if (x == null || x.isEmpty()) {
+				return 0;
+			}
+			double sum = 0;
+			for (final double a : x) {
+				sum += a;
+			}
+			return this instanceof DailyGraph ? sum : sum * 365.0 / 12.0;
 		}
-		double sum = 0;
-		for (final double a : x) {
-			sum += a;
-		}
-		return this instanceof DailyGraph ? sum : sum * 365.0 / 12.0;
 	}
 
 	int getLength() {

@@ -1694,7 +1694,7 @@ public class SolarRadiation {
 			result += ASHRAE_C[month] * viewFactorWithSky * peakRadiation;
 		}
 		final double viewFactorWithGround = 0.5 * Math.abs(1 - cos); // if a surface faces down, it should receive ground reflection as well
-		if (viewFactorWithGround != 0) { // short-wave reflection from the ground
+		if (!Util.isZero(viewFactorWithGround)) { // short-wave reflection from the ground
 			result += Scene.getInstance().getGround().getAdjustedAlbedo(month) * viewFactorWithGround * peakRadiation;
 		}
 		return result;

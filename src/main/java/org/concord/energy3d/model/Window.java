@@ -783,11 +783,6 @@ public class Window extends HousePart implements Thermal {
 	}
 
 	@Override
-	public Spatial getRadiationCollisionSpatial() {
-		return getRadiationMesh();
-	}
-
-	@Override
 	public boolean isDrawable() {
 		if (container == null) {
 			return true;
