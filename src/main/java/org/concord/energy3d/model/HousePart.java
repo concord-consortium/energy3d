@@ -43,6 +43,7 @@ import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.BlendState;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.renderer.state.OffsetState.OffsetType;
 import com.ardor3d.renderer.state.RenderState.StateType;
@@ -1343,6 +1344,15 @@ public abstract class HousePart implements Serializable {
 
 	public void addPrintMeshes(final List<Mesh> list) {
 
+	}
+
+	protected void addPrintMesh(final List<Mesh> list, final Mesh mesh) {
+		if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
+			final MaterialState material = new MaterialState();
+			material.setDiffuse(mesh.getDefaultColor());
+			mesh.setRenderState(material);
+			list.add(mesh);
+		}
 	}
 
 }

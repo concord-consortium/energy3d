@@ -1844,9 +1844,12 @@ public class Wall extends HousePart implements Thermal {
 
 	@Override
 	public void addPrintMeshes(final List<Mesh> list) {
-		list.add(mesh);
-		list.add(backMesh);
-		list.add(surroundMesh);
+		addPrintMesh(list, mesh);
+		addPrintMesh(list, backMesh);
+		addPrintMesh(list, surroundMesh);
+		addPrintMesh(list, columns);
+		addPrintMesh(list, rails);
+		addPrintMesh(list, steelFrame);
 	}
 
 }

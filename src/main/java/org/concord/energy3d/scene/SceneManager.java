@@ -517,7 +517,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			initCamera();
 			return false;
 		}
-		setWindowsVisible(false);
+		// setWindowsVisible(false);
 		try {
 			passManager.renderPasses(renderer);
 		} catch (final Throwable t) {
@@ -545,6 +545,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			t.printStackTrace();
 		}
 		// com.ardor3d.util.geom.Debugger.drawBounds(Scene.getRoot(), renderer, true);
+		setWindowsVisible(false);
 		taskManager.getQueue(GameTaskQueue.RENDER).execute(renderer);
 		if (framesStartTime != -1) {
 			frames++;

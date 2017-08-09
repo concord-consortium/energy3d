@@ -3,6 +3,7 @@ package org.concord.energy3d.model;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -904,6 +905,11 @@ public class Window extends HousePart implements Thermal {
 
 	public double getWindowHeight() {
 		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
+	}
+
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		addPrintMesh(list, mesh);
 	}
 
 }

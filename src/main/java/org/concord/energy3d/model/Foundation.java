@@ -3754,9 +3754,9 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	@Override
 	public void addPrintMeshes(final List<Mesh> list) {
-		list.add(mesh);
+		addPrintMesh(list, mesh);
 		for (final Mesh mesh : sideMesh) {
-			list.add(mesh);
+			addPrintMesh(list, mesh);
 		}
 	}
 

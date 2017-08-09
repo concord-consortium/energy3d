@@ -232,7 +232,7 @@ public class Door extends HousePart implements Thermal {
 
 	@Override
 	public void addPrintMeshes(final List<Mesh> list) {
-		list.add(mesh);
+		addPrintMesh(list, mesh);
 	}
 
 }

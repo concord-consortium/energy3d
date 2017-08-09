@@ -1444,7 +1444,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
-				list.add(mesh);
+				addPrintMesh(list, mesh);
 			}
 		}
 	}
