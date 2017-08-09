@@ -72,10 +72,12 @@ import org.concord.energy3d.util.Pair;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.WallVisitor;
 
+import com.ardor3d.extension.model.obj.ObjExporter;
 import com.ardor3d.image.Texture.MinificationFilter;
 import com.ardor3d.image.Texture2D;
 import com.ardor3d.image.util.awt.AWTImageLoader;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.Quaternion;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -608,6 +610,27 @@ public class Scene implements Serializable {
 			SceneManager.getInstance().getUndoManager().addEdit(new AddNodeCommand(foundation));
 		}
 		setEdited(true);
+	}
+
+	public void exportObj(final File file) throws Exception {
+		try {
+			final List<Mesh> objs = new ArrayList<Mesh>();
+			for (final HousePart part : parts) {
+				part.addPrintMeshes(objs);
+			}
+			final Quaternion rotate = new Quaternion(-1, 0, 0, 1);
+			for (final Mesh mesh : objs) {
+				mesh.getMeshData().rotatePoints(rotate);
+				if (mesh.getMeshData().getNormalBuffer() != null) {
+					mesh.getMeshData().rotateNormals(rotate);
+				}
+				mesh.updateModelBound();
+			}
+			new ObjExporter().save(objs, new File(file.toString() + ".obj"), new File(file.toString() + ".mtl"), null);
+
+		} catch (final Throwable t) {
+			Util.reportError(t);
+		}
 	}
 
 	/** This can be used by the user to fix problems that are caused by bugs based on our observations. This is different than cleanup() as the latter cannot be used to remove undrawables. */

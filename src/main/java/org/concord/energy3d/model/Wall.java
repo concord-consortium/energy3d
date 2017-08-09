@@ -1842,4 +1842,11 @@ public class Wall extends HousePart implements Thermalizable {
 		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
 	}
 
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		list.add(mesh);
+		list.add(backMesh);
+		list.add(surroundMesh);
+	}
+
 }

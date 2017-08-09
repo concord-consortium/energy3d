@@ -1341,4 +1341,8 @@ public abstract class HousePart implements Serializable {
 		return labelCustomText;
 	}
 
+	public void addPrintMeshes(final List<Mesh> list) {
+
+	}
+
 }

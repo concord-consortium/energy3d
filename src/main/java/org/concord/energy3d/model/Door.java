@@ -1,6 +1,7 @@
 package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -227,6 +228,11 @@ public class Door extends HousePart implements Thermalizable {
 			return false;
 		}
 		return super.isDrawable();
+	}
+
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		list.add(mesh);
 	}
 
 }

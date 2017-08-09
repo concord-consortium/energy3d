@@ -31,5 +31,6 @@
 	<classpathentry kind="lib" path="exe/lib/poly2tri/poly2tri-core.jar"/>
 	<classpathentry kind="lib" path="exe/lib/samskivert.jar"/>
 	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-jogl-awt.jar" sourcepath="exe/lib/ardor3d/ardor3d-jogl-awt-sources.jar"/>
+	<classpathentry kind="lib" path="exe/lib/ardor3d/ardor3d-extras.jar" sourcepath="exe/lib/ardor3d/ardor3d-extras-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

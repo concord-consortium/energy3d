@@ -1439,4 +1439,14 @@ public abstract class Roof extends HousePart implements Thermalizable {
 		return getRoofPartsRoot().getNumberOfChildren() == 1 && Util.isEqual((ReadOnlyVector3) getRoofPartsRoot().getChild(0).getUserData(), Vector3.UNIT_Z, 0.01);
 	}
 
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
+			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
+				final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
+				list.add(mesh);
+			}
+		}
+	}
+
 }

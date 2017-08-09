@@ -146,6 +146,7 @@ public class MainFrame extends JFrame {
 	private static final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
 	static final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
 	static final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
+	static final ExtensionFileFilter objFilter = new ExtensionFileFilter("Wavefront (*.obj)", "obj");
 	private final JColorChooser colorChooser;
 	private int fileMenuItemCount;
 
@@ -226,7 +227,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem scaleToFitRadioButtonMenuItem;
 	private JRadioButtonMenuItem exactSizeRadioButtonMenuItem;
 	private final ButtonGroup printSizeOptionBbuttonGroup = new ButtonGroup();
-	private JMenuItem importMenuItem, importColladaMenuItem;
+	private JMenuItem importMenuItem, importColladaMenuItem, exportModelMenuItem;
 	private JCheckBoxMenuItem snapMenuItem;
 	private JCheckBoxMenuItem snapToGridsMenuItem;
 	private JCheckBoxMenuItem topViewCheckBoxMenuItem;
@@ -596,6 +597,7 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getImportMenuItem());
 			addItemToFileMenu(getImportColladaMenuItem());
 			addItemToFileMenu(getCopyImageMenuItem());
+			addItemToFileMenu(getExportModelMenuItem());
 			addItemToFileMenu(getExportImageMenuItem());
 			addItemToFileMenu(getExportLogMenuItem());
 			addItemToFileMenu(new JSeparator());
@@ -3041,7 +3043,7 @@ public class MainFrame extends JFrame {
 	}
 
 	void importColladaFile() {
-		final File file = FileChooser.getInstance().showDialog(".dae", daeFilter, false);
+		final File file = FileChooser.getInstance().showDialog("", objFilter, false);
 		if (file != null) {
 			EnergyPanel.getInstance().clearRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3049,6 +3051,24 @@ public class MainFrame extends JFrame {
 				public Object call() throws Exception {
 					try {
 						Scene.getInstance().importCollada(file);
+					} catch (final Throwable err) {
+						Util.reportError(err);
+					}
+					return null;
+				}
+			});
+		}
+	}
+
+	private void exportObjFile() {
+		final File file = FileChooser.getInstance().showDialog("", objFilter, true);
+		if (file != null) {
+			EnergyPanel.getInstance().clearRadiationHeatMap();
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					try {
+						Scene.getInstance().exportObj(file);
 					} catch (final Throwable err) {
 						Util.reportError(err);
 					}
@@ -3126,6 +3146,19 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return importColladaMenuItem;
+	}
+
+	private JMenuItem getExportModelMenuItem() {
+		if (exportModelMenuItem == null) {
+			exportModelMenuItem = new JMenuItem("Export Scene as 3D Model...");
+			exportModelMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					exportObjFile();
+				}
+			});
+		}
+		return exportModelMenuItem;
 	}
 
 	private JCheckBoxMenuItem getSnapMenuItem() {

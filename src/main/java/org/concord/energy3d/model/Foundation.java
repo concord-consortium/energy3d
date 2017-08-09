@@ -3752,4 +3752,12 @@ public class Foundation extends HousePart implements Thermalizable, Labelable {
 		return labelBuildingEnergy;
 	}
 
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		list.add(mesh);
+		for (final Mesh mesh : sideMesh) {
+			list.add(mesh);
+		}
+	}
+
 }
