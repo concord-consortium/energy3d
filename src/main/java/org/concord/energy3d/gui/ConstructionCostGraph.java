@@ -178,7 +178,7 @@ public class ConstructionCostGraph extends JPanel {
 	}
 
 	public void updateBudget() {
-		if (budgetPanel != null) {
+		if (budgetPanel != null && foundation != null) {
 			calculateCost();
 			switch (foundation.getStructureType()) {
 			case Foundation.TYPE_BUILDING:

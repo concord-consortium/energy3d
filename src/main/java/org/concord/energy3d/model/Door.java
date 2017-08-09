@@ -17,7 +17,7 @@ import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Door extends HousePart implements Thermalizable {
+public class Door extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
 	private static final double DEFAULT_DOOR_HEIGHT = 10;

@@ -69,7 +69,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.URLResourceSource;
 
-public class Foundation extends HousePart implements Thermalizable, Labelable {
+public class Foundation extends HousePart implements Thermal, Labelable {
 	private static final long serialVersionUID = 1L;
 	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 

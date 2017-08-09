@@ -5,7 +5,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.Thermal;
 
 public class ChangeVolumetricHeatCapacityCommand extends AbstractUndoableEdit {
 
@@ -15,8 +15,8 @@ public class ChangeVolumetricHeatCapacityCommand extends AbstractUndoableEdit {
 
 	public ChangeVolumetricHeatCapacityCommand(HousePart part) {
 		this.part = part;
-		if (part instanceof Thermalizable)
-			oldValue = ((Thermalizable) part).getVolumetricHeatCapacity();
+		if (part instanceof Thermal)
+			oldValue = ((Thermal) part).getVolumetricHeatCapacity();
 	}
 
 	public double getOldValue() {
@@ -30,17 +30,17 @@ public class ChangeVolumetricHeatCapacityCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		if (part instanceof Thermalizable) {
-			newValue = ((Thermalizable) part).getVolumetricHeatCapacity();
-			((Thermalizable) part).setVolumetricHeatCapacity(oldValue);
+		if (part instanceof Thermal) {
+			newValue = ((Thermal) part).getVolumetricHeatCapacity();
+			((Thermal) part).setVolumetricHeatCapacity(oldValue);
 		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		if (part instanceof Thermalizable)
-			((Thermalizable) part).setVolumetricHeatCapacity(newValue);
+		if (part instanceof Thermal)
+			((Thermal) part).setVolumetricHeatCapacity(newValue);
 	}
 
 	@Override

@@ -36,7 +36,7 @@ import com.ardor3d.ui.text.BMText;
 import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
-public class Window extends HousePart implements Thermalizable {
+public class Window extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
 	public static final int NO_MUNTIN_BAR = -1; // TODO: remove this in 2017 as it is no longer needed
@@ -543,7 +543,7 @@ public class Window extends HousePart implements Thermalizable {
 
 	@Override
 	public double getGridSize() {
-		return SceneManager.getInstance().isFineGrid() ? 1.0 : 2.0;
+		return SceneManager.getInstance().isFineGrid() ? 0.4 : 2.0;
 	}
 
 	@Override
@@ -780,11 +780,6 @@ public class Window extends HousePart implements Thermalizable {
 	@Override
 	public Mesh getRadiationMesh() {
 		return collisionMesh;
-	}
-
-	@Override
-	public Spatial getRadiationCollisionSpatial() {
-		return getRadiationMesh();
 	}
 
 	@Override

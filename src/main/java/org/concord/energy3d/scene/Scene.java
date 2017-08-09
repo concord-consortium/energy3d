@@ -44,7 +44,7 @@ import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Thermalizable;
+import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.model.Wall;
@@ -2276,13 +2276,13 @@ public class Scene implements Serializable {
 	}
 
 	public void setUValuesOfSameTypeInBuilding(final HousePart x, final double uValue) {
-		if (x instanceof Thermalizable) {
+		if (x instanceof Thermal) {
 			if (x instanceof Foundation) {
 				((Foundation) x).setUValue(uValue);
 			} else {
 				for (final HousePart p : parts) {
 					if (p.getClass().equals(x.getClass()) && p.getTopContainer() == x.getTopContainer()) {
-						((Thermalizable) p).setUValue(uValue);
+						((Thermal) p).setUValue(uValue);
 					}
 				}
 			}

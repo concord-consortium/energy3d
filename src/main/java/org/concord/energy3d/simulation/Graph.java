@@ -102,7 +102,7 @@ public abstract class Graph extends JPanel {
 
 	Graph() {
 		super();
-		data = new HashMap<String, List<Double>>();
+		data = Collections.synchronizedMap(new HashMap<String, List<Double>>());
 		hideData = new HashMap<String, Boolean>();
 		hideRuns = new HashMap<Integer, Boolean>();
 		hideData("Windows", true);
@@ -332,15 +332,17 @@ public abstract class Graph extends JPanel {
 	}
 
 	public double getSum(final String name) {
-		final List<Double> x = getData(name);
-		if (x == null || x.isEmpty()) {
-			return 0;
+		synchronized (data) {
+			final List<Double> x = getData(name);
+			if (x == null || x.isEmpty()) {
+				return 0;
+			}
+			double sum = 0;
+			for (final double a : x) {
+				sum += a;
+			}
+			return this instanceof DailyGraph ? sum : sum * 365.0 / 12.0;
 		}
-		double sum = 0;
-		for (final double a : x) {
-			sum += a;
-		}
-		return this instanceof DailyGraph ? sum : sum * 365.0 / 12.0;
 	}
 
 	int getLength() {
@@ -348,9 +350,11 @@ public abstract class Graph extends JPanel {
 			return 0;
 		}
 		List<Double> list = null;
-		for (final String name : data.keySet()) {
-			list = data.get(name);
-			break;
+		synchronized (data) {
+			for (final String name : data.keySet()) {
+				list = data.get(name);
+				break;
+			}
 		}
 		return list.size();
 	}
@@ -485,16 +489,18 @@ public abstract class Graph extends JPanel {
 				}
 			}
 		}
-		for (final String key : data.keySet()) {
-			final List<Double> list = data.get(key);
-			if (!list.isEmpty()) {
-				final double max = Collections.max(list);
-				final double min = Collections.min(list);
-				if (max > ymax) {
-					ymax = max;
-				}
-				if (min < ymin) {
-					ymin = min;
+		synchronized (data) {
+			for (final String key : data.keySet()) {
+				final List<Double> list = data.get(key);
+				if (!list.isEmpty()) {
+					final double max = Collections.max(list);
+					final double min = Collections.min(list);
+					if (max > ymax) {
+						ymax = max;
+					}
+					if (min < ymin) {
+						ymin = min;
+					}
 				}
 			}
 		}
@@ -545,51 +551,55 @@ public abstract class Graph extends JPanel {
 
 	void drawBuildingCurves(final Graphics2D g2) {
 
-		for (final String key : data.keySet()) {
+		synchronized (data) {
 
-			if (isDataHidden(key)) {
-				continue;
-			}
+			for (final String key : data.keySet()) {
 
-			final List<Double> list = data.get(key);
-
-			if (!list.isEmpty()) {
-
-				if (Collections.max(list) == Collections.min(list)) {
+				if (isDataHidden(key)) {
 					continue;
 				}
 
-				g2.setColor(Color.BLACK);
-				double dataX, dataY;
-				final Path2D.Float path = new Path2D.Float();
-				for (int i = 0; i < list.size(); i++) {
-					dataX = left + dx * i;
-					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-					if (i == 0) {
-						path.moveTo(dataX, dataY);
-					} else {
-						path.lineTo(dataX, dataY);
-					}
-				}
-				g2.setStroke("Net".equals(key) ? thick : dashed);
-				g2.draw(path);
+				final List<Double> list = data.get(key);
 
-				g2.setStroke(thin);
-				final Color c = colors.get(key);
-				for (int i = 0; i < list.size(); i++) {
-					dataX = left + dx * i;
-					dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-					if ("Windows".equals(key)) {
-						drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
-					} else if ("Solar Panels".equals(key)) {
-						drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
-					} else if ("Heater".equals(key)) {
-						drawTriangleUp(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
-					} else if ("AC".equals(key)) {
-						drawTriangleDown(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
-					} else if ("Net".equals(key)) {
-						drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, c);
+				if (!list.isEmpty()) {
+
+					if (Collections.max(list) == Collections.min(list)) {
+						continue;
 					}
+
+					g2.setColor(Color.BLACK);
+					double dataX, dataY;
+					final Path2D.Float path = new Path2D.Float();
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+						if (i == 0) {
+							path.moveTo(dataX, dataY);
+						} else {
+							path.lineTo(dataX, dataY);
+						}
+					}
+					g2.setStroke("Net".equals(key) ? thick : dashed);
+					g2.draw(path);
+
+					g2.setStroke(thin);
+					final Color c = colors.get(key);
+					for (int i = 0; i < list.size(); i++) {
+						dataX = left + dx * i;
+						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+						if ("Windows".equals(key)) {
+							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
+						} else if ("Solar Panels".equals(key)) {
+							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						} else if ("Heater".equals(key)) {
+							drawTriangleUp(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						} else if ("AC".equals(key)) {
+							drawTriangleDown(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+						} else if ("Net".equals(key)) {
+							drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, c);
+						}
+					}
+
 				}
 
 			}
@@ -665,90 +675,94 @@ public abstract class Graph extends JPanel {
 
 		final Path2D.Float path = new Path2D.Float();
 
-		for (final String key : data.keySet()) {
+		synchronized (data) {
 
-			if (isDataHidden(key)) {
-				continue;
-			}
+			for (final String key : data.keySet()) {
 
-			final List<Double> list = data.get(key);
-
-			if (!list.isEmpty()) {
-
-				if (Collections.max(list) == Collections.min(list)) {
+				if (isDataHidden(key)) {
 					continue;
 				}
 
-				g2.setColor(Color.BLACK);
-				path.reset();
-				double dataX, dataY;
-				double xLabel = 0;
-				double yLabel = Double.MAX_VALUE;
-				if ("Utility".equals(key)) {
-					g2.setStroke(thin);
-					g2.setColor(colors.get(key));
-					double hi;
-					for (int i = 0; i < list.size(); i++) {
-						dataX = left + dx * i;
-						hi = (list.get(i) - ymin) * dy;
-						dataY = getHeight() - top - hi;
-						g2.fillRect((int) Math.round(dataX - dx / 2 + 5), (int) Math.round(dataY), (int) Math.round(dx - 10), (int) Math.round(hi));
-					}
-				} else {
-					for (int i = 0; i < list.size(); i++) {
-						dataX = left + dx * i;
-						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-						if (i == 0) {
-							path.moveTo(dataX, dataY);
-						} else {
-							path.lineTo(dataX, dataY);
-						}
-						if (dataY < yLabel) {
-							yLabel = dataY;
-							xLabel = dataX;
-						}
-					}
-					g2.setStroke(thin);
-					g2.draw(path);
-				}
+				final List<Double> list = data.get(key);
 
-				if (!(this instanceof DailyGraph)) {
-					xLabel = left - 30;
-					yLabel = getHeight() - top - (list.get(0) - ymin) * dy + 5;
-				} else {
-					yLabel -= 8;
-				}
+				if (!list.isEmpty()) {
 
-				g2.setStroke(thin);
-				switch (type) {
-				case SENSOR:
-					for (int i = 0; i < list.size(); i++) {
-						dataX = left + dx * i;
-						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+					if (Collections.max(list) == Collections.min(list)) {
+						continue;
+					}
+
+					g2.setColor(Color.BLACK);
+					path.reset();
+					double dataX, dataY;
+					double xLabel = 0;
+					double yLabel = Double.MAX_VALUE;
+					if ("Utility".equals(key)) {
+						g2.setStroke(thin);
+						g2.setColor(colors.get(key));
+						double hi;
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							hi = (list.get(i) - ymin) * dy;
+							dataY = getHeight() - top - hi;
+							g2.fillRect((int) Math.round(dataX - dx / 2 + 5), (int) Math.round(dataY), (int) Math.round(dx - 10), (int) Math.round(hi));
+						}
+					} else {
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+							if (i == 0) {
+								path.moveTo(dataX, dataY);
+							} else {
+								path.lineTo(dataX, dataY);
+							}
+							if (dataY < yLabel) {
+								yLabel = dataY;
+								xLabel = dataX;
+							}
+						}
+						g2.setStroke(thin);
+						g2.draw(path);
+					}
+
+					if (!(this instanceof DailyGraph)) {
+						xLabel = left - 30;
+						yLabel = getHeight() - top - (list.get(0) - ymin) * dy + 5;
+					} else {
+						yLabel -= 8;
+					}
+
+					g2.setStroke(thin);
+					switch (type) {
+					case SENSOR:
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+							if (key.startsWith("Light")) {
+								drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
+							} else if (key.startsWith("Heat Flux")) {
+								drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
+							}
+						}
+						final int pound = key.indexOf("#");
+						String s = key.substring(pound);
 						if (key.startsWith("Light")) {
-							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
-						} else if (key.startsWith("Heat Flux")) {
-							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
+							s = s + " (" + TWO_DECIMALS.format(getSum(key)) + ")";
+						}
+						final FontMetrics fm = g2.getFontMetrics();
+						g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
+						break;
+					default:
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+							if (key.startsWith("Solar") || key.startsWith("PV") || key.startsWith("CSP")) {
+								drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get(key));
+							} else if (key.startsWith("Heat Gain") || key.startsWith("Building")) {
+								drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get(key));
+							}
 						}
 					}
-					final int pound = key.indexOf("#");
-					String s = key.substring(pound);
-					if (key.startsWith("Light")) {
-						s = s + " (" + TWO_DECIMALS.format(getSum(key)) + ")";
-					}
-					final FontMetrics fm = g2.getFontMetrics();
-					g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
-					break;
-				default:
-					for (int i = 0; i < list.size(); i++) {
-						dataX = left + dx * i;
-						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-						if (key.startsWith("Solar") || key.startsWith("PV") || key.startsWith("CSP")) {
-							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get(key));
-						} else if (key.startsWith("Heat Gain") || key.startsWith("Building")) {
-							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get(key));
-						}
-					}
+
 				}
 
 			}
@@ -758,12 +772,14 @@ public abstract class Graph extends JPanel {
 	}
 
 	boolean containsSensorType(final String s) {
-		for (final String key : data.keySet()) {
-			if (key.startsWith(s)) {
-				final List<Double> val = data.get(key);
-				for (final double x : val) {
-					if (x != 0) {
-						return true;
+		synchronized (data) {
+			for (final String key : data.keySet()) {
+				if (key.startsWith(s)) {
+					final List<Double> val = data.get(key);
+					for (final double x : val) {
+						if (x != 0) {
+							return true;
+						}
 					}
 				}
 			}

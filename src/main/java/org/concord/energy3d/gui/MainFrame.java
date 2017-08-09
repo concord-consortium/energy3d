@@ -1284,6 +1284,14 @@ public class MainFrame extends JFrame {
 					MainPanel.getInstance().defaultTool();
 				}
 			});
+			final JMenu benchmarksMenu = new JMenu("Benchmarks");
+			examplesMenu.add(benchmarksMenu);
+			final JMenu bestestMenu = new JMenu("Building Energy Simulation Tests");
+			benchmarksMenu.add(bestestMenu);
+			addModel(bestestMenu, "BESTEST Case 600", "benchmarks/bestest600.ng3");
+			addModel(bestestMenu, "BESTEST Case 610", "benchmarks/bestest610.ng3");
+			addModel(bestestMenu, "BESTEST Case 620", "benchmarks/bestest620.ng3");
+			addModel(bestestMenu, "BESTEST Case 630", "benchmarks/bestest630.ng3");
 			final JMenu simpleMenu = new JMenu("Simple Buildings");
 			examplesMenu.add(simpleMenu);
 			addModel(simpleMenu, "Apartment 1", "templates/apartment-template-1.ng3");

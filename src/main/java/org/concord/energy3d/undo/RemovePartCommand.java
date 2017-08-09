@@ -27,11 +27,11 @@ public class RemovePartCommand extends AbstractUndoableEdit {
 		this.housePart = housePart;
 	}
 
-	public void setGableInfo(List<Map<Integer, List<Wall>>> x) {
+	public void setGableInfo(final List<Map<Integer, List<Wall>>> x) {
 		gableInfo = new ArrayList<Map<Integer, List<Wall>>>();
-		for (Map<Integer, List<Wall>> m : x) {
-			Map<Integer, List<Wall>> a = new HashMap<Integer, List<Wall>>();
-			for (Map.Entry<Integer, List<Wall>> e : m.entrySet()) {
+		for (final Map<Integer, List<Wall>> m : x) {
+			final Map<Integer, List<Wall>> a = new HashMap<Integer, List<Wall>>();
+			for (final Map.Entry<Integer, List<Wall>> e : m.entrySet()) {
 				a.put(e.getKey(), new ArrayList<Wall>(e.getValue()));
 			}
 			gableInfo.add(a);
@@ -47,13 +47,13 @@ public class RemovePartCommand extends AbstractUndoableEdit {
 		super.undo();
 		Scene.getInstance().add(housePart, true);
 		if (housePart instanceof Wall) {
-			Roof roof = ((Wall) housePart).getRoof();
+			final Roof roof = ((Wall) housePart).getRoof();
 			if (roof != null && gableInfo.size() == 1) {
 				roof.setGableEditPointToWallMap(gableInfo.get(0));
 			}
 		} else if (housePart instanceof Foundation) {
-			List<Roof> roofs = ((Foundation) housePart).getRoofs();
-			if (!roofs.isEmpty()) {
+			final List<Roof> roofs = ((Foundation) housePart).getRoofs();
+			if (!roofs.isEmpty() && !gableInfo.isEmpty()) {
 				for (int i = 0; i < roofs.size(); i++) {
 					roofs.get(i).setGableEditPointToWallMap(gableInfo.get(i));
 				}
@@ -72,8 +72,9 @@ public class RemovePartCommand extends AbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		if (housePart instanceof Foundation && !housePart.getChildren().isEmpty())
+		if (housePart instanceof Foundation && !housePart.getChildren().isEmpty()) {
 			return "Remove Building";
+		}
 		return "Remove " + housePart.getClass().getSimpleName();
 	}
 
