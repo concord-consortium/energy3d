@@ -2,13 +2,15 @@ package org.concord.energy3d.undo;
 
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 
-public class UndoManager extends javax.swing.undo.UndoManager {
+public class MyUndoManager extends UndoManager {
+
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -55,6 +57,18 @@ public class UndoManager extends javax.swing.undo.UndoManager {
 	@Override
 	public UndoableEdit lastEdit() {
 		return super.lastEdit();
+	}
+
+	// override to make it public
+	@Override
+	public UndoableEdit editToBeUndone() {
+		return super.editToBeUndone();
+	}
+
+	// override to make it public
+	@Override
+	public UndoableEdit editToBeRedone() {
+		return super.editToBeRedone();
 	}
 
 	private void refreshUndoRedoGui() {

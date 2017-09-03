@@ -63,6 +63,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.logger.DesignReplay;
@@ -111,6 +112,7 @@ import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.undo.AbstractUndoableEditWithTimestamp;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
@@ -118,6 +120,7 @@ import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
+import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowReflectorLightBeamsCommand;
@@ -2832,6 +2835,7 @@ public class MainFrame extends JFrame {
 					} else {
 						rescaleMenuItem.setEnabled(selectedPart instanceof Foundation || selectedPart == null);
 					}
+					refreshUndoRedo();
 				}
 			});
 
@@ -2895,10 +2899,22 @@ public class MainFrame extends JFrame {
 	}
 
 	public void refreshUndoRedo() {
-		getUndoMenuItem().setText(SceneManager.getInstance().getUndoManager().getUndoPresentationName());
-		getUndoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canUndo());
-		getRedoMenuItem().setText(SceneManager.getInstance().getUndoManager().getRedoPresentationName());
-		getRedoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canRedo());
+		final MyUndoManager um = SceneManager.getInstance().getUndoManager();
+		final UndoableEdit lastEdit = um.lastEdit();
+		long timestampUndo = -1;
+		long timestampRedo = -1;
+		if (lastEdit instanceof AbstractUndoableEditWithTimestamp) {
+			if (um.editToBeUndone() != null) {
+				timestampUndo = ((AbstractUndoableEditWithTimestamp) um.editToBeUndone()).getTimestamp();
+			}
+			if (um.editToBeRedone() != null) {
+				timestampRedo = ((AbstractUndoableEditWithTimestamp) um.editToBeRedone()).getTimestamp();
+			}
+		}
+		getUndoMenuItem().setText(um.getUndoPresentationName() + (timestampUndo == -1 ? "" : " (" + EnergyPanel.ONE_DECIMAL.format(0.001 * (System.currentTimeMillis() - timestampUndo)) + " seconds ago)"));
+		getUndoMenuItem().setEnabled(um.canUndo());
+		getRedoMenuItem().setText(um.getRedoPresentationName() + (timestampRedo == -1 ? "" : " (" + EnergyPanel.ONE_DECIMAL.format(0.001 * (System.currentTimeMillis() - timestampRedo)) + " seconds ago)"));
+		getRedoMenuItem().setEnabled(um.canRedo());
 	}
 
 	private JMenuItem getUndoMenuItem() {

@@ -71,7 +71,7 @@ import org.concord.energy3d.undo.EditRackCommand;
 import org.concord.energy3d.undo.MovePartCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
-import org.concord.energy3d.undo.UndoManager;
+import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Config.RenderMode;
@@ -183,7 +183,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Mesh gridsMesh;
 	private final Spatial axes;
 	private final LightState lightState = new LightState();
-	private final UndoManager undoManager = new UndoManager();
+	private final MyUndoManager undoManager = new MyUndoManager();
 	private HousePart selectedPart;
 	private HousePart hoveredPart;
 	private Operation operation = Operation.SELECT;
@@ -1749,7 +1749,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateDurationInSeconds;
 	}
 
-	public UndoManager getUndoManager() {
+	public MyUndoManager getUndoManager() {
 		return undoManager;
 	}
 
