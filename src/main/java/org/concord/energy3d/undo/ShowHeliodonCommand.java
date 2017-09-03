@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -8,10 +7,10 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
-public class ShowHeliodonCommand extends AbstractUndoableEdit {
+public class ShowHeliodonCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private boolean oldValue, newValue;
+	private final boolean oldValue, newValue;
 
 	public ShowHeliodonCommand() {
 		oldValue = SceneManager.getInstance().isHeliodonVisible();

@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -10,15 +9,16 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeTiltAngleForAllMirrorsCommand extends AbstractUndoableEdit {
+public class ChangeTiltAngleForAllMirrorsCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private double[] oldValues, newValues;
-	private List<Mirror> mirrors;
+	private final double[] oldValues;
+	private double[] newValues;
+	private final List<Mirror> mirrors;
 
 	public ChangeTiltAngleForAllMirrorsCommand() {
 		mirrors = Scene.getInstance().getAllMirrors();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			oldValues[i] = mirrors.get(i).getTiltAngle();
@@ -28,10 +28,10 @@ public class ChangeTiltAngleForAllMirrorsCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			Mirror m = mirrors.get(i);
+			final Mirror m = mirrors.get(i);
 			newValues[i] = m.getTiltAngle();
 			m.setTiltAngle(oldValues[i]);
 			m.draw();
@@ -42,9 +42,9 @@ public class ChangeTiltAngleForAllMirrorsCommand extends AbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
-			Mirror m = mirrors.get(i);
+			final Mirror m = mirrors.get(i);
 			m.setTiltAngle(newValues[i]);
 			m.draw();
 		}

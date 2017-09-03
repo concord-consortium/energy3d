@@ -8,6 +8,7 @@ import org.concord.energy3d.model.Rack;
 import com.ardor3d.math.Vector3;
 
 public class EditRackCommand extends EditPartCommand {
+
 	private static final long serialVersionUID = 1L;
 	private final double oldRackWidth, oldRackHeight;
 	private final Vector3 oldRackCenter;

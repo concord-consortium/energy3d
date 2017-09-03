@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -9,10 +8,11 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.Util;
 
-public class TopViewCommand extends AbstractUndoableEdit {
+public class TopViewCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private ViewMode oldValue, newValue;
+	private final ViewMode oldValue;
+	private ViewMode newValue;
 
 	public TopViewCommand() {
 		oldValue = SceneManager.getInstance().getViewMode();

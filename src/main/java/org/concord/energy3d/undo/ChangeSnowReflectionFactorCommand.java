@@ -1,12 +1,11 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeSnowReflectionFactorCommand extends AbstractUndoableEdit {
+public class ChangeSnowReflectionFactorCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValue = new double[12];

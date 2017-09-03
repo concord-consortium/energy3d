@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -12,7 +11,7 @@ import org.concord.energy3d.model.NodeState;
 
 import com.ardor3d.scenegraph.Node;
 
-public class AddNodeCommand extends AbstractUndoableEdit {
+public class AddNodeCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private final Node node;

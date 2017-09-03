@@ -1,15 +1,15 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeThemeCommand extends AbstractUndoableEdit {
+public class ChangeThemeCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private int oldValue, newValue;
+	private final int oldValue;
+	private int newValue;
 
 	public ChangeThemeCommand() {
 		oldValue = Scene.getInstance().getTheme();

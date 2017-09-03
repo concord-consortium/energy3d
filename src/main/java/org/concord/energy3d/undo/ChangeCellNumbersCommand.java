@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -9,7 +8,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeCellNumbersCommand extends AbstractUndoableEdit {
+public class ChangeCellNumbersCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private int oldNx, newNx;

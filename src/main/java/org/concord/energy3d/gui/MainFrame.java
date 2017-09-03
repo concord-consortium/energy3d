@@ -95,7 +95,6 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
-import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
@@ -193,7 +192,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyFresnelReflectorAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
-	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem constructionCostAnalysisMenuItem;
 	private JMenuItem monthlySunshineHoursMenuItem;
 	private JMenuItem annualEnvironmentalTemperatureMenuItem;
@@ -1204,7 +1202,7 @@ public class MainFrame extends JFrame {
 					annualEnergyAnalysisForSelectionMenuItem.setEnabled(b);
 					dailyEnergyAnalysisMenuItem.setEnabled(b);
 					dailyEnergyAnalysisForSelectionMenuItem.setEnabled(b);
-					orientationalEnergyAnalysisMenuItem.setEnabled(b);
+					// orientationalEnergyAnalysisMenuItem.setEnabled(b);
 				}
 
 				@Override
@@ -1257,7 +1255,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			analysisMenu.add(getAnnualSensorMenuItem());
 			analysisMenu.add(getDailySensorMenuItem());
-			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
+			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getSimulationSettingsMenuItem());
 		}
@@ -2669,40 +2667,40 @@ public class MainFrame extends JFrame {
 		return showHeatFluxVectorsMenuItem;
 	}
 
-	private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
-		if (orientationalEnergyAnalysisMenuItem == null) {
-			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientation Analysis...");
-			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						int count = 0;
-						HousePart hp = null;
-						for (final HousePart x : Scene.getInstance().getParts()) {
-							if (x instanceof Foundation) {
-								count++;
-								hp = x;
-							}
-						}
-						if (count == 1) {
-							SceneManager.getInstance().setSelectedPart(hp);
-						} else {
-							JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-							return;
-						}
-					}
-					new EnergyAngularAnalysis().show("Orientation");
-				}
-			});
-		}
-		return orientationalEnergyAnalysisMenuItem;
-	}
+	// private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
+	// if (orientationalEnergyAnalysisMenuItem == null) {
+	// orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientation Analysis...");
+	// orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
+	// @Override
+	// public void actionPerformed(final ActionEvent e) {
+	// final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+	// if ("".equals(city)) {
+	// JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+	// return;
+	// }
+	// final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+	// if (selectedPart == null) {
+	// int count = 0;
+	// HousePart hp = null;
+	// for (final HousePart x : Scene.getInstance().getParts()) {
+	// if (x instanceof Foundation) {
+	// count++;
+	// hp = x;
+	// }
+	// }
+	// if (count == 1) {
+	// SceneManager.getInstance().setSelectedPart(hp);
+	// } else {
+	// JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+	// return;
+	// }
+	// }
+	// new EnergyAngularAnalysis().show("Orientation");
+	// }
+	// });
+	// }
+	// return orientationalEnergyAnalysisMenuItem;
+	// }
 
 	private JMenuItem getConstructionCostAnalysisMenuItem() {
 		if (constructionCostAnalysisMenuItem == null) {

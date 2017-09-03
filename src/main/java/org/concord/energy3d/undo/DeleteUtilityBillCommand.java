@@ -1,19 +1,18 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.simulation.UtilityBill;
 
-public class DeleteUtilityBillCommand extends AbstractUndoableEdit {
+public class DeleteUtilityBillCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private Foundation foundation;
-	private UtilityBill bill;
+	private final Foundation foundation;
+	private final UtilityBill bill;
 
-	public DeleteUtilityBillCommand(Foundation foundation) {
+	public DeleteUtilityBillCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		bill = foundation.getUtilityBill();
 	}

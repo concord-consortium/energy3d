@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -8,10 +7,11 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
-public class ChangeLatitudeCommand extends AbstractUndoableEdit {
+public class ChangeLatitudeCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
+	private final double oldValue;
+	private double newValue;
 
 	public ChangeLatitudeCommand() {
 		oldValue = Heliodon.getInstance().getLatitude();

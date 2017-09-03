@@ -3,7 +3,6 @@ package org.concord.energy3d.undo;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -12,7 +11,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.WallVisitor;
 
-public class ChangeHeightForConnectedWallsCommand extends AbstractUndoableEdit {
+public class ChangeHeightForConnectedWallsCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

@@ -1,13 +1,12 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Trackable;
 
-public class SetSolarTrackerCommand extends AbstractUndoableEdit {
+public class SetSolarTrackerCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;

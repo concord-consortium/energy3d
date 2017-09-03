@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -9,10 +8,10 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
-public class ShowShadowCommand extends AbstractUndoableEdit {
+public class ShowShadowCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private boolean oldValue, newValue;
+	private final boolean oldValue, newValue;
 
 	public ShowShadowCommand() {
 		oldValue = SceneManager.getInstance().isShadowEnabled();
@@ -38,7 +37,7 @@ public class ShowShadowCommand extends AbstractUndoableEdit {
 		Util.selectSilently(MainFrame.getInstance().getShadowMenuItem(), newValue);
 		Util.selectSilently(MainPanel.getInstance().getShadowButton(), newValue);
 	}
-	
+
 	@Override
 	public String getPresentationName() {
 		return "Show Shadow";

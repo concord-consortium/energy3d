@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -9,13 +8,14 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class LockPartCommand extends AbstractUndoableEdit {
+public class LockPartCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private boolean oldValue, newValue;
-	private HousePart part;
+	private final boolean oldValue;
+	private boolean newValue;
+	private final HousePart part;
 
-	public LockPartCommand(HousePart part) {
+	public LockPartCommand(final HousePart part) {
 		this.part = part;
 		oldValue = part.isFrozen();
 	}
@@ -33,8 +33,9 @@ public class LockPartCommand extends AbstractUndoableEdit {
 				}
 			}
 		}
-		if (oldValue)
+		if (oldValue) {
 			SceneManager.getInstance().hideAllEditPoints();
+		}
 		part.draw();
 	}
 
@@ -50,8 +51,9 @@ public class LockPartCommand extends AbstractUndoableEdit {
 				}
 			}
 		}
-		if (newValue)
+		if (newValue) {
 			SceneManager.getInstance().hideAllEditPoints();
+		}
 		part.draw();
 	}
 

@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.Date;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -10,10 +9,11 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
-public class ChangeTimeCommand extends AbstractUndoableEdit {
+public class ChangeTimeCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private Date oldTime, newTime;
+	private final Date oldTime;
+	private Date newTime;
 
 	public ChangeTimeCommand() {
 		oldTime = Scene.getInstance().getDate();

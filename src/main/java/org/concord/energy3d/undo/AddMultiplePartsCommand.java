@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -12,13 +11,13 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
-public class AddMultiplePartsCommand extends AbstractUndoableEdit {
+public class AddMultiplePartsCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private final List<HousePart> parts;
 	private final URL url; // if null, adding part happens through importing from an existing file
 
-	public AddMultiplePartsCommand(final List<HousePart> parts, URL url) {
+	public AddMultiplePartsCommand(final List<HousePart> parts, final URL url) {
 		this.parts = new ArrayList<HousePart>(parts);
 		this.url = url;
 	}
@@ -34,16 +33,18 @@ public class AddMultiplePartsCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		for (HousePart p : parts)
+		for (final HousePart p : parts) {
 			Scene.getInstance().remove(p, true);
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		for (HousePart p : parts)
+		for (final HousePart p : parts) {
 			Scene.getInstance().add(p, true);
+		}
 		EnergyPanel.getInstance().clearRadiationHeatMap();
 	}
 

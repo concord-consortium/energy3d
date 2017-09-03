@@ -1,18 +1,18 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Window;
 
-public class ChangeShutterLengthCommand extends AbstractUndoableEdit {
+public class ChangeShutterLengthCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
-	private Window window;
+	private final double oldValue;
+	private double newValue;
+	private final Window window;
 
-	public ChangeShutterLengthCommand(Window window) {
+	public ChangeShutterLengthCommand(final Window window) {
 		this.window = window;
 		oldValue = window.getShutterLength();
 	}

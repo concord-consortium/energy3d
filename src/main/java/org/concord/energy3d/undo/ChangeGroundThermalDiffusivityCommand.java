@@ -1,15 +1,15 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeGroundThermalDiffusivityCommand extends AbstractUndoableEdit {
+public class ChangeGroundThermalDiffusivityCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
+	private final double oldValue;
+	private double newValue;
 
 	public ChangeGroundThermalDiffusivityCommand() {
 		oldValue = Scene.getInstance().getGround().getThermalDiffusivity();

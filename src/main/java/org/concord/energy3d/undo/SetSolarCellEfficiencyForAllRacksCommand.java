@@ -2,14 +2,13 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.Scene;
 
-public class SetSolarCellEfficiencyForAllRacksCommand extends AbstractUndoableEdit {
+public class SetSolarCellEfficiencyForAllRacksCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

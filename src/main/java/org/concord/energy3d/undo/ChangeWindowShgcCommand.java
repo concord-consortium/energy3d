@@ -1,18 +1,18 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Window;
 
-public class ChangeWindowShgcCommand extends AbstractUndoableEdit {
+public class ChangeWindowShgcCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
-	private Window window;
+	private final double oldValue;
+	private double newValue;
+	private final Window window;
 
-	public ChangeWindowShgcCommand(Window selectedWindow) {
+	public ChangeWindowShgcCommand(final Window selectedWindow) {
 		this.window = selectedWindow;
 		oldValue = selectedWindow.getSolarHeatGainCoefficient();
 	}

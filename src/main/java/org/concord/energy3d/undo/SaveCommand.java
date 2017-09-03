@@ -1,8 +1,6 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
-public class SaveCommand extends AbstractUndoableEdit {
+public class SaveCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private static boolean significant = false;

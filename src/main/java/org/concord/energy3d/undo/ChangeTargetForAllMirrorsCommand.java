@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -11,15 +10,16 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeTargetForAllMirrorsCommand extends AbstractUndoableEdit {
+public class ChangeTargetForAllMirrorsCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private Foundation[] oldValues, newValues;
-	private List<Mirror> mirrors;
+	private final Foundation[] oldValues;
+	private Foundation[] newValues;
+	private final List<Mirror> mirrors;
 
 	public ChangeTargetForAllMirrorsCommand() {
 		mirrors = Scene.getInstance().getAllMirrors();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		oldValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
 			oldValues[i] = mirrors.get(i).getHeliostatTarget();
@@ -29,10 +29,10 @@ public class ChangeTargetForAllMirrorsCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		newValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
-			Mirror m = mirrors.get(i);
+			final Mirror m = mirrors.get(i);
 			newValues[i] = m.getHeliostatTarget();
 			m.setHeliostatTarget(oldValues[i]);
 			m.draw();
@@ -43,9 +43,9 @@ public class ChangeTargetForAllMirrorsCommand extends AbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
-			Mirror m = mirrors.get(i);
+			final Mirror m = mirrors.get(i);
 			m.setHeliostatTarget(newValues[i]);
 			m.draw();
 		}

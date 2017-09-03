@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -16,7 +15,7 @@ import org.concord.energy3d.scene.Scene;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 
-public class DeleteMeshCommand extends AbstractUndoableEdit {
+public class DeleteMeshCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
 	private final Mesh mesh;

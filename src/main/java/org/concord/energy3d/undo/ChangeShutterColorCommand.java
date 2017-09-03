@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -8,13 +7,14 @@ import org.concord.energy3d.model.Window;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeShutterColorCommand extends AbstractUndoableEdit {
+public class ChangeShutterColorCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyColorRGBA oldColor, newColor;
-	private Window window;
+	private final ReadOnlyColorRGBA oldColor;
+	private ReadOnlyColorRGBA newColor;
+	private final Window window;
 
-	public ChangeShutterColorCommand(Window window) {
+	public ChangeShutterColorCommand(final Window window) {
 		this.window = window;
 		oldColor = window.getShutterColor();
 	}

@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -13,17 +12,18 @@ import org.concord.energy3d.scene.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeContainerShutterColorCommand extends AbstractUndoableEdit {
+public class ChangeContainerShutterColorCommand extends AbstractUndoableEditWithTimestamp {
 
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyColorRGBA[] oldColors, newColors;
-	private HousePart container;
-	private List<Window> windows;
+	private final ReadOnlyColorRGBA[] oldColors;
+	private ReadOnlyColorRGBA[] newColors;
+	private final HousePart container;
+	private final List<Window> windows;
 
-	public ChangeContainerShutterColorCommand(HousePart container) {
+	public ChangeContainerShutterColorCommand(final HousePart container) {
 		this.container = container;
 		windows = Scene.getInstance().getWindowsOnContainer(container);
-		int n = windows.size();
+		final int n = windows.size();
 		oldColors = new ColorRGBA[n];
 		for (int i = 0; i < n; i++) {
 			oldColors[i] = windows.get(i).getShutterColor();
@@ -37,10 +37,10 @@ public class ChangeContainerShutterColorCommand extends AbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		int n = windows.size();
+		final int n = windows.size();
 		newColors = new ColorRGBA[n];
 		for (int i = 0; i < n; i++) {
-			Window w = windows.get(i);
+			final Window w = windows.get(i);
 			newColors[i] = windows.get(i).getShutterColor();
 			w.setShutterColor(oldColors[i]);
 			w.draw();
@@ -50,9 +50,9 @@ public class ChangeContainerShutterColorCommand extends AbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		int n = windows.size();
+		final int n = windows.size();
 		for (int i = 0; i < n; i++) {
-			Window w = windows.get(i);
+			final Window w = windows.get(i);
 			w.setShutterColor(newColors[i]);
 			w.draw();
 		}
