@@ -13,6 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -45,15 +48,15 @@ public class ActionHistogram extends JComponent {
 	// private final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 8f }, 0.0f);
 	private final BasicStroke thin = new BasicStroke(1);
 	private final BasicStroke thick = new BasicStroke(2);
-	// DecimalFormat format3 = new DecimalFormat("#.###");
-	// DecimalFormat format1 = new DecimalFormat("#.#");
-	private final int binSize = 20; // in seconds
+	private final DecimalFormat format1 = new DecimalFormat("#.#");
+	private double binSize = 1; // in seconds
 	private double xmax; // in seconds
-	private int ymax = -1;
+	private int ymax = 0;
 	private final Vector<UndoableEdit> edits;
 	private int[] totalCount;
 
 	public ActionHistogram() {
+
 		super();
 		setPreferredSize(new Dimension(800, 500));
 		setBackground(Color.WHITE);
@@ -71,13 +74,15 @@ public class ActionHistogram extends JComponent {
 				t1 = ((MyAbstractUndoableEdit) e1).getTimestamp();
 			}
 			if (t0 != -1 && t1 != -1) {
-				xmax = (t1 - t0) * 0.001;
-				totalCount = new int[(int) Math.round(xmax / binSize) + 1];
+				final double duration = (t1 - t0) * 0.001;
+				binSize = Math.max(duration * 0.05, 1);
+				xmax = Math.max(duration + binSize, 10 * binSize);
+				totalCount = new int[(int) Math.round(xmax / binSize)];
 				for (final UndoableEdit e : edits) {
 					if (e instanceof MyAbstractUndoableEdit) {
 						final MyAbstractUndoableEdit x = (MyAbstractUndoableEdit) e;
 						final double t = (x.getTimestamp() - t0) * 0.001;
-						totalCount[(int) Math.round(t / binSize)]++;
+						totalCount[(int) (t / binSize)]++;
 					}
 				}
 				for (int i = 0; i < totalCount.length; i++) {
@@ -120,39 +125,57 @@ public class ActionHistogram extends JComponent {
 		// draw x axis
 
 		g2.setColor(Color.BLACK);
-		g2.setFont(new Font("Arial", Font.BOLD, 16));
-		g2.drawString("Time", width - RIGHT_MARGIN - 36, xAxisY + 24);
+		g2.setFont(new Font("Arial", Font.BOLD, 12));
+		final String xLabel = "Time (seconds), bin size " + format1.format(binSize);
+		g2.drawString(xLabel, width / 2 - g2.getFontMetrics().stringWidth(xLabel) / 2, xAxisY + 30);
 
 		// draw y axis
 
+		String tickmark;
 		final int x0 = LEFT_MARGIN + 1;
-		String yLabel;
-		final int scaleY = 60;
-		final int ny = Math.round(graphWindowHeight / (float) scaleY);
-		g2.setFont(new Font("Arial", Font.PLAIN, 14));
+		final int ny = ymax + 1;
+		final double dy = graphWindowHeight / ny;
+		g2.setFont(new Font("Arial", Font.PLAIN, 10));
+		double yTick;
 		for (int i = 0; i < ny; i++) {
-			g2.drawLine(x0, height - BOTTOM_MARGIN - i * scaleY, x0 + 5, height - BOTTOM_MARGIN - i * scaleY);
-			g2.drawString(i + "", x0 - 12, height - BOTTOM_MARGIN - i * scaleY + 4);
+			yTick = height - BOTTOM_MARGIN - i * dy;
+			g2.drawLine(x0, (int) yTick, x0 - 5, (int) yTick);
+			tickmark = "" + i;
+			g2.drawString(tickmark, x0 - 10 - g2.getFontMetrics().stringWidth(tickmark), (int) (yTick + 4));
 		}
-		yLabel = "Action Count";
-		g2.setFont(new Font("Arial", Font.BOLD, 16));
+		final String yLabel = "Action Count";
+		g2.setFont(new Font("Arial", Font.BOLD, 12));
 		final int yLabelX = x0 - 30;
 		final int yLabelY = height / 2 + g2.getFontMetrics().stringWidth(yLabel) / 2 - 8;
 		g2.rotate(-Math.PI * 0.5, yLabelX, yLabelY);
 		g2.drawString(yLabel, yLabelX, yLabelY);
 		g2.rotate(Math.PI * 0.5, yLabelX, yLabelY);
 
-		if (totalCount != null) {
+		if (totalCount != null) { // draw Manhattan plot
+			final Area area = new Area();
+			g2.setFont(new Font("Arial", Font.PLAIN, 10));
 			final double dx = graphWindowWidth / totalCount.length;
-			final double dy = graphWindowHeight / ymax;
+			double xTick;
+			int tickmarkLength;
 			for (int i = 0; i < totalCount.length; i++) {
-				g2.drawRect((int) (x0 + i * dx), graphWindowHeight - (int) (totalCount[i] * dy), binSize, (int) (totalCount[i] * dy));
+				xTick = x0 + i * dx;
+				area.add(new Area(new Rectangle2D.Double(xTick, xAxisY - totalCount[i] * dy, dx, totalCount[i] * dy)));
+				g2.setColor(Color.LIGHT_GRAY);
+				g2.fill(area);
+				g2.setColor(Color.BLACK);
+				g2.draw(area);
+				g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
+				if (i == totalCount.length - 1) {
+					tickmark = Math.round((i + 1) * binSize) + "";
+					tickmarkLength = g2.getFontMetrics().stringWidth(tickmark);
+					g2.drawString(tickmark, (int) (xTick + dx - tickmarkLength * 0.5), xAxisY + 16);
+				}
 			}
 		}
 
 	}
 
-	public void showDialog() {
+	public void showGui() {
 
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Action Histogram", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -205,4 +228,5 @@ public class ActionHistogram extends JComponent {
 		dialog.setVisible(true);
 
 	}
+
 }

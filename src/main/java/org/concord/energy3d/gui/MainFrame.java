@@ -1096,7 +1096,7 @@ public class MainFrame extends JFrame {
 			miVpa.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new ActionHistogram().showDialog();
+					new ActionHistogram().showGui();
 				}
 			});
 			vpaMenu.add(miVpa);
