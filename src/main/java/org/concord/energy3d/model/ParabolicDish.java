@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.swing.JOptionPane;
@@ -330,13 +331,13 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		post.setTranslation(p);
 
 		final double flScaled = focalLength / annotationScale;
-		receiver.setRotation(mesh.getRotation());
+		receiver.setRotation(rotation);
 		receiver.setTranslation(center.clone().addLocal(normal.multiply(flScaled, null)));
 
 		switch (structureType) {
 		case STRUCTURE_CENTRAL_POLE:
 			duct.setHeight(flScaled + receiver.getHeight());
-			duct.setRotation(mesh.getRotation());
+			duct.setRotation(rotation);
 			duct.setTranslation(center.clone().addLocal(normal.multiply(flScaled * 0.5, null)));
 			break;
 		case STRUCTURE_TRIPOD:
@@ -831,6 +832,18 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	public int getNAxialSections() {
 		return nAxialSections;
+	}
+
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		// addPrintMesh(list, dish);
+		addPrintMesh(list, dishBack);
+		addPrintMesh(list, post);
+		addPrintMesh(list, duct);
+		addPrintMesh(list, receiver);
+		for (final Cylinder mesh : tripod) {
+			addPrintMesh(list, mesh);
+		}
 	}
 
 }

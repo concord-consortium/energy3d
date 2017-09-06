@@ -35,6 +35,7 @@ import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Ray3;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector2;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
@@ -1348,10 +1349,15 @@ public abstract class HousePart implements Serializable {
 
 	protected void addPrintMesh(final List<Mesh> list, final Mesh mesh) {
 		if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
+			final Mesh newMesh = mesh.makeCopy(false);
 			final MaterialState material = new MaterialState();
 			material.setDiffuse(mesh.getDefaultColor());
-			mesh.setRenderState(material);
-			list.add(mesh);
+			newMesh.setRenderState(material);
+
+			newMesh.getMeshData().transformVertices((Transform) mesh.getWorldTransform());
+			newMesh.getMeshData().transformNormals((Transform) mesh.getWorldTransform(), true);
+
+			list.add(newMesh);
 		}
 	}
 
