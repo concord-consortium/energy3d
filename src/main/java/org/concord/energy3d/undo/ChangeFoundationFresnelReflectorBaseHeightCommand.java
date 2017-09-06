@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationFresnelReflectorBaseHeightCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationFresnelReflectorBaseHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

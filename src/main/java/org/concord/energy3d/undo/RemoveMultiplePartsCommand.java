@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
-public class RemoveMultiplePartsCommand extends AbstractUndoableEditWithTimestamp {
+public class RemoveMultiplePartsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final List<HousePart> parts;

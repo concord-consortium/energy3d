@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.scene.Scene;
 
-public class ShowReflectorLightBeamsCommand extends AbstractUndoableEditWithTimestamp {
+public class ShowReflectorLightBeamsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue, newValue;

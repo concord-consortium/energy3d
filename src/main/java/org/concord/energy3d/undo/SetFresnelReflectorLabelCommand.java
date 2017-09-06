@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.FresnelReflector;
 
-public class SetFresnelReflectorLabelCommand extends AbstractUndoableEditWithTimestamp {
+public class SetFresnelReflectorLabelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;

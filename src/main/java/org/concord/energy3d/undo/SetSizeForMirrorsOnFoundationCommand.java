@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSizeForMirrorsOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSizeForMirrorsOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths;

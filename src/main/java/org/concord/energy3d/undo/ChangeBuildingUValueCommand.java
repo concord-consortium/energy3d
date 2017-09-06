@@ -9,7 +9,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeBuildingUValueCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeBuildingUValueCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

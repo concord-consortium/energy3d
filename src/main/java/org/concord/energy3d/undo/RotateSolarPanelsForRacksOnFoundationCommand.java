@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.SceneManager;
 
-public class RotateSolarPanelsForRacksOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class RotateSolarPanelsForRacksOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean[] oldValues;

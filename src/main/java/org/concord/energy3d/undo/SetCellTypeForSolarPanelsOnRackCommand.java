@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Rack;
 
-public class SetCellTypeForSolarPanelsOnRackCommand extends AbstractUndoableEditWithTimestamp {
+public class SetCellTypeForSolarPanelsOnRackCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;

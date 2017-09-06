@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 
-public class SetGroupMasterCommand extends AbstractUndoableEditWithTimestamp {
+public class SetGroupMasterCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue;

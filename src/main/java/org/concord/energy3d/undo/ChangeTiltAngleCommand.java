@@ -8,7 +8,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeTiltAngleCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeTiltAngleCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldValue, newValue;

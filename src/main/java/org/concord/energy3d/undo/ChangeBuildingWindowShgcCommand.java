@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeBuildingWindowShgcCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeBuildingWindowShgcCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

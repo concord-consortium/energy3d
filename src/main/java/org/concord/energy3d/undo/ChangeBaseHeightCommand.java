@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.SolarCollector;
 
-public class ChangeBaseHeightCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeBaseHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;

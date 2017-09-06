@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSolarPanelColorForAllRacksCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSolarPanelColorForAllRacksCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;

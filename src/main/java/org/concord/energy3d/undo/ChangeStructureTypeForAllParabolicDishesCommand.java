@@ -9,7 +9,7 @@ import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeStructureTypeForAllParabolicDishesCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeStructureTypeForAllParabolicDishesCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;

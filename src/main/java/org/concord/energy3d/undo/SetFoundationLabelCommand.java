@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 
-public class SetFoundationLabelCommand extends AbstractUndoableEditWithTimestamp {
+public class SetFoundationLabelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;

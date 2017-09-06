@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 
-public class SetNoctForAllRacksCommand extends AbstractUndoableEditWithTimestamp {
+public class SetNoctForAllRacksCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

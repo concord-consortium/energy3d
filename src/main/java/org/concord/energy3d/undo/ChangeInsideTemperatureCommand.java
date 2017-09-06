@@ -8,7 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.shapes.Heliodon;
 
-public class ChangeInsideTemperatureCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeInsideTemperatureCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int orgTemperature;

@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Thermal;
 
-public class ChangePartUValueCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangePartUValueCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldValue, newValue;

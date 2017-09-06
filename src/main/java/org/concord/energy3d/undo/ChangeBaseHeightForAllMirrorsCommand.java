@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeBaseHeightForAllMirrorsCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeBaseHeightForAllMirrorsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

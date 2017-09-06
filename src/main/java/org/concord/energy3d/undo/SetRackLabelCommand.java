@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Rack;
 
-public class SetRackLabelCommand extends AbstractUndoableEditWithTimestamp {
+public class SetRackLabelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;

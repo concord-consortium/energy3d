@@ -7,7 +7,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeRoofOverhangCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeRoofOverhangCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;

@@ -7,7 +7,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
-public class PastePartCommand extends AbstractUndoableEditWithTimestamp {
+public class PastePartCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final HousePart housePart;

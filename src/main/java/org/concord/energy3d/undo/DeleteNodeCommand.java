@@ -13,7 +13,7 @@ import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.scenegraph.Node;
 
-public class DeleteNodeCommand extends AbstractUndoableEditWithTimestamp {
+public class DeleteNodeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Node node;

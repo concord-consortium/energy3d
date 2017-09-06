@@ -9,7 +9,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
-public class ChangeTimeCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeTimeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Date oldTime;

@@ -8,7 +8,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.util.Util;
 
-public class TopViewCommand extends AbstractUndoableEditWithTimestamp {
+public class TopViewCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final ViewMode oldValue;

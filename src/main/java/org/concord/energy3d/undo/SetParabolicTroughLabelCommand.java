@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.ParabolicTrough;
 
-public class SetParabolicTroughLabelCommand extends AbstractUndoableEditWithTimestamp {
+public class SetParabolicTroughLabelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;

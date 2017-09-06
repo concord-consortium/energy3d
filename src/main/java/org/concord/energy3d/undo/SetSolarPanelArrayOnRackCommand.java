@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
-public class SetSolarPanelArrayOnRackCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSolarPanelArrayOnRackCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final SolarPanel oldValue;

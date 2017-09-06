@@ -7,7 +7,7 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
-public class ShowAnnotationCommand extends AbstractUndoableEditWithTimestamp {
+public class ShowAnnotationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue, newValue;

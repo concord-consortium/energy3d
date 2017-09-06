@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 
-public class ShowBorderLineCommand extends AbstractUndoableEditWithTimestamp {
+public class ShowBorderLineCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue;

@@ -7,7 +7,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
-public class ShowHeatFluxCommand extends AbstractUndoableEditWithTimestamp {
+public class ShowHeatFluxCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue, newValue;

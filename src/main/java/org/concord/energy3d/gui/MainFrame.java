@@ -66,6 +66,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.agents.ActionHistogram;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.logger.PostProcessor;
@@ -112,7 +113,7 @@ import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
-import org.concord.energy3d.undo.AbstractUndoableEditWithTimestamp;
+import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
@@ -1052,8 +1053,7 @@ public class MainFrame extends JFrame {
 
 	private JMenu getHelpMenu() {
 		if (helpMenu == null) {
-			helpMenu = new JMenu();
-			helpMenu.setText("Help");
+			helpMenu = new JMenu("Help");
 			final JMenuItem miUpdate = new JMenuItem("Check Update...");
 			helpMenu.addMenuListener(new MenuListener() {
 
@@ -1088,23 +1088,31 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			JMenuItem mi = new JMenuItem("Download PDF User's Guide...");
-			mi.addActionListener(new ActionListener() {
+			final JMenu vpaMenu = new JMenu("Process Data");
+			helpMenu.add(vpaMenu);
+			helpMenu.addSeparator();
+
+			JMenuItem miVpa = new JMenuItem("View Actions in Histogram");
+			miVpa.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d/Energy3D-Guide.pdf");
+					new ActionHistogram().showDialog();
 				}
 			});
-			// helpMenu.add(mi);
-			mi = new JMenuItem("Visit Home Page...");
+			vpaMenu.add(miVpa);
+
+			miVpa = new JMenuItem("View Actions in Vertex-Edge Graph");
+			vpaMenu.add(miVpa);
+
+			JMenuItem mi = new JMenuItem("View Sites...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d");
+					Util.openBrowser("http://energy.concord.org/energy3d/sites.html");
 				}
 			});
 			helpMenu.add(mi);
-			mi = new JMenuItem("View Examples...");
+			mi = new JMenuItem("View House Examples...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1117,6 +1125,16 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Util.openBrowser("http://energy.concord.org/energy3d/models.html");
+				}
+			});
+			helpMenu.add(mi);
+			helpMenu.addSeparator();
+
+			mi = new JMenuItem("Visit Home Page...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Util.openBrowser("http://energy3d.concord.org");
 				}
 			});
 			helpMenu.add(mi);
@@ -2903,12 +2921,12 @@ public class MainFrame extends JFrame {
 		final UndoableEdit lastEdit = um.lastEdit();
 		long timestampUndo = -1;
 		long timestampRedo = -1;
-		if (lastEdit instanceof AbstractUndoableEditWithTimestamp) {
+		if (lastEdit instanceof MyAbstractUndoableEdit) {
 			if (um.editToBeUndone() != null) {
-				timestampUndo = ((AbstractUndoableEditWithTimestamp) um.editToBeUndone()).getTimestamp();
+				timestampUndo = ((MyAbstractUndoableEdit) um.editToBeUndone()).getTimestamp();
 			}
 			if (um.editToBeRedone() != null) {
-				timestampRedo = ((AbstractUndoableEditWithTimestamp) um.editToBeRedone()).getTimestamp();
+				timestampRedo = ((MyAbstractUndoableEdit) um.editToBeRedone()).getTimestamp();
 			}
 		}
 		getUndoMenuItem().setText(um.getUndoPresentationName() + (timestampUndo == -1 ? "" : " (" + EnergyPanel.ONE_DECIMAL.format(0.001 * (System.currentTimeMillis() - timestampUndo)) + " seconds ago)"));

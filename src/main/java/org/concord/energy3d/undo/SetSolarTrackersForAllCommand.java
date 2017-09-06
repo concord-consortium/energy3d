@@ -11,7 +11,7 @@ import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSolarTrackersForAllCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSolarTrackersForAllCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;

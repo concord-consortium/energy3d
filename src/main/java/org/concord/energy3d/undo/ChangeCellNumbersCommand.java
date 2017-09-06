@@ -8,7 +8,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 
-public class ChangeCellNumbersCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeCellNumbersCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private int oldNx, newNx;

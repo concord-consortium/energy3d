@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Window;
 
-public class ChangeShutterLengthCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeShutterLengthCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;

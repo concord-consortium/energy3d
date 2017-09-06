@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSizeForRacksOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSizeForRacksOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths;

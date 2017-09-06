@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeBackgroundAlbedoCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeBackgroundAlbedoCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;

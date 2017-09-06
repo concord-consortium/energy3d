@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 
-public class ShowSunAnglesCommand extends AbstractUndoableEditWithTimestamp {
+public class ShowSunAnglesCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue, newValue;

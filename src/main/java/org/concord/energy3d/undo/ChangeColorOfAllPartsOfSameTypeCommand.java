@@ -10,7 +10,7 @@ import org.concord.energy3d.scene.Scene;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeColorOfAllPartsOfSameTypeCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeColorOfAllPartsOfSameTypeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final ReadOnlyColorRGBA[] oldColors;

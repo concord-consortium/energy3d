@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSolarPanelSizeForRacksOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSolarPanelSizeForRacksOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths;

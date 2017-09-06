@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationSolarCellPropertiesCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationSolarCellPropertiesCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldEfficiencies;

@@ -8,7 +8,7 @@ import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
-public class ShowShadowCommand extends AbstractUndoableEditWithTimestamp {
+public class ShowShadowCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue, newValue;

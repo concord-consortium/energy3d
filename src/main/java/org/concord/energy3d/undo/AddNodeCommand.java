@@ -11,7 +11,7 @@ import org.concord.energy3d.model.NodeState;
 
 import com.ardor3d.scenegraph.Node;
 
-public class AddNodeCommand extends AbstractUndoableEditWithTimestamp {
+public class AddNodeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Node node;

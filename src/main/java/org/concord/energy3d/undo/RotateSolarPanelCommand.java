@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class RotateSolarPanelCommand extends AbstractUndoableEditWithTimestamp {
+public class RotateSolarPanelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue;

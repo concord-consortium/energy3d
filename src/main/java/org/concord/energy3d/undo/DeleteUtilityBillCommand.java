@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.simulation.UtilityBill;
 
-public class DeleteUtilityBillCommand extends AbstractUndoableEditWithTimestamp {
+public class DeleteUtilityBillCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Foundation foundation;

@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeContainerWindowSizeCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeContainerWindowSizeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths, oldHeights;

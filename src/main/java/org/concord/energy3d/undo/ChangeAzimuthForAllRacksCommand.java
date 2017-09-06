@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeAzimuthForAllRacksCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeAzimuthForAllRacksCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

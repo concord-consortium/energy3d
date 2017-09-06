@@ -8,7 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.SolarPanel;
 
-public class SetShadeToleranceForSolarPanelsOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class SetShadeToleranceForSolarPanelsOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;

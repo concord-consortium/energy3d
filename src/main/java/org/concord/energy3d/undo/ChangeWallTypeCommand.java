@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Wall;
 
-public class ChangeWallTypeCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeWallTypeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;

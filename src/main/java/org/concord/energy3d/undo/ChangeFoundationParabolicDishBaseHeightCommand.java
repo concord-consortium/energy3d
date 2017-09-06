@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationParabolicDishBaseHeightCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationParabolicDishBaseHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

@@ -7,7 +7,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationSizeCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationSizeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldLength, oldWidth, oldHeight;

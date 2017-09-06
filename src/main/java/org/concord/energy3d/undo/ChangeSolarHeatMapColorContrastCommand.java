@@ -7,7 +7,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.Util;
 
-public class ChangeSolarHeatMapColorContrastCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeSolarHeatMapColorContrastCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;

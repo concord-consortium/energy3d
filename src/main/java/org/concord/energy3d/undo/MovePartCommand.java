@@ -19,7 +19,7 @@ import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.math.Vector3;
 
-public class MovePartCommand extends AbstractUndoableEditWithTimestamp {
+public class MovePartCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final HousePart part;

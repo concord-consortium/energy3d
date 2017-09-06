@@ -12,7 +12,7 @@ import org.concord.energy3d.scene.Scene;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeContainerShutterColorCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeContainerShutterColorCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final ReadOnlyColorRGBA[] oldColors;

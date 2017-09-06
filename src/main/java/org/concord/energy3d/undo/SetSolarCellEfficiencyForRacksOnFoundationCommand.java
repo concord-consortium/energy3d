@@ -8,7 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 
-public class SetSolarCellEfficiencyForRacksOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSolarCellEfficiencyForRacksOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

@@ -10,7 +10,7 @@ import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.math.Vector3;
 
-public class EditPartCommand extends AbstractUndoableEditWithTimestamp {
+public class EditPartCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	final HousePart housePart;

@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeTargetForAllMirrorsCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeTargetForAllMirrorsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Foundation[] oldValues;

@@ -11,7 +11,7 @@ import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Window;
 
-public class SetPartSizeCommand extends AbstractUndoableEditWithTimestamp {
+public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldWidth, newWidth;

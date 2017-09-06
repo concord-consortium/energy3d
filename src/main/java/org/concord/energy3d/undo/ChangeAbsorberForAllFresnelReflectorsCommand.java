@@ -10,7 +10,7 @@ import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeAbsorberForAllFresnelReflectorsCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeAbsorberForAllFresnelReflectorsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Foundation[] oldValues;

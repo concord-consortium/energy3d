@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSolarPanelCellTypeForAllRacksCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSolarPanelCellTypeForAllRacksCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldValues;

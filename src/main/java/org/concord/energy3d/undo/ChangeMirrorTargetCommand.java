@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 
-public class ChangeMirrorTargetCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeMirrorTargetCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Foundation oldValue;

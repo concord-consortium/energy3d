@@ -16,7 +16,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class RemovePartCommand extends AbstractUndoableEditWithTimestamp {
+public class RemovePartCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final HousePart housePart;

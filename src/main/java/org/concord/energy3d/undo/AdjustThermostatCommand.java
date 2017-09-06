@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 
-public class AdjustThermostatCommand extends AbstractUndoableEditWithTimestamp {
+public class AdjustThermostatCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[][][] oldTemperatures;

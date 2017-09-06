@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.scene.Scene;
 
-public class RescaleCommand extends AbstractUndoableEditWithTimestamp {
+public class RescaleCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;

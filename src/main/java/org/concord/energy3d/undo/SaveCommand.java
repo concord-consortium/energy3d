@@ -1,6 +1,6 @@
 package org.concord.energy3d.undo;
 
-public class SaveCommand extends AbstractUndoableEditWithTimestamp {
+public class SaveCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private static boolean significant = false;

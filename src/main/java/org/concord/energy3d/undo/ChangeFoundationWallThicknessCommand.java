@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 
-public class ChangeFoundationWallThicknessCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationWallThicknessCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

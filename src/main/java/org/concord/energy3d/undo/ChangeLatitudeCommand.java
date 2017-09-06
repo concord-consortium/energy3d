@@ -7,7 +7,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.Util;
 
-public class ChangeLatitudeCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeLatitudeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;

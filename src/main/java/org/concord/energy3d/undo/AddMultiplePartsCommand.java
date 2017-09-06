@@ -11,7 +11,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 
-public class AddMultiplePartsCommand extends AbstractUndoableEditWithTimestamp {
+public class AddMultiplePartsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final List<HousePart> parts;

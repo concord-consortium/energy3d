@@ -13,7 +13,7 @@ import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeColorOfConnectedWallsCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeColorOfConnectedWallsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final ReadOnlyColorRGBA[] oldColors;

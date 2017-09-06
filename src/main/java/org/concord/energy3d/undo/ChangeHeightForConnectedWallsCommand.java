@@ -11,7 +11,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.WallVisitor;
 
-public class ChangeHeightForConnectedWallsCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeHeightForConnectedWallsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationRackBaseHeightCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationRackBaseHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

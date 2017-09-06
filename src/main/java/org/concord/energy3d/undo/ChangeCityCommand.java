@@ -8,7 +8,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.util.Util;
 
-public class ChangeCityCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeCityCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final String oldValue;

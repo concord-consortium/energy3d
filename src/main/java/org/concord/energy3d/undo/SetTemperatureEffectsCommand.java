@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class SetTemperatureEffectsCommand extends AbstractUndoableEditWithTimestamp {
+public class SetTemperatureEffectsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldPmax;

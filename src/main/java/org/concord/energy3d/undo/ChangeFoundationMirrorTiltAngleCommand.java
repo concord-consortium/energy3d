@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationMirrorTiltAngleCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationMirrorTiltAngleCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

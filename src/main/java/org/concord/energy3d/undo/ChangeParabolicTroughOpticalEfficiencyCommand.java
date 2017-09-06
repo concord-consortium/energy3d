@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.ParabolicTrough;
 
-public class ChangeParabolicTroughOpticalEfficiencyCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeParabolicTroughOpticalEfficiencyCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double oldValue;

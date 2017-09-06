@@ -8,7 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Rack;
 
-public class SetTemperatureCoefficientPmaxForRacksOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class SetTemperatureCoefficientPmaxForRacksOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

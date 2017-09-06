@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 
-public class ChangeTextureCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeTextureCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final TextureMode oldValue;

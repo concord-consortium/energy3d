@@ -11,7 +11,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeFoundationWallHeightCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationWallHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

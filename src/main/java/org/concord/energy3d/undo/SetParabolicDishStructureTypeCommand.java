@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.ParabolicDish;
 
-public class SetParabolicDishStructureTypeCommand extends AbstractUndoableEditWithTimestamp {
+public class SetParabolicDishStructureTypeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;

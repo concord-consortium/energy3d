@@ -7,7 +7,7 @@ import org.concord.energy3d.model.Window;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangeShutterColorCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeShutterColorCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final ReadOnlyColorRGBA oldColor;

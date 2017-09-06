@@ -15,7 +15,7 @@ import org.concord.energy3d.scene.Scene;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 
-public class DeleteMeshCommand extends AbstractUndoableEditWithTimestamp {
+public class DeleteMeshCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Mesh mesh;

@@ -8,7 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.scene.Scene;
 
-public class SetFocalLengthForAllParabolicDishesCommand extends AbstractUndoableEditWithTimestamp {
+public class SetFocalLengthForAllParabolicDishesCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

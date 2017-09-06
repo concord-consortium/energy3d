@@ -10,7 +10,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationSolarPanelCellNumbersCommand extends AbstractUndoableEditWithTimestamp {
+public class ChangeFoundationSolarPanelCellNumbersCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int[] oldNxs;

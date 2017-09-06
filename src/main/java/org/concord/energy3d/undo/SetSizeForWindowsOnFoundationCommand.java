@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSizeForWindowsOnFoundationCommand extends AbstractUndoableEditWithTimestamp {
+public class SetSizeForWindowsOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths;

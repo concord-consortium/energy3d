@@ -8,7 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Window;
 
-public class RemoveMultipleShuttersCommand extends AbstractUndoableEditWithTimestamp {
+public class RemoveMultipleShuttersCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final List<Window> windows;

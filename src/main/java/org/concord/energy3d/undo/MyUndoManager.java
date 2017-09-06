@@ -1,5 +1,7 @@
 package org.concord.energy3d.undo;
 
+import java.util.Vector;
+
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
@@ -51,6 +53,10 @@ public class MyUndoManager extends UndoManager {
 	public void die() {
 		super.die();
 		refreshUndoRedoGui();
+	}
+
+	public Vector<UndoableEdit> getEdits() {
+		return edits;
 	}
 
 	// override to make it public
