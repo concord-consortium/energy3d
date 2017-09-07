@@ -32,6 +32,7 @@ import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -1444,6 +1445,14 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 
 	public boolean getLabelEnergyOutput() {
 		return labelEnergyOutput;
+	}
+
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		addPrintMesh(list, surround);
+		for (final Spatial pole : this.polesRoot.getChildren()) {
+			addPrintMesh(list, (Mesh) pole);
+		}
 	}
 
 }

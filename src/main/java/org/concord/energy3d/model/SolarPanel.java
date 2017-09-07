@@ -1142,4 +1142,10 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		return labelEnergyOutput;
 	}
 
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		addPrintMesh(list, surround);
+		addPrintMesh(list, supportFrame);
+	}
+
 }
