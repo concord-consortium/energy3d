@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -34,7 +35,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 /**
  * Mirror for solar power towers
- * 
+ *
  * @author Charles Xie
  *
  */
@@ -577,6 +578,12 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 	@Override
 	public void setYieldToday(final double yieldToday) {
 		this.yieldToday = yieldToday;
+	}
+
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		addPrintMesh(list, surround);
+		addPrintMesh(list, post);
 	}
 
 }
