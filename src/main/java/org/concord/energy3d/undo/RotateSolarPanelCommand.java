@@ -1,18 +1,18 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.SolarPanel;
 
-public class RotateSolarPanelCommand extends AbstractUndoableEdit {
+public class RotateSolarPanelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private boolean oldValue, newValue;
-	private SolarPanel solarPanel;
+	private final boolean oldValue;
+	private boolean newValue;
+	private final SolarPanel solarPanel;
 
-	public RotateSolarPanelCommand(SolarPanel solarPanel) {
+	public RotateSolarPanelCommand(final SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
 		oldValue = solarPanel.isRotated();
 	}

@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.ArrayList;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -11,7 +10,8 @@ import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.math.Vector3;
 
-public class EditPartCommand extends AbstractUndoableEdit {
+public class EditPartCommand extends MyAbstractUndoableEdit {
+
 	private static final long serialVersionUID = 1L;
 	final HousePart housePart;
 	protected final ArrayList<Vector3> orgPoints;

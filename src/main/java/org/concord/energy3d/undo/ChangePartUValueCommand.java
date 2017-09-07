@@ -1,22 +1,22 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Thermal;
 
-public class ChangePartUValueCommand extends AbstractUndoableEdit {
+public class ChangePartUValueCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private double oldValue, newValue;
-	private HousePart part;
+	private final HousePart part;
 
-	public ChangePartUValueCommand(HousePart part) {
+	public ChangePartUValueCommand(final HousePart part) {
 		this.part = part;
-		if (part instanceof Thermal)
+		if (part instanceof Thermal) {
 			oldValue = ((Thermal) part).getUValue();
+		}
 	}
 
 	public HousePart getPart() {
@@ -39,8 +39,9 @@ public class ChangePartUValueCommand extends AbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		if (part instanceof Thermal)
+		if (part instanceof Thermal) {
 			((Thermal) part).setUValue(newValue);
+		}
 	}
 
 	@Override

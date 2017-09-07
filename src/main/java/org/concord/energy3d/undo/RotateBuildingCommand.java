@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.concurrent.Callable;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -10,13 +9,13 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.scene.SceneManager;
 
-public class RotateBuildingCommand extends AbstractUndoableEdit {
+public class RotateBuildingCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Foundation foundation;
 	private final double rotationAngle;
 
-	public RotateBuildingCommand(final Foundation foundation, double rotationAngle) {
+	public RotateBuildingCommand(final Foundation foundation, final double rotationAngle) {
 		this.foundation = foundation;
 		this.rotationAngle = rotationAngle;
 	}

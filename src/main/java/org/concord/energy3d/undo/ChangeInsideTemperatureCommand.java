@@ -2,24 +2,24 @@ package org.concord.energy3d.undo;
 
 import java.util.Calendar;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.shapes.Heliodon;
 
-public class ChangeInsideTemperatureCommand extends AbstractUndoableEdit {
+public class ChangeInsideTemperatureCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private int orgTemperature, newTemperature;
-	private int monthOfYear;
-	private int dayOfWeek;
-	private int hourOfDay;
-	private Foundation foundation;
+	private final int orgTemperature;
+	private int newTemperature;
+	private final int monthOfYear;
+	private final int dayOfWeek;
+	private final int hourOfDay;
+	private final Foundation foundation;
 
-	public ChangeInsideTemperatureCommand(Foundation foundation) {
-		Calendar c = Heliodon.getInstance().getCalendar();
+	public ChangeInsideTemperatureCommand(final Foundation foundation) {
+		final Calendar c = Heliodon.getInstance().getCalendar();
 		monthOfYear = c.get(Calendar.MONTH);
 		dayOfWeek = c.get(Calendar.DAY_OF_WEEK) - Calendar.SUNDAY;
 		hourOfDay = c.get(Calendar.HOUR_OF_DAY);

@@ -2,7 +2,6 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -10,17 +9,18 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationMirrorBaseHeightCommand extends AbstractUndoableEdit {
+public class ChangeFoundationMirrorBaseHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double[] oldValues, newValues;
-	private Foundation foundation;
-	private List<Mirror> mirrors;
+	private final double[] oldValues;
+	private double[] newValues;
+	private final Foundation foundation;
+	private final List<Mirror> mirrors;
 
-	public ChangeFoundationMirrorBaseHeightCommand(Foundation foundation) {
+	public ChangeFoundationMirrorBaseHeightCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		mirrors = foundation.getMirrors();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			oldValues[i] = mirrors.get(i).getBaseHeight();
@@ -34,10 +34,10 @@ public class ChangeFoundationMirrorBaseHeightCommand extends AbstractUndoableEdi
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		newValues = new double[n];
 		for (int i = 0; i < n; i++) {
-			Mirror m = mirrors.get(i);
+			final Mirror m = mirrors.get(i);
 			newValues[i] = m.getBaseHeight();
 			m.setBaseHeight(oldValues[i]);
 			m.draw();
@@ -48,9 +48,9 @@ public class ChangeFoundationMirrorBaseHeightCommand extends AbstractUndoableEdi
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		int n = mirrors.size();
+		final int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
-			Mirror m = mirrors.get(i);
+			final Mirror m = mirrors.get(i);
 			m.setBaseHeight(newValues[i]);
 			m.draw();
 		}

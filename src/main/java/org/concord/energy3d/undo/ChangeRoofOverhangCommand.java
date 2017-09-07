@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -8,13 +7,14 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
+public class ChangeRoofOverhangCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private double oldValue, newValue;
-	private Roof roof;
+	private final double oldValue;
+	private double newValue;
+	private final Roof roof;
 
-	public ChangeRoofOverhangCommand(Roof roof) {
+	public ChangeRoofOverhangCommand(final Roof roof) {
 		this.roof = roof;
 		oldValue = roof.getOverhangLength();
 	}
@@ -34,7 +34,7 @@ public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
 		roof.setOverhangLength(oldValue);
 		roof.draw();
 		// can't just use Roof.draw() as we also need to draw the wall parts
-		Foundation f = roof.getTopContainer();
+		final Foundation f = roof.getTopContainer();
 		f.drawChildren();
 		SceneManager.getInstance().refresh();
 	}
@@ -45,7 +45,7 @@ public class ChangeRoofOverhangCommand extends AbstractUndoableEdit {
 		roof.setOverhangLength(newValue);
 		roof.draw();
 		// can't just use Roof.draw() as we also need to draw the wall parts
-		Foundation f = roof.getTopContainer();
+		final Foundation f = roof.getTopContainer();
 		f.drawChildren();
 		SceneManager.getInstance().refresh();
 	}

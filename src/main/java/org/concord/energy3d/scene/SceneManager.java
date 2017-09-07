@@ -53,6 +53,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.ShedRoof;
+import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.model.Tree;
@@ -70,7 +71,7 @@ import org.concord.energy3d.undo.EditRackCommand;
 import org.concord.energy3d.undo.MovePartCommand;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
-import org.concord.energy3d.undo.UndoManager;
+import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Config.RenderMode;
@@ -182,7 +183,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private final Mesh gridsMesh;
 	private final Spatial axes;
 	private final LightState lightState = new LightState();
-	private final UndoManager undoManager = new UndoManager();
+	private final MyUndoManager undoManager = new MyUndoManager();
 	private HousePart selectedPart;
 	private HousePart hoveredPart;
 	private Operation operation = Operation.SELECT;
@@ -1679,7 +1680,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
 						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 					} else {
-						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarPanel || hoveredPart instanceof Rack || hoveredPart instanceof Mirror || hoveredPart instanceof ParabolicTrough || hoveredPart instanceof ParabolicDish || hoveredPart instanceof FresnelReflector || hoveredPart instanceof Sensor || hoveredPart instanceof Window)) {
+						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarCollector || hoveredPart instanceof Window)) {
 							canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 						}
 					}
@@ -1749,7 +1750,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		refreshTime = frameHandler.getTimer().getTimeInSeconds() + updateDurationInSeconds;
 	}
 
-	public UndoManager getUndoManager() {
+	public MyUndoManager getUndoManager() {
 		return undoManager;
 	}
 

@@ -3,7 +3,6 @@ package org.concord.energy3d.undo;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -12,7 +11,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeFoundationWallHeightCommand extends AbstractUndoableEdit {
+public class ChangeFoundationWallHeightCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

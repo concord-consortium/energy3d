@@ -2,14 +2,13 @@ package org.concord.energy3d.undo;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 
-public class ChangeReflectanceForAllMirrorsCommand extends AbstractUndoableEdit {
+public class ChangeReflectanceForAllMirrorsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;

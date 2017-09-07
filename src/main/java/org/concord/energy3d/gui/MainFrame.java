@@ -63,8 +63,10 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.agents.ActionHistogram;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.logger.PostProcessor;
@@ -95,7 +97,6 @@ import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.Cost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
-import org.concord.energy3d.simulation.EnergyAngularAnalysis;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
@@ -112,6 +113,7 @@ import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
+import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
@@ -119,6 +121,7 @@ import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
+import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowReflectorLightBeamsCommand;
@@ -194,7 +197,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyFresnelReflectorAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
-	private JMenuItem orientationalEnergyAnalysisMenuItem;
 	private JMenuItem constructionCostAnalysisMenuItem;
 	private JMenuItem monthlySunshineHoursMenuItem;
 	private JMenuItem annualEnvironmentalTemperatureMenuItem;
@@ -1053,8 +1055,7 @@ public class MainFrame extends JFrame {
 
 	private JMenu getHelpMenu() {
 		if (helpMenu == null) {
-			helpMenu = new JMenu();
-			helpMenu.setText("Help");
+			helpMenu = new JMenu("Help");
 			final JMenuItem miUpdate = new JMenuItem("Check Update...");
 			helpMenu.addMenuListener(new MenuListener() {
 
@@ -1089,23 +1090,31 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			JMenuItem mi = new JMenuItem("Download PDF User's Guide...");
-			mi.addActionListener(new ActionListener() {
+			final JMenu vpaMenu = new JMenu("Process Data");
+			helpMenu.add(vpaMenu);
+			helpMenu.addSeparator();
+
+			JMenuItem miVpa = new JMenuItem("View Actions in Histogram");
+			miVpa.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d/Energy3D-Guide.pdf");
+					new ActionHistogram().showGui();
 				}
 			});
-			// helpMenu.add(mi);
-			mi = new JMenuItem("Visit Home Page...");
+			vpaMenu.add(miVpa);
+
+			miVpa = new JMenuItem("View Actions in Vertex-Edge Graph");
+			vpaMenu.add(miVpa);
+
+			JMenuItem mi = new JMenuItem("View Sites...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d");
+					Util.openBrowser("http://energy.concord.org/energy3d/sites.html");
 				}
 			});
 			helpMenu.add(mi);
-			mi = new JMenuItem("View Examples...");
+			mi = new JMenuItem("View House Examples...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1118,6 +1127,16 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Util.openBrowser("http://energy.concord.org/energy3d/models.html");
+				}
+			});
+			helpMenu.add(mi);
+			helpMenu.addSeparator();
+
+			mi = new JMenuItem("Visit Home Page...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Util.openBrowser("http://energy3d.concord.org");
 				}
 			});
 			helpMenu.add(mi);
@@ -1206,7 +1225,7 @@ public class MainFrame extends JFrame {
 					annualEnergyAnalysisForSelectionMenuItem.setEnabled(b);
 					dailyEnergyAnalysisMenuItem.setEnabled(b);
 					dailyEnergyAnalysisForSelectionMenuItem.setEnabled(b);
-					orientationalEnergyAnalysisMenuItem.setEnabled(b);
+					// orientationalEnergyAnalysisMenuItem.setEnabled(b);
 				}
 
 				@Override
@@ -1259,7 +1278,7 @@ public class MainFrame extends JFrame {
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			analysisMenu.add(getAnnualSensorMenuItem());
 			analysisMenu.add(getDailySensorMenuItem());
-			analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
+			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getSimulationSettingsMenuItem());
 		}
@@ -2671,40 +2690,40 @@ public class MainFrame extends JFrame {
 		return showHeatFluxVectorsMenuItem;
 	}
 
-	private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
-		if (orientationalEnergyAnalysisMenuItem == null) {
-			orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientation Analysis...");
-			orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart == null) {
-						int count = 0;
-						HousePart hp = null;
-						for (final HousePart x : Scene.getInstance().getParts()) {
-							if (x instanceof Foundation) {
-								count++;
-								hp = x;
-							}
-						}
-						if (count == 1) {
-							SceneManager.getInstance().setSelectedPart(hp);
-						} else {
-							JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
-							return;
-						}
-					}
-					new EnergyAngularAnalysis().show("Orientation");
-				}
-			});
-		}
-		return orientationalEnergyAnalysisMenuItem;
-	}
+	// private JMenuItem getOrientationalEnergyAnalysisMenuItem() {
+	// if (orientationalEnergyAnalysisMenuItem == null) {
+	// orientationalEnergyAnalysisMenuItem = new JMenuItem("Run Orientation Analysis...");
+	// orientationalEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
+	// @Override
+	// public void actionPerformed(final ActionEvent e) {
+	// final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+	// if ("".equals(city)) {
+	// JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+	// return;
+	// }
+	// final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+	// if (selectedPart == null) {
+	// int count = 0;
+	// HousePart hp = null;
+	// for (final HousePart x : Scene.getInstance().getParts()) {
+	// if (x instanceof Foundation) {
+	// count++;
+	// hp = x;
+	// }
+	// }
+	// if (count == 1) {
+	// SceneManager.getInstance().setSelectedPart(hp);
+	// } else {
+	// JOptionPane.showMessageDialog(MainFrame.this, "You must select a building or a component first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+	// return;
+	// }
+	// }
+	// new EnergyAngularAnalysis().show("Orientation");
+	// }
+	// });
+	// }
+	// return orientationalEnergyAnalysisMenuItem;
+	// }
 
 	private JMenuItem getConstructionCostAnalysisMenuItem() {
 		if (constructionCostAnalysisMenuItem == null) {
@@ -2836,6 +2855,7 @@ public class MainFrame extends JFrame {
 					} else {
 						rescaleMenuItem.setEnabled(selectedPart instanceof Foundation || selectedPart == null);
 					}
+					refreshUndoRedo();
 				}
 			});
 
@@ -2899,10 +2919,22 @@ public class MainFrame extends JFrame {
 	}
 
 	public void refreshUndoRedo() {
-		getUndoMenuItem().setText(SceneManager.getInstance().getUndoManager().getUndoPresentationName());
-		getUndoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canUndo());
-		getRedoMenuItem().setText(SceneManager.getInstance().getUndoManager().getRedoPresentationName());
-		getRedoMenuItem().setEnabled(SceneManager.getInstance().getUndoManager().canRedo());
+		final MyUndoManager um = SceneManager.getInstance().getUndoManager();
+		final UndoableEdit lastEdit = um.lastEdit();
+		long timestampUndo = -1;
+		long timestampRedo = -1;
+		if (lastEdit instanceof MyAbstractUndoableEdit) {
+			if (um.editToBeUndone() != null) {
+				timestampUndo = ((MyAbstractUndoableEdit) um.editToBeUndone()).getTimestamp();
+			}
+			if (um.editToBeRedone() != null) {
+				timestampRedo = ((MyAbstractUndoableEdit) um.editToBeRedone()).getTimestamp();
+			}
+		}
+		getUndoMenuItem().setText(um.getUndoPresentationName() + (timestampUndo == -1 ? "" : " (" + EnergyPanel.ONE_DECIMAL.format(0.001 * (System.currentTimeMillis() - timestampUndo)) + " seconds ago)"));
+		getUndoMenuItem().setEnabled(um.canUndo());
+		getRedoMenuItem().setText(um.getRedoPresentationName() + (timestampRedo == -1 ? "" : " (" + EnergyPanel.ONE_DECIMAL.format(0.001 * (System.currentTimeMillis() - timestampRedo)) + " seconds ago)"));
+		getRedoMenuItem().setEnabled(um.canRedo());
 	}
 
 	private JMenuItem getUndoMenuItem() {

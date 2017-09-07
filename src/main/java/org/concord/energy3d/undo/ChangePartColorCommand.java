@@ -1,6 +1,5 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -8,13 +7,14 @@ import org.concord.energy3d.model.HousePart;
 
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
-public class ChangePartColorCommand extends AbstractUndoableEdit {
+public class ChangePartColorCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private ReadOnlyColorRGBA oldColor, newColor;
-	private HousePart part;
+	private final ReadOnlyColorRGBA oldColor;
+	private ReadOnlyColorRGBA newColor;
+	private final HousePart part;
 
-	public ChangePartColorCommand(HousePart part) {
+	public ChangePartColorCommand(final HousePart part) {
 		this.part = part;
 		oldColor = part.getColor();
 	}

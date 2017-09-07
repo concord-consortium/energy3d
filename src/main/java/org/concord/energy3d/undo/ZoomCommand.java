@@ -1,17 +1,16 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.scene.SceneManager;
 
-public class ZoomCommand extends AbstractUndoableEdit {
+public class ZoomCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private boolean value;
+	private final boolean value;
 
-	public ZoomCommand(boolean value) {
+	public ZoomCommand(final boolean value) {
 		this.value = value;
 	}
 

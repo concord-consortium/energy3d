@@ -26,7 +26,7 @@ public final class LocationData {
 
 		final Map<String, String> data = new HashMap<String, String>();
 		InputStream is = null;
-		final int cut = 29;
+		final int cut = 35;
 		try {
 			is = getClass().getResourceAsStream("cities/data.txt");
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(is));

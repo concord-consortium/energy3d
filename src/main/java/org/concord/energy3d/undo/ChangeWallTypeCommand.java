@@ -1,18 +1,18 @@
 package org.concord.energy3d.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Wall;
 
-public class ChangeWallTypeCommand extends AbstractUndoableEdit {
+public class ChangeWallTypeCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private int oldValue, newValue;
-	private Wall wall;
+	private final int oldValue;
+	private int newValue;
+	private final Wall wall;
 
-	public ChangeWallTypeCommand(Wall wall) {
+	public ChangeWallTypeCommand(final Wall wall) {
 		this.wall = wall;
 		oldValue = wall.getType();
 	}
