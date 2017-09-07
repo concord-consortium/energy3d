@@ -113,7 +113,6 @@ import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.UtilityBill;
-import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
@@ -121,6 +120,7 @@ import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
+import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
@@ -3083,7 +3083,7 @@ public class MainFrame extends JFrame {
 	}
 
 	void importColladaFile() {
-		final File file = FileChooser.getInstance().showDialog("", objFilter, false);
+		final File file = FileChooser.getInstance().showDialog(".dae", daeFilter, false);
 		if (file != null) {
 			EnergyPanel.getInstance().clearRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3101,7 +3101,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void exportObjFile() {
-		final File file = FileChooser.getInstance().showDialog("", objFilter, true);
+		final File file = FileChooser.getInstance().showDialog(".obj", objFilter, true);
 		if (file != null) {
 			EnergyPanel.getInstance().clearRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {

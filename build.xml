@@ -6,12 +6,12 @@
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
-	<property name="jdk" value="jdk1.8.0_131" />
+	<property name="jdk" value="jdk1.8.0_144" />
 	
 	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\${jdk}\">
 		<os family="windows" />
 	</condition>
-	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_101.jdk/Contents/Home">
+	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home">
 		<os family="mac" />
 	</condition>
 	<condition property="JAVA_HOME" value="">

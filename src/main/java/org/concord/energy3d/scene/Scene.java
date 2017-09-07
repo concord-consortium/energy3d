@@ -626,8 +626,8 @@ public class Scene implements Serializable {
 				}
 				mesh.updateModelBound();
 			}
-			new ObjExporter().save(objs, new File(file.toString() + ".obj"), new File(file.toString() + ".mtl"), null);
-
+			final String s = file.toString();
+			new ObjExporter().save(objs, new File(s), new File(s.substring(0, s.lastIndexOf(".")) + ".mtl"), null);
 		} catch (final Throwable t) {
 			Util.reportError(t);
 		}
