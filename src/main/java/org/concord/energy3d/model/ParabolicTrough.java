@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -33,6 +34,7 @@ import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Cylinder;
 import com.ardor3d.ui.text.BMText;
@@ -974,6 +976,20 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 
 	public int getNSectionAxis() {
 		return nSectionAxis;
+	}
+
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		addPrintMesh(list, reflectorBack);
+		addPrintMesh(list, absorber);
+		addPrintMesh(list, absorberCore);
+		addPrintMesh(list, absorberEnd1);
+		addPrintMesh(list, absorberEnd1Core);
+		addPrintMesh(list, absorberEnd2);
+		addPrintMesh(list, absorberEnd2Core);
+		for (final Spatial mesh : modulesRoot.getChildren()) {
+			addPrintMesh(list, (Mesh) mesh);
+		}
 	}
 
 }
