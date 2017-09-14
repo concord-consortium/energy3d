@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -30,6 +31,7 @@ import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.scenegraph.shape.Box;
 import com.ardor3d.scenegraph.shape.Cylinder;
@@ -848,6 +850,14 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 
 	public int getNSectionWidth() {
 		return nSectionWidth;
+	}
+
+	@Override
+	public void addPrintMeshes(final List<Mesh> list) {
+		addPrintMesh(list, reflector);
+		for (final Spatial mesh : modulesRoot.getChildren()) {
+			addPrintMesh(list, (Mesh) mesh);
+		}
 	}
 
 }
