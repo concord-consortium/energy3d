@@ -1090,23 +1090,36 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			final JMenu vpaMenu = new JMenu("Process Data");
-			helpMenu.add(vpaMenu);
+			// User data and models
+
+			final JMenu userMenu = new JMenu("User Modeling");
+			helpMenu.add(userMenu);
 			helpMenu.addSeparator();
 
-			JMenuItem miVpa = new JMenuItem("View Actions in Histogram");
-			miVpa.addActionListener(new ActionListener() {
+			final JMenu userDataMenu = new JMenu("Data");
+			userMenu.add(userDataMenu);
+
+			JMenuItem mi = new JMenuItem("Histogram");
+			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					new ActionHistogram().showGui();
 				}
 			});
-			vpaMenu.add(miVpa);
+			userDataMenu.add(mi);
 
-			miVpa = new JMenuItem("View Actions in Vertex-Edge Graph");
-			vpaMenu.add(miVpa);
+			final JMenu userModelMenu = new JMenu("Model");
+			userMenu.add(userModelMenu);
 
-			JMenuItem mi = new JMenuItem("View Sites...");
+			mi = new JMenuItem("Multinormial");
+			userModelMenu.add(mi);
+
+			mi = new JMenuItem("Markov");
+			userModelMenu.add(mi);
+
+			// Energy3D web pages
+
+			mi = new JMenuItem("View Sites...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
