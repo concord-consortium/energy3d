@@ -431,7 +431,7 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeAzimuthCommand) {
 					final ChangeAzimuthCommand c = (ChangeAzimuthCommand) lastEdit;
 					final HousePart p = c.getPart();
-					stateValue = "{\"Foundation\": " + p.getTopContainer().getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
+					stateValue = "{\"Foundation\": " + (p instanceof Foundation ? (Foundation) p : p.getTopContainer()).getId() + ", \"ID\": " + p.getId() + ", \"Old Value\": " + c.getOldValue() + ", \"New Value\": " + c.getNewValue() + "}";
 				} else if (lastEdit instanceof ChangeBaseHeightCommand) {
 					final ChangeBaseHeightCommand c = (ChangeBaseHeightCommand) lastEdit;
 					final SolarCollector s = c.getPart();
