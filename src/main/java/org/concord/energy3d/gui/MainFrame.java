@@ -1447,10 +1447,17 @@ public class MainFrame extends JFrame {
 			addModel(solarBasicsMenu, "Nominal Operating Cell Temperature", "tutorials/solar-panel-noct.ng3");
 			addModel(solarBasicsMenu, "Solar Trackers", "tutorials/solar-trackers.ng3");
 
-			final JMenu designBasicsMenu = new JMenu("Engineering Design Basics");
-			tutorialsMenu.add(designBasicsMenu);
-			addModel(designBasicsMenu, "Single-Variable, Single-Objective Optimization", "tutorials/guided-design-single-variable-single-objective.ng3");
-			// addModel(designBasicsMenu, "Multi-Objective Optimization", "tutorials/guided-design-yield-area-vs-yield-cost.ng3");
+			tutorialsMenu.addSeparator();
+
+			final JMenu inquiryMethodMenu = new JMenu("Methods of Scientific Inquiry");
+			tutorialsMenu.add(inquiryMethodMenu);
+			addModel(inquiryMethodMenu, "Passive Solar Investigation", "tutorials/guided-inquiry-passive-solar.ng3");
+
+			final JMenu designMethodMenu = new JMenu("Methods of Engineering Design");
+			tutorialsMenu.add(designMethodMenu);
+			addModel(designMethodMenu, "Single-Variable, Single-Objective Optimization", "tutorials/guided-design-single-variable-single-objective.ng3");
+
+			tutorialsMenu.addSeparator();
 
 			final JMenu pvMenu = new JMenu("Photovoltaic Solar Power");
 			tutorialsMenu.add(pvMenu);
