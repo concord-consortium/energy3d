@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
@@ -69,9 +70,9 @@ import org.concord.energy3d.undo.EditParabolicTroughCommand;
 import org.concord.energy3d.undo.EditPartCommand;
 import org.concord.energy3d.undo.EditRackCommand;
 import org.concord.energy3d.undo.MovePartCommand;
+import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
-import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.util.Blinker;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Config.RenderMode;
@@ -232,6 +233,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public static SceneManager getInstance() {
 		return instance;
+	}
+
+	public static boolean isTaskManagerThread() {
+		return MainApplication.isSceneManagerThread();
 	}
 
 	public static GameTaskQueueManager getTaskManager() {

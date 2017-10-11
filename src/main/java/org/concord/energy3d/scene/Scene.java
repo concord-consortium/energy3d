@@ -3280,86 +3280,110 @@ public class Scene implements Serializable {
 
 	// XIE: This needs to be called for trees to change texture when the month changes
 	public void updateTreeLeaves() {
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				for (final HousePart p : parts) {
-					if (p instanceof Tree) {
-						p.updateTextureAndColor();
-					}
+		if (SceneManager.isTaskManagerThread()) {
+			updateTreeLeavesImmediately();
+		} else {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					updateTreeLeavesImmediately();
+					return null;
 				}
-				return null;
+			});
+		}
+	}
+
+	private void updateTreeLeavesImmediately() {
+		for (final HousePart p : parts) {
+			if (p instanceof Tree) {
+				p.updateTextureAndColor();
 			}
-		});
+		}
 	}
 
 	public void updateLabels() {
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				for (final HousePart p : parts) { // update the parts that support floating labels
-					if (p instanceof Labelable) {
-						((Labelable) p).updateLabel();
-					}
+		if (SceneManager.isTaskManagerThread()) {
+			updateLablesImmediately();
+		} else {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					updateLablesImmediately();
+					return null;
 				}
-				return null;
+			});
+		}
+	}
+
+	private void updateLablesImmediately() {
+		for (final HousePart p : parts) { // update the parts that support floating labels
+			if (p instanceof Labelable) {
+				((Labelable) p).updateLabel();
 			}
-		});
+		}
 	}
 
 	public void updateTrackables() {
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				final boolean night = Heliodon.getInstance().isNightTime();
-				for (final HousePart part : parts) {
-					if (part instanceof Mirror) {
-						final Mirror mirror = (Mirror) part;
-						if (night) {
-							mirror.drawLightBeams(); // call this so that the light beams can be set invisible
-						} else {
-							mirror.draw();
-						}
-					} else if (part instanceof ParabolicTrough) {
-						final ParabolicTrough trough = (ParabolicTrough) part;
-						if (night) {
-							trough.drawLightBeams(); // call this so that the light beams can be set invisible
-						} else {
-							trough.draw();
-						}
-					} else if (part instanceof ParabolicDish) {
-						final ParabolicDish dish = (ParabolicDish) part;
-						if (night) {
-							dish.drawLightBeams(); // call this so that the light beams can be set invisible
-						} else {
-							dish.draw();
-						}
-					} else if (part instanceof FresnelReflector) {
-						final FresnelReflector fresnel = (FresnelReflector) part;
-						if (night) {
-							fresnel.drawLightBeams(); // call this so that the light beams can be set invisible
-						} else {
-							fresnel.draw();
-						}
-					} else if (part instanceof SolarPanel) {
-						final SolarPanel panel = (SolarPanel) part;
-						if (night) {
-							panel.drawSunBeam(); // call this so that the sun beam can be set invisible
-						} else {
-							panel.draw();
-						}
-					} else if (part instanceof Rack) {
-						final Rack rack = (Rack) part;
-						if (night) {
-							rack.drawSunBeam(); // call this so that the sun beam can be set invisible
-						} else {
-							rack.draw();
-						}
-					}
+		if (SceneManager.isTaskManagerThread()) {
+			updateTrackablesImmediately();
+		} else {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					updateTrackablesImmediately();
+					return null;
 				}
-				return null;
+			});
+		}
+	}
+
+	private void updateTrackablesImmediately() {
+		final boolean night = Heliodon.getInstance().isNightTime();
+		for (final HousePart part : parts) {
+			if (part instanceof Mirror) {
+				final Mirror mirror = (Mirror) part;
+				if (night) {
+					mirror.drawLightBeams(); // call this so that the light beams can be set invisible
+				} else {
+					mirror.draw();
+				}
+			} else if (part instanceof ParabolicTrough) {
+				final ParabolicTrough trough = (ParabolicTrough) part;
+				if (night) {
+					trough.drawLightBeams(); // call this so that the light beams can be set invisible
+				} else {
+					trough.draw();
+				}
+			} else if (part instanceof ParabolicDish) {
+				final ParabolicDish dish = (ParabolicDish) part;
+				if (night) {
+					dish.drawLightBeams(); // call this so that the light beams can be set invisible
+				} else {
+					dish.draw();
+				}
+			} else if (part instanceof FresnelReflector) {
+				final FresnelReflector fresnel = (FresnelReflector) part;
+				if (night) {
+					fresnel.drawLightBeams(); // call this so that the light beams can be set invisible
+				} else {
+					fresnel.draw();
+				}
+			} else if (part instanceof SolarPanel) {
+				final SolarPanel panel = (SolarPanel) part;
+				if (night) {
+					panel.drawSunBeam(); // call this so that the sun beam can be set invisible
+				} else {
+					panel.draw();
+				}
+			} else if (part instanceof Rack) {
+				final Rack rack = (Rack) part;
+				if (night) {
+					rack.drawSunBeam(); // call this so that the sun beam can be set invisible
+				} else {
+					rack.draw();
+				}
 			}
-		});
+		}
 	}
 
 	public Ground getGround() {

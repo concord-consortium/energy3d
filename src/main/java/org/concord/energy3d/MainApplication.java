@@ -413,6 +413,10 @@ public class MainApplication {
 		return sb.toString();
 	}
 
+	public static boolean isSceneManagerThread() {
+		return Thread.currentThread() == sceneManagerThread;
+	}
+
 	public static boolean isSceneManagerThreadAlive() {
 		return sceneManagerThread.isAlive();
 	}
