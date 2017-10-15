@@ -682,6 +682,10 @@ public class Scene implements Serializable {
 			} else if (p.getContainer() == null) { // remove orphan parts without a container
 				if (p instanceof Wall || p instanceof Roof || p instanceof Window || p instanceof Door || p instanceof SolarCollector || p instanceof Floor) {
 					toBeRemoved.add(p);
+				} else if (p instanceof Foundation) {
+					if (!p.isDrawable()) { // sometimes we can get invisible foundations that have only six points (not sure how this could happen)
+						toBeRemoved.add(p);
+					}
 				}
 			} else if (!parts.contains(p.getContainer())) { // remove parts whose container doesn't exist in the scene
 				toBeRemoved.add(p);
@@ -1278,6 +1282,7 @@ public class Scene implements Serializable {
 				}
 				add(c, true);
 				copyBuffer = c;
+				SceneManager.getInstance().setSelectedPart(c);
 				SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 			}
 		}

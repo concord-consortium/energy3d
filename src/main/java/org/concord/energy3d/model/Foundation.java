@@ -608,8 +608,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	private void syncUpperPoints() {
-		for (int i = 0; i < 4; i++) {
-			points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
+		if (points.size() >= 8) {
+			for (int i = 0; i < 4; i++) {
+				points.get(i + 4).set(points.get(i)).setZ(Math.max(height, newBoundingHeight + height));
+			}
 		}
 	}
 
@@ -1736,6 +1738,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		} else {
 			area = 0.0;
 		}
+	}
+
+	@Override
+	public boolean isDrawable() {
+		if (points.size() < 8) {
+			return false;
+		}
+		return super.isDrawable();
 	}
 
 	@Override
