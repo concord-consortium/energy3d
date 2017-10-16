@@ -3770,4 +3770,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
+	@Override
+	public boolean isValid() {
+		if (!super.isValid()) {
+			return false;
+		}
+		return super.isDrawable();
+	}
+
 }

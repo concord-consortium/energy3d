@@ -904,7 +904,7 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public boolean isValid() {
-		// if (!isDrawable())
+		// if (!isDrawable()) // The call to isDrawable() is moved to sub classes to avoid Wall/Window infinite calls
 		// return false;
 		for (final ReadOnlyVector3 p : points) {
 			if (!Vector3.isValid(p)) {
