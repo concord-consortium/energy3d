@@ -86,6 +86,12 @@ public class HipRoof extends Roof {
 		} else {
 			applyHeight();
 		}
+		// remove extra points that are sometimes added due to unknown reason
+		final int numOfEditPoints = 3;
+		while (points.size() > numOfEditPoints) {
+			points.remove(numOfEditPoints);
+			pointsRoot.detachChildAt(numOfEditPoints);
+		}
 	}
 
 	private Vector3 findFarthestIntersection(final List<? extends ReadOnlyVector3> wallUpperPoints, final ReadOnlyVector3 center, final Vector3 p) {

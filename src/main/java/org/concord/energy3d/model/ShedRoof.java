@@ -29,6 +29,12 @@ public class ShedRoof extends HipRoof {
 		} else {
 			applyHeight();
 		}
+		// remove extra points that are sometimes added due to unknown reason
+		final int numOfEditPoints = 3;
+		while (points.size() > numOfEditPoints) {
+			points.remove(numOfEditPoints);
+			pointsRoot.detachChildAt(numOfEditPoints);
+		}
 	}
 
 }
