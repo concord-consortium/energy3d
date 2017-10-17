@@ -152,7 +152,7 @@ public class MeshLib {
 		if (a == b) {
 			return true;
 		}
-		return a.dot(b) > 0.99;
+		return a.dot(b) > 0.999;
 	}
 
 	public static void createMeshes(final Node root, final ArrayList<GroupData> groups) {
