@@ -7,9 +7,19 @@
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
 	<property name="jdk" value="jdk1.8.0_144" />
+	<property name="bit64" value="false" />
 	
 	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\${jdk}\">
-		<os family="windows" />
+		<and>
+			<os family="windows" />
+			<isfalse value="${bit64}" />
+		</and>
+	</condition>
+	<condition property="JAVA_HOME" value="C:\Program Files\Java\${jdk}\">
+		<and>
+			<os family="windows" />
+			<istrue value="${bit64}" />
+		</and>
 	</condition>
 	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home">
 		<os family="mac" />
@@ -49,7 +59,16 @@
 	</condition>	
 
 	<condition property="os" value="windows-32">
-		<os family="windows" />
+		<and>
+			<os family="windows" />
+			<isfalse value="${bit64}" />
+		</and>
+	</condition>
+	<condition property="os" value="windows-64">
+		<and>
+			<os family="windows" />
+			<istrue value="${bit64}" />
+		</and>
 	</condition>
 	<condition property="os" value="mac-universal">
 		<os family="mac" />
