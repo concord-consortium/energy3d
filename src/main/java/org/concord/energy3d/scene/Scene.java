@@ -852,7 +852,7 @@ public class Scene implements Serializable {
 		instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 		instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
 
-		if (setAsCurrentFile) {
+		if (setAsCurrentFile || Scene.url == null) {
 			Scene.url = url;
 		}
 		System.out.print("Saving " + url + "...");

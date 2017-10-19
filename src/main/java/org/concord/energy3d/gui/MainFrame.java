@@ -1554,10 +1554,9 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getZoomInMenuItem());
 			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
-			viewMenu.add(weatherMenu);
-			viewMenu.add(getTextureMenu());
-			viewMenu.add(getThemeMenu());
 			viewMenu.add(getGroundImageMenu());
+			viewMenu.add(weatherMenu);
+			viewMenu.add(getVisualizationSettingsMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(solarHeatMapMenu);
@@ -1566,8 +1565,9 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getDisableShadowInActionMenuItem());
 			viewMenu.add(getSunAnglesMenuItem());
 			viewMenu.add(getLightBeamsMenuItem());
-			viewMenu.add(getVisualizationSettingsMenuItem());
 			viewMenu.addSeparator();
+			viewMenu.add(getTextureMenu());
+			viewMenu.add(getThemeMenu());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getRoofDashedLineMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
@@ -3063,6 +3063,25 @@ public class MainFrame extends JFrame {
 
 	}
 
+	private void save() {
+		try {
+			final URL url = Scene.getURL();
+			if (url != null) {
+				if (Scene.isInternalFile()) {
+					saveFile(true);
+				} else {
+					Scene.saveOutsideTaskManager(url);
+				}
+			} else {
+				saveFile(true);
+			}
+			Scene.getInstance().setEdited(false);
+		} catch (final Throwable err) {
+			err.printStackTrace();
+			JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
 	private void saveFile(final boolean outsideTaskManager) {
 		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, true);
 		if (file == null) {
@@ -3706,25 +3725,6 @@ public class MainFrame extends JFrame {
 			}
 		} else {
 			MainApplication.exit();
-		}
-	}
-
-	private void save() {
-		try {
-			final URL url = Scene.getURL();
-			if (url != null) {
-				if (Scene.isInternalFile()) {
-					saveFile(true);
-				} else {
-					Scene.saveOutsideTaskManager(url);
-				}
-			} else {
-				saveFile(true);
-			}
-			Scene.getInstance().setEdited(false);
-		} catch (final Throwable err) {
-			err.printStackTrace();
-			JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
