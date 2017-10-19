@@ -3643,13 +3643,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				for (int i = 0; i < n; i++) {
 					ni = importedNodes.get(i);
 					if (root.getChildren().contains(ni)) {
-						final Vector3 vi = matrix.applyPost(importedNodeStates.get(i).getRelativePosition(), null);
-						ni.setTranslation(c.add(vi, null));
-						ni.setRotation(matrix);
-						for (final Spatial s : ni.getChildren()) {
-							if (s instanceof Mesh) {
-								final Mesh m = (Mesh) s;
-								m.updateModelBound();
+						final Vector3 relativePosition = importedNodeStates.get(i).getRelativePosition();
+						if (relativePosition != null) {
+							final Vector3 vi = matrix.applyPost(relativePosition, null);
+							ni.setTranslation(c.add(vi, null));
+							ni.setRotation(matrix);
+							for (final Spatial s : ni.getChildren()) {
+								if (s instanceof Mesh) {
+									final Mesh m = (Mesh) s;
+									m.updateModelBound();
+								}
 							}
 						}
 					}

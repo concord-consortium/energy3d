@@ -236,9 +236,12 @@ public abstract class CameraControl {
 			if (loc.length() > SceneManager.SKY_RADIUS) {
 				return;
 			}
-			camera.setLocation(loc);
-			if (this instanceof OrbitControl) {
-				((OrbitControl) this).computeNewFrontDistance();
+			// camera cannot be set below ground when zooming. This has a side effect of not being able to zoom when the camera is already rotated underground, but it is probably OK.
+			if (loc.getZ() >= 0) {
+				camera.setLocation(loc);
+				if (this instanceof OrbitControl) {
+					((OrbitControl) this).computeNewFrontDistance();
+				}
 			}
 		}
 		SceneManager.getInstance().getCameraNode().updateFromCamera();
