@@ -1268,7 +1268,6 @@ public class MainFrame extends JFrame {
 
 			final JMenu buildingsMenu = new JMenu("Buildings");
 			analysisMenu.add(buildingsMenu);
-			analysisMenu.addSeparator();
 			buildingsMenu.add(getDailyEnergyAnalysisMenuItem());
 			buildingsMenu.add(getAnnualEnergyAnalysisMenuItem());
 			buildingsMenu.addSeparator();
@@ -1277,45 +1276,42 @@ public class MainFrame extends JFrame {
 
 			final JMenu solarPanelsMenu = new JMenu("Solar Panels");
 			analysisMenu.add(solarPanelsMenu);
-			analysisMenu.addSeparator();
 			solarPanelsMenu.add(getDailyPvAnalysisMenuItem());
 			solarPanelsMenu.add(getAnnualPvAnalysisMenuItem());
 
-			final JMenu heliostatsMenu = new JMenu("Heliostats");
+			final JMenu heliostatsMenu = new JMenu("Heliostats (Mirrors)");
 			analysisMenu.add(heliostatsMenu);
-			analysisMenu.addSeparator();
 			heliostatsMenu.add(getDailyMirrorAnalysisMenuItem());
 			heliostatsMenu.add(getAnnualMirrorAnalysisMenuItem());
 
-			final JMenu parabolicTroughsMenu = new JMenu("Paraoblic Troughs");
+			final JMenu parabolicTroughsMenu = new JMenu("Parabolic Troughs");
 			analysisMenu.add(parabolicTroughsMenu);
-			analysisMenu.addSeparator();
 			parabolicTroughsMenu.add(getDailyParabolicTroughAnalysisMenuItem());
 			parabolicTroughsMenu.add(getAnnualParabolicTroughAnalysisMenuItem());
 
-			final JMenu parabolicDishesMenu = new JMenu("Paraoblic Dishes");
+			final JMenu parabolicDishesMenu = new JMenu("Parabolic Dishes");
 			analysisMenu.add(parabolicDishesMenu);
-			analysisMenu.addSeparator();
 			parabolicDishesMenu.add(getDailyParabolicDishAnalysisMenuItem());
 			parabolicDishesMenu.add(getAnnualParabolicDishAnalysisMenuItem());
 
 			final JMenu fresnelReflectorsMenu = new JMenu("Linear Fresnel Reflectors");
 			analysisMenu.add(fresnelReflectorsMenu);
-			analysisMenu.addSeparator();
 			fresnelReflectorsMenu.add(getDailyFresnelReflectorAnalysisMenuItem());
 			fresnelReflectorsMenu.add(getAnnualFresnelReflectorAnalysisMenuItem());
 
 			final JMenu sensorsMenu = new JMenu("Sensors");
 			analysisMenu.add(sensorsMenu);
-			analysisMenu.addSeparator();
 			sensorsMenu.add(getDailySensorMenuItem());
 			sensorsMenu.add(getAnnualSensorMenuItem());
 
+			analysisMenu.addSeparator();
+
 			final JMenu groupMenu = new JMenu("Group");
 			analysisMenu.add(groupMenu);
-			analysisMenu.addSeparator();
 			groupMenu.add(getGroupDailyAnalysisMenuItem());
 			groupMenu.add(getGroupAnnualAnalysisMenuItem());
+
+			analysisMenu.addSeparator();
 
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
