@@ -1265,32 +1265,59 @@ public class MainFrame extends JFrame {
 					enableEnergyAnalysis(!Scene.getInstance().getOnlySolarAnalysis());
 				}
 			});
-			analysisMenu.add(getAnnualEnergyAnalysisMenuItem());
-			analysisMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
-			analysisMenu.add(getDailyEnergyAnalysisMenuItem());
-			analysisMenu.add(getDailyEnergyAnalysisForSelectionMenuItem());
+
+			final JMenu buildingsMenu = new JMenu("Buildings");
+			analysisMenu.add(buildingsMenu);
 			analysisMenu.addSeparator();
-			analysisMenu.add(getAnnualPvAnalysisMenuItem());
-			analysisMenu.add(getDailyPvAnalysisMenuItem());
+			buildingsMenu.add(getDailyEnergyAnalysisMenuItem());
+			buildingsMenu.add(getAnnualEnergyAnalysisMenuItem());
+			buildingsMenu.addSeparator();
+			buildingsMenu.add(getDailyEnergyAnalysisForSelectionMenuItem());
+			buildingsMenu.add(getAnnualEnergyAnalysisForSelectionMenuItem());
+
+			final JMenu solarPanelsMenu = new JMenu("Solar Panels");
+			analysisMenu.add(solarPanelsMenu);
 			analysisMenu.addSeparator();
-			analysisMenu.add(getAnnualMirrorAnalysisMenuItem());
-			analysisMenu.add(getDailyMirrorAnalysisMenuItem());
+			solarPanelsMenu.add(getDailyPvAnalysisMenuItem());
+			solarPanelsMenu.add(getAnnualPvAnalysisMenuItem());
+
+			final JMenu heliostatsMenu = new JMenu("Heliostats");
+			analysisMenu.add(heliostatsMenu);
 			analysisMenu.addSeparator();
-			analysisMenu.add(getAnnualParabolicTroughAnalysisMenuItem());
-			analysisMenu.add(getDailyParabolicTroughAnalysisMenuItem());
+			heliostatsMenu.add(getDailyMirrorAnalysisMenuItem());
+			heliostatsMenu.add(getAnnualMirrorAnalysisMenuItem());
+
+			final JMenu parabolicTroughsMenu = new JMenu("Paraoblic Troughs");
+			analysisMenu.add(parabolicTroughsMenu);
 			analysisMenu.addSeparator();
-			analysisMenu.add(getAnnualParabolicDishAnalysisMenuItem());
-			analysisMenu.add(getDailyParabolicDishAnalysisMenuItem());
+			parabolicTroughsMenu.add(getDailyParabolicTroughAnalysisMenuItem());
+			parabolicTroughsMenu.add(getAnnualParabolicTroughAnalysisMenuItem());
+
+			final JMenu parabolicDishesMenu = new JMenu("Paraoblic Dishes");
+			analysisMenu.add(parabolicDishesMenu);
 			analysisMenu.addSeparator();
-			analysisMenu.add(getAnnualFresnelReflectorAnalysisMenuItem());
-			analysisMenu.add(getDailyFresnelReflectorAnalysisMenuItem());
+			parabolicDishesMenu.add(getDailyParabolicDishAnalysisMenuItem());
+			parabolicDishesMenu.add(getAnnualParabolicDishAnalysisMenuItem());
+
+			final JMenu fresnelReflectorsMenu = new JMenu("Linear Fresnel Reflectors");
+			analysisMenu.add(fresnelReflectorsMenu);
 			analysisMenu.addSeparator();
-			analysisMenu.add(getGroupAnnualAnalysisMenuItem());
-			analysisMenu.add(getGroupDailyAnalysisMenuItem());
+			fresnelReflectorsMenu.add(getDailyFresnelReflectorAnalysisMenuItem());
+			fresnelReflectorsMenu.add(getAnnualFresnelReflectorAnalysisMenuItem());
+
+			final JMenu sensorsMenu = new JMenu("Sensors");
+			analysisMenu.add(sensorsMenu);
 			analysisMenu.addSeparator();
+			sensorsMenu.add(getDailySensorMenuItem());
+			sensorsMenu.add(getAnnualSensorMenuItem());
+
+			final JMenu groupMenu = new JMenu("Group");
+			analysisMenu.add(groupMenu);
+			analysisMenu.addSeparator();
+			groupMenu.add(getGroupDailyAnalysisMenuItem());
+			groupMenu.add(getGroupAnnualAnalysisMenuItem());
+
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
-			analysisMenu.add(getAnnualSensorMenuItem());
-			analysisMenu.add(getDailySensorMenuItem());
 			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 			analysisMenu.addSeparator();
 			analysisMenu.add(getSimulationSettingsMenuItem());
@@ -1554,9 +1581,9 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getZoomInMenuItem());
 			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
+			viewMenu.add(getVisualizationSettingsMenuItem());
 			viewMenu.add(getGroundImageMenu());
 			viewMenu.add(weatherMenu);
-			viewMenu.add(getVisualizationSettingsMenuItem());
 			viewMenu.addSeparator();
 			viewMenu.add(getSolarRadiationHeatMapMenuItem());
 			viewMenu.add(solarHeatMapMenu);
@@ -1566,12 +1593,12 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getSunAnglesMenuItem());
 			viewMenu.add(getLightBeamsMenuItem());
 			viewMenu.addSeparator();
-			viewMenu.add(getTextureMenu());
-			viewMenu.add(getThemeMenu());
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getRoofDashedLineMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
 			// viewMenu.add(getWallThicknessMenuItem());
+			viewMenu.add(getTextureMenu());
+			viewMenu.add(getThemeMenu());
 			viewMenu.addSeparator();
 			viewMenu.add(getInfoPanelCheckBoxMenuItem());
 			viewMenu.add(getNoteCheckBoxMenuItem());
@@ -2109,7 +2136,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getDailyMirrorAnalysisMenuItem() {
 		if (dailyMirrorAnalysisMenuItem == null) {
-			dailyMirrorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Mirrors (Heliostats)...");
+			dailyMirrorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Heliostats (Mirrors)...");
 			dailyMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2152,7 +2179,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualMirrorAnalysisMenuItem() {
 		if (annualMirrorAnalysisMenuItem == null) {
-			annualMirrorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Mirrors (Heliostats)...");
+			annualMirrorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Heliostats (Mirrors)...");
 			annualMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2579,7 +2606,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getAnnualSensorMenuItem() {
 		if (annualSensorMenuItem == null) {
-			annualSensorMenuItem = new JMenuItem("Collect Annual Sensor Data...");
+			annualSensorMenuItem = new JMenuItem("Annual Sensor Data...");
 			annualSensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2596,7 +2623,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getDailySensorMenuItem() {
 		if (dailySensorMenuItem == null) {
-			dailySensorMenuItem = new JMenuItem("Collect Daily Sensor Data...");
+			dailySensorMenuItem = new JMenuItem("Daily Sensor Data...");
 			dailySensorMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
