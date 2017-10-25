@@ -1266,6 +1266,9 @@ public class MainFrame extends JFrame {
 				}
 			});
 
+			analysisMenu.add(getSimulationSettingsMenuItem());
+			analysisMenu.addSeparator();
+
 			final JMenu buildingsMenu = new JMenu("Buildings");
 			analysisMenu.add(buildingsMenu);
 			buildingsMenu.add(getDailyEnergyAnalysisMenuItem());
@@ -1315,8 +1318,6 @@ public class MainFrame extends JFrame {
 
 			analysisMenu.add(getConstructionCostAnalysisMenuItem());
 			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
-			analysisMenu.addSeparator();
-			analysisMenu.add(getSimulationSettingsMenuItem());
 		}
 		return analysisMenu;
 	}

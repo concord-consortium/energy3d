@@ -1295,7 +1295,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						} else {
 							Scene.getInstance().remove(selectedPart, false);
 						}
-						selectedPart = null;
+						if (operation != Operation.RESIZE) { // need to keep selectedPart when resizing
+							selectedPart = null;
+						}
 					}
 					return null;
 				}
@@ -1309,9 +1311,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public void executeOperation() {
 		operationFlag = false;
-		for (final HousePart part : Scene.getInstance().getParts()) {
-			if (part instanceof Foundation) {
-				((Foundation) part).setResizeHouseMode(operation == Operation.RESIZE);
+		if (operation == Operation.RESIZE) {
+			if (selectedPart instanceof Foundation) {
+				((Foundation) selectedPart).setResizeHouseMode(true);
+			}
+		} else {
+			for (final HousePart part : Scene.getInstance().getParts()) {
+				if (part instanceof Foundation) {
+					((Foundation) part).setResizeHouseMode(false);
+				}
 			}
 		}
 
@@ -1903,9 +1911,28 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								cameraControl.setLeftMouseButtonEnabled(false);
 							}
 
+							if (operation == Operation.RESIZE) {
+								for (final HousePart p : Scene.getInstance().getParts()) {
+									if (p instanceof Foundation && p != selectedPart) {
+										((Foundation) p).setResizeHouseMode(false);
+									}
+								}
+								if (selectedPart != null) {
+									if (selectedPart instanceof Foundation) {
+										final Foundation foundation = (Foundation) selectedPart;
+										foundation.setResizeHouseMode(true);
+									} else {
+										final Foundation foundation = selectedPart.getTopContainer();
+										foundation.setResizeHouseMode(true);
+										setSelectedPart(foundation);
+									}
+								}
+							}
+
 							if (operation == Operation.SELECT || operation == Operation.ROTATE) {
 								if (previousSelectedPart instanceof Foundation) {
-									((Foundation) previousSelectedPart).updateAzimuthArrowVisibility(false);
+									final Foundation foundation = (Foundation) previousSelectedPart;
+									foundation.updateAzimuthArrowVisibility(false);
 								}
 								if (selectedPart instanceof Foundation) {
 									final Foundation foundation = (Foundation) selectedPart;
