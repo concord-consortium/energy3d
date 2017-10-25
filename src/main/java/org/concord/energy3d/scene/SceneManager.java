@@ -1913,8 +1913,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 							if (operation == Operation.RESIZE) {
 								for (final HousePart p : Scene.getInstance().getParts()) {
-									if (p instanceof Foundation && p != selectedPart) {
-										((Foundation) p).setResizeHouseMode(false);
+									if (p instanceof Foundation) {
+										if (p != selectedPart) {
+											((Foundation) p).setResizeHouseMode(false);
+										}
 									}
 								}
 								if (selectedPart != null) {
@@ -1990,16 +1992,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (previousSelectedPart != null && previousSelectedPart != selectedPart && operation != Operation.RESIZE) {
 								previousSelectedPart.setEditPointsVisible(false);
 								previousSelectedPart.setGridsVisible(false);
-								if (previousSelectedPart != null) {
-									final Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
-									if (foundationOfPreviousSelectedPart != null) {
-										if (selectedPart == null) {
-											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
-										} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
-											foundationOfPreviousSelectedPart.setMovePointsVisible(false);
-										}
-										foundationOfPreviousSelectedPart.clearSelectedMesh();
+								final Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
+								if (foundationOfPreviousSelectedPart != null) {
+									if (selectedPart == null) {
+										foundationOfPreviousSelectedPart.setMovePointsVisible(false);
+									} else if (foundationOfPreviousSelectedPart != (selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer())) {
+										foundationOfPreviousSelectedPart.setMovePointsVisible(false);
 									}
+									foundationOfPreviousSelectedPart.clearSelectedMesh();
+									foundationOfPreviousSelectedPart.setResizeHouseMode(false);
 								}
 							}
 							if (selectedPart != null && !PrintController.getInstance().isPrintPreview()) {

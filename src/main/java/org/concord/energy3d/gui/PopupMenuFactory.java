@@ -3671,8 +3671,8 @@ public class PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miHeight = new JMenuItem("Size...");
-			miHeight.addActionListener(new ActionListener() {
+			final JMenuItem miSize = new JMenuItem("Size...");
+			miSize.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -3762,11 +3762,33 @@ public class PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miResize = new JMenuItem("Resize Structure Above");
+			miResize.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final Foundation f = (Foundation) selectedPart;
+					if (f.getChildren().isEmpty()) {
+						return;
+					}
+					for (final HousePart p : Scene.getInstance().getParts()) {
+						if (p instanceof Foundation) {
+							if (p != f) {
+								((Foundation) p).setResizeHouseMode(false);
+							}
+						}
+					}
+					f.setResizeHouseMode(true);
+				}
+			});
+
 			final JMenu labelMenu = new JMenu("Label");
 
 			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
 			miLabelNone.addActionListener(new ActionListener() {
-
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (miLabelNone.isSelected()) {
@@ -3994,6 +4016,14 @@ public class PopupMenuFactory {
 						default:
 							Util.selectSilently(rbmiTypeAutoDetected, true);
 						}
+						miResize.setEnabled(!f.getChildren().isEmpty());
+						for (final HousePart x : Scene.getInstance().getParts()) {
+							if (x instanceof Foundation) {
+								if (x != f) {
+									((Foundation) x).setResizeHouseMode(false);
+								}
+							}
+						}
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					final Node copyNode = Scene.getInstance().getCopyNode();
@@ -4005,7 +4035,8 @@ public class PopupMenuFactory {
 			popupMenuForFoundation.add(miCopy);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miImportCollada);
-			popupMenuForFoundation.add(miHeight);
+			popupMenuForFoundation.add(miResize);
+			popupMenuForFoundation.add(miSize);
 			popupMenuForFoundation.add(miRescale);
 			popupMenuForFoundation.add(rotateMenu);
 			popupMenuForFoundation.add(clearMenu);
