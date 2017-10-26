@@ -1925,8 +1925,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										foundation.setResizeHouseMode(true);
 									} else {
 										final Foundation foundation = selectedPart.getTopContainer();
-										foundation.setResizeHouseMode(true);
-										setSelectedPart(foundation);
+										if (foundation != null) {
+											foundation.setResizeHouseMode(true);
+											setSelectedPart(foundation);
+										}
 									}
 								}
 							}

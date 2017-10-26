@@ -1197,7 +1197,7 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable world</i></h3><br>Version: " + MainApplication.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Laboratory of Engineering Computation, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Saeid Nourian, developer of 3D user interface and graphics<li>Dr. Charles Xie, developer of simulation and analysis engines</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054.</html>"), BorderLayout.CENTER);
+			p.add(new JLabel("<html><h1>Energy3D</h1><h3><i>Learning to build a sustainable world</i></h3><br>Version: " + MainApplication.VERSION + ", Copyright 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Engineering Computation Laboratory, Concord Consortium<hr><h3>Credit:</h3>This program is brought to you by:<ul><li>Dr. Charles Xie (Principal Investigator)<li>Dr. Saeid Nourian (Former Contributor)</ul><p>This program is based on Ardor3D and JOGL and provided to you under the MIT License.<br>Funding of this program is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and General Motors<br>through grant 34871079. Any opinions, findings, and conclusions or recommendations<br>expressed in the materials associated with this program are those of the author(s) and<br>do not necessarily reflect the views of the funders, however.</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
 				@Override
@@ -3095,11 +3095,11 @@ public class MainFrame extends JFrame {
 					saveFile(true);
 				} else {
 					Scene.saveOutsideTaskManager(url);
+					Scene.getInstance().setEdited(false);
 				}
 			} else {
 				saveFile(true);
 			}
-			Scene.getInstance().setEdited(false);
 		} catch (final Throwable err) {
 			err.printStackTrace();
 			JOptionPane.showMessageDialog(this, err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -3123,6 +3123,7 @@ public class MainFrame extends JFrame {
 		} else {
 			Scene.save(url, true);
 		}
+		Scene.getInstance().setEdited(false);
 		updateTitleBar();
 		FileChooser.getInstance().rememberFile(file.getAbsolutePath());
 	}

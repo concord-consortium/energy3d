@@ -112,7 +112,7 @@ public class Scene implements Serializable {
 	private TextureMode textureMode = TextureMode.None;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
-	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1, 0, 0.5f);
+	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1.0f, 0.5f, 0.5f);
 	private ReadOnlyColorRGBA foundationColor;
 	private ReadOnlyColorRGBA wallColor;
 	private ReadOnlyColorRGBA doorColor;
@@ -852,7 +852,7 @@ public class Scene implements Serializable {
 		instance.note = MainPanel.getInstance().getNoteTextArea().getText().trim();
 		instance.solarContrast = EnergyPanel.getInstance().getColorMapSlider().getValue();
 
-		if (setAsCurrentFile || Scene.url == null) {
+		if (setAsCurrentFile || (!logger && Scene.url == null)) {
 			Scene.url = url;
 		}
 		System.out.print("Saving " + url + "...");
