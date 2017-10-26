@@ -6,6 +6,8 @@ import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -14,6 +16,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -87,6 +90,15 @@ public class Util {
 			return true;
 		}
 		return false;
+	}
+
+	public static BufferedImage resizeImage(final BufferedImage bi, final int newW, final int newH) {
+		final Image tmp = bi.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+		final BufferedImage bi2 = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+		final Graphics2D g2d = bi2.createGraphics();
+		g2d.drawImage(tmp, 0, 0, null);
+		g2d.dispose();
+		return bi2;
 	}
 
 	public static double[][] cloneArray(final double[][] src) {

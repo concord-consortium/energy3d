@@ -3568,7 +3568,7 @@ public class Scene implements Serializable {
 	}
 
 	public void setGroundImage(final BufferedImage groundImage, final double groundImageScale) {
-		this.groundImage = groundImage;
+		this.groundImage = Util.resizeImage(groundImage, 640, 640); // TODO: Google Maps's current size is 1280 x 1280, but it was 640 x 640 before. This is a quick fix. Let's catch up later.
 		this.groundImageScale = groundImageScale;
 		applyGroundImage();
 	}
