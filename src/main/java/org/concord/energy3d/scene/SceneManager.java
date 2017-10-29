@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -1327,13 +1328,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			Scene.getInstance().drawResizeBounds();
 		}
 
-		selectedPart = newHousePart();
+		selectedPart = newPart();
 		if (selectedPart != null) {
 			cameraControl.setLeftMouseButtonEnabled(false);
 		}
 	}
 
-	private HousePart newHousePart() {
+	private HousePart newPart() {
 		final HousePart drawn;
 		setGridsVisible(false);
 		if (operation == Operation.DRAW_WALL) {
@@ -1431,6 +1432,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public Operation getOperation() {
 		return operation;
+	}
+
+	public boolean isOperationAddTree() {
+		return operation == Operation.DRAW_DOGWOOD || operation == Operation.DRAW_COTTONWOOD || operation == Operation.DRAW_ELM || operation == Operation.DRAW_LINDEN || operation == Operation.DRAW_OAK || operation == Operation.DRAW_MAPLE || operation == Operation.DRAW_PINE;
 	}
 
 	public void setShading(final boolean enable) {
@@ -2069,8 +2074,19 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								}
 							}
 							if (editPartCommand != null) {
-								if (editPartCommand.isReallyEdited()) {
-									undoManager.addEdit(editPartCommand);
+								if (isTooFar(selectedPart)) {
+									editPartCommand.undo();
+									final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
+									EventQueue.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Moving " + name + " was not allowed because it was moved too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
+										}
+									});
+								} else {
+									if (editPartCommand.isReallyEdited()) {
+										undoManager.addEdit(editPartCommand);
+									}
 								}
 								editPartCommand = null;
 							}
@@ -2107,7 +2123,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (selectedPart.isDrawable()) {
 								selectedPart.setDrawCompleted(drawCompletedOrg);
 								if (addPartCommand != null) {
-									undoManager.addEdit(addPartCommand);
+									if (isTooFar(selectedPart)) { // prevent an object to be placed at a very far position
+										Scene.getInstance().remove(selectedPart, true);
+										final String name = selectedPart.getClass().getSimpleName() + " (" + selectedPart.getId() + ")";
+										EventQueue.invokeLater(new Runnable() {
+											@Override
+											public void run() {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Adding " + name + " was not allowed because it was placed too far from the center.", "Illegal position", JOptionPane.WARNING_MESSAGE);
+											}
+										});
+									} else {
+										undoManager.addEdit(addPartCommand);
+									}
 								}
 								addPartCommand = null;
 							} else {
@@ -2144,6 +2171,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		});
 		EnergyPanel.getInstance().updateGraphs();
+
+	}
+
+	private boolean isTooFar(final HousePart p) {
+		final double rc = p.getAbsCenter().length();
+		final Rectangle2D bounds = Scene.getInstance().getFoundationBounds(true);
+		double rmax = 4 * SKY_RADIUS / 10000;
+		if (bounds != null) {
+			rmax = 2 * (bounds.getWidth() + bounds.getHeight());
+		}
+		return rc > rmax;
 	}
 
 	public void grabOrRelease() {

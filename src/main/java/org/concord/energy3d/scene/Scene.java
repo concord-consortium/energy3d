@@ -1,6 +1,7 @@
 package org.concord.energy3d.scene;
 
 import java.awt.EventQueue;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -3674,6 +3675,50 @@ public class Scene implements Serializable {
 			}
 		}
 		return list;
+	}
+
+	public Rectangle2D getFoundationBounds(final boolean excludeSelectedPart) {
+		Rectangle2D bounds = null;
+		if (excludeSelectedPart) {
+			for (final HousePart p : parts) {
+				if (p instanceof Foundation && p != SceneManager.getInstance().getSelectedPart()) {
+					final Foundation f = (Foundation) p;
+					final Vector3 v0 = f.getAbsPoint(0);
+					final Vector3 v1 = f.getAbsPoint(1);
+					final Vector3 v2 = f.getAbsPoint(2);
+					final Vector3 v3 = f.getAbsPoint(3);
+					final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX());
+					final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double lx = v0.distance(v2);
+					final double ly = v0.distance(v1);
+					if (bounds == null) {
+						bounds = new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly);
+					} else {
+						bounds = bounds.createUnion(new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly));
+					}
+				}
+			}
+		} else {
+			for (final HousePart p : parts) {
+				if (p instanceof Foundation) {
+					final Foundation f = (Foundation) p;
+					final Vector3 v0 = f.getAbsPoint(0);
+					final Vector3 v1 = f.getAbsPoint(1);
+					final Vector3 v2 = f.getAbsPoint(2);
+					final Vector3 v3 = f.getAbsPoint(3);
+					final double cx = 0.25 * (v0.getX() + v1.getX() + v2.getX() + v3.getX());
+					final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double lx = v0.distance(v2);
+					final double ly = v0.distance(v1);
+					if (bounds == null) {
+						bounds = new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly);
+					} else {
+						bounds = bounds.createUnion(new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly));
+					}
+				}
+			}
+		}
+		return bounds;
 	}
 
 	public List<Foundation> getFoundationGroup(final Foundation master) {
