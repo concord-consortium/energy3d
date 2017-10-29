@@ -57,15 +57,15 @@ class MapDialog extends JDialog {
 	private MapLoader mapLoader;
 
 	class MapLoader extends SwingWorker<BufferedImage, Void> {
-		private final boolean highResolution;
+		private final boolean export;
 		private final String googleMapUrl;
 
-		public MapLoader(final boolean highResolution) {
+		public MapLoader(final boolean export) {
 			if (mapLoader != null) {
 				mapLoader.cancel(true);
 			}
-			this.highResolution = highResolution;
-			googleMapUrl = MapImageView.getGoogleMapUrl("satellite", highResolution, (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue());
+			this.export = export;
+			googleMapUrl = MapImageView.getGoogleMapUrl("satellite", (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue());
 			mapImageView.setText("Loading...");
 			mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
@@ -80,7 +80,7 @@ class MapDialog extends JDialog {
 		protected void done() {
 			try {
 				final BufferedImage mapImage = get();
-				if (highResolution) {
+				if (export) {
 					final double lat = (Double) latitudeSpinner.getValue();
 					final double lon = (Double) longitudeSpinner.getValue();
 					Scene.getInstance().setGeoLocation(lat, lon, (Integer) zoomSpinner.getValue(), addressField.getText());
