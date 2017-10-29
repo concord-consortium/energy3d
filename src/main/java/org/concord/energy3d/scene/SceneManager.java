@@ -1785,7 +1785,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	// The image that Google Maps API returns is 640x640. That image needs to be rescaled in such a way that one meter wall in a Google Map is exactly same length as one meter in Energy3D.
 	// I had to use trial-and-error to find the correct scale factor, which is roughly 68.75 for Boston, MA, but this factor varies with latitude as Google Maps use the mercator projection.
-	private final static double MERCATOR_PROJECTION_SCALE_CONSTANT = 68.75 / Math.cos(Heliodon.DEFAULT_LATITUDE * Math.PI / 180.0);
+	private final static double MERCATOR_PROJECTION_SCALE_CONSTANT = 68.75 / Math.cos(Math.toRadians(Heliodon.DEFAULT_LATITUDE));
 
 	private void initGroundImageLand(final double scale) {
 		final double d = 68.75 / 0.2 * scale; // 0.2 is the obsolete annotation scale by default, can't call Scene.getAnnotationScale() yet
@@ -1800,7 +1800,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void resizeGroundImageLand(final double scale) {
-		final double d = MERCATOR_PROJECTION_SCALE_CONSTANT * Math.cos(Heliodon.getInstance().getLatitude()) * scale / Scene.getInstance().getAnnotationScale();
+		final double lat = Math.toRadians(Scene.getInstance().getGeoLocation().getLatitude());
+		final double d = MERCATOR_PROJECTION_SCALE_CONSTANT * Math.cos(lat) * scale / Scene.getInstance().getAnnotationScale();
 		groundImageLand.resize(d, d);
 		groundImageLand.updateModelBound();
 		groundImageLand.updateWorldBound(true);

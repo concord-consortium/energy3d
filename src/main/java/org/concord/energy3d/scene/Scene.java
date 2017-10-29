@@ -135,7 +135,7 @@ public class Scene implements Serializable {
 	private String note;
 	private long idCounter;
 	private int version = currentVersion;
-	private int latitude;
+	private int latitude; // Legacy: Do NOT use this in the calculation -- use geoLocation.getLatitude() instead
 	private int solarContrast;
 	private int theme;
 	private double annotationScale = 0.2;

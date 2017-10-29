@@ -876,7 +876,11 @@ public class EnergyPanel extends JPanel {
 
 	public void setLatitude(final int latitude) {
 		Util.setSilently(latitudeSpinner, latitude);
-		Heliodon.getInstance().setLatitude(Math.toRadians(latitude));
+		if (Scene.getInstance().getGeoLocation() == null) {
+			Heliodon.getInstance().setLatitude(Math.toRadians(latitude));
+		} else {
+			Heliodon.getInstance().setLatitude(Math.toRadians(Scene.getInstance().getGeoLocation().getLatitude()));
+		}
 	}
 
 	public JSlider getColorMapSlider() {
