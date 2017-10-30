@@ -21,12 +21,13 @@ public class PvModuleSpecs {
 	private float impp; // A
 	private float voc; // V
 	private float isc; // A
-	private float noct; // % / degree C
+	private float pmaxTc; // % / degree C
+	private float noct; // degree C
 	private float weight; // kg
 
 	@Override
 	public String toString() {
-		return brand + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", " + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + noct + ", " + weight;
+		return brand + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", " + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + pmaxTc + ", " + noct + ", " + weight;
 	}
 
 	public PvModuleSpecs(final String model) {
@@ -131,6 +132,14 @@ public class PvModuleSpecs {
 
 	public float getIsc() {
 		return isc;
+	}
+
+	public void setPmaxTc(final float pmaxTc) {
+		this.pmaxTc = pmaxTc;
+	}
+
+	public float getPmaxTc() {
+		return pmaxTc;
 	}
 
 	public void setNoct(final float noct) {

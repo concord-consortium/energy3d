@@ -372,6 +372,7 @@ public class Scene implements Serializable {
 
 		setTheme(theme);
 		SceneManager.getInstance().getLand().setDefaultColor(landColor != null ? landColor : new ColorRGBA(0, 1, 0, 0.5f));
+		PvModulesData.getInstance();
 
 		final EnergyPanel energyPanel = EnergyPanel.getInstance();
 		if (calendar != null) {
@@ -398,7 +399,6 @@ public class Scene implements Serializable {
 			} else {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), city + " not supported. Please upgrade your Energy3D to the latest.", "Missing City", JOptionPane.ERROR_MESSAGE);
 			}
-			final PvModulesData pvModules = PvModulesData.getInstance();
 			Scene.getInstance().updateTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();

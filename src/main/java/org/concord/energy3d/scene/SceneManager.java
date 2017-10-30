@@ -2179,7 +2179,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		final Rectangle2D bounds = Scene.getInstance().getFoundationBounds(true);
 		double rmax = 4 * SKY_RADIUS / 10000;
 		if (!Util.isZero(bounds.getWidth() - 0.2) || !Util.isZero(bounds.getHeight() - 0.2)) {
-			rmax = 5 * (bounds.getWidth() + bounds.getHeight());
+			final double b = 5 * (bounds.getWidth() + bounds.getHeight());
+			if (b > rmax) {
+				rmax = b;
+			}
 		}
 		return rc > rmax;
 	}

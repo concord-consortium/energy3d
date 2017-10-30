@@ -6,11 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public final class PvModulesData {
 
 	private static final PvModulesData instance = new PvModulesData();
-	private final Map<String, PvModuleSpecs> modules = new HashMap<String, PvModuleSpecs>();
+	private final Map<String, PvModuleSpecs> modules = new TreeMap<String, PvModuleSpecs>();
 
 	public static PvModulesData getInstance() {
 		return instance;
@@ -59,10 +60,15 @@ public final class PvModulesData {
 			module.setImpp(Float.parseFloat(t[10].trim()));
 			module.setVoc(Float.parseFloat(t[11].trim()));
 			module.setIsc(Float.parseFloat(t[12].trim()));
-			module.setNoct(Float.parseFloat(t[13].trim()));
-			module.setWeight(Float.parseFloat(t[14].trim()));
+			module.setPmaxTc(Float.parseFloat(t[13].trim()));
+			module.setNoct(Float.parseFloat(t[14].trim()));
+			module.setWeight(Float.parseFloat(t[15].trim()));
 		}
 
+	}
+
+	public Map<String, PvModuleSpecs> getModules() {
+		return modules;
 	}
 
 	public PvModuleSpecs getModuleSpecs(final String model) {
