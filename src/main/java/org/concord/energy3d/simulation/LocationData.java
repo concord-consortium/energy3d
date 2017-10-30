@@ -28,7 +28,7 @@ public final class LocationData {
 		InputStream is = null;
 		final int cut = 35;
 		try {
-			is = getClass().getResourceAsStream("cities/data.txt");
+			is = getClass().getResourceAsStream("data/cities.txt");
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 			String line;
 			while ((line = reader.readLine()) != null) {

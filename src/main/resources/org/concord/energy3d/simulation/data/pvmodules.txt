@@ -1,0 +1,2 @@
+Model               Brand        Cell_Type          Efficiency   Length   Width   Thickness  Nx    Ny   Pmax    Vmpp    Impp    Voc    Isc    NOCT     Weight  
+SPR-X21-345         SunPower     Monocrystalline    21.5         1558     1046    46         12    8    345     57.3    6.02    68.2   6.39   -0.29    18.6    

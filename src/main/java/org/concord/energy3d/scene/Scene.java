@@ -60,6 +60,7 @@ import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.PvCustomPrice;
 import org.concord.energy3d.simulation.PvDesignSpecs;
+import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddNodeCommand;
@@ -397,6 +398,7 @@ public class Scene implements Serializable {
 			} else {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), city + " not supported. Please upgrade your Energy3D to the latest.", "Missing City", JOptionPane.ERROR_MESSAGE);
 			}
+			final PvModulesData pvModules = PvModulesData.getInstance();
 			Scene.getInstance().updateTreeLeaves();
 			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
 			Heliodon.getInstance().drawSun();
