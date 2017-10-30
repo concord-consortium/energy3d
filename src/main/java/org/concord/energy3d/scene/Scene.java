@@ -3680,7 +3680,7 @@ public class Scene implements Serializable {
 	}
 
 	public Rectangle2D getFoundationBounds(final boolean excludeSelectedPart) {
-		Rectangle2D bounds = null;
+		Rectangle2D bounds = new Rectangle2D.Double(-0.1, -0.1, 0.2, 0.2);
 		if (excludeSelectedPart) {
 			for (final HousePart p : parts) {
 				if (p instanceof Foundation && p != SceneManager.getInstance().getSelectedPart()) {
@@ -3693,11 +3693,7 @@ public class Scene implements Serializable {
 					final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY());
 					final double lx = v0.distance(v2);
 					final double ly = v0.distance(v1);
-					if (bounds == null) {
-						bounds = new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly);
-					} else {
-						bounds = bounds.createUnion(new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly));
-					}
+					bounds = bounds.createUnion(new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly));
 				}
 			}
 		} else {
@@ -3712,11 +3708,7 @@ public class Scene implements Serializable {
 					final double cy = 0.25 * (v0.getY() + v1.getY() + v2.getY() + v3.getY());
 					final double lx = v0.distance(v2);
 					final double ly = v0.distance(v1);
-					if (bounds == null) {
-						bounds = new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly);
-					} else {
-						bounds = bounds.createUnion(new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly));
-					}
+					bounds = bounds.createUnion(new Rectangle2D.Double(cx - lx * 0.5, cy - ly * 0.5, lx, ly));
 				}
 			}
 		}
