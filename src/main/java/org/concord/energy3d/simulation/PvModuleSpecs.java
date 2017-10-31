@@ -34,7 +34,7 @@ public class PvModuleSpecs {
 		this.model = model;
 	}
 
-	public String getMode() {
+	public String getModel() {
 		return model;
 	}
 

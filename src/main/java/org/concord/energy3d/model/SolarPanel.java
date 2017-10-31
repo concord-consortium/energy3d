@@ -70,6 +70,8 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	private static double normalVectorLength = 5;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
+	private String modelName;
+	private String brandName;
 	private double efficiency = 0.15; // a number in (0, 1)
 	private double temperatureCoefficientPmax = -0.005;
 	private double nominalOperatingCellTemperature = 48;
@@ -898,6 +900,22 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	/** a number between 0 and 1, typically 0.95 */
 	public double getInverterEfficiency() {
 		return inverterEfficiency;
+	}
+
+	public void setModelName(final String modelName) {
+		this.modelName = modelName;
+	}
+
+	public String getModelName() {
+		return modelName;
+	}
+
+	public void setBrandName(final String brandName) {
+		this.brandName = brandName;
+	}
+
+	public String getBrandName() {
+		return brandName;
 	}
 
 	public void setPanelWidth(final double panelWidth) {

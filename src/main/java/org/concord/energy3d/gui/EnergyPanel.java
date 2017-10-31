@@ -1037,11 +1037,13 @@ public class EnergyPanel extends JPanel {
 								} else {
 									if (rack.isMonolithic()) {
 										final int[] rnc = rack.getSolarPanelRowAndColumnNumbers();
-										partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + rack.getSolarPanel().getPanelWidth() + "\u00D7" + rack.getSolarPanel().getPanelHeight() + lengthUnit + ", " + eff);
+										final SolarPanel s = rack.getSolarPanel();
+										final String modelName = s.getModelName() == null ? "" : s.getModelName();
+										partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + modelName + ": " + s.getPanelWidth() + "\u00D7" + s.getPanelHeight() + lengthUnit + ", " + eff);
 									} else {
 										partProperty3TextField.setText("" + n);
 									}
-									partProperty3TextField.setToolTipText("Number of solar panels on this rack");
+									partProperty3TextField.setToolTipText("Number and type of solar panels on this rack");
 								}
 							}
 						});
