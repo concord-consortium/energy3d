@@ -376,13 +376,8 @@ public abstract class PopupMenuFactory {
 
 				}
 
-				while (true)
-
-				{
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)
-
-					{
-
+				while (true) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Input: " + partInfo, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
 						final String newValue = siField.getText();
 						try {
 							final double val = Double.parseDouble(newValue);
@@ -474,7 +469,15 @@ public abstract class PopupMenuFactory {
 					return;
 				}
 				final String s = selectedPart.toString();
-				miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+				if (selectedPart instanceof SolarPanel) {
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+				} else if (selectedPart instanceof Rack) {
+					final SolarPanel sp = ((Rack) selectedPart).getSolarPanel();
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+				} else {
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+				}
 				if (runWhenBecomingVisible != null) {
 					runWhenBecomingVisible.run();
 				}

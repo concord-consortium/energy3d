@@ -10,24 +10,24 @@ import java.io.Serializable;
 public class PvModuleSpecs implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private String model;
-	private String brand;
-	private String cellType; // monocrystalline, polycrystalline, thin-film
-	private double cellEfficiency; // %
-	private int length; // mm
-	private int width; // mm
-	private int nominalLength; // mm (Energy3D-specific GUI thing)
-	private int nominalWidth; // mm (Energy3D-specific GUI thing)
-	private int thickness; // mm
-	private Dimension layout; // cell layout
-	private double pmax; // Maximum Power Point (W)
-	private double vmpp; // Voltage at Maximum Power Point (V)
-	private double impp; // Current at Maximum Power Point (A)
-	private double voc; // Voltage at Open Circuit (V). The output Voltage of a PV under no load.
-	private double isc; // Current under short-circuit conditions (A). Used for calculating wire size and circuit protection ratings.
-	private double pmaxTc; // Temperature Coefficient of Pmax (% / degree C)
-	private double noct; // Nominal operating cell temperature (degree C)
-	private double weight; // kg
+	private String model = "Custom";
+	private String brand = "Custom";
+	private String cellType = "Monocrystalline"; // monocrystalline, polycrystalline, thin film
+	private double cellEfficiency = 0.1833; // peak solar cell efficiency (0-1, not %)
+	private int length = 1650; // mm
+	private int width = 990; // mm
+	private int nominalLength = 1650; // mm (Energy3D-specific GUI thing)
+	private int nominalWidth = 990; // mm (Energy3D-specific GUI thing)
+	private int thickness = 40; // mm
+	private Dimension layout = new Dimension(10, 6); // cell layout
+	private double pmax = 300; // Maximum Power Point (W)
+	private double vmpp = 32.6; // Voltage at Maximum Power Point (V)
+	private double impp = 9.21; // Current at Maximum Power Point (A)
+	private double voc = 40.1; // Voltage at Open Circuit (V). The output Voltage of a PV under no load.
+	private double isc = 9.72; // Current under short-circuit conditions (A). Used for calculating wire size and circuit protection ratings.
+	private double pmaxTc = -0.0039; // Temperature Coefficient of Pmax (0-1, not % / degree C)
+	private double noct = 45; // Nominal operating cell temperature (degree C)
+	private double weight = 19; // kg
 
 	@Override
 	public String toString() {

@@ -14,6 +14,7 @@ import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
@@ -180,6 +181,9 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			sampleSolarPanel = new SolarPanel();
 		}
 		// ugly fixes for zero initial values when sampleSolarPanel is previously serialized without new variables
+		if (sampleSolarPanel.getPvModuleSpecs() == null) {
+			sampleSolarPanel.setPvModuleSpecs(new PvModuleSpecs());
+		}
 		if (Util.isZero(sampleSolarPanel.getNominalOperatingCellTemperature())) {
 			sampleSolarPanel.setNominalOperatingCellTemperature(48);
 		}

@@ -975,7 +975,7 @@ public class EnergyPanel extends JPanel {
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								String title = "Solar Panel (" + sp.getId() + ")";
+								String title = "Solar Panel (" + sp.getId() + "), " + (sp.getModelName() == null ? "" : "Model: " + sp.getModelName());
 								final String trackerName = sp.getTrackerName();
 								if (trackerName != null) {
 									title += ", Tracker: " + trackerName;
@@ -1016,6 +1016,10 @@ public class EnergyPanel extends JPanel {
 							@Override
 							public void run() {
 								String title = "Rack (" + rack.getId() + ")";
+								final SolarPanel s = rack.getSolarPanel();
+								if (s.getModelName() != null) {
+									title += ", Model: " + s.getModelName();
+								}
 								final String trackerName = rack.getTrackerName();
 								if (trackerName != null) {
 									title += ", Tracker: " + trackerName;
@@ -1037,9 +1041,7 @@ public class EnergyPanel extends JPanel {
 								} else {
 									if (rack.isMonolithic()) {
 										final int[] rnc = rack.getSolarPanelRowAndColumnNumbers();
-										final SolarPanel s = rack.getSolarPanel();
-										final String modelName = s.getModelName() == null ? "" : s.getModelName();
-										partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + modelName + ": " + s.getPanelWidth() + "\u00D7" + s.getPanelHeight() + lengthUnit + ", " + eff);
+										partProperty3TextField.setText("" + n + " (" + rnc[0] + "\u00D7" + rnc[1] + "), " + s.getPanelWidth() + "\u00D7" + s.getPanelHeight() + lengthUnit + ", " + eff);
 									} else {
 										partProperty3TextField.setText("" + n);
 									}

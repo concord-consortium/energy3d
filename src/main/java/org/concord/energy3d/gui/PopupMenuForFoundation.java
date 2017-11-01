@@ -510,13 +510,15 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Size:"));
-						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
+						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)", "0.6m \u00D7 1.2m (10 \u00D7 20 cells)" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
-						} else if (Util.isZero(1.046 - solarPanelWidth) && Util.isZero(1.558 - solarPanelHeight)) {
+						} else if (Util.isZero(1.05 - solarPanelWidth) && Util.isZero(1.56 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(1);
-						} else {
+						} else if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.96 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(2);
+						} else if (Util.isZero(0.6 - solarPanelWidth) && Util.isZero(1.2 - solarPanelHeight)) {
+							sizeComboBox.setSelectedIndex(3);
 						}
 						panel.add(sizeComboBox);
 
@@ -607,11 +609,17 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										numberOfCellsInX = 8;
 										numberOfCellsInY = 12;
 										break;
-									default:
+									case 2:
 										solarPanelWidth = 0.99;
 										solarPanelHeight = 1.96;
 										numberOfCellsInX = 6;
 										numberOfCellsInY = 12;
+										break;
+									case 3:
+										solarPanelWidth = 0.6;
+										solarPanelHeight = 1.2;
+										numberOfCellsInX = 10;
+										numberOfCellsInY = 20;
 										break;
 									}
 									solarPanelOrientation = orientationComboBox.getSelectedIndex();
@@ -721,13 +729,15 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Solar Panel Size:"));
-						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
+						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)", "0.6m \u00D7 1.2m (10 \u00D7 20 cells)" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
-						} else if (Util.isZero(1.046 - solarPanelWidth) && Util.isZero(1.558 - solarPanelHeight)) {
+						} else if (Util.isZero(1.05 - solarPanelWidth) && Util.isZero(1.56 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(1);
-						} else {
+						} else if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.96 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(2);
+						} else if (Util.isZero(0.6 - solarPanelWidth) && Util.isZero(1.2 - solarPanelHeight)) {
+							sizeComboBox.setSelectedIndex(3);
 						}
 						panel.add(sizeComboBox);
 
@@ -823,11 +833,17 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 										numberOfCellsInX = 8;
 										numberOfCellsInY = 12;
 										break;
-									default:
+									case 2:
 										solarPanelWidth = 0.99;
 										solarPanelHeight = 1.96;
 										numberOfCellsInX = 6;
 										numberOfCellsInY = 12;
+										break;
+									case 3:
+										solarPanelWidth = 0.6;
+										solarPanelHeight = 1.2;
+										numberOfCellsInX = 10;
+										numberOfCellsInY = 20;
 										break;
 									}
 									solarPanelOrientation = orientationComboBox.getSelectedIndex();
