@@ -2745,7 +2745,7 @@ public class PopupMenuFactory {
 						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Size:"));
-						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.046m \u00D7 1.558m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
+						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
 						} else if (Util.isZero(1.046 - solarPanelWidth) && Util.isZero(1.558 - solarPanelHeight)) {
@@ -2956,7 +2956,7 @@ public class PopupMenuFactory {
 						panel.add(colorOptionComboBox);
 
 						panel.add(new JLabel("Solar Panel Size:"));
-						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.046m \u00D7 1.558m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
+						sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
 						if (Util.isZero(0.99 - solarPanelWidth) && Util.isZero(1.65 - solarPanelHeight)) {
 							sizeComboBox.setSelectedIndex(0);
 						} else if (Util.isZero(1.046 - solarPanelWidth) && Util.isZero(1.558 - solarPanelHeight)) {
@@ -5310,7 +5310,7 @@ public class PopupMenuFactory {
 					final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
 					gui.setBorder(BorderFactory.createTitledBorder("Choose Size for " + partInfo));
-					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.046m \u00D7 1.558m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
 					if (Util.isZero(s.getPanelHeight() - 1.65)) {
 						typeComboBox.setSelectedIndex(0);
 						w = 0.99;
@@ -5581,87 +5581,6 @@ public class PopupMenuFactory {
 					sp.drawSunBeam();
 					sp.draw();
 					Scene.getInstance().setEdited(true);
-				}
-			});
-
-			popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
-				@Override
-				public void run() {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel)) {
-						return;
-					}
-					final SolarPanel sp = (SolarPanel) selectedPart;
-					switch (sp.getShadeTolerance()) {
-					case SolarPanel.HIGH_SHADE_TOLERANCE:
-						Util.selectSilently(miHighTolerance, true);
-						break;
-					case SolarPanel.PARTIAL_SHADE_TOLERANCE:
-						Util.selectSilently(miPartialTolerance, true);
-						break;
-					case SolarPanel.NO_SHADE_TOLERANCE:
-						Util.selectSilently(miNoTolerance, true);
-						break;
-					}
-					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
-					Util.selectSilently(rbmiLandscape, sp.isRotated());
-					Util.selectSilently(rbmiPortrait, !sp.isRotated());
-					Util.selectSilently(miLabelNone, !sp.isLabelVisible());
-					Util.selectSilently(miLabelCustom, sp.getLabelCustom());
-					Util.selectSilently(miLabelId, sp.getLabelId());
-					Util.selectSilently(miLabelCellEfficiency, sp.getLabelCellEfficiency());
-					Util.selectSilently(miLabelTiltAngle, sp.getLabelTiltAngle());
-					Util.selectSilently(miLabelTracker, sp.getLabelTracker());
-					Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
-
-					switch (sp.getTracker()) {
-					case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-						Util.selectSilently(miAltazimuthDualAxisTracker, true);
-						break;
-					case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-						Util.selectSilently(miHorizontalSingleAxisTracker, true);
-						break;
-					case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-						Util.selectSilently(miVerticalSingleAxisTracker, true);
-						break;
-					case Trackable.NO_TRACKER:
-						Util.selectSilently(miNoTracker, true);
-						break;
-					}
-					miAltazimuthDualAxisTracker.setEnabled(true);
-					miHorizontalSingleAxisTracker.setEnabled(true);
-					miVerticalSingleAxisTracker.setEnabled(true);
-					if (sp.getContainer() instanceof Roof) {
-						final Roof roof = (Roof) sp.getContainer();
-						final boolean flat = Util.isZero(roof.getHeight());
-						miAltazimuthDualAxisTracker.setEnabled(flat);
-						miHorizontalSingleAxisTracker.setEnabled(flat);
-						miVerticalSingleAxisTracker.setEnabled(flat);
-					} else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
-						miAltazimuthDualAxisTracker.setEnabled(false);
-						miHorizontalSingleAxisTracker.setEnabled(false);
-						miVerticalSingleAxisTracker.setEnabled(false);
-					}
-					if (sp.getTracker() != Trackable.NO_TRACKER) {
-						miTiltAngle.setEnabled(sp.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-						miAzimuth.setEnabled(false);
-					} else {
-						miTiltAngle.setEnabled(true);
-						miAzimuth.setEnabled(true);
-						miBaseHeight.setEnabled(true);
-						if (sp.getContainer() instanceof Roof) {
-							final Roof roof = (Roof) sp.getContainer();
-							if (roof.getHeight() > 0) {
-								miTiltAngle.setEnabled(false);
-								miAzimuth.setEnabled(false);
-								miBaseHeight.setEnabled(false);
-							}
-						} else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
-							miTiltAngle.setEnabled(false);
-							miAzimuth.setEnabled(false);
-							miBaseHeight.setEnabled(false);
-						}
-					}
 				}
 			});
 
@@ -6014,6 +5933,153 @@ public class PopupMenuFactory {
 			shadeToleranceMenu.add(miPartialTolerance);
 			shadeToleranceMenu.add(miHighTolerance);
 
+			final JMenu modelMenu = new JMenu("Model");
+			final ButtonGroup modelGroup = new ButtonGroup();
+			final JRadioButtonMenuItem miCustomModel = new JRadioButtonMenuItem("Custom");
+			miCustomModel.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (!(selectedPart instanceof SolarPanel)) {
+							return;
+						}
+						final SolarPanel sp = (SolarPanel) selectedPart;
+						final PvModuleSpecs specs = sp.getPvModuleSpecs();
+						specs.setModel("Custom");
+						sp.draw();
+					}
+				}
+			});
+			modelMenu.add(miCustomModel);
+			modelGroup.add(miCustomModel);
+			modelMenu.addSeparator();
+			final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
+			for (final String key : modules.keySet()) {
+				final JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(key);
+				rbmi.addItemListener(new ItemListener() {
+					@Override
+					public void itemStateChanged(final ItemEvent e) {
+						if (e.getStateChange() == ItemEvent.SELECTED) {
+							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+							if (!(selectedPart instanceof SolarPanel)) {
+								return;
+							}
+							final SolarPanel sp = (SolarPanel) selectedPart;
+							final PvModuleSpecs specs = PvModulesData.getInstance().getModuleSpecs(key);
+							sp.setPvModuleSpecs(specs);
+							sp.draw();
+						}
+					}
+				});
+				modelMenu.add(rbmi);
+				modelGroup.add(rbmi);
+			}
+
+			popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
+				@Override
+				public void run() {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel)) {
+						return;
+					}
+					final SolarPanel sp = (SolarPanel) selectedPart;
+					switch (sp.getShadeTolerance()) {
+					case SolarPanel.HIGH_SHADE_TOLERANCE:
+						Util.selectSilently(miHighTolerance, true);
+						break;
+					case SolarPanel.PARTIAL_SHADE_TOLERANCE:
+						Util.selectSilently(miPartialTolerance, true);
+						break;
+					case SolarPanel.NO_SHADE_TOLERANCE:
+						Util.selectSilently(miNoTolerance, true);
+						break;
+					}
+					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
+					Util.selectSilently(rbmiLandscape, sp.isRotated());
+					Util.selectSilently(rbmiPortrait, !sp.isRotated());
+					Util.selectSilently(miLabelNone, !sp.isLabelVisible());
+					Util.selectSilently(miLabelCustom, sp.getLabelCustom());
+					Util.selectSilently(miLabelId, sp.getLabelId());
+					Util.selectSilently(miLabelCellEfficiency, sp.getLabelCellEfficiency());
+					Util.selectSilently(miLabelTiltAngle, sp.getLabelTiltAngle());
+					Util.selectSilently(miLabelTracker, sp.getLabelTracker());
+					Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
+
+					final PvModuleSpecs pms = sp.getPvModuleSpecs();
+					if ("Custom".equals(pms.getModel())) {
+						Util.selectSilently(miCustomModel, true);
+						miCells.setEnabled(true);
+						miSize.setEnabled(true);
+						miTemperatureEffects.setEnabled(true);
+						shadeToleranceMenu.setEnabled(true);
+					} else {
+						for (final Component c : modelMenu.getMenuComponents()) {
+							if (c instanceof JRadioButtonMenuItem) {
+								final JRadioButtonMenuItem rbmi = (JRadioButtonMenuItem) c;
+								if (!rbmi.getText().equals("Custom") && rbmi.getText().equals(pms.getModel())) {
+									Util.selectSilently(rbmi, true);
+									break;
+								}
+							}
+						}
+						miCells.setEnabled(false);
+						miSize.setEnabled(false);
+						miTemperatureEffects.setEnabled(false);
+						shadeToleranceMenu.setEnabled(false);
+					}
+
+					switch (sp.getTracker()) {
+					case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+						Util.selectSilently(miAltazimuthDualAxisTracker, true);
+						break;
+					case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+						Util.selectSilently(miHorizontalSingleAxisTracker, true);
+						break;
+					case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+						Util.selectSilently(miVerticalSingleAxisTracker, true);
+						break;
+					case Trackable.NO_TRACKER:
+						Util.selectSilently(miNoTracker, true);
+						break;
+					}
+					miAltazimuthDualAxisTracker.setEnabled(true);
+					miHorizontalSingleAxisTracker.setEnabled(true);
+					miVerticalSingleAxisTracker.setEnabled(true);
+					if (sp.getContainer() instanceof Roof) {
+						final Roof roof = (Roof) sp.getContainer();
+						final boolean flat = Util.isZero(roof.getHeight());
+						miAltazimuthDualAxisTracker.setEnabled(flat);
+						miHorizontalSingleAxisTracker.setEnabled(flat);
+						miVerticalSingleAxisTracker.setEnabled(flat);
+					} else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
+						miAltazimuthDualAxisTracker.setEnabled(false);
+						miHorizontalSingleAxisTracker.setEnabled(false);
+						miVerticalSingleAxisTracker.setEnabled(false);
+					}
+					if (sp.getTracker() != Trackable.NO_TRACKER) {
+						miTiltAngle.setEnabled(sp.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+						miAzimuth.setEnabled(false);
+					} else {
+						miTiltAngle.setEnabled(true);
+						miAzimuth.setEnabled(true);
+						miBaseHeight.setEnabled(true);
+						if (sp.getContainer() instanceof Roof) {
+							final Roof roof = (Roof) sp.getContainer();
+							if (roof.getHeight() > 0) {
+								miTiltAngle.setEnabled(false);
+								miAzimuth.setEnabled(false);
+								miBaseHeight.setEnabled(false);
+							}
+						} else if (sp.getContainer() instanceof Wall || sp.getContainer() instanceof Rack) {
+							miTiltAngle.setEnabled(false);
+							miAzimuth.setEnabled(false);
+							miBaseHeight.setEnabled(false);
+						}
+					}
+				}
+			});
+
 			final JMenuItem miDeleteRow = new JMenuItem("Delete Row");
 			miDeleteRow.addActionListener(new ActionListener() {
 				@Override
@@ -6032,18 +6098,18 @@ public class PopupMenuFactory {
 				}
 			});
 			popupMenuForSolarPanel.add(miDeleteRow);
-
 			popupMenuForSolarPanel.addSeparator();
+			popupMenuForSolarPanel.add(modelMenu);
 			popupMenuForSolarPanel.add(miCells);
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miTemperatureEffects);
-			popupMenuForSolarPanel.add(orientationMenu);
 			popupMenuForSolarPanel.add(shadeToleranceMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(miTiltAngle);
 			popupMenuForSolarPanel.add(miAzimuth);
 			popupMenuForSolarPanel.add(miBaseHeight);
 			popupMenuForSolarPanel.add(miInverterEff);
+			popupMenuForSolarPanel.add(orientationMenu);
 			popupMenuForSolarPanel.add(trackerMenu);
 			popupMenuForSolarPanel.addSeparator();
 			popupMenuForSolarPanel.add(cbmiDrawSunBeam);
@@ -6710,7 +6776,7 @@ public class PopupMenuFactory {
 								cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency()));
 								noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
 								pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
-								final String s = threeDecimalsFormat.format(specs.getWidth() * 0.001) + "m \u00D7 " + threeDecimalsFormat.format(specs.getLength() * 0.001) + "m (" + specs.getLayout().height + " \u00D7 " + specs.getLayout().width + " cells)";
+								final String s = threeDecimalsFormat.format(specs.getNominalWidth() * 0.001) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength() * 0.001) + "m (" + specs.getLayout().height + " \u00D7 " + specs.getLayout().width + " cells)";
 								sizeComboBox.setSelectedItem(s);
 								modelName = specs.getModel();
 								brandName = specs.getBrand();
@@ -6721,7 +6787,7 @@ public class PopupMenuFactory {
 
 					// the following properties should be disabled when the model is not custom
 					panel.add(new JLabel("Panel Size:"));
-					sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.046m \u00D7 1.558m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
+					sizeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)", "0.6m \u00D7 1.2m (10 \u00D7 20 cells)" });
 					if (Util.isZero(0.99 - solarPanel.getPanelWidth()) && Util.isZero(1.65 - solarPanel.getPanelHeight())) {
 						sizeComboBox.setSelectedIndex(0);
 					} else if (Util.isZero(1.046 - solarPanel.getPanelWidth()) && Util.isZero(1.558 - solarPanel.getPanelHeight())) {
@@ -6830,11 +6896,17 @@ public class PopupMenuFactory {
 						solarPanel.setNumberOfCellsInX(8);
 						solarPanel.setNumberOfCellsInX(12);
 						break;
-					default:
+					case 2:
 						solarPanel.setPanelWidth(0.99);
 						solarPanel.setPanelHeight(1.96);
 						solarPanel.setNumberOfCellsInX(6);
 						solarPanel.setNumberOfCellsInX(12);
+						break;
+					case 3:
+						solarPanel.setPanelWidth(0.6);
+						solarPanel.setPanelHeight(1.2);
+						solarPanel.setNumberOfCellsInX(10);
+						solarPanel.setNumberOfCellsInX(20);
 						break;
 					}
 					solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
@@ -6886,7 +6958,7 @@ public class PopupMenuFactory {
 					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
 					gui.setBorder(BorderFactory.createTitledBorder("Solar Panel Size for " + partInfo));
-					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.046m \u00D7 1.558m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)" });
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)", "0.6m \u00D7 1.2m (10 \u00D7 20 cells)" });
 					if (Util.isZero(s.getPanelHeight() - 1.65)) {
 						typeComboBox.setSelectedIndex(0);
 					} else if (Util.isZero(s.getPanelHeight() - 1.558)) {
@@ -6915,6 +6987,12 @@ public class PopupMenuFactory {
 								h = 1.96;
 								numberOfCellsInX = 6;
 								numberOfCellsInY = 12;
+								break;
+							case 3:
+								w = 0.6;
+								h = 1.2;
+								numberOfCellsInX = 10;
+								numberOfCellsInY = 20;
 								break;
 							}
 						}

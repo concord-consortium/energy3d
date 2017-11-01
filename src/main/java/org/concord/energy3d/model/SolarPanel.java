@@ -15,6 +15,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.AngleAnnotation;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.Atmosphere;
+import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
@@ -97,6 +98,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	private transient double layoutGap = 0.01;
 	private static transient BloomRenderPass bloomRenderPass;
 	private MeshLocator meshLocator; // if the mesh that this solar panel rests on is a vertical surface of unknown type (e.g., an imported mesh), store its info for finding it later
+	private PvModuleSpecs pvModuleSpecs;
 
 	public SolarPanel() {
 		super(1, 1, 0);
@@ -132,6 +134,27 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		}
 		if (Util.isZero(numberOfCellsInY)) {
 			numberOfCellsInY = 10;
+		}
+
+		if (pvModuleSpecs == null) { // backward compatibility
+			pvModuleSpecs = new PvModuleSpecs("Custom");
+			pvModuleSpecs.setCellEfficiency(efficiency);
+			pvModuleSpecs.setWidth((int) Math.round(panelWidth * 1000));
+			pvModuleSpecs.setLength((int) Math.round(panelHeight * 1000));
+			pvModuleSpecs.setNoct(nominalOperatingCellTemperature);
+			pvModuleSpecs.setPmaxTc(temperatureCoefficientPmax);
+			pvModuleSpecs.setLayout(numberOfCellsInY, numberOfCellsInX);
+			switch (cellType) {
+			case MONOCRYSTALLINE:
+				pvModuleSpecs.setCellType("Monocrystalline");
+				break;
+			case POLYCRYSTALLINE:
+				pvModuleSpecs.setCellType("Polycrystalline");
+				break;
+			case THIN_FILM:
+				pvModuleSpecs.setCellType("Thin-Film");
+				break;
+			}
 		}
 
 		mesh = new Mesh("SolarPanel");
@@ -1164,6 +1187,16 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	public void addPrintMeshes(final List<Mesh> list) {
 		addPrintMesh(list, surround);
 		addPrintMesh(list, supportFrame);
+	}
+
+	public void setPvModuleSpecs(final PvModuleSpecs pvModuleSpecs) {
+		this.pvModuleSpecs = pvModuleSpecs;
+		panelWidth = pvModuleSpecs.getWidth() * 0.001;
+		panelHeight = pvModuleSpecs.getLength() * 0.001;
+	}
+
+	public PvModuleSpecs getPvModuleSpecs() {
+		return pvModuleSpecs;
 	}
 
 }

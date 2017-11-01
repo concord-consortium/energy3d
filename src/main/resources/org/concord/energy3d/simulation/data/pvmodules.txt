@@ -1,5 +1,7 @@
-Model               Brand          Cell_Type          Efficiency   Length   Width   Thickness  Nx    Ny   Pmax    Vmpp    Impp    Voc    Isc    PmaxTC   NOCT   Weight    Frame_Color
-FS-4122-3           First_Solar    Thin-Film          16.94        1200      600    7          20    10   122     71.5    1.71    88.7   1.85   -0.28    45     12        Black
-HiS-M280MI          Hyundai        Polycrystalline    14.43        1965      987    50         12    6    280     36.5    7.7     44.4   8.3    -0.45    46     29        Clear
-LG300N1C-B3         LG             Monocrystalline    18.29        1650      990    35         10    6    300     32      9.4     39.8   9.98   -0.41    45     16.8      Black
-SPR-X21-345         SunPower       Monocrystalline    21.16        1558     1046    46         12    8    345     57.3    6.02    68.2   6.39   -0.29    41.5   18.6      Black
+Model                Brand            Cell Type           Efficiency  Length(nominal)  Width(nominal)  Thickness  Nx   Ny   Pmax  Vmpp   Impp   Voc    Isc    PmaxTC   NOCT   Weight  Frame Color
+CS6X-330M-FG,        Canadian Solar,  Monocrystalline,    16.8,       1972(1960),      996(990),       6,         12,  6,   330,  37.5,  8.8,   45.9,  9.31,  -0.41,   45,    27.5,   Clear
+FS-4122-3,           First Solar,     Thin Film,          16.94,      1200(1200),      600(600),       7,         20,  10,  122,  71.5,  1.71,  88.7,  1.85,  -0.28,   45,    12,     Black
+HiS-M280MI,          Hyundai,         Polycrystalline,    14.43,      1965(1960),      987(990),       50,        12,  6,   280,  36.5,  7.7,   44.4,  8.3,   -0.45,   46,    29,     Clear
+JKM300M-60,          Jinko,           Monocrystalline,    18.33,      1650(1650),      992(990),       40,        10,  6,   300,  32.6,  9.21,  40.1,  9.72,  -0.39,   45,    19,     Clear
+LG300N1C-B3,         LG,              Monocrystalline,    18.29,      1640(1650),      1000(990),      35,        10,  6,   300,  32,    9.4,   39.8,  9.98,  -0.41,   45,    16.8,   Black
+SPR-X21-345,         SunPower,        Monocrystalline,    21.16,      1558(1560),      1046(1050),     46,        12,  8,   345,  57.3,  6.02,  68.2,  6.39,  -0.29,   41.5,  18.6,   Black

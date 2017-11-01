@@ -1,36 +1,48 @@
 package org.concord.energy3d.simulation;
 
 import java.awt.Dimension;
+import java.io.Serializable;
 
 /**
  * @author Charles Xie
  *
  */
-public class PvModuleSpecs {
+public class PvModuleSpecs implements Serializable {
 
-	private final String model;
+	private static final long serialVersionUID = 1L;
+	private String model;
 	private String brand;
-	private String cellType; // monocrystalline or polycrystalline
-	private float cellEfficiency; // %
+	private String cellType; // monocrystalline, polycrystalline, thin-film
+	private double cellEfficiency; // %
 	private int length; // mm
 	private int width; // mm
+	private int nominalLength; // mm (Energy3D-specific GUI thing)
+	private int nominalWidth; // mm (Energy3D-specific GUI thing)
 	private int thickness; // mm
-	private Dimension layout;
-	private float pmax; // W
-	private float vmpp; // V
-	private float impp; // A
-	private float voc; // V
-	private float isc; // A
-	private float pmaxTc; // % / degree C
-	private float noct; // degree C
-	private float weight; // kg
+	private Dimension layout; // cell layout
+	private double pmax; // Maximum Power Point (W)
+	private double vmpp; // Voltage at Maximum Power Point (V)
+	private double impp; // Current at Maximum Power Point (A)
+	private double voc; // Voltage at Open Circuit (V). The output Voltage of a PV under no load.
+	private double isc; // Current under short-circuit conditions (A). Used for calculating wire size and circuit protection ratings.
+	private double pmaxTc; // Temperature Coefficient of Pmax (% / degree C)
+	private double noct; // Nominal operating cell temperature (degree C)
+	private double weight; // kg
 
 	@Override
 	public String toString() {
-		return brand + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", " + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + pmaxTc + ", " + noct + ", " + weight;
+		return model + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", " + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + pmaxTc + ", " + noct + ", " + weight;
+	}
+
+	public PvModuleSpecs() {
+		model = "Custom";
 	}
 
 	public PvModuleSpecs(final String model) {
+		this.model = model;
+	}
+
+	public void setModel(final String model) {
 		this.model = model;
 	}
 
@@ -54,11 +66,11 @@ public class PvModuleSpecs {
 		return cellType;
 	}
 
-	public void setCellEfficiency(final float cellEfficiency) {
+	public void setCellEfficiency(final double cellEfficiency) {
 		this.cellEfficiency = cellEfficiency;
 	}
 
-	public float getCelLEfficiency() {
+	public double getCelLEfficiency() {
 		return cellEfficiency;
 	}
 
@@ -86,6 +98,22 @@ public class PvModuleSpecs {
 		return thickness;
 	}
 
+	public void setNominalLength(final int nominalLength) {
+		this.nominalLength = nominalLength;
+	}
+
+	public int getNominalLength() {
+		return nominalLength;
+	}
+
+	public void setNominalWidth(final int nominalWidth) {
+		this.nominalWidth = nominalWidth;
+	}
+
+	public int getNominalWidth() {
+		return nominalWidth;
+	}
+
 	public void setLayout(final int m, final int n) {
 		layout = new Dimension(m, n);
 	}
@@ -98,63 +126,63 @@ public class PvModuleSpecs {
 		this.pmax = pmax;
 	}
 
-	public float getPmax() {
+	public double getPmax() {
 		return pmax;
 	}
 
-	public void setVmpp(final float vmpp) {
+	public void setVmpp(final double vmpp) {
 		this.vmpp = vmpp;
 	}
 
-	public float getVmpp() {
+	public double getVmpp() {
 		return vmpp;
 	}
 
-	public void setImpp(final float impp) {
+	public void setImpp(final double impp) {
 		this.impp = impp;
 	}
 
-	public float getImpp() {
+	public double getImpp() {
 		return impp;
 	}
 
-	public void setVoc(final float voc) {
+	public void setVoc(final double voc) {
 		this.voc = voc;
 	}
 
-	public float getVoc() {
+	public double getVoc() {
 		return voc;
 	}
 
-	public void setIsc(final float isc) {
+	public void setIsc(final double isc) {
 		this.isc = isc;
 	}
 
-	public float getIsc() {
+	public double getIsc() {
 		return isc;
 	}
 
-	public void setPmaxTc(final float pmaxTc) {
+	public void setPmaxTc(final double pmaxTc) {
 		this.pmaxTc = pmaxTc;
 	}
 
-	public float getPmaxTc() {
+	public double getPmaxTc() {
 		return pmaxTc;
 	}
 
-	public void setNoct(final float noct) {
+	public void setNoct(final double noct) {
 		this.noct = noct;
 	}
 
-	public float getNoct() {
+	public double getNoct() {
 		return noct;
 	}
 
-	public void setWeight(final float weight) {
+	public void setWeight(final double weight) {
 		this.weight = weight;
 	}
 
-	public float getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 
