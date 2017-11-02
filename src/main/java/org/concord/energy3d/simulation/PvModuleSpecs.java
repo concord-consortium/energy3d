@@ -14,11 +14,11 @@ public class PvModuleSpecs implements Serializable {
 	private String brand = "Custom";
 	private String cellType = "Monocrystalline"; // monocrystalline, polycrystalline, thin film
 	private double cellEfficiency = 0.1833; // peak solar cell efficiency (0-1, not %)
-	private int length = 1650; // mm
-	private int width = 990; // mm
-	private int nominalLength = 1650; // mm (Energy3D-specific GUI thing)
-	private int nominalWidth = 990; // mm (Energy3D-specific GUI thing)
-	private int thickness = 40; // mm
+	private double length = 1.65; // m
+	private double width = 0.99; // m
+	private double nominalLength = 1.65; // m (Energy3D-specific GUI thing)
+	private double nominalWidth = 0.99; // m (Energy3D-specific GUI thing)
+	private double thickness = 0.04; // mm
 	private Dimension layout = new Dimension(10, 6); // cell layout
 	private double pmax = 300; // Maximum Power Point (W)
 	private double vmpp = 32.6; // Voltage at Maximum Power Point (V)
@@ -74,43 +74,43 @@ public class PvModuleSpecs implements Serializable {
 		return cellEfficiency;
 	}
 
-	public void setLength(final int length) {
+	public void setLength(final double length) {
 		this.length = length;
 	}
 
-	public int getLength() {
+	public double getLength() {
 		return length;
 	}
 
-	public void setWidth(final int width) {
+	public void setWidth(final double width) {
 		this.width = width;
 	}
 
-	public int getWidth() {
+	public double getWidth() {
 		return width;
 	}
 
-	public void setThickness(final int thickness) {
+	public void setThickness(final double thickness) {
 		this.thickness = thickness;
 	}
 
-	public int getThickness() {
+	public double getThickness() {
 		return thickness;
 	}
 
-	public void setNominalLength(final int nominalLength) {
+	public void setNominalLength(final double nominalLength) {
 		this.nominalLength = nominalLength;
 	}
 
-	public int getNominalLength() {
+	public double getNominalLength() {
 		return nominalLength;
 	}
 
-	public void setNominalWidth(final int nominalWidth) {
+	public void setNominalWidth(final double nominalWidth) {
 		this.nominalWidth = nominalWidth;
 	}
 
-	public int getNominalWidth() {
+	public double getNominalWidth() {
 		return nominalWidth;
 	}
 
@@ -122,7 +122,7 @@ public class PvModuleSpecs implements Serializable {
 		return layout;
 	}
 
-	public void setPmax(final float pmax) {
+	public void setPmax(final double pmax) {
 		this.pmax = pmax;
 	}
 

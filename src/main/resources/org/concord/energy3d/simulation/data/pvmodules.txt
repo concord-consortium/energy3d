@@ -1,9 +1,9 @@
-Model                Brand            Cell Type           Efficiency  Length(nominal)  Width(nominal)  Thickness  Nx   Ny   Pmax  Vmpp   Impp   Voc    Isc    PmaxTC    NOCT   Weight  Frame Color
-CS6X-330M-FG,        Canadian Solar,  Monocrystalline,    0.168,      1972(1960),      996(990),       6,         12,  6,   330,  37.5,  8.8,   45.9,  9.31,  -0.0041,  45,    27.5,   Clear
-FS-4122-3,           First Solar,     Thin Film,          0.1694,     1200(1200),      600(600),       7,         20,  10,  122,  71.5,  1.71,  88.7,  1.85,  -0.0028,  45,    12,     Black
-HiS-M280MI,          Hyundai,         Polycrystalline,    0.1443,     1965(1960),      987(990),       50,        12,  6,   280,  36.5,  7.7,   44.4,  8.3,   -0.0045,  46,    29,     Clear
-JAM6(K)-60-300/PR,   JA Solar,        Monocrystalline,    0.1835,     1650(1650),      991(990),       35,        10,  6,   300,  32.26, 9.30,  39.85, 9.75,  -0.0039,  45,    18,     Silver
-JKM300M-60,          Jinko,           Monocrystalline,    0.1833,     1650(1650),      992(990),       40,        10,  6,   300,  32.6,  9.21,  40.1,  9.72,  -0.0039,  45,    19,     Clear
-LG300N1C-B3,         LG,              Monocrystalline,    0.1829,     1640(1650),      1000(990),      35,        10,  6,   300,  32,    9.4,   39.8,  9.98,  -0.0041,  45,    16.8,   Black
-SPR-X21-345,         SunPower,        Monocrystalline,    0.2116,     1558(1560),      1046(1050),     46,        12,  8,   345,  57.3,  6.02,  68.2,  6.39,  -0.0029,  41.5,  18.6,   Black
-YL305P-35b,          Yingli,          Polycrystalline,    0.1564,     1970(1960),      990(990),       50,        12,  6,   305,  37,    8.25,  46.3,  8.87,  -0.0045,  46,    26.8,   Clear
+Model                Brand            Cell Type           Efficiency  Length(nominal)  Width(nominal)  Thickness  M    N    Pmax  Vmpp   Impp   Voc    Isc    PmaxTC    NOCT   Weight  Frame Color
+CS6X-330M-FG,        Canadian Solar,  Monocrystalline,    0.168,      1.972(1.96),     0.996(0.99),    0.006,     12,  6,   330,  37.5,  8.8,   45.9,  9.31,  -0.0041,  45,    27.5,   Clear
+FS-4122-3,           First Solar,     Thin Film,          0.1694,     1.2(1.2),        0.6(0.6),       0.007,     20,  10,  122,  71.5,  1.71,  88.7,  1.85,  -0.0028,  45,    12,     Black
+HiS-M280MI,          Hyundai,         Polycrystalline,    0.1443,     1.965(1.96),     0.987(0.99),    0.05,      12,  6,   280,  36.5,  7.7,   44.4,  8.3,   -0.0045,  46,    29,     Clear
+JAM6(K)-60-300/PR,   JA Solar,        Monocrystalline,    0.1835,     1.65(1.65),      0.991(0.99),    0.035,     10,  6,   300,  32.26, 9.30,  39.85, 9.75,  -0.0039,  45,    18,     Silver
+JKM300M-60,          Jinko,           Monocrystalline,    0.1833,     1.65(1.65),      0.992(0.99),    0.04,      10,  6,   300,  32.6,  9.21,  40.1,  9.72,  -0.0039,  45,    19,     Clear
+LG300N1C-B3,         LG,              Monocrystalline,    0.1829,     1.64(1.65),      1(0.99),        0.035,     10,  6,   300,  32,    9.4,   39.8,  9.98,  -0.0041,  45,    16.8,   Black
+SPR-X21-345,         SunPower,        Monocrystalline,    0.2116,     1.558(1.56),     1.046(1.05),    0.046,     12,  8,   345,  57.3,  6.02,  68.2,  6.39,  -0.0029,  41.5,  18.6,   Black
+YL305P-35b,          Yingli,          Polycrystalline,    0.1564,     1.97(1.96),      0.99(0.99),     0.05,      12,  6,   305,  37,    8.25,  46.3,  8.87,  -0.0045,  46,    26.8,   Clear

@@ -137,11 +137,11 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		if (pvModuleSpecs == null) { // backward compatibility
 			pvModuleSpecs = new PvModuleSpecs("Custom");
 			pvModuleSpecs.setCellEfficiency(efficiency);
-			pvModuleSpecs.setWidth((int) Math.round(panelWidth * 1000));
-			pvModuleSpecs.setLength((int) Math.round(panelHeight * 1000));
+			pvModuleSpecs.setWidth(panelWidth);
+			pvModuleSpecs.setLength(panelHeight);
 			pvModuleSpecs.setNoct(nominalOperatingCellTemperature);
 			pvModuleSpecs.setPmaxTc(temperatureCoefficientPmax);
-			pvModuleSpecs.setLayout(numberOfCellsInY, numberOfCellsInX);
+			pvModuleSpecs.setLayout(numberOfCellsInX, numberOfCellsInY);
 			switch (cellType) {
 			case MONOCRYSTALLINE:
 				pvModuleSpecs.setCellType("Monocrystalline");
@@ -150,7 +150,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 				pvModuleSpecs.setCellType("Polycrystalline");
 				break;
 			case THIN_FILM:
-				pvModuleSpecs.setCellType("Thin-Film");
+				pvModuleSpecs.setCellType("Thin Film");
 				break;
 			}
 		}
@@ -603,7 +603,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		final Vector3 p0 = trans.applyForward(new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5))); // (0, 0)
 		final Vector3 p1 = trans.applyForward(new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8))); // (1, 0)
 		final Vector3 p2 = trans.applyForward(new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2))); // (0, 1)
-		final int bufferSize = (numberOfCellsInX + numberOfCellsInY + 2) * 6;
+		final int bufferSize = (getNumberOfCellsInX() + getNumberOfCellsInY() + 2) * 6;
 		FloatBuffer vertices = solarCellOutlines.getMeshData().getVertexBuffer();
 		if (vertices.capacity() != bufferSize) {
 			vertices = BufferUtils.createFloatBuffer(bufferSize);
@@ -612,8 +612,8 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			vertices.rewind();
 			vertices.limit(vertices.capacity());
 		}
-		final int nx = rotated ? numberOfCellsInY : numberOfCellsInX;
-		final int ny = rotated ? numberOfCellsInX : numberOfCellsInY;
+		final int nx = rotated ? getNumberOfCellsInY() : getNumberOfCellsInX();
+		final int ny = rotated ? getNumberOfCellsInX() : getNumberOfCellsInY();
 		final Vector3 u = p1.subtract(p0, null).normalizeLocal();
 		final Vector3 v = p2.subtract(p0, null).normalizeLocal();
 		final double margin = 0.3;
@@ -1034,18 +1034,30 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setNumberOfCellsInX(final int numberOfCellsInX) {
 		this.numberOfCellsInX = numberOfCellsInX;
+		if (pvModuleSpecs != null) {
+			pvModuleSpecs.setLayout(numberOfCellsInX, numberOfCellsInY);
+		}
 	}
 
 	public int getNumberOfCellsInX() {
-		return numberOfCellsInX;
+		if (pvModuleSpecs == null) {
+			return numberOfCellsInX;
+		}
+		return pvModuleSpecs.getLayout().width;
 	}
 
 	public void setNumberOfCellsInY(final int numberOfCellsInY) {
 		this.numberOfCellsInY = numberOfCellsInY;
+		if (pvModuleSpecs != null) {
+			pvModuleSpecs.setLayout(numberOfCellsInX, numberOfCellsInY);
+		}
 	}
 
 	public int getNumberOfCellsInY() {
-		return numberOfCellsInY;
+		if (pvModuleSpecs == null) {
+			return numberOfCellsInY;
+		}
+		return pvModuleSpecs.getLayout().height;
 	}
 
 	public void setShadeTolerance(final int shadeTolerance) {
@@ -1207,8 +1219,8 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setPvModuleSpecs(final PvModuleSpecs pvModuleSpecs) {
 		this.pvModuleSpecs = pvModuleSpecs;
-		panelWidth = pvModuleSpecs.getWidth() * 0.001;
-		panelHeight = pvModuleSpecs.getLength() * 0.001;
+		panelWidth = pvModuleSpecs.getWidth();
+		panelHeight = pvModuleSpecs.getLength();
 	}
 
 	public PvModuleSpecs getPvModuleSpecs() {

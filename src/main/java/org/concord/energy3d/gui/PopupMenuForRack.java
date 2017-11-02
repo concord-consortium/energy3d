@@ -733,7 +733,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 								cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
 								noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
 								pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
-								final String s = threeDecimalsFormat.format(specs.getNominalWidth() * 0.001) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength() * 0.001) + "m (" + specs.getLayout().height + " \u00D7 " + specs.getLayout().width + " cells)";
+								final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().height + " \u00D7 " + specs.getLayout().width + " cells)";
 								sizeComboBox.setSelectedItem(s);
 								modelName = specs.getModel();
 								brandName = specs.getBrand();

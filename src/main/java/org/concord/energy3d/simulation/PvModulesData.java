@@ -51,27 +51,27 @@ public final class PvModulesData {
 			final String[] t = data.get(s).split(",");
 			module.setBrand(t[0].trim());
 			module.setCellType(t[1].trim());
-			module.setCellEfficiency(Float.parseFloat(t[2].trim()));
+			module.setCellEfficiency(Double.parseDouble(t[2].trim()));
 			final String length = t[3].trim();
 			final String l1 = length.substring(0, length.indexOf("("));
 			final String l2 = length.substring(length.indexOf("(") + 1, length.indexOf(")"));
-			module.setLength(Integer.parseInt(l1));
-			module.setNominalLength(Integer.parseInt(l2));
+			module.setLength(Double.parseDouble(l1));
+			module.setNominalLength(Double.parseDouble(l2));
 			final String width = t[4].trim();
 			final String w1 = width.substring(0, width.indexOf("("));
 			final String w2 = width.substring(width.indexOf("(") + 1, width.indexOf(")"));
-			module.setWidth(Integer.parseInt(w1));
-			module.setNominalWidth(Integer.parseInt(w2));
-			module.setThickness(Integer.parseInt(t[5].trim()));
-			module.setLayout(Integer.parseInt(t[6].trim()), Integer.parseInt(t[7].trim()));
-			module.setPmax(Float.parseFloat(t[8].trim()));
-			module.setVmpp(Float.parseFloat(t[9].trim()));
-			module.setImpp(Float.parseFloat(t[10].trim()));
-			module.setVoc(Float.parseFloat(t[11].trim()));
-			module.setIsc(Float.parseFloat(t[12].trim()));
-			module.setPmaxTc(Float.parseFloat(t[13].trim()));
-			module.setNoct(Float.parseFloat(t[14].trim()));
-			module.setWeight(Float.parseFloat(t[15].trim()));
+			module.setWidth(Double.parseDouble(w1));
+			module.setNominalWidth(Double.parseDouble(w2));
+			module.setThickness(Double.parseDouble(t[5].trim()));
+			module.setLayout(Integer.parseInt(t[7].trim()), Integer.parseInt(t[6].trim()));
+			module.setPmax(Double.parseDouble(t[8].trim()));
+			module.setVmpp(Double.parseDouble(t[9].trim()));
+			module.setImpp(Double.parseDouble(t[10].trim()));
+			module.setVoc(Double.parseDouble(t[11].trim()));
+			module.setIsc(Double.parseDouble(t[12].trim()));
+			module.setPmaxTc(Double.parseDouble(t[13].trim()));
+			module.setNoct(Double.parseDouble(t[14].trim()));
+			module.setWeight(Double.parseDouble(t[15].trim()));
 		}
 
 	}
