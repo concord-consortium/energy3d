@@ -71,14 +71,16 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	private static double normalVectorLength = 5;
 	private transient double yieldNow; // solar output at current hour
 	private transient double yieldToday;
-	private double efficiency = 0.15; // a number in (0, 1)
-	private double temperatureCoefficientPmax = -0.005;
-	private double nominalOperatingCellTemperature = 48;
-	private double inverterEfficiency = 0.95;
-	private double panelWidth = 0.99; // 39"
-	private double panelHeight = 1.65; // 65"
+	private double efficiency = 0.15; // a number in (0, 1) (backward compatibility, should use pvModuleSpecs.getCellEfficiency)
+	private double temperatureCoefficientPmax = -0.005; // backward compatibility, should use pvModuleSpecs.getPmaxTc
+	private double nominalOperatingCellTemperature = 48; // backward compatibility, should use pvModuleSpecs.getNoct
+	private double panelWidth = 0.99; // 39" (backward compatibility, should use pvModuleSpecs.getWidth)
+	private double panelHeight = 1.65; // 65" (backward compatibility, should use pvModuleSpecs.getLength)
+	private int cellType = MONOCRYSTALLINE; // backward compatibility, should use pvModuleSpecs.getCellType
+	private int numberOfCellsInX = 6; // backward compatibility, should use pvModuleSpecs.getLayout
+	private int numberOfCellsInY = 10; // backward compatibility, should use pvModuleSpecs.getLayout
 	private int colorOption = COLOR_OPTION_BLUE;
-	private int cellType = MONOCRYSTALLINE;
+	private double inverterEfficiency = 0.95;
 	private boolean rotated = false; // rotation around the normal usually takes only two angles: 0 or 90, so we use a boolean here
 	private double relativeAzimuth;
 	private double tiltAngle;
@@ -87,8 +89,6 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	private boolean drawSunBeam;
 	private int rotationAxis;
 	private int shadeTolerance = PARTIAL_SHADE_TOLERANCE;
-	private int numberOfCellsInX = 6;
-	private int numberOfCellsInY = 10;
 	private boolean labelCellEfficiency;
 	private boolean labelTiltAngle;
 	private boolean labelTracker;
@@ -682,6 +682,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			case MONOCRYSTALLINE:
 				return rotated ? "solarpanel-black-landscape.png" : "solarpanel-black-portrait.png";
 			case POLYCRYSTALLINE:
+			case THIN_FILM:
 				return rotated ? "polycrystal-solarpanel-black-landscape.png" : "polycrystal-solarpanel-black-portrait.png";
 			}
 		case COLOR_OPTION_GRAY:
@@ -689,11 +690,13 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			case MONOCRYSTALLINE:
 				return rotated ? "solarpanel-gray-landscape.png" : "solarpanel-gray-portrait.png";
 			case POLYCRYSTALLINE:
+			case THIN_FILM:
 				return rotated ? "polycrystal-solarpanel-gray-landscape.png" : "polycrystal-solarpanel-gray-portrait.png";
 			}
 		default:
 			switch (cellType) {
 			case POLYCRYSTALLINE:
+			case THIN_FILM:
 				return rotated ? "polycrystal-solarpanel-blue-landscape.png" : "polycrystal-solarpanel-blue-portrait.png";
 			default:
 				return rotated ? "solarpanel-blue-landscape.png" : "solarpanel-blue-portrait.png";
@@ -1141,10 +1144,32 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setCellType(final int cellType) {
 		this.cellType = cellType;
+		if (pvModuleSpecs != null) {
+			switch (cellType) {
+			case 0:
+				pvModuleSpecs.setCellType("Monocrystalline");
+				break;
+			case 1:
+				pvModuleSpecs.setCellType("Polycrystalline");
+				break;
+			case 2:
+				pvModuleSpecs.setCellType("Thin Film");
+				break;
+			}
+		}
 	}
 
 	public int getCellType() {
-		return cellType;
+		if (pvModuleSpecs == null) {
+			return cellType;
+		}
+		if ("Polycrystalline".equals(pvModuleSpecs.getCellType())) {
+			return POLYCRYSTALLINE;
+		}
+		if ("Thin Film".equals(pvModuleSpecs.getCellType())) {
+			return THIN_FILM;
+		}
+		return MONOCRYSTALLINE;
 	}
 
 	@Override
@@ -1221,6 +1246,13 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		this.pvModuleSpecs = pvModuleSpecs;
 		panelWidth = pvModuleSpecs.getWidth();
 		panelHeight = pvModuleSpecs.getLength();
+		if ("Monocrystalline".equals(pvModuleSpecs.getCellType())) {
+			cellType = MONOCRYSTALLINE;
+		} else if ("Polycrystalline".equals(pvModuleSpecs.getCellType())) {
+			cellType = POLYCRYSTALLINE;
+		} else if ("Thin Film".equals(pvModuleSpecs.getCellType())) {
+			cellType = THIN_FILM;
+		}
 	}
 
 	public PvModuleSpecs getPvModuleSpecs() {

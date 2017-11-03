@@ -78,7 +78,8 @@ import org.concord.energy3d.undo.SetSizeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarCellEfficiencyForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarCellEfficiencyForRackCommand;
 import org.concord.energy3d.undo.SetSolarCellEfficiencyForRacksOnFoundationCommand;
-import org.concord.energy3d.undo.SetSolarPanelArrayOnRackCommand;
+import org.concord.energy3d.undo.SetSolarPanelArrayOnRackByModelCommand;
+import org.concord.energy3d.undo.SetSolarPanelArrayOnRackCustomCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForAllRacksCommand;
@@ -725,15 +726,15 @@ class PopupMenuForRack extends PopupMenuFactory {
 							noctField.setEnabled(isCustom);
 							pmaxTcField.setEnabled(isCustom);
 							if (isCustom) {
-								modelName = null;
-								brandName = null;
+								modelName = "Custom";
+								brandName = "Custom";
 							} else {
 								final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
 								cellTypeComboBox.setSelectedItem(specs.getCellType());
 								cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
 								noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
 								pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
-								final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().height + " \u00D7 " + specs.getLayout().width + " cells)";
+								final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
 								sizeComboBox.setSelectedItem(s);
 								modelName = specs.getModel();
 								brandName = specs.getBrand();
@@ -808,28 +809,47 @@ class PopupMenuForRack extends PopupMenuFactory {
 							break;
 						} else {
 							boolean ok = true;
-							try {
-								cellEfficiency = Double.parseDouble(cellEfficiencyField.getText());
-								inverterEfficiency = Double.parseDouble(inverterEfficiencyField.getText());
-								pmax = Double.parseDouble(pmaxTcField.getText());
-								noct = Double.parseDouble(noctField.getText());
-							} catch (final NumberFormatException ex) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
-								ok = false;
-							}
-							if (ok) {
-								if (cellEfficiency < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || cellEfficiency > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (inverterEfficiency < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiency >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and less than " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (pmax < -1 || pmax > 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (noct < 33 || noct > 58) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal Cell Operating Temperature must be between 33 and 58 Celsius degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									setSolarPanels();
-									if (choice == options[0]) {
-										break;
+							if (modelComboBox.getSelectedIndex() == 0) {
+								try {
+									cellEfficiency = Double.parseDouble(cellEfficiencyField.getText());
+									pmax = Double.parseDouble(pmaxTcField.getText());
+									noct = Double.parseDouble(noctField.getText());
+									inverterEfficiency = Double.parseDouble(inverterEfficiencyField.getText());
+								} catch (final NumberFormatException ex) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
+									if (cellEfficiency < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || cellEfficiency > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (inverterEfficiency < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiency >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and less than " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (pmax < -1 || pmax > 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (noct < 33 || noct > 58) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal Cell Operating Temperature must be between 33 and 58 Celsius degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else {
+										setCustomSolarPanels();
+										if (choice == options[0]) {
+											break;
+										}
+									}
+								}
+							} else {
+								try {
+									inverterEfficiency = Double.parseDouble(inverterEfficiencyField.getText());
+								} catch (final NumberFormatException ex) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
+									if (inverterEfficiency < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiency >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and less than " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else {
+										setBrandSolarPanels((String) modelComboBox.getSelectedItem());
+										if (choice == options[0]) {
+											break;
+										}
 									}
 								}
 							}
@@ -837,11 +857,31 @@ class PopupMenuForRack extends PopupMenuFactory {
 					}
 				}
 
-				private void setSolarPanels() {
+				private void setBrandSolarPanels(final String modelName) {
+					final SolarPanel solarPanel = rack.getSolarPanel();
+					final SetSolarPanelArrayOnRackByModelCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackByModelCommand(rack) : null;
+					solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
+					solarPanel.setColorOption(colorOptionComboBox.getSelectedIndex());
+					solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
+					solarPanel.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							rack.addSolarPanels();
+							if (command != null) {
+								SceneManager.getInstance().getUndoManager().addEdit(command);
+							}
+							return null;
+						}
+					});
+					updateAfterEdit();
+				}
+
+				private void setCustomSolarPanels() {
 					final SolarPanel solarPanel = rack.getSolarPanel();
 					solarPanel.setModelName(modelName);
 					solarPanel.setBrandName(brandName);
-					final SetSolarPanelArrayOnRackCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackCommand(rack) : null;
+					final SetSolarPanelArrayOnRackCustomCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackCustomCommand(rack) : null;
 					switch (sizeComboBox.getSelectedIndex()) {
 					case 0:
 						solarPanel.setPanelWidth(0.99);
@@ -2327,6 +2367,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					Util.selectSilently(miLabelTiltAngle, rack.getLabelTiltAngle());
 					Util.selectSilently(miLabelTracker, rack.getLabelTracker());
 					Util.selectSilently(miLabelEnergyOutput, rack.getLabelEnergyOutput());
+					solarPanelMenu.setEnabled("Custom".equals(rack.getSolarPanel().getModelName()));
 				}
 
 			});

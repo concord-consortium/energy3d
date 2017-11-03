@@ -60,6 +60,7 @@ import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
 import org.concord.energy3d.undo.ChangeSolarCellPropertiesCommand;
 import org.concord.energy3d.undo.ChangeSolarCellPropertiesForAllCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelModelCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForSolarPanelRowCommand;
@@ -1690,9 +1691,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							return;
 						}
 						final SolarPanel sp = (SolarPanel) selectedPart;
+						final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(sp);
 						final PvModuleSpecs specs = sp.getPvModuleSpecs();
 						specs.setModel("Custom");
 						sp.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
 					}
 				}
 			});
@@ -1711,9 +1715,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								return;
 							}
 							final SolarPanel sp = (SolarPanel) selectedPart;
+							final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(sp);
 							final PvModuleSpecs specs = PvModulesData.getInstance().getModuleSpecs(key);
 							sp.setPvModuleSpecs(specs);
 							sp.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							updateAfterEdit();
 						}
 					}
 				});
