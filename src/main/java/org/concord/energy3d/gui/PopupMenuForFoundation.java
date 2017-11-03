@@ -1845,7 +1845,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			final JMenu analysisMenu = new JMenu("Analysis");
 			popupMenuForFoundation.add(analysisMenu);
 
-			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");
+			JMenu subMenu = new JMenu("Buildings");
+			analysisMenu.add(subMenu);
+
+			JMenuItem mi = new JMenuItem("Daily Building Energy Analysis...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1854,23 +1857,25 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						if (SceneManager.getInstance().getSolarHeatMap()) {
 							analysis.updateGraph();
 						}
-						analysis.show("Daily Energy");
+						analysis.show("Daily Building Energy");
 					}
 				}
 			});
-			analysisMenu.add(mi);
+			subMenu.add(mi);
 
-			mi = new JMenuItem("Annual Energy Analysis...");
+			mi = new JMenuItem("Annual Building Energy Analysis...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
-						new EnergyAnnualAnalysis().show("Annual Energy");
+						new EnergyAnnualAnalysis().show("Annual Building Energy");
 					}
 				}
 			});
-			analysisMenu.add(mi);
-			analysisMenu.addSeparator();
+			subMenu.add(mi);
+
+			subMenu = new JMenu("Solar Panels");
+			analysisMenu.add(subMenu);
 
 			mi = new JMenuItem("Daily Solar Panel Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1890,7 +1895,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
+			subMenu.add(mi);
 
 			mi = new JMenuItem("Annual Solar Panel Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1911,8 +1916,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
-			analysisMenu.addSeparator();
+			subMenu.add(mi);
+
+			subMenu = new JMenu("Mirrors (Heliostats)");
+			analysisMenu.add(subMenu);
 
 			mi = new JMenuItem("Daily Mirror Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1932,7 +1939,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
+			subMenu.add(mi);
 
 			mi = new JMenuItem("Annual Mirror Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1949,8 +1956,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
-			analysisMenu.addSeparator();
+			subMenu.add(mi);
+
+			subMenu = new JMenu("Parabolic Troughs");
+			analysisMenu.add(subMenu);
 
 			mi = new JMenuItem("Daily Parabolic Trough Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1970,7 +1979,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
+			subMenu.add(mi);
 
 			mi = new JMenuItem("Annual Parabolic Trough Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -1987,8 +1996,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
-			analysisMenu.addSeparator();
+			subMenu.add(mi);
+
+			subMenu = new JMenu("Parabolic Dishes");
+			analysisMenu.add(subMenu);
 
 			mi = new JMenuItem("Daily Parabolic Dish Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -2008,7 +2019,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
+			subMenu.add(mi);
 
 			mi = new JMenuItem("Annual Parabolic Dish Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -2025,8 +2036,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
-			analysisMenu.addSeparator();
+			subMenu.add(mi);
+
+			subMenu = new JMenu("Linear Fresnel Reflectors");
+			analysisMenu.add(subMenu);
 
 			mi = new JMenuItem("Daily Fresnel Reflector Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -2046,7 +2059,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
+			subMenu.add(mi);
 
 			mi = new JMenuItem("Annual Fresnel Reflector Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
@@ -2063,7 +2076,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			analysisMenu.add(mi);
+			subMenu.add(mi);
 
 		}
 

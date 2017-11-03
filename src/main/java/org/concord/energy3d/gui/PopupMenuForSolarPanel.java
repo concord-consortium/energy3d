@@ -1380,7 +1380,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					gui.add(inputPanel, BorderLayout.CENTER);
 					JLabel label = new JLabel("Type: ", JLabel.LEFT);
 					inputPanel.add(label);
-					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline", "Thin Film" });
+					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Polycrystalline", "Monocrystalline", "Thin Film" });
 					typeComboBox.setSelectedIndex(solarPanel.getCellType());
 					label.setLabelFor(typeComboBox);
 					inputPanel.add(typeComboBox);

@@ -1805,7 +1805,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void resizeGroundImageLand(final double scale) {
-		final double lat = Math.toRadians(Scene.getInstance().getGeoLocation().getLatitude());
+		final double lat = Scene.getInstance().getGeoLocation() != null ? Math.toRadians(Scene.getInstance().getGeoLocation().getLatitude()) : 0;
 		final double d = MERCATOR_PROJECTION_SCALE_CONSTANT * Math.cos(lat) * scale / Scene.getInstance().getAnnotationScale();
 		groundImageLand.resize(d, d);
 		groundImageLand.updateModelBound();

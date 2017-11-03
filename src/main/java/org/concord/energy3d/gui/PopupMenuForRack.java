@@ -688,7 +688,6 @@ class PopupMenuForRack extends PopupMenuFactory {
 				private double inverterEfficiency;
 				private double pmax;
 				private double noct;
-				private String modelName, brandName;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -725,10 +724,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							cellEfficiencyField.setEnabled(isCustom);
 							noctField.setEnabled(isCustom);
 							pmaxTcField.setEnabled(isCustom);
-							if (isCustom) {
-								modelName = "Custom";
-								brandName = "Custom";
-							} else {
+							if (!isCustom) {
 								final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
 								cellTypeComboBox.setSelectedItem(specs.getCellType());
 								cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
@@ -736,8 +732,6 @@ class PopupMenuForRack extends PopupMenuFactory {
 								pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
 								final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
 								sizeComboBox.setSelectedItem(s);
-								modelName = specs.getModel();
-								brandName = specs.getBrand();
 							}
 						}
 					});
@@ -757,7 +751,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					}
 					panel.add(sizeComboBox);
 					panel.add(new JLabel("Cell Type:"));
-					cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline", "Thin Film" });
+					cellTypeComboBox = new JComboBox<String>(new String[] { "Polycrystalline", "Monocrystalline", "Thin Film" });
 					cellTypeComboBox.setSelectedIndex(solarPanel.getCellType());
 					panel.add(cellTypeComboBox);
 					panel.add(new JLabel("Solar Cell Efficiency (%):"));
@@ -861,9 +855,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 					final SolarPanel solarPanel = rack.getSolarPanel();
 					final SetSolarPanelArrayOnRackByModelCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackByModelCommand(rack) : null;
 					solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
-					solarPanel.setColorOption(colorOptionComboBox.getSelectedIndex());
 					solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
 					solarPanel.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+					// solarPanel.setColorOption(colorOptionComboBox.getSelectedIndex());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
@@ -879,8 +873,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 
 				private void setCustomSolarPanels() {
 					final SolarPanel solarPanel = rack.getSolarPanel();
-					solarPanel.setModelName(modelName);
-					solarPanel.setBrandName(brandName);
+					solarPanel.setModelName("Custom");
+					solarPanel.setBrandName("Custom");
 					final SetSolarPanelArrayOnRackCustomCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackCustomCommand(rack) : null;
 					switch (sizeComboBox.getSelectedIndex()) {
 					case 0:
@@ -1254,6 +1248,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miSolarPanelColor = new JMenuItem("Color...");
 			final JMenuItem miSolarPanelCellType = new JMenuItem("Cell Type...");
 			solarPanelMenu.add(miSolarPanelCellType);
 			miSolarPanelCellType.addActionListener(new ActionListener() {
@@ -1272,7 +1267,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
 					gui.setBorder(BorderFactory.createTitledBorder("Choose Cell Type for " + partInfo));
-					final JComboBox<String> cellTypeComboBox = new JComboBox<String>(new String[] { "Monocrystalline", "Polycrystalline", "Thin Film" });
+					final JComboBox<String> cellTypeComboBox = new JComboBox<String>(new String[] { "Polycrystalline", "Monocrystalline", "Thin Film" });
 					cellTypeComboBox.setSelectedIndex(s.getCellType());
 					gui.add(cellTypeComboBox, BorderLayout.NORTH);
 					final JPanel scopePanel = new JPanel();
@@ -1337,7 +1332,6 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miSolarPanelColor = new JMenuItem("Color...");
 			solarPanelMenu.add(miSolarPanelColor);
 			miSolarPanelColor.addActionListener(new ActionListener() {
 

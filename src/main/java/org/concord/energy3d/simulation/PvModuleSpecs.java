@@ -12,6 +12,7 @@ public class PvModuleSpecs implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String model = "Custom";
 	private String brand = "Custom";
+	private String color = "Blue";
 	private String cellType = "Monocrystalline"; // monocrystalline, polycrystalline, thin film
 	private double cellEfficiency = 0.1833; // peak solar cell efficiency (0-1, not %)
 	private double length = 1.65; // m
@@ -31,7 +32,7 @@ public class PvModuleSpecs implements Serializable {
 
 	@Override
 	public String toString() {
-		return model + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", " + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + pmaxTc + ", " + noct + ", " + weight;
+		return model + ", " + cellType + ", " + cellEfficiency + ", " + length + ", " + width + ", " + thickness + ", " + layout + ", " + pmax + ", " + vmpp + ", " + impp + ", " + voc + ", " + isc + ", " + pmaxTc + ", " + noct + ", " + weight + ", " + color;
 	}
 
 	public PvModuleSpecs() {
@@ -56,6 +57,14 @@ public class PvModuleSpecs implements Serializable {
 
 	public String getBrand() {
 		return brand;
+	}
+
+	public void setColor(final String color) {
+		this.color = color;
+	}
+
+	public String getColor() {
+		return color;
 	}
 
 	public void setCellType(final String cellType) {

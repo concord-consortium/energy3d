@@ -72,6 +72,7 @@ public final class PvModulesData {
 			module.setPmaxTc(Double.parseDouble(t[13].trim()));
 			module.setNoct(Double.parseDouble(t[14].trim()));
 			module.setWeight(Double.parseDouble(t[15].trim()));
+			module.setColor(t[16].trim());
 		}
 
 	}
@@ -81,6 +82,9 @@ public final class PvModulesData {
 	}
 
 	public PvModuleSpecs getModuleSpecs(final String model) {
+		if ("Custom".equals(model) || model == null) {
+			return new PvModuleSpecs();
+		}
 		return modules.get(model);
 	}
 

@@ -42,6 +42,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class SolarPanel extends HousePart implements Trackable, Meshable, Labelable {
+
 	private static final long serialVersionUID = 1L;
 
 	public static final int PARTIAL_SHADE_TOLERANCE = 0;
@@ -54,8 +55,8 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	public static final int COLOR_OPTION_BLUE = 0;
 	public static final int COLOR_OPTION_BLACK = 1;
 	public static final int COLOR_OPTION_GRAY = 2;
-	public static final int MONOCRYSTALLINE = 0;
-	public static final int POLYCRYSTALLINE = 1;
+	public static final int POLYCRYSTALLINE = 0;
+	public static final int MONOCRYSTALLINE = 1;
 	public static final int THIN_FILM = 2;
 
 	private transient ReadOnlyVector3 normal;
@@ -76,7 +77,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	private double nominalOperatingCellTemperature = 48; // backward compatibility, should use pvModuleSpecs.getNoct
 	private double panelWidth = 0.99; // 39" (backward compatibility, should use pvModuleSpecs.getWidth)
 	private double panelHeight = 1.65; // 65" (backward compatibility, should use pvModuleSpecs.getLength)
-	private int cellType = MONOCRYSTALLINE; // backward compatibility, should use pvModuleSpecs.getCellType
+	private int cellType = POLYCRYSTALLINE; // backward compatibility, should use pvModuleSpecs.getCellType
 	private int numberOfCellsInX = 6; // backward compatibility, should use pvModuleSpecs.getLayout
 	private int numberOfCellsInY = 10; // backward compatibility, should use pvModuleSpecs.getLayout
 	private int colorOption = COLOR_OPTION_BLUE;
@@ -143,15 +144,33 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			pvModuleSpecs.setPmaxTc(temperatureCoefficientPmax);
 			pvModuleSpecs.setLayout(numberOfCellsInX, numberOfCellsInY);
 			switch (cellType) {
-			case MONOCRYSTALLINE:
-				pvModuleSpecs.setCellType("Monocrystalline");
-				break;
 			case POLYCRYSTALLINE:
 				pvModuleSpecs.setCellType("Polycrystalline");
+				colorOption = COLOR_OPTION_BLUE;
+				break;
+			case MONOCRYSTALLINE:
+				pvModuleSpecs.setCellType("Monocrystalline");
+				colorOption = COLOR_OPTION_BLACK;
 				break;
 			case THIN_FILM:
 				pvModuleSpecs.setCellType("Thin Film");
+				colorOption = COLOR_OPTION_BLACK;
 				break;
+			}
+		} else {
+			if ("Polycrystalline".equals(pvModuleSpecs.getCellType())) {
+				cellType = POLYCRYSTALLINE;
+			} else if ("Monocrystalline".equals(pvModuleSpecs.getCellType())) {
+				cellType = MONOCRYSTALLINE;
+			} else if ("Thin Film".equals(pvModuleSpecs.getCellType())) {
+				cellType = THIN_FILM;
+			}
+			if ("Blue".equals(pvModuleSpecs.getColor())) {
+				colorOption = COLOR_OPTION_BLUE;
+			} else if ("Black".equals(pvModuleSpecs.getColor())) {
+				colorOption = COLOR_OPTION_BLACK;
+			} else if ("Gray".equals(pvModuleSpecs.getColor())) {
+				colorOption = COLOR_OPTION_GRAY;
 			}
 		}
 
@@ -164,6 +183,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 		surround = new Box("SolarPanel (Surround)");
 		surround.setModelBound(new OrientedBoundingBox());
+
 		final OffsetState offset = new OffsetState();
 		offset.setFactor(1);
 		offset.setUnits(1);
@@ -1136,23 +1156,45 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setColorOption(final int colorOption) {
 		this.colorOption = colorOption;
+		if (pvModuleSpecs != null) {
+			switch (colorOption) {
+			case COLOR_OPTION_BLUE:
+				pvModuleSpecs.setColor("Blue");
+				break;
+			case COLOR_OPTION_BLACK:
+				pvModuleSpecs.setColor("Black");
+				break;
+			case COLOR_OPTION_GRAY:
+				pvModuleSpecs.setColor("Gray");
+				break;
+			}
+		}
 	}
 
 	public int getColorOption() {
-		return colorOption;
+		if (pvModuleSpecs == null) {
+			return colorOption;
+		}
+		if ("Black".equals(pvModuleSpecs.getColor())) {
+			return COLOR_OPTION_BLACK;
+		}
+		if ("Gray".equals(pvModuleSpecs.getColor())) {
+			return COLOR_OPTION_GRAY;
+		}
+		return COLOR_OPTION_BLUE;
 	}
 
 	public void setCellType(final int cellType) {
 		this.cellType = cellType;
 		if (pvModuleSpecs != null) {
 			switch (cellType) {
-			case 0:
-				pvModuleSpecs.setCellType("Monocrystalline");
-				break;
-			case 1:
+			case POLYCRYSTALLINE:
 				pvModuleSpecs.setCellType("Polycrystalline");
 				break;
-			case 2:
+			case MONOCRYSTALLINE:
+				pvModuleSpecs.setCellType("Monocrystalline");
+				break;
+			case THIN_FILM:
 				pvModuleSpecs.setCellType("Thin Film");
 				break;
 			}
@@ -1246,12 +1288,19 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		this.pvModuleSpecs = pvModuleSpecs;
 		panelWidth = pvModuleSpecs.getWidth();
 		panelHeight = pvModuleSpecs.getLength();
-		if ("Monocrystalline".equals(pvModuleSpecs.getCellType())) {
-			cellType = MONOCRYSTALLINE;
-		} else if ("Polycrystalline".equals(pvModuleSpecs.getCellType())) {
+		if ("Polycrystalline".equals(pvModuleSpecs.getCellType())) {
 			cellType = POLYCRYSTALLINE;
+		} else if ("Monocrystalline".equals(pvModuleSpecs.getCellType())) {
+			cellType = MONOCRYSTALLINE;
 		} else if ("Thin Film".equals(pvModuleSpecs.getCellType())) {
 			cellType = THIN_FILM;
+		}
+		if ("Blue".equals(pvModuleSpecs.getColor())) {
+			colorOption = COLOR_OPTION_BLUE;
+		} else if ("Black".equals(pvModuleSpecs.getColor())) {
+			colorOption = COLOR_OPTION_BLACK;
+		} else if ("Gray".equals(pvModuleSpecs.getColor())) {
+			colorOption = COLOR_OPTION_GRAY;
 		}
 	}
 
