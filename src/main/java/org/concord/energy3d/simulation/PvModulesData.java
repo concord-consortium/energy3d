@@ -73,6 +73,7 @@ public final class PvModulesData {
 			module.setNoct(Double.parseDouble(t[14].trim()));
 			module.setWeight(Double.parseDouble(t[15].trim()));
 			module.setColor(t[16].trim());
+			module.setShadeTolerance(t[17].trim());
 		}
 
 	}

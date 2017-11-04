@@ -715,28 +715,25 @@ class PopupMenuForRack extends PopupMenuFactory {
 					modelComboBox.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(final ItemEvent e) {
-							final boolean isCustom = modelComboBox.getSelectedIndex() == 0;
-							sizeComboBox.setEnabled(isCustom);
-							cellTypeComboBox.setEnabled(isCustom);
-							colorOptionComboBox.setEnabled(isCustom);
-							shadeToleranceComboBox.setEnabled(isCustom);
-							cellEfficiencyField.setEnabled(isCustom);
-							noctField.setEnabled(isCustom);
-							pmaxTcField.setEnabled(isCustom);
-							if (!isCustom) {
-								final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
-								cellTypeComboBox.setSelectedItem(specs.getCellType());
-								cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
-								noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
-								pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
-								final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
-								sizeComboBox.setSelectedItem(s);
-								if ("Blue".equals(specs.getColor())) {
-									colorOptionComboBox.setSelectedIndex(0);
-								} else if ("Black".equals(specs.getColor())) {
-									colorOptionComboBox.setSelectedIndex(1);
-								} else if ("Gray".equals(specs.getColor())) {
-									colorOptionComboBox.setSelectedIndex(2);
+							if (e.getStateChange() == ItemEvent.SELECTED) {
+								final boolean isCustom = modelComboBox.getSelectedIndex() == 0;
+								sizeComboBox.setEnabled(isCustom);
+								cellTypeComboBox.setEnabled(isCustom);
+								colorOptionComboBox.setEnabled(isCustom);
+								shadeToleranceComboBox.setEnabled(isCustom);
+								cellEfficiencyField.setEnabled(isCustom);
+								noctField.setEnabled(isCustom);
+								pmaxTcField.setEnabled(isCustom);
+								if (!isCustom) {
+									final PvModuleSpecs specs = modules.get(modelComboBox.getSelectedItem());
+									cellTypeComboBox.setSelectedItem(specs.getCellType());
+									shadeToleranceComboBox.setSelectedItem(specs.getShadeTolerance());
+									cellEfficiencyField.setText(threeDecimalsFormat.format(specs.getCelLEfficiency() * 100));
+									noctField.setText(threeDecimalsFormat.format(specs.getNoct()));
+									pmaxTcField.setText(sixDecimalsFormat.format(specs.getPmaxTc()));
+									final String s = threeDecimalsFormat.format(specs.getNominalWidth()) + "m \u00D7 " + threeDecimalsFormat.format(specs.getNominalLength()) + "m (" + specs.getLayout().width + " \u00D7 " + specs.getLayout().height + " cells)";
+									sizeComboBox.setSelectedItem(s);
+									colorOptionComboBox.setSelectedItem(specs.getColor());
 								}
 							}
 						}

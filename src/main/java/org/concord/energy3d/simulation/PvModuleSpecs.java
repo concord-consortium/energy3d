@@ -29,6 +29,7 @@ public class PvModuleSpecs implements Serializable {
 	private double pmaxTc = -0.0039; // Temperature Coefficient of Pmax (0-1, not % / degree C)
 	private double noct = 45; // Nominal operating cell temperature (degree C)
 	private double weight = 19; // kg
+	private String shadeTolerance = "Partial"; // ad hoc
 
 	@Override
 	public String toString() {
@@ -65,6 +66,14 @@ public class PvModuleSpecs implements Serializable {
 
 	public String getColor() {
 		return color;
+	}
+
+	public void setShadeTolerance(final String shadeTolerance) {
+		this.shadeTolerance = shadeTolerance;
+	}
+
+	public String getShadeTolerance() {
+		return shadeTolerance;
 	}
 
 	public void setCellType(final String cellType) {

@@ -158,20 +158,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 				break;
 			}
 		} else {
-			if ("Polycrystalline".equals(pvModuleSpecs.getCellType())) {
-				cellType = POLYCRYSTALLINE;
-			} else if ("Monocrystalline".equals(pvModuleSpecs.getCellType())) {
-				cellType = MONOCRYSTALLINE;
-			} else if ("Thin Film".equals(pvModuleSpecs.getCellType())) {
-				cellType = THIN_FILM;
-			}
-			if ("Blue".equals(pvModuleSpecs.getColor())) {
-				colorOption = COLOR_OPTION_BLUE;
-			} else if ("Black".equals(pvModuleSpecs.getColor())) {
-				colorOption = COLOR_OPTION_BLACK;
-			} else if ("Gray".equals(pvModuleSpecs.getColor())) {
-				colorOption = COLOR_OPTION_GRAY;
-			}
+			convertStringPropertiesToIntegerProperties();
 		}
 
 		mesh = new Mesh("SolarPanel");
@@ -1091,10 +1078,32 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setShadeTolerance(final int shadeTolerance) {
 		this.shadeTolerance = shadeTolerance;
+		if (pvModuleSpecs != null) {
+			switch (shadeTolerance) {
+			case PARTIAL_SHADE_TOLERANCE:
+				pvModuleSpecs.setShadeTolerance("Partial");
+				break;
+			case HIGH_SHADE_TOLERANCE:
+				pvModuleSpecs.setShadeTolerance("High");
+				break;
+			case NO_SHADE_TOLERANCE:
+				pvModuleSpecs.setShadeTolerance("None");
+				break;
+			}
+		}
 	}
 
 	public int getShadeTolerance() {
-		return shadeTolerance;
+		if (pvModuleSpecs == null) {
+			return shadeTolerance;
+		}
+		if ("Partial".equals(pvModuleSpecs.getShadeTolerance())) {
+			return PARTIAL_SHADE_TOLERANCE;
+		}
+		if ("High".equals(pvModuleSpecs.getShadeTolerance())) {
+			return HIGH_SHADE_TOLERANCE;
+		}
+		return NO_SHADE_TOLERANCE;
 	}
 
 	public void setSunBeamVisible(final boolean drawSunBeam) {
@@ -1294,6 +1303,10 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		this.pvModuleSpecs = pvModuleSpecs;
 		panelWidth = pvModuleSpecs.getWidth();
 		panelHeight = pvModuleSpecs.getLength();
+		convertStringPropertiesToIntegerProperties();
+	}
+
+	private void convertStringPropertiesToIntegerProperties() {
 		if ("Polycrystalline".equals(pvModuleSpecs.getCellType())) {
 			cellType = POLYCRYSTALLINE;
 		} else if ("Monocrystalline".equals(pvModuleSpecs.getCellType())) {
@@ -1307,6 +1320,13 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			colorOption = COLOR_OPTION_BLACK;
 		} else if ("Gray".equals(pvModuleSpecs.getColor())) {
 			colorOption = COLOR_OPTION_GRAY;
+		}
+		if ("Partial".equals(pvModuleSpecs.getShadeTolerance())) {
+			shadeTolerance = PARTIAL_SHADE_TOLERANCE;
+		} else if ("High".equals(pvModuleSpecs.getColor())) {
+			shadeTolerance = HIGH_SHADE_TOLERANCE;
+		} else if ("None".equals(pvModuleSpecs.getColor())) {
+			shadeTolerance = NO_SHADE_TOLERANCE;
 		}
 	}
 

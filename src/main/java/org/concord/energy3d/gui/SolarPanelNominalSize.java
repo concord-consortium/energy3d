@@ -2,7 +2,7 @@ package org.concord.energy3d.gui;
 
 class SolarPanelNominalSize {
 
-	private final int n = 5;
+	private final int n = 6;
 	private final String[] nominalStrings = new String[n];
 	private final double[] nominalWidths = new double[n];
 	private final double[] nominalHeights = new double[n];
@@ -16,25 +16,30 @@ class SolarPanelNominalSize {
 		cellNx[0] = 6;
 		cellNy[0] = 10;
 
-		nominalWidths[1] = 1.05;
-		nominalHeights[1] = 1.56;
-		cellNx[1] = 8;
+		nominalWidths[1] = 0.99;
+		nominalHeights[1] = 1.96;
+		cellNx[1] = 6;
 		cellNy[1] = 12;
 
-		nominalWidths[2] = 0.99;
-		nominalHeights[2] = 1.96;
-		cellNx[2] = 6;
+		nominalWidths[2] = 1.05;
+		nominalHeights[2] = 1.56;
+		cellNx[2] = 8;
 		cellNy[2] = 12;
 
-		nominalWidths[3] = 1.07;
-		nominalHeights[3] = 2.07;
+		nominalWidths[3] = 1.31;
+		nominalHeights[3] = 1.96;
 		cellNx[3] = 8;
-		cellNy[3] = 16;
+		cellNy[3] = 12;
 
-		nominalWidths[4] = 0.6;
-		nominalHeights[4] = 1.2;
-		cellNx[4] = 10;
-		cellNy[4] = 20;
+		nominalWidths[4] = 1.07;
+		nominalHeights[4] = 2.07;
+		cellNx[4] = 8;
+		cellNy[4] = 16;
+
+		nominalWidths[5] = 0.6;
+		nominalHeights[5] = 1.2;
+		cellNx[5] = 10;
+		cellNy[5] = 20;
 
 		for (int i = 0; i < n; i++) {
 			nominalStrings[i] = PopupMenuFactory.threeDecimalsFormat.format(nominalWidths[i]) + "m \u00D7 " + PopupMenuFactory.threeDecimalsFormat.format(nominalHeights[i]) + "m (" + cellNx[i] + " \u00D7 " + cellNy[i] + " cells)";
