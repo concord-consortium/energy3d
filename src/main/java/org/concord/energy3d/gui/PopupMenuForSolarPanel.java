@@ -1033,11 +1033,6 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 			final JMenuItem miSize = new JMenuItem("Size...");
 			miSize.addActionListener(new ActionListener() {
 
-				private double w = 0.99;
-				private double h = 1.65;
-				private int numberOfCellsInX = 6;
-				private int numberOfCellsInY = 10;
-
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1048,64 +1043,23 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
 					gui.setBorder(BorderFactory.createTitledBorder("Choose Size for " + partInfo));
-					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)", "0.6m \u00D7 1.2m (10 \u00D7 20 cells)" });
-					if (Util.isZero(s.getPanelHeight() - 1.65)) {
-						typeComboBox.setSelectedIndex(0);
-						w = 0.99;
-						h = 1.65;
-					} else if (Util.isZero(s.getPanelHeight() - 1.56)) {
-						typeComboBox.setSelectedIndex(1);
-						w = 1.05;
-						h = 1.56;
-					} else if (Util.isZero(s.getPanelHeight() - 1.96)) {
-						typeComboBox.setSelectedIndex(2);
-						w = 0.99;
-						h = 1.96;
-					} else if (Util.isZero(s.getPanelHeight() - 1.2)) {
-						typeComboBox.setSelectedIndex(3);
-						w = 0.6;
-						h = 1.2;
-					}
-					typeComboBox.addItemListener(new ItemListener() {
-						@Override
-						public void itemStateChanged(final ItemEvent e) {
-							switch (typeComboBox.getSelectedIndex()) {
-							case 0:
-								w = 0.99;
-								h = 1.65;
-								numberOfCellsInX = 6;
-								numberOfCellsInY = 10;
-								break;
-							case 1:
-								w = 1.05;
-								h = 1.56;
-								numberOfCellsInX = 8;
-								numberOfCellsInY = 12;
-								break;
-							case 2:
-								w = 0.99;
-								h = 1.96;
-								numberOfCellsInX = 6;
-								numberOfCellsInY = 12;
-								break;
-							case 3:
-								w = 0.6;
-								h = 1.2;
-								numberOfCellsInX = 10;
-								numberOfCellsInY = 20;
-								break;
-							}
+					final JComboBox<String> sizeComboBox = new JComboBox<String>(solarPanelNominalSize.getStrings());
+					final int nItems = sizeComboBox.getItemCount();
+					for (int i = 0; i < nItems; i++) {
+						if (Util.isZero(s.getPanelHeight() - solarPanelNominalSize.getNominalHeights()[i]) && Util.isZero(s.getPanelWidth() - solarPanelNominalSize.getNominalWidths()[i])) {
+							sizeComboBox.setSelectedIndex(i);
 						}
-					});
-					gui.add(typeComboBox, BorderLayout.NORTH);
+					}
+					gui.add(sizeComboBox, BorderLayout.NORTH);
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
 					final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
-					s.setPanelWidth(w);
-					s.setPanelHeight(h);
-					s.setNumberOfCellsInX(numberOfCellsInX);
-					s.setNumberOfCellsInY(numberOfCellsInY);
+					final int i = sizeComboBox.getSelectedIndex();
+					s.setPanelWidth(solarPanelNominalSize.getNominalWidths()[i]);
+					s.setPanelHeight(solarPanelNominalSize.getNominalHeights()[i]);
+					s.setNumberOfCellsInX(solarPanelNominalSize.getCellNx()[i]);
+					s.setNumberOfCellsInY(solarPanelNominalSize.getCellNy()[i]);
 					s.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 					updateAfterEdit();

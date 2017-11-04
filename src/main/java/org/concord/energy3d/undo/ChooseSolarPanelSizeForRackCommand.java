@@ -4,6 +4,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.SolarPanel;
 
 public class ChooseSolarPanelSizeForRackCommand extends MyAbstractUndoableEdit {
 
@@ -12,16 +13,23 @@ public class ChooseSolarPanelSizeForRackCommand extends MyAbstractUndoableEdit {
 	private double newWidth;
 	private final double oldHeight;
 	private double newHeight;
+	private final double oldRackWidth;
+	private double newRackWidth;
+	private final double oldRackHeight;
+	private double newRackHeight;
 	private final int oldCellNx, oldCellNy;
 	private int newCellNx, newCellNy;
 	private final Rack rack;
 
 	public ChooseSolarPanelSizeForRackCommand(final Rack rack) {
 		this.rack = rack;
-		oldWidth = rack.getSolarPanel().getPanelWidth();
-		oldHeight = rack.getSolarPanel().getPanelHeight();
-		oldCellNx = rack.getSolarPanel().getNumberOfCellsInX();
-		oldCellNy = rack.getSolarPanel().getNumberOfCellsInY();
+		oldRackWidth = rack.getRackWidth();
+		oldRackHeight = rack.getRackHeight();
+		final SolarPanel s = rack.getSolarPanel();
+		oldWidth = s.getPanelWidth();
+		oldHeight = s.getPanelHeight();
+		oldCellNx = s.getNumberOfCellsInX();
+		oldCellNy = s.getNumberOfCellsInY();
 	}
 
 	public Rack getRack() {
@@ -39,14 +47,19 @@ public class ChooseSolarPanelSizeForRackCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newWidth = rack.getSolarPanel().getPanelWidth();
-		newHeight = rack.getSolarPanel().getPanelHeight();
-		newCellNx = rack.getSolarPanel().getNumberOfCellsInX();
-		newCellNy = rack.getSolarPanel().getNumberOfCellsInY();
-		rack.getSolarPanel().setPanelWidth(oldWidth);
-		rack.getSolarPanel().setPanelHeight(oldHeight);
-		rack.getSolarPanel().setNumberOfCellsInX(oldCellNx);
-		rack.getSolarPanel().setNumberOfCellsInY(oldCellNy);
+		final SolarPanel s = rack.getSolarPanel();
+		newRackWidth = rack.getRackWidth();
+		newRackHeight = rack.getRackHeight();
+		newWidth = s.getPanelWidth();
+		newHeight = s.getPanelHeight();
+		newCellNx = s.getNumberOfCellsInX();
+		newCellNy = s.getNumberOfCellsInY();
+		s.setPanelWidth(oldWidth);
+		s.setPanelHeight(oldHeight);
+		s.setNumberOfCellsInX(oldCellNx);
+		s.setNumberOfCellsInY(oldCellNy);
+		rack.setRackWidth(oldRackWidth);
+		rack.setRackHeight(oldRackHeight);
 		rack.ensureFullSolarPanels(false);
 		rack.draw();
 	}
@@ -54,10 +67,13 @@ public class ChooseSolarPanelSizeForRackCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		rack.getSolarPanel().setPanelWidth(newWidth);
-		rack.getSolarPanel().setPanelHeight(newHeight);
-		rack.getSolarPanel().setNumberOfCellsInX(newCellNx);
-		rack.getSolarPanel().setNumberOfCellsInY(newCellNy);
+		final SolarPanel s = rack.getSolarPanel();
+		s.setPanelWidth(newWidth);
+		s.setPanelHeight(newHeight);
+		s.setNumberOfCellsInX(newCellNx);
+		s.setNumberOfCellsInY(newCellNy);
+		rack.setRackWidth(newRackWidth);
+		rack.setRackHeight(newRackHeight);
 		rack.ensureFullSolarPanels(false);
 		rack.draw();
 	}

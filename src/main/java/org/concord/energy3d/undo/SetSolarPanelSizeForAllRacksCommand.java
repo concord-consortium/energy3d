@@ -17,6 +17,10 @@ public class SetSolarPanelSizeForAllRacksCommand extends MyAbstractUndoableEdit 
 	private double[] newWidths;
 	private final double[] oldHeights;
 	private double[] newHeights;
+	private final double[] oldRackWidths;
+	private double[] newRackWidths;
+	private final double[] oldRackHeights;
+	private double[] newRackHeights;
 	private final int[] oldCellNxs, oldCellNys;
 	private int[] newCellNxs, newCellNys;
 	private final List<Rack> racks;
@@ -24,12 +28,17 @@ public class SetSolarPanelSizeForAllRacksCommand extends MyAbstractUndoableEdit 
 	public SetSolarPanelSizeForAllRacksCommand() {
 		racks = Scene.getInstance().getAllRacks();
 		final int n = racks.size();
+		oldRackWidths = new double[n];
+		oldRackHeights = new double[n];
 		oldWidths = new double[n];
 		oldHeights = new double[n];
 		oldCellNxs = new int[n];
 		oldCellNys = new int[n];
 		for (int i = 0; i < n; i++) {
-			final SolarPanel s = racks.get(i).getSolarPanel();
+			final Rack r = racks.get(i);
+			oldRackWidths[i] = r.getRackWidth();
+			oldRackHeights[i] = r.getRackHeight();
+			final SolarPanel s = r.getSolarPanel();
 			oldWidths[i] = s.getPanelWidth();
 			oldHeights[i] = s.getPanelHeight();
 			oldCellNxs[i] = s.getNumberOfCellsInX();
@@ -41,12 +50,16 @@ public class SetSolarPanelSizeForAllRacksCommand extends MyAbstractUndoableEdit 
 	public void undo() throws CannotUndoException {
 		super.undo();
 		final int n = racks.size();
+		newRackWidths = new double[n];
+		newRackHeights = new double[n];
 		newWidths = new double[n];
 		newHeights = new double[n];
 		newCellNxs = new int[n];
 		newCellNys = new int[n];
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
+			newRackWidths[i] = r.getRackWidth();
+			newRackHeights[i] = r.getRackHeight();
 			final SolarPanel s = r.getSolarPanel();
 			newWidths[i] = s.getPanelWidth();
 			s.setPanelWidth(oldWidths[i]);
@@ -56,6 +69,8 @@ public class SetSolarPanelSizeForAllRacksCommand extends MyAbstractUndoableEdit 
 			newCellNys[i] = s.getNumberOfCellsInY();
 			s.setNumberOfCellsInX(oldCellNxs[i]);
 			s.setNumberOfCellsInY(oldCellNys[i]);
+			r.setRackWidth(oldRackWidths[i]);
+			r.setRackHeight(oldRackHeights[i]);
 			r.ensureFullSolarPanels(false);
 			r.draw();
 		}
@@ -68,6 +83,8 @@ public class SetSolarPanelSizeForAllRacksCommand extends MyAbstractUndoableEdit 
 		final int n = racks.size();
 		for (int i = 0; i < n; i++) {
 			final Rack r = racks.get(i);
+			r.setRackWidth(newRackWidths[i]);
+			r.setRackHeight(newRackHeights[i]);
 			final SolarPanel s = r.getSolarPanel();
 			s.setPanelWidth(newWidths[i]);
 			s.setPanelHeight(newHeights[i]);

@@ -77,6 +77,8 @@ public abstract class PopupMenuFactory {
 		sixDecimalsFormat.setMaximumFractionDigits(6);
 	}
 
+	static SolarPanelNominalSize solarPanelNominalSize = new SolarPanelNominalSize();
+
 	// cached values
 	static JColorChooser colorChooser = new JColorChooser();
 	static double solarPanelWidth = 0.99;
