@@ -982,6 +982,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setPanelWidth(final double panelWidth) {
 		this.panelWidth = panelWidth;
+		if (pvModuleSpecs != null) {
+			pvModuleSpecs.setWidth(panelWidth);
+		}
 	}
 
 	public double getPanelWidth() {
@@ -990,6 +993,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setPanelHeight(final double panelHeight) {
 		this.panelHeight = panelHeight;
+		if (pvModuleSpecs != null) {
+			pvModuleSpecs.setLength(panelHeight);
+		}
 	}
 
 	public double getPanelHeight() {

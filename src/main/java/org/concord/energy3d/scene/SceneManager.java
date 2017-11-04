@@ -165,6 +165,7 @@ import com.ardor3d.util.resource.ResourceSource;
 import com.ardor3d.util.resource.SimpleResourceLocator;
 
 public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Updater {
+
 	public static final int SKY_RADIUS = 1000000;
 	private static final GameTaskQueueManager taskManager = GameTaskQueueManager.getManager("Task Manager");
 	private static final SceneManager instance = new SceneManager(MainPanel.getInstance().getCanvasPanel());
@@ -2177,7 +2178,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	private boolean isTooFar(final HousePart p) {
 		final double rc = p.getAbsCenter().length();
 		final Rectangle2D bounds = Scene.getInstance().getFoundationBounds(true);
-		double rmax = 4 * SKY_RADIUS / 10000;
+		double rmax = SKY_RADIUS / 1000;
 		if (!Util.isZero(bounds.getWidth() - 0.2) || !Util.isZero(bounds.getHeight() - 0.2)) {
 			final double b = 5 * (bounds.getWidth() + bounds.getHeight());
 			if (b > rmax) {

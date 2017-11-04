@@ -23,6 +23,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.SizeAnnotation;
+import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.Thermostat;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddArrayCommand;
@@ -2761,6 +2762,19 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				final Rack r = (Rack) p;
 				r.setRackWidth(width);
 				r.setRackHeight(height);
+				r.ensureFullSolarPanels(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSolarPanelModelForRacks(final PvModuleSpecs specs) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				final Rack r = (Rack) p;
+				final SolarPanel s = r.getSolarPanel();
+				s.setPvModuleSpecs(specs);
 				r.ensureFullSolarPanels(false);
 				r.draw();
 			}

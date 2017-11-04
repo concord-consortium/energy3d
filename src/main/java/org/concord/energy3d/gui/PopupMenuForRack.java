@@ -15,7 +15,6 @@ import java.util.concurrent.Callable;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -47,17 +46,15 @@ import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllRacksCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllRacksCommand;
-import org.concord.energy3d.undo.ChangeCellNumbersCommand;
-import org.concord.energy3d.undo.ChangeCellNumbersForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelCellNumbersCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForAllRacksCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.ChangeRackPoleSettingsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
+import org.concord.energy3d.undo.ChooseSolarPanelModelForRackCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsOnAllRacksCommand;
@@ -84,6 +81,8 @@ import org.concord.energy3d.undo.SetSolarPanelCellTypeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForRacksOnFoundationCommand;
+import org.concord.energy3d.undo.SetSolarPanelModelForAllRacksCommand;
+import org.concord.energy3d.undo.SetSolarPanelModelForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelSizeForAllRacksCommand;
@@ -937,6 +936,109 @@ class PopupMenuForRack extends PopupMenuFactory {
 
 			final JMenu solarPanelMenu = new JMenu("Change Solar Panel Properties");
 
+			final JMenuItem miSolarPanelModel = new JMenuItem("Model...");
+			solarPanelMenu.add(miSolarPanelModel);
+			miSolarPanelModel.addActionListener(new ActionListener() {
+
+				private String modelName;
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
+					final String[] models = new String[modules.size() + 1];
+					int i = 0;
+					models[i] = "Custom";
+					for (final String key : modules.keySet()) {
+						models[++i] = key;
+					}
+					final PvModuleSpecs specs = s.getPvModuleSpecs();
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Solar Panel Model for " + partInfo));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(models);
+					typeComboBox.setSelectedItem(specs.getModel());
+					typeComboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+							if (e.getStateChange() == ItemEvent.SELECTED) {
+								modelName = (String) typeComboBox.getSelectedItem();
+							}
+						}
+					});
+					gui.add(typeComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.CENTER);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Model");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								final ChooseSolarPanelModelForRackCommand c = new ChooseSolarPanelModelForRackCommand(r);
+								s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+								r.ensureFullSolarPanels(false);
+								r.draw();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final SetSolarPanelModelForRacksOnFoundationCommand c = new SetSolarPanelModelForRacksOnFoundationCommand(foundation);
+								foundation.setSolarPanelModelForRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final SetSolarPanelModelForAllRacksCommand c = new SetSolarPanelModelForAllRacksCommand();
+								Scene.getInstance().setSolarPanelModelForAllRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (choice == options[0]) {
+								break;
+							}
+						}
+					}
+				}
+			});
+
+			solarPanelMenu.addSeparator();
+
 			final JMenuItem miSolarPanelSize = new JMenuItem("Size...");
 			solarPanelMenu.add(miSolarPanelSize);
 			miSolarPanelSize.addActionListener(new ActionListener() {
@@ -961,7 +1063,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
 					gui.setBorder(BorderFactory.createTitledBorder("Solar Panel Size for " + partInfo));
-					final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)", "0.6m \u00D7 1.2m (10 \u00D7 20 cells)" });
+					final String[] sizes = new String[] { "0.99m \u00D7 1.65m (6 \u00D7 10 cells)", "1.05m \u00D7 1.56m (8 \u00D7 12 cells)", "0.99m \u00D7 1.96m (6 \u00D7 12 cells)", "0.6m \u00D7 1.2m (10 \u00D7 20 cells)" };
+					final JComboBox<String> typeComboBox = new JComboBox<String>(sizes);
 					final PvModuleSpecs specs = s.getPvModuleSpecs();
 					final boolean isCustom = "Custom".equals(specs.getModel());
 					final double width = isCustom ? s.getPanelWidth() : specs.getNominalWidth();
@@ -1067,195 +1170,6 @@ class PopupMenuForRack extends PopupMenuFactory {
 							updateAfterEdit();
 							if (choice == options[0]) {
 								break;
-							}
-						}
-					}
-				}
-			});
-
-			final JMenuItem miSolarPanelOrientation = new JMenuItem("Orientation...");
-			solarPanelMenu.add(miSolarPanelOrientation);
-			miSolarPanelOrientation.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Rack)) {
-						return;
-					}
-					final Rack r = (Rack) selectedPart;
-					final Foundation foundation = r.getTopContainer();
-					final SolarPanel s = r.getSolarPanel();
-					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
-					final JPanel gui = new JPanel(new BorderLayout(5, 5));
-					gui.setBorder(BorderFactory.createTitledBorder("Solar Panel Orientation for " + partInfo));
-					final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
-					orientationComboBox.setSelectedIndex(s.isRotated() ? 1 : 0);
-					gui.add(orientationComboBox, BorderLayout.NORTH);
-					final JPanel scopePanel = new JPanel();
-					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
-					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Racks");
-					scopePanel.add(rb1);
-					scopePanel.add(rb2);
-					scopePanel.add(rb3);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					switch (selectedScopeIndex) {
-					case 0:
-						rb1.setSelected(true);
-						break;
-					case 1:
-						rb2.setSelected(true);
-						break;
-					case 2:
-						rb3.setSelected(true);
-						break;
-					}
-					gui.add(scopePanel, BorderLayout.CENTER);
-
-					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Orientation");
-
-					while (true) {
-						dialog.setVisible(true);
-						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
-							break;
-						} else {
-							if (rb1.isSelected()) {
-								final RotateSolarPanelsOnRackCommand c = new RotateSolarPanelsOnRackCommand(r);
-								s.setRotated(orientationComboBox.getSelectedIndex() == 1);
-								r.ensureFullSolarPanels(false);
-								r.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								selectedScopeIndex = 0;
-							} else if (rb2.isSelected()) {
-								final RotateSolarPanelsForRacksOnFoundationCommand c = new RotateSolarPanelsForRacksOnFoundationCommand(foundation);
-								foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								selectedScopeIndex = 1;
-							} else if (rb3.isSelected()) {
-								final RotateSolarPanelsOnAllRacksCommand c = new RotateSolarPanelsOnAllRacksCommand();
-								Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								selectedScopeIndex = 2;
-							}
-							updateAfterEdit();
-							if (choice == options[0]) {
-								break;
-							}
-						}
-					}
-				}
-			});
-
-			// @deprecated: module structure is related to size and may not be set independently
-			final JMenuItem miModuleStructure = new JMenuItem("Module Structure...");
-			// solarPanelMenu.add(miModuleStructure);
-			miModuleStructure.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Rack)) {
-						return;
-					}
-					final Rack r = (Rack) selectedPart;
-					final SolarPanel s = r.getSolarPanel();
-					final Foundation foundation = r.getTopContainer();
-					int nx = s.getNumberOfCellsInX();
-					int ny = s.getNumberOfCellsInY();
-					final String partInfo = r.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final JPanel inputFields = new JPanel();
-					inputFields.setBorder(BorderFactory.createTitledBorder("Cell Numbers for " + partInfo));
-					final JTextField nxField = new JTextField(nx + "", 10);
-					inputFields.add(nxField);
-					inputFields.add(new JLabel("  \u00D7  "));
-					final JTextField nyField = new JTextField(ny + "", 10);
-					inputFields.add(nyField);
-					final JPanel scopeFields = new JPanel();
-					scopeFields.setLayout(new BoxLayout(scopeFields, BoxLayout.Y_AXIS));
-					scopeFields.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
-					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Racks");
-					scopeFields.add(rb1);
-					scopeFields.add(rb2);
-					scopeFields.add(rb3);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					switch (selectedScopeIndex) {
-					case 0:
-						rb1.setSelected(true);
-						break;
-					case 1:
-						rb2.setSelected(true);
-						break;
-					case 2:
-						rb3.setSelected(true);
-						break;
-					}
-					final JPanel panel = new JPanel(new BorderLayout(0, 8));
-					panel.add(inputFields, BorderLayout.NORTH);
-					panel.add(new JLabel(new ImageIcon(PopupMenuFactory.class.getResource("icons/solarcells.png"))));
-					panel.add(scopeFields, BorderLayout.SOUTH);
-
-					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Cells of Panels on Rack");
-
-					while (true) {
-						dialog.setVisible(true);
-						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
-							break;
-						} else {
-							boolean ok = true;
-							try {
-								nx = Integer.parseInt(nxField.getText());
-								ny = Integer.parseInt(nyField.getText());
-							} catch (final NumberFormatException ex) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
-								ok = false;
-							}
-							if (ok) {
-								if (nx <= 0 || nx > 20 || ny <= 0 || ny > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of cells in X or Y direction must be between 1 and 20.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
-									if (rb1.isSelected()) {
-										final ChangeCellNumbersCommand c = new ChangeCellNumbersCommand(s);
-										s.setNumberOfCellsInX(nx);
-										s.setNumberOfCellsInY(ny);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-										selectedScopeIndex = 0;
-									} else if (rb2.isSelected()) {
-										final ChangeFoundationSolarPanelCellNumbersCommand c = new ChangeFoundationSolarPanelCellNumbersCommand(foundation);
-										foundation.setCellNumbersForSolarPanels(nx, ny);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-										selectedScopeIndex = 1;
-									} else if (rb3.isSelected()) {
-										final ChangeCellNumbersForAllSolarPanelsCommand c = new ChangeCellNumbersForAllSolarPanelsCommand();
-										Scene.getInstance().setCellNumbersForAllSolarPanels(nx, ny);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-										selectedScopeIndex = 2;
-									}
-									updateAfterEdit();
-									if (choice == options[0]) {
-										break;
-									}
-								}
 							}
 						}
 					}
@@ -1428,9 +1342,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miSolarCellEfficiency = new JMenuItem("Solar Cell Efficiency...");
-			solarPanelMenu.add(miSolarCellEfficiency);
-			miSolarCellEfficiency.addActionListener(new ActionListener() {
+			final JMenuItem miSolarPanelCellEfficiency = new JMenuItem("Solar Cell Efficiency...");
+			solarPanelMenu.add(miSolarPanelCellEfficiency);
+			miSolarPanelCellEfficiency.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -1524,9 +1438,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miNoct = new JMenuItem("Nominal Operating Cell Temperature...");
-			solarPanelMenu.add(miNoct);
-			miNoct.addActionListener(new ActionListener() {
+			final JMenuItem miSolarPanelNoct = new JMenuItem("Nominal Operating Cell Temperature...");
+			solarPanelMenu.add(miSolarPanelNoct);
+			miSolarPanelNoct.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -1620,9 +1534,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miPmax = new JMenuItem("Temperature Coefficient of Pmax...");
-			solarPanelMenu.add(miPmax);
-			miPmax.addActionListener(new ActionListener() {
+			final JMenuItem miSolarPanelPmaxTc = new JMenuItem("Temperature Coefficient of Pmax...");
+			solarPanelMenu.add(miSolarPanelPmaxTc);
+			miSolarPanelPmaxTc.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -1786,6 +1700,92 @@ class PopupMenuForRack extends PopupMenuFactory {
 							} else if (rb3.isSelected()) {
 								final SetSolarPanelShadeToleranceForAllRacksCommand c = new SetSolarPanelShadeToleranceForAllRacksCommand();
 								Scene.getInstance().setSolarPanelShadeToleranceForAllRacks(toleranceComboBox.getSelectedIndex());
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (choice == options[0]) {
+								break;
+							}
+						}
+					}
+				}
+			});
+
+			solarPanelMenu.addSeparator();
+
+			final JMenuItem miSolarPanelOrientation = new JMenuItem("Orientation...");
+			solarPanelMenu.add(miSolarPanelOrientation);
+			miSolarPanelOrientation.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack r = (Rack) selectedPart;
+					final Foundation foundation = r.getTopContainer();
+					final SolarPanel s = r.getSolarPanel();
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Solar Panel Orientation for " + partInfo));
+					final JComboBox<String> orientationComboBox = new JComboBox<String>(new String[] { "Portrait", "Landscape" });
+					orientationComboBox.setSelectedIndex(s.isRotated() ? 1 : 0);
+					gui.add(orientationComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.CENTER);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Orientation");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								final RotateSolarPanelsOnRackCommand c = new RotateSolarPanelsOnRackCommand(r);
+								s.setRotated(orientationComboBox.getSelectedIndex() == 1);
+								r.ensureFullSolarPanels(false);
+								r.draw();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final RotateSolarPanelsForRacksOnFoundationCommand c = new RotateSolarPanelsForRacksOnFoundationCommand(foundation);
+								foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final RotateSolarPanelsOnAllRacksCommand c = new RotateSolarPanelsOnAllRacksCommand();
+								Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;
 							}
@@ -2375,7 +2375,14 @@ class PopupMenuForRack extends PopupMenuFactory {
 					Util.selectSilently(miLabelTiltAngle, rack.getLabelTiltAngle());
 					Util.selectSilently(miLabelTracker, rack.getLabelTracker());
 					Util.selectSilently(miLabelEnergyOutput, rack.getLabelEnergyOutput());
-					solarPanelMenu.setEnabled("Custom".equals(rack.getSolarPanel().getModelName()));
+					final boolean isCustom = "Custom".equals(rack.getSolarPanel().getModelName());
+					miSolarPanelCellEfficiency.setEnabled(isCustom);
+					miSolarPanelCellType.setEnabled(isCustom);
+					miSolarPanelColor.setEnabled(isCustom);
+					miSolarPanelSize.setEnabled(isCustom);
+					miSolarPanelShadeTolerance.setEnabled(isCustom);
+					miSolarPanelNoct.setEnabled(isCustom);
+					miSolarPanelPmaxTc.setEnabled(isCustom);
 				}
 
 			});

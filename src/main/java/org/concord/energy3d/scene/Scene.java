@@ -60,6 +60,7 @@ import org.concord.energy3d.simulation.Ground;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.PvCustomPrice;
 import org.concord.energy3d.simulation.PvDesignSpecs;
+import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
@@ -2507,6 +2508,19 @@ public class Scene implements Serializable {
 				rack.setRackHeight(height);
 				rack.ensureFullSolarPanels(false);
 				rack.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSolarPanelModelForAllRacks(final PvModuleSpecs specs) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				final Rack r = (Rack) p;
+				final SolarPanel s = r.getSolarPanel();
+				s.setPvModuleSpecs(specs);
+				r.ensureFullSolarPanels(false);
+				r.draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
