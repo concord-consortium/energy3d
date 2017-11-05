@@ -9,12 +9,14 @@ public class SetSolarPanelLabelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;
+	private final boolean oldLabelModel;
 	private final boolean oldLabelCustom;
 	private final boolean oldLabelCellEfficiency;
 	private final boolean oldLabelTiltAngle;
 	private final boolean oldLabelTracker;
 	private final boolean oldLabelEnergyOutput;
 	private boolean newLabelId;
+	private boolean newLabelModel;
 	private boolean newLabelCustom;
 	private boolean newLabelCellEfficiency;
 	private boolean newLabelTiltAngle;
@@ -25,6 +27,7 @@ public class SetSolarPanelLabelCommand extends MyAbstractUndoableEdit {
 	public SetSolarPanelLabelCommand(final SolarPanel panel) {
 		this.panel = panel;
 		oldLabelId = panel.getLabelId();
+		oldLabelModel = panel.getLabelModelName();
 		oldLabelCustom = panel.getLabelCustom();
 		oldLabelCellEfficiency = panel.getLabelCellEfficiency();
 		oldLabelTiltAngle = panel.getLabelTiltAngle();
@@ -48,12 +51,14 @@ public class SetSolarPanelLabelCommand extends MyAbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		newLabelId = panel.getLabelId();
+		newLabelModel = panel.getLabelModelName();
 		newLabelCustom = panel.getLabelCustom();
 		newLabelCellEfficiency = panel.getLabelCellEfficiency();
 		newLabelTiltAngle = panel.getLabelTiltAngle();
 		newLabelTracker = panel.getLabelTracker();
 		newLabelEnergyOutput = panel.getLabelEnergyOutput();
 		panel.setLabelId(oldLabelId);
+		panel.setLabelModelName(oldLabelModel);
 		panel.setLabelCustom(oldLabelCustom);
 		panel.setLabelCellEfficiency(oldLabelCellEfficiency);
 		panel.setLabelTiltAngle(oldLabelTiltAngle);
@@ -66,6 +71,7 @@ public class SetSolarPanelLabelCommand extends MyAbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		panel.setLabelId(newLabelId);
+		panel.setLabelModelName(newLabelModel);
 		panel.setLabelCustom(newLabelCustom);
 		panel.setLabelCellEfficiency(newLabelCellEfficiency);
 		panel.setLabelTiltAngle(newLabelTiltAngle);

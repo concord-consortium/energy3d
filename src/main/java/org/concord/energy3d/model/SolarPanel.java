@@ -90,6 +90,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	private boolean drawSunBeam;
 	private int rotationAxis;
 	private int shadeTolerance = PARTIAL_SHADE_TOLERANCE;
+	private boolean labelModelName;
 	private boolean labelCellEfficiency;
 	private boolean labelTiltAngle;
 	private boolean labelTracker;
@@ -447,8 +448,11 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		if (labelId) {
 			text += (text.equals("") ? "" : "\n") + "#" + id;
 		}
+		if (labelModelName) {
+			text += (text.equals("") ? "" : "\n") + pvModuleSpecs.getModel();
+		}
 		if (labelCellEfficiency) {
-			text += (text.equals("") ? "" : "\n") + EnergyPanel.TWO_DECIMALS.format(100 * efficiency) + "%";
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.TWO_DECIMALS.format(100 * getCellEfficiency()) + "%";
 		}
 		if (labelTiltAngle) {
 			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(onFlatSurface ? tiltAngle : Math.toDegrees(Math.asin(normal.getY()))) + " \u00B0";
@@ -1251,6 +1255,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	@Override
 	public void clearLabels() {
 		super.clearLabels();
+		labelModelName = false;
 		labelCellEfficiency = false;
 		labelTiltAngle = false;
 		labelTracker = false;
@@ -1259,6 +1264,14 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public boolean isLabelVisible() {
 		return label.isVisible();
+	}
+
+	public void setLabelModelName(final boolean labelModelName) {
+		this.labelModelName = labelModelName;
+	}
+
+	public boolean getLabelModelName() {
+		return labelModelName;
 	}
 
 	public void setLabelTracker(final boolean labelTracker) {

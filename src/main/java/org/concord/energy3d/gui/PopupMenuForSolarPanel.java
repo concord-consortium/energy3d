@@ -735,6 +735,24 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 			});
 			labelMenu.add(miLabelId);
 
+			final JCheckBoxMenuItem miLabelModelName = new JCheckBoxMenuItem("Model");
+			miLabelModelName.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof SolarPanel) {
+						final SolarPanel s = (SolarPanel) selectedPart;
+						final SetSolarPanelLabelCommand c = new SetSolarPanelLabelCommand(s);
+						s.setLabelModelName(miLabelModelName.isSelected());
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().refresh();
+					}
+				}
+			});
+			labelMenu.add(miLabelModelName);
+
 			final JCheckBoxMenuItem miLabelCellEfficiency = new JCheckBoxMenuItem("Cell Efficiency");
 			miLabelCellEfficiency.addActionListener(new ActionListener() {
 				@Override
@@ -1707,6 +1725,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					Util.selectSilently(miLabelNone, !sp.isLabelVisible());
 					Util.selectSilently(miLabelCustom, sp.getLabelCustom());
 					Util.selectSilently(miLabelId, sp.getLabelId());
+					Util.selectSilently(miLabelModelName, sp.getLabelModelName());
 					Util.selectSilently(miLabelCellEfficiency, sp.getLabelCellEfficiency());
 					Util.selectSilently(miLabelTiltAngle, sp.getLabelTiltAngle());
 					Util.selectSilently(miLabelTracker, sp.getLabelTracker());

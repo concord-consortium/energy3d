@@ -1485,6 +1485,7 @@ public class MainFrame extends JFrame {
 
 			final JMenu pvMenu = new JMenu("Photovoltaic Solar Power");
 			tutorialsMenu.add(pvMenu);
+			addModel(pvMenu, "Brand Name Solar Panels", "tutorials/solar-panel-brand-names.ng3");
 			addModel(pvMenu, "Single Solar Rack", "tutorials/solar-single-rack.ng3");
 			addModel(pvMenu, "Multiple Solar Racks", "tutorials/solar-multiple-racks.ng3");
 			addModel(pvMenu, "Solar Trackers for Racks", "tutorials/solar-tracker-racks.ng3");
