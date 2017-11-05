@@ -2,6 +2,11 @@ package org.concord.energy3d.simulation;
 
 import java.io.Serializable;
 
+import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Trackable;
+import org.concord.energy3d.scene.Scene;
+
 /**
  * @author Charles Xie
  *
@@ -45,6 +50,31 @@ public class PvCustomPrice implements Serializable {
 		if (solarPanelAadatPrice == 0) {
 			solarPanelAadatPrice = 1000;
 		}
+	}
+
+	public double getTotalCost(final Rack r) {
+		return getTotalCost(r.getSolarPanel()) * r.getNumberOfSolarPanels();
+	}
+
+	public double getTotalCost(final SolarPanel s) {
+		double cost = solarPanelPrice;
+		cost += solarPanelRackBasePrice;
+		final double baseHeight = s.getBaseHeight() * Scene.getInstance().getAnnotationScale();
+		if (baseHeight > 1) {
+			cost += solarPanelRackHeightPrice * (baseHeight - 1);
+		}
+		switch (s.getTracker()) {
+		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+			cost += solarPanelHsatPrice;
+			break;
+		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+			cost += solarPanelVsatPrice;
+			break;
+		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			cost += solarPanelAadatPrice;
+			break;
+		}
+		return cost;
 	}
 
 	public void setLifespan(final int lifespan) {

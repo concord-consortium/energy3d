@@ -142,6 +142,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyColorRGBA;
 
 public class MainFrame extends JFrame {
+
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
@@ -197,7 +198,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem dailyFresnelReflectorAnalysisMenuItem;
 	private JMenuItem annualSensorMenuItem;
 	private JMenuItem dailySensorMenuItem;
-	private JMenuItem constructionCostAnalysisMenuItem;
+	private JMenuItem costAnalysisMenuItem;
 	private JMenuItem monthlySunshineHoursMenuItem;
 	private JMenuItem annualEnvironmentalTemperatureMenuItem;
 	private JMenuItem dailyEnvironmentalTemperatureMenuItem;
@@ -1316,7 +1317,7 @@ public class MainFrame extends JFrame {
 
 			analysisMenu.addSeparator();
 
-			analysisMenu.add(getConstructionCostAnalysisMenuItem());
+			analysisMenu.add(getCostAnalysisMenuItem());
 			// analysisMenu.add(getOrientationalEnergyAnalysisMenuItem());
 		}
 		return analysisMenu;
@@ -2770,18 +2771,18 @@ public class MainFrame extends JFrame {
 	// return orientationalEnergyAnalysisMenuItem;
 	// }
 
-	private JMenuItem getConstructionCostAnalysisMenuItem() {
-		if (constructionCostAnalysisMenuItem == null) {
-			constructionCostAnalysisMenuItem = new JMenuItem("Show Construction Costs...");
-			constructionCostAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
-			constructionCostAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getCostAnalysisMenuItem() {
+		if (costAnalysisMenuItem == null) {
+			costAnalysisMenuItem = new JMenuItem("Show Costs...");
+			costAnalysisMenuItem.setAccelerator(KeyStroke.getKeyStroke("F7"));
+			costAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Cost.getInstance().showGraph();
 				}
 			});
 		}
-		return constructionCostAnalysisMenuItem;
+		return costAnalysisMenuItem;
 	}
 
 	private JMenuItem getMonthlySunshineHoursMenuItem() {

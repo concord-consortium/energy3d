@@ -13,7 +13,6 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
-import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.simulation.PvCustomPrice;
 import org.concord.energy3d.simulation.PvDesignSpecs;
@@ -108,23 +107,7 @@ public class PvStationInfoPanel extends JPanel {
 		if (!panels.isEmpty()) {
 			countSolarPanels += panels.size();
 			for (final SolarPanel s : panels) {
-				cost += price.getSolarPanelPrice();
-				cost += price.getSolarPanelRackBasePrice();
-				final double baseHeight = s.getBaseHeight() * Scene.getInstance().getAnnotationScale();
-				if (baseHeight > 1) {
-					cost += price.getSolarPanelRackHeightPrice() * (baseHeight - 1);
-				}
-				switch (s.getTracker()) {
-				case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-					cost += price.getSolarPanelHsatPrice();
-					break;
-				case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-					cost += price.getSolarPanelVsatPrice();
-					break;
-				case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-					cost += price.getSolarPanelAadatPrice();
-					break;
-				}
+				cost += price.getTotalCost(s);
 				panelArea += s.getPanelWidth() * s.getPanelHeight();
 			}
 		}
@@ -132,23 +115,7 @@ public class PvStationInfoPanel extends JPanel {
 		if (!racks.isEmpty()) {
 			for (final Rack r : racks) {
 				countSolarPanels += r.getNumberOfSolarPanels();
-				cost += price.getSolarPanelPrice() * r.getNumberOfSolarPanels();
-				cost += price.getSolarPanelRackBasePrice() * r.getNumberOfSolarPanels();
-				final double baseHeight = r.getBaseHeight() * Scene.getInstance().getAnnotationScale();
-				if (baseHeight > 1) {
-					cost += price.getSolarPanelRackHeightPrice() * (baseHeight - 1) * r.getNumberOfSolarPanels();
-				}
-				switch (r.getTracker()) {
-				case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-					cost += price.getSolarPanelHsatPrice() * r.getNumberOfSolarPanels();
-					break;
-				case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-					cost += price.getSolarPanelVsatPrice() * r.getNumberOfSolarPanels();
-					break;
-				case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-					cost += price.getSolarPanelAadatPrice() * r.getNumberOfSolarPanels();
-					break;
-				}
+				cost += price.getTotalCost(r);
 				panelArea += r.getArea();
 			}
 		}

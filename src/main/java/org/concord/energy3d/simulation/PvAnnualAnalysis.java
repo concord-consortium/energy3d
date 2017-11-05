@@ -240,12 +240,12 @@ public class PvAnnualAnalysis extends Analysis {
 		String title = "Annual Yield of All Solar Panels (" + Scene.getInstance().countSolarPanels() + " Solar Panels)";
 		if (selectedPart != null) {
 			if (selectedPart instanceof SolarPanel) {
-				cost = Cost.getInstance().getPartCost(selectedPart);
+				cost = (int) Cost.getInstance().getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield";
 			} else if (selectedPart instanceof Rack) {
 				final Rack rack = (Rack) selectedPart;
-				cost = Cost.getInstance().getPartCost(rack.getSolarPanel()) * rack.getNumberOfSolarPanels();
+				cost = (int) Cost.getInstance().getPartCost(rack.getSolarPanel()) * rack.getNumberOfSolarPanels();
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield (" + rack.getNumberOfSolarPanels() + " Solar Panels)";
 			} else if (selectedPart instanceof Foundation) {

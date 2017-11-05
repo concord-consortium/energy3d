@@ -209,7 +209,7 @@ public class FresnelReflectorAnnualAnalysis extends Analysis {
 		String title = "Annual Yield of All Fresnel Reflectors";
 		if (selectedPart != null) {
 			if (selectedPart instanceof FresnelReflector) {
-				cost = Cost.getInstance().getPartCost(selectedPart);
+				cost = (int) Cost.getInstance().getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield";
 			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {

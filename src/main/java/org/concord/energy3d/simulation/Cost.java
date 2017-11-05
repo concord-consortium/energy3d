@@ -55,8 +55,8 @@ public class Cost {
 		return instance;
 	}
 
-	public int getTotalCost() {
-		int sum = 0;
+	public double getTotalCost() {
+		double sum = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.isFrozen()) {
 				continue;
@@ -66,7 +66,7 @@ public class Cost {
 		return sum;
 	}
 
-	public int getBuildingCost(final Foundation foundation) {
+	public double getBuildingCost(final Foundation foundation) {
 		if (foundation == null) {
 			return 0;
 		}
@@ -76,7 +76,7 @@ public class Cost {
 				buildingCount++;
 			}
 		}
-		int sum = 0;
+		double sum = 0;
 		if (buildingCount == 1) {
 			for (final HousePart p : Scene.getInstance().getParts()) { // if there is only one building, trees are included in its cost
 				if (p.isFrozen() && p instanceof Tree) {
@@ -95,7 +95,7 @@ public class Cost {
 		return sum;
 	}
 
-	public int getPartCost(final HousePart part) {
+	public double getPartCost(final HousePart part) {
 		if (part instanceof Wall) {
 			final double uFactor = ((Wall) part).getUValue();
 			// According to http://www.homewyse.com/services/cost_to_insulate_your_home.html
@@ -155,8 +155,10 @@ public class Cost {
 			return (int) (part.getArea() * unitPrice);
 		}
 		if (part instanceof SolarPanel) {
-			// According to http://www.solartown.com/learning/solar-panels/solar-module-comparison
-			return 350 + (int) (((SolarPanel) part).getCellEfficiency() * 2000);
+			return Scene.getInstance().getPvCustomPrice().getTotalCost((SolarPanel) part);
+		}
+		if (part instanceof Rack) {
+			return Scene.getInstance().getPvCustomPrice().getTotalCost((Rack) part);
 		}
 		if (part instanceof Mirror) {
 			return (int) (((Mirror) part).getArea() * 100);
@@ -315,14 +317,14 @@ public class Cost {
 			selectedPart.setEditPointsVisible(false);
 			SceneManager.getInstance().setSelectedPart(selectedBuilding);
 		}
-		int wallSum = 0;
-		int floorSum = 0;
-		int windowSum = 0;
-		int roofSum = 0;
-		int foundationSum = 0;
-		int doorSum = 0;
-		int solarPanelSum = 0;
-		int treeSum = 0;
+		double wallSum = 0;
+		double floorSum = 0;
+		double windowSum = 0;
+		double roofSum = 0;
+		double foundationSum = 0;
+		double doorSum = 0;
+		double solarPanelSum = 0;
+		double treeSum = 0;
 		String info;
 		if (selectedBuilding != null) {
 			info = "Building #" + selectedBuilding.getId();
@@ -374,7 +376,7 @@ public class Cost {
 			}
 		}
 
-		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
+		final float[] data = new float[] { (float) wallSum, (float) windowSum, (float) roofSum, (float) foundationSum, (float) floorSum, (float) doorSum, (float) solarPanelSum, (float) treeSum };
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
 

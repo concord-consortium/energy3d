@@ -54,15 +54,15 @@ public class ConstructionCostGraph extends JPanel {
 	private final JPopupMenu popupMenu;
 	private final DecimalFormat noDecimals = new DecimalFormat();
 	private Foundation foundation;
-	private int wallSum;
-	private int floorSum;
-	private int windowSum;
-	private int roofSum;
-	private int doorSum;
-	private int solarPanelSum;
-	private int treeSum;
-	private int foundationSum;
-	private int totalCost;
+	private double wallSum;
+	private double floorSum;
+	private double windowSum;
+	private double roofSum;
+	private double doorSum;
+	private double solarPanelSum;
+	private double treeSum;
+	private double foundationSum;
+	private double totalCost;
 
 	public ConstructionCostGraph() {
 		super(new BorderLayout());
@@ -203,7 +203,7 @@ public class ConstructionCostGraph extends JPanel {
 				budgetPanel.setBorder(EnergyPanel.createTitledBorder(t, true));
 				break;
 			}
-			budgetBar.setValue(totalCost);
+			budgetBar.setValue((float) totalCost);
 			budgetBar.repaint();
 			budgetPanel.repaint();
 		}
@@ -219,7 +219,7 @@ public class ConstructionCostGraph extends JPanel {
 
 		add(budgetPanel, BorderLayout.NORTH);
 
-		final float[] data = new float[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
+		final float[] data = new float[] { (float) wallSum, (float) windowSum, (float) roofSum, (float) foundationSum, (float) floorSum, (float) doorSum, (float) solarPanelSum, (float) treeSum };
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
 
