@@ -1,7 +1,6 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -55,9 +54,11 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCellPropertiesCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelCellNumbersCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarPanelModelCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyForAllCommand;
+import org.concord.energy3d.undo.ChangeModelForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeSolarCellPropertiesCommand;
 import org.concord.energy3d.undo.ChangeSolarCellPropertiesForAllCommand;
 import org.concord.energy3d.undo.ChangeSolarPanelModelCommand;
@@ -1651,54 +1652,103 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 			shadeToleranceMenu.add(miPartialTolerance);
 			shadeToleranceMenu.add(miHighTolerance);
 
-			final JMenu modelMenu = new JMenu("Model");
-			final ButtonGroup modelGroup = new ButtonGroup();
-			final JRadioButtonMenuItem miCustomModel = new JRadioButtonMenuItem("Custom");
-			miCustomModel.addItemListener(new ItemListener() {
+			final JMenuItem miModel = new JMenuItem("Model...");
+			miModel.addActionListener(new ActionListener() {
+
+				private String modelName;
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof SolarPanel)) {
-							return;
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof SolarPanel)) {
+						return;
+					}
+					final SolarPanel s = (SolarPanel) selectedPart;
+					final Foundation foundation = s.getTopContainer();
+					final String partInfo = s.toString().substring(0, s.toString().indexOf(')') + 1);
+					final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
+					final String[] models = new String[modules.size() + 1];
+					int i = 0;
+					models[i] = "Custom";
+					for (final String key : modules.keySet()) {
+						models[++i] = key;
+					}
+					final PvModuleSpecs specs = s.getPvModuleSpecs();
+					final JPanel gui = new JPanel(new BorderLayout(5, 5));
+					gui.setBorder(BorderFactory.createTitledBorder("Model for " + partInfo));
+					final JComboBox<String> typeComboBox = new JComboBox<String>(models);
+					typeComboBox.setSelectedItem(specs.getModel());
+					typeComboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+							if (e.getStateChange() == ItemEvent.SELECTED) {
+								modelName = (String) typeComboBox.getSelectedItem();
+							}
 						}
-						final SolarPanel sp = (SolarPanel) selectedPart;
-						final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(sp);
-						final PvModuleSpecs specs = sp.getPvModuleSpecs();
-						specs.setModel("Custom");
-						sp.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-						updateAfterEdit();
+					});
+					gui.add(typeComboBox, BorderLayout.NORTH);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
+					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.CENTER);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(gui, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Panel Model");
+
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1]) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(s);
+								s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+								s.draw();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final ChangeFoundationSolarPanelModelCommand c = new ChangeFoundationSolarPanelModelCommand(foundation);
+								foundation.setModelForSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final ChangeModelForAllSolarPanelsCommand c = new ChangeModelForAllSolarPanelsCommand();
+								Scene.getInstance().setModelForAllSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (choice == options[0]) {
+								break;
+							}
+						}
 					}
 				}
 			});
-			modelMenu.add(miCustomModel);
-			modelGroup.add(miCustomModel);
-			modelMenu.addSeparator();
-			final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
-			for (final String key : modules.keySet()) {
-				final JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(key);
-				rbmi.addItemListener(new ItemListener() {
-					@Override
-					public void itemStateChanged(final ItemEvent e) {
-						if (e.getStateChange() == ItemEvent.SELECTED) {
-							final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-							if (!(selectedPart instanceof SolarPanel)) {
-								return;
-							}
-							final SolarPanel sp = (SolarPanel) selectedPart;
-							final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(sp);
-							final PvModuleSpecs specs = PvModulesData.getInstance().getModuleSpecs(key);
-							sp.setPvModuleSpecs(specs);
-							sp.draw();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
-							updateAfterEdit();
-						}
-					}
-				});
-				modelMenu.add(rbmi);
-				modelGroup.add(rbmi);
-			}
 
 			popupMenuForSolarPanel = createPopupMenu(true, true, new Runnable() {
 				@Override
@@ -1732,27 +1782,11 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					Util.selectSilently(miLabelEnergyOutput, sp.getLabelEnergyOutput());
 
 					final PvModuleSpecs pms = sp.getPvModuleSpecs();
-					if ("Custom".equals(pms.getModel())) {
-						Util.selectSilently(miCustomModel, true);
-						miCells.setEnabled(true);
-						miSize.setEnabled(true);
-						miTemperatureEffects.setEnabled(true);
-						shadeToleranceMenu.setEnabled(true);
-					} else {
-						for (final Component c : modelMenu.getMenuComponents()) {
-							if (c instanceof JRadioButtonMenuItem) {
-								final JRadioButtonMenuItem rbmi = (JRadioButtonMenuItem) c;
-								if (!rbmi.getText().equals("Custom") && rbmi.getText().equals(pms.getModel())) {
-									Util.selectSilently(rbmi, true);
-									break;
-								}
-							}
-						}
-						miCells.setEnabled(false);
-						miSize.setEnabled(false);
-						miTemperatureEffects.setEnabled(false);
-						shadeToleranceMenu.setEnabled(false);
-					}
+					final boolean isCustom = "Custom".equals(pms.getModel());
+					miCells.setEnabled(isCustom);
+					miSize.setEnabled(isCustom);
+					miTemperatureEffects.setEnabled(isCustom);
+					shadeToleranceMenu.setEnabled(isCustom);
 
 					switch (sp.getTracker()) {
 					case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
@@ -1824,7 +1858,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 			});
 			popupMenuForSolarPanel.add(miDeleteRow);
 			popupMenuForSolarPanel.addSeparator();
-			popupMenuForSolarPanel.add(modelMenu);
+			popupMenuForSolarPanel.add(miModel);
 			popupMenuForSolarPanel.add(miCells);
 			popupMenuForSolarPanel.add(miSize);
 			popupMenuForSolarPanel.add(miTemperatureEffects);

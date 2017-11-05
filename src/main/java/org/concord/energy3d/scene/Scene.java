@@ -2398,6 +2398,16 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setModelForAllSolarPanels(final PvModuleSpecs specs) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarPanel) {
+				((SolarPanel) p).setPvModuleSpecs(specs);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setCellTypeForAllSolarPanels(final int cellType) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {

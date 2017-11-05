@@ -2704,6 +2704,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setModelForSolarPanels(final PvModuleSpecs specs) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				((SolarPanel) p).setPvModuleSpecs(specs);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setCellTypeForSolarPanels(final int cellType) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarPanel && p.getTopContainer() == this) {
