@@ -11,28 +11,28 @@ import org.concord.energy3d.simulation.PvModuleSpecs;
 public class ChangeSolarPanelModelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private final PvModuleSpecs oldSpecs;
-	private PvModuleSpecs newSpecs;
+	private final PvModuleSpecs oldModel;
+	private PvModuleSpecs newModel;
 	private final SolarPanel solarPanel;
 
 	public ChangeSolarPanelModelCommand(final SolarPanel solarPanel) {
 		this.solarPanel = solarPanel;
-		oldSpecs = solarPanel.getPvModuleSpecs();
+		oldModel = solarPanel.getPvModuleSpecs();
 	}
 
 	public SolarPanel getSolarPanel() {
 		return solarPanel;
 	}
 
-	public PvModuleSpecs getOldValue() {
-		return oldSpecs;
+	public PvModuleSpecs getOldModel() {
+		return oldModel;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newSpecs = solarPanel.getPvModuleSpecs();
-		solarPanel.setPvModuleSpecs(oldSpecs);
+		newModel = solarPanel.getPvModuleSpecs();
+		solarPanel.setPvModuleSpecs(oldModel);
 		solarPanel.draw();
 		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().updateProperties();
@@ -42,7 +42,7 @@ public class ChangeSolarPanelModelCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		solarPanel.setPvModuleSpecs(newSpecs);
+		solarPanel.setPvModuleSpecs(newModel);
 		solarPanel.draw();
 		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().updateProperties();

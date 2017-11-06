@@ -6,7 +6,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 
-public class ChooseSolarPanelModelForRackCommand extends MyAbstractUndoableEdit {
+public class ChangeSolarPanelModelForRackCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final PvModuleSpecs oldModel;
@@ -15,7 +15,7 @@ public class ChooseSolarPanelModelForRackCommand extends MyAbstractUndoableEdit 
 	private double newRackWidth, newRackHeight;
 	private final Rack rack;
 
-	public ChooseSolarPanelModelForRackCommand(final Rack rack) {
+	public ChangeSolarPanelModelForRackCommand(final Rack rack) {
 		this.rack = rack;
 		oldModel = rack.getSolarPanel().getPvModuleSpecs();
 		oldRackWidth = rack.getRackWidth();

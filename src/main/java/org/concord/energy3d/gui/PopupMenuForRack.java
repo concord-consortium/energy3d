@@ -54,7 +54,7 @@ import org.concord.energy3d.undo.ChangePoleSettingsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.ChangeRackPoleSettingsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
-import org.concord.energy3d.undo.ChooseSolarPanelModelForRackCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelModelForRackCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsOnAllRacksCommand;
@@ -81,8 +81,8 @@ import org.concord.energy3d.undo.SetSolarPanelCellTypeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForRacksOnFoundationCommand;
-import org.concord.energy3d.undo.SetSolarPanelModelForAllRacksCommand;
-import org.concord.energy3d.undo.SetSolarPanelModelForRacksOnFoundationCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelModelForAllRacksCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelModelForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelSizeForAllRacksCommand;
@@ -984,19 +984,19 @@ class PopupMenuForRack extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final ChooseSolarPanelModelForRackCommand c = new ChooseSolarPanelModelForRackCommand(r);
+								final ChangeSolarPanelModelForRackCommand c = new ChangeSolarPanelModelForRackCommand(r);
 								s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
 								r.ensureFullSolarPanels(false);
 								r.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final SetSolarPanelModelForRacksOnFoundationCommand c = new SetSolarPanelModelForRacksOnFoundationCommand(foundation);
+								final ChangeSolarPanelModelForRacksOnFoundationCommand c = new ChangeSolarPanelModelForRacksOnFoundationCommand(foundation);
 								foundation.setSolarPanelModelForRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarPanelModelForAllRacksCommand c = new SetSolarPanelModelForAllRacksCommand();
+								final ChangeSolarPanelModelForAllRacksCommand c = new ChangeSolarPanelModelForAllRacksCommand();
 								Scene.getInstance().setSolarPanelModelForAllRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;

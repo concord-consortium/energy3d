@@ -11,7 +11,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 
-public class SetSolarPanelModelForRacksOnFoundationCommand extends MyAbstractUndoableEdit {
+public class ChangeSolarPanelModelForRacksOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final PvModuleSpecs[] oldModels;
@@ -23,7 +23,7 @@ public class SetSolarPanelModelForRacksOnFoundationCommand extends MyAbstractUnd
 	private final Foundation foundation;
 	private final List<Rack> racks;
 
-	public SetSolarPanelModelForRacksOnFoundationCommand(final Foundation foundation) {
+	public ChangeSolarPanelModelForRacksOnFoundationCommand(final Foundation foundation) {
 		this.foundation = foundation;
 		racks = foundation.getRacks();
 		final int n = racks.size();

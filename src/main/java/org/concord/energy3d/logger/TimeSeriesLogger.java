@@ -456,7 +456,12 @@ public class TimeSeriesLogger {
 
 				/* solar panel properties */
 
-				else if (lastEdit instanceof ChooseSolarPanelSizeCommand) {
+				else if (lastEdit instanceof ChangeSolarPanelModelCommand) {
+					final ChangeSolarPanelModelCommand c = (ChangeSolarPanelModelCommand) lastEdit;
+					final SolarPanel sp = c.getSolarPanel();
+					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
+					stateValue += ", \"Old Model\": \"" + c.getOldModel().getModel() + "\", \"New Model\": \"" + sp.getPvModuleSpecs().getModel() + "\"}";
+				} else if (lastEdit instanceof ChooseSolarPanelSizeCommand) {
 					final ChooseSolarPanelSizeCommand c = (ChooseSolarPanelSizeCommand) lastEdit;
 					final SolarPanel sp = c.getSolarPanel();
 					stateValue = "{\"Foundation\": " + sp.getTopContainer().getId() + ", \"ID\": " + sp.getId();
@@ -566,9 +571,23 @@ public class TimeSeriesLogger {
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getBaseHeight()) + "}";
 				}
 
+				else if (lastEdit instanceof ChangeFoundationSolarPanelModelCommand) {
+					final Foundation f = ((ChangeFoundationSolarPanelModelCommand) lastEdit).getFoundation();
+					final List<SolarPanel> solarPanels = f.getSolarPanels();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Model\": " + (solarPanels.isEmpty() ? null : "\"" + solarPanels.get(0).getPvModuleSpecs().getModel() + "\"") + "}";
+				} else if (lastEdit instanceof ChangeModelForAllSolarPanelsCommand) {
+					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
+					stateValue = "{\"New Model\": " + (solarPanels.isEmpty() ? null : "\"" + solarPanels.get(0).getPvModuleSpecs().getModel() + "\"") + "}";
+				}
+
 				/* rack properties */
 
-				else if (lastEdit instanceof ChooseSolarPanelSizeForRackCommand) {
+				else if (lastEdit instanceof ChangeSolarPanelModelForRackCommand) {
+					final ChangeSolarPanelModelForRackCommand c = (ChangeSolarPanelModelForRackCommand) lastEdit;
+					final Rack rack = c.getRack();
+					stateValue = "{\"Foundation\": " + rack.getTopContainer().getId() + ", \"ID\": " + rack.getId();
+					stateValue += ", \"Old Model\": \"" + c.getOldModel().getModel() + "\", \"New Model\": \"" + rack.getSolarPanel().getPvModuleSpecs().getModel() + "\"}";
+				} else if (lastEdit instanceof ChooseSolarPanelSizeForRackCommand) {
 					final ChooseSolarPanelSizeForRackCommand c = (ChooseSolarPanelSizeForRackCommand) lastEdit;
 					final Rack rack = c.getRack();
 					stateValue = "{\"Foundation\": " + rack.getTopContainer().getId() + ", \"ID\": " + rack.getId();
@@ -612,6 +631,15 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeBaseHeightForAllRacksCommand) {
 					final List<Rack> racks = Scene.getInstance().getAllRacks();
 					stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getBaseHeight()) + "}";
+				}
+
+				else if (lastEdit instanceof ChangeSolarPanelModelForRacksOnFoundationCommand) {
+					final Foundation f = ((ChangeSolarPanelModelForRacksOnFoundationCommand) lastEdit).getFoundation();
+					final List<Rack> racks = f.getRacks();
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Model\": " + (racks.isEmpty() ? null : "\"" + racks.get(0).getSolarPanel().getPvModuleSpecs().getModel() + "\"") + "}";
+				} else if (lastEdit instanceof ChangeSolarPanelModelForAllRacksCommand) {
+					final List<Rack> racks = Scene.getInstance().getAllRacks();
+					stateValue = "{\"New Model\": " + (racks.isEmpty() ? null : "\"" + racks.get(0).getSolarPanel().getPvModuleSpecs().getModel() + "\"") + "}";
 				}
 
 				/* tracker properties */

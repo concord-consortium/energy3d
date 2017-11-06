@@ -11,7 +11,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 
-public class SetSolarPanelModelForAllRacksCommand extends MyAbstractUndoableEdit {
+public class ChangeSolarPanelModelForAllRacksCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final PvModuleSpecs[] oldModels;
@@ -22,7 +22,7 @@ public class SetSolarPanelModelForAllRacksCommand extends MyAbstractUndoableEdit
 	private double[] newHeights;
 	private final List<Rack> racks;
 
-	public SetSolarPanelModelForAllRacksCommand() {
+	public ChangeSolarPanelModelForAllRacksCommand() {
 		racks = Scene.getInstance().getAllRacks();
 		final int n = racks.size();
 		oldWidths = new double[n];
