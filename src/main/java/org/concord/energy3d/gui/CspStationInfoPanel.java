@@ -41,10 +41,10 @@ public class CspStationInfoPanel extends JPanel {
 		container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
 		add(container, BorderLayout.NORTH);
 
-		// mirror/trough/Fresnel reflector count on the selected base
+		// mirror/trough/dish/Fresnel reflector count on the selected base
 
 		countPanel = new JPanel(new BorderLayout());
-		countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
+		countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors (heliostats)", true));
 		container.add(countPanel);
 		countBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		countBar.setUnit("");
@@ -81,7 +81,7 @@ public class CspStationInfoPanel extends JPanel {
 		packingDensityBar.setPreferredSize(new Dimension(100, 16));
 		packingDensityPanel.add(packingDensityBar, BorderLayout.CENTER);
 
-		// mirror/trough cost on the selected base
+		// mirror/trough/dish cost on the selected base
 
 		costPanel = new JPanel(new BorderLayout());
 		costPanel.setBorder(EnergyPanel.createTitledBorder("Total cost", true));
@@ -139,7 +139,7 @@ public class CspStationInfoPanel extends JPanel {
 				final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 				for (final ParabolicDish d : dishes) {
 					rimArea = d.getRimRadius() * d.getRimRadius() * Math.PI;
-					cost += price.getMirrorUnitPrice() * rimArea;
+					cost += price.getHeliostatUnitPrice() * rimArea;
 					reflectingArea += rimArea;
 				}
 				cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
@@ -157,7 +157,7 @@ public class CspStationInfoPanel extends JPanel {
 					final List<Mirror> mirrors = foundation.getMirrors();
 					countBar.setValue(mirrors.size());
 					moduleCountBar.setValue(mirrors.size());
-					countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors", true));
+					countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors (heliostats)", true));
 					double cost = 0;
 					double reflectingArea = 0;
 					double mirrorArea = 0;
@@ -165,8 +165,7 @@ public class CspStationInfoPanel extends JPanel {
 					final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 					for (final Mirror m : mirrors) {
 						mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
-						cost += price.getMirrorUnitPrice() * mirrorArea;
-						cost += price.getHeliostatPrice() * mirrorArea;
+						cost += price.getHeliostatUnitPrice() * mirrorArea;
 						reflectingArea += mirrorArea;
 						if (m.getHeliostatTarget() != null) {
 							if (!towers.contains(m.getHeliostatTarget())) {
@@ -236,7 +235,7 @@ public class CspStationInfoPanel extends JPanel {
 	public void updateMirrorNumberMaximum() {
 		if (Scene.getInstance().countParts(Mirror.class) > 0) {
 			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
-			String t = "Number of mirrors";
+			String t = "Number of mirrors (heliostats)";
 			if (specs.isNumberOfMirrorsEnabled()) {
 				t += " (" + "<" + specs.getMaximumNumberOfMirrors() + ")";
 			}

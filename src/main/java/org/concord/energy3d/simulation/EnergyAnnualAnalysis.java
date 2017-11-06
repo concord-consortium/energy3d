@@ -214,7 +214,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 		String s = null;
 		int cost = -1;
 		if (selectedPart != null) {
-			cost = (int) ProjectCost.getPartCost(selectedPart);
+			cost = (int) BuildingCost.getPartCost(selectedPart);
 			if (graph.type == Graph.SENSOR) {
 				SceneManager.getInstance().setSelectedPart(null);
 			} else {

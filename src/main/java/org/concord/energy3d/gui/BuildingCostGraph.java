@@ -35,7 +35,6 @@ import org.concord.energy3d.simulation.BuildingCost;
 import org.concord.energy3d.simulation.CspDesignSpecs;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.PieChart;
-import org.concord.energy3d.simulation.ProjectCost;
 import org.concord.energy3d.simulation.PvDesignSpecs;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
@@ -44,7 +43,7 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-public class ProjectCostGraph extends JPanel {
+public class BuildingCostGraph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -65,7 +64,7 @@ public class ProjectCostGraph extends JPanel {
 	private double foundationSum;
 	private double totalCost;
 
-	public ProjectCostGraph() {
+	public BuildingCostGraph() {
 		super(new BorderLayout());
 
 		noDecimals.setMaximumFractionDigits(0);
@@ -122,7 +121,7 @@ public class ProjectCostGraph extends JPanel {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(ProjectCostGraph.this);
+				new ClipImage().copyImageToClipboard(BuildingCostGraph.this);
 			}
 		});
 		popupMenu.add(mi);
@@ -142,28 +141,28 @@ public class ProjectCostGraph extends JPanel {
 		doorSum = 0;
 		solarPanelSum = 0;
 		treeSum = 0;
-		foundationSum = ProjectCost.getPartCost(foundation);
+		foundationSum = BuildingCost.getPartCost(foundation);
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation) {
 				if (p instanceof Wall) {
-					wallSum += ProjectCost.getPartCost(p);
+					wallSum += BuildingCost.getPartCost(p);
 				} else if (p instanceof Floor) {
-					floorSum += ProjectCost.getPartCost(p);
+					floorSum += BuildingCost.getPartCost(p);
 				} else if (p instanceof Window) {
-					windowSum += ProjectCost.getPartCost(p);
+					windowSum += BuildingCost.getPartCost(p);
 				} else if (p instanceof Roof) {
-					roofSum += ProjectCost.getPartCost(p);
+					roofSum += BuildingCost.getPartCost(p);
 				} else if (p instanceof Door) {
-					doorSum += ProjectCost.getPartCost(p);
+					doorSum += BuildingCost.getPartCost(p);
 				} else if (p instanceof SolarPanel) {
-					solarPanelSum += ProjectCost.getPartCost(p);
+					solarPanelSum += BuildingCost.getPartCost(p);
 				} else if (p instanceof Rack) {
-					solarPanelSum += ProjectCost.getPartCost(p);
+					solarPanelSum += BuildingCost.getPartCost(p);
 				}
 			}
 			if (countBuildings <= 1) {
 				if (p instanceof Tree && !p.isFrozen()) {
-					treeSum += ProjectCost.getPartCost(p);
+					treeSum += BuildingCost.getPartCost(p);
 				}
 			}
 		}
@@ -235,7 +234,7 @@ public class ProjectCostGraph extends JPanel {
 					BuildingCost.getInstance().showGraph();
 				} else {
 					if (Util.isRightClick(e)) {
-						popupMenu.show(ProjectCostGraph.this, e.getX(), e.getY());
+						popupMenu.show(BuildingCostGraph.this, e.getX(), e.getY());
 					}
 				}
 			}

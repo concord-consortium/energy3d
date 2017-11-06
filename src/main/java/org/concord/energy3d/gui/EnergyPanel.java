@@ -132,7 +132,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty2TextField;
 	private JTextField partProperty3TextField;
 	private ChangeListener latitudeChangeListener;
-	private ProjectCostGraph projectCostGraph;
+	private BuildingCostGraph projectCostGraph;
 	private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
 	private PvStationDailyEnergyGraph pvStationDailyEnergyGraph;
 	private CspStationDailyEnergyGraph cspStationDailyEnergyGraph;
@@ -528,7 +528,7 @@ public class EnergyPanel extends JPanel {
 		buildingInfoPanel = new BuildingInfoPanel(); // basics panel
 		buildingTabbedPane.add("Basics", buildingInfoPanel);
 
-		projectCostGraph = new ProjectCostGraph(); // cost graph
+		projectCostGraph = new BuildingCostGraph(); // cost graph
 		buildingTabbedPane.add("Cost", projectCostGraph);
 
 		buildingDailyEnergyGraph = new BuildingDailyEnergyGraph(); // hourly energy graph
@@ -819,7 +819,7 @@ public class EnergyPanel extends JPanel {
 		return cspStationInfoPanel;
 	}
 
-	public ProjectCostGraph getProjectCostGraph() {
+	public BuildingCostGraph getProjectCostGraph() {
 		return projectCostGraph;
 	}
 

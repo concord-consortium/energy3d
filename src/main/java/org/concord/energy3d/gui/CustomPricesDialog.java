@@ -102,13 +102,13 @@ class CustomPricesDialog extends JDialog {
 
 		private static final long serialVersionUID = 1L;
 
-		final JTextField mirrorField;
 		final JTextField heliostatField;
 		final JTextField towerField;
+		final JTextField parabolicTroughField;
+		final JTextField parabolicDishField;
+		final JTextField fresnelReflectorField;
 		JTextField lifespanField;
 		JTextField landCostField;
-		final JTextField parabolicTroughField;
-		final JTextField fresnelReflectorField;
 
 		CspStationPricesPanel() {
 
@@ -126,13 +126,8 @@ class CustomPricesDialog extends JDialog {
 			add(landCostField);
 			add(new JLabel("<html>$ per year per m<sup>2</sup></html>"));
 
-			add(new JLabel("Mirror: "));
-			mirrorField = new JTextField(FORMAT.format(price.getMirrorUnitPrice()), 6);
-			add(mirrorField);
-			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
-
-			add(new JLabel("Heliostat: "));
-			heliostatField = new JTextField(FORMAT.format(price.getHeliostatPrice()), 6);
+			add(new JLabel("Mirror (Heliostat): "));
+			heliostatField = new JTextField(FORMAT.format(price.getHeliostatUnitPrice()), 6);
 			add(heliostatField);
 			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
 
@@ -141,12 +136,17 @@ class CustomPricesDialog extends JDialog {
 			add(towerField);
 			add(new JLabel("<html>$ per meter</html>"));
 
-			add(new JLabel("Parabolic Trough Module: "));
+			add(new JLabel("Parabolic Trough: "));
 			parabolicTroughField = new JTextField(FORMAT.format(price.getParabolicTroughUnitPrice()), 6);
 			add(parabolicTroughField);
 			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
 
-			add(new JLabel("Fresnel Reflector Module: "));
+			add(new JLabel("Parabolic Dish: "));
+			parabolicDishField = new JTextField(FORMAT.format(price.getParabolicDishUnitPrice()), 6);
+			add(parabolicDishField);
+			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
+
+			add(new JLabel("Fresnel Reflector: "));
 			fresnelReflectorField = new JTextField(FORMAT.format(price.getFresnelReflectorUnitPrice()), 6);
 			add(fresnelReflectorField);
 			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
@@ -198,9 +198,9 @@ class CustomPricesDialog extends JDialog {
 
 				int cspLifespan;
 				double cspLandUnitPrice;
-				double mirrorUnitPrice;
-				double heliostatPrice;
+				double heliostatUnitPrice;
 				double parabolicTroughUnitPrice;
+				final double parabolicDishUnitPrice;
 				double fresnelReflectorUnitPrice;
 				try {
 					pvLifespan = Integer.parseInt(pvStationPricesPanel.lifespanField.getText());
@@ -214,9 +214,9 @@ class CustomPricesDialog extends JDialog {
 
 					cspLifespan = Integer.parseInt(cspStationPricesPanel.lifespanField.getText());
 					cspLandUnitPrice = Double.parseDouble(cspStationPricesPanel.landCostField.getText());
-					mirrorUnitPrice = Double.parseDouble(cspStationPricesPanel.mirrorField.getText());
-					heliostatPrice = Double.parseDouble(cspStationPricesPanel.heliostatField.getText());
+					heliostatUnitPrice = Double.parseDouble(cspStationPricesPanel.heliostatField.getText());
 					parabolicTroughUnitPrice = Double.parseDouble(cspStationPricesPanel.parabolicTroughField.getText());
+					parabolicDishUnitPrice = Double.parseDouble(cspStationPricesPanel.parabolicDishField.getText());
 					fresnelReflectorUnitPrice = Double.parseDouble(cspStationPricesPanel.fresnelReflectorField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
@@ -269,15 +269,15 @@ class CustomPricesDialog extends JDialog {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your land price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (mirrorUnitPrice < 0 && mirrorUnitPrice > 10000) {
+				if (heliostatUnitPrice < 0 && heliostatUnitPrice > 10000) {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your mirror unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (heliostatPrice < 0 && heliostatPrice > 10000) {
-					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your heliostat price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+				if (parabolicTroughUnitPrice < 0 && parabolicTroughUnitPrice > 10000) {
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				if (parabolicTroughUnitPrice < 0 && parabolicTroughUnitPrice > 10000) {
+				if (parabolicDishUnitPrice < 0 && parabolicDishUnitPrice > 10000) {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
@@ -299,9 +299,9 @@ class CustomPricesDialog extends JDialog {
 				final CspCustomPrice cspPrice = Scene.getInstance().getCspCustomPrice();
 				cspPrice.setLifespan(cspLifespan);
 				cspPrice.setLandUnitPrice(cspLandUnitPrice);
-				cspPrice.setMirrorUnitPrice(mirrorUnitPrice);
-				cspPrice.setHeliostatPrice(heliostatPrice);
+				cspPrice.setHeliostatUnitPrice(heliostatUnitPrice);
 				cspPrice.setParabolicTroughUnitPrice(parabolicTroughUnitPrice);
+				cspPrice.setParabolicDishUnitPrice(parabolicDishUnitPrice);
 				cspPrice.setFresnelReflectorUnitPrice(fresnelReflectorUnitPrice);
 
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

@@ -10,12 +10,11 @@ public class CspCustomPrice implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private double mirrorUnitPrice = 100;
+	private double heliostatUnitPrice = 100;
+	private double towerUnitPrice = 500;
 	private double parabolicTroughUnitPrice = 100;
 	private double parabolicDishUnitPrice = 100;
 	private double fresnelReflectorUnitPrice = 50;
-	private double heliostatPrice = 100;
-	private double towerUnitPrice = 500;
 	private int lifespan = 50;
 	private double landUnitPrice;
 
@@ -27,8 +26,11 @@ public class CspCustomPrice implements Serializable {
 		if (lifespan == 0) {
 			lifespan = 50;
 		}
-		if (mirrorUnitPrice == 0) {
-			mirrorUnitPrice = 100;
+		if (heliostatUnitPrice == 0) {
+			heliostatUnitPrice = 100;
+		}
+		if (towerUnitPrice == 0) {
+			towerUnitPrice = 1000;
 		}
 		if (parabolicTroughUnitPrice == 0) {
 			parabolicTroughUnitPrice = 100;
@@ -38,12 +40,6 @@ public class CspCustomPrice implements Serializable {
 		}
 		if (fresnelReflectorUnitPrice == 0) {
 			fresnelReflectorUnitPrice = 50;
-		}
-		if (heliostatPrice == 0) {
-			heliostatPrice = 1000;
-		}
-		if (towerUnitPrice == 0) {
-			towerUnitPrice = 1000;
 		}
 	}
 
@@ -87,20 +83,12 @@ public class CspCustomPrice implements Serializable {
 		return fresnelReflectorUnitPrice;
 	}
 
-	public void setMirrorUnitPrice(final double mirrorUnitPrice) {
-		this.mirrorUnitPrice = mirrorUnitPrice;
+	public void setHeliostatUnitPrice(final double heliostatUnitPrice) {
+		this.heliostatUnitPrice = heliostatUnitPrice;
 	}
 
-	public double getMirrorUnitPrice() {
-		return mirrorUnitPrice;
-	}
-
-	public void setHeliostatPrice(final double heliostatPrice) {
-		this.heliostatPrice = heliostatPrice;
-	}
-
-	public double getHeliostatPrice() {
-		return heliostatPrice;
+	public double getHeliostatUnitPrice() {
+		return heliostatUnitPrice;
 	}
 
 	public void setTowerUnitPrice(final double towerUnitPrice) {

@@ -473,12 +473,12 @@ public abstract class PopupMenuFactory {
 				final String s = selectedPart.toString();
 				if (selectedPart instanceof SolarPanel) {
 					final SolarPanel sp = (SolarPanel) selectedPart;
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + ProjectCost.getPartCost(selectedPart) + ")");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + (int) ProjectCost.getCost(selectedPart) + ")");
 				} else if (selectedPart instanceof Rack) {
 					final SolarPanel sp = ((Rack) selectedPart).getSolarPanel();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + ProjectCost.getPartCost(selectedPart) + ")");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + (int) ProjectCost.getCost(selectedPart) + ")");
 				} else {
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + ProjectCost.getPartCost(selectedPart) + ")");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + (int) ProjectCost.getCost(selectedPart) + ")");
 				}
 				if (runWhenBecomingVisible != null) {
 					runWhenBecomingVisible.run();

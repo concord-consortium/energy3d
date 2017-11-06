@@ -9,7 +9,7 @@ import javax.swing.event.PopupMenuListener;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.ProjectCost;
+import org.concord.energy3d.simulation.BuildingCost;
 import org.concord.energy3d.util.Config;
 
 class PopupMenuForFloor extends PopupMenuFactory {
@@ -37,7 +37,7 @@ class PopupMenuForFloor extends PopupMenuFactory {
 						return;
 					}
 					final String s = selectedPart.toString();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + ProjectCost.getPartCost(selectedPart) + ")");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + BuildingCost.getPartCost(selectedPart) + ")");
 				}
 
 				@Override
