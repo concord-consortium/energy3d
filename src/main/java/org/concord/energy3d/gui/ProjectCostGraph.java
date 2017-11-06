@@ -31,10 +31,11 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.BuildingCost;
 import org.concord.energy3d.simulation.CspDesignSpecs;
 import org.concord.energy3d.simulation.DesignSpecs;
 import org.concord.energy3d.simulation.PieChart;
+import org.concord.energy3d.simulation.ProjectCost;
 import org.concord.energy3d.simulation.PvDesignSpecs;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
@@ -43,7 +44,7 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-public class ConstructionCostGraph extends JPanel {
+public class ProjectCostGraph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,7 +65,7 @@ public class ConstructionCostGraph extends JPanel {
 	private double foundationSum;
 	private double totalCost;
 
-	public ConstructionCostGraph() {
+	public ProjectCostGraph() {
 		super(new BorderLayout());
 
 		noDecimals.setMaximumFractionDigits(0);
@@ -113,7 +114,7 @@ public class ConstructionCostGraph extends JPanel {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				Cost.getInstance().showItemizedCost();
+				BuildingCost.getInstance().showItemizedCost();
 			}
 		});
 		popupMenu.add(mi);
@@ -121,7 +122,7 @@ public class ConstructionCostGraph extends JPanel {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(ConstructionCostGraph.this);
+				new ClipImage().copyImageToClipboard(ProjectCostGraph.this);
 			}
 		});
 		popupMenu.add(mi);
@@ -141,28 +142,28 @@ public class ConstructionCostGraph extends JPanel {
 		doorSum = 0;
 		solarPanelSum = 0;
 		treeSum = 0;
-		foundationSum = Cost.getInstance().getPartCost(foundation);
+		foundationSum = ProjectCost.getPartCost(foundation);
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation) {
 				if (p instanceof Wall) {
-					wallSum += Cost.getInstance().getPartCost(p);
+					wallSum += ProjectCost.getPartCost(p);
 				} else if (p instanceof Floor) {
-					floorSum += Cost.getInstance().getPartCost(p);
+					floorSum += ProjectCost.getPartCost(p);
 				} else if (p instanceof Window) {
-					windowSum += Cost.getInstance().getPartCost(p);
+					windowSum += ProjectCost.getPartCost(p);
 				} else if (p instanceof Roof) {
-					roofSum += Cost.getInstance().getPartCost(p);
+					roofSum += ProjectCost.getPartCost(p);
 				} else if (p instanceof Door) {
-					doorSum += Cost.getInstance().getPartCost(p);
+					doorSum += ProjectCost.getPartCost(p);
 				} else if (p instanceof SolarPanel) {
-					solarPanelSum += Cost.getInstance().getPartCost(p);
+					solarPanelSum += ProjectCost.getPartCost(p);
 				} else if (p instanceof Rack) {
-					solarPanelSum += Cost.getInstance().getPartCost(p);
+					solarPanelSum += ProjectCost.getPartCost(p);
 				}
 			}
 			if (countBuildings <= 1) {
 				if (p instanceof Tree && !p.isFrozen()) {
-					treeSum += Cost.getInstance().getPartCost(p);
+					treeSum += ProjectCost.getPartCost(p);
 				}
 			}
 		}
@@ -219,7 +220,7 @@ public class ConstructionCostGraph extends JPanel {
 
 		add(budgetPanel, BorderLayout.NORTH);
 
-		final float[] data = new float[] { (float) wallSum, (float) windowSum, (float) roofSum, (float) foundationSum, (float) floorSum, (float) doorSum, (float) solarPanelSum, (float) treeSum };
+		final double[] data = new double[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
 
@@ -231,10 +232,10 @@ public class ConstructionCostGraph extends JPanel {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() >= 2) {
-					Cost.getInstance().showGraph();
+					BuildingCost.getInstance().showGraph();
 				} else {
 					if (Util.isRightClick(e)) {
-						popupMenu.show(ConstructionCostGraph.this, e.getX(), e.getY());
+						popupMenu.show(ProjectCostGraph.this, e.getX(), e.getY());
 					}
 				}
 			}

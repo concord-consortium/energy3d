@@ -34,7 +34,7 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualSensorData;
-import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.BuildingCost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAngularAnalysis;
@@ -857,12 +857,12 @@ public class TimeSeriesLogger {
 						line += ((EnergyAnnualAnalysis) analysisRequester).toJson();
 					} else if (analysisRequester instanceof EnergyAngularAnalysis) {
 						line += ((EnergyAngularAnalysis) analysisRequester).toJson();
-					} else if (analysisRequester instanceof Cost) {
-						line += ((Cost) analysisRequester).toJson();
+					} else if (analysisRequester instanceof BuildingCost) {
+						line += ((BuildingCost) analysisRequester).toJson();
 					}
 				} else {
-					if (analysisRequester instanceof Cost) {
-						line += ((Cost) analysisRequester).toJson();
+					if (analysisRequester instanceof BuildingCost) {
+						line += ((BuildingCost) analysisRequester).toJson();
 					} else if (analysisRequester instanceof BuildingDailyEnergyGraph) {
 						line += ((BuildingDailyEnergyGraph) analysisRequester).toJson();
 						final String result = Building.getBuildingSolarPotentials();

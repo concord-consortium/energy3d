@@ -12,6 +12,7 @@ public class CspCustomPrice implements Serializable {
 
 	private double mirrorUnitPrice = 100;
 	private double parabolicTroughUnitPrice = 100;
+	private double parabolicDishUnitPrice = 100;
 	private double fresnelReflectorUnitPrice = 50;
 	private double heliostatPrice = 100;
 	private double towerUnitPrice = 500;
@@ -31,6 +32,9 @@ public class CspCustomPrice implements Serializable {
 		}
 		if (parabolicTroughUnitPrice == 0) {
 			parabolicTroughUnitPrice = 100;
+		}
+		if (parabolicDishUnitPrice == 0) {
+			parabolicDishUnitPrice = 100;
 		}
 		if (fresnelReflectorUnitPrice == 0) {
 			fresnelReflectorUnitPrice = 50;
@@ -65,6 +69,14 @@ public class CspCustomPrice implements Serializable {
 
 	public double getParabolicTroughUnitPrice() {
 		return parabolicTroughUnitPrice;
+	}
+
+	public void setParabolicDishUnitPrice(final double parabolicDishUnitPrice) {
+		this.parabolicDishUnitPrice = parabolicDishUnitPrice;
+	}
+
+	public double getParabolicDishUnitPrice() {
+		return parabolicDishUnitPrice;
 	}
 
 	public void setFresnelReflectorUnitPrice(final double fresnelReflectorUnitPrice) {

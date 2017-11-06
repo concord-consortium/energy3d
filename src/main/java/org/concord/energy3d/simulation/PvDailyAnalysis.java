@@ -167,12 +167,12 @@ public class PvDailyAnalysis extends Analysis {
 		String title = "Daily Yield of All Solar Panels (" + Scene.getInstance().countSolarPanels() + " Solar Panels)";
 		if (selectedPart != null) {
 			if (selectedPart instanceof SolarPanel) {
-				cost = (int) Cost.getInstance().getPartCost(selectedPart);
+				cost = (int) ProjectCost.getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Daily Yield";
 			} else if (selectedPart instanceof Rack) {
 				final Rack rack = (Rack) selectedPart;
-				cost = (int) Cost.getInstance().getPartCost(rack.getSolarPanel()) * rack.getNumberOfSolarPanels();
+				cost = (int) ProjectCost.getPartCost(rack.getSolarPanel()) * rack.getNumberOfSolarPanels();
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Daily Yield (" + rack.getNumberOfSolarPanels() + " Solar Panels)";
 			} else if (selectedPart instanceof Foundation) {

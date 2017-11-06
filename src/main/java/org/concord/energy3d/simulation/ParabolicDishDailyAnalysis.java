@@ -158,7 +158,7 @@ public class ParabolicDishDailyAnalysis extends Analysis {
 		String title = "Daily Yield of All Parabolic Dishes";
 		if (selectedPart != null) {
 			if (selectedPart instanceof ParabolicDish) {
-				cost = (int) Cost.getInstance().getPartCost(selectedPart);
+				cost = (int) ProjectCost.getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Daily Yield";
 			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {

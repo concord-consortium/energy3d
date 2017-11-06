@@ -94,7 +94,7 @@ import org.concord.energy3d.scene.SceneManager.ViewMode;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualSensorData;
-import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.BuildingCost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
@@ -2778,7 +2778,7 @@ public class MainFrame extends JFrame {
 			costAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Cost.getInstance().showGraph();
+					BuildingCost.getInstance().showGraph();
 				}
 			});
 		}

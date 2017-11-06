@@ -214,13 +214,13 @@ public class EnergyAnnualAnalysis extends Analysis {
 		String s = null;
 		int cost = -1;
 		if (selectedPart != null) {
-			cost = (int) Cost.getInstance().getPartCost(selectedPart);
+			cost = (int) ProjectCost.getPartCost(selectedPart);
 			if (graph.type == Graph.SENSOR) {
 				SceneManager.getInstance().setSelectedPart(null);
 			} else {
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				if (selectedPart instanceof Foundation) {
-					cost = (int) Cost.getInstance().getTotalCost();
+					cost = (int) BuildingCost.getInstance().getTotalCost();
 					s = s.replaceAll("Foundation", "Building");
 					if (selectedPart.getChildren().isEmpty()) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.INFORMATION_MESSAGE);

@@ -257,7 +257,7 @@ public class Scene implements Serializable {
 					final Foundation f = (Foundation) p;
 					switch (f.getStructureType()) {
 					case Foundation.TYPE_BUILDING:
-						e.getConstructionCostGraph().addGraph(f);
+						e.getProjectCostGraph().addGraph(f);
 						e.getBuildingDailyEnergyGraph().clearData();
 						e.getBuildingDailyEnergyGraph().addGraph(f);
 						e.validate();

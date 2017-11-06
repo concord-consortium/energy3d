@@ -69,6 +69,7 @@ import com.ardor3d.util.geom.BufferUtils;
  */
 
 public abstract class HousePart implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 	public static final OffsetState offsetState = new OffsetState();
 	protected static final double SNAP_DISTANCE = 0.5;
@@ -1347,7 +1348,6 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public void addPrintMeshes(final List<Mesh> list) {
-
 	}
 
 	protected void addPrintMesh(final List<Mesh> list, final Mesh mesh) {

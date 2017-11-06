@@ -3,7 +3,6 @@ package org.concord.energy3d.simulation;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -26,7 +25,6 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
-import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
@@ -37,21 +35,19 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
- * Calculate the cost. The material and installation costs are partly based on http://www.homewyse.com, but should be considered as largely fictitious.
+ * Calculate the cost of a building.
  * 
  * @author Charles Xie
  * 
  */
-public class Cost {
+public class BuildingCost extends ProjectCost {
 
-	private static Cost instance = new Cost();
+	private static BuildingCost instance = new BuildingCost();
 
-	private static Point windowLocation = new Point();
-
-	private Cost() {
+	private BuildingCost() {
 	}
 
-	public static Cost getInstance() {
+	public static BuildingCost getInstance() {
 		return instance;
 	}
 
@@ -66,135 +62,41 @@ public class Cost {
 		return sum;
 	}
 
-	public double getBuildingCost(final Foundation foundation) {
+	public double getCost(final Foundation foundation) {
 		if (foundation == null) {
 			return 0;
 		}
-		int buildingCount = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation) {
-				buildingCount++;
-			}
-		}
 		double sum = 0;
-		if (buildingCount == 1) {
-			for (final HousePart p : Scene.getInstance().getParts()) { // if there is only one building, trees are included in its cost
-				if (p.isFrozen() && p instanceof Tree) {
-					continue;
-				}
-				sum += getPartCost(p);
-			}
-		} else {
-			sum = getPartCost(foundation);
+		switch (foundation.getStructureType()) {
+		case Foundation.TYPE_BUILDING:
+			int buildingCount = 0;
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p.getTopContainer() == foundation) {
+				if (p instanceof Foundation) {
+					buildingCount++;
+				}
+			}
+			if (buildingCount == 1) {
+				for (final HousePart p : Scene.getInstance().getParts()) { // if there is only one building, trees are included in its cost
+					if (p.isFrozen() && p instanceof Tree) {
+						continue;
+					}
 					sum += getPartCost(p);
 				}
+			} else {
+				sum = getPartCost(foundation);
+				for (final HousePart p : Scene.getInstance().getParts()) {
+					if (p.getTopContainer() == foundation) {
+						sum += getPartCost(p);
+					}
+				}
 			}
+			break;
+		case Foundation.TYPE_PV_STATION:
+			break;
+		case Foundation.TYPE_CSP_STATION:
+			break;
 		}
 		return sum;
-	}
-
-	public double getPartCost(final HousePart part) {
-		if (part instanceof Wall) {
-			final double uFactor = ((Wall) part).getUValue();
-			// According to http://www.homewyse.com/services/cost_to_insulate_your_home.html
-			// As of 2015, a 1000 square feet wall insulation will cost as high as $1500 to insulate in Boston.
-			// This translates into $16/m^2. We don't know what R-value this insulation will be. But let's assume it is R13 material that has a U-value of 0.44 W/m^2/C.
-			// Let's also assume that the insulation cost is inversely proportional to the U-value.
-			// The baseline cost for a wall is set to be $300/m^2, close to homewyse's estimates of masonry walls, interior framing, etc.
-			final double unitPrice = 300 + 8 / uFactor;
-			return (int) (part.getArea() * unitPrice);
-		}
-		if (part instanceof Window) {
-			final double uFactor = ((Window) part).getUValue();
-			// According to http://www.homewyse.com/costs/cost_of_double_pane_windows.html
-			// A storm window of about 1 m^2 costs about $500. A double-pane window of about 1 m^2 costs about $700.
-			final double unitPrice = 500 + 800 / uFactor;
-			return (int) (part.getArea() * unitPrice);
-		}
-		if (part instanceof Roof) {
-			final double uFactor = ((Roof) part).getUValue();
-			// According to http://www.homewyse.com/services/cost_to_insulate_attic.html
-			// As of 2015, a 1000 square feet of attic area costs as high as $3200 to insulate in Boston.
-			// This translates into $34/m^2. We don't know the R-value of this insulation. But let's assume it is R22 material that has a U-value of 0.26 W/m^2/C.
-			// Let's also assume that the insulation cost is inversely proportional to the U-value.
-			// The baseline (that is, the structure without insulation) cost for a roof is set to be $100/m^2.
-			final double unitPrice = 100 + 10 / uFactor;
-			return (int) (part.getArea() * unitPrice);
-		}
-		if (part instanceof Foundation) {
-			// http://www.homewyse.com/costs/cost_of_floor_insulation.html
-			// As of 2015, a 1000 square feet of floor area costs as high as $3000 to insulate in Boston. This translates into $32/m^2.
-			// Now, we don't know what R-value this insulation is. But let's assume it is R25 material (minimum insulation recommended
-			// for zone 5 by energystar.gov) that has a U-value of 0.23 W/m^2/C.
-			// Let's also assume that the insulation cost is inversely proportional to the U-value.
-			// The baseline cost (that is, the structure without insulation) for floor is set to be $100/m^2.
-			// The foundation cost is set to be $200/m^2.
-			final Foundation foundation = (Foundation) part;
-			final Building b = new Building(foundation);
-			if (b.isWallComplete()) {
-				b.calculate();
-				final double uFactor = foundation.getUValue();
-				final double unitPrice = 300 + 8 / uFactor;
-				return (int) (b.getArea() * unitPrice);
-			}
-			return -1; // the building is incomplete yet, so we can assume the floor insulation isn't there yet
-		}
-		if (part instanceof Floor) {
-			final double area = part.getArea();
-			if (area > 0) {
-				return (int) (part.getArea() * 100);
-			}
-			return -1;
-		}
-		if (part instanceof Door) {
-			final double uFactor = ((Door) part).getUValue();
-			// According to http://www.homewyse.com/costs/cost_of_exterior_doors.html
-			final double unitPrice = 500 + 100 / uFactor;
-			return (int) (part.getArea() * unitPrice);
-		}
-		if (part instanceof SolarPanel) {
-			return Scene.getInstance().getPvCustomPrice().getTotalCost((SolarPanel) part);
-		}
-		if (part instanceof Rack) {
-			return Scene.getInstance().getPvCustomPrice().getTotalCost((Rack) part);
-		}
-		if (part instanceof Mirror) {
-			return (int) (((Mirror) part).getArea() * 100);
-		}
-		if (part instanceof Rack) {
-			final Rack rack = (Rack) part;
-			return getPartCost(rack.getSolarPanel()) * rack.getNumberOfSolarPanels();
-		}
-		if (part instanceof Tree) {
-			final Tree tree = (Tree) part;
-			int price;
-			switch (tree.getTreeType()) {
-			case Tree.LINDEN:
-				price = 3000;
-				break;
-			case Tree.COTTONWOOD:
-				price = 2500;
-				break;
-			case Tree.ELM:
-				price = 2000;
-				break;
-			case Tree.OAK:
-				price = 2000;
-				break;
-			case Tree.PINE:
-				price = 1500;
-				break;
-			case Tree.MAPLE:
-				price = 1000;
-				break;
-			default:
-				price = 500;
-			}
-			return price;
-		}
-		return 0;
 	}
 
 	@SuppressWarnings("serial")
@@ -241,7 +143,7 @@ public class Cost {
 					partName = partName.substring(0, beg);
 				}
 				column[i][1] = partName;
-				column[i][2] = "$" + Cost.getInstance().getPartCost(p);
+				column[i][2] = "$" + getPartCost(p);
 				i++;
 			}
 		}
@@ -299,7 +201,7 @@ public class Cost {
 			if (p instanceof Foundation) {
 				count++;
 				final Foundation foundation = (Foundation) p;
-				details += "#" + foundation.getId() + ":$" + getBuildingCost(foundation) + "/";
+				details += "#" + foundation.getId() + ":$" + getCost(foundation) + "/";
 			}
 		}
 		if (count > 0) {
@@ -376,7 +278,7 @@ public class Cost {
 			}
 		}
 
-		final float[] data = new float[] { (float) wallSum, (float) windowSum, (float) roofSum, (float) foundationSum, (float) floorSum, (float) doorSum, (float) solarPanelSum, (float) treeSum };
+		final double[] data = new double[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
 		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
 		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
 
@@ -417,7 +319,7 @@ public class Cost {
 		if (selectedPart != null) {
 			s = "{";
 			s += "\"Building\": " + Building.getBuildingId(selectedPart);
-			s += ", \"Amount\": " + getBuildingCost(selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer());
+			s += ", \"Amount\": " + getCost(selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer());
 			s += "}";
 		} else {
 			s = "[";
@@ -425,7 +327,7 @@ public class Cost {
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
 					count++;
-					s += "{\"Building\": " + Building.getBuildingId(p) + ", \"Amount\": " + getBuildingCost((Foundation) p) + "}, ";
+					s += "{\"Building\": " + Building.getBuildingId(p) + ", \"Amount\": " + getCost((Foundation) p) + "}, ";
 				}
 			}
 			if (count > 0) {

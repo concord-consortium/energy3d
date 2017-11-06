@@ -102,7 +102,7 @@ public class DesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
+				EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
 			}
 		});
 	}
@@ -116,7 +116,7 @@ public class DesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
+				EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
 			}
 		});
 	}

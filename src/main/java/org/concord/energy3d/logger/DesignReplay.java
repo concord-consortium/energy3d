@@ -86,7 +86,7 @@ public class DesignReplay extends PlayControl {
 									EnergyPanel.getInstance().clearAllGraphs();
 									final HousePart p = SceneManager.getInstance().getSelectedPart();
 									if (p instanceof Foundation) {
-										EnergyPanel.getInstance().getConstructionCostGraph().addGraph((Foundation) p);
+										EnergyPanel.getInstance().getProjectCostGraph().addGraph((Foundation) p);
 										EnergyPanel.getInstance().validate();
 									}
 									if (MainFrame.getInstance().getTopViewCheckBoxMenuItem().isSelected()) { // make sure we exist the 2D top view

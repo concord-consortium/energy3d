@@ -51,7 +51,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.Cost;
+import org.concord.energy3d.simulation.ProjectCost;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
@@ -396,7 +396,7 @@ public abstract class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								updateAfterEdit();
-								EnergyPanel.getInstance().getConstructionCostGraph().updateBudget();
+								EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
 								break;
 							}
 						} catch (final NumberFormatException exception) {
@@ -473,12 +473,12 @@ public abstract class PopupMenuFactory {
 				final String s = selectedPart.toString();
 				if (selectedPart instanceof SolarPanel) {
 					final SolarPanel sp = (SolarPanel) selectedPart;
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + ProjectCost.getPartCost(selectedPart) + ")");
 				} else if (selectedPart instanceof Rack) {
 					final SolarPanel sp = ((Rack) selectedPart).getSolarPanel();
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + ProjectCost.getPartCost(selectedPart) + ")");
 				} else {
-					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + Cost.getInstance().getPartCost(selectedPart) + ")");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + ProjectCost.getPartCost(selectedPart) + ")");
 				}
 				if (runWhenBecomingVisible != null) {
 					runWhenBecomingVisible.run();

@@ -132,7 +132,7 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty2TextField;
 	private JTextField partProperty3TextField;
 	private ChangeListener latitudeChangeListener;
-	private ConstructionCostGraph constructionCostGraph;
+	private ProjectCostGraph projectCostGraph;
 	private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
 	private PvStationDailyEnergyGraph pvStationDailyEnergyGraph;
 	private CspStationDailyEnergyGraph cspStationDailyEnergyGraph;
@@ -528,8 +528,8 @@ public class EnergyPanel extends JPanel {
 		buildingInfoPanel = new BuildingInfoPanel(); // basics panel
 		buildingTabbedPane.add("Basics", buildingInfoPanel);
 
-		constructionCostGraph = new ConstructionCostGraph(); // construction cost graph
-		buildingTabbedPane.add("Cost", constructionCostGraph);
+		projectCostGraph = new ProjectCostGraph(); // cost graph
+		buildingTabbedPane.add("Cost", projectCostGraph);
 
 		buildingDailyEnergyGraph = new BuildingDailyEnergyGraph(); // hourly energy graph
 		buildingTabbedPane.add("Energy", buildingDailyEnergyGraph);
@@ -819,8 +819,8 @@ public class EnergyPanel extends JPanel {
 		return cspStationInfoPanel;
 	}
 
-	public ConstructionCostGraph getConstructionCostGraph() {
-		return constructionCostGraph;
+	public ProjectCostGraph getProjectCostGraph() {
+		return projectCostGraph;
 	}
 
 	public BuildingDailyEnergyGraph getBuildingDailyEnergyGraph() {
@@ -837,7 +837,7 @@ public class EnergyPanel extends JPanel {
 
 	/** call when loading a new file */
 	public void clearAllGraphs() {
-		constructionCostGraph.removeGraph();
+		projectCostGraph.removeGraph();
 		buildingDailyEnergyGraph.removeGraph();
 		pvStationDailyEnergyGraph.removeGraph();
 		cspStationDailyEnergyGraph.removeGraph();
@@ -1738,7 +1738,7 @@ public class EnergyPanel extends JPanel {
 					final Foundation f = (Foundation) selectedPart;
 					switch (f.getStructureType()) {
 					case Foundation.TYPE_BUILDING:
-						constructionCostGraph.addGraph(f);
+						projectCostGraph.addGraph(f);
 						buildingDailyEnergyGraph.addGraph(f);
 						break;
 					case Foundation.TYPE_PV_STATION:
@@ -1749,7 +1749,7 @@ public class EnergyPanel extends JPanel {
 						break;
 					}
 				} else {
-					constructionCostGraph.removeGraph();
+					projectCostGraph.removeGraph();
 					buildingDailyEnergyGraph.removeGraph();
 					pvStationDailyEnergyGraph.removeGraph();
 					cspStationDailyEnergyGraph.removeGraph();

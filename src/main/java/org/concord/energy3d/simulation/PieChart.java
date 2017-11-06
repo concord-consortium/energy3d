@@ -27,22 +27,23 @@ public class PieChart extends JComponent {
 	private NumberFormat format;
 	private Color[] colors;
 	private String[] legends;
-	private float sum;
-	private float[] percents;
-	private Arc2D.Float[] arcs;
+	private double sum;
+	private double[] percents;
+	private Arc2D.Double[] arcs;
 	private String unit;
 	private String info;
 	private String details;
 	private boolean popup;
-	private BasicStroke thinStroke = new BasicStroke(1);
-	private BasicStroke thickStroke = new BasicStroke(2);
-	private Color normalColor = Color.BLACK;
-	private Color highlightColor = Color.YELLOW;
+	private final BasicStroke thinStroke = new BasicStroke(1);
+	private final BasicStroke thickStroke = new BasicStroke(2);
+	private final Color normalColor = Color.BLACK;
+	private final Color highlightColor = Color.YELLOW;
 	private int selectedIndex = -1;
 
-	public PieChart(final float[] data, final Color[] colors, final String[] legends, final String unit, final String info, final String details, final boolean popup) {
-		if (popup)
+	public PieChart(final double[] data, final Color[] colors, final String[] legends, final String unit, final String info, final String details, final boolean popup) {
+		if (popup) {
 			setPreferredSize(new Dimension(450, 300));
+		}
 		this.popup = popup;
 		format = NumberFormat.getNumberInstance();
 		format.setMaximumFractionDigits(2);
@@ -51,16 +52,18 @@ public class PieChart extends JComponent {
 		this.unit = unit;
 		this.info = info;
 		this.details = details;
-		for (float x : data)
+		for (final double x : data) {
 			sum += x;
-		percents = new float[data.length];
-		arcs = new Arc2D.Float[data.length];
+		}
+		percents = new double[data.length];
+		arcs = new Arc2D.Double[data.length];
 		for (int i = 0; i < percents.length; i++) {
 			percents[i] = data[i] / sum;
-			arcs[i] = new Arc2D.Float();
+			arcs[i] = new Arc2D.Double();
 		}
 		addMouseMotionListener(new MouseMotionAdapter() {
-			public void mouseMoved(MouseEvent e) {
+			@Override
+			public void mouseMoved(final MouseEvent e) {
 				selectedIndex = -1;
 				for (int i = 0; i < arcs.length; i++) {
 					if (arcs[i].contains(e.getX(), e.getY())) {
@@ -81,37 +84,40 @@ public class PieChart extends JComponent {
 		});
 	}
 
-	public void paintComponent(Graphics g) {
+	@Override
+	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		update(g);
 	}
 
-	public void update(Graphics g) {
+	@Override
+	public void update(final Graphics g) {
 
-		Graphics2D g2 = (Graphics2D) g;
+		final Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-		Dimension dim = getSize();
-		int width = dim.width;
-		int height = dim.height;
+		final Dimension dim = getSize();
+		final int width = dim.width;
+		final int height = dim.height;
 		g2.setColor(getBackground());
 		g2.fillRect(0, 0, width, height);
 		g2.setFont(new Font("Arial", Font.PLAIN, popup ? 10 : 8));
 
-		int legendX1 = width / 20;
+		final int legendX1 = width / 20;
 		int legendX2 = width / 6;
-		Rectangle bound = new Rectangle(width / 20, height / 10, width / 2, width / 2);
-		int r = bound.x + bound.width + legendX1;
-		int s = bound.y + (popup ? 10 : 0);
+		final Rectangle bound = new Rectangle(width / 20, height / 10, width / 2, width / 2);
+		final int r = bound.x + bound.width + legendX1;
+		final int s = bound.y + (popup ? 10 : 0);
 
 		float t = 0.0f;
-		int n = percents.length;
-		FontMetrics fm = g.getFontMetrics();
-		for (String l : legends) {
-			int len = fm.stringWidth(l);
-			if (legendX2 < len)
+		final int n = percents.length;
+		final FontMetrics fm = g.getFontMetrics();
+		for (final String l : legends) {
+			final int len = fm.stringWidth(l);
+			if (legendX2 < len) {
 				legendX2 = len;
+			}
 		}
 		legendX2 += legendX1 + 8;
 
@@ -137,7 +143,7 @@ public class PieChart extends JComponent {
 
 		g2.setFont(new Font("Arial", Font.PLAIN | Font.BOLD, 11));
 		if (info != null) {
-			String total = info + ", Total: " + unit + (int) sum;
+			final String total = info + ", Total: " + unit + (int) sum;
 			g2.drawString(total, (width - fm.stringWidth(total)) / 2, height - 30);
 		}
 		if (details != null) {

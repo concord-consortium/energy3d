@@ -163,7 +163,7 @@ public class EnergyAngularAnalysis extends Analysis {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s + " (Construction cost: $" + Cost.getInstance().getTotalCost() + ")", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s + " (Construction cost: $" + BuildingCost.getInstance().getTotalCost() + ")", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		graph.parent = dialog;
 
