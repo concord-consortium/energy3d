@@ -25,6 +25,7 @@ import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.Util;
 
 /**
  * Calculate the cost of a CSP project, covering four types of CSP technologies.
@@ -65,7 +66,7 @@ public class CspProjectCost extends ProjectCost {
 
 		if (part instanceof Foundation) {
 			final Foundation f = (Foundation) part;
-			if (f.isSolarPowerTower()) {
+			if (f.hasSolarReceiver()) {
 				return price.getTowerUnitPrice() * f.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
 			}
 			return f.getArea() * price.getLandUnitPrice() * price.getLifespan();
@@ -81,7 +82,7 @@ public class CspProjectCost extends ProjectCost {
 			return 0;
 		}
 		double sum = getPartCost(foundation);
-		if (foundation.isSolarPowerTower()) {
+		if (foundation.hasSolarReceiver()) {
 			return sum;
 		}
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -114,10 +115,44 @@ public class CspProjectCost extends ProjectCost {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
 				final Foundation foundation = (Foundation) p;
-				if (!foundation.isSolarPowerTower()) {
+				if (!foundation.hasSolarReceiver()) {
 					count++;
 					if (selectedFoundation == null) {
-						details += "$" + (int) getCostByFoundation(foundation) + " (" + foundation.getId() + ") | ";
+						double receiverSum = 0;
+						final List<Mirror> mirrors = foundation.getMirrors();
+						if (!mirrors.isEmpty()) {
+							final ArrayList<Foundation> towers = new ArrayList<Foundation>();
+							for (final Mirror m : mirrors) {
+								if (m.getHeliostatTarget() != null) {
+									if (!towers.contains(m.getHeliostatTarget())) {
+										towers.add(m.getHeliostatTarget());
+									}
+								}
+							}
+							if (!towers.isEmpty()) {
+								for (final Foundation tower : towers) {
+									receiverSum += getPartCost(tower);
+								}
+							}
+						} else {
+							final List<FresnelReflector> reflectors = foundation.getFresnelReflectors();
+							if (!reflectors.isEmpty()) {
+								final ArrayList<Foundation> absorbers = new ArrayList<Foundation>();
+								for (final FresnelReflector r : reflectors) {
+									if (r.getAbsorber() != null) {
+										if (!absorbers.contains(r.getAbsorber())) {
+											absorbers.add(r.getAbsorber());
+										}
+									}
+								}
+								if (!absorbers.isEmpty()) {
+									for (final Foundation absorber : absorbers) {
+										receiverSum += getPartCost(absorber);
+									}
+								}
+							}
+						}
+						details += "$" + (int) (getCostByFoundation(foundation) + receiverSum) + " (" + foundation.getId() + ") | ";
 					}
 				}
 			}
@@ -129,13 +164,13 @@ public class CspProjectCost extends ProjectCost {
 		}
 
 		double landSum = 0;
-		double solarCollectorSum = 0;
-		double towerSum = 0;
+		double collectorSum = 0;
+		double receiverSum = 0;
 		String info;
 		if (selectedFoundation != null) {
 			info = "Zone #" + selectedFoundation.getId();
-			if (selectedFoundation.isSolarPowerTower()) {
-				towerSum = getPartCost(selectedFoundation);
+			if (selectedFoundation.hasSolarReceiver()) {
+				receiverSum = getPartCost(selectedFoundation);
 			} else {
 				landSum = getPartCost(selectedFoundation);
 				final List<Mirror> mirrors = selectedFoundation.getMirrors();
@@ -150,7 +185,24 @@ public class CspProjectCost extends ProjectCost {
 					}
 					if (!towers.isEmpty()) {
 						for (final Foundation tower : towers) {
-							towerSum += getPartCost(tower);
+							receiverSum += getPartCost(tower);
+						}
+					}
+				} else {
+					final List<FresnelReflector> reflectors = selectedFoundation.getFresnelReflectors();
+					if (!reflectors.isEmpty()) {
+						final ArrayList<Foundation> absorbers = new ArrayList<Foundation>();
+						for (final FresnelReflector r : reflectors) {
+							if (r.getAbsorber() != null) {
+								if (!absorbers.contains(r.getAbsorber())) {
+									absorbers.add(r.getAbsorber());
+								}
+							}
+						}
+						if (!absorbers.isEmpty()) {
+							for (final Foundation absorber : absorbers) {
+								receiverSum += getPartCost(absorber);
+							}
 						}
 					}
 				}
@@ -158,7 +210,7 @@ public class CspProjectCost extends ProjectCost {
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p.getTopContainer() == selectedFoundation) {
 					if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
-						solarCollectorSum += getPartCost(p);
+						collectorSum += getPartCost(p);
 					}
 				}
 			}
@@ -167,26 +219,35 @@ public class CspProjectCost extends ProjectCost {
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
 					final Foundation f = (Foundation) p;
-					if (f.isSolarPowerTower()) {
-						towerSum += getPartCost(p);
+					if (f.hasSolarReceiver()) {
+						receiverSum += getPartCost(p);
 					} else {
 						landSum += getPartCost(p);
 					}
 				} else if (p instanceof SolarCollector) {
-					solarCollectorSum += getPartCost(p);
+					collectorSum += getPartCost(p);
 				}
 			}
 		}
 
-		final double[] data = new double[] { landSum, solarCollectorSum, towerSum };
-		final String[] legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Solar Collectors", "Towers" };
-		final Color[] colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE };
+		double[] data;
+		String[] legends;
+		Color[] colors;
+		if (Util.isZero(receiverSum)) {
+			data = new double[] { landSum, collectorSum };
+			legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors" };
+			colors = new Color[] { Color.RED, Color.GREEN };
+		} else {
+			data = new double[] { landSum, collectorSum, receiverSum };
+			legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors", "Receivers" };
+			colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE };
+		}
 
 		// show them in a popup window
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Costs by Category", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Project Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

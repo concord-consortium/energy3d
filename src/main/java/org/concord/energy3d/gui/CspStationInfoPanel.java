@@ -181,7 +181,7 @@ public class CspStationInfoPanel extends JPanel {
 							}
 						}
 					} else {
-						if (foundation.isSolarPowerTower()) {
+						if (foundation.hasSolarReceiver()) {
 							cost += price.getTowerUnitPrice() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
 						}
 					}

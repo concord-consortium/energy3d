@@ -16,7 +16,7 @@ public class CspCustomPrice implements Serializable {
 	private double parabolicDishUnitPrice = 100;
 	private double fresnelReflectorUnitPrice = 50;
 	private int lifespan = 50;
-	private double landUnitPrice;
+	private double landUnitPrice = 2;
 
 	public CspCustomPrice() {
 		setDefaultValues();
@@ -25,6 +25,9 @@ public class CspCustomPrice implements Serializable {
 	public void setDefaultValues() {
 		if (lifespan == 0) {
 			lifespan = 50;
+		}
+		if (landUnitPrice == 0) {
+			landUnitPrice = 2;
 		}
 		if (heliostatUnitPrice == 0) {
 			heliostatUnitPrice = 100;
