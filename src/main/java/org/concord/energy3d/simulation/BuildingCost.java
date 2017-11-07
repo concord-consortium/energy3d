@@ -274,7 +274,7 @@ public class BuildingCost extends ProjectCost {
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Costs by Category", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Project Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

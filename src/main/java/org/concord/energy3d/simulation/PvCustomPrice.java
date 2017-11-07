@@ -53,7 +53,24 @@ public class PvCustomPrice implements Serializable {
 	}
 
 	public double getTotalCost(final Rack r) {
-		return getTotalCost(r.getSolarPanel()) * r.getNumberOfSolarPanels();
+		double cost = solarPanelPrice;
+		cost += solarPanelRackBasePrice;
+		final double baseHeight = r.getBaseHeight() * Scene.getInstance().getAnnotationScale();
+		if (baseHeight > 1) {
+			cost += solarPanelRackHeightPrice * (baseHeight - 1);
+		}
+		switch (r.getTracker()) {
+		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+			cost += solarPanelHsatPrice;
+			break;
+		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+			cost += solarPanelVsatPrice;
+			break;
+		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+			cost += solarPanelAadatPrice;
+			break;
+		}
+		return cost * r.getNumberOfSolarPanels();
 	}
 
 	public double getTotalCost(final SolarPanel s) {

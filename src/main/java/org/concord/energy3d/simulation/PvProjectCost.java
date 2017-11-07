@@ -132,14 +132,14 @@ public class PvProjectCost extends ProjectCost {
 		}
 
 		final double[] data = new double[] { landSum, solarPanelSum };
-		final String[] legends = new String[] { "Land", "Solar Panels" };
+		final String[] legends = new String[] { "Land (" + Scene.getInstance().getPvCustomPrice().getLifespan() + " years)", "Solar Panels" };
 		final Color[] colors = new Color[] { Color.RED, Color.GREEN };
 
 		// show them in a popup window
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Costs by Category", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Project Costs by Category", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.getContentPane().add(pie, BorderLayout.CENTER);
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
