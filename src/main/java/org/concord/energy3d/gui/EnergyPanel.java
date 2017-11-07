@@ -1684,7 +1684,14 @@ public class EnergyPanel extends JPanel {
 					title = "CSP";
 					break;
 				}
-				timeAndLocationPanel.setBorder(createTitledBorder(title + " Project: " + (s != null ? s : ""), true));
+				String author = "";
+				if (Scene.getInstance().getDesigner() != null) {
+					final String name = Scene.getInstance().getDesigner().getName();
+					if (!"User".equals(name)) {
+						author += name + "'s";
+					}
+				}
+				timeAndLocationPanel.setBorder(createTitledBorder(author + " " + title + " Project: " + (s != null ? s : ""), true));
 				buildingInfoPanel.updateAreaBounds();
 				buildingInfoPanel.updateHeightBounds();
 				buildingInfoPanel.updateWindowToFloorRatioBounds();

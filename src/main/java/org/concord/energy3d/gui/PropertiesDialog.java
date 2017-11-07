@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 
+import org.concord.energy3d.Designer;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.SpringUtilities;
 
@@ -36,6 +37,8 @@ class PropertiesDialog extends JDialog {
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
+		final JTextField designerNameField = new JTextField(Scene.getInstance().getDesigner() == null ? "User" : Scene.getInstance().getDesigner().getName());
+		final JTextField designerOrganizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
 		final JComboBox<String> projectTypeComboBox = new JComboBox<String>(new String[] { "Building", "Photovoltaic Solar Power System", "Concentrated Solar Power System" });
 		projectTypeComboBox.setSelectedIndex(Scene.getInstance().getProjectType() - 1);
 		final JComboBox<String> unitSystemComboBox = new JComboBox<String>(new String[] { "International System of Units", "United States Customary Units" });
@@ -69,6 +72,38 @@ class PropertiesDialog extends JDialog {
 					Scene.getInstance().setUnit(Scene.Unit.USCustomaryUnits);
 					break;
 				}
+				final String designerName = designerNameField.getText();
+				final String designerOrganization = designerOrganizationField.getText();
+				if (designerName != null && !designerName.trim().equals("")) {
+					Designer designer = Scene.getInstance().getDesigner();
+					if (designer == null) {
+						designer = new Designer();
+						Scene.getInstance().setDesigner(designer);
+					}
+					designer.setName(designerName);
+				} else {
+					Designer designer = Scene.getInstance().getDesigner();
+					if (designer == null) {
+						designer = new Designer();
+						Scene.getInstance().setDesigner(designer);
+					}
+					designer.setName("User");
+				}
+				if (designerOrganization != null && !designerOrganization.trim().equals("")) {
+					Designer designer = Scene.getInstance().getDesigner();
+					if (designer == null) {
+						designer = new Designer();
+						Scene.getInstance().setDesigner(designer);
+					}
+					designer.setOrganization(designerOrganization);
+				} else {
+					Designer designer = Scene.getInstance().getDesigner();
+					if (designer == null) {
+						designer = new Designer();
+						Scene.getInstance().setDesigner(designer);
+					}
+					designer.setOrganization(null);
+				}
 				Scene.getInstance().setProjectName(projectNameField.getText());
 				Scene.getInstance().setProjectType(projectTypeComboBox.getSelectedIndex() + 1);
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
@@ -81,6 +116,14 @@ class PropertiesDialog extends JDialog {
 				PropertiesDialog.this.dispose();
 			}
 		};
+
+		// set designer name
+		panel.add(new JLabel("Designer Name: "));
+		panel.add(designerNameField);
+
+		// set designer organization
+		panel.add(new JLabel("Designer Organization: "));
+		panel.add(designerOrganizationField);
 
 		// set project name
 		panel.add(new JLabel("Project Name: "));
@@ -110,7 +153,7 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Ground Image Coloration: "));
 		panel.add(groundImageColorationComboBox);
 
-		SpringUtilities.makeCompactGrid(panel, 7, 2, 8, 8, 8, 8);
+		SpringUtilities.makeCompactGrid(panel, 9, 2, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

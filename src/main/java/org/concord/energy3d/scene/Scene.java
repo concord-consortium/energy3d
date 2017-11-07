@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
+import org.concord.energy3d.Designer;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
@@ -135,6 +136,7 @@ public class Scene implements Serializable {
 	private UtilityBill utilityBill;
 	private String projectName;
 	private int projectType = Foundation.TYPE_BUILDING;
+	private Designer designer;
 	private String city;
 	private String note;
 	private long idCounter;
@@ -3151,6 +3153,14 @@ public class Scene implements Serializable {
 
 	public String getProjectName() {
 		return projectName;
+	}
+
+	public void setDesigner(final Designer designer) {
+		this.designer = designer;
+	}
+
+	public Designer getDesigner() {
+		return designer;
 	}
 
 	public void setStudentMode(final boolean b) {
