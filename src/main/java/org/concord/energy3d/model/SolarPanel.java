@@ -115,7 +115,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			panelHeight = 1.65;
 		}
 		if (Util.isZero(efficiency)) {
-			efficiency = 0.15;
+			efficiency = 0.1833; // make it the same as the default one in PvModuleSpecs
 		}
 		if (Util.isZero(temperatureCoefficientPmax)) {
 			temperatureCoefficientPmax = -0.005;
@@ -1135,7 +1135,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	}
 
 	public double getSystemEfficiency(final double temperature) {
-		double e = efficiency * inverterEfficiency;
+		double e = getCellEfficiency() * inverterEfficiency;
 		if (cellType == MONOCRYSTALLINE) {
 			e *= 0.95; // assuming that the packing density factor of semi-round cells is 0.95
 		}
@@ -1314,8 +1314,14 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public void setPvModuleSpecs(final PvModuleSpecs pvModuleSpecs) {
 		this.pvModuleSpecs = pvModuleSpecs;
+		// backward compatibility
 		panelWidth = pvModuleSpecs.getWidth();
 		panelHeight = pvModuleSpecs.getLength();
+		efficiency = pvModuleSpecs.getCelLEfficiency();
+		temperatureCoefficientPmax = pvModuleSpecs.getPmaxTc();
+		nominalOperatingCellTemperature = pvModuleSpecs.getNoct();
+		numberOfCellsInX = pvModuleSpecs.getLayout().width;
+		numberOfCellsInY = pvModuleSpecs.getLayout().height;
 		convertStringPropertiesToIntegerProperties();
 	}
 
