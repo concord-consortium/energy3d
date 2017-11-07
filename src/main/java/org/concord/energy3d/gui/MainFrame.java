@@ -1130,7 +1130,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 			helpMenu.add(mi);
-			mi = new JMenuItem("View House Examples...");
+			mi = new JMenuItem("View Building Examples...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2781,11 +2781,14 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					int i;
 					if (selectedPart == null) {
-						return;
+						i = Scene.getInstance().getProjectType();
+					} else {
+						final Foundation f = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+						i = f.getProjectType();
 					}
-					final Foundation f = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
-					switch (f.getProjectType()) {
+					switch (i) {
 					case Foundation.TYPE_PV_STATION:
 						PvProjectCost.getInstance().showGraph();
 						break;

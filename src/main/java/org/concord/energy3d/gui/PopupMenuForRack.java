@@ -52,9 +52,11 @@ import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForAllRacksCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.ChangeRackPoleSettingsCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelModelForAllRacksCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelModelForRackCommand;
+import org.concord.energy3d.undo.ChangeSolarPanelModelForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelModelForRackCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsOnAllRacksCommand;
@@ -81,8 +83,6 @@ import org.concord.energy3d.undo.SetSolarPanelCellTypeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForRacksOnFoundationCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelModelForAllRacksCommand;
-import org.concord.energy3d.undo.ChangeSolarPanelModelForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelSizeForAllRacksCommand;
@@ -351,6 +351,27 @@ class PopupMenuForRack extends PopupMenuFactory {
 							}
 						}
 					}
+				}
+			});
+
+			final JMenuItem miRotate = new JMenuItem("Rotate 90\u00B0");
+			miRotate.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack rack = (Rack) selectedPart;
+					double a = rack.getRelativeAzimuth() + 90;
+					if (a > 360) {
+						a -= 360;
+					}
+					final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
+					rack.setRelativeAzimuth(a);
+					rack.draw();
+					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 
@@ -2332,6 +2353,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 			popupMenuForRack.addSeparator();
 			popupMenuForRack.add(miTiltAngle);
 			popupMenuForRack.add(miAzimuth);
+			popupMenuForRack.add(miRotate);
 			popupMenuForRack.add(miRackSize);
 			popupMenuForRack.add(miBaseHeight);
 			popupMenuForRack.add(miPoleSpacing);

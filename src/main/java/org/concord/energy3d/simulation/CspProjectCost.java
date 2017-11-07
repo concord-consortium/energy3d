@@ -12,8 +12,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.model.Door;
-import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
@@ -21,17 +19,13 @@ import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
-import org.concord.energy3d.model.Rack;
-import org.concord.energy3d.model.Roof;
-import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.Tree;
-import org.concord.energy3d.model.Wall;
-import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
 /**
- * Calculate the cost of a CSP project
+ * Calculate the cost of a CSP project, covering four types of CSP technologies.
  * 
  * @author Charles Xie
  * 
@@ -49,20 +43,27 @@ public class CspProjectCost extends ProjectCost {
 
 	static double getPartCost(final HousePart part) {
 
+		final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
+
 		if (part instanceof Mirror) {
-			return Scene.getInstance().getCspCustomPrice().getHeliostatUnitPrice() * part.getArea();
+			return price.getHeliostatUnitPrice() * part.getArea();
 		}
 
 		if (part instanceof ParabolicTrough) {
-			return Scene.getInstance().getCspCustomPrice().getParabolicTroughUnitPrice() * part.getArea();
+			return price.getParabolicTroughUnitPrice() * part.getArea();
 		}
 
 		if (part instanceof ParabolicDish) {
-			return Scene.getInstance().getCspCustomPrice().getParabolicDishUnitPrice() * part.getArea();
+			return price.getParabolicDishUnitPrice() * part.getArea();
 		}
 
 		if (part instanceof FresnelReflector) {
-			return Scene.getInstance().getCspCustomPrice().getFresnelReflectorUnitPrice() * part.getArea();
+			return price.getFresnelReflectorUnitPrice() * part.getArea();
+		}
+
+		if (part instanceof Foundation) {
+			final Foundation f = (Foundation) part;
+			return f.getArea() * price.getLandUnitPrice() * price.getLifespan();
 		}
 
 		return 0;
@@ -77,7 +78,7 @@ public class CspProjectCost extends ProjectCost {
 		double sum = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation) {
-				if (p instanceof SolarPanel || p instanceof Rack) {
+				if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
 					sum += getPartCost(p);
 				}
 			}
@@ -88,92 +89,62 @@ public class CspProjectCost extends ProjectCost {
 	@Override
 	void showPieChart() {
 
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final Foundation selectedFoundation;
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
+			selectedFoundation = null;
+		} else if (selectedPart instanceof Foundation) {
+			selectedFoundation = (Foundation) selectedPart;
+		} else {
+			selectedFoundation = selectedPart.getTopContainer();
+			selectedPart.setEditPointsVisible(false);
+			SceneManager.getInstance().setSelectedPart(selectedFoundation);
+		}
+
 		String details = "";
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
 				count++;
-				final Foundation foundation = (Foundation) p;
-				details += "#" + foundation.getId() + ":$" + getCostByFoundation(foundation) + "/";
+				if (selectedFoundation == null) {
+					final Foundation foundation = (Foundation) p;
+					details += "$" + (int) getCostByFoundation(foundation) + " (" + foundation.getId() + ") | ";
+				}
 			}
 		}
-		if (count > 0) {
-			details = details.substring(0, details.length() - 1);
+		if (selectedFoundation == null) {
+			if (count > 0) {
+				details = details.substring(0, details.length() - 2);
+			}
 		}
 
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		final Foundation selectedBuilding;
-		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
-			selectedBuilding = null;
-		} else if (selectedPart instanceof Foundation) {
-			selectedBuilding = (Foundation) selectedPart;
-		} else {
-			selectedBuilding = selectedPart.getTopContainer();
-			selectedPart.setEditPointsVisible(false);
-			SceneManager.getInstance().setSelectedPart(selectedBuilding);
-		}
-		double wallSum = 0;
-		double floorSum = 0;
-		double windowSum = 0;
-		double roofSum = 0;
 		double foundationSum = 0;
-		double doorSum = 0;
-		double solarPanelSum = 0;
-		double treeSum = 0;
+		double solarCollectorSum = 0;
 		String info;
-		if (selectedBuilding != null) {
-			info = "Building #" + selectedBuilding.getId();
-			foundationSum = getPartCost(selectedBuilding);
+		if (selectedFoundation != null) {
+			info = "Zone #" + selectedFoundation.getId();
+			foundationSum = getPartCost(selectedFoundation);
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p.getTopContainer() == selectedBuilding) {
-					if (p instanceof Wall) {
-						wallSum += getPartCost(p);
-					} else if (p instanceof Floor) {
-						floorSum += getPartCost(p);
-					} else if (p instanceof Window) {
-						windowSum += getPartCost(p);
-					} else if (p instanceof Roof) {
-						roofSum += getPartCost(p);
-					} else if (p instanceof Door) {
-						doorSum += getPartCost(p);
-					} else if (p instanceof SolarPanel) {
-						solarPanelSum += getPartCost(p);
-					} else if (p instanceof Rack) {
-						solarPanelSum += getPartCost(p);
-					}
-				}
-				if (count <= 1) {
-					if (p instanceof Tree && !p.isFrozen()) {
-						treeSum += getPartCost(p);
+				if (p.getTopContainer() == selectedFoundation) {
+					if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
+						solarCollectorSum += getPartCost(p);
 					}
 				}
 			}
 		} else {
-			info = count + " buildings";
+			info = count + " zones";
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p instanceof Wall) {
-					wallSum += getPartCost(p);
-				} else if (p instanceof Floor) {
-					floorSum += getPartCost(p);
-				} else if (p instanceof Window) {
-					windowSum += getPartCost(p);
-				} else if (p instanceof Roof) {
-					roofSum += getPartCost(p);
-				} else if (p instanceof Foundation) {
+				if (p instanceof Foundation) {
 					foundationSum += getPartCost(p);
-				} else if (p instanceof Door) {
-					doorSum += getPartCost(p);
-				} else if (p instanceof SolarPanel) {
-					solarPanelSum += getPartCost(p);
-				} else if (p instanceof Tree && !p.isFrozen()) {
-					treeSum += getPartCost(p);
+				} else if (p instanceof SolarCollector) {
+					solarCollectorSum += getPartCost(p);
 				}
 			}
 		}
 
-		final double[] data = new double[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
-		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
+		final double[] data = new double[] { foundationSum, solarCollectorSum };
+		final String[] legends = new String[] { "Foundation", "Solar Collectors" };
+		final Color[] colors = new Color[] { Color.RED, Color.GREEN };
 
 		// show them in a popup window
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
