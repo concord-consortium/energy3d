@@ -69,19 +69,9 @@ public class CspProjectCost extends ProjectCost {
 
 	}
 
-	public double getTotalCost() {
-		double sum = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation) {
-				sum += getCostByFoundation((Foundation) p);
-			}
-		}
-		return sum;
-	}
-
 	@Override
 	public double getCostByFoundation(final Foundation foundation) {
-		if (foundation == null || foundation.getStructureType() != Foundation.TYPE_CSP_STATION) {
+		if (foundation == null || foundation.getProjectType() != Foundation.TYPE_CSP_STATION) {
 			return 0;
 		}
 		double sum = 0;
@@ -96,7 +86,7 @@ public class CspProjectCost extends ProjectCost {
 	}
 
 	@Override
-	void show() {
+	void showPieChart() {
 
 		String details = "";
 		int count = 0;

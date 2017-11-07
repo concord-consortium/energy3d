@@ -12,18 +12,18 @@ public abstract class ProjectCost {
 
 	static Point windowLocation = new Point();
 
-	abstract void show();
+	abstract void showPieChart();
 
 	public abstract double getCostByFoundation(final Foundation foundation);
 
 	public void showGraph() {
-		show();
+		showPieChart();
 		TimeSeriesLogger.getInstance().logAnalysis(this);
 	}
 
 	public static double getCost(final HousePart p) {
 		final Foundation f = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
-		switch (f.getStructureType()) {
+		switch (f.getProjectType()) {
 		case Foundation.TYPE_PV_STATION:
 			return PvProjectCost.getPartCost(p);
 		case Foundation.TYPE_CSP_STATION:

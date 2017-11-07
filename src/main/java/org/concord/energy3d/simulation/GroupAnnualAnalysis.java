@@ -216,7 +216,7 @@ public class GroupAnnualAnalysis extends Analysis {
 			} else if (p instanceof Foundation) {
 				final boolean mean = group.getType().endsWith("(Mean)");
 				final Foundation foundation = (Foundation) p;
-				switch (foundation.getStructureType()) {
+				switch (foundation.getProjectType()) {
 				case Foundation.TYPE_PV_STATION:
 					double pv = foundation.getPhotovoltaicToday();
 					if (mean) {
@@ -539,7 +539,7 @@ public class GroupAnnualAnalysis extends Analysis {
 				type = "Window";
 			} else if (p instanceof Foundation) {
 				final Foundation foundation = (Foundation) p;
-				switch (foundation.getStructureType()) {
+				switch (foundation.getProjectType()) {
 				case Foundation.TYPE_PV_STATION:
 					names.add("PV " + p.getId());
 					break;

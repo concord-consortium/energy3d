@@ -134,6 +134,7 @@ public class Scene implements Serializable {
 	private transient NodeState copyNodeState;
 	private UtilityBill utilityBill;
 	private String projectName;
+	private int projectType = Foundation.TYPE_BUILDING;
 	private String city;
 	private String note;
 	private long idCounter;
@@ -255,7 +256,7 @@ public class Scene implements Serializable {
 				final HousePart p = SceneManager.getInstance().getSelectedPart();
 				if (p instanceof Foundation) {
 					final Foundation f = (Foundation) p;
-					switch (f.getStructureType()) {
+					switch (f.getProjectType()) {
 					case Foundation.TYPE_BUILDING:
 						e.getProjectCostGraph().addGraph(f);
 						e.getBuildingDailyEnergyGraph().clearData();
@@ -3129,6 +3130,19 @@ public class Scene implements Serializable {
 			}
 		}
 		return false;
+	}
+
+	public void setProjectType(final int projectType) {
+		this.projectType = projectType;
+		for (final HousePart p : parts) {
+			if (p instanceof Foundation) {
+				((Foundation) p).setProjectType(projectType);
+			}
+		}
+	}
+
+	public int getProjectType() {
+		return projectType;
 	}
 
 	public void setProjectName(final String projectName) {

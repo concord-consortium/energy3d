@@ -36,6 +36,8 @@ class PropertiesDialog extends JDialog {
 		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
+		final JComboBox<String> projectTypeComboBox = new JComboBox<String>(new String[] { "Building", "Photovoltaic Solar Power System", "Concentrated Solar Power System" });
+		projectTypeComboBox.setSelectedIndex(Scene.getInstance().getProjectType() - 1);
 		final JComboBox<String> unitSystemComboBox = new JComboBox<String>(new String[] { "International System of Units", "United States Customary Units" });
 		if (Scene.getInstance().getUnit() == Scene.Unit.USCustomaryUnits) {
 			unitSystemComboBox.setSelectedIndex(1);
@@ -68,6 +70,7 @@ class PropertiesDialog extends JDialog {
 					break;
 				}
 				Scene.getInstance().setProjectName(projectNameField.getText());
+				Scene.getInstance().setProjectType(projectTypeComboBox.getSelectedIndex() + 1);
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
@@ -83,7 +86,11 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Project Name: "));
 		panel.add(projectNameField);
 
-		// set project name
+		// set project type
+		panel.add(new JLabel("Project Type: "));
+		panel.add(projectTypeComboBox);
+
+		// set student mode
 		panel.add(new JLabel("Student Mode: "));
 		panel.add(studentModeComboBox);
 
@@ -103,7 +110,7 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Ground Image Coloration: "));
 		panel.add(groundImageColorationComboBox);
 
-		SpringUtilities.makeCompactGrid(panel, 6, 2, 8, 8, 8, 8);
+		SpringUtilities.makeCompactGrid(panel, 7, 2, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

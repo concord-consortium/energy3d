@@ -679,7 +679,7 @@ public class EnergyPanel extends JPanel {
 							final HousePart p = SceneManager.getInstance().getSelectedPart();
 							if (p instanceof Foundation) {
 								final Foundation f = (Foundation) p;
-								switch (f.getStructureType()) {
+								switch (f.getProjectType()) {
 								case Foundation.TYPE_BUILDING:
 									Util.setSilently(buildingTabbedPane, buildingDailyEnergyGraph);
 									buildingDailyEnergyGraph.addGraph(f);
@@ -1579,7 +1579,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void run() {
 				if (selectedFoundation != null) {
-					switch (selectedFoundation.getStructureType()) {
+					switch (selectedFoundation.getProjectType()) {
 					case Foundation.TYPE_BUILDING:
 						dataPanel.remove(instructionPanel);
 						dataPanel.remove(pvStationPanel);
@@ -1672,7 +1672,19 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void run() {
 				final String s = Scene.getInstance().getProjectName();
-				timeAndLocationPanel.setBorder(createTitledBorder("Project: " + (s != null ? s : ""), true));
+				String title = "";
+				switch (Scene.getInstance().getProjectType()) {
+				case Foundation.TYPE_BUILDING:
+					title = "Building";
+					break;
+				case Foundation.TYPE_PV_STATION:
+					title = "PV";
+					break;
+				case Foundation.TYPE_CSP_STATION:
+					title = "CSP";
+					break;
+				}
+				timeAndLocationPanel.setBorder(createTitledBorder(title + " Project: " + (s != null ? s : ""), true));
 				buildingInfoPanel.updateAreaBounds();
 				buildingInfoPanel.updateHeightBounds();
 				buildingInfoPanel.updateWindowToFloorRatioBounds();
@@ -1736,7 +1748,7 @@ public class EnergyPanel extends JPanel {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
 					final Foundation f = (Foundation) selectedPart;
-					switch (f.getStructureType()) {
+					switch (f.getProjectType()) {
 					case Foundation.TYPE_BUILDING:
 						projectCostGraph.addGraph(f);
 						buildingDailyEnergyGraph.addGraph(f);

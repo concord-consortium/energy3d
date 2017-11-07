@@ -653,7 +653,7 @@ class SpecsDialog extends JDialog {
 				final HousePart part = SceneManager.getInstance().getSelectedPart();
 				if (part instanceof Foundation) {
 					final Foundation foundation = (Foundation) part;
-					switch (foundation.getStructureType()) {
+					switch (foundation.getProjectType()) {
 					case Foundation.TYPE_BUILDING:
 						EnergyPanel.getInstance().getBuildingInfoPanel().update(foundation);
 						break;

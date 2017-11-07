@@ -95,6 +95,7 @@ import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.BuildingCost;
+import org.concord.energy3d.simulation.CspProjectCost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
@@ -112,6 +113,7 @@ import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
+import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
@@ -2778,7 +2780,21 @@ public class MainFrame extends JFrame {
 			costAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					BuildingCost.getInstance().showGraph();
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart == null) {
+						return;
+					}
+					final Foundation f = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
+					switch (f.getProjectType()) {
+					case Foundation.TYPE_PV_STATION:
+						PvProjectCost.getInstance().showGraph();
+						break;
+					case Foundation.TYPE_CSP_STATION:
+						CspProjectCost.getInstance().showGraph();
+						break;
+					default:
+						BuildingCost.getInstance().showGraph();
+					}
 				}
 			});
 		}

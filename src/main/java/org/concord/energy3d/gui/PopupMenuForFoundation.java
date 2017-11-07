@@ -1435,8 +1435,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			});
 			optionsMenu.add(miChildGridSize);
 
-			final JMenu structureTypeSubMenu = new JMenu("Structure Type");
-			optionsMenu.add(structureTypeSubMenu);
+			final JMenu projectTypeSubMenu = new JMenu("Project Type");
+			optionsMenu.add(projectTypeSubMenu);
 
 			final ButtonGroup bgStructureTypes = new ButtonGroup();
 
@@ -1447,11 +1447,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						foundation.setStructureType(Foundation.TYPE_AUTO_DETECTED);
+						foundation.setProjectType(Foundation.TYPE_AUTO_DETECTED);
 					}
 				}
 			});
-			structureTypeSubMenu.add(rbmiTypeAutoDetected);
+			projectTypeSubMenu.add(rbmiTypeAutoDetected);
 			bgStructureTypes.add(rbmiTypeAutoDetected);
 
 			final JRadioButtonMenuItem rbmiTypeBuilding = new JRadioButtonMenuItem("Building");
@@ -1461,11 +1461,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						foundation.setStructureType(Foundation.TYPE_BUILDING);
+						foundation.setProjectType(Foundation.TYPE_BUILDING);
 					}
 				}
 			});
-			structureTypeSubMenu.add(rbmiTypeBuilding);
+			projectTypeSubMenu.add(rbmiTypeBuilding);
 			bgStructureTypes.add(rbmiTypeBuilding);
 
 			final JRadioButtonMenuItem rbmiTypePvStation = new JRadioButtonMenuItem("Photovoltaic Solar Power System");
@@ -1475,11 +1475,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						foundation.setStructureType(Foundation.TYPE_PV_STATION);
+						foundation.setProjectType(Foundation.TYPE_PV_STATION);
 					}
 				}
 			});
-			structureTypeSubMenu.add(rbmiTypePvStation);
+			projectTypeSubMenu.add(rbmiTypePvStation);
 			bgStructureTypes.add(rbmiTypePvStation);
 
 			final JRadioButtonMenuItem rbmiTypeCspStation = new JRadioButtonMenuItem("Concentrated Solar Power System");
@@ -1489,11 +1489,11 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						foundation.setStructureType(Foundation.TYPE_CSP_STATION);
+						foundation.setProjectType(Foundation.TYPE_CSP_STATION);
 					}
 				}
 			});
-			structureTypeSubMenu.add(rbmiTypeCspStation);
+			projectTypeSubMenu.add(rbmiTypeCspStation);
 			bgStructureTypes.add(rbmiTypeCspStation);
 
 			final JMenuItem miThermostat = new JMenuItem("Thermostat...");
@@ -1843,7 +1843,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						Util.selectSilently(miLabelNumberOfSolarPanels, f.getLabelNumberOfSolarPanels());
 						Util.selectSilently(miLabelBuildingEnergy, f.getLabelBuildingEnergy());
 						powerTowerLabelMenu.setEnabled(f.isSolarReceiverVisible());
-						switch (f.getStructureType()) {
+						switch (f.getProjectType()) {
 						case Foundation.TYPE_BUILDING:
 							Util.selectSilently(rbmiTypeBuilding, true);
 							break;

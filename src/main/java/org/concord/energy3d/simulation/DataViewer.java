@@ -191,7 +191,7 @@ class DataViewer {
 				headers.add("Heat Gain " + p.getId());
 			} else if (p instanceof Foundation) {
 				final Foundation foundation = (Foundation) p;
-				switch (foundation.getStructureType()) {
+				switch (foundation.getProjectType()) {
 				case Foundation.TYPE_PV_STATION:
 					headers.add("PV " + p.getId());
 					break;

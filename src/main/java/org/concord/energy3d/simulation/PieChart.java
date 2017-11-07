@@ -75,7 +75,7 @@ public class PieChart extends JComponent {
 				}
 				String toolTipText = "<html><h4>Data:</h4><hr>";
 				for (int i = 0; i < data.length; i++) {
-					toolTipText += legends[i] + ": " + unit + data[i] + "<br>";
+					toolTipText += legends[i] + ": " + unit + Math.round(data[i]) + "<br>";
 				}
 				toolTipText += "<hr>Hover mouse over the pie chart to view the numbers.";
 				setToolTipText(toolTipText + (popup ? "" : "<br>Double-click to enlarge this chart.") + "</html>");

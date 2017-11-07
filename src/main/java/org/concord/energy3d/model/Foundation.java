@@ -2553,11 +2553,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return rack;
 	}
 
-	public void setStructureType(final int structureType) {
-		this.structureType = structureType;
+	public void setProjectType(final int projectType) {
+		this.structureType = projectType;
 	}
 
-	public int getStructureType() {
+	public int getProjectType() {
 		if (structureType == TYPE_AUTO_DETECTED) {
 			for (final HousePart p : children) {
 				if (p instanceof Wall) {

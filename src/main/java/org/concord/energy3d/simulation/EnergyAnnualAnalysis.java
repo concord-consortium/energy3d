@@ -220,7 +220,7 @@ public class EnergyAnnualAnalysis extends Analysis {
 			} else {
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				if (selectedPart instanceof Foundation) {
-					cost = (int) BuildingCost.getInstance().getTotalCost();
+					cost = (int) BuildingCost.getInstance().getCostByFoundation((Foundation) selectedPart);
 					s = s.replaceAll("Foundation", "Building");
 					if (selectedPart.getChildren().isEmpty()) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.INFORMATION_MESSAGE);

@@ -12,17 +12,12 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.model.Door;
-import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Rack;
-import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
-import org.concord.energy3d.model.Wall;
-import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
@@ -64,22 +59,12 @@ public class PvProjectCost extends ProjectCost {
 
 	}
 
-	public double getTotalCost() {
-		double sum = 0;
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Foundation) {
-				sum += getCostByFoundation((Foundation) p);
-			}
-		}
-		return sum;
-	}
-
 	@Override
 	public double getCostByFoundation(final Foundation foundation) {
-		if (foundation == null || foundation.getStructureType() != Foundation.TYPE_PV_STATION) {
+		if (foundation == null || foundation.getProjectType() != Foundation.TYPE_PV_STATION) {
 			return 0;
 		}
-		double sum = 0;
+		double sum = getPartCost(foundation);
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation) {
 				if (p instanceof SolarPanel || p instanceof Rack) {
@@ -91,94 +76,64 @@ public class PvProjectCost extends ProjectCost {
 	}
 
 	@Override
-	void show() {
+	void showPieChart() {
+
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		final Foundation selectedFoundation;
+		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
+			selectedFoundation = null;
+		} else if (selectedPart instanceof Foundation) {
+			selectedFoundation = (Foundation) selectedPart;
+		} else {
+			selectedFoundation = selectedPart.getTopContainer();
+			selectedPart.setEditPointsVisible(false);
+			SceneManager.getInstance().setSelectedPart(selectedFoundation);
+		}
 
 		String details = "";
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
 				count++;
-				final Foundation foundation = (Foundation) p;
-				details += "#" + foundation.getId() + ":$" + getCostByFoundation(foundation) + "/";
+				if (selectedFoundation == null) {
+					final Foundation foundation = (Foundation) p;
+					details += "$" + (int) getCostByFoundation(foundation) + " (" + foundation.getId() + ") | ";
+				}
 			}
 		}
-		if (count > 0) {
-			details = details.substring(0, details.length() - 1);
+		if (selectedFoundation == null) {
+			if (count > 0) {
+				details = details.substring(0, details.length() - 2);
+			}
 		}
 
-		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		final Foundation selectedBuilding;
-		if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
-			selectedBuilding = null;
-		} else if (selectedPart instanceof Foundation) {
-			selectedBuilding = (Foundation) selectedPart;
-		} else {
-			selectedBuilding = selectedPart.getTopContainer();
-			selectedPart.setEditPointsVisible(false);
-			SceneManager.getInstance().setSelectedPart(selectedBuilding);
-		}
-		double wallSum = 0;
-		double floorSum = 0;
-		double windowSum = 0;
-		double roofSum = 0;
 		double foundationSum = 0;
-		double doorSum = 0;
 		double solarPanelSum = 0;
-		double treeSum = 0;
 		String info;
-		if (selectedBuilding != null) {
-			info = "Building #" + selectedBuilding.getId();
-			foundationSum = getPartCost(selectedBuilding);
+		if (selectedFoundation != null) {
+			info = "Zone #" + selectedFoundation.getId();
+			foundationSum = getPartCost(selectedFoundation);
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p.getTopContainer() == selectedBuilding) {
-					if (p instanceof Wall) {
-						wallSum += getPartCost(p);
-					} else if (p instanceof Floor) {
-						floorSum += getPartCost(p);
-					} else if (p instanceof Window) {
-						windowSum += getPartCost(p);
-					} else if (p instanceof Roof) {
-						roofSum += getPartCost(p);
-					} else if (p instanceof Door) {
-						doorSum += getPartCost(p);
-					} else if (p instanceof SolarPanel) {
+				if (p.getTopContainer() == selectedFoundation) {
+					if (p instanceof SolarPanel || p instanceof Rack) {
 						solarPanelSum += getPartCost(p);
-					} else if (p instanceof Rack) {
-						solarPanelSum += getPartCost(p);
-					}
-				}
-				if (count <= 1) {
-					if (p instanceof Tree && !p.isFrozen()) {
-						treeSum += getPartCost(p);
 					}
 				}
 			}
 		} else {
-			info = count + " buildings";
+			info = count + " zones";
 			for (final HousePart p : Scene.getInstance().getParts()) {
-				if (p instanceof Wall) {
-					wallSum += getPartCost(p);
-				} else if (p instanceof Floor) {
-					floorSum += getPartCost(p);
-				} else if (p instanceof Window) {
-					windowSum += getPartCost(p);
-				} else if (p instanceof Roof) {
-					roofSum += getPartCost(p);
-				} else if (p instanceof Foundation) {
+				if (p instanceof Foundation) {
 					foundationSum += getPartCost(p);
-				} else if (p instanceof Door) {
-					doorSum += getPartCost(p);
-				} else if (p instanceof SolarPanel) {
+				} else if (p instanceof SolarPanel || p instanceof Rack) {
 					solarPanelSum += getPartCost(p);
-				} else if (p instanceof Tree && !p.isFrozen()) {
-					treeSum += getPartCost(p);
 				}
 			}
 		}
 
-		final double[] data = new double[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
-		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
+		final double[] data = new double[] { foundationSum, solarPanelSum };
+		final String[] legends = new String[] { "Foundation", "Solar Panels" };
+		final Color[] colors = new Color[] { Color.RED, Color.GREEN };
 
 		// show them in a popup window
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);

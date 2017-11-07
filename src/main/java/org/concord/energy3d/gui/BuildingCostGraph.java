@@ -180,7 +180,7 @@ public class BuildingCostGraph extends JPanel {
 	public void updateBudget() {
 		if (budgetPanel != null && foundation != null) {
 			calculateCost();
-			switch (foundation.getStructureType()) {
+			switch (foundation.getProjectType()) {
 			case Foundation.TYPE_BUILDING:
 				final DesignSpecs specs = Scene.getInstance().getDesignSpecs();
 				budgetBar.setEnabled(specs.isBudgetEnabled());
