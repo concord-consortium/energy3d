@@ -173,12 +173,18 @@ public class CspStationInfoPanel extends JPanel {
 							}
 						}
 					}
-					if (!towers.isEmpty()) {
-						for (final Foundation tower : towers) {
-							cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+					if (!mirrors.isEmpty()) {
+						cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
+						if (!towers.isEmpty()) {
+							for (final Foundation tower : towers) {
+								cost += price.getTowerUnitPrice() * tower.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+							}
+						}
+					} else {
+						if (foundation.isSolarPowerTower()) {
+							cost += price.getTowerUnitPrice() * foundation.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
 						}
 					}
-					cost += foundation.getArea() * price.getLandUnitPrice() * price.getLifespan();
 					costBar.setValue(Math.round(cost));
 					final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
 					String t = "Total cost over " + price.getLifespan() + " years";

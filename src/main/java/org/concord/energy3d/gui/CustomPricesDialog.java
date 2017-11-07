@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -134,7 +136,7 @@ class CustomPricesDialog extends JDialog {
 			add(new JLabel("Tower: "));
 			towerField = new JTextField(FORMAT.format(price.getTowerUnitPrice()), 6);
 			add(towerField);
-			add(new JLabel("<html>$ per meter</html>"));
+			add(new JLabel("<html>$ per meter height</html>"));
 
 			add(new JLabel("Parabolic Trough: "));
 			parabolicTroughField = new JTextField(FORMAT.format(price.getParabolicTroughUnitPrice()), 6);
@@ -169,15 +171,15 @@ class CustomPricesDialog extends JDialog {
 
 		final PvStationPricesPanel pvStationPricesPanel = new PvStationPricesPanel();
 		pvStationPricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-		JPanel p = new JPanel(new BorderLayout());
-		p.add(pvStationPricesPanel, BorderLayout.NORTH);
-		tabbedPane.addTab("PV", p);
+		final JPanel pvPanel = new JPanel(new BorderLayout());
+		pvPanel.add(pvStationPricesPanel, BorderLayout.NORTH);
+		tabbedPane.addTab("PV", pvPanel);
 
 		final CspStationPricesPanel cspStationPricesPanel = new CspStationPricesPanel();
 		cspStationPricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-		p = new JPanel(new BorderLayout());
-		p.add(cspStationPricesPanel, BorderLayout.NORTH);
-		tabbedPane.addTab("CSP", p);
+		final JPanel cspPanel = new JPanel(new BorderLayout());
+		cspPanel.add(cspStationPricesPanel, BorderLayout.NORTH);
+		tabbedPane.addTab("CSP", cspPanel);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -199,6 +201,7 @@ class CustomPricesDialog extends JDialog {
 				int cspLifespan;
 				double cspLandUnitPrice;
 				double heliostatUnitPrice;
+				double towerHeightUnitPrice;
 				double parabolicTroughUnitPrice;
 				final double parabolicDishUnitPrice;
 				double fresnelReflectorUnitPrice;
@@ -215,6 +218,7 @@ class CustomPricesDialog extends JDialog {
 					cspLifespan = Integer.parseInt(cspStationPricesPanel.lifespanField.getText());
 					cspLandUnitPrice = Double.parseDouble(cspStationPricesPanel.landCostField.getText());
 					heliostatUnitPrice = Double.parseDouble(cspStationPricesPanel.heliostatField.getText());
+					towerHeightUnitPrice = Double.parseDouble(cspStationPricesPanel.towerField.getText());
 					parabolicTroughUnitPrice = Double.parseDouble(cspStationPricesPanel.parabolicTroughField.getText());
 					parabolicDishUnitPrice = Double.parseDouble(cspStationPricesPanel.parabolicDishField.getText());
 					fresnelReflectorUnitPrice = Double.parseDouble(cspStationPricesPanel.fresnelReflectorField.getText());
@@ -273,6 +277,10 @@ class CustomPricesDialog extends JDialog {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your mirror unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				if (towerHeightUnitPrice < 0 && towerHeightUnitPrice > 100000) {
+					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your tower height unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				if (parabolicTroughUnitPrice < 0 && parabolicTroughUnitPrice > 10000) {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your parabolic trough unit price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
 					return;
@@ -300,6 +308,7 @@ class CustomPricesDialog extends JDialog {
 				cspPrice.setLifespan(cspLifespan);
 				cspPrice.setLandUnitPrice(cspLandUnitPrice);
 				cspPrice.setHeliostatUnitPrice(heliostatUnitPrice);
+				cspPrice.setTowerUnitPrice(towerHeightUnitPrice);
 				cspPrice.setParabolicTroughUnitPrice(parabolicTroughUnitPrice);
 				cspPrice.setParabolicDishUnitPrice(parabolicDishUnitPrice);
 				cspPrice.setFresnelReflectorUnitPrice(fresnelReflectorUnitPrice);
@@ -335,6 +344,20 @@ class CustomPricesDialog extends JDialog {
 		});
 		cancelButton.setActionCommand("Cancel");
 		buttonPanel.add(cancelButton);
+
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowActivated(final WindowEvent e) {
+				switch (Scene.getInstance().getProjectType()) {
+				case Foundation.TYPE_PV_STATION:
+					tabbedPane.setSelectedComponent(pvPanel);
+					break;
+				case Foundation.TYPE_CSP_STATION:
+					tabbedPane.setSelectedComponent(cspPanel);
+					break;
+				}
+			}
+		});
 
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());

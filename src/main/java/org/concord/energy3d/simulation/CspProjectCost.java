@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -63,6 +65,9 @@ public class CspProjectCost extends ProjectCost {
 
 		if (part instanceof Foundation) {
 			final Foundation f = (Foundation) part;
+			if (f.isSolarPowerTower()) {
+				return price.getTowerUnitPrice() * f.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
+			}
 			return f.getArea() * price.getLandUnitPrice() * price.getLifespan();
 		}
 
@@ -75,7 +80,10 @@ public class CspProjectCost extends ProjectCost {
 		if (foundation == null || foundation.getProjectType() != Foundation.TYPE_CSP_STATION) {
 			return 0;
 		}
-		double sum = 0;
+		double sum = getPartCost(foundation);
+		if (foundation.isSolarPowerTower()) {
+			return sum;
+		}
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p.getTopContainer() == foundation) {
 				if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
@@ -105,10 +113,12 @@ public class CspProjectCost extends ProjectCost {
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
-				count++;
-				if (selectedFoundation == null) {
-					final Foundation foundation = (Foundation) p;
-					details += "$" + (int) getCostByFoundation(foundation) + " (" + foundation.getId() + ") | ";
+				final Foundation foundation = (Foundation) p;
+				if (!foundation.isSolarPowerTower()) {
+					count++;
+					if (selectedFoundation == null) {
+						details += "$" + (int) getCostByFoundation(foundation) + " (" + foundation.getId() + ") | ";
+					}
 				}
 			}
 		}
@@ -118,12 +128,33 @@ public class CspProjectCost extends ProjectCost {
 			}
 		}
 
-		double foundationSum = 0;
+		double landSum = 0;
 		double solarCollectorSum = 0;
+		double towerSum = 0;
 		String info;
 		if (selectedFoundation != null) {
 			info = "Zone #" + selectedFoundation.getId();
-			foundationSum = getPartCost(selectedFoundation);
+			if (selectedFoundation.isSolarPowerTower()) {
+				towerSum = getPartCost(selectedFoundation);
+			} else {
+				landSum = getPartCost(selectedFoundation);
+				final List<Mirror> mirrors = selectedFoundation.getMirrors();
+				if (!mirrors.isEmpty()) {
+					final ArrayList<Foundation> towers = new ArrayList<Foundation>();
+					for (final Mirror m : mirrors) {
+						if (m.getHeliostatTarget() != null) {
+							if (!towers.contains(m.getHeliostatTarget())) {
+								towers.add(m.getHeliostatTarget());
+							}
+						}
+					}
+					if (!towers.isEmpty()) {
+						for (final Foundation tower : towers) {
+							towerSum += getPartCost(tower);
+						}
+					}
+				}
+			}
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p.getTopContainer() == selectedFoundation) {
 					if (p instanceof SolarCollector) { // assuming that sensor doesn't cost anything
@@ -135,16 +166,21 @@ public class CspProjectCost extends ProjectCost {
 			info = count + " zones";
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
-					foundationSum += getPartCost(p);
+					final Foundation f = (Foundation) p;
+					if (f.isSolarPowerTower()) {
+						towerSum += getPartCost(p);
+					} else {
+						landSum += getPartCost(p);
+					}
 				} else if (p instanceof SolarCollector) {
 					solarCollectorSum += getPartCost(p);
 				}
 			}
 		}
 
-		final double[] data = new double[] { foundationSum, solarCollectorSum };
-		final String[] legends = new String[] { "Foundation", "Solar Collectors" };
-		final Color[] colors = new Color[] { Color.RED, Color.GREEN };
+		final double[] data = new double[] { landSum, solarCollectorSum, towerSum };
+		final String[] legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Solar Collectors", "Towers" };
+		final Color[] colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE };
 
 		// show them in a popup window
 		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);

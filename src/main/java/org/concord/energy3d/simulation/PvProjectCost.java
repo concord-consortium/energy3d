@@ -107,12 +107,12 @@ public class PvProjectCost extends ProjectCost {
 			}
 		}
 
-		double foundationSum = 0;
+		double landSum = 0;
 		double solarPanelSum = 0;
 		String info;
 		if (selectedFoundation != null) {
 			info = "Zone #" + selectedFoundation.getId();
-			foundationSum = getPartCost(selectedFoundation);
+			landSum = getPartCost(selectedFoundation);
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p.getTopContainer() == selectedFoundation) {
 					if (p instanceof SolarPanel || p instanceof Rack) {
@@ -124,15 +124,15 @@ public class PvProjectCost extends ProjectCost {
 			info = count + " zones";
 			for (final HousePart p : Scene.getInstance().getParts()) {
 				if (p instanceof Foundation) {
-					foundationSum += getPartCost(p);
+					landSum += getPartCost(p);
 				} else if (p instanceof SolarPanel || p instanceof Rack) {
 					solarPanelSum += getPartCost(p);
 				}
 			}
 		}
 
-		final double[] data = new double[] { foundationSum, solarPanelSum };
-		final String[] legends = new String[] { "Foundation", "Solar Panels" };
+		final double[] data = new double[] { landSum, solarPanelSum };
+		final String[] legends = new String[] { "Land", "Solar Panels" };
 		final Color[] colors = new Color[] { Color.RED, Color.GREEN };
 
 		// show them in a popup window

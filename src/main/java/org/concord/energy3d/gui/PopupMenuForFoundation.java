@@ -1842,7 +1842,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						Util.selectSilently(miLabelPvEnergy, f.getLabelPvEnergy());
 						Util.selectSilently(miLabelNumberOfSolarPanels, f.getLabelNumberOfSolarPanels());
 						Util.selectSilently(miLabelBuildingEnergy, f.getLabelBuildingEnergy());
-						powerTowerLabelMenu.setEnabled(f.isSolarReceiverVisible());
+						powerTowerLabelMenu.setEnabled(f.isSolarPowerTower());
 						switch (f.getProjectType()) {
 						case Foundation.TYPE_BUILDING:
 							Util.selectSilently(rbmiTypeBuilding, true);

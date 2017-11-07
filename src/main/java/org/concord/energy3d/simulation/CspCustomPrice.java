@@ -11,7 +11,7 @@ public class CspCustomPrice implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private double heliostatUnitPrice = 100;
-	private double towerUnitPrice = 500;
+	private double towerUnitPrice = 5000;
 	private double parabolicTroughUnitPrice = 100;
 	private double parabolicDishUnitPrice = 100;
 	private double fresnelReflectorUnitPrice = 50;
@@ -30,7 +30,7 @@ public class CspCustomPrice implements Serializable {
 			heliostatUnitPrice = 100;
 		}
 		if (towerUnitPrice == 0) {
-			towerUnitPrice = 1000;
+			towerUnitPrice = 5000;
 		}
 		if (parabolicTroughUnitPrice == 0) {
 			parabolicTroughUnitPrice = 100;

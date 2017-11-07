@@ -1035,7 +1035,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
-	public boolean isSolarReceiverVisible() {
+	public boolean isSolarPowerTower() {
 		return solarReceiver != null && solarReceiver.isVisible();
 	}
 
