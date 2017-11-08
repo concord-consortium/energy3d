@@ -104,18 +104,18 @@ class PopupMenuForSky extends PopupMenuFactory {
 			final JMenu themeMenu = new JMenu("Theme");
 			final ButtonGroup themeButtonGroup = new ButtonGroup();
 
-			final JRadioButtonMenuItem miCloudySky = new JRadioButtonMenuItem("Cloudy Sky");
-			miCloudySky.addActionListener(new ActionListener() {
+			final JRadioButtonMenuItem miBlueSky = new JRadioButtonMenuItem("Blue Sky");
+			miBlueSky.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.CLOUDY_SKY_THEME);
+					Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
-			themeButtonGroup.add(miCloudySky);
-			themeMenu.add(miCloudySky);
+			themeButtonGroup.add(miBlueSky);
+			themeMenu.add(miBlueSky);
 
 			final JRadioButtonMenuItem miDesert = new JRadioButtonMenuItem("Desert");
 			miDesert.addActionListener(new ActionListener() {
@@ -168,7 +168,7 @@ class PopupMenuForSky extends PopupMenuFactory {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(miCloudySky, Scene.getInstance().getTheme() == Scene.CLOUDY_SKY_THEME);
+					Util.selectSilently(miBlueSky, Scene.getInstance().getTheme() == Scene.BLUE_SKY_THEME);
 					Util.selectSilently(miDesert, Scene.getInstance().getTheme() == Scene.DESERT_THEME);
 					Util.selectSilently(miGrassland, Scene.getInstance().getTheme() == Scene.GRASSLAND_THEME);
 					Util.selectSilently(miForest, Scene.getInstance().getTheme() == Scene.FOREST_THEME);

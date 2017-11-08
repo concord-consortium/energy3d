@@ -244,7 +244,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem fullTextureMenuItem;
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
 	private JMenu themeMenu;
-	private JRadioButtonMenuItem cloudySkyMenuItem;
+	private JRadioButtonMenuItem blueSkyMenuItem;
 	private JRadioButtonMenuItem desertMenuItem;
 	private JRadioButtonMenuItem grasslandMenuItem;
 	private JRadioButtonMenuItem forestMenuItem;
@@ -1655,14 +1655,14 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(cloudySkyMenuItem, Scene.getInstance().getTheme() == Scene.CLOUDY_SKY_THEME);
+					Util.selectSilently(blueSkyMenuItem, Scene.getInstance().getTheme() == Scene.BLUE_SKY_THEME);
 					Util.selectSilently(desertMenuItem, Scene.getInstance().getTheme() == Scene.DESERT_THEME);
 					Util.selectSilently(grasslandMenuItem, Scene.getInstance().getTheme() == Scene.GRASSLAND_THEME);
 					Util.selectSilently(forestMenuItem, Scene.getInstance().getTheme() == Scene.FOREST_THEME);
 				}
 			});
 
-			themeMenu.add(getCloudySkyMenuItem());
+			themeMenu.add(getBlueSkyMenuItem());
 			themeMenu.add(getDesertMenuItem());
 			themeMenu.add(getGrasslandMenuItem());
 			themeMenu.add(getForestMenuItem());
@@ -3437,21 +3437,21 @@ public class MainFrame extends JFrame {
 		return fullTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getCloudySkyMenuItem() {
-		if (cloudySkyMenuItem == null) {
-			cloudySkyMenuItem = new JRadioButtonMenuItem("Cloudy Sky");
-			cloudySkyMenuItem.addActionListener(new ActionListener() {
+	public JRadioButtonMenuItem getBlueSkyMenuItem() {
+		if (blueSkyMenuItem == null) {
+			blueSkyMenuItem = new JRadioButtonMenuItem("Blue Sky");
+			blueSkyMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.CLOUDY_SKY_THEME);
+					Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
 					Scene.getInstance().setEdited(true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
-			themeButtonGroup.add(cloudySkyMenuItem);
+			themeButtonGroup.add(blueSkyMenuItem);
 		}
-		return cloudySkyMenuItem;
+		return blueSkyMenuItem;
 	}
 
 	public JRadioButtonMenuItem getDesertMenuItem() {

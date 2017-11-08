@@ -615,7 +615,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private Mesh createLand() {
 		final Quad land = new Quad("Land", SKY_RADIUS * 2, SKY_RADIUS * 2);
-		land.setDefaultColor(new ColorRGBA(0, 1, 0, 0.5f));
+		land.setDefaultColor(new ColorRGBA(0, 1.0f, 0.75f, 0.5f));
 		final OffsetState offsetState = new OffsetState();
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
 		offsetState.setFactor(10);

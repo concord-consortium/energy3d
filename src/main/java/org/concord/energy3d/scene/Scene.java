@@ -92,7 +92,8 @@ import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.TextureKey;
 
 public class Scene implements Serializable {
-	public static final int CLOUDY_SKY_THEME = 0;
+
+	public static final int BLUE_SKY_THEME = 0;
 	public static final int DESERT_THEME = 1;
 	public static final int GRASSLAND_THEME = 2;
 	public static final int FOREST_THEME = 3;
@@ -116,7 +117,7 @@ public class Scene implements Serializable {
 	private TextureMode textureMode = TextureMode.None;
 	private ReadOnlyVector3 cameraLocation;
 	private ReadOnlyVector3 cameraDirection;
-	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1.0f, 0.5f, 0.5f);
+	private ReadOnlyColorRGBA landColor = new ColorRGBA(0, 1.0f, 0.75f, 0.5f);
 	private ReadOnlyColorRGBA foundationColor;
 	private ReadOnlyColorRGBA wallColor;
 	private ReadOnlyColorRGBA doorColor;
@@ -3504,7 +3505,7 @@ public class Scene implements Serializable {
 			c = new ColorRGBA(0, 1, 0.2f, 0.5f);
 			break;
 		default:
-			c = landColor == null ? new ColorRGBA(0, 1, 0, 0.5f) : landColor;
+			c = landColor == null ? new ColorRGBA(0, 1, 0.75f, 0.5f) : landColor;
 		}
 		setLandColor(c);
 		SceneManager.getInstance().changeSkyTexture();
