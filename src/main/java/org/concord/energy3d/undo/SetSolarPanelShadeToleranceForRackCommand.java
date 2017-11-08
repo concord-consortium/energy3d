@@ -5,16 +5,16 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Rack;
 
-public class SetCellTypeForSolarPanelsOnRackCommand extends MyAbstractUndoableEdit {
+public class SetSolarPanelShadeToleranceForRackCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final int oldValue;
 	private int newValue;
 	private final Rack rack;
 
-	public SetCellTypeForSolarPanelsOnRackCommand(final Rack rack) {
+	public SetSolarPanelShadeToleranceForRackCommand(final Rack rack) {
 		this.rack = rack;
-		oldValue = rack.getSolarPanel().getCellType();
+		oldValue = rack.getSolarPanel().getShadeTolerance();
 	}
 
 	public Rack getRack() {
@@ -28,21 +28,19 @@ public class SetCellTypeForSolarPanelsOnRackCommand extends MyAbstractUndoableEd
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = rack.getSolarPanel().getCellType();
-		rack.getSolarPanel().setCellType(oldValue);
-		rack.draw();
+		newValue = rack.getSolarPanel().getShadeTolerance();
+		rack.getSolarPanel().setShadeTolerance(oldValue);
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		rack.getSolarPanel().setCellType(newValue);
-		rack.draw();
+		rack.getSolarPanel().setShadeTolerance(newValue);
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Set Cell Type of Solar Panels on Selected Rack";
+		return "Set Shade Tolerance of Solar Panels on Selected Rack";
 	}
 
 }

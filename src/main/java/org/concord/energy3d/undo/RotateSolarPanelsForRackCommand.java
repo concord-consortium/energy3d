@@ -5,14 +5,14 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Rack;
 
-public class RotateSolarPanelsOnRackCommand extends MyAbstractUndoableEdit {
+public class RotateSolarPanelsForRackCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue;
 	private boolean newValue;
 	private final Rack rack;
 
-	public RotateSolarPanelsOnRackCommand(final Rack rack) {
+	public RotateSolarPanelsForRackCommand(final Rack rack) {
 		this.rack = rack;
 		oldValue = rack.getSolarPanel().isRotated();
 	}

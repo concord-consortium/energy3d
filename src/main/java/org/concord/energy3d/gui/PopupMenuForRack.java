@@ -59,10 +59,9 @@ import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForRacksOnFoundationCommand;
-import org.concord.energy3d.undo.RotateSolarPanelsOnAllRacksCommand;
-import org.concord.energy3d.undo.RotateSolarPanelsOnRackCommand;
-import org.concord.energy3d.undo.SetCellTypeForSolarPanelsOnRackCommand;
-import org.concord.energy3d.undo.SetColorForSolarPanelsOnRackCommand;
+import org.concord.energy3d.undo.RotateSolarPanelsForAllRacksCommand;
+import org.concord.energy3d.undo.RotateSolarPanelsForRackCommand;
+import org.concord.energy3d.undo.SetSolarPanelColorForRackCommand;
 import org.concord.energy3d.undo.SetInverterEfficiencyForAllRacksCommand;
 import org.concord.energy3d.undo.SetInverterEfficiencyForRackCommand;
 import org.concord.energy3d.undo.SetInverterEfficiencyForRacksOnFoundationCommand;
@@ -71,7 +70,7 @@ import org.concord.energy3d.undo.SetNoctForRackCommand;
 import org.concord.energy3d.undo.SetNoctForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetRackLabelCommand;
-import org.concord.energy3d.undo.SetShadeToleranceForSolarPanelsOnRackCommand;
+import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForRackCommand;
 import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSizeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarCellEfficiencyForAllRacksCommand;
@@ -80,6 +79,7 @@ import org.concord.energy3d.undo.SetSolarCellEfficiencyForRacksOnFoundationComma
 import org.concord.energy3d.undo.SetSolarPanelArrayOnRackByModelCommand;
 import org.concord.energy3d.undo.SetSolarPanelArrayOnRackCustomCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForAllRacksCommand;
+import org.concord.energy3d.undo.SetSolarPanelCellTypeForRackCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForRacksOnFoundationCommand;
@@ -1134,7 +1134,6 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miSolarPanelColor = new JMenuItem("Color...");
 			final JMenuItem miSolarPanelCellType = new JMenuItem("Cell Type...");
 			solarPanelMenu.add(miSolarPanelCellType);
 			miSolarPanelCellType.addActionListener(new ActionListener() {
@@ -1193,7 +1192,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final SetCellTypeForSolarPanelsOnRackCommand c = new SetCellTypeForSolarPanelsOnRackCommand(r);
+								final SetSolarPanelCellTypeForRackCommand c = new SetSolarPanelCellTypeForRackCommand(r);
 								s.setCellType(cellTypeComboBox.getSelectedIndex());
 								r.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1218,6 +1217,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miSolarPanelColor = new JMenuItem("Color...");
 			solarPanelMenu.add(miSolarPanelColor);
 			miSolarPanelColor.addActionListener(new ActionListener() {
 
@@ -1275,7 +1275,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final SetColorForSolarPanelsOnRackCommand c = new SetColorForSolarPanelsOnRackCommand(r);
+								final SetSolarPanelColorForRackCommand c = new SetSolarPanelColorForRackCommand(r);
 								s.setColorOption(colorComboBox.getSelectedIndex());
 								r.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -1646,7 +1646,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final SetShadeToleranceForSolarPanelsOnRackCommand c = new SetShadeToleranceForSolarPanelsOnRackCommand(r);
+								final SetSolarPanelShadeToleranceForRackCommand c = new SetSolarPanelShadeToleranceForRackCommand(r);
 								s.setShadeTolerance(toleranceComboBox.getSelectedIndex());
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;
@@ -1730,7 +1730,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final RotateSolarPanelsOnRackCommand c = new RotateSolarPanelsOnRackCommand(r);
+								final RotateSolarPanelsForRackCommand c = new RotateSolarPanelsForRackCommand(r);
 								s.setRotated(orientationComboBox.getSelectedIndex() == 1);
 								r.ensureFullSolarPanels(false);
 								r.draw();
@@ -1742,7 +1742,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final RotateSolarPanelsOnAllRacksCommand c = new RotateSolarPanelsOnAllRacksCommand();
+								final RotateSolarPanelsForAllRacksCommand c = new RotateSolarPanelsForAllRacksCommand();
 								Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;

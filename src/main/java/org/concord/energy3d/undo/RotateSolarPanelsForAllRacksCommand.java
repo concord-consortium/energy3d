@@ -9,14 +9,14 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class RotateSolarPanelsOnAllRacksCommand extends MyAbstractUndoableEdit {
+public class RotateSolarPanelsForAllRacksCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean[] oldValues;
 	private boolean[] newValues;
 	private final List<Rack> racks;
 
-	public RotateSolarPanelsOnAllRacksCommand() {
+	public RotateSolarPanelsForAllRacksCommand() {
 		racks = Scene.getInstance().getAllRacks();
 		final int n = racks.size();
 		oldValues = new boolean[n];
