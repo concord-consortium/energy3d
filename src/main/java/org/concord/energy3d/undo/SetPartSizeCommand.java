@@ -61,6 +61,10 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 		return oldHeight;
 	}
 
+	public double getOldModuleLength() {
+		return oldModuleLength;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();

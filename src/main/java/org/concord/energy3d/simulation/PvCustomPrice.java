@@ -2,7 +2,9 @@ package org.concord.energy3d.simulation;
 
 import java.io.Serializable;
 
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.scene.Scene;
@@ -55,20 +57,30 @@ public class PvCustomPrice implements Serializable {
 	public double getTotalCost(final Rack r) {
 		double cost = solarPanelPrice;
 		cost += solarPanelRackBasePrice;
-		final double baseHeight = r.getBaseHeight() * Scene.getInstance().getAnnotationScale();
-		if (baseHeight > 1) {
-			cost += solarPanelRackHeightPrice * (baseHeight - 1);
+		boolean flat = false;
+		final HousePart container = r.getContainer();
+		if (container instanceof Roof) {
+			final Roof roof = (Roof) container;
+			flat = roof.getHeight() < 0.1;
+		} else {
+			flat = true;
 		}
-		switch (r.getTracker()) {
-		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-			cost += solarPanelHsatPrice;
-			break;
-		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-			cost += solarPanelVsatPrice;
-			break;
-		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			cost += solarPanelAadatPrice;
-			break;
+		if (flat) {
+			final double baseHeight = r.getBaseHeight() * Scene.getInstance().getAnnotationScale();
+			if (baseHeight > 1) {
+				cost += solarPanelRackHeightPrice * (baseHeight - 1);
+			}
+			switch (r.getTracker()) {
+			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+				cost += solarPanelHsatPrice;
+				break;
+			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
+				cost += solarPanelVsatPrice;
+				break;
+			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
+				cost += solarPanelAadatPrice;
+				break;
+			}
 		}
 		return cost * r.getNumberOfSolarPanels();
 	}

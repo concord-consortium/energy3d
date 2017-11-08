@@ -15,9 +15,12 @@ import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.SolarCollector;
@@ -446,11 +449,32 @@ public class TimeSeriesLogger {
 						stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
 						stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + m.getMirrorWidth();
 						stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + m.getMirrorHeight() + "}";
+					} else if (c.getPart() instanceof ParabolicDish) {
+						final ParabolicDish d = (ParabolicDish) c.getPart();
+						stateValue = "{\"Foundation\": " + d.getTopContainer().getId() + ", \"ID\": " + d.getId();
+						stateValue += ", \"Old Rim Radius\": " + c.getOldWidth() + ", \"New Rim Radius\": " + d.getRimRadius() + "}";
+					} else if (c.getPart() instanceof ParabolicTrough) {
+						final ParabolicTrough t = (ParabolicTrough) c.getPart();
+						stateValue = "{\"Foundation\": " + t.getTopContainer().getId() + ", \"ID\": " + t.getId();
+						stateValue += ", \"Old Aperture\": " + c.getOldWidth() + ", \"New Aperture\": " + t.getApertureWidth();
+						stateValue += ", \"Old Length\": " + c.getOldHeight() + ", \"New Length\": " + t.getTroughLength();
+						stateValue += ", \"Old Module Length\": " + c.getOldModuleLength() + ", \"New Module Length\": " + t.getModuleLength() + "}";
+					} else if (c.getPart() instanceof FresnelReflector) {
+						final FresnelReflector t = (FresnelReflector) c.getPart();
+						stateValue = "{\"Foundation\": " + t.getTopContainer().getId() + ", \"ID\": " + t.getId();
+						stateValue += ", \"Old Module Width\": " + c.getOldWidth() + ", \"New Module Width\": " + t.getModuleWidth();
+						stateValue += ", \"Old Length\": " + c.getOldHeight() + ", \"New Length\": " + t.getLength();
+						stateValue += ", \"Old Module Length\": " + c.getOldModuleLength() + ", \"New Module Length\": " + t.getModuleLength() + "}";
 					} else if (c.getPart() instanceof Rack) {
 						final Rack r = (Rack) c.getPart();
 						stateValue = "{\"Foundation\": " + r.getTopContainer().getId() + ", \"ID\": " + r.getId();
 						stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + r.getRackWidth();
 						stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + r.getRackHeight() + "}";
+					} else if (c.getPart() instanceof Window) {
+						final Window r = (Window) c.getPart();
+						stateValue = "{\"Foundation\": " + r.getTopContainer().getId() + ", \"ID\": " + r.getId();
+						stateValue += ", \"Old Width\": " + c.getOldWidth() + ", \"New Width\": " + r.getWindowWidth();
+						stateValue += ", \"Old Height\": " + c.getOldHeight() + ", \"New Height\": " + r.getWindowHeight() + "}";
 					}
 				}
 
@@ -879,6 +903,45 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeBaseHeightForAllMirrorsCommand) {
 					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
 					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getBaseHeight()) + "}";
+				}
+
+				/* parabolic trough properties */
+
+				else if (lastEdit instanceof SetShapeForParabolicTroughsOnFoundationCommand) {
+					final Foundation f = ((SetShapeForParabolicTroughsOnFoundationCommand) lastEdit).getFoundation();
+					final List<ParabolicTrough> troughs = f.getParabolicTroughs();
+					final ParabolicTrough t = troughs.isEmpty() ? null : troughs.get(0);
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Aperture Width\": " + (t == null ? -1 : t.getApertureWidth()) + ", \"New Length\": " + (t == null ? -1 : t.getTroughLength()) + ", \"New Module Length\": " + (t == null ? -1 : t.getModuleLength()) + ", \"New Semilatus Rectum\": " + (t == null ? -1 : t.getSemilatusRectum()) + "}";
+				} else if (lastEdit instanceof SetShapeForAllParabolicTroughsCommand) {
+					final List<ParabolicTrough> troughs = Scene.getInstance().getAllParabolicTroughs();
+					final ParabolicTrough t = troughs.isEmpty() ? null : troughs.get(0);
+					stateValue = "{\"New Aperture Width\": " + (t == null ? -1 : t.getApertureWidth()) + ", \"New Length\": " + (t == null ? -1 : t.getTroughLength()) + ", \"New Module Length\": " + (t == null ? -1 : t.getModuleLength()) + ", \"New Semilatus Rectum\": " + (t == null ? -1 : t.getSemilatusRectum()) + "}";
+				}
+
+				/* parabolic dish properties */
+
+				else if (lastEdit instanceof SetRimRadiusForParabolicDishesOnFoundationCommand) {
+					final Foundation f = ((SetRimRadiusForParabolicDishesOnFoundationCommand) lastEdit).getFoundation();
+					final List<ParabolicDish> dishes = f.getParabolicDishes();
+					final ParabolicDish d = dishes.isEmpty() ? null : dishes.get(0);
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Rim Radius\": " + (d == null ? -1 : d.getRimRadius()) + "}";
+				} else if (lastEdit instanceof SetRimRadiusForAllParabolicDishesCommand) {
+					final List<ParabolicDish> dishes = Scene.getInstance().getAllParabolicDishes();
+					final ParabolicDish d = dishes.isEmpty() ? null : dishes.get(0);
+					stateValue = "{\"New Rim Radius\": " + (d == null ? -1 : d.getRimRadius()) + "}";
+				}
+
+				/* Fresnel reflector properties */
+
+				else if (lastEdit instanceof SetSizeForFresnelReflectorsOnFoundationCommand) {
+					final Foundation f = ((SetSizeForFresnelReflectorsOnFoundationCommand) lastEdit).getFoundation();
+					final List<FresnelReflector> reflectors = f.getFresnelReflectors();
+					final FresnelReflector r = reflectors.isEmpty() ? null : reflectors.get(0);
+					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Length\": " + (r == null ? -1 : r.getLength()) + ", \"New Module Length\": " + (r == null ? -1 : r.getModuleLength()) + ", \"New Module Width\": " + (r == null ? -1 : r.getModuleWidth()) + "}";
+				} else if (lastEdit instanceof SetSizeForAllFresnelReflectorsCommand) {
+					final List<FresnelReflector> reflectors = Scene.getInstance().getAllFresnelReflectors();
+					final FresnelReflector r = reflectors.isEmpty() ? null : reflectors.get(0);
+					stateValue = "{\"New Length\": " + (r == null ? -1 : r.getLength()) + ", \"New Module Length\": " + (r == null ? -1 : r.getModuleLength()) + ", \"New Module Width\": " + (r == null ? -1 : r.getModuleWidth()) + "}";
 				}
 
 				/* wall properties */

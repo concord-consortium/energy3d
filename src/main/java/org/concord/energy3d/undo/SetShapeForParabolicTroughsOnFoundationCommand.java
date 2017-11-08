@@ -14,8 +14,8 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends MyAbstractUn
 	private static final long serialVersionUID = 1L;
 	private final double[] oldLengths;
 	private double[] newLengths;
-	private final double[] oldWidths;
-	private double[] newWidths;
+	private final double[] oldApertureWidths;
+	private double[] newApertureWidths;
 	private final double[] oldSemilatusRecta;
 	private double[] newSemilatusRecta;
 	private final double[] oldModuleLengths;
@@ -28,13 +28,13 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends MyAbstractUn
 		troughs = foundation.getParabolicTroughs();
 		final int n = troughs.size();
 		oldLengths = new double[n];
-		oldWidths = new double[n];
+		oldApertureWidths = new double[n];
 		oldSemilatusRecta = new double[n];
 		oldModuleLengths = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
 			oldLengths[i] = t.getTroughLength();
-			oldWidths[i] = t.getApertureWidth();
+			oldApertureWidths[i] = t.getApertureWidth();
 			oldSemilatusRecta[i] = t.getSemilatusRectum();
 			oldModuleLengths[i] = t.getModuleLength();
 		}
@@ -49,17 +49,17 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends MyAbstractUn
 		super.undo();
 		final int n = troughs.size();
 		newLengths = new double[n];
-		newWidths = new double[n];
+		newApertureWidths = new double[n];
 		newSemilatusRecta = new double[n];
 		newModuleLengths = new double[n];
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
 			newLengths[i] = t.getTroughLength();
-			newWidths[i] = t.getApertureWidth();
+			newApertureWidths[i] = t.getApertureWidth();
 			newSemilatusRecta[i] = t.getSemilatusRectum();
 			newModuleLengths[i] = t.getModuleLength();
 			t.setTroughLength(oldLengths[i]);
-			t.setApertureWidth(oldWidths[i]);
+			t.setApertureWidth(oldApertureWidths[i]);
 			t.setSemilatusRectum(oldSemilatusRecta[i]);
 			t.setModuleLength(oldModuleLengths[i]);
 			t.draw();
@@ -74,7 +74,7 @@ public class SetShapeForParabolicTroughsOnFoundationCommand extends MyAbstractUn
 		for (int i = 0; i < n; i++) {
 			final ParabolicTrough t = troughs.get(i);
 			t.setTroughLength(newLengths[i]);
-			t.setApertureWidth(newWidths[i]);
+			t.setApertureWidth(newApertureWidths[i]);
 			t.setSemilatusRectum(newSemilatusRecta[i]);
 			t.setModuleLength(newModuleLengths[i]);
 			t.draw();
