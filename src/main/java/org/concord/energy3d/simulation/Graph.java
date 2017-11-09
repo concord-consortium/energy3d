@@ -212,7 +212,31 @@ public abstract class Graph extends JPanel {
 		if (x > legendX && x < legendX + legendWidth && y > legendY && y < legendY + legendHeight) {
 			setToolTipText(legendText);
 		} else {
-			setToolTipText("<html>Move mouse for more information.<br>Right-click for more options." + (popup ? "" : "<br>Double-click to enlarge this graph.") + "</html>");
+			boolean inSymbol = false;
+			final double r = 0.5 * symbolSize;
+			synchronized (data) {
+				for (final String key : data.keySet()) {
+					if (isDataHidden(key)) {
+						continue;
+					}
+					final List<Double> list = data.get(key);
+					if (!list.isEmpty()) {
+						double dataX, dataY;
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+							if (x > dataX - r && x < dataX + r && y > dataY - r && y < dataY + r) {
+								inSymbol = true;
+								setToolTipText(getXAxisLabel(i) + ": " + FIVE_DECIMALS.format(list.get(i)));
+								break;
+							}
+						}
+					}
+				}
+			}
+			if (!inSymbol) {
+				setToolTipText("<html>Move mouse for more information.<br>Right-click for more options." + (popup ? "" : "<br>Double-click to enlarge this graph.") + "</html>");
+			}
 		}
 	}
 
@@ -402,6 +426,8 @@ public abstract class Graph extends JPanel {
 		g2.setColor(Color.GRAY);
 		g2.setStroke(thick);
 		g2.drawRect(left / 2, top / 2, width - (left + right) / 2, height - (top + bottom) / 2);
+		g2.setColor(new Color(245, 245, 245));
+		g2.fillRect(left / 2, top / 2, width - (left + right) / 2, height - (top + bottom) / 2);
 
 		g2.setColor(Color.BLACK);
 		g2.setStroke(thin);
@@ -452,18 +478,28 @@ public abstract class Graph extends JPanel {
 			final int i2 = (int) Math.round(ymax / digits) + 2;
 			float hVal;
 			int hPos;
-			final boolean fewPoints = i2 - i1 < 5;
-			for (int i = i1; i <= i2; i++) {
-				hVal = i * digits;
-				hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
-				if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
-					drawHorizontalLine(g2, hPos, Float.toString(hVal));
-				}
-				if (fewPoints) {
-					hVal = (i + 0.5f) * digits;
+			if (i2 == 2) { // for values within [0, 1]
+				for (int i = 0; i <= 100; i++) {
+					hVal = i * digits * 0.01f;
 					hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
 					if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
-						drawHorizontalLine(g2, hPos, Float.toString(hVal));
+						drawHorizontalLine(g2, hPos, TWO_DECIMALS.format(hVal));
+					}
+				}
+			} else {
+				final boolean fewPoints = i2 - i1 < 5;
+				for (int i = i1; i <= i2; i++) {
+					hVal = i * digits;
+					hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+					if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
+						drawHorizontalLine(g2, hPos, ONE_DECIMAL.format(hVal));
+					}
+					if (fewPoints) {
+						hVal = (i + 0.5f) * digits;
+						hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+						if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
+							drawHorizontalLine(g2, hPos, ONE_DECIMAL.format(hVal));
+						}
 					}
 				}
 			}
@@ -803,47 +839,59 @@ public abstract class Graph extends JPanel {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2.setStroke(thin);
-		int x0 = getWidth() - right;
+		final int x0 = getWidth() - (popup ? 100 : 80) - right;
 		int y0 = top - 10;
+		legendX = x0;
+		legendY = y0;
+		legendText = "<html><h4>Energy (kWh):</h4><hr><ul>";
 
 		switch (type) {
 		case SENSOR:
-			x0 -= 50;
 			String s = "Light";
 			if (containsSensorType(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get("Solar"));
 				g2.drawString(s, x0 + 14, y0 + 8);
+				legendText += "<li>" + s;
 			}
 			s = "Heat Flux";
+			y0 += 12;
 			if (containsSensorType(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get("Heat Gain"));
 				g2.drawString(s, x0 + 14, y0 + 8);
+				legendText += "<li>" + s;
 			}
 			break;
 		default:
 			final boolean isAngularGraph = this instanceof AngularGraph;
 			boolean found = false;
-			x0 -= 100;
 			s = "Solar";
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				drawDiamond(g2, x0 + 4, y0 + 4, 5, colors.get(s));
-				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				s = isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")";
+				g2.drawString(s, x0 + 14, y0 + 8);
 				found = true;
+				legendText += "<li>" + s;
 			}
 			s = "Heat Gain";
+			y0 += 12;
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawSquare(g2, x0, y0, 8, colors.get(s));
-				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				s = isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")";
+				g2.drawString(s, x0 + 14, y0 + 8);
 				found = true;
+				legendText += "<li>" + s;
 			}
 			s = "Utility";
+			y0 += 12;
 			if (data.containsKey(s) && !isDataHidden(s)) {
 				y0 += 14;
 				drawCircle(g2, x0, y0, 8, colors.get(s));
-				g2.drawString(isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")", x0 + 14, y0 + 8);
+				s = isAngularGraph ? s : s + " (" + TWO_DECIMALS.format(getSum(s)) + ")";
+				g2.drawString(s, x0 + 14, y0 + 8);
 				found = true;
+				legendText += "<li>" + s;
 			}
 			if (!found) {
 				final ArrayList<String> set = new ArrayList<String>(data.keySet());
@@ -864,9 +912,18 @@ public abstract class Graph extends JPanel {
 					if (i2 != -1) {
 						k2 = k2.substring(i2 + 1);
 					}
-					g2.drawString(isAngularGraph ? k2 : k2 + " (" + TWO_DECIMALS.format(getSum(k)) + ")", x0 + 14, y0 + 8);
+					s = isAngularGraph ? k2 : k2 + " (" + TWO_DECIMALS.format(getSum(k)) + ")";
+					g2.drawString(s, x0 + 14, y0 + 8);
+					y0 += 12;
+					legendText += "<li>" + s;
 				}
 			}
+
+			legendWidth = getWidth() - x0;
+			legendHeight = y0 - legendY;
+
+			legendText += "</html>";
+
 		}
 
 	}

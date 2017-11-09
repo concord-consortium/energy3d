@@ -174,7 +174,6 @@ public class FresnelReflectorDailyAnalysis extends Analysis {
 
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
 		final JMenuItem miView = new JMenuItem("View Raw Data...");
-		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
 
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
@@ -193,6 +192,18 @@ public class FresnelReflectorDailyAnalysis extends Analysis {
 			}
 		});
 		menuBar.add(menu);
+
+		final JCheckBoxMenuItem miMilitaryTime = new JCheckBoxMenuItem("Military Time");
+		miMilitaryTime.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (graph instanceof DailyGraph) {
+					((DailyGraph) graph).setMilitaryTime(miMilitaryTime.isSelected());
+					graph.repaint();
+				}
+			}
+		});
+		menu.add(miMilitaryTime);
 
 		miClear.addActionListener(new ActionListener() {
 			@Override
@@ -216,6 +227,7 @@ public class FresnelReflectorDailyAnalysis extends Analysis {
 		});
 		menu.add(miView);
 
+		final JMenuItem miCopyImage = new JMenuItem("Copy Image");
 		miCopyImage.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
