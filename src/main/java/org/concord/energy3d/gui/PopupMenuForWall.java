@@ -155,7 +155,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -262,7 +262,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -369,7 +369,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {

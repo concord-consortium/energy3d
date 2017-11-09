@@ -58,10 +58,9 @@ import org.concord.energy3d.undo.ChangeSolarPanelModelForRacksOnFoundationComman
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
-import org.concord.energy3d.undo.RotateSolarPanelsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForAllRacksCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForRackCommand;
-import org.concord.energy3d.undo.SetSolarPanelColorForRackCommand;
+import org.concord.energy3d.undo.RotateSolarPanelsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetInverterEfficiencyForAllRacksCommand;
 import org.concord.energy3d.undo.SetInverterEfficiencyForRackCommand;
 import org.concord.energy3d.undo.SetInverterEfficiencyForRacksOnFoundationCommand;
@@ -70,7 +69,6 @@ import org.concord.energy3d.undo.SetNoctForRackCommand;
 import org.concord.energy3d.undo.SetNoctForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetRackLabelCommand;
-import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForRackCommand;
 import org.concord.energy3d.undo.SetSizeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSizeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarCellEfficiencyForAllRacksCommand;
@@ -82,8 +80,10 @@ import org.concord.energy3d.undo.SetSolarPanelCellTypeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForRackCommand;
 import org.concord.energy3d.undo.SetSolarPanelCellTypeForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForAllRacksCommand;
+import org.concord.energy3d.undo.SetSolarPanelColorForRackCommand;
 import org.concord.energy3d.undo.SetSolarPanelColorForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForAllRacksCommand;
+import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForRackCommand;
 import org.concord.energy3d.undo.SetSolarPanelShadeToleranceForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.SetSolarPanelSizeForAllRacksCommand;
 import org.concord.energy3d.undo.SetSolarPanelSizeForRacksOnFoundationCommand;
@@ -206,7 +206,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -313,7 +313,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -437,7 +437,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double w = 0, h = 0;
@@ -539,7 +539,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -640,7 +640,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -824,7 +824,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -1001,7 +1001,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -1096,7 +1096,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							final int i = sizeComboBox.getSelectedIndex();
@@ -1188,7 +1188,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -1271,7 +1271,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -1355,7 +1355,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -1451,7 +1451,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -1547,7 +1547,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -1642,7 +1642,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -1726,7 +1726,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -1811,7 +1811,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;

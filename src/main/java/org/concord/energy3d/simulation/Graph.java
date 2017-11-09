@@ -212,7 +212,7 @@ public abstract class Graph extends JPanel {
 		if (x > legendX && x < legendX + legendWidth && y > legendY && y < legendY + legendHeight) {
 			setToolTipText(legendText);
 		} else {
-			setToolTipText(popup ? "" : "<html>Move mouse for more information.<br>Right-click for more options.<br>Double-click to enlarge this graph.</html>");
+			setToolTipText("<html>Move mouse for more information.<br>Right-click for more options." + (popup ? "" : "<br>Double-click to enlarge this graph.") + "</html>");
 		}
 	}
 
@@ -445,14 +445,26 @@ public abstract class Graph extends JPanel {
 			}
 			int digits = String.valueOf(Math.round(ymax - ymin)).length() - 1;
 			digits = (int) Math.pow(10, digits);
-			final int i1 = (int) Math.round(ymin / digits) - 2;
+			int i1 = (int) Math.round(ymin / digits) - 2;
+			if (i1 < 0) {
+				i1 = 0;
+			}
 			final int i2 = (int) Math.round(ymax / digits) + 2;
-			int hVal, hPos;
+			float hVal;
+			int hPos;
+			final boolean fewPoints = i2 - i1 < 5;
 			for (int i = i1; i <= i2; i++) {
 				hVal = i * digits;
-				hPos = (int) (getHeight() - top - (hVal - ymin) * dy);
-				if (hPos > top / 2 && hPos < getHeight() - bottom / 2) {
-					drawHorizontalLine(g2, hPos, Integer.toString(hVal));
+				hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+				if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
+					drawHorizontalLine(g2, hPos, Float.toString(hVal));
+				}
+				if (fewPoints) {
+					hVal = (i + 0.5f) * digits;
+					hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+					if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
+						drawHorizontalLine(g2, hPos, Float.toString(hVal));
+					}
 				}
 			}
 			drawCurves(g2);

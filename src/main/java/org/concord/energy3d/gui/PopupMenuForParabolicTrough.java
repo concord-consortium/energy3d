@@ -115,7 +115,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							int nSectionParabola = 0, nSectionAxis = 0;
@@ -234,7 +234,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double l = 0;
@@ -332,7 +332,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double w = 0;
@@ -430,7 +430,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double u = 0;
@@ -528,7 +528,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double f = 0;
@@ -625,7 +625,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -813,7 +813,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -909,7 +909,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1005,7 +1005,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1101,7 +1101,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;

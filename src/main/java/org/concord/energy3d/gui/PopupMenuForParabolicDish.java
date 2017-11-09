@@ -109,7 +109,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							int nRadialSections = 0, nAxialSections = 0;
@@ -212,7 +212,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							int nrib = 0;
@@ -325,7 +325,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double r = 0;
@@ -422,7 +422,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double fl = 0;
@@ -519,7 +519,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -610,7 +610,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							final int structureType = comboBox.getSelectedIndex();
@@ -788,7 +788,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -884,7 +884,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -980,7 +980,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1076,7 +1076,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;

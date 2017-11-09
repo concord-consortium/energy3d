@@ -285,7 +285,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							while (true) {
 								dialog.setVisible(true);
 								final Object choice = optionPane.getValue();
-								if (choice == options[1]) {
+								if (choice == options[1] || choice == null) {
 									break;
 								} else {
 									if (rb1.isSelected()) { // apply to only this window
@@ -355,7 +355,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 						inputField.selectAll();
 						inputField.requestFocusInWindow();
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -457,7 +457,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 						inputField.selectAll();
 						inputField.requestFocusInWindow();
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;
@@ -538,7 +538,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							while (true) {
 								dialog.setVisible(true);
 								final Object choice = optionPane.getValue();
-								if (choice == options[1]) {
+								if (choice == options[1] || choice == null) {
 									break;
 								} else {
 									if (rb1.isSelected()) { // apply to only this window
@@ -611,7 +611,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							boolean ok = true;

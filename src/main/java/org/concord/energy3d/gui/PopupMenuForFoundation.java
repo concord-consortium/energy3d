@@ -627,7 +627,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						while (true) {
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
+							if (choice == options[1] || choice == null) {
 								break;
 							} else {
 								boolean ok = true;
@@ -875,7 +875,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						while (true) {
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
+							if (choice == options[1] || choice == null) {
 								break;
 							} else {
 								boolean ok = true;
@@ -1028,7 +1028,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						while (true) {
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
+							if (choice == options[1] || choice == null) {
 								break;
 							} else {
 								boolean ok = true;
@@ -1140,7 +1140,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						while (true) {
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
+							if (choice == options[1] || choice == null) {
 								break;
 							} else {
 								boolean ok = true;
@@ -1250,7 +1250,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						while (true) {
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
-							if (choice == options[1]) {
+							if (choice == options[1] || choice == null) {
 								break;
 							} else {
 								boolean ok = true;
@@ -1559,7 +1559,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double lx1 = lx0, ly1 = ly0, lz1 = lz0;

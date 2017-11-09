@@ -139,7 +139,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -215,7 +215,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -291,7 +291,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -369,7 +369,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -445,7 +445,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -522,7 +522,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -599,7 +599,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
@@ -886,7 +886,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1005,7 +1005,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1147,7 +1147,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							nx = (Integer) nxSpinner.getValue();
@@ -1239,7 +1239,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1379,7 +1379,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						efficiencyField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1496,7 +1496,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double noct = 0;
@@ -1600,7 +1600,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							double val = 0;
@@ -1721,7 +1721,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					while (true) {
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
-						if (choice == options[1]) {
+						if (choice == options[1] || choice == null) {
 							break;
 						} else {
 							if (rb1.isSelected()) {
