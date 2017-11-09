@@ -39,17 +39,18 @@ public class BuildingDailyEnergyGraph extends JPanel {
 
 	public BuildingDailyEnergyGraph() {
 		super(new BorderLayout());
+		setPreferredSize(new Dimension(200, 100));
 
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
 		buttonPanel.setBackground(Color.WHITE);
 		buttonPanel.add(Box.createVerticalGlue());
-		JButton button = new JButton("Show");
+		final JButton button = new JButton("Show");
 		button.setAlignmentX(CENTER_ALIGNMENT);
 		button.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				SceneManager.getInstance().autoSelectBuilding(true);
-				HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
 					addGraph((Foundation) selectedPart);
 					EnergyPanel.getInstance().validate();
@@ -64,15 +65,16 @@ public class BuildingDailyEnergyGraph extends JPanel {
 		graph.setBackground(Color.WHITE);
 		graph.setBorder(BorderFactory.createEtchedBorder());
 		graph.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() >= 2) {
-					String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 					if ("".equals(city)) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
 						return;
 					}
 					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
-						EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+						final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
 						analysis.updateGraph();
 						analysis.show("Daily Energy");
 					}
@@ -81,7 +83,7 @@ public class BuildingDailyEnergyGraph extends JPanel {
 		});
 	}
 
-	public void setCalendar(Calendar today) {
+	public void setCalendar(final Calendar today) {
 		graph.setCalendar(today);
 	}
 
@@ -111,8 +113,9 @@ public class BuildingDailyEnergyGraph extends JPanel {
 	}
 
 	public void updateGraph() {
-		if (building == null)
+		if (building == null) {
 			return;
+		}
 		graph.clearData();
 		for (int i = 0; i < 24; i++) {
 			SolarRadiation.getInstance().computeEnergyAtHour(i);
@@ -125,12 +128,14 @@ public class BuildingDailyEnergyGraph extends JPanel {
 		repaint();
 	}
 
-	public void addGraph(Foundation building) {
-
+	public void addGraph(final Foundation building) {
 		removeAll();
-
 		this.building = building;
-		graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
+		if (getWidth() > 0) {
+			graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
+		} else {
+			graph.setPreferredSize(new Dimension(getPreferredSize().width - 5, getPreferredSize().height - 5));
+		}
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			updateGraph();
 		}
@@ -143,14 +148,15 @@ public class BuildingDailyEnergyGraph extends JPanel {
 		String s = "{";
 		if (building != null) {
 			s += "\"Building\": " + building.getId();
-			String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
-			for (String name : names) {
-				List<Double> data = graph.getData(name);
-				if (data == null)
+			final String[] names = { "Net", "AC", "Heater", "Windows", "Solar Panels" };
+			for (final String name : names) {
+				final List<Double> data = graph.getData(name);
+				if (data == null) {
 					continue;
+				}
 				s += ", \"" + name + "\": {";
 				s += "\"Hourly\": [";
-				for (Double x : data) {
+				for (final Double x : data) {
 					s += Graph.FIVE_DECIMALS.format(x) + ",";
 				}
 				s = s.substring(0, s.length() - 1);

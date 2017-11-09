@@ -46,6 +46,7 @@ public class CspStationDailyEnergyGraph extends JPanel {
 
 	public CspStationDailyEnergyGraph() {
 		super(new BorderLayout());
+		setPreferredSize(new Dimension(200, 100));
 
 		buttonPanel = new Box(BoxLayout.Y_AXIS);
 		buttonPanel.setBackground(Color.WHITE);
@@ -189,11 +190,13 @@ public class CspStationDailyEnergyGraph extends JPanel {
 	}
 
 	public void addGraph(final Foundation base) {
-
 		removeAll();
-
 		this.base = base;
-		graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
+		if (getWidth() > 0) {
+			graph.setPreferredSize(new Dimension(getWidth() - 5, getHeight() - 5));
+		} else {
+			graph.setPreferredSize(new Dimension(getPreferredSize().width - 5, getPreferredSize().height - 5));
+		}
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			updateGraph();
 		}
