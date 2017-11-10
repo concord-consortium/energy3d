@@ -463,7 +463,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (part instanceof Mirror) {
 						final Mirror m = (Mirror) part;
 						if (night) {
-							m.drawLightBeams(); // call this so that the light beams can be set invisible
+							m.drawSunBeam(); // call this so that the light beams can be set invisible
 						} else {
 							if (m.getHeliostatTarget() != null) {
 								m.draw();
@@ -472,21 +472,21 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					} else if (part instanceof ParabolicTrough) {
 						final ParabolicTrough t = (ParabolicTrough) part;
 						if (night) {
-							t.drawLightBeams(); // call this so that the light beams can be set invisible
+							t.drawSunBeam(); // call this so that the light beams can be set invisible
 						} else {
 							t.draw();
 						}
 					} else if (part instanceof ParabolicDish) {
 						final ParabolicDish d = (ParabolicDish) part;
 						if (night) {
-							d.drawLightBeams(); // call this so that the light beams can be set invisible
+							d.drawSunBeam(); // call this so that the light beams can be set invisible
 						} else {
 							d.draw();
 						}
 					} else if (part instanceof FresnelReflector) {
 						final FresnelReflector f = (FresnelReflector) part;
 						if (night) {
-							f.drawLightBeams(); // call this so that the light beams can be set invisible
+							f.drawSunBeam(); // call this so that the light beams can be set invisible
 						} else {
 							f.draw();
 						}
@@ -495,7 +495,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!night && sp.getTracker() != Trackable.NO_TRACKER) {
 							sp.draw();
 						}
-						if (sp.isDrawSunBeamVisible()) {
+						if (sp.isSunBeamVisible()) {
 							sp.drawSunBeam();
 						}
 					} else if (part instanceof Rack) {
@@ -503,7 +503,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (!night && rack.getTracker() != Trackable.NO_TRACKER) {
 							rack.draw();
 						}
-						if (rack.isDrawSunBeamVisible()) {
+						if (rack.isSunBeamVisible()) {
 							rack.drawSunBeam();
 						}
 					}

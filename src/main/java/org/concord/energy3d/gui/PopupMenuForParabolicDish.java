@@ -42,6 +42,7 @@ import org.concord.energy3d.undo.SetParabolicDishStructureTypeCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetRimRadiusForAllParabolicDishesCommand;
 import org.concord.energy3d.undo.SetRimRadiusForParabolicDishesOnFoundationCommand;
+import org.concord.energy3d.undo.ShowSunBeamCommand;
 import org.concord.energy3d.util.Util;
 
 class PopupMenuForParabolicDish extends PopupMenuFactory {
@@ -264,9 +265,12 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						return;
 					}
 					final ParabolicDish d = (ParabolicDish) selectedPart;
-					d.setBeamsVisible(cbmiDrawSunBeams.isSelected());
-					d.drawLightBeams();
+					final ShowSunBeamCommand c = new ShowSunBeamCommand(d);
+					d.setSunBeamVisible(cbmiDrawSunBeams.isSelected());
+					d.drawSunBeam();
 					d.draw();
+					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -731,7 +735,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					Util.selectSilently(miLabelCustom, d.getLabelCustom());
 					Util.selectSilently(miLabelId, d.getLabelId());
 					Util.selectSilently(miLabelEnergyOutput, d.getLabelEnergyOutput());
-					Util.selectSilently(cbmiDrawSunBeams, d.areBeamsVisible());
+					Util.selectSilently(cbmiDrawSunBeams, d.isSunBeamVisible());
 				}
 			});
 

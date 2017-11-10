@@ -3398,28 +3398,28 @@ public class Scene implements Serializable {
 			if (part instanceof Mirror) {
 				final Mirror mirror = (Mirror) part;
 				if (night) {
-					mirror.drawLightBeams(); // call this so that the light beams can be set invisible
+					mirror.drawSunBeam(); // call this so that the light beams can be set invisible
 				} else {
 					mirror.draw();
 				}
 			} else if (part instanceof ParabolicTrough) {
 				final ParabolicTrough trough = (ParabolicTrough) part;
 				if (night) {
-					trough.drawLightBeams(); // call this so that the light beams can be set invisible
+					trough.drawSunBeam(); // call this so that the light beams can be set invisible
 				} else {
 					trough.draw();
 				}
 			} else if (part instanceof ParabolicDish) {
 				final ParabolicDish dish = (ParabolicDish) part;
 				if (night) {
-					dish.drawLightBeams(); // call this so that the light beams can be set invisible
+					dish.drawSunBeam(); // call this so that the light beams can be set invisible
 				} else {
 					dish.draw();
 				}
 			} else if (part instanceof FresnelReflector) {
 				final FresnelReflector fresnel = (FresnelReflector) part;
 				if (night) {
-					fresnel.drawLightBeams(); // call this so that the light beams can be set invisible
+					fresnel.drawSunBeam(); // call this so that the light beams can be set invisible
 				} else {
 					fresnel.draw();
 				}

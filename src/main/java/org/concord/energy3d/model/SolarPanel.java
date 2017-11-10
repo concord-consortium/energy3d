@@ -1110,11 +1110,13 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		return NO_SHADE_TOLERANCE;
 	}
 
+	@Override
 	public void setSunBeamVisible(final boolean drawSunBeam) {
 		this.drawSunBeam = drawSunBeam;
 	}
 
-	public boolean isDrawSunBeamVisible() {
+	@Override
+	public boolean isSunBeamVisible() {
 		return drawSunBeam;
 	}
 

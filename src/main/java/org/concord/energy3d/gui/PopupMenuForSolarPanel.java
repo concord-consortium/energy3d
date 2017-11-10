@@ -77,6 +77,7 @@ import org.concord.energy3d.undo.SetSolarTrackersForAllCommand;
 import org.concord.energy3d.undo.SetSolarTrackersOnFoundationCommand;
 import org.concord.energy3d.undo.SetTemperatrureEffectsForAllCommand;
 import org.concord.energy3d.undo.SetTemperatureEffectsCommand;
+import org.concord.energy3d.undo.ShowSunBeamCommand;
 import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
 
@@ -1298,9 +1299,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						return;
 					}
 					final SolarPanel sp = (SolarPanel) selectedPart;
+					final ShowSunBeamCommand c = new ShowSunBeamCommand(sp);
 					sp.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
 					sp.drawSunBeam();
 					sp.draw();
+					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -1769,7 +1773,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						Util.selectSilently(miNoTolerance, true);
 						break;
 					}
-					Util.selectSilently(cbmiDrawSunBeam, sp.isDrawSunBeamVisible());
+					Util.selectSilently(cbmiDrawSunBeam, sp.isSunBeamVisible());
 					Util.selectSilently(rbmiLandscape, sp.isRotated());
 					Util.selectSilently(rbmiPortrait, !sp.isRotated());
 					Util.selectSilently(miLabelNone, !sp.isLabelVisible());

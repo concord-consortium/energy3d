@@ -93,6 +93,7 @@ import org.concord.energy3d.undo.SetSolarTrackersOnFoundationCommand;
 import org.concord.energy3d.undo.SetTemperatureCoefficientPmaxForAllRacksCommand;
 import org.concord.energy3d.undo.SetTemperatureCoefficientPmaxForRackCommand;
 import org.concord.energy3d.undo.SetTemperatureCoefficientPmaxForRacksOnFoundationCommand;
+import org.concord.energy3d.undo.ShowSunBeamCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
@@ -2132,9 +2133,12 @@ class PopupMenuForRack extends PopupMenuFactory {
 						return;
 					}
 					final Rack rack = (Rack) selectedPart;
+					final ShowSunBeamCommand c = new ShowSunBeamCommand(rack);
 					rack.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
 					rack.drawSunBeam();
 					rack.draw();
+					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -2325,7 +2329,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							}
 						}
 					}
-					Util.selectSilently(cbmiDrawSunBeam, rack.isDrawSunBeamVisible());
+					Util.selectSilently(cbmiDrawSunBeam, rack.isSunBeamVisible());
 					Util.selectSilently(miLabelNone, !rack.isLabelVisible());
 					Util.selectSilently(miLabelCustom, rack.getLabelCustom());
 					Util.selectSilently(miLabelId, rack.getLabelId());

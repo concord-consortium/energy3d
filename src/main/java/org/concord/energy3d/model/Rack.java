@@ -1368,11 +1368,13 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 	}
 
+	@Override
 	public void setSunBeamVisible(final boolean drawSunBeam) {
 		this.drawSunBeam = drawSunBeam;
 	}
 
-	public boolean isDrawSunBeamVisible() {
+	@Override
+	public boolean isSunBeamVisible() {
 		return drawSunBeam;
 	}
 

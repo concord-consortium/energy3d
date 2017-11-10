@@ -48,6 +48,7 @@ import org.concord.energy3d.undo.SetParabolicTroughSemilatusRectumCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetShapeForAllParabolicTroughsCommand;
 import org.concord.energy3d.undo.SetShapeForParabolicTroughsOnFoundationCommand;
+import org.concord.energy3d.undo.ShowSunBeamCommand;
 import org.concord.energy3d.util.Util;
 
 class PopupMenuForParabolicTrough extends PopupMenuFactory {
@@ -173,9 +174,12 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 						return;
 					}
 					final ParabolicTrough t = (ParabolicTrough) selectedPart;
-					t.setBeamsVisible(cbmiDrawSunBeams.isSelected());
-					t.drawLightBeams();
+					final ShowSunBeamCommand c = new ShowSunBeamCommand(t);
+					t.setSunBeamVisible(cbmiDrawSunBeams.isSelected());
+					t.drawSunBeam();
 					t.draw();
+					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -756,7 +760,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 					Util.selectSilently(miLabelCustom, t.getLabelCustom());
 					Util.selectSilently(miLabelId, t.getLabelId());
 					Util.selectSilently(miLabelEnergyOutput, t.getLabelEnergyOutput());
-					Util.selectSilently(cbmiDrawSunBeams, t.areBeamsVisible());
+					Util.selectSilently(cbmiDrawSunBeams, t.isSunBeamVisible());
 				}
 			});
 

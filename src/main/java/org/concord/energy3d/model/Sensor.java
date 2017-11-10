@@ -302,4 +302,19 @@ public class Sensor extends HousePart implements SolarCollector {
 	public void setYieldToday(final double yieldToday) {
 	}
 
+	// Not implemented
+	@Override
+	public void drawSunBeam() {
+	}
+
+	// Not implemented
+	@Override
+	public void setSunBeamVisible(final boolean visible) {
+	}
+
+	// Not implemented
+	@Override
+	public boolean isSunBeamVisible() {
+		return false;
+	}
 }

@@ -47,6 +47,7 @@ import org.concord.energy3d.undo.SetMirrorLabelCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForAllMirrorsCommand;
 import org.concord.energy3d.undo.SetSizeForMirrorsOnFoundationCommand;
+import org.concord.energy3d.undo.ShowSunBeamCommand;
 import org.concord.energy3d.util.Util;
 
 class PopupMenuForMirror extends PopupMenuFactory {
@@ -66,8 +67,11 @@ class PopupMenuForMirror extends PopupMenuFactory {
 						return;
 					}
 					final Mirror m = (Mirror) selectedPart;
-					m.setDrawSunBeam(cbmiDrawSunBeam.isSelected());
+					final ShowSunBeamCommand c = new ShowSunBeamCommand(m);
+					m.setSunBeamVisible(cbmiDrawSunBeam.isSelected());
 					m.draw();
+					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -756,7 +760,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 						miAzimuth.setEnabled(false);
 						miDisableHeliostat.setEnabled(true);
 					}
-					Util.selectSilently(cbmiDrawSunBeam, m.getDrawSunBeam());
+					Util.selectSilently(cbmiDrawSunBeam, m.isSunBeamVisible());
 					Util.selectSilently(miLabelNone, !m.isLabelVisible());
 					Util.selectSilently(miLabelCustom, m.getLabelCustom());
 					Util.selectSilently(miLabelId, m.getLabelId());

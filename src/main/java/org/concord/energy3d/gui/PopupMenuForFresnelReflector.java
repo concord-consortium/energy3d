@@ -44,6 +44,7 @@ import org.concord.energy3d.undo.SetFresnelReflectorLabelCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForAllFresnelReflectorsCommand;
 import org.concord.energy3d.undo.SetSizeForFresnelReflectorsOnFoundationCommand;
+import org.concord.energy3d.undo.ShowSunBeamCommand;
 import org.concord.energy3d.util.Util;
 
 class PopupMenuForFresnelReflector extends PopupMenuFactory {
@@ -163,9 +164,12 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 						return;
 					}
 					final FresnelReflector r = (FresnelReflector) selectedPart;
-					r.setBeamVisible(cbmiDrawBeam.isSelected());
-					r.drawLightBeams();
+					final ShowSunBeamCommand c = new ShowSunBeamCommand(r);
+					r.setSunBeamVisible(cbmiDrawBeam.isSelected());
+					r.drawSunBeam();
 					r.draw();
+					SceneManager.getInstance().refresh();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
 				}
 			});
@@ -753,7 +757,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 						return;
 					}
 					final FresnelReflector r = (FresnelReflector) selectedPart;
-					Util.selectSilently(cbmiDrawBeam, r.areBeamsVisible());
+					Util.selectSilently(cbmiDrawBeam, r.isSunBeamVisible());
 					Util.selectSilently(miLabelNone, !r.isLabelVisible());
 					Util.selectSilently(miLabelCustom, r.getLabelCustom());
 					Util.selectSilently(miLabelId, r.getLabelId());

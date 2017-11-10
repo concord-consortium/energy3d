@@ -372,7 +372,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 
 		if (beamsVisible) {
-			drawLightBeams();
+			drawSunBeam();
 		}
 
 		updateLabel();
@@ -382,7 +382,8 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 
 	}
 
-	public void drawLightBeams() {
+	@Override
+	public void drawSunBeam() {
 		if (Heliodon.getInstance().isNightTime() || !beamsVisible) {
 			lightBeams.setVisible(false);
 			return;
@@ -736,11 +737,13 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 		}
 	}
 
-	public void setBeamsVisible(final boolean beamsVisible) {
+	@Override
+	public void setSunBeamVisible(final boolean beamsVisible) {
 		this.beamsVisible = beamsVisible;
 	}
 
-	public boolean areBeamsVisible() {
+	@Override
+	public boolean isSunBeamVisible() {
 		return beamsVisible;
 	}
 

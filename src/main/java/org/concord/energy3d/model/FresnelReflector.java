@@ -377,7 +377,7 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 		outlines.updateModelBound();
 
 		if (beamsVisible) {
-			drawLightBeams();
+			drawSunBeam();
 		}
 
 		updateLabel();
@@ -388,7 +388,8 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 
 	}
 
-	public void drawLightBeams() {
+	@Override
+	public void drawSunBeam() {
 		if (Heliodon.getInstance().isNightTime() || absorber == null || !beamsVisible || !Scene.getInstance().areLightBeamsVisible()) {
 			lightBeams.setVisible(false);
 			return;
@@ -764,11 +765,13 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 		return mesh.getWorldTransform().applyForward(v);
 	}
 
-	public void setBeamVisible(final boolean beamsVisible) {
+	@Override
+	public void setSunBeamVisible(final boolean beamsVisible) {
 		this.beamsVisible = beamsVisible;
 	}
 
-	public boolean areBeamsVisible() {
+	@Override
+	public boolean isSunBeamVisible() {
 		return beamsVisible;
 	}
 

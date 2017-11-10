@@ -12,6 +12,12 @@ public interface SolarCollector {
 
 	public double getBaseHeight();
 
+	public void setSunBeamVisible(final boolean visible);
+
+	public boolean isSunBeamVisible();
+
+	public void drawSunBeam();
+
 	public double getYieldNow();
 
 	public void setYieldNow(final double yieldNow);

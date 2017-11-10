@@ -224,7 +224,7 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 		post.setHeight(baseHeight - 0.5 * post.getRadius());
 		post.setTranslation(getAbsPoint(0).addLocal(0, 0, post.getHeight() / 2 - baseHeight));
 
-		drawLightBeams();
+		drawSunBeam();
 
 		updateLabel();
 
@@ -246,7 +246,8 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 		normal = v.normalizeLocal();
 	}
 
-	public void drawLightBeams() {
+	@Override
+	public void drawSunBeam() {
 		if (Heliodon.getInstance().isNightTime() || heliostatTarget == null || !Scene.getInstance().areLightBeamsVisible()) {
 			lightBeams.setVisible(false);
 			return;
@@ -505,11 +506,13 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 		return heliostatTarget;
 	}
 
-	public void setDrawSunBeam(final boolean drawSunBeam) {
+	@Override
+	public void setSunBeamVisible(final boolean drawSunBeam) {
 		this.drawSunBeam = drawSunBeam;
 	}
 
-	public boolean getDrawSunBeam() {
+	@Override
+	public boolean isSunBeamVisible() {
 		return drawSunBeam;
 	}
 
