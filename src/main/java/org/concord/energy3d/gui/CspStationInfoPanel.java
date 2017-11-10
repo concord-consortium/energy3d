@@ -96,6 +96,10 @@ public class CspStationInfoPanel extends JPanel {
 		costBar.setPreferredSize(new Dimension(100, 16));
 		costPanel.add(costBar, BorderLayout.CENTER);
 
+		final JPanel placeholder = new JPanel();
+		placeholder.setPreferredSize(new Dimension(100, 100));
+		container.add(placeholder);
+
 	}
 
 	void update(final Foundation foundation) {

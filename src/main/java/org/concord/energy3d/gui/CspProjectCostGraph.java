@@ -31,7 +31,6 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.CspProjectCost;
 import org.concord.energy3d.simulation.PieChart;
 import org.concord.energy3d.simulation.PvDesignSpecs;
-import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
@@ -215,7 +214,7 @@ public class CspProjectCostGraph extends JPanel {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
 				if (e.getClickCount() >= 2) {
-					PvProjectCost.getInstance().showGraph();
+					CspProjectCost.getInstance().showGraph();
 				} else {
 					if (Util.isRightClick(e)) {
 						popupMenu.show(CspProjectCostGraph.this, e.getX(), e.getY());
