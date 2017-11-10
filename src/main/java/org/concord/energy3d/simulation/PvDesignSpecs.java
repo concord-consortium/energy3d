@@ -45,7 +45,7 @@ public class PvDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
+				EnergyPanel.getInstance().getPvProjectCostGraph().updateBudget();
 				EnergyPanel.getInstance().getPvStationInfoPanel().updateBudgetMaximum();
 			}
 		});
@@ -60,7 +60,7 @@ public class PvDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
+				EnergyPanel.getInstance().getPvProjectCostGraph().updateBudget();
 				EnergyPanel.getInstance().getPvStationInfoPanel().updateBudgetMaximum();
 			}
 		});

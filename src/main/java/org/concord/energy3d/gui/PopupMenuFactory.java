@@ -396,7 +396,7 @@ public abstract class PopupMenuFactory {
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								updateAfterEdit();
-								EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
+								EnergyPanel.getInstance().getBuildingCostGraph().updateBudget();
 								break;
 							}
 						} catch (final NumberFormatException exception) {

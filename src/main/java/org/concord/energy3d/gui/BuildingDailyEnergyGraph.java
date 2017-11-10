@@ -21,6 +21,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.BuildingEnergyDailyGraph;
+import org.concord.energy3d.simulation.DailyGraph;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.Graph;
 import org.concord.energy3d.simulation.SolarRadiation;
@@ -76,6 +77,11 @@ public class BuildingDailyEnergyGraph extends JPanel {
 					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
 						final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
 						analysis.updateGraph();
+						final Graph g = analysis.getGraph();
+						if (g instanceof DailyGraph) {
+							final DailyGraph dg = (DailyGraph) g;
+							dg.setMilitaryTime(graph.getMilitaryTime());
+						}
 						analysis.show("Daily Energy");
 					}
 				}

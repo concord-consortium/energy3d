@@ -48,7 +48,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
+				EnergyPanel.getInstance().getCspProjectCostGraph().updateBudget();
 				EnergyPanel.getInstance().getCspStationInfoPanel().updateBudgetMaximum();
 			}
 		});
@@ -63,7 +63,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getProjectCostGraph().updateBudget();
+				EnergyPanel.getInstance().getCspProjectCostGraph().updateBudget();
 				EnergyPanel.getInstance().getCspStationInfoPanel().updateBudgetMaximum();
 			}
 		});

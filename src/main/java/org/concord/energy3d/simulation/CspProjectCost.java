@@ -44,7 +44,7 @@ public class CspProjectCost extends ProjectCost {
 		return instance;
 	}
 
-	static double getPartCost(final HousePart part) {
+	public static double getPartCost(final HousePart part) {
 
 		final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 

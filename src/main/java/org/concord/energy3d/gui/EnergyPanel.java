@@ -132,7 +132,9 @@ public class EnergyPanel extends JPanel {
 	private JTextField partProperty2TextField;
 	private JTextField partProperty3TextField;
 	private ChangeListener latitudeChangeListener;
-	private BuildingCostGraph projectCostGraph;
+	private BuildingCostGraph buildingCostGraph;
+	private PvProjectCostGraph pvProjectCostGraph;
+	private CspProjectCostGraph cspProjectCostGraph;
 	private BuildingDailyEnergyGraph buildingDailyEnergyGraph;
 	private PvStationDailyEnergyGraph pvStationDailyEnergyGraph;
 	private CspStationDailyEnergyGraph cspStationDailyEnergyGraph;
@@ -431,6 +433,9 @@ public class EnergyPanel extends JPanel {
 		pvStationInfoPanel = new PvStationInfoPanel();
 		pvStationTabbedPane.add("Info", pvStationInfoPanel);
 
+		pvProjectCostGraph = new PvProjectCostGraph(); // cost graph
+		pvStationTabbedPane.add("Cost", pvProjectCostGraph);
+
 		pvStationDailyEnergyGraph = new PvStationDailyEnergyGraph();
 		pvStationTabbedPane.add("Output", pvStationDailyEnergyGraph);
 
@@ -463,6 +468,9 @@ public class EnergyPanel extends JPanel {
 
 		cspStationInfoPanel = new CspStationInfoPanel();
 		cspStationTabbedPane.add("Info", cspStationInfoPanel);
+
+		cspProjectCostGraph = new CspProjectCostGraph(); // cost graph
+		cspStationTabbedPane.add("Cost", cspProjectCostGraph);
 
 		cspStationDailyEnergyGraph = new CspStationDailyEnergyGraph();
 		cspStationTabbedPane.add("Output", cspStationDailyEnergyGraph);
@@ -528,8 +536,8 @@ public class EnergyPanel extends JPanel {
 		buildingInfoPanel = new BuildingInfoPanel(); // basics panel
 		buildingTabbedPane.add("Basics", buildingInfoPanel);
 
-		projectCostGraph = new BuildingCostGraph(); // cost graph
-		buildingTabbedPane.add("Cost", projectCostGraph);
+		buildingCostGraph = new BuildingCostGraph(); // cost graph
+		buildingTabbedPane.add("Cost", buildingCostGraph);
 
 		buildingDailyEnergyGraph = new BuildingDailyEnergyGraph(); // hourly energy graph
 		buildingTabbedPane.add("Energy", buildingDailyEnergyGraph);
@@ -819,8 +827,16 @@ public class EnergyPanel extends JPanel {
 		return cspStationInfoPanel;
 	}
 
-	public BuildingCostGraph getProjectCostGraph() {
-		return projectCostGraph;
+	public BuildingCostGraph getBuildingCostGraph() {
+		return buildingCostGraph;
+	}
+
+	public PvProjectCostGraph getPvProjectCostGraph() {
+		return pvProjectCostGraph;
+	}
+
+	public CspProjectCostGraph getCspProjectCostGraph() {
+		return cspProjectCostGraph;
 	}
 
 	public BuildingDailyEnergyGraph getBuildingDailyEnergyGraph() {
@@ -837,7 +853,9 @@ public class EnergyPanel extends JPanel {
 
 	/** call when loading a new file */
 	public void clearAllGraphs() {
-		projectCostGraph.removeGraph();
+		buildingCostGraph.removeGraph();
+		pvProjectCostGraph.removeGraph();
+		cspProjectCostGraph.removeGraph();
 		buildingDailyEnergyGraph.removeGraph();
 		pvStationDailyEnergyGraph.removeGraph();
 		cspStationDailyEnergyGraph.removeGraph();
@@ -1757,18 +1775,22 @@ public class EnergyPanel extends JPanel {
 					final Foundation f = (Foundation) selectedPart;
 					switch (f.getProjectType()) {
 					case Foundation.TYPE_BUILDING:
-						projectCostGraph.addGraph(f);
+						buildingCostGraph.addGraph(f);
 						buildingDailyEnergyGraph.addGraph(f);
 						break;
 					case Foundation.TYPE_PV_STATION:
+						pvProjectCostGraph.addGraph(f);
 						pvStationDailyEnergyGraph.addGraph(f);
 						break;
 					case Foundation.TYPE_CSP_STATION:
+						cspProjectCostGraph.addGraph(f);
 						cspStationDailyEnergyGraph.addGraph(f);
 						break;
 					}
 				} else {
-					projectCostGraph.removeGraph();
+					buildingCostGraph.removeGraph();
+					pvProjectCostGraph.removeGraph();
+					cspProjectCostGraph.removeGraph();
 					buildingDailyEnergyGraph.removeGraph();
 					pvStationDailyEnergyGraph.removeGraph();
 					cspStationDailyEnergyGraph.removeGraph();

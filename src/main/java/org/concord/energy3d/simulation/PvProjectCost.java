@@ -38,7 +38,7 @@ public class PvProjectCost extends ProjectCost {
 		return instance;
 	}
 
-	static double getPartCost(final HousePart part) {
+	public static double getPartCost(final HousePart part) {
 
 		final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
 

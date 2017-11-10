@@ -100,6 +100,10 @@ public abstract class Analysis {
 
 	public abstract void updateGraph();
 
+	public Graph getGraph() {
+		return graph;
+	}
+
 	void onCompletion() {
 		TimeSeriesLogger.getInstance().logAnalysis(this);
 		EnergyPanel.getInstance().progress(0);

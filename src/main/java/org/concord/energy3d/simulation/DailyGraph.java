@@ -33,6 +33,10 @@ public abstract class DailyGraph extends Graph {
 		this.militaryTime = militaryTime;
 	}
 
+	public boolean getMilitaryTime() {
+		return militaryTime;
+	}
+
 	@Override
 	String getXAxisLabel(final int i) {
 		if (militaryTime) {

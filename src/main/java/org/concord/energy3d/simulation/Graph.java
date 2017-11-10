@@ -87,6 +87,7 @@ public abstract class Graph extends JPanel {
 	private final JPopupMenu popupMenu;
 	private int legendX, legendY, legendWidth, legendHeight;
 	private String legendText = "";
+	private final Color windowColor = new Color(245, 245, 245);
 
 	static {
 		colors = new HashMap<String, Color>();
@@ -117,6 +118,20 @@ public abstract class Graph extends JPanel {
 			@Override
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 				popupMenu.removeAll();
+
+				if (Graph.this instanceof DailyGraph) {
+					final DailyGraph g = (DailyGraph) Graph.this;
+					final JCheckBoxMenuItem miMilitaryTime = new JCheckBoxMenuItem("Military Time");
+					miMilitaryTime.setSelected(g.getMilitaryTime());
+					miMilitaryTime.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+							g.setMilitaryTime(miMilitaryTime.isSelected());
+							g.repaint();
+						}
+					});
+					popupMenu.add(miMilitaryTime);
+				}
 				JMenuItem mi = new JMenuItem("View Raw Data...");
 				mi.addActionListener(new ActionListener() {
 					@Override
@@ -227,7 +242,7 @@ public abstract class Graph extends JPanel {
 							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
 							if (x > dataX - r && x < dataX + r && y > dataY - r && y < dataY + r) {
 								inSymbol = true;
-								setToolTipText(getXAxisLabel(i) + ": " + FIVE_DECIMALS.format(list.get(i)));
+								setToolTipText(key + ": (" + getXAxisLabel(i) + ", " + FIVE_DECIMALS.format(list.get(i)) + ")");
 								break;
 							}
 						}
@@ -426,7 +441,7 @@ public abstract class Graph extends JPanel {
 		g2.setColor(Color.GRAY);
 		g2.setStroke(thick);
 		g2.drawRect(left / 2, top / 2, width - (left + right) / 2, height - (top + bottom) / 2);
-		g2.setColor(new Color(245, 245, 245));
+		g2.setColor(windowColor);
 		g2.fillRect(left / 2, top / 2, width - (left + right) / 2, height - (top + bottom) / 2);
 
 		g2.setColor(Color.BLACK);

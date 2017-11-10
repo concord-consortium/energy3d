@@ -22,6 +22,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.DailyGraph;
 import org.concord.energy3d.simulation.Graph;
 import org.concord.energy3d.simulation.PartEnergyDailyGraph;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
@@ -78,6 +79,11 @@ public class PvStationDailyEnergyGraph extends JPanel {
 					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
 						final PvDailyAnalysis analysis = new PvDailyAnalysis();
 						analysis.updateGraph();
+						final Graph g = analysis.getGraph();
+						if (g instanceof DailyGraph) {
+							final DailyGraph dg = (DailyGraph) g;
+							dg.setMilitaryTime(graph.getMilitaryTime());
+						}
 						analysis.show();
 					}
 				}
