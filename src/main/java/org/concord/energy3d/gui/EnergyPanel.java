@@ -14,6 +14,9 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -30,9 +33,12 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -71,8 +77,11 @@ import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
+import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
+import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.LocationData;
+import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.undo.ChangeCityCommand;
@@ -255,6 +264,24 @@ public class EnergyPanel extends JPanel {
 				Scene.getInstance().setEdited(true);
 			}
 		});
+		regionComboBox.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					final JPopupMenu popupMenu = new JPopupMenu();
+					final JMenuItem mi = new JMenuItem("Show Map...");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							new GlobalMap(MainFrame.getInstance()).setVisible(true);
+						}
+					});
+					popupMenu.add(mi);
+					popupMenu.pack();
+					popupMenu.show(regionComboBox, 0, 0);
+				}
+			}
+		});
 
 		final GridBagConstraints gbc_cityComboBox = new GridBagConstraints();
 		gbc_cityComboBox.gridwidth = 2;
@@ -362,6 +389,42 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(createLabel("Temp.: "), gbc_outsideTemperatureLabel);
 
 		outsideTemperatureField = createTextField();
+		outsideTemperatureField.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					final JPopupMenu popupMenu = new JPopupMenu();
+					JMenuItem mi = new JMenuItem("Daily Environmental Temperature...");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							final String city = (String) regionComboBox.getSelectedItem();
+							if ("".equals(city)) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							new DailyEnvironmentalTemperature().showDialog();
+						}
+					});
+					popupMenu.add(mi);
+					mi = new JMenuItem("Annual Environmental Temperature...");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							final String city = (String) regionComboBox.getSelectedItem();
+							if ("".equals(city)) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							new AnnualEnvironmentalTemperature().showDialog();
+						}
+					});
+					popupMenu.add(mi);
+					popupMenu.pack();
+					popupMenu.show(outsideTemperatureField, 0, 0);
+				}
+			}
+		});
 		outsideTemperatureField.setToolTipText("Current outside temperature at this time and day");
 		outsideTemperatureField.setEditable(false);
 		outsideTemperatureField.setEnabled(false);
@@ -380,6 +443,29 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(createLabel("Sunshine: "), gbc_sunshineLabel);
 
 		sunshineHoursField = createTextField();
+		sunshineHoursField.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					final JPopupMenu popupMenu = new JPopupMenu();
+					final JMenuItem mi = new JMenuItem("Monthly Sunshine Hours...");
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							final String city = (String) regionComboBox.getSelectedItem();
+							if ("".equals(city)) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+								return;
+							}
+							new MonthlySunshineHours().showDialog();
+						}
+					});
+					popupMenu.add(mi);
+					popupMenu.pack();
+					popupMenu.show(sunshineHoursField, 0, 0);
+				}
+			}
+		});
 		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
 		sunshineHoursField.setEditable(false);
 		sunshineHoursField.setEnabled(false);
@@ -406,17 +492,46 @@ public class EnergyPanel extends JPanel {
 		partProperty3Label = createLabel(" Z:");
 		labelPanel.add(partProperty3Label);
 
+		final MouseListener propertyTextFieldMouseListener = new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				final HousePart part = SceneManager.getInstance().getSelectedPart();
+				if (part != null) {
+					if (Util.isRightClick(e)) {
+						final JPopupMenu popupMenu = new JPopupMenu();
+						final JMenuItem mi = new JMenuItem("Show More Properties...");
+						mi.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(final ActionEvent e) {
+								final JDialog d = PropertiesDialogFactory.getDialog();
+								if (d != null) {
+									d.setLocationRelativeTo(popupMenu.getInvoker());
+									d.setVisible(true);
+								}
+							}
+						});
+						popupMenu.add(mi);
+						popupMenu.pack();
+						popupMenu.show(e.getComponent(), 0, 0);
+					}
+				}
+			}
+		};
+
 		final JPanel fieldPanel = new JPanel(new GridLayout(3, 1, 2, 2));
 		partPanel.add(fieldPanel, BorderLayout.CENTER);
 		partProperty1TextField = createTextField();
+		partProperty1TextField.addMouseListener(propertyTextFieldMouseListener);
 		partProperty1TextField.setEnabled(false);
 		partProperty1TextField.setBackground(Color.WHITE);
 		fieldPanel.add(partProperty1TextField);
 		partProperty2TextField = createTextField();
+		partProperty2TextField.addMouseListener(propertyTextFieldMouseListener);
 		partProperty2TextField.setEnabled(false);
 		partProperty2TextField.setBackground(Color.WHITE);
 		fieldPanel.add(partProperty2TextField);
 		partProperty3TextField = createTextField();
+		partProperty3TextField.addMouseListener(propertyTextFieldMouseListener);
 		partProperty3TextField.setEnabled(false);
 		partProperty3TextField.setBackground(Color.WHITE);
 		fieldPanel.add(partProperty3TextField);

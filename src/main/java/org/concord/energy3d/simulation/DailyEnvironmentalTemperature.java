@@ -56,33 +56,33 @@ public class DailyEnvironmentalTemperature extends JPanel {
 	private static final int TRIANGLEUP = 3;
 	private static final int TRIANGLEDOWN = 4;
 
-	private int top = 50, right = 50, bottom = 80, left = 90;
-	private double xmin = 0;
-	private double xmax = 23;
+	private final int top = 50, right = 50, bottom = 80, left = 90;
+	private final double xmin = 0;
+	private final double xmax = 23;
 	private double ymin = 1000;
 	private double ymax = -1000;
 	private double dx;
 	private double dy;
-	private double xNow;
-	private int symbolSize = 8;
-	private int numberOfTicks = 24;
-	private String xAxisLabel = "Hour";
-	private String yAxisLabel = "Temperature (\u00b0C)";
-	private BasicStroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
-	private BasicStroke thin = new BasicStroke(1);
-	private BasicStroke thick = new BasicStroke(2);
-	private String city;
-	private Calendar today;
+	private final double xNow;
+	private final int symbolSize = 8;
+	private final int numberOfTicks = 24;
+	private final String xAxisLabel = "Hour";
+	private final String yAxisLabel = "Temperature (\u00b0C)";
+	private final BasicStroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
+	private final BasicStroke thin = new BasicStroke(1);
+	private final BasicStroke thick = new BasicStroke(2);
+	private final String city;
+	private final Calendar today;
 
-	private double lowestAirTemperature;
-	private double highestAirTemperature;
+	private final double lowestAirTemperature;
+	private final double highestAirTemperature;
 
-	private double[] depth;
-	private double[][] groundTemperature;
+	private final double[] depth;
+	private final double[][] groundTemperature;
 
-	private int[] symbol;
-	private BasicStroke[] stroke;
-	private Map<double[], Boolean> hideData;
+	private final int[] symbol;
+	private final BasicStroke[] stroke;
+	private final Map<double[], Boolean> hideData;
 
 	public DailyEnvironmentalTemperature() {
 
@@ -95,20 +95,21 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		depth = new double[] { 0, 0.5, 1, 2, 6 };
 		symbol = new int[] { -1, CIRCLE, DIAMOND, SQUARE, -1 };
 		stroke = new BasicStroke[] { thick, thick, thick, thick, dashed };
-		int m = depth.length;
+		final int m = depth.length;
 		groundTemperature = new double[m][24];
 
-		for (int i = 0; i < m; i++)
+		for (int i = 0; i < m; i++) {
 			hideData.put(groundTemperature[i], false);
+		}
 
 		city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
 		today = Heliodon.getInstance().getCalendar();
-		xNow = today.get(Calendar.HOUR_OF_DAY) + (double) today.get(Calendar.MINUTE) / 60.0;
-		int day = today.get(Calendar.DAY_OF_YEAR);
-		double[] r = Weather.computeOutsideTemperature(today, city);
+		xNow = today.get(Calendar.HOUR_OF_DAY) + today.get(Calendar.MINUTE) / 60.0;
+		final int day = today.get(Calendar.DAY_OF_YEAR);
+		final double[] r = Weather.computeOutsideTemperature(today, city);
 		lowestAirTemperature = r[0];
 		highestAirTemperature = r[1];
-		double amp = 0.5 * (highestAirTemperature - lowestAirTemperature);
+		final double amp = 0.5 * (highestAirTemperature - lowestAirTemperature);
 		for (int h = 0; h < 24; h++) {
 			for (int i = 0; i < m; i++) {
 				groundTemperature[i][h] = i == 0 ? Weather.getInstance().getOutsideTemperatureAtMinute(highestAirTemperature, lowestAirTemperature, h * 60) : Scene.getInstance().getGround().getTemperatureMinuteOfDay(day, h * 60, amp, depth[i]);
@@ -117,20 +118,22 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	}
 
-	public void paintComponent(Graphics g) {
+	@Override
+	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		update(g);
 	}
 
-	public void update(Graphics g) {
+	@Override
+	public void update(final Graphics g) {
 
-		Graphics2D g2 = (Graphics2D) g;
+		final Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-		Dimension dim = getSize();
-		int width = dim.width;
-		int height = dim.height;
+		final Dimension dim = getSize();
+		final int width = dim.width;
+		final int height = dim.height;
 		g2.setColor(getBackground());
 		g2.fillRect(0, 0, width, height);
 		g2.setColor(Color.GRAY);
@@ -138,18 +141,18 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 		g2.setColor(Color.BLACK);
 		g2.setFont(new Font("Arial", Font.PLAIN, 8));
-		float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
+		final float tickWidth = (float) (width - left - right) / (float) (numberOfTicks - 1);
 		float xTick;
 		for (int i = 0; i < numberOfTicks; i++) {
-			String s = i + "";
-			int sWidth = g2.getFontMetrics().stringWidth(s);
+			final String s = i + "";
+			final int sWidth = g2.getFontMetrics().stringWidth(s);
 			xTick = left + tickWidth * i;
 			g2.drawString(s, xTick - sWidth / 2, height - bottom / 2 + 16);
 			g2.drawLine((int) xTick, height - bottom / 2, (int) xTick, height - bottom / 2 - 4);
 		}
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
-		int xAxisLabelWidth = g2.getFontMetrics().stringWidth(xAxisLabel);
-		int yAxisLabelWidth = g2.getFontMetrics().stringWidth(yAxisLabel);
+		final int xAxisLabelWidth = g2.getFontMetrics().stringWidth(xAxisLabel);
+		final int yAxisLabelWidth = g2.getFontMetrics().stringWidth(yAxisLabel);
 		g2.drawString(xAxisLabel, (width - xAxisLabelWidth) / 2, height - 8);
 		g2.rotate(-Math.PI / 2, 16, (height + yAxisLabelWidth) / 2);
 		g2.drawString(yAxisLabel, 16, (height + yAxisLabelWidth) / 2);
@@ -159,13 +162,22 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		int digits = String.valueOf(Math.round(ymax - ymin)).length() - 1;
 		digits = (int) Math.pow(10, digits);
 		int i1 = (int) Math.round(ymin / digits) - 2;
-		int i2 = (int) Math.round(ymax / digits) + 2;
-		int hVal, hPos;
+		if (i1 < 0) {
+			i1 = 0;
+		}
+		final int i2 = (int) Math.round(ymax / digits) + 2;
+		float hVal;
+		int hPos;
 		for (int i = i1; i <= i2; i++) {
 			hVal = i * digits;
 			hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
 			if (hPos > top / 2 && hPos < getHeight() - bottom / 2) {
-				drawHorizontalLine(g2, hPos, Integer.toString(hVal));
+				drawHorizontalLine(g2, hPos, Graph.ONE_DECIMAL.format(hVal));
+			}
+			hVal = (i + 0.5f) * digits;
+			hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+			if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
+				drawHorizontalLine(g2, hPos, Graph.ONE_DECIMAL.format(hVal));
 			}
 		}
 
@@ -178,22 +190,22 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		drawLegends(g2);
 
 		g2.setFont(new Font("Arial", Font.BOLD, 14));
-		FontMetrics fm = g2.getFontMetrics();
-		String cityAndDate = city + " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH);
+		final FontMetrics fm = g2.getFontMetrics();
+		final String cityAndDate = city + " - " + (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.DAY_OF_MONTH);
 		g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, 20);
 
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.setStroke(thin);
-		int xTodayLine = (int) Math.round(left + dx * xNow);
+		final int xTodayLine = (int) Math.round(left + dx * xNow);
 		g2.drawLine(xTodayLine, top / 2, xTodayLine, height - bottom / 2);
 
 	}
 
-	void drawLegends(Graphics2D g2) {
+	void drawLegends(final Graphics2D g2) {
 
 		g2.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2.setStroke(thin);
-		int x0 = left / 2 + 20;
+		final int x0 = left / 2 + 20;
 		int y0 = top - 10;
 
 		for (int i = 0; i < depth.length - 1; i++) {
@@ -218,7 +230,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	}
 
-	private void drawSymbol(Graphics g2, int sym, int x0, int y0) {
+	private void drawSymbol(final Graphics g2, final int sym, final int x0, final int y0) {
 		switch (sym) {
 		case CIRCLE:
 			Graph.drawCircle(g2, x0, y0, 6, Color.WHITE);
@@ -238,10 +250,10 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		}
 	}
 
-	private void drawCurve(Graphics2D g2, double[] data, Color color, int sym, BasicStroke stk) {
+	private void drawCurve(final Graphics2D g2, final double[] data, final Color color, final int sym, final BasicStroke stk) {
 
 		double dataX, dataY;
-		Path2D.Float path = new Path2D.Float();
+		final Path2D.Float path = new Path2D.Float();
 		for (int i = 0; i < data.length; i++) {
 			dataX = left + dx * i;
 			dataY = getHeight() - top - (data[i] - ymin) * dy;
@@ -282,32 +294,36 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	}
 
-	private void drawHorizontalLine(Graphics2D g2, int yValue, String yLabel) {
+	private void drawHorizontalLine(final Graphics2D g2, final int yValue, final String yLabel) {
 		g2.setStroke(thin);
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.drawLine(left / 2, yValue, getWidth() - right / 2, yValue);
 		g2.setColor(Color.BLACK);
-		int yLabelWidth = g2.getFontMetrics().stringWidth(yLabel);
+		final int yLabelWidth = g2.getFontMetrics().stringWidth(yLabel);
 		g2.drawString(yLabel, left / 2 - 5 - yLabelWidth, yValue + 4);
 	}
 
 	private void calculateBounds() {
-		if (ymin > lowestAirTemperature)
+		if (ymin > lowestAirTemperature) {
 			ymin = lowestAirTemperature;
-		if (ymax < highestAirTemperature)
+		}
+		if (ymax < highestAirTemperature) {
 			ymax = highestAirTemperature;
+		}
 		double t;
 		for (int i = 0; i < groundTemperature.length; i++) {
 			for (int j = 0; j < groundTemperature[i].length; j++) {
 				t = groundTemperature[i][j];
-				if (t < ymin)
+				if (t < ymin) {
 					ymin = t;
-				if (t > ymax)
+				}
+				if (t > ymax) {
 					ymax = t;
+				}
 			}
 		}
-		dx = (double) (getWidth() - left - right) / (xmax - xmin);
-		dy = (double) (getHeight() - top - bottom) / (ymax - ymin);
+		dx = (getWidth() - left - right) / (xmax - xmin);
+		dy = (getHeight() - top - bottom) / (ymax - ymin);
 	}
 
 	public void showDialog() {
@@ -331,17 +347,18 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		menuBar.add(menuView);
 		menuView.addMenuListener(new MenuListener() {
 			@Override
-			public void menuSelected(MenuEvent e) {
-				for (int i = 0; i < depth.length; i++)
+			public void menuSelected(final MenuEvent e) {
+				for (int i = 0; i < depth.length; i++) {
 					Util.selectSilently(cbmiGroundTemperature[i], !hideData.get(groundTemperature[i]));
+				}
 			}
 
 			@Override
-			public void menuDeselected(MenuEvent e) {
+			public void menuDeselected(final MenuEvent e) {
 			}
 
 			@Override
-			public void menuCanceled(MenuEvent e) {
+			public void menuCanceled(final MenuEvent e) {
 			}
 		});
 
@@ -350,7 +367,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 			cbmiGroundTemperature[i].addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
+					final JCheckBoxMenuItem source = (JCheckBoxMenuItem) e.getSource();
 					hideData.put(groundTemperature[i2], !source.isSelected());
 					DailyEnvironmentalTemperature.this.repaint();
 				}
@@ -361,10 +378,10 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		final JMenu menuAction = new JMenu("Action");
 		menuBar.add(menuAction);
 
-		JMenuItem mi = new JMenuItem("Copy Image");
+		final JMenuItem mi = new JMenuItem("Copy Image");
 		mi.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				new ClipImage().copyImageToClipboard(DailyEnvironmentalTemperature.this);
 			}
 		});
@@ -379,7 +396,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
-		JButton button = new JButton("Close");
+		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -405,7 +422,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 
 	// TODO
 	public String toJson() {
-		String s = "{}";
+		final String s = "{}";
 		return s;
 	}
 
