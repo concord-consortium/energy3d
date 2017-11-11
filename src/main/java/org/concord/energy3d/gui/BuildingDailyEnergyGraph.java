@@ -82,6 +82,7 @@ public class BuildingDailyEnergyGraph extends JPanel {
 							final DailyGraph dg = (DailyGraph) g;
 							dg.setMilitaryTime(graph.getMilitaryTime());
 						}
+						g.setType(graph.getType());
 						analysis.show("Daily Energy");
 					}
 				}

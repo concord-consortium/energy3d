@@ -84,6 +84,7 @@ public class PvStationDailyEnergyGraph extends JPanel {
 							final DailyGraph dg = (DailyGraph) g;
 							dg.setMilitaryTime(graph.getMilitaryTime());
 						}
+						g.setType(graph.getType());
 						analysis.show();
 					}
 				}

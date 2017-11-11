@@ -65,7 +65,7 @@ abstract class AnnualAnalysis extends Analysis {
 		});
 		chartMenu.add(miLine);
 		chartGroup.add(miLine);
-		miLine.setSelected(true);
+		miLine.setSelected(graph.getType() == Graph.LINE_CHART);
 
 		final JRadioButtonMenuItem miArea = new JRadioButtonMenuItem("Area");
 		miArea.addItemListener(new ItemListener() {
@@ -79,6 +79,7 @@ abstract class AnnualAnalysis extends Analysis {
 		});
 		chartMenu.add(miArea);
 		chartGroup.add(miArea);
+		miArea.setSelected(graph.getType() == Graph.AREA_CHART);
 
 		miClear.addActionListener(new ActionListener() {
 			@Override

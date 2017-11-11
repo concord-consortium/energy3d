@@ -27,12 +27,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -122,6 +125,38 @@ public abstract class Graph extends JPanel {
 			@Override
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 				popupMenu.removeAll();
+
+				final JMenu chartMenu = new JMenu("Chart");
+				final ButtonGroup chartGroup = new ButtonGroup();
+				popupMenu.add(chartMenu);
+
+				final JRadioButtonMenuItem miLine = new JRadioButtonMenuItem("Line");
+				miLine.addItemListener(new ItemListener() {
+					@Override
+					public void itemStateChanged(final ItemEvent e) {
+						if (e.getStateChange() == ItemEvent.SELECTED) {
+							setType(Graph.LINE_CHART);
+							Graph.this.repaint();
+						}
+					}
+				});
+				chartMenu.add(miLine);
+				chartGroup.add(miLine);
+				miLine.setSelected(graphType == LINE_CHART);
+
+				final JRadioButtonMenuItem miArea = new JRadioButtonMenuItem("Area");
+				miArea.addItemListener(new ItemListener() {
+					@Override
+					public void itemStateChanged(final ItemEvent e) {
+						if (e.getStateChange() == ItemEvent.SELECTED) {
+							setType(Graph.AREA_CHART);
+							Graph.this.repaint();
+						}
+					}
+				});
+				chartMenu.add(miArea);
+				chartGroup.add(miArea);
+				miArea.setSelected(graphType == AREA_CHART);
 
 				if (Graph.this instanceof DailyGraph) {
 					final DailyGraph g = (DailyGraph) Graph.this;
@@ -642,37 +677,65 @@ public abstract class Graph extends JPanel {
 						continue;
 					}
 
-					g2.setColor(Color.BLACK);
-					double dataX, dataY;
-					final Path2D.Float path = new Path2D.Float();
-					for (int i = 0; i < list.size(); i++) {
-						dataX = left + dx * i;
-						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-						if (i == 0) {
-							path.moveTo(dataX, dataY);
-						} else {
-							path.lineTo(dataX, dataY);
-						}
-					}
-					g2.setStroke("Net".equals(key) ? thick : dashed);
-					g2.draw(path);
+					switch (graphType) {
 
-					g2.setStroke(thin);
-					final Color c = colors.get(key);
-					for (int i = 0; i < list.size(); i++) {
-						dataX = left + dx * i;
-						dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-						if ("Windows".equals(key)) {
-							drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
-						} else if ("Solar Panels".equals(key)) {
-							drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
-						} else if ("Heater".equals(key)) {
-							drawTriangleUp(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
-						} else if ("AC".equals(key)) {
-							drawTriangleDown(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
-						} else if ("Net".equals(key)) {
-							drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, c);
+					case LINE_CHART:
+						g2.setColor(Color.BLACK);
+						double dataX, dataY;
+						Path2D.Float path = new Path2D.Float();
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+							if (i == 0) {
+								path.moveTo(dataX, dataY);
+							} else {
+								path.lineTo(dataX, dataY);
+							}
 						}
+						g2.setStroke("Net".equals(key) ? thick : dashed);
+						g2.draw(path);
+						g2.setStroke(thin);
+						Color c = colors.get(key);
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+							if ("Windows".equals(key)) {
+								drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, c);
+							} else if ("Solar Panels".equals(key)) {
+								drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+							} else if ("Heater".equals(key)) {
+								drawTriangleUp(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+							} else if ("AC".equals(key)) {
+								drawTriangleDown(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, c);
+							} else if ("Net".equals(key)) {
+								drawCircle(g2, (int) Math.round(dataX - symbolSize / 2 + 1), (int) Math.round(dataY - symbolSize / 2 + 1), symbolSize - 2, c);
+							}
+						}
+						break;
+
+					case AREA_CHART:
+						path = new Path2D.Float();
+						dataX = 0;
+						final double dataY0 = getHeight() - top + ymin * dy;
+						for (int i = 0; i < list.size(); i++) {
+							dataX = left + dx * i;
+							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+							if (i == 0) {
+								path.moveTo(dataX, dataY0);
+								path.lineTo(dataX, dataY);
+							} else {
+								path.lineTo(dataX, dataY);
+							}
+						}
+						path.lineTo(dataX, dataY0);
+						c = colors.get(key);
+						g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 128));
+						g2.fill(path);
+						g2.setStroke("Net".equals(key) ? thick : dashed);
+						g2.setColor(Color.BLACK);
+						g2.draw(path);
+						break;
+
 					}
 
 				}
