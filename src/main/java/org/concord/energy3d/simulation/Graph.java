@@ -54,11 +54,15 @@ public abstract class Graph extends JPanel {
 	final static byte DEFAULT = 0;
 	final static byte SENSOR = 1;
 
+	public final static int LINE_CHART = 0;
+	public final static int AREA_CHART = 1;
+
 	final static DecimalFormat ONE_DECIMAL = new DecimalFormat();
 	final static DecimalFormat TWO_DECIMALS = new DecimalFormat();
 	public final static DecimalFormat FIVE_DECIMALS = new DecimalFormat();
 	public final static DecimalFormat ENERGY_FORMAT = new DecimalFormat("######.##");
 
+	int graphType = LINE_CHART;
 	int top = 50, right = 50, bottom = 80, left = 90;
 	BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 2f }, 0.0f);
 	BasicStroke thin = new BasicStroke(1);
@@ -260,6 +264,14 @@ public abstract class Graph extends JPanel {
 
 	private void processMouseReleased(final MouseEvent e) {
 		popupMenu.show(this, e.getX(), e.getY());
+	}
+
+	public void setType(final int type) {
+		graphType = type;
+	}
+
+	public int getType() {
+		return graphType;
 	}
 
 	/** Is this graph going to be in a popup window that allows for more drawing space? */
@@ -754,76 +766,118 @@ public abstract class Graph extends JPanel {
 						continue;
 					}
 
-					g2.setColor(Color.BLACK);
-					path.reset();
-					double dataX, dataY;
-					double xLabel = 0;
-					double yLabel = Double.MAX_VALUE;
-					if ("Utility".equals(key)) {
-						g2.setStroke(thin);
-						g2.setColor(colors.get(key));
-						double hi;
-						for (int i = 0; i < list.size(); i++) {
-							dataX = left + dx * i;
-							hi = (list.get(i) - ymin) * dy;
-							dataY = getHeight() - top - hi;
-							g2.fillRect((int) Math.round(dataX - dx / 2 + 5), (int) Math.round(dataY), (int) Math.round(dx - 10), (int) Math.round(hi));
-						}
-					} else {
-						for (int i = 0; i < list.size(); i++) {
-							dataX = left + dx * i;
-							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-							if (i == 0) {
-								path.moveTo(dataX, dataY);
-							} else {
-								path.lineTo(dataX, dataY);
-							}
-							if (dataY < yLabel) {
-								yLabel = dataY;
-								xLabel = dataX;
-							}
-						}
-						g2.setStroke(thin);
-						g2.draw(path);
-					}
+					switch (graphType) {
 
-					if (!(this instanceof DailyGraph)) {
-						xLabel = left - 30;
-						yLabel = getHeight() - top - (list.get(0) - ymin) * dy + 5;
-					} else {
-						yLabel -= 8;
-					}
-
-					g2.setStroke(thin);
-					switch (type) {
-					case SENSOR:
-						for (int i = 0; i < list.size(); i++) {
-							dataX = left + dx * i;
-							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+					case LINE_CHART:
+						g2.setColor(Color.BLACK);
+						path.reset();
+						double dataX, dataY;
+						double xLabel = 0;
+						double yLabel = Double.MAX_VALUE;
+						if ("Utility".equals(key)) {
+							g2.setStroke(thin);
+							g2.setColor(colors.get(key));
+							double hi;
+							for (int i = 0; i < list.size(); i++) {
+								dataX = left + dx * i;
+								hi = (list.get(i) - ymin) * dy;
+								dataY = getHeight() - top - hi;
+								g2.fillRect((int) Math.round(dataX - dx / 2 + 5), (int) Math.round(dataY), (int) Math.round(dx - 10), (int) Math.round(hi));
+							}
+						} else {
+							for (int i = 0; i < list.size(); i++) {
+								dataX = left + dx * i;
+								dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+								if (i == 0) {
+									path.moveTo(dataX, dataY);
+								} else {
+									path.lineTo(dataX, dataY);
+								}
+								if (dataY < yLabel) {
+									yLabel = dataY;
+									xLabel = dataX;
+								}
+							}
+							g2.setStroke(thin);
+							g2.draw(path);
+						}
+						if (!(this instanceof DailyGraph)) {
+							xLabel = left - 30;
+							yLabel = getHeight() - top - (list.get(0) - ymin) * dy + 5;
+						} else {
+							yLabel -= 8;
+						}
+						g2.setStroke(thin);
+						switch (type) {
+						case SENSOR:
+							for (int i = 0; i < list.size(); i++) {
+								dataX = left + dx * i;
+								dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+								if (key.startsWith("Light")) {
+									drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
+								} else if (key.startsWith("Heat Flux")) {
+									drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
+								}
+							}
+							final int pound = key.indexOf("#");
+							String s = key.substring(pound);
 							if (key.startsWith("Light")) {
-								drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get("Solar"));
-							} else if (key.startsWith("Heat Flux")) {
-								drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get("Heat Gain"));
+								s = s + " (" + TWO_DECIMALS.format(getSum(key)) + ")";
+							}
+							final FontMetrics fm = g2.getFontMetrics();
+							g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
+							break;
+						default:
+							for (int i = 0; i < list.size(); i++) {
+								dataX = left + dx * i;
+								dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+								if (key.startsWith("Solar") || key.startsWith("PV") || key.startsWith("CSP")) {
+									drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get(key));
+								} else if (key.startsWith("Heat Gain") || key.startsWith("Building")) {
+									drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get(key));
+								}
 							}
 						}
-						final int pound = key.indexOf("#");
-						String s = key.substring(pound);
-						if (key.startsWith("Light")) {
-							s = s + " (" + TWO_DECIMALS.format(getSum(key)) + ")";
-						}
-						final FontMetrics fm = g2.getFontMetrics();
-						g2.drawString(s, (int) (xLabel - 0.5 * fm.stringWidth(s)), (int) yLabel);
+
 						break;
-					default:
-						for (int i = 0; i < list.size(); i++) {
-							dataX = left + dx * i;
-							dataY = getHeight() - top - (list.get(i) - ymin) * dy;
-							if (key.startsWith("Solar") || key.startsWith("PV") || key.startsWith("CSP")) {
-								drawDiamond(g2, (int) Math.round(dataX), (int) Math.round(dataY), 2 * symbolSize / 3, colors.get(key));
-							} else if (key.startsWith("Heat Gain") || key.startsWith("Building")) {
-								drawSquare(g2, (int) Math.round(dataX - symbolSize / 2), (int) Math.round(dataY - symbolSize / 2), symbolSize, colors.get(key));
+
+					case AREA_CHART:
+						path.reset();
+						if ("Utility".equals(key)) {
+							g2.setStroke(thin);
+							g2.setColor(colors.get(key));
+							double hi;
+							for (int i = 0; i < list.size(); i++) {
+								dataX = left + dx * i;
+								hi = (list.get(i) - ymin) * dy;
+								dataY = getHeight() - top - hi;
+								g2.fillRect((int) Math.round(dataX - dx / 2 + 5), (int) Math.round(dataY), (int) Math.round(dx - 10), (int) Math.round(hi));
 							}
+						} else {
+							dataX = 0;
+							final double dataY0 = getHeight() - top + ymin * dy;
+							for (int i = 0; i < list.size(); i++) {
+								dataX = left + dx * i;
+								dataY = getHeight() - top - (list.get(i) - ymin) * dy;
+								if (i == 0) {
+									path.moveTo(dataX, dataY0);
+									path.lineTo(dataX, dataY);
+								} else {
+									path.lineTo(dataX, dataY);
+								}
+							}
+							path.lineTo(dataX, dataY0);
+							final Color c0 = colors.get(key);
+							if (c0 != null) {
+								g2.setColor(new Color(c0.getRed(), c0.getGreen(), c0.getBlue(), 128));
+							}
+							g2.fill(path);
+							g2.setColor(Color.BLACK);
+							g2.setStroke(thin);
+							g2.draw(path);
 						}
+						break;
+
 					}
 
 				}
