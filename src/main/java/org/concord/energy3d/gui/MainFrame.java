@@ -1404,7 +1404,12 @@ public class MainFrame extends JFrame {
 			final JMenu miscMenu = new JMenu("Miscellaneous");
 			examplesMenu.add(miscMenu);
 			addModel(miscMenu, "Temple", "templates/temple-template.ng3");
-			addModel(miscMenu, "Church", "templates/church-template.ng3");
+			addModel(miscMenu, "Tibetan Temple", "templates/tibetan-temple-template.ng3");
+			addModel(miscMenu, "Church 1", "templates/church-template-1.ng3");
+			addModel(miscMenu, "Church 2", "templates/church-template-2.ng3");
+			addModel(miscMenu, "Church 3", "templates/cathedral-template.ng3");
+			addModel(miscMenu, "Mexican Church", "templates/mexican-church-template.ng3");
+			addModel(miscMenu, "Chinese Tower", "templates/chinese-tower-template.ng3");
 			addModel(miscMenu, "Dome", "templates/dome-template.ng3");
 			addModel(miscMenu, "Egyptian Pyramid", "templates/egyptian-pyramid-template.ng3");
 			addModel(miscMenu, "Mayan Pyramid", "templates/mayan-pyramid-template.ng3");
