@@ -392,37 +392,35 @@ public class EnergyPanel extends JPanel {
 		outsideTemperatureField.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
-				if (Util.isRightClick(e)) {
-					final JPopupMenu popupMenu = new JPopupMenu();
-					JMenuItem mi = new JMenuItem("Daily Environmental Temperature...");
-					mi.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent e) {
-							final String city = (String) regionComboBox.getSelectedItem();
-							if ("".equals(city)) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
-							}
-							new DailyEnvironmentalTemperature().showDialog();
+				final JPopupMenu popupMenu = new JPopupMenu();
+				JMenuItem mi = new JMenuItem("Daily Environmental Temperature...");
+				mi.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						final String city = (String) regionComboBox.getSelectedItem();
+						if ("".equals(city)) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-					});
-					popupMenu.add(mi);
-					mi = new JMenuItem("Annual Environmental Temperature...");
-					mi.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent e) {
-							final String city = (String) regionComboBox.getSelectedItem();
-							if ("".equals(city)) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
-							}
-							new AnnualEnvironmentalTemperature().showDialog();
+						new DailyEnvironmentalTemperature().showDialog();
+					}
+				});
+				popupMenu.add(mi);
+				mi = new JMenuItem("Annual Environmental Temperature...");
+				mi.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						final String city = (String) regionComboBox.getSelectedItem();
+						if ("".equals(city)) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-					});
-					popupMenu.add(mi);
-					popupMenu.pack();
-					popupMenu.show(outsideTemperatureField, 0, 0);
-				}
+						new AnnualEnvironmentalTemperature().showDialog();
+					}
+				});
+				popupMenu.add(mi);
+				popupMenu.pack();
+				popupMenu.show(outsideTemperatureField, 0, 0);
 			}
 		});
 		outsideTemperatureField.setToolTipText("Current outside temperature at this time and day");
@@ -446,24 +444,22 @@ public class EnergyPanel extends JPanel {
 		sunshineHoursField.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
-				if (Util.isRightClick(e)) {
-					final JPopupMenu popupMenu = new JPopupMenu();
-					final JMenuItem mi = new JMenuItem("Monthly Sunshine Hours...");
-					mi.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent e) {
-							final String city = (String) regionComboBox.getSelectedItem();
-							if ("".equals(city)) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
-							}
-							new MonthlySunshineHours().showDialog();
+				final JPopupMenu popupMenu = new JPopupMenu();
+				final JMenuItem mi = new JMenuItem("Monthly Sunshine Hours...");
+				mi.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(final ActionEvent e) {
+						final String city = (String) regionComboBox.getSelectedItem();
+						if ("".equals(city)) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-					});
-					popupMenu.add(mi);
-					popupMenu.pack();
-					popupMenu.show(sunshineHoursField, 0, 0);
-				}
+						new MonthlySunshineHours().showDialog();
+					}
+				});
+				popupMenu.add(mi);
+				popupMenu.pack();
+				popupMenu.show(sunshineHoursField, 0, 0);
 			}
 		});
 		sunshineHoursField.setToolTipText("Average sunshine hours in this month");
@@ -497,17 +493,15 @@ public class EnergyPanel extends JPanel {
 			public void mouseClicked(final MouseEvent e) {
 				final HousePart part = SceneManager.getInstance().getSelectedPart();
 				if (part != null) {
-					if (Util.isRightClick(e)) {
+					final JDialog d = PropertiesDialogFactory.getDialog();
+					if (d != null) {
 						final JPopupMenu popupMenu = new JPopupMenu();
 						final JMenuItem mi = new JMenuItem("Show More Properties...");
 						mi.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(final ActionEvent e) {
-								final JDialog d = PropertiesDialogFactory.getDialog();
-								if (d != null) {
-									d.setLocationRelativeTo(popupMenu.getInvoker());
-									d.setVisible(true);
-								}
+								d.setLocationRelativeTo(popupMenu.getInvoker());
+								d.setVisible(true);
 							}
 						});
 						popupMenu.add(mi);

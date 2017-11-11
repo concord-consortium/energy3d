@@ -1,6 +1,7 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
@@ -35,8 +37,11 @@ class PropertiesDialogForRack extends PropertiesDialogFactory {
 
 		dialog.getContentPane().setLayout(new BorderLayout());
 		final JPanel panel = new JPanel(new SpringLayout());
-		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
-		dialog.getContentPane().add(panel, BorderLayout.CENTER);
+		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
+		final JScrollPane scroller = new JScrollPane(panel);
+		scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scroller.setPreferredSize(new Dimension(400, 300));
+		dialog.getContentPane().add(scroller, BorderLayout.CENTER);
 
 		final PvModuleSpecs specs = solarPanel.getPvModuleSpecs();
 
@@ -44,7 +49,6 @@ class PropertiesDialogForRack extends PropertiesDialogFactory {
 
 		panel.add(new JLabel("Solar Panel Manufacturer: "));
 		final JTextField brandField = new JTextField(specs.getBrand());
-		brandField.setColumns(20);
 		brandField.setEditable(false);
 		panel.add(brandField);
 		i++;
@@ -68,13 +72,13 @@ class PropertiesDialogForRack extends PropertiesDialogFactory {
 		panel.add(colorField);
 		i++;
 
-		panel.add(new JLabel("Cell Type: "));
+		panel.add(new JLabel("Solar Cell Type: "));
 		final JTextField cellTypeField = new JTextField(specs.getCellType());
 		cellTypeField.setEditable(false);
 		panel.add(cellTypeField);
 		i++;
 
-		panel.add(new JLabel("Cell Efficiency: "));
+		panel.add(new JLabel("Solar Cell Efficiency: "));
 		final JTextField cellEfficiencyField = new JTextField(PopupMenuFactory.threeDecimalsFormat.format(specs.getCelLEfficiency() * 100) + "%");
 		cellEfficiencyField.setEditable(false);
 		panel.add(cellEfficiencyField);
@@ -129,7 +133,7 @@ class PropertiesDialogForRack extends PropertiesDialogFactory {
 		i++;
 
 		panel.add(new JLabel("Temperature Coefficient of Power: "));
-		final JTextField pmaxTcField = new JTextField(PopupMenuFactory.sixDecimalsFormat.format(specs.getPmaxTc()) + " %/\u00B0C");
+		final JTextField pmaxTcField = new JTextField(PopupMenuFactory.sixDecimalsFormat.format(specs.getPmaxTc()) + "%/\u00B0C");
 		pmaxTcField.setEditable(false);
 		panel.add(pmaxTcField);
 		i++;
@@ -138,6 +142,12 @@ class PropertiesDialogForRack extends PropertiesDialogFactory {
 		final JTextField weightField = new JTextField(PopupMenuFactory.threeDecimalsFormat.format(specs.getWeight()) + " kg");
 		weightField.setEditable(false);
 		panel.add(weightField);
+		i++;
+
+		panel.add(new JLabel("Tracker: "));
+		final JTextField trackerField = new JTextField(rack.getTrackerName() == null ? "None" : rack.getTrackerName());
+		trackerField.setEditable(false);
+		panel.add(trackerField);
 		i++;
 
 		SpringUtilities.makeCompactGrid(panel, i, 2, 4, 4, 4, 4);
