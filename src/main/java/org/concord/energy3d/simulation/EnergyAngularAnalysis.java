@@ -61,7 +61,8 @@ public class EnergyAngularAnalysis extends Analysis {
 		graph.setBackground(Color.white);
 	}
 
-	private void runAnalysis(final JDialog parent) {
+	@Override
+	void runAnalysis(final JDialog parent) {
 		onStart();
 		for (int i = 0; i < nRotation; i++) {
 			SceneManager.getTaskManager().update(new Callable<Object>() {

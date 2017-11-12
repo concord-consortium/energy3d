@@ -1,28 +1,19 @@
 package org.concord.energy3d.simulation;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.CspStationDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
@@ -50,7 +41,8 @@ public class ParabolicDishAnnualAnalysis extends AnnualAnalysis {
 		graph.setBackground(Color.WHITE);
 	}
 
-	private void runAnalysis(final JDialog parent) {
+	@Override
+	void runAnalysis(final JDialog parent) {
 		graph.info = "Calculating...";
 		graph.repaint();
 		onStart();
@@ -193,7 +185,6 @@ public class ParabolicDishAnnualAnalysis extends AnnualAnalysis {
 	}
 
 	public void show() {
-
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
@@ -207,76 +198,12 @@ public class ParabolicDishAnnualAnalysis extends AnnualAnalysis {
 				title = "Annual Yield of Selected Foundation";
 			}
 		}
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), s == null ? title : title + ": " + s + " (Cost: $" + cost + ")", true);
-		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		graph.parent = dialog;
-
+		final JDialog dialog = createDialog(s == null ? title : title + ": " + s + " (Cost: $" + cost + ")");
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
-
 		menuBar.add(createOptionsMenu(dialog, null, true));
 		menuBar.add(createRunsMenu());
-
-		final JPanel contentPane = new JPanel(new BorderLayout());
-		dialog.setContentPane(contentPane);
-
-		final JPanel panel = new JPanel(new BorderLayout());
-		panel.setBorder(BorderFactory.createEtchedBorder());
-		contentPane.add(panel, BorderLayout.CENTER);
-
-		panel.add(graph, BorderLayout.CENTER);
-
-		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		contentPane.add(buttonPanel, BorderLayout.SOUTH);
-
-		runButton = new JButton("Run");
-		runButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				runButton.setEnabled(false);
-				runAnalysis(dialog);
-			}
-		});
-		buttonPanel.add(runButton);
-
-		final JButton button = new JButton("Close");
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				stopAnalysis();
-				if (graph.hasData()) {
-					final Object[] options = { "Yes", "No", "Cancel" };
-					final int i = JOptionPane.showOptionDialog(dialog, "Do you want to keep the results of this run?", "Confirmation", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
-					if (i == JOptionPane.CANCEL_OPTION) {
-						return;
-					}
-					if (i == JOptionPane.YES_OPTION) {
-						graph.keepResults();
-					}
-				}
-				windowLocation.setLocation(dialog.getLocationOnScreen());
-				dialog.dispose();
-			}
-		});
-		buttonPanel.add(button);
-
-		dialog.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(final WindowEvent e) {
-				stopAnalysis();
-				windowLocation.setLocation(dialog.getLocationOnScreen());
-				dialog.dispose();
-			}
-		});
-
-		dialog.pack();
-		if (windowLocation.x > 0 && windowLocation.y > 0) {
-			dialog.setLocation(windowLocation);
-		} else {
-			dialog.setLocationRelativeTo(MainFrame.getInstance());
-		}
 		dialog.setVisible(true);
-
 	}
 
 	@Override
