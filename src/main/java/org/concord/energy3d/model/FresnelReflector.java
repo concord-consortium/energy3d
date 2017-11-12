@@ -62,6 +62,7 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double absorptance = 0.95; // the percentage of energy absorbed by the absorber tube
 	private double opticalEfficiency = 0.7;
+	private double thermalEfficiency = 0.6;
 	private double moduleLength = 3;
 	private double moduleWidth = 2;
 	private double length = 2 * moduleLength;
@@ -106,6 +107,9 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 		}
 		if (Util.isZero(opticalEfficiency)) {
 			opticalEfficiency = 0.7;
+		}
+		if (Util.isZero(thermalEfficiency)) {
+			thermalEfficiency = 0.6;
 		}
 		if (Util.isZero(nSectionLength)) {
 			nSectionLength = 16;
@@ -598,7 +602,7 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 	}
 
 	public double getSystemEfficiency() {
-		double e = reflectance * absorptance * opticalEfficiency;
+		double e = reflectance * absorptance * opticalEfficiency * thermalEfficiency;
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
@@ -614,6 +618,16 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 	/** a number between 0 and 1 */
 	public double getOpticalEfficiency() {
 		return opticalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	public void setThermalEfficiency(final double thermalEfficiency) {
+		this.thermalEfficiency = thermalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	public double getThermalEfficiency() {
+		return thermalEfficiency;
 	}
 
 	/** a number between 0 and 1 */

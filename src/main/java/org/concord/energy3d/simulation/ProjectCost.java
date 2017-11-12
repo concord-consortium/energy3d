@@ -23,6 +23,9 @@ public abstract class ProjectCost {
 
 	public static double getCost(final HousePart p) {
 		final Foundation f = p instanceof Foundation ? (Foundation) p : p.getTopContainer();
+		if (f == null) {
+			return BuildingCost.getPartCost(p);
+		}
 		switch (f.getProjectType()) {
 		case Foundation.TYPE_PV_STATION:
 			return PvProjectCost.getPartCost(p);

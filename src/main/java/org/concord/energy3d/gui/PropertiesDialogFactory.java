@@ -45,7 +45,7 @@ public abstract class PropertiesDialogFactory {
 			return null;
 		}
 		if (selectedPart instanceof Foundation) {
-			return null;
+			return PropertiesDialogForFoundation.getDialog((Foundation) selectedPart);
 		}
 		if (selectedPart instanceof SolarPanel) {
 			return PropertiesDialogForSolarPanel.getDialog((SolarPanel) selectedPart);
@@ -54,16 +54,16 @@ public abstract class PropertiesDialogFactory {
 			return PropertiesDialogForRack.getDialog((Rack) selectedPart);
 		}
 		if (selectedPart instanceof Mirror) {
-			return null;
+			return PropertiesDialogForMirror.getDialog((Mirror) selectedPart);
 		}
 		if (selectedPart instanceof ParabolicTrough) {
-			return null;
+			return PropertiesDialogForParabolicTrough.getDialog((ParabolicTrough) selectedPart);
 		}
 		if (selectedPart instanceof ParabolicDish) {
-			return null;
+			return PropertiesDialogForParabolicDish.getDialog((ParabolicDish) selectedPart);
 		}
 		if (selectedPart instanceof FresnelReflector) {
-			return null;
+			return PropertiesDialogForFresnelReflector.getDialog((FresnelReflector) selectedPart);
 		}
 		if (selectedPart instanceof Sensor) {
 			return null;

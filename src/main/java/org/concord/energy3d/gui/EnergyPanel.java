@@ -1222,6 +1222,7 @@ public class EnergyPanel extends JPanel {
 						if (a >= 360) {
 							a -= 360;
 						}
+						// http://www.powerfromthesun.net/Book/chapter08/chapter08.html
 						final double focalLength = t.getSemilatusRectum() * 0.5;
 						final double d = t.getApertureWidth();
 						final double h = d * d / (16 * focalLength);
@@ -1433,7 +1434,7 @@ public class EnergyPanel extends JPanel {
 								partProperty1Label.setText("  Size:");
 								partProperty2Label.setText("  Position:");
 								partProperty3Label.setText("  Azimuth:");
-								partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + "\u00d7" + (TWO_DECIMALS.format(lz * scale)) + lengthUnit + "\u2248" + ONE_DECIMAL.format(lx * ly * scale * scale) + landArea + lengthUnit + "\u00B2");
+								partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + "\u00d7" + (TWO_DECIMALS.format(lz * scale)) + lengthUnit + ", Area\u2248" + ONE_DECIMAL.format(lx * ly * scale * scale) + landArea + lengthUnit + "\u00B2");
 								partProperty2TextField.setText("(" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ")" + lengthUnit);
 								partProperty3TextField.setText(NO_DECIMAL.format(az) + "\u00B0");
 								partProperty1TextField.setToolTipText("The length and width of the foundation");
