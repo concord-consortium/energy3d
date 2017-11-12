@@ -912,28 +912,53 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 										sp.setTiltAngle(val);
 										sp.draw();
 										SceneManager.getInstance().refresh();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (sp.checkContainerIntersection()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as the solar panel would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final List<SolarPanel> row = sp.getRow();
 										final ChangeTiltAngleForSolarPanelRowCommand c = new ChangeTiltAngleForSolarPanelRowCommand(row);
+										boolean intersected = false;
 										for (final SolarPanel x : row) {
 											x.setTiltAngle(val);
 											x.draw();
+											if (x.checkContainerIntersection()) {
+												intersected = true;
+												break;
+											}
 										}
 										SceneManager.getInstance().refresh();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (intersected) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final Foundation foundation = sp.getTopContainer();
 										final ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
 										foundation.setTiltAngleForSolarPanels(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (foundation.checkContainerIntersectionForSolarPanels()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									} else if (rb4.isSelected()) {
 										final ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
 										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 3;
 									}
 									updateAfterEdit();
@@ -1257,27 +1282,52 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 									sp.setBaseHeight(val);
 									sp.draw();
 									SceneManager.getInstance().refresh();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (sp.checkContainerIntersection()) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+										c.undo();
+									} else {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
 									final List<SolarPanel> row = sp.getRow();
 									final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
+									boolean intersected = false;
 									for (final SolarPanel x : row) {
 										x.setBaseHeight(val);
 										x.draw();
+										if (x.checkContainerIntersection()) {
+											intersected = true;
+											break;
+										}
 									}
 									SceneManager.getInstance().refresh();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (intersected) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+										c.undo();
+									} else {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
 									final ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
 									foundation.setBaseHeightForSolarPanels(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (foundation.checkContainerIntersectionForSolarPanels()) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+										c.undo();
+									} else {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								} else if (rb4.isSelected()) {
 									final ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
 									Scene.getInstance().setBaseHeightForAllSolarPanels(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+										c.undo();
+									} else {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 3;
 								}
 								updateAfterEdit();

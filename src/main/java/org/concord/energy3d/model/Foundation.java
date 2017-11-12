@@ -2644,6 +2644,17 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public boolean checkContainerIntersectionForSolarPanels() {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel && p.getTopContainer() == this) {
+				if (((SolarPanel) p).checkContainerIntersection()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public void setBaseHeightForSolarPanels(final double baseHeight) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof SolarPanel && p.getTopContainer() == this) {

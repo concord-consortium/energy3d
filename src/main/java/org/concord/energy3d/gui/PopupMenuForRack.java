@@ -477,17 +477,32 @@ class PopupMenuForRack extends PopupMenuFactory {
 										rack.setRackHeight(h);
 										rack.ensureFullSolarPanels(false);
 										rack.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (rack.checkContainerIntersection()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as the rack would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
 										foundation.setSizeForRacks(w, h);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (foundation.checkContainerIntersectionForRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
 										Scene.getInstance().setSizeForAllRacks(w, h);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
@@ -571,17 +586,32 @@ class PopupMenuForRack extends PopupMenuFactory {
 									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
 									rack.setBaseHeight(val);
 									rack.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (rack.checkContainerIntersection()) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+										c.undo();
+									} else {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
 									final ChangeFoundationRackBaseHeightCommand c = new ChangeFoundationRackBaseHeightCommand(foundation);
 									foundation.setBaseHeightForRacks(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (foundation.checkContainerIntersectionForRacks()) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+										c.undo();
+									} else {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
 									final ChangeBaseHeightForAllRacksCommand c = new ChangeBaseHeightForAllRacksCommand();
 									Scene.getInstance().setBaseHeightForAllRacks(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+										c.undo();
+									} else {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
 								updateAfterEdit();

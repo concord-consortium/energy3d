@@ -2374,6 +2374,17 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public boolean checkContainerIntersectionForAllSolarPanels() {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarPanel) {
+				if (((SolarPanel) p).checkContainerIntersection()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public void setAzimuthForAllSolarPanels(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarPanel) {

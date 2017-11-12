@@ -293,6 +293,39 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		}
 	}
 
+	public boolean checkContainerIntersection() {
+		final double z0 = container.getAbsCenter().getZ() + container.height + surround.getZExtent() * 2;
+		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
+		final ReadOnlyTransform trans = mesh.getWorldTransform();
+		final Vector3 v1 = new Vector3();
+		final Vector3 v2 = new Vector3();
+		BufferUtils.populateFromBuffer(v1, buf, 0);
+		BufferUtils.populateFromBuffer(v2, buf, 1);
+		final Vector3 p1 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		if (p1.getZ() < z0) {
+			return true;
+		}
+		BufferUtils.populateFromBuffer(v1, buf, 1);
+		BufferUtils.populateFromBuffer(v2, buf, 2);
+		final Vector3 p2 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		if (p2.getZ() < z0) {
+			return true;
+		}
+		BufferUtils.populateFromBuffer(v1, buf, 2);
+		BufferUtils.populateFromBuffer(v2, buf, 4);
+		final Vector3 p3 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		if (p3.getZ() < z0) {
+			return true;
+		}
+		BufferUtils.populateFromBuffer(v1, buf, 4);
+		BufferUtils.populateFromBuffer(v2, buf, 0);
+		final Vector3 p4 = trans.applyForward(v1).add(trans.applyForward(v2), null).multiplyLocal(0.5);
+		if (p4.getZ() < z0) {
+			return true;
+		}
+		return false;
+	}
+
 	private boolean onFlatSurface() {
 		if (meshLocator != null) { // if this solar panel rests on an imported mesh, treat it differently
 			return false;
@@ -542,6 +575,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		supportFrame.updateModelBound();
 	}
 
+	@Override
 	public void drawSunBeam() {
 		if (Heliodon.getInstance().isNightTime() || !drawSunBeam) {
 			sunBeam.setVisible(false);
