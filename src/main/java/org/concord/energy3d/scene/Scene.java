@@ -2496,6 +2496,17 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public boolean checkContainerIntersectionForAllRacks() {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack) {
+				if (((Rack) p).checkContainerIntersection()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public void setAzimuthForAllRacks(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {

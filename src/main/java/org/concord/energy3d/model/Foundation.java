@@ -2746,6 +2746,17 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public boolean checkContainerIntersectionForRacks() {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				if (((Rack) p).checkContainerIntersection()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public void setAzimuthForRacks(final double angle) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {

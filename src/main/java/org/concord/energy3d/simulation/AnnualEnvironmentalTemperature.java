@@ -190,10 +190,7 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 		calculateBounds();
 		int digits = String.valueOf(Math.round(ymax - ymin)).length() - 1;
 		digits = (int) Math.pow(10, digits);
-		int i1 = (int) Math.round(ymin / digits) - 2;
-		if (i1 < 0) {
-			i1 = 0;
-		}
+		final int i1 = (int) Math.round(ymin / digits) - 2;
 		final int i2 = (int) Math.round(ymax / digits) + 2;
 		float hVal;
 		int hPos;

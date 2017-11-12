@@ -533,35 +533,30 @@ public abstract class Graph extends JPanel {
 			}
 			int digits = String.valueOf(Math.round(ymax - ymin)).length() - 1;
 			digits = (int) Math.pow(10, digits);
-			int i1 = (int) Math.round(ymin / digits) - 2;
-			if (i1 < 0) {
-				i1 = 0;
-			}
+			final int i1 = (int) Math.round(ymin / digits) - 2;
 			final int i2 = (int) Math.round(ymax / digits) + 2;
+			final int di = i2 - i1;
 			float hVal;
 			int hPos;
-			if (i2 == 2) { // for values within [0, 1]
-				for (int i = 0; i <= 100; i++) {
-					hVal = i * digits * 0.01f;
-					hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
-					if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
-						drawHorizontalLine(g2, hPos, TWO_DECIMALS.format(hVal));
-					}
+			for (int i = i1; i <= i2; i++) {
+				hVal = i * digits;
+				hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+				if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
+					drawHorizontalLine(g2, hPos, ONE_DECIMAL.format(hVal));
 				}
-			} else {
-				final boolean fewPoints = i2 - i1 < 5;
-				for (int i = i1; i <= i2; i++) {
-					hVal = i * digits;
+				if (di <= 5) {
+					for (int j = 0; j < 10; j++) {
+						hVal = (i + j * 0.1f) * digits;
+						hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
+						if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
+							drawHorizontalLine(g2, hPos, TWO_DECIMALS.format(hVal));
+						}
+					}
+				} else if (di < 10) {
+					hVal = (i + 0.5f) * digits;
 					hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
 					if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
 						drawHorizontalLine(g2, hPos, ONE_DECIMAL.format(hVal));
-					}
-					if (fewPoints) {
-						hVal = (i + 0.5f) * digits;
-						hPos = (int) Math.round(getHeight() - top - (hVal - ymin) * dy);
-						if (hPos >= top / 2 && hPos <= getHeight() - bottom / 2) {
-							drawHorizontalLine(g2, hPos, ONE_DECIMAL.format(hVal));
-						}
 					}
 				}
 			}

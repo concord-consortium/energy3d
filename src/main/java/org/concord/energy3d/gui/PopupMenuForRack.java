@@ -231,18 +231,33 @@ class PopupMenuForRack extends PopupMenuFactory {
 										final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(rack);
 										rack.setTiltAngle(val);
 										rack.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (rack.checkContainerIntersection()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = rack.getTopContainer();
 										final ChangeFoundationRackTiltAngleCommand c = new ChangeFoundationRackTiltAngleCommand(foundation);
 										foundation.setTiltAngleForRacks(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (foundation.checkContainerIntersectionForRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final ChangeTiltAngleForAllRacksCommand c = new ChangeTiltAngleForAllRacksCommand();
 										Scene.getInstance().setTiltAngleForAllRacks(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
 									updateAfterEdit();
@@ -2314,9 +2329,11 @@ class PopupMenuForRack extends PopupMenuFactory {
 					if (rack.getTracker() != Trackable.NO_TRACKER) {
 						miTiltAngle.setEnabled(rack.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						miAzimuth.setEnabled(false);
+						miRotate.setEnabled(false);
 					} else {
 						miTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);
+						miRotate.setEnabled(true);
 						miBaseHeight.setEnabled(true);
 						miPoleSpacing.setEnabled(true);
 						if (rack.getContainer() instanceof Roof) {
@@ -2326,6 +2343,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 								miAzimuth.setEnabled(false);
 								miBaseHeight.setEnabled(false);
 								miPoleSpacing.setEnabled(false);
+								miRotate.setEnabled(false);
 							}
 						}
 					}
