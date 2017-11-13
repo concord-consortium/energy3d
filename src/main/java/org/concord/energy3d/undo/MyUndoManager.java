@@ -1,5 +1,7 @@
 package org.concord.energy3d.undo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.undo.CannotRedoException;
@@ -7,6 +9,8 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.agents.Agent;
+import org.concord.energy3d.agents.SimpleReflexAgent;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
@@ -14,13 +18,25 @@ import org.concord.energy3d.scene.Scene;
 public class MyUndoManager extends UndoManager {
 
 	private static final long serialVersionUID = 1L;
+	private final List<Agent> agents;
+
+	public MyUndoManager() {
+		agents = new ArrayList<Agent>();
+		agents.add(new SimpleReflexAgent());
+	}
 
 	@Override
-	public boolean addEdit(final UndoableEdit anEdit) {
-		final boolean result = super.addEdit(anEdit);
-		final boolean saveFlag = anEdit instanceof SaveCommand;
+	public boolean addEdit(final UndoableEdit edit) {
+		final boolean result = super.addEdit(edit);
+		final boolean saveFlag = edit instanceof SaveCommand;
 		Scene.getInstance().setEdited(!saveFlag);
 		refreshUndoRedoGui();
+		if (edit instanceof MyAbstractUndoableEdit) {
+			for (final Agent a : agents) {
+				a.sense((MyAbstractUndoableEdit) edit);
+				a.actuate();
+			}
+		}
 		if (saveFlag) {
 			TimeSeriesLogger.getInstance().logSave();
 		} else {
