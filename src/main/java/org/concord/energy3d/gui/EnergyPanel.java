@@ -257,7 +257,7 @@ public class EnergyPanel extends JPanel {
 					Scene.getInstance().setCity(city);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 					final LocationData ld = LocationData.getInstance();
-					regionComboBox.setToolTipText("<html>(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)<br>Use Edit>Set Region... to select country and region.</html>");
+					regionComboBox.setToolTipText("<html>(" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
 				}
 				Scene.getInstance().updateTrackables();
 				Scene.getInstance().updateTreeLeaves();

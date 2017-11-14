@@ -300,8 +300,18 @@ public class Scene implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				MainPanel.getInstance().getHeliodonButton().setSelected(false);
-				MainPanel.getInstance().getSunAnimationButton().setSelected(false);
+				// MainPanel.getInstance().getHeliodonButton().setSelected(false);
+				// MainPanel.getInstance().getSunAnimationButton().setSelected(false);
+				// don't use the above in order to avoid triggering the undo manager and other side effects
+				Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), false);
+				Util.selectSilently(MainPanel.getInstance().getSunAnimationButton(), false);
+				EventQueue.invokeLater(new Runnable() { // why should these actions be put at the end of queue?
+					@Override
+					public void run() {
+						SceneManager.getInstance().setHeliodonVisible(false);
+						SceneManager.getInstance().setSunAnimation(false);
+					}
+				});
 			}
 		});
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
@@ -402,7 +412,7 @@ public class Scene implements Serializable {
 			Util.selectSilently(energyPanel.getCityComboBox(), city);
 			final LocationData ld = LocationData.getInstance();
 			if (ld.getLatitudes().get(city) != null) {
-				energyPanel.getCityComboBox().setToolTipText("(" + ld.getLatitudes().get(city) + "\u00B0, " + ld.getLongitudes().get(city) + "\u00B0, " + ld.getAltitudes().get(city).intValue() + "m)");
+				energyPanel.getCityComboBox().setToolTipText("<html>(" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
 			} else {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), city + " not supported. Please upgrade your Energy3D to the latest.", "Missing City", JOptionPane.ERROR_MESSAGE);
 			}
@@ -502,7 +512,7 @@ public class Scene implements Serializable {
 				energyPanel.updateThermostat();
 				MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
 				MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
-				SceneManager.getInstance().getUndoManager().die();
+				SceneManager.getInstance().getUndoManager().discardAllEdits();
 			}
 		});
 

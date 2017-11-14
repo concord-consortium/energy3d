@@ -647,6 +647,15 @@ public class MainPanel extends JPanel {
 		return heliodonButton;
 	}
 
+	public void disableSunAnim() {
+		final boolean enableSunAnim = shadowButton.isSelected() || heliodonButton.isSelected();
+		sunAnimButton.setEnabled(enableSunAnim);
+		if (!enableSunAnim && sunAnimButton.isSelected()) {
+			sunAnimButton.setSelected(false);
+			SceneManager.getInstance().setSunAnimation(false);
+		}
+	}
+
 	public JToggleButton getSunAnimationButton() {
 		if (sunAnimButton == null) {
 			sunAnimButton = new JToggleButton();
@@ -932,15 +941,6 @@ public class MainPanel extends JPanel {
 		component.setVisible(visible);
 		splitPane.setDividerSize(visible ? defaultDividerSize : 0);
 		splitPane.resetToPreferredSizes();
-	}
-
-	private void disableSunAnim() {
-		final boolean enableSunAnim = shadowButton.isSelected() || heliodonButton.isSelected();
-		sunAnimButton.setEnabled(enableSunAnim);
-		if (!enableSunAnim && sunAnimButton.isSelected()) {
-			sunAnimButton.setSelected(false);
-			SceneManager.getInstance().setSunAnimation(false);
-		}
 	}
 
 	private JToggleButton getSolarButton() {

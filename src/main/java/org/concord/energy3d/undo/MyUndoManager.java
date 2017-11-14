@@ -18,7 +18,7 @@ import org.concord.energy3d.scene.Scene;
 public class MyUndoManager extends UndoManager {
 
 	private static final long serialVersionUID = 1L;
-	private final List<Agent> agents;
+	private final List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
 	public MyUndoManager() {
 		agents = new ArrayList<Agent>();
