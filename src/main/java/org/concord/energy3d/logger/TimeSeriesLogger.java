@@ -318,6 +318,15 @@ public class TimeSeriesLogger {
 					stateValue = "{\"Old Time\": \"" + (cal0.get(Calendar.HOUR_OF_DAY)) + ":" + cal0.get(Calendar.MINUTE) + "\"";
 					final Calendar cal1 = Heliodon.getInstance().getCalendar();
 					stateValue += ", \"New Time\": \"" + (cal1.get(Calendar.HOUR_OF_DAY)) + ":" + cal1.get(Calendar.MINUTE) + "\"}";
+				} else if (lastEdit instanceof ChangeTimeAndDateWithHeliodonCommand) {
+					final ChangeTimeAndDateWithHeliodonCommand c = (ChangeTimeAndDateWithHeliodonCommand) lastEdit;
+					final Calendar oldCal = new GregorianCalendar();
+					oldCal.setTime(c.getOldTime());
+					final Calendar newCal = Heliodon.getInstance().getCalendar();
+					stateValue = "{\"Old Time\": \"" + (oldCal.get(Calendar.HOUR_OF_DAY)) + ":" + oldCal.get(Calendar.MINUTE) + "\"";
+					stateValue += ", \"New Time\": \"" + (newCal.get(Calendar.HOUR_OF_DAY)) + ":" + newCal.get(Calendar.MINUTE) + "\"";
+					stateValue += ", \"Old Date\": \"" + (oldCal.get(Calendar.MONTH) + 1) + "/" + oldCal.get(Calendar.DAY_OF_MONTH) + "\"";
+					stateValue += ", \"New Date\": \"" + (newCal.get(Calendar.MONTH) + 1) + "/" + newCal.get(Calendar.DAY_OF_MONTH) + "\"}";
 				} else if (lastEdit instanceof ChangeTextureCommand) {
 					stateValue = "{\"Old Value\": ";
 					TextureMode textureMode = ((ChangeTextureCommand) lastEdit).getOldValue();

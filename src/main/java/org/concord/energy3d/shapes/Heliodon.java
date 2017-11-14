@@ -8,6 +8,7 @@ import java.util.Date;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.ChangeTimeAndDateWithHeliodonCommand;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.Util;
 
@@ -97,6 +98,8 @@ public class Heliodon {
 	private BloomRenderPass bloomRenderPass;
 	private final BasicPassManager passManager;
 	private boolean visible;
+	private double oldHourAngle;
+	private ChangeTimeAndDateWithHeliodonCommand changeTimeAndDateCommand;
 
 	public static Heliodon getInstance() {
 		return instance;
@@ -294,6 +297,8 @@ public class Heliodon {
 		logicalLayer.registerTrigger(new InputTrigger(new MouseButtonPressedCondition(MouseButton.LEFT), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
+				oldHourAngle = hourAngle;
+				changeTimeAndDateCommand = new ChangeTimeAndDateWithHeliodonCommand(calendar.getTime());
 				final int x = inputStates.getCurrent().getMouseState().getX();
 				final int y = inputStates.getCurrent().getMouseState().getY();
 				final Ray3 pickRay = SceneManager.getInstance().getCanvas().getCanvasRenderer().getCamera().getPickRay(new Vector2(x, y), false, null);
@@ -321,6 +326,9 @@ public class Heliodon {
 					sunRegion.getSceneHints().setCullHint(CullHint.Always);
 				}
 				SceneManager.getInstance().setMouseControlEnabled(true);
+				if (!Util.isEqual(oldHourAngle, hourAngle) && changeTimeAndDateCommand != null) {
+					SceneManager.getInstance().getUndoManager().addEdit(changeTimeAndDateCommand);
+				}
 			}
 		}));
 
@@ -429,7 +437,7 @@ public class Heliodon {
 				final double newHourAngle = (hourVertex - Math.floor(totalHourVertices / 2.0)) * Math.PI / 48.0;
 				final boolean hourAngleChanged = !Util.isEqual(newHourAngle, hourAngle);
 				if (hourAngleChanged) {
-					setHourAngle(newHourAngle, false, true, true);
+					setHourAngle(newHourAngle, false, true, false);
 				}
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
