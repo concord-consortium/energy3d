@@ -545,6 +545,10 @@ public class Util {
 		return multipart.finish();
 	}
 
+	public final static void openBrowser(final URL url) {
+		openBrowser(url.toString());
+	}
+
 	public final static void openBrowser(final String url) {
 		if (Desktop.isDesktopSupported()) {
 			try {
