@@ -103,6 +103,7 @@ public class Scene implements Serializable {
 	private static final Node originalHouseRoot = new Node("Original Model Root");
 	private static final Node notReceivingShadowRoot = new Node("No-Shadow Root");
 	private static final int currentVersion = 1;
+	private static boolean first = true;
 	private static Scene instance;
 	private static URL url;
 	private static boolean redrawAll;
@@ -227,6 +228,7 @@ public class Scene implements Serializable {
 	private static void newFile(final double xLength, final double yLength) {
 		try {
 			open(null);
+			first = false;
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -297,23 +299,12 @@ public class Scene implements Serializable {
 
 		Scene.url = file;
 
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				// MainPanel.getInstance().getHeliodonButton().setSelected(false);
-				// MainPanel.getInstance().getSunAnimationButton().setSelected(false);
-				// don't use the above in order to avoid triggering the undo manager and other side effects
-				Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), false);
-				Util.selectSilently(MainPanel.getInstance().getSunAnimationButton(), false);
-				EventQueue.invokeLater(new Runnable() { // why should these actions be put at the end of queue?
-					@Override
-					public void run() {
-						SceneManager.getInstance().setHeliodonVisible(false);
-						SceneManager.getInstance().setSunAnimation(false);
-					}
-				});
-			}
-		});
+		if (!first) {
+			SceneManager.getInstance().setHeliodonVisible(false);
+			SceneManager.getInstance().setSunAnimation(false);
+			Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), false);
+			Util.selectSilently(MainPanel.getInstance().getSunAnimationButton(), false);
+		}
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 		Wall.resetDefaultWallHeight();
 
@@ -417,9 +408,12 @@ public class Scene implements Serializable {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), city + " not supported. Please upgrade your Energy3D to the latest.", "Missing City", JOptionPane.ERROR_MESSAGE);
 			}
 			Scene.getInstance().updateTreeLeaves();
-			MainPanel.getInstance().getHeliodonButton().setSelected(isHeliodonVisible);
-			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().changeSkyTexture();
+			if (!first) {
+				SceneManager.getInstance().setHeliodonVisible(isHeliodonVisible);
+				Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), isHeliodonVisible);
+			}
+			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());
 		}
 

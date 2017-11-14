@@ -647,7 +647,7 @@ public class MainPanel extends JPanel {
 		return heliodonButton;
 	}
 
-	public void disableSunAnim() {
+	private void disableSunAnim() {
 		final boolean enableSunAnim = shadowButton.isSelected() || heliodonButton.isSelected();
 		sunAnimButton.setEnabled(enableSunAnim);
 		if (!enableSunAnim && sunAnimButton.isSelected()) {
