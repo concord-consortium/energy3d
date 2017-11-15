@@ -133,16 +133,26 @@ class MyEditorPane {
 					}
 				}
 				if (buttonModel != null && action != null) {
-					final String action2 = action;
+					final String act = action;
 					buttonModel.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + action2 + "</html>", "Information", JOptionPane.INFORMATION_MESSAGE);
+							if ("Sheet 1".equals(act)) {
+								EnergyPanel.getInstance().selectInstructionSheet(0);
+							} else if ("Sheet 2".equals(act)) {
+								EnergyPanel.getInstance().selectInstructionSheet(1);
+							} else if ("Sheet 3".equals(act)) {
+								EnergyPanel.getInstance().selectInstructionSheet(2);
+							} else {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + act + "</html>", "Information", JOptionPane.INFORMATION_MESSAGE);
+							}
 						}
 					});
 				}
+
 			}
 		}
+
 	}
 
 	public String getText() {
