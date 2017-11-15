@@ -412,6 +412,12 @@ public class Scene implements Serializable {
 			if (!first) {
 				SceneManager.getInstance().setHeliodonVisible(isHeliodonVisible);
 				Util.selectSilently(MainPanel.getInstance().getHeliodonButton(), isHeliodonVisible);
+				EventQueue.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						MainPanel.getInstance().getSunAnimationButton().setEnabled(isHeliodonVisible);
+					}
+				});
 			}
 			Heliodon.getInstance().drawSun();
 			SceneManager.getInstance().setShading(Heliodon.getInstance().isNightTime());

@@ -134,23 +134,51 @@ class MyEditorPane {
 				}
 				if (buttonModel != null && action != null) {
 					final String act = action;
+					final DefaultButtonModel model = buttonModel;
 					buttonModel.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
-							if ("Sheet 1".equals(act)) {
-								EnergyPanel.getInstance().selectInstructionSheet(0);
-							} else if ("Sheet 2".equals(act)) {
-								EnergyPanel.getInstance().selectInstructionSheet(1);
-							} else if ("Sheet 3".equals(act)) {
-								EnergyPanel.getInstance().selectInstructionSheet(2);
-							} else {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + act + "</html>", "Information", JOptionPane.INFORMATION_MESSAGE);
-							}
+							interpret(act, model);
 						}
 					});
 				}
 
 			}
+		}
+
+	}
+
+	private void interpret(final String act, final DefaultButtonModel model) {
+
+		// instruction sheet selection commands
+		if ("Sheet 1".equals(act)) {
+			EnergyPanel.getInstance().selectInstructionSheet(0);
+		} else if ("Sheet 2".equals(act)) {
+			EnergyPanel.getInstance().selectInstructionSheet(1);
+		} else if ("Sheet 3".equals(act)) {
+			EnergyPanel.getInstance().selectInstructionSheet(2);
+		}
+
+		// sun motion commands
+		else if ("Sun Motion".equals(act)) {
+			MainPanel.getInstance().getSunAnimationButton().setSelected(model.isSelected());
+		} else if ("Sun Motion On".equals(act)) {
+			MainPanel.getInstance().getSunAnimationButton().setSelected(true);
+		} else if ("Sun Motion Off".equals(act)) {
+			MainPanel.getInstance().getSunAnimationButton().setSelected(false);
+		}
+
+		// shadow commands
+		else if ("Shadow".equals(act)) {
+			MainPanel.getInstance().getShadowButton().setSelected(model.isSelected());
+		} else if ("Shadow On".equals(act)) {
+			MainPanel.getInstance().getShadowButton().setSelected(true);
+		} else if ("Shadow Off".equals(act)) {
+			MainPanel.getInstance().getShadowButton().setSelected(false);
+		}
+
+		else {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + act + "</html>", "Information", JOptionPane.INFORMATION_MESSAGE);
 		}
 
 	}

@@ -585,9 +585,9 @@ public class MainPanel extends JPanel {
 			shadowButton.setIcon(new ImageIcon(getClass().getResource("icons/shadow.png")));
 			shadowButton.setToolTipText("Show shadows");
 			shadowButton.setFocusable(false);
-			shadowButton.addActionListener(new ActionListener() {
+			shadowButton.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					final ShowShadowCommand c = new ShowShadowCommand();
 					if (SceneManager.getInstance().isSunAnimation() || Heliodon.getInstance().isNightTime()) {
 						SceneManager.getInstance().setShading(shadowButton.isSelected());
