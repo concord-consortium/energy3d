@@ -613,9 +613,9 @@ public class MainPanel extends JPanel {
 			spinViewButton.setIcon(new ImageIcon(getClass().getResource("icons/spin.png")));
 			spinViewButton.setToolTipText("Spin view");
 			spinViewButton.setFocusable(false);
-			spinViewButton.addActionListener(new ActionListener() {
+			spinViewButton.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					SceneManager.getInstance().getUndoManager().addEdit(new SpinViewCommand());
 					SceneManager.getInstance().toggleSpinView();
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
@@ -688,8 +688,7 @@ public class MainPanel extends JPanel {
 			previewButton.setIcon(new ImageIcon(getClass().getResource("icons/print_preview.png")));
 			previewButton.setToolTipText("Preview printable parts");
 			previewButton.setFocusable(false);
-			// must be ItemListner to be triggered when selection is changed by code
-			previewButton.addItemListener(new ItemListener() {
+			previewButton.addItemListener(new ItemListener() { // must be ItemListner to be triggered when selection is changed by code
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (mainFrame != null) {
@@ -725,9 +724,9 @@ public class MainPanel extends JPanel {
 			annotationButton.setIcon(new ImageIcon(getClass().getResource("icons/annotation.png")));
 			annotationButton.setToolTipText("Show annotations");
 			annotationButton.setFocusable(false);
-			annotationButton.addActionListener(new ActionListener() {
+			annotationButton.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
+				public void itemStateChanged(final ItemEvent e) {
 					final ShowAnnotationCommand c = new ShowAnnotationCommand();
 					Scene.getInstance().setAnnotationsVisible(annotationButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();

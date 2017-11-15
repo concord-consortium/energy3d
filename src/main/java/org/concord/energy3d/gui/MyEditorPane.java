@@ -21,6 +21,8 @@ import javax.swing.text.Element;
 import javax.swing.text.ElementIterator;
 import javax.swing.text.html.HTMLDocument;
 
+import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
+import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -43,12 +45,37 @@ class MyEditorPane {
 		editorPane.addHyperlinkListener(new HyperlinkListener() {
 			@Override
 			public void hyperlinkUpdate(final HyperlinkEvent e) {
-				if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-					Util.openBrowser(e.getURL());
-				} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-					editorPane.setToolTipText(e.getURL().toString());
-				} else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-					editorPane.setToolTipText("<html>Double-click to enlarge this window<br>Right-click to open a popup menu for editing</html>");
+				if (e.getURL() != null) {
+					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+						Util.openBrowser(e.getURL());
+					} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+						editorPane.setToolTipText(e.getURL().toString());
+					} else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+						editorPane.setToolTipText("<html>Double-click to enlarge this window<br>Right-click to open a popup menu for editing</html>");
+					}
+				} else {
+					final Element element = e.getSourceElement();
+					final AttributeSet as = element.getAttributes();
+					final Enumeration<?> en = as.getAttributeNames();
+					while (en.hasMoreElements()) {
+						final Object n = en.nextElement();
+						final Object v = as.getAttribute(n);
+						if (n.toString().equals("a")) {
+							if (v != null) {
+								String s = v.toString();
+								if (s.startsWith("href=goto://")) {
+									s = s.substring(12);
+								}
+								if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+									EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s.trim());
+								} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+									editorPane.setToolTipText(s);
+								} else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+									editorPane.setToolTipText("<html>Double-click to enlarge this window<br>Right-click to open a popup menu for editing</html>");
+								}
+							}
+						}
+					}
 				}
 			}
 		});
@@ -118,13 +145,13 @@ class MyEditorPane {
 
 			while ((element = it.next()) != null) {
 				final AttributeSet as = element.getAttributes();
-				final Enumeration<?> enumm = as.getAttributeNames();
+				final Enumeration<?> en = as.getAttributeNames();
 
 				// look for buttons
 				DefaultButtonModel buttonModel = null;
 				String action = null;
-				while (enumm.hasMoreElements()) {
-					final Object n = enumm.nextElement();
+				while (en.hasMoreElements()) {
+					final Object n = en.nextElement();
 					final Object v = as.getAttribute(n);
 					if (v instanceof DefaultButtonModel) {
 						buttonModel = (DefaultButtonModel) v;
@@ -159,6 +186,15 @@ class MyEditorPane {
 			EnergyPanel.getInstance().selectInstructionSheet(2);
 		}
 
+		// heliodon commands
+		else if ("Heliodon".equals(act)) {
+			MainPanel.getInstance().getHeliodonButton().setSelected(model.isSelected());
+		} else if ("Heliodon On".equals(act)) {
+			MainPanel.getInstance().getHeliodonButton().setSelected(true);
+		} else if ("Heliodon Off".equals(act)) {
+			MainPanel.getInstance().getHeliodonButton().setSelected(false);
+		}
+
 		// sun motion commands
 		else if ("Sun Motion".equals(act)) {
 			MainPanel.getInstance().getSunAnimationButton().setSelected(model.isSelected());
@@ -175,6 +211,23 @@ class MyEditorPane {
 			MainPanel.getInstance().getShadowButton().setSelected(true);
 		} else if ("Shadow Off".equals(act)) {
 			MainPanel.getInstance().getShadowButton().setSelected(false);
+		}
+
+		// environmental temperature graph
+		else if ("Daily Environmental Temperature".equals(act)) {
+			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+			if ("".equals(city)) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			new DailyEnvironmentalTemperature().showDialog();
+		} else if ("Annual Environmental Temperature".equals(act)) {
+			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+			if ("".equals(city)) {
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			new AnnualEnvironmentalTemperature().showDialog();
 		}
 
 		else {

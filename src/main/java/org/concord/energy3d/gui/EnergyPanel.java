@@ -14,6 +14,8 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -242,9 +244,9 @@ public class EnergyPanel extends JPanel {
 		regionComboBox.setModel(new DefaultComboBoxModel<String>(LocationData.getInstance().getCities()));
 		regionComboBox.setSelectedItem("Boston, MA");
 		regionComboBox.setMaximumRowCount(15);
-		regionComboBox.addActionListener(new ActionListener() {
+		regionComboBox.addItemListener(new ItemListener() {
 			@Override
-			public void actionPerformed(final ActionEvent e) {
+			public void itemStateChanged(final ItemEvent e) {
 				final String city = (String) regionComboBox.getSelectedItem();
 				if (city.equals("")) {
 					clearRadiationHeatMap();
@@ -994,11 +996,6 @@ public class EnergyPanel extends JPanel {
 			progressBar.setStringPainted(true);
 		}
 		progressBar.repaint();
-	}
-
-	public void setCity(final String city) {
-		regionComboBox.setSelectedItem(city);
-		regionComboBox.repaint(); // in some cases, this must be called in order to update the view
 	}
 
 	public void setLatitude(final int latitude) {
