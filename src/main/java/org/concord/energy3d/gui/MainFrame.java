@@ -1971,13 +1971,10 @@ public class MainFrame extends JFrame {
 			annualEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
-						new EnergyAnnualAnalysis().show("Annual Energy");
+					if (EnergyPanel.getInstance().checkCity()) {
+						if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
+							new EnergyAnnualAnalysis().show("Annual Energy");
+						}
 					}
 				}
 			});
@@ -1991,16 +1988,13 @@ public class MainFrame extends JFrame {
 			annualEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
-						new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
-					} else {
-						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+					if (EnergyPanel.getInstance().checkCity()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
+							new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");
+						} else {
+							JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+						}
 					}
 				}
 			});
@@ -2014,17 +2008,14 @@ public class MainFrame extends JFrame {
 			dailyEnergyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
-						final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
-						if (SceneManager.getInstance().getSolarHeatMap()) {
-							analysis.updateGraph();
+					if (EnergyPanel.getInstance().checkCity()) {
+						if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
+							final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
+							if (SceneManager.getInstance().getSolarHeatMap()) {
+								analysis.updateGraph();
+							}
+							analysis.show("Daily Energy");
 						}
-						analysis.show("Daily Energy");
 					}
 				}
 			});
@@ -2038,16 +2029,13 @@ public class MainFrame extends JFrame {
 			dailyEnergyAnalysisForSelectionMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
-						new EnergyDailyAnalysis().show("Daily Energy for Selected Part");
-					} else {
-						JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+					if (EnergyPanel.getInstance().checkCity()) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
+							new EnergyDailyAnalysis().show("Daily Energy for Selected Part");
+						} else {
+							JOptionPane.showMessageDialog(MainFrame.this, "You must select a building part first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+						}
 					}
 				}
 			});
@@ -2062,37 +2050,34 @@ public class MainFrame extends JFrame {
 			annualPvAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final PvAnnualAnalysis a = new PvAnnualAnalysis();
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final PvAnnualAnalysis a = new PvAnnualAnalysis();
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
 							}
-							a.setUtilityBill(foundation.getUtilityBill());
+							if (foundation != null) {
+								n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
+								a.setUtilityBill(foundation.getUtilityBill());
+							}
+						} else {
+							a.setUtilityBill(Scene.getInstance().getUtilityBill());
 						}
-					} else {
-						a.setUtilityBill(Scene.getInstance().getUtilityBill());
+						a.show();
 					}
-					a.show();
 				}
 			});
 		}
@@ -2105,37 +2090,34 @@ public class MainFrame extends JFrame {
 			dailyPvAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						final PvDailyAnalysis a = new PvDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
 					}
-					final PvDailyAnalysis a = new PvDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						a.updateGraph();
-					}
-					a.show();
 				}
 			});
 		}
@@ -2148,37 +2130,34 @@ public class MainFrame extends JFrame {
 			dailyMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(Mirror.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(Mirror.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(Mirror.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(Mirror.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
 					}
-					final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						a.updateGraph();
-					}
-					a.show();
 				}
 			});
 		}
@@ -2191,34 +2170,31 @@ public class MainFrame extends JFrame {
 			annualMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(Mirror.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final MirrorAnnualAnalysis a = new MirrorAnnualAnalysis();
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(Mirror.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(Mirror.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final MirrorAnnualAnalysis a = new MirrorAnnualAnalysis();
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(Mirror.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						a.show();
 					}
-					a.show();
 				}
 			});
 		}
@@ -2231,37 +2207,34 @@ public class MainFrame extends JFrame {
 			dailyParabolicTroughAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(ParabolicTrough.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(ParabolicTrough.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(ParabolicTrough.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(ParabolicTrough.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						final ParabolicTroughDailyAnalysis a = new ParabolicTroughDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
 					}
-					final ParabolicTroughDailyAnalysis a = new ParabolicTroughDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						a.updateGraph();
-					}
-					a.show();
 				}
 			});
 		}
@@ -2274,34 +2247,31 @@ public class MainFrame extends JFrame {
 			annualParabolicTroughAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(ParabolicTrough.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final ParabolicTroughAnnualAnalysis a = new ParabolicTroughAnnualAnalysis();
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(ParabolicTrough.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(ParabolicTrough.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final ParabolicTroughAnnualAnalysis a = new ParabolicTroughAnnualAnalysis();
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(ParabolicTrough.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						a.show();
 					}
-					a.show();
 				}
 			});
 		}
@@ -2314,37 +2284,34 @@ public class MainFrame extends JFrame {
 			dailyParabolicDishAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(ParabolicDish.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(ParabolicDish.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(ParabolicDish.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(ParabolicDish.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						final ParabolicDishDailyAnalysis a = new ParabolicDishDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
 					}
-					final ParabolicDishDailyAnalysis a = new ParabolicDishDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						a.updateGraph();
-					}
-					a.show();
 				}
 			});
 		}
@@ -2357,34 +2324,31 @@ public class MainFrame extends JFrame {
 			annualParabolicDishAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(ParabolicDish.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final ParabolicDishAnnualAnalysis a = new ParabolicDishAnnualAnalysis();
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(ParabolicDish.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(ParabolicDish.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final ParabolicDishAnnualAnalysis a = new ParabolicDishAnnualAnalysis();
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(ParabolicDish.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						a.show();
 					}
-					a.show();
 				}
 			});
 		}
@@ -2397,37 +2361,34 @@ public class MainFrame extends JFrame {
 			dailyFresnelReflectorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(FresnelReflector.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(FresnelReflector.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(FresnelReflector.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(FresnelReflector.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						final FresnelReflectorDailyAnalysis a = new FresnelReflectorDailyAnalysis();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							a.updateGraph();
+						}
+						a.show();
 					}
-					final FresnelReflectorDailyAnalysis a = new FresnelReflectorDailyAnalysis();
-					if (SceneManager.getInstance().getSolarHeatMap()) {
-						a.updateGraph();
-					}
-					a.show();
 				}
 			});
 		}
@@ -2440,34 +2401,31 @@ public class MainFrame extends JFrame {
 			annualFresnelReflectorAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					int n = Scene.getInstance().countParts(FresnelReflector.class);
-					if (n <= 0) {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					final FresnelReflectorAnnualAnalysis a = new FresnelReflectorAnnualAnalysis();
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart != null) {
-						Foundation foundation;
-						if (selectedPart instanceof Foundation) {
-							foundation = (Foundation) selectedPart;
-						} else {
-							foundation = selectedPart.getTopContainer();
+					if (EnergyPanel.getInstance().checkCity()) {
+						int n = Scene.getInstance().countParts(FresnelReflector.class);
+						if (n <= 0) {
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
 						}
-						if (foundation != null) {
-							n = foundation.countParts(FresnelReflector.class);
-							if (n <= 0) {
-								JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
-								return;
+						final FresnelReflectorAnnualAnalysis a = new FresnelReflectorAnnualAnalysis();
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart != null) {
+							Foundation foundation;
+							if (selectedPart instanceof Foundation) {
+								foundation = (Foundation) selectedPart;
+							} else {
+								foundation = selectedPart.getTopContainer();
+							}
+							if (foundation != null) {
+								n = foundation.countParts(FresnelReflector.class);
+								if (n <= 0) {
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									return;
+								}
 							}
 						}
+						a.show();
 					}
-					a.show();
 				}
 			});
 		}
@@ -2480,17 +2438,14 @@ public class MainFrame extends JFrame {
 			groupDailyAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						final PartGroup g = selectGroup();
+						if (g != null) {
+							final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
+							a.show(g.getType() + ": " + g.getIds());
+						}
+						SceneManager.getInstance().hideAllEditPoints();
 					}
-					final PartGroup g = selectGroup();
-					if (g != null) {
-						final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
-						a.show(g.getType() + ": " + g.getIds());
-					}
-					SceneManager.getInstance().hideAllEditPoints();
 				}
 			});
 		}
@@ -2503,17 +2458,14 @@ public class MainFrame extends JFrame {
 			groupAnnualAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						final PartGroup g = selectGroup();
+						if (g != null) {
+							final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g);
+							a.show(g.getType() + ": " + g.getIds());
+						}
+						SceneManager.getInstance().hideAllEditPoints();
 					}
-					final PartGroup g = selectGroup();
-					if (g != null) {
-						final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g);
-						a.show(g.getType() + ": " + g.getIds());
-					}
-					SceneManager.getInstance().hideAllEditPoints();
 				}
 			});
 		}
@@ -2557,7 +2509,7 @@ public class MainFrame extends JFrame {
 		return c;
 	}
 
-	private PartGroup selectGroup() {
+	public PartGroup selectGroup() {
 		final JPanel gui = new JPanel(new BorderLayout(5, 5));
 		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
 		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
@@ -2817,12 +2769,9 @@ public class MainFrame extends JFrame {
 			monthlySunshineHoursMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						new MonthlySunshineHours().showDialog();
 					}
-					new MonthlySunshineHours().showDialog();
 				}
 			});
 		}
@@ -2835,12 +2784,9 @@ public class MainFrame extends JFrame {
 			annualEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						new AnnualEnvironmentalTemperature().showDialog();
 					}
-					new AnnualEnvironmentalTemperature().showDialog();
 				}
 			});
 		}
@@ -2853,12 +2799,9 @@ public class MainFrame extends JFrame {
 			dailyEnvironmentalTemperatureMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.this, "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						new DailyEnvironmentalTemperature().showDialog();
 					}
-					new DailyEnvironmentalTemperature().showDialog();
 				}
 			});
 		}

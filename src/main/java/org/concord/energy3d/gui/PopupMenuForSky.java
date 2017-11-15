@@ -63,12 +63,9 @@ class PopupMenuForSky extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						new MonthlySunshineHours().showDialog();
 					}
-					new MonthlySunshineHours().showDialog();
 				}
 			});
 			weatherMenu.add(mi);
@@ -77,12 +74,9 @@ class PopupMenuForSky extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						new AnnualEnvironmentalTemperature().showDialog();
 					}
-					new AnnualEnvironmentalTemperature().showDialog();
 				}
 			});
 			weatherMenu.add(mi);
@@ -91,12 +85,9 @@ class PopupMenuForSky extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
+					if (EnergyPanel.getInstance().checkCity()) {
+						new DailyEnvironmentalTemperature().showDialog();
 					}
-					new DailyEnvironmentalTemperature().showDialog();
 				}
 			});
 			weatherMenu.add(mi);

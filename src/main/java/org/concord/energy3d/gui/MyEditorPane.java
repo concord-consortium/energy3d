@@ -21,8 +21,12 @@ import javax.swing.text.Element;
 import javax.swing.text.ElementIterator;
 import javax.swing.text.html.HTMLDocument;
 
+import org.concord.energy3d.model.PartGroup;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
+import org.concord.energy3d.simulation.GroupDailyAnalysis;
+import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -213,21 +217,32 @@ class MyEditorPane {
 			MainPanel.getInstance().getShadowButton().setSelected(false);
 		}
 
+		// group analysis tools
+
+		else if ("Daily Analysis for Group".equals(act)) {
+			if (EnergyPanel.getInstance().checkCity()) {
+				final PartGroup g = MainFrame.getInstance().selectGroup();
+				if (g != null) {
+					final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
+					a.show(g.getType() + ": " + g.getIds());
+				}
+				SceneManager.getInstance().hideAllEditPoints();
+			}
+		}
+
 		// environmental temperature graph
 		else if ("Daily Environmental Temperature".equals(act)) {
-			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-			if ("".equals(city)) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
+			if (EnergyPanel.getInstance().checkCity()) {
+				new DailyEnvironmentalTemperature().showDialog();
 			}
-			new DailyEnvironmentalTemperature().showDialog();
 		} else if ("Annual Environmental Temperature".equals(act)) {
-			final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-			if ("".equals(city)) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-				return;
+			if (EnergyPanel.getInstance().checkCity()) {
+				new AnnualEnvironmentalTemperature().showDialog();
 			}
-			new AnnualEnvironmentalTemperature().showDialog();
+		} else if ("Monthly Sunshine Hours".equals(act)) {
+			if (EnergyPanel.getInstance().checkCity()) {
+				new MonthlySunshineHours().showDialog();
+			}
 		}
 
 		else {

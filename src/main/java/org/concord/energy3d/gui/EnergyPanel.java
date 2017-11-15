@@ -368,7 +368,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
 				final ChangeLatitudeCommand c = new ChangeLatitudeCommand();
-				Heliodon.getInstance().setLatitude(((Integer) latitudeSpinner.getValue()) / 180.0 * Math.PI);
+				Heliodon.getInstance().setLatitude(((Double) latitudeSpinner.getValue()) / 180.0 * Math.PI);
 				clearRadiationHeatMap();
 				Scene.getInstance().updateTrackables();
 				Scene.getInstance().setEdited(true);
@@ -399,12 +399,9 @@ public class EnergyPanel extends JPanel {
 				mi.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
-						final String city = (String) regionComboBox.getSelectedItem();
-						if ("".equals(city)) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-							return;
+						if (checkCity()) {
+							new DailyEnvironmentalTemperature().showDialog();
 						}
-						new DailyEnvironmentalTemperature().showDialog();
 					}
 				});
 				popupMenu.add(mi);
@@ -412,12 +409,9 @@ public class EnergyPanel extends JPanel {
 				mi.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
-						final String city = (String) regionComboBox.getSelectedItem();
-						if ("".equals(city)) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-							return;
+						if (checkCity()) {
+							new AnnualEnvironmentalTemperature().showDialog();
 						}
-						new AnnualEnvironmentalTemperature().showDialog();
 					}
 				});
 				popupMenu.add(mi);
@@ -451,12 +445,9 @@ public class EnergyPanel extends JPanel {
 				mi.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(final ActionEvent e) {
-						final String city = (String) regionComboBox.getSelectedItem();
-						if ("".equals(city)) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-							return;
+						if (checkCity()) {
+							new MonthlySunshineHours().showDialog();
 						}
-						new MonthlySunshineHours().showDialog();
 					}
 				});
 				popupMenu.add(mi);
@@ -1936,6 +1927,15 @@ public class EnergyPanel extends JPanel {
 
 	public void setComputingStartMillis(final long t) {
 		computingStartMillis = t;
+	}
+
+	public boolean checkCity() {
+		final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
+		if ("".equals(city)) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -14,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.model.Foundation;
@@ -41,9 +40,9 @@ public class CspStationDailyEnergyGraph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private PartEnergyDailyGraph graph;
+	private final PartEnergyDailyGraph graph;
 	private Foundation base;
-	private Box buttonPanel;
+	private final Box buttonPanel;
 
 	public CspStationDailyEnergyGraph() {
 		super(new BorderLayout());
@@ -75,12 +74,7 @@ public class CspStationDailyEnergyGraph extends JPanel {
 		graph.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
-				if (e.getClickCount() >= 2) {
-					final String city = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
-					if ("".equals(city)) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "Can't perform this task without specifying a city.", "Error", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
+				if (e.getClickCount() >= 2 && EnergyPanel.getInstance().checkCity()) {
 					final Foundation f = SceneManager.getInstance().autoSelectBuilding(true);
 					if (f != null) {
 						if (f.countParts(ParabolicTrough.class) > 0) {
