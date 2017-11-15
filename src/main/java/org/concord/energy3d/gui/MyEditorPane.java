@@ -171,12 +171,7 @@ class MyEditorPane {
 					buttonModel.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
-							EventQueue.invokeLater(new Runnable() {
-								@Override
-								public void run() { // for some reason, this may be delayed in the AWT Event Queue in order to avoid a HTML form NullPointerException
-									interpret(act, model);
-								}
-							});
+							interpret(act, model);
 						}
 					});
 				}
@@ -258,8 +253,14 @@ class MyEditorPane {
 					g = selector.select();
 				}
 				if (g != null) {
-					final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
-					a.show(g.getType() + ": " + g.getIds());
+					final PartGroup g2 = g;
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() { // for some reason, this may be delayed in the AWT Event Queue in order to avoid a HTML form NullPointerException
+							final GroupDailyAnalysis a = new GroupDailyAnalysis(g2);
+							a.show(g2.getType() + ": " + g2.getIds());
+						}
+					});
 				}
 				SceneManager.getInstance().hideAllEditPoints();
 			}
@@ -291,8 +292,14 @@ class MyEditorPane {
 					g = selector.select();
 				}
 				if (g != null) {
-					final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g);
-					a.show(g.getType() + ": " + g.getIds());
+					final PartGroup g2 = g;
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() { // for some reason, this may be delayed in the AWT Event Queue in order to avoid a HTML form NullPointerException
+							final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g2);
+							a.show(g2.getType() + ": " + g2.getIds());
+						}
+					});
 				}
 				SceneManager.getInstance().hideAllEditPoints();
 			}
