@@ -27,7 +27,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
@@ -36,17 +35,14 @@ import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -55,11 +51,8 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -294,7 +287,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem rescaleGroundImageMenuItem;
 	private JMenuItem clearGroundImageMenuItem;
 	private JCheckBoxMenuItem showGroundImageMenuItem;
-	private String currentGroupType = "Solar Panel";
 
 	public final static FilenameFilter ng3NameFilter = new FilenameFilter() {
 		@Override
@@ -2439,7 +2431,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
-						final PartGroup g = selectGroup();
+						final PartGroup g = new GroupSelector().select();
 						if (g != null) {
 							final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
 							a.show(g.getType() + ": " + g.getIds());
@@ -2459,7 +2451,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
-						final PartGroup g = selectGroup();
+						final PartGroup g = new GroupSelector().select();
 						if (g != null) {
 							final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g);
 							a.show(g.getType() + ": " + g.getIds());
@@ -2470,98 +2462,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return groupAnnualAnalysisMenuItem;
-	}
-
-	private ArrayList<Long> getIdArray(final Class<?> c) {
-		final ArrayList<Long> idArray = new ArrayList<Long>();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (c.isInstance(p)) {
-				idArray.add(p.getId());
-			}
-		}
-		Collections.sort(idArray);
-		return idArray;
-	}
-
-	private Class<?> getCurrentGroupClass() {
-		Class<?> c = null;
-		if ("Wall".equals(currentGroupType)) {
-			c = Wall.class;
-		} else if ("Window".equals(currentGroupType)) {
-			c = Window.class;
-		} else if ("Roof".equals(currentGroupType)) {
-			c = Roof.class;
-		} else if ("Solar Panel".equals(currentGroupType)) {
-			c = SolarPanel.class;
-		} else if ("Solar Panel Rack".equals(currentGroupType)) {
-			c = Rack.class;
-		} else if ("Mirror".equals(currentGroupType)) {
-			c = Mirror.class;
-		} else if ("Parabolic Trough".equals(currentGroupType)) {
-			c = ParabolicTrough.class;
-		} else if ("Parabolic Dish".equals(currentGroupType)) {
-			c = ParabolicDish.class;
-		} else if ("Fresnel Reflector".equals(currentGroupType)) {
-			c = FresnelReflector.class;
-		} else if ("Foundation".equals(currentGroupType) || currentGroupType.startsWith("Foundation")) {
-			c = Foundation.class;
-		}
-		return c;
-	}
-
-	public PartGroup selectGroup() {
-		final JPanel gui = new JPanel(new BorderLayout(5, 5));
-		gui.setBorder(BorderFactory.createTitledBorder("Types and IDs"));
-		final DefaultListModel<Long> idListModel = new DefaultListModel<Long>();
-		final JComboBox<String> typeComboBox = new JComboBox<String>(new String[] { "Solar Panel", "Solar Panel Rack", "Mirror", "Parabolic Trough", "Parabolic Dish", "Fresnel Reflector", "Window", "Wall", "Roof", "Foundation", "Foundation (Mean)" });
-		if (currentGroupType != null) {
-			typeComboBox.setSelectedItem(currentGroupType);
-		}
-		typeComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				idListModel.clear();
-				currentGroupType = (String) typeComboBox.getSelectedItem();
-				final Class<?> c = getCurrentGroupClass();
-				if (c != null) {
-					final ArrayList<Long> idArray = getIdArray(c);
-					for (final Long id : idArray) {
-						idListModel.addElement(id);
-					}
-				}
-			}
-		});
-		final Class<?> c = getCurrentGroupClass();
-		if (c != null) {
-			final ArrayList<Long> idArray = getIdArray(c);
-			for (final Long id : idArray) {
-				idListModel.addElement(id);
-			}
-		}
-		final JList<Long> idList = new JList<Long>(idListModel);
-		idList.addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(final ListSelectionEvent e) {
-				SceneManager.getInstance().hideAllEditPoints();
-				final List<Long> selectedValues = idList.getSelectedValuesList();
-				for (final Long i : selectedValues) {
-					final HousePart p = Scene.getInstance().getPart(i);
-					p.setEditPointsVisible(true);
-					p.draw();
-				}
-			}
-		});
-		gui.add(typeComboBox, BorderLayout.NORTH);
-		gui.add(new JScrollPane(idList), BorderLayout.CENTER);
-		if (JOptionPane.showConfirmDialog(MainFrame.this, gui, "Select a Group", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
-			return null;
-		}
-		final List<Long> selectedIds = idList.getSelectedValuesList();
-		if (selectedIds.isEmpty()) {
-			JOptionPane.showMessageDialog(MainFrame.this, "You must select a group of parts first.", "Error", JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
-		return new PartGroup((String) typeComboBox.getSelectedItem(), selectedIds);
 	}
 
 	private JMenuItem getAnnualSensorMenuItem() {

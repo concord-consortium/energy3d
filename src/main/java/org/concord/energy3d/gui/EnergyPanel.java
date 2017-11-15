@@ -1836,6 +1836,12 @@ public class EnergyPanel extends JPanel {
 
 	public void cancel() {
 		cancel = true;
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+			}
+		});
 	}
 
 	public JComboBox<String> getCityComboBox() {

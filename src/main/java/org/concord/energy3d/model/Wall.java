@@ -1607,21 +1607,23 @@ public class Wall extends HousePart implements Thermal {
 
 	@Override
 	public boolean fits(final HousePart window) {
-		final List<Vector3> hole = computeWindowHole(window, Vector3.ZERO);
-		applyXYTransform(hole);
-		final double minDistanceToRoof = 0.1 * getGridSize();
-		final ArrayList<Vector3> polygon = new ArrayList<Vector3>(wallAndWindowsPoints.get(0).size());
-		for (int i = 0; i < wallAndWindowsPoints.get(0).size(); i++) {
-			final Vector3 p = wallAndWindowsPoints.get(0).get(i).clone();
-			if (i == 0 || i > 2) {
-				p.subtractLocal(0, 0, minDistanceToRoof);
+		if (wallAndWindowsPoints != null) {
+			final List<Vector3> hole = computeWindowHole(window, Vector3.ZERO);
+			applyXYTransform(hole);
+			final double minDistanceToRoof = 0.1 * getGridSize();
+			final ArrayList<Vector3> polygon = new ArrayList<Vector3>(wallAndWindowsPoints.get(0).size());
+			for (int i = 0; i < wallAndWindowsPoints.get(0).size(); i++) {
+				final Vector3 p = wallAndWindowsPoints.get(0).get(i).clone();
+				if (i == 0 || i > 2) {
+					p.subtractLocal(0, 0, minDistanceToRoof);
+				}
+				polygon.add(p);
 			}
-			polygon.add(p);
-		}
-		applyXYTransform(polygon);
-		for (final Vector3 p : hole) {
-			if (!Util.insidePolygon(p, polygon)) {
-				return false;
+			applyXYTransform(polygon);
+			for (final Vector3 p : hole) {
+				if (!Util.insidePolygon(p, polygon)) {
+					return false;
+				}
 			}
 		}
 		return true;

@@ -1,5 +1,6 @@
 package org.concord.energy3d.gui;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -25,6 +26,7 @@ import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
+import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.util.Util;
@@ -169,7 +171,12 @@ class MyEditorPane {
 					buttonModel.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
-							interpret(act, model);
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() { // for some reason, this may be delayed in the AWT Event Queue in order to avoid a HTML form NullPointerException
+									interpret(act, model);
+								}
+							});
 						}
 					});
 				}
@@ -180,6 +187,10 @@ class MyEditorPane {
 	}
 
 	private void interpret(final String act, final DefaultButtonModel model) {
+
+		if (act == null) {
+			return;
+		}
 
 		// instruction sheet selection commands
 		if ("Sheet 1".equals(act)) {
@@ -219,11 +230,68 @@ class MyEditorPane {
 
 		// group analysis tools
 
-		else if ("Daily Analysis for Group".equals(act)) {
+		else if (act.startsWith("Daily Analysis for Group")) {
 			if (EnergyPanel.getInstance().checkCity()) {
-				final PartGroup g = MainFrame.getInstance().selectGroup();
+				PartGroup g = null;
+				final GroupSelector selector = new GroupSelector();
+				for (final String s : GroupSelector.types) {
+					final int index = act.indexOf(s);
+					if (index > 0) {
+						selector.setCurrentGroupType(s);
+						try {
+							final String t = act.substring(index + s.length()).trim();
+							if (!t.equals("")) {
+								g = new PartGroup(s);
+								final String[] a = t.split(",");
+								for (final String x : a) {
+									g.addId(Integer.parseInt(x.trim()));
+								}
+							}
+						} catch (final Exception e) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+							g = null;
+						}
+						break;
+					}
+				}
+				if (g == null) {
+					g = selector.select();
+				}
 				if (g != null) {
 					final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
+					a.show(g.getType() + ": " + g.getIds());
+				}
+				SceneManager.getInstance().hideAllEditPoints();
+			}
+		} else if (act.startsWith("Annual Analysis for Group")) {
+			if (EnergyPanel.getInstance().checkCity()) {
+				PartGroup g = null;
+				final GroupSelector selector = new GroupSelector();
+				for (final String s : GroupSelector.types) {
+					final int index = act.indexOf(s);
+					if (index > 0) {
+						selector.setCurrentGroupType(s);
+						try {
+							final String t = act.substring(index + s.length()).trim();
+							if (!t.equals("")) {
+								g = new PartGroup(s);
+								final String[] a = t.split(",");
+								for (final String x : a) {
+									g.addId(Integer.parseInt(x.trim()));
+								}
+							}
+						} catch (final Exception e) {
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Error in <i>" + act + "</i>.<br>Please select the IDs manually.</html>", "Input Error", JOptionPane.ERROR_MESSAGE);
+							g = null;
+						}
+						break;
+					}
+				}
+				if (g == null) {
+					g = selector.select();
+				}
+				if (g != null) {
+					final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g);
 					a.show(g.getType() + ": " + g.getIds());
 				}
 				SceneManager.getInstance().hideAllEditPoints();
