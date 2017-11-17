@@ -217,7 +217,7 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 			points.get(0).set(toRelative(p));
 		}
 		if (outOfBound()) {
-			if (oldDishCenter != null) {
+			if (oldDishCenter != null && !oldDishCenter.equals(new Vector3())) { // TODO: Need to find a better way to do this
 				points.get(0).set(oldDishCenter);
 			}
 		} else {

@@ -190,7 +190,7 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 				pickedNormal = null;
 			}
 			if (outOfBound()) {
-				if (oldReflectorCenter != null) {
+				if (oldReflectorCenter != null && !oldReflectorCenter.equals(new Vector3())) { // TODO: Need to find a better way to do this
 					points.get(0).set(oldReflectorCenter);
 				}
 			} else {

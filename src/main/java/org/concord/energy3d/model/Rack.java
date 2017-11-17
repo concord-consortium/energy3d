@@ -220,7 +220,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				pickedNormal = null;
 			}
 			if (outOfBound()) {
-				if (oldRackCenter != null) {
+				if (oldRackCenter != null && !oldRackCenter.equals(new Vector3())) { // TODO: Need to find a better way to do this
 					points.get(0).set(oldRackCenter);
 				}
 			} else {

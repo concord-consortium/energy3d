@@ -244,7 +244,7 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 				pickedNormal = null;
 			}
 			if (outOfBound()) {
-				if (oldTroughCenter != null) {
+				if (oldTroughCenter != null && !oldTroughCenter.equals(new Vector3())) { // TODO: Need to find a better way to do this
 					points.get(0).set(oldTroughCenter);
 				}
 			} else {
