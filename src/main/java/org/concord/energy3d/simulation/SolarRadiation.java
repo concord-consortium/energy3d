@@ -180,12 +180,14 @@ public class SolarRadiation {
 		}
 	}
 
+	private int hourOfDay, minuteOfHour;
+
 	private void computeToday() {
 
 		// save current calendar for restoring at the end of this calculation
 		final Calendar today = (Calendar) Heliodon.getInstance().getCalendar().clone();
-		final int hourOfDay = today.get(Calendar.HOUR_OF_DAY);
-		final int minuteOfHour = today.get(Calendar.MINUTE);
+		hourOfDay = today.get(Calendar.HOUR_OF_DAY);
+		minuteOfHour = today.get(Calendar.MINUTE);
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.HOUR_OF_DAY, 0);
@@ -271,7 +273,11 @@ public class SolarRadiation {
 		}
 		maxValue = Math.round((MINUTES_OF_DAY / timeStep + 1.0) * (1 - 0.01 * Scene.getInstance().getSolarHeatMapColorContrast()));
 
-		// If driven by heliostat or solar tracker, the heliodon's calendar has been changed. Restore the time now.
+		resetTrackables(); // If tracking the sun, the heliodon's calendar has been changed. Restore the time now.
+
+	}
+
+	public void resetTrackables() {
 		Heliodon.getInstance().getCalendar().set(Calendar.HOUR_OF_DAY, hourOfDay);
 		Heliodon.getInstance().getCalendar().set(Calendar.MINUTE, minuteOfHour);
 		for (final HousePart part : Scene.getInstance().getParts()) {
@@ -303,7 +309,6 @@ public class SolarRadiation {
 				}
 			}
 		}
-
 	}
 
 	private void computeOnLand(final ReadOnlyVector3 directionTowardSun) {

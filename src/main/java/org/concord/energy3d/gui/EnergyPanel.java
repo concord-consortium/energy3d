@@ -853,6 +853,7 @@ public class EnergyPanel extends JPanel {
 
 		} catch (final CancellationException e) {
 			System.out.println("Energy calculation cancelled.");
+			SolarRadiation.getInstance().resetTrackables();
 		}
 
 	}

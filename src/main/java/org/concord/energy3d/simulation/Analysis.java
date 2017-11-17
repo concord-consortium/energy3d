@@ -174,6 +174,7 @@ public abstract class Analysis {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				runButton.setEnabled(false);
+				analysisStopped = false;
 				runAnalysis(dialog);
 			}
 		});

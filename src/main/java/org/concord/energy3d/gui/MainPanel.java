@@ -1112,7 +1112,9 @@ public class MainPanel extends JPanel {
 						@Override
 						public void run() {
 							final HousePart part = SceneManager.getInstance().getSelectedPart();
-							c = new ChangeAzimuthCommand(part);
+							if (part != null) {
+								c = new ChangeAzimuthCommand(part);
+							}
 							while (mousePressed) {
 								SceneManager.getTaskManager().update(new Callable<Object>() {
 									@Override
@@ -1160,7 +1162,9 @@ public class MainPanel extends JPanel {
 								if (part instanceof Foundation) {
 									SceneManager.getInstance().getUndoManager().addEdit(new RotateBuildingCommand((Foundation) part, rotationAngle * count));
 								} else if (part instanceof SolarPanel || part instanceof Rack || part instanceof Mirror) {
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (c != null) {
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 								}
 							}
 						}

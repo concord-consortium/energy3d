@@ -89,6 +89,7 @@ public class GroupAnnualAnalysis extends AnnualAnalysis {
 					if (!analysisStopped) {
 						final Calendar c = Heliodon.getInstance().getCalendar();
 						c.set(Calendar.MONTH, m);
+						Scene.getInstance().updateTrackables();
 						final Throwable t = compute();
 						if (t != null) {
 							stopAnalysis();
