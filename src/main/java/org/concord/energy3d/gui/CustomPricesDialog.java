@@ -1,12 +1,14 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -14,6 +16,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
@@ -24,6 +27,8 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.CspCustomPrice;
 import org.concord.energy3d.simulation.PvCustomPrice;
+import org.concord.energy3d.simulation.PvModuleSpecs;
+import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.util.SpringUtilities;
 
 /**
@@ -35,7 +40,34 @@ class CustomPricesDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT = new DecimalFormat("#0.##");
 
-	class PvStationPricesPanel extends JPanel {
+	class PvModulePricesPanel extends JPanel {
+
+		private static final long serialVersionUID = 1L;
+		JTextField[] priceFields;
+
+		PvModulePricesPanel() {
+
+			super(new SpringLayout());
+
+			final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
+			final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
+			priceFields = new JTextField[modules.size()];
+			int i = 0;
+			for (final String key : modules.keySet()) {
+				add(new JLabel(key + ": "));
+				add(new JLabel("$"));
+				priceFields[i] = new JTextField(FORMAT.format(price.getPvModelPrice(key)), 6);
+				add(priceFields[i]);
+				add(new JLabel(modules.get(key).getBrand()));
+				i++;
+			}
+			SpringUtilities.makeCompactGrid(this, i, 4, 6, 6, 6, 6);
+
+		}
+
+	}
+
+	class PvSystemPricesPanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
 
@@ -48,53 +80,61 @@ class CustomPricesDialog extends JDialog {
 		JTextField lifespanField;
 		JTextField landCostField;
 
-		PvStationPricesPanel() {
+		PvSystemPricesPanel() {
 
 			super(new SpringLayout());
 
 			final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
 
 			add(new JLabel("Life Span: "));
+			add(new JLabel());
 			lifespanField = new JTextField(FORMAT.format(price.getLifespan()), 6);
 			add(lifespanField);
 			add(new JLabel("<html>Years</html>"));
 
 			add(new JLabel("Land Cost: "));
+			add(new JLabel("$"));
 			landCostField = new JTextField(FORMAT.format(price.getLandUnitPrice()), 6);
 			add(landCostField);
-			add(new JLabel("<html>$ per year per m<sup>2</sup></html>"));
+			add(new JLabel("<html>Per year per m<sup>2</sup></html>"));
 
-			add(new JLabel("Solar Panel: "));
+			add(new JLabel("Custom Solar Panel: "));
+			add(new JLabel("$"));
 			solarPanelField = new JTextField(FORMAT.format(price.getSolarPanelPrice()), 6);
 			add(solarPanelField);
-			add(new JLabel("<html>$ per panel</html>"));
+			add(new JLabel("<html>Per panel</html>"));
 
 			add(new JLabel("Rack Base (Below 1m): "));
+			add(new JLabel("$"));
 			rackBaseField = new JTextField(FORMAT.format(price.getSolarPanelRackBasePrice()), 6);
 			add(rackBaseField);
-			add(new JLabel("<html>$ per panel</html>"));
+			add(new JLabel("<html>Per panel</html>"));
 
 			add(new JLabel("Rack Extra Height (Beyond 1m): "));
+			add(new JLabel("$"));
 			rackHeightField = new JTextField(FORMAT.format(price.getSolarPanelRackHeightPrice()), 6);
 			add(rackHeightField);
-			add(new JLabel("<html>$ per meter per panel</html>"));
+			add(new JLabel("<html>Per meter per panel</html>"));
 
 			add(new JLabel("Horizontal Single-Axis Tracker: "));
+			add(new JLabel("$"));
 			hsatField = new JTextField(FORMAT.format(price.getSolarPanelHsatPrice()), 6);
 			add(hsatField);
-			add(new JLabel("<html>$ per panel</html>"));
+			add(new JLabel("<html>Per panel</html>"));
 
 			add(new JLabel("Vertical Single-Axis Tracker: "));
+			add(new JLabel("$"));
 			vsatField = new JTextField(FORMAT.format(price.getSolarPanelVsatPrice()), 6);
 			add(vsatField);
-			add(new JLabel("<html>$ per panel</html>"));
+			add(new JLabel("<html>Per panel</html>"));
 
 			add(new JLabel("Azimuth–Altitude Dual-Axis Tracker: "));
+			add(new JLabel("$"));
 			aadatField = new JTextField(FORMAT.format(price.getSolarPanelAadatPrice()), 6);
 			add(aadatField);
-			add(new JLabel("<html>$ per panel</html>"));
+			add(new JLabel("<html>Per panel</html>"));
 
-			SpringUtilities.makeCompactGrid(this, 8, 3, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, 8, 4, 6, 6, 6, 6);
 
 		}
 
@@ -119,41 +159,48 @@ class CustomPricesDialog extends JDialog {
 			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 
 			add(new JLabel("Life Span: "));
+			add(new JLabel());
 			lifespanField = new JTextField(FORMAT.format(price.getLifespan()), 6);
 			add(lifespanField);
 			add(new JLabel("<html>Years</html>"));
 
 			add(new JLabel("Land Cost: "));
+			add(new JLabel("$"));
 			landCostField = new JTextField(FORMAT.format(price.getLandUnitPrice()), 6);
 			add(landCostField);
-			add(new JLabel("<html>$ per year per m<sup>2</sup></html>"));
+			add(new JLabel("<html>Per year per m<sup>2</sup></html>"));
 
 			add(new JLabel("Mirror (Heliostat): "));
+			add(new JLabel("$"));
 			heliostatField = new JTextField(FORMAT.format(price.getHeliostatUnitPrice()), 6);
 			add(heliostatField);
-			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
+			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
 			add(new JLabel("Tower: "));
+			add(new JLabel("$"));
 			towerField = new JTextField(FORMAT.format(price.getTowerUnitPrice()), 6);
 			add(towerField);
-			add(new JLabel("<html>$ per meter height</html>"));
+			add(new JLabel("<html>Per meter height</html>"));
 
 			add(new JLabel("Parabolic Trough: "));
+			add(new JLabel("$"));
 			parabolicTroughField = new JTextField(FORMAT.format(price.getParabolicTroughUnitPrice()), 6);
 			add(parabolicTroughField);
-			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
+			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
 			add(new JLabel("Parabolic Dish: "));
+			add(new JLabel("$"));
 			parabolicDishField = new JTextField(FORMAT.format(price.getParabolicDishUnitPrice()), 6);
 			add(parabolicDishField);
-			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
+			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
 			add(new JLabel("Fresnel Reflector: "));
+			add(new JLabel("$"));
 			fresnelReflectorField = new JTextField(FORMAT.format(price.getFresnelReflectorUnitPrice()), 6);
 			add(fresnelReflectorField);
-			add(new JLabel("<html>$ per m<sup>2</sup></html>"));
+			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
-			SpringUtilities.makeCompactGrid(this, 7, 3, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, 7, 4, 6, 6, 6, 6);
 
 		}
 
@@ -169,17 +216,25 @@ class CustomPricesDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-		final PvStationPricesPanel pvStationPricesPanel = new PvStationPricesPanel();
-		pvStationPricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-		final JPanel pvPanel = new JPanel(new BorderLayout());
-		pvPanel.add(pvStationPricesPanel, BorderLayout.NORTH);
-		tabbedPane.addTab("PV", pvPanel);
+		final PvSystemPricesPanel pvSystemPricesPanel = new PvSystemPricesPanel();
+		pvSystemPricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		final JPanel pvSystemPanel = new JPanel(new BorderLayout());
+		pvSystemPanel.add(pvSystemPricesPanel, BorderLayout.NORTH);
+		tabbedPane.addTab("PV System", pvSystemPanel);
 
-		final CspStationPricesPanel cspStationPricesPanel = new CspStationPricesPanel();
-		cspStationPricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-		final JPanel cspPanel = new JPanel(new BorderLayout());
-		cspPanel.add(cspStationPricesPanel, BorderLayout.NORTH);
-		tabbedPane.addTab("CSP", cspPanel);
+		final PvModulePricesPanel pvModulePricesPanel = new PvModulePricesPanel();
+		pvModulePricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		final JPanel pvModulePanel = new JPanel(new BorderLayout());
+		final JScrollPane scrollPane = new JScrollPane(pvModulePricesPanel);
+		scrollPane.setPreferredSize(new Dimension(100, 300));
+		pvModulePanel.add(scrollPane, BorderLayout.NORTH);
+		tabbedPane.addTab("PV Models", pvModulePanel);
+
+		final CspStationPricesPanel cspSystemPricesPanel = new CspStationPricesPanel();
+		cspSystemPricesPanel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		final JPanel cspSystemPanel = new JPanel(new BorderLayout());
+		cspSystemPanel.add(cspSystemPricesPanel, BorderLayout.NORTH);
+		tabbedPane.addTab("CSP System", cspSystemPanel);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -198,6 +253,8 @@ class CustomPricesDialog extends JDialog {
 				double solarPanelVsatPrice;
 				double solarPanelAadatPrice;
 
+				final double[] pvModelPrices = new double[pvModulePricesPanel.priceFields.length];
+
 				int cspLifespan;
 				double cspLandUnitPrice;
 				double heliostatUnitPrice;
@@ -206,29 +263,33 @@ class CustomPricesDialog extends JDialog {
 				final double parabolicDishUnitPrice;
 				double fresnelReflectorUnitPrice;
 				try {
-					pvLifespan = Integer.parseInt(pvStationPricesPanel.lifespanField.getText());
-					pvLandUnitPrice = Double.parseDouble(pvStationPricesPanel.landCostField.getText());
-					solarPanelPrice = Double.parseDouble(pvStationPricesPanel.solarPanelField.getText());
-					solarPanelRackBasePrice = Double.parseDouble(pvStationPricesPanel.rackBaseField.getText());
-					solarPanelRackHeightPrice = Double.parseDouble(pvStationPricesPanel.rackHeightField.getText());
-					solarPanelHsatPrice = Double.parseDouble(pvStationPricesPanel.hsatField.getText());
-					solarPanelVsatPrice = Double.parseDouble(pvStationPricesPanel.vsatField.getText());
-					solarPanelAadatPrice = Double.parseDouble(pvStationPricesPanel.aadatField.getText());
+					pvLifespan = Integer.parseInt(pvSystemPricesPanel.lifespanField.getText());
+					pvLandUnitPrice = Double.parseDouble(pvSystemPricesPanel.landCostField.getText());
+					solarPanelPrice = Double.parseDouble(pvSystemPricesPanel.solarPanelField.getText());
+					solarPanelRackBasePrice = Double.parseDouble(pvSystemPricesPanel.rackBaseField.getText());
+					solarPanelRackHeightPrice = Double.parseDouble(pvSystemPricesPanel.rackHeightField.getText());
+					solarPanelHsatPrice = Double.parseDouble(pvSystemPricesPanel.hsatField.getText());
+					solarPanelVsatPrice = Double.parseDouble(pvSystemPricesPanel.vsatField.getText());
+					solarPanelAadatPrice = Double.parseDouble(pvSystemPricesPanel.aadatField.getText());
 
-					cspLifespan = Integer.parseInt(cspStationPricesPanel.lifespanField.getText());
-					cspLandUnitPrice = Double.parseDouble(cspStationPricesPanel.landCostField.getText());
-					heliostatUnitPrice = Double.parseDouble(cspStationPricesPanel.heliostatField.getText());
-					towerHeightUnitPrice = Double.parseDouble(cspStationPricesPanel.towerField.getText());
-					parabolicTroughUnitPrice = Double.parseDouble(cspStationPricesPanel.parabolicTroughField.getText());
-					parabolicDishUnitPrice = Double.parseDouble(cspStationPricesPanel.parabolicDishField.getText());
-					fresnelReflectorUnitPrice = Double.parseDouble(cspStationPricesPanel.fresnelReflectorField.getText());
+					for (int i = 0; i < pvModelPrices.length; i++) {
+						pvModelPrices[i] = Double.parseDouble(pvModulePricesPanel.priceFields[i].getText());
+					}
+
+					cspLifespan = Integer.parseInt(cspSystemPricesPanel.lifespanField.getText());
+					cspLandUnitPrice = Double.parseDouble(cspSystemPricesPanel.landCostField.getText());
+					heliostatUnitPrice = Double.parseDouble(cspSystemPricesPanel.heliostatField.getText());
+					towerHeightUnitPrice = Double.parseDouble(cspSystemPricesPanel.towerField.getText());
+					parabolicTroughUnitPrice = Double.parseDouble(cspSystemPricesPanel.parabolicTroughField.getText());
+					parabolicDishUnitPrice = Double.parseDouble(cspSystemPricesPanel.parabolicDishField.getText());
+					fresnelReflectorUnitPrice = Double.parseDouble(cspSystemPricesPanel.fresnelReflectorField.getText());
 				} catch (final NumberFormatException err) {
 					err.printStackTrace();
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 
-				// PV
+				// PV system
 
 				if (pvLifespan < 5 && pvLifespan > 30) {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your PV lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -263,7 +324,14 @@ class CustomPricesDialog extends JDialog {
 					return;
 				}
 
-				// CSP
+				for (int i = 0; i < pvModelPrices.length; i++) {
+					if (pvModelPrices[i] < 0 && pvModelPrices[i] > 10000) {
+						JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your solar panel price is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				}
+
+				// CSP system
 
 				if (cspLifespan < 5 && cspLifespan > 50) {
 					JOptionPane.showMessageDialog(CustomPricesDialog.this, "Your CSP lifespan is out of range.", "Range Error", JOptionPane.ERROR_MESSAGE);
@@ -303,6 +371,13 @@ class CustomPricesDialog extends JDialog {
 				pvPrice.setSolarPanelHsatPrice(solarPanelHsatPrice);
 				pvPrice.setSolarPanelVsatPrice(solarPanelVsatPrice);
 				pvPrice.setSolarPanelAadatPrice(solarPanelAadatPrice);
+
+				final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
+				int i = 0;
+				for (final String key : modules.keySet()) {
+					pvPrice.setPvModelPrice(key, pvModelPrices[i]);
+					i++;
+				}
 
 				final CspCustomPrice cspPrice = Scene.getInstance().getCspCustomPrice();
 				cspPrice.setLifespan(cspLifespan);
@@ -350,10 +425,10 @@ class CustomPricesDialog extends JDialog {
 			public void windowActivated(final WindowEvent e) {
 				switch (Scene.getInstance().getProjectType()) {
 				case Foundation.TYPE_PV_STATION:
-					tabbedPane.setSelectedComponent(pvPanel);
+					tabbedPane.setSelectedComponent(pvSystemPanel);
 					break;
 				case Foundation.TYPE_CSP_STATION:
-					tabbedPane.setSelectedComponent(cspPanel);
+					tabbedPane.setSelectedComponent(cspSystemPanel);
 					break;
 				}
 			}

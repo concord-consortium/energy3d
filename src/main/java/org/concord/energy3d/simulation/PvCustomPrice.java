@@ -1,6 +1,8 @@
 package org.concord.energy3d.simulation;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Rack;
@@ -25,6 +27,7 @@ public class PvCustomPrice implements Serializable {
 	private double solarPanelAadatPrice = 100;
 	private int lifespan = 20;
 	private double landUnitPrice;
+	private HashMap<String, Double> pvModelPrices;
 
 	public PvCustomPrice() {
 		setDefaultValues();
@@ -52,10 +55,26 @@ public class PvCustomPrice implements Serializable {
 		if (solarPanelAadatPrice == 0) {
 			solarPanelAadatPrice = 1000;
 		}
+		if (pvModelPrices == null) {
+			pvModelPrices = new HashMap<String, Double>();
+			final Map<String, PvModuleSpecs> modules = PvModulesData.getInstance().getModules();
+			for (final String key : modules.keySet()) {
+				pvModelPrices.put(key, modules.get(key).getPrice());
+			}
+		}
 	}
 
 	public double getTotalCost(final Rack r) {
-		double cost = solarPanelPrice;
+		final String modelName = r.getSolarPanel().getModelName();
+		double cost = 0;
+		if ("Custom".equals(modelName)) {
+			cost = solarPanelPrice;
+		} else {
+			final Double d = pvModelPrices.get(modelName);
+			if (d != null) {
+				cost = d;
+			}
+		}
 		cost += solarPanelRackBasePrice;
 		boolean flat = false;
 		final HousePart container = r.getContainer();
@@ -86,7 +105,16 @@ public class PvCustomPrice implements Serializable {
 	}
 
 	public double getTotalCost(final SolarPanel s) {
-		double cost = solarPanelPrice;
+		final String modelName = s.getModelName();
+		double cost = 0;
+		if ("Custom".equals(modelName)) {
+			cost = solarPanelPrice;
+		} else {
+			final Double d = pvModelPrices.get(modelName);
+			if (d != null) {
+				cost = d;
+			}
+		}
 		cost += solarPanelRackBasePrice;
 		final double baseHeight = s.getBaseHeight() * Scene.getInstance().getAnnotationScale();
 		if (baseHeight > 1) {
@@ -168,6 +196,14 @@ public class PvCustomPrice implements Serializable {
 
 	public double getSolarPanelRackHeightPrice() {
 		return solarPanelRackHeightPrice;
+	}
+
+	public void setPvModelPrice(final String model, final double price) {
+		pvModelPrices.put(model, price);
+	}
+
+	public double getPvModelPrice(final String model) {
+		return pvModelPrices.get(model);
 	}
 
 }

@@ -30,6 +30,7 @@ public class PvModuleSpecs implements Serializable {
 	private double noct = 45; // Nominal operating cell temperature (degree C)
 	private double weight = 19; // kg
 	private String shadeTolerance = "Partial"; // ad hoc
+	private double price = 1000; // reference price
 
 	@Override
 	public String toString() {
@@ -202,6 +203,14 @@ public class PvModuleSpecs implements Serializable {
 
 	public double getWeight() {
 		return weight;
+	}
+
+	public void setPrice(final double price) {
+		this.price = price;
+	}
+
+	public double getPrice() {
+		return price;
 	}
 
 }

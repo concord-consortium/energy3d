@@ -74,6 +74,7 @@ public final class PvModulesData {
 			module.setWeight(Double.parseDouble(t[15].trim()));
 			module.setColor(t[16].trim());
 			module.setShadeTolerance(t[17].trim());
+			module.setPrice(Double.parseDouble(t[18].trim()));
 		}
 
 	}
