@@ -11,13 +11,18 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.UIManager;
 
+import org.concord.energy3d.agents.Agent;
+import org.concord.energy3d.agents.MyEvent;
+import org.concord.energy3d.agents.SimpleReflexAgent;
 import org.concord.energy3d.etc.oneinstance.OneInstance;
 import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
 import org.concord.energy3d.gui.Mac;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.logger.EventLog;
 import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
@@ -27,12 +32,14 @@ import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 public class MainApplication {
-	public static final String VERSION = "7.5.8";
+	public static final String VERSION = "7.5.9";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
 	private static volatile boolean initializing;
 	private static ArrayList<Runnable> shutdownHooks;
+	private static EventLog eventLog;
+	private static List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
 	public static void main(final String[] args) {
 
@@ -40,6 +47,9 @@ public class MainApplication {
 		final long t = System.nanoTime();
 		checkSingleInstance(MainApplication.class, args);
 		startDeadlockDetectionThread();
+
+		agents = new ArrayList<Agent>();
+		agents.add(new SimpleReflexAgent());
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
@@ -141,6 +151,23 @@ public class MainApplication {
 		if (!shutdownHooks.contains(r)) {
 			shutdownHooks.add(r);
 		}
+	}
+
+	public static void addEvent(final MyEvent e) {
+		if (eventLog == null) {
+			eventLog = new EventLog();
+		}
+		eventLog.addEvent(e);
+		if (e instanceof MyEvent) {
+			for (final Agent a : agents) {
+				a.sense(e);
+				a.actuate();
+			}
+		}
+	}
+
+	public static List<Agent> getAgents() {
+		return agents;
 	}
 
 	public static void exit() {

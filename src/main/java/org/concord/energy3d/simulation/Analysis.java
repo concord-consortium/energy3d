@@ -40,6 +40,8 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.agents.AnalysisEvent;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
@@ -124,6 +126,7 @@ public abstract class Analysis {
 	}
 
 	void onCompletion() {
+		MainApplication.addEvent(new AnalysisEvent(Scene.getURL(), System.currentTimeMillis(), getClass().getName(), graph.data));
 		TimeSeriesLogger.getInstance().logAnalysis(this);
 		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);

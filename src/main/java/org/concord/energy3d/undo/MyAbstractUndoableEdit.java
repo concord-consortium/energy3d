@@ -4,6 +4,7 @@ import java.net.URL;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import org.concord.energy3d.agents.MyEvent;
 import org.concord.energy3d.scene.Scene;
 
 /**
@@ -12,7 +13,7 @@ import org.concord.energy3d.scene.Scene;
  * @author Charles Xie
  *
  */
-public abstract class MyAbstractUndoableEdit extends AbstractUndoableEdit {
+public abstract class MyAbstractUndoableEdit extends AbstractUndoableEdit implements MyEvent {
 
 	private static final long serialVersionUID = 1L;
 	protected long timestamp;
@@ -24,10 +25,17 @@ public abstract class MyAbstractUndoableEdit extends AbstractUndoableEdit {
 		file = Scene.getURL();
 	}
 
+	@Override
 	public long getTimestamp() {
 		return timestamp;
 	}
 
+	@Override
+	public String getName() {
+		return getPresentationName();
+	}
+
+	@Override
 	public URL getFile() {
 		return file;
 	}

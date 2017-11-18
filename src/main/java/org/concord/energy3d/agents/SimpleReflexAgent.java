@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.concord.energy3d.undo.MyAbstractUndoableEdit;
-
 /**
  * @author Charles Xie
  *
@@ -37,8 +35,8 @@ public class SimpleReflexAgent implements Agent {
 	}
 
 	@Override
-	public void sense(final MyAbstractUndoableEdit edit) {
-		System.out.println(this + ": sensing " + edit.getPresentationName() + " @" + new Date(edit.getTimestamp()));
+	public void sense(final MyEvent e) {
+		System.out.println(this + ": sensing " + e.getFile() + ":" + e.getName() + " @" + new Date(e.getTimestamp()));
 		for (final Sensor s : sensors) {
 			s.sense();
 		}

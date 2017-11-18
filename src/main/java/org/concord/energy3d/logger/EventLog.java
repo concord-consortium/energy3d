@@ -1,10 +1,10 @@
 package org.concord.energy3d.logger;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import javax.swing.undo.UndoableEdit;
-
-import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.agents.MyEvent;
 
 /**
  * @author Charles Xie
@@ -12,10 +12,18 @@ import org.concord.energy3d.scene.SceneManager;
  */
 public class EventLog {
 
-	private final Vector<UndoableEdit> edits;
+	private final List<MyEvent> events;
 
 	public EventLog() {
-		edits = SceneManager.getInstance().getUndoManager().getEdits();
+		events = Collections.synchronizedList(new ArrayList<MyEvent>());
+	}
+
+	public void clear() {
+		events.clear();
+	}
+
+	public void addEvent(final MyEvent e) {
+		events.add(e);
 	}
 
 }

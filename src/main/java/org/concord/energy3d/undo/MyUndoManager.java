@@ -1,7 +1,5 @@
 package org.concord.energy3d.undo;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import javax.swing.undo.CannotRedoException;
@@ -9,8 +7,9 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.Agent;
-import org.concord.energy3d.agents.SimpleReflexAgent;
+import org.concord.energy3d.agents.MyEvent;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
@@ -18,11 +17,8 @@ import org.concord.energy3d.scene.Scene;
 public class MyUndoManager extends UndoManager {
 
 	private static final long serialVersionUID = 1L;
-	private final List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
 	public MyUndoManager() {
-		agents = new ArrayList<Agent>();
-		agents.add(new SimpleReflexAgent());
 	}
 
 	@Override
@@ -31,9 +27,9 @@ public class MyUndoManager extends UndoManager {
 		final boolean saveFlag = edit instanceof SaveCommand;
 		Scene.getInstance().setEdited(!saveFlag);
 		refreshUndoRedoGui();
-		if (edit instanceof MyAbstractUndoableEdit) {
-			for (final Agent a : agents) {
-				a.sense((MyAbstractUndoableEdit) edit);
+		if (edit instanceof MyEvent) {
+			for (final Agent a : MainApplication.getAgents()) {
+				a.sense((MyEvent) edit);
 				a.actuate();
 			}
 		}

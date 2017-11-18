@@ -1070,12 +1070,12 @@ public class MainFrame extends JFrame {
 
 			// User data and models
 
-			final JMenu userMenu = new JMenu("User Modeling");
-			helpMenu.add(userMenu);
+			final JMenu userHistoryMenu = new JMenu("View My History");
+			helpMenu.add(userHistoryMenu);
 			helpMenu.addSeparator();
 
-			final JMenu userDataMenu = new JMenu("Data");
-			userMenu.add(userDataMenu);
+			final JMenu userEventsMenu = new JMenu("Events");
+			userHistoryMenu.add(userEventsMenu);
 
 			JMenuItem mi = new JMenuItem("Event Time Series");
 			mi.addActionListener(new ActionListener() {
@@ -1084,7 +1084,7 @@ public class MainFrame extends JFrame {
 					new EventTimeSeries().showGui();
 				}
 			});
-			userDataMenu.add(mi);
+			userEventsMenu.add(mi);
 
 			mi = new JMenuItem("Event Frequency");
 			mi.addActionListener(new ActionListener() {
@@ -1093,16 +1093,13 @@ public class MainFrame extends JFrame {
 					new EventFrequency().showGui();
 				}
 			});
-			userDataMenu.add(mi);
+			userEventsMenu.add(mi);
 
-			final JMenu userModelMenu = new JMenu("Model");
-			userMenu.add(userModelMenu);
+			final JMenu userResultsMenu = new JMenu("Results");
+			userHistoryMenu.add(userResultsMenu);
 
-			mi = new JMenuItem("Multinormial");
-			userModelMenu.add(mi);
-
-			mi = new JMenuItem("Markov");
-			userModelMenu.add(mi);
+			mi = new JMenuItem("Analysis Results");
+			userResultsMenu.add(mi);
 
 			// Energy3D web pages
 
