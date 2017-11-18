@@ -25,7 +25,12 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.swing.AbstractButton;
@@ -90,6 +95,22 @@ public class Util {
 			return true;
 		}
 		return false;
+	}
+
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(final Map<K, V> map, final boolean ascending) {
+		final List<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>(map.entrySet());
+		Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+			@Override
+			public int compare(final Map.Entry<K, V> o1, final Map.Entry<K, V> o2) {
+				return (ascending ? 1 : -1) * o1.getValue().compareTo(o2.getValue());
+			}
+		});
+
+		final Map<K, V> result = new LinkedHashMap<K, V>();
+		for (final Map.Entry<K, V> entry : list) {
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return result;
 	}
 
 	public static BufferedImage resizeImage(final BufferedImage bi, final int newW, final int newH) {

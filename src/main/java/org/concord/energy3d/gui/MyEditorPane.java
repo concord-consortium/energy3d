@@ -22,6 +22,7 @@ import javax.swing.text.Element;
 import javax.swing.text.ElementIterator;
 import javax.swing.text.html.HTMLDocument;
 
+import org.concord.energy3d.agents.EventFrequency;
 import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
@@ -194,6 +195,11 @@ class MyEditorPane {
 			EnergyPanel.getInstance().selectInstructionSheet(1);
 		} else if ("Sheet 3".equals(act)) {
 			EnergyPanel.getInstance().selectInstructionSheet(2);
+		}
+
+		// show actions
+		else if ("actions".equals(act)) {
+			new EventFrequency().showGui();
 		}
 
 		// heliodon commands

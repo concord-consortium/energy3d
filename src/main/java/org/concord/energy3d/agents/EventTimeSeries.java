@@ -37,7 +37,7 @@ import org.concord.energy3d.util.ClipImage;
  * @author Charles Xie
  *
  */
-public class ActionHistogram extends JComponent {
+public class EventTimeSeries extends JComponent {
 
 	private static final long serialVersionUID = 1L;
 	private final static int LEFT_MARGIN = 60;
@@ -55,7 +55,7 @@ public class ActionHistogram extends JComponent {
 	private final Vector<UndoableEdit> edits;
 	private int[] totalCount;
 
-	public ActionHistogram() {
+	public EventTimeSeries() {
 
 		super();
 		setPreferredSize(new Dimension(800, 500));
@@ -143,7 +143,7 @@ public class ActionHistogram extends JComponent {
 			tickmark = "" + i;
 			g2.drawString(tickmark, x0 - 10 - g2.getFontMetrics().stringWidth(tickmark), (int) (yTick + 4));
 		}
-		final String yLabel = "Action Count";
+		final String yLabel = "Event Count";
 		g2.setFont(new Font("Arial", Font.BOLD, 12));
 		final int yLabelX = x0 - 30;
 		final int yLabelY = height / 2 + g2.getFontMetrics().stringWidth(yLabel) / 2 - 8;
@@ -177,7 +177,7 @@ public class ActionHistogram extends JComponent {
 
 	public void showGui() {
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Action Histogram", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Time Series of Events", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		final JPanel contentPane = new JPanel(new BorderLayout());
@@ -193,7 +193,7 @@ public class ActionHistogram extends JComponent {
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				new ClipImage().copyImageToClipboard(ActionHistogram.this);
+				new ClipImage().copyImageToClipboard(EventTimeSeries.this);
 			}
 		});
 		menu.add(mi);

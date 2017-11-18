@@ -59,7 +59,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.MainApplication;
-import org.concord.energy3d.agents.ActionHistogram;
+import org.concord.energy3d.agents.EventFrequency;
+import org.concord.energy3d.agents.EventTimeSeries;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.logger.PostProcessor;
@@ -1094,11 +1095,20 @@ public class MainFrame extends JFrame {
 			final JMenu userDataMenu = new JMenu("Data");
 			userMenu.add(userDataMenu);
 
-			JMenuItem mi = new JMenuItem("Histogram");
+			JMenuItem mi = new JMenuItem("Event Time Series");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					new ActionHistogram().showGui();
+					new EventTimeSeries().showGui();
+				}
+			});
+			userDataMenu.add(mi);
+
+			mi = new JMenuItem("Event Frequency");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new EventFrequency().showGui();
 				}
 			});
 			userDataMenu.add(mi);
