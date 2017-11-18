@@ -50,8 +50,8 @@ public class EventFrequency extends JComponent {
 	public EventFrequency() {
 
 		super();
-		setPreferredSize(new Dimension(800, 500));
-		setBackground(Color.WHITE);
+		setPreferredSize(new Dimension(400, 600));
+		setBackground(Color.DARK_GRAY);
 
 		final Map<String, List<MyAbstractUndoableEdit>> actions = new ActionList().getActions();
 		if (!actions.isEmpty()) {
@@ -88,7 +88,7 @@ public class EventFrequency extends JComponent {
 		g2.fillRect(0, 0, width, height);
 
 		g2.setStroke(thin);
-		g2.setColor(Color.BLACK);
+		g2.setColor(Color.LIGHT_GRAY);
 		final int xAxisY = height - BOTTOM_MARGIN;
 		final int graphWindowHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
 		final int graphWindowWidth = width - LEFT_MARGIN - RIGHT_MARGIN;
@@ -96,18 +96,18 @@ public class EventFrequency extends JComponent {
 
 		// draw x axis
 
-		g2.setColor(Color.BLACK);
-		g2.setFont(new Font("Arial", Font.PLAIN, 12));
+		g2.setColor(Color.WHITE);
+		g2.setFont(new Font("Arial", Font.PLAIN, 11));
 		final String xLabel = "Event Count";
 		g2.drawString(xLabel, width / 2 - g2.getFontMetrics().stringWidth(xLabel) / 2, xAxisY + 30);
 
-		if (!actionCounts.isEmpty() && max > 0) {
-			final int dx = Math.round((float) graphWindowWidth / (float) max);
+		if (max > 0 && actionCounts != null && !actionCounts.isEmpty()) {
+			final int dx = (int) ((float) (graphWindowWidth - 4) / (float) max);
 			g2.setFont(new Font("Arial", Font.PLAIN, 9));
 			int i = 0;
 			for (final String key : actionCounts.keySet()) {
 				g2.setColor(Color.GRAY);
-				g2.fillRect(LEFT_MARGIN, TOP_MARGIN + 20 * i + 10, dx * actionCounts.get(key), 10);
+				g2.fillRect(LEFT_MARGIN + 2, TOP_MARGIN + 20 * i + 10, dx * actionCounts.get(key), 10);
 				g2.setColor(Color.WHITE);
 				g2.drawString(key + " (" + actionCounts.get(key) + ")", LEFT_MARGIN + 6, TOP_MARGIN + 20 * i + 18);
 				i++;
@@ -145,7 +145,7 @@ public class EventFrequency extends JComponent {
 
 		panel.add(this, BorderLayout.CENTER);
 
-		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
 		final JButton button = new JButton("Close");

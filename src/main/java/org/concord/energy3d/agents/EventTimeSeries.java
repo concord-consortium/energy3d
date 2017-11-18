@@ -47,7 +47,6 @@ public class EventTimeSeries extends JComponent {
 
 	// private final BasicStroke dashed = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1, new float[] { 8f }, 0.0f);
 	private final BasicStroke thin = new BasicStroke(1);
-	private final BasicStroke thick = new BasicStroke(2);
 	private final DecimalFormat format1 = new DecimalFormat("#.#");
 	private double binSize = 1; // in seconds
 	private double xmax; // in seconds
@@ -59,7 +58,7 @@ public class EventTimeSeries extends JComponent {
 
 		super();
 		setPreferredSize(new Dimension(800, 500));
-		setBackground(Color.WHITE);
+		setBackground(Color.DARK_GRAY);
 
 		edits = SceneManager.getInstance().getUndoManager().getEdits();
 		long t0 = -1;
@@ -114,8 +113,7 @@ public class EventTimeSeries extends JComponent {
 		g2.setColor(getBackground());
 		g2.fillRect(0, 0, width, height);
 
-		g2.setStroke(thick);
-		g2.setColor(Color.BLACK);
+		g2.setColor(Color.LIGHT_GRAY);
 		final int xAxisY = height - BOTTOM_MARGIN;
 		final int graphWindowHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
 		final int graphWindowWidth = width - LEFT_MARGIN - RIGHT_MARGIN;
@@ -124,7 +122,7 @@ public class EventTimeSeries extends JComponent {
 
 		// draw x axis
 
-		g2.setColor(Color.BLACK);
+		g2.setColor(Color.WHITE);
 		g2.setFont(new Font("Arial", Font.BOLD, 12));
 		final String xLabel = "Time (seconds), bin size " + format1.format(binSize);
 		g2.drawString(xLabel, width / 2 - g2.getFontMetrics().stringWidth(xLabel) / 2, xAxisY + 30);
@@ -160,9 +158,9 @@ public class EventTimeSeries extends JComponent {
 			for (int i = 0; i < totalCount.length; i++) {
 				xTick = x0 + i * dx;
 				area.add(new Area(new Rectangle2D.Double(xTick, xAxisY - totalCount[i] * dy, dx, totalCount[i] * dy)));
-				g2.setColor(Color.LIGHT_GRAY);
+				g2.setColor(Color.GRAY);
 				g2.fill(area);
-				g2.setColor(Color.BLACK);
+				g2.setColor(Color.LIGHT_GRAY);
 				g2.draw(area);
 				g2.drawLine((int) xTick, xAxisY + 2, (int) xTick, xAxisY);
 				if (i == totalCount.length - 1) {
@@ -204,7 +202,7 @@ public class EventTimeSeries extends JComponent {
 
 		panel.add(this, BorderLayout.CENTER);
 
-		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
 		final JButton button = new JButton("Close");

@@ -24,7 +24,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -129,7 +131,6 @@ import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Printout;
-import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.ColorRGBA;
@@ -1052,37 +1053,18 @@ public class MainFrame extends JFrame {
 	private JMenu getHelpMenu() {
 		if (helpMenu == null) {
 			helpMenu = new JMenu("Help");
-			final JMenuItem miUpdate = new JMenuItem("Check Update...");
 			helpMenu.addMenuListener(new MenuListener() {
 
 				@Override
-				public void menuSelected(final MenuEvent e) {
-					miUpdate.setEnabled(!Updater.isDownloadInProgress());
+				public void menuCanceled(final MenuEvent e) {
 				}
 
 				@Override
 				public void menuDeselected(final MenuEvent e) {
-					miUpdate.setEnabled(true);
 				}
 
 				@Override
-				public void menuCanceled(final MenuEvent e) {
-					miUpdate.setEnabled(true);
-				}
-			});
-			// helpMenu.add(miUpdate); // TODO
-			miUpdate.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Updater.download();
-					if (Updater.isUpdateAvailable()) {
-						Updater.install();
-						if (Updater.isRestartRequested()) {
-							MainApplication.restartApplication();
-						}
-					} else {
-						JOptionPane.showMessageDialog(instance, "Your software is up to date.", "Update Status", JOptionPane.INFORMATION_MESSAGE);
-					}
+				public void menuSelected(final MenuEvent e) {
 				}
 			});
 
@@ -1123,6 +1105,40 @@ public class MainFrame extends JFrame {
 			userModelMenu.add(mi);
 
 			// Energy3D web pages
+
+			final JMenuItem miUpdate = new JMenuItem("Check Update..."); // the automatic updater can fail sometimes. This provides an independent check.
+			helpMenu.add(miUpdate);
+			miUpdate.setEnabled(!Config.isWebStart());
+			miUpdate.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					File jarFile = null;
+					try {
+						jarFile = new File(MainApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+					} catch (final URISyntaxException e1) {
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(instance, e1.getMessage(), "URL Error (local energy3d.jar)", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if (!jarFile.toString().endsWith("energy3d.jar")) {
+						return;
+					}
+					URLConnection connection = null;
+					try {
+						connection = new URL("http://energy.concord.org/energy3d/update/energy3d.jar").openConnection();
+					} catch (final Exception e1) {
+						e1.printStackTrace();
+						JOptionPane.showMessageDialog(instance, e1.getMessage(), "URL Error (remote energy3d.jar)", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if (connection.getLastModified() <= jarFile.lastModified()) {
+						JOptionPane.showMessageDialog(instance, "Your software is up to date.", "Update Status", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(instance, "<html>Your software is out of date. But for some reason, it cannot update itself.<br>Please go to http://energy3d.concord.org to download and reinstall the latest version.</html>", "Update Status", JOptionPane.INFORMATION_MESSAGE);
+						Util.openBrowser("http://energy3d.concord.org");
+					}
+				}
+			});
 
 			mi = new JMenuItem("View Sites...");
 			mi.addActionListener(new ActionListener() {

@@ -198,7 +198,7 @@ class MyEditorPane {
 		}
 
 		// show actions
-		else if ("actions".equals(act)) {
+		else if ("Event Frequency".equals(act)) {
 			new EventFrequency().showGui();
 		}
 
