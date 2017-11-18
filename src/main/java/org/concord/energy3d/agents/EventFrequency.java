@@ -27,7 +27,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Util;
 
@@ -44,7 +43,7 @@ public class EventFrequency extends JComponent {
 	private final static int BOTTOM_MARGIN = 40;
 	private final BasicStroke thin = new BasicStroke(1);
 
-	private Map<String, Integer> actionCounts;
+	private Map<String, Integer> eventCounts;
 	private int max;
 
 	public EventFrequency() {
@@ -53,17 +52,17 @@ public class EventFrequency extends JComponent {
 		setPreferredSize(new Dimension(400, 600));
 		setBackground(Color.DARK_GRAY);
 
-		final Map<String, List<MyAbstractUndoableEdit>> actions = new ActionList().getActions();
-		if (!actions.isEmpty()) {
-			actionCounts = new HashMap<String, Integer>();
-			for (final String key : actions.keySet()) {
-				final int i = actions.get(key).size();
-				actionCounts.put(key, i);
+		final Map<String, List<MyEvent>> events = new EventList().getEvents();
+		if (!events.isEmpty()) {
+			eventCounts = new HashMap<String, Integer>();
+			for (final String key : events.keySet()) {
+				final int i = events.get(key).size();
+				eventCounts.put(key, i);
 				if (i > max) {
 					max = i;
 				}
 			}
-			actionCounts = Util.sortByValue(actionCounts, false);
+			eventCounts = Util.sortByValue(eventCounts, false);
 		}
 
 	}
@@ -101,15 +100,15 @@ public class EventFrequency extends JComponent {
 		final String xLabel = "Event Count";
 		g2.drawString(xLabel, width / 2 - g2.getFontMetrics().stringWidth(xLabel) / 2, xAxisY + 30);
 
-		if (max > 0 && actionCounts != null && !actionCounts.isEmpty()) {
+		if (max > 0 && eventCounts != null && !eventCounts.isEmpty()) {
 			final int dx = (int) ((float) (graphWindowWidth - 4) / (float) max);
 			g2.setFont(new Font("Arial", Font.PLAIN, 9));
 			int i = 0;
-			for (final String key : actionCounts.keySet()) {
+			for (final String key : eventCounts.keySet()) {
 				g2.setColor(Color.GRAY);
-				g2.fillRect(LEFT_MARGIN + 2, TOP_MARGIN + 20 * i + 10, dx * actionCounts.get(key), 10);
+				g2.fillRect(LEFT_MARGIN + 2, TOP_MARGIN + 20 * i + 10, dx * eventCounts.get(key), 10);
 				g2.setColor(Color.WHITE);
-				g2.drawString(key + " (" + actionCounts.get(key) + ")", LEFT_MARGIN + 6, TOP_MARGIN + 20 * i + 18);
+				g2.drawString(key + " (" + eventCounts.get(key) + ")", LEFT_MARGIN + 6, TOP_MARGIN + 20 * i + 18);
 				i++;
 			}
 		}

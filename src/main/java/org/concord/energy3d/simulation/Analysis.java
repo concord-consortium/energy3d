@@ -126,7 +126,7 @@ public abstract class Analysis {
 	}
 
 	void onCompletion() {
-		MainApplication.addEvent(new AnalysisEvent(Scene.getURL(), System.currentTimeMillis(), getClass().getName(), graph.data));
+		MainApplication.addEvent(new AnalysisEvent(Scene.getURL(), System.currentTimeMillis(), getClass().getSimpleName(), graph.data));
 		TimeSeriesLogger.getInstance().logAnalysis(this);
 		EnergyPanel.getInstance().progress(0);
 		runButton.setEnabled(true);

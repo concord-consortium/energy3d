@@ -22,6 +22,10 @@ public class EventLog {
 		events.clear();
 	}
 
+	public List<MyEvent> getEvents() {
+		return events;
+	}
+
 	public void addEvent(final MyEvent e) {
 		events.add(e);
 	}

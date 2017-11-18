@@ -16,7 +16,8 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,9 +29,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.util.ClipImage;
 
 /**
@@ -51,7 +52,7 @@ public class EventTimeSeries extends JComponent {
 	private double binSize = 1; // in seconds
 	private double xmax; // in seconds
 	private int ymax = 0;
-	private final Vector<UndoableEdit> edits;
+	private final List<MyEvent> events;
 	private int[] totalCount;
 
 	public EventTimeSeries() {
@@ -60,34 +61,40 @@ public class EventTimeSeries extends JComponent {
 		setPreferredSize(new Dimension(800, 500));
 		setBackground(Color.DARK_GRAY);
 
-		edits = SceneManager.getInstance().getUndoManager().getEdits();
-		long t0 = -1;
-		long t1 = -1;
-		if (edits.size() > 1) {
-			final UndoableEdit e0 = edits.get(0);
-			final UndoableEdit e1 = edits.get(edits.size() - 1);
-			if (e0 instanceof MyAbstractUndoableEdit) {
-				t0 = ((MyAbstractUndoableEdit) e0).getTimestamp();
+		// combine the events first
+		events = new ArrayList<MyEvent>(MainApplication.getEventLog().getEvents());
+		for (final UndoableEdit x : SceneManager.getInstance().getUndoManager().getEdits()) {
+			if (x instanceof MyEvent) {
+				events.add((MyEvent) x);
 			}
-			if (e1 instanceof MyAbstractUndoableEdit) {
-				t1 = ((MyAbstractUndoableEdit) e1).getTimestamp();
-			}
-			if (t0 != -1 && t1 != -1) {
-				final double duration = (t1 - t0) * 0.001;
-				binSize = Math.max(duration * 0.05, 1);
-				xmax = Math.max(duration + binSize, 10 * binSize);
-				totalCount = new int[(int) Math.round(xmax / binSize)];
-				for (final UndoableEdit e : edits) {
-					if (e instanceof MyAbstractUndoableEdit) {
-						final MyAbstractUndoableEdit x = (MyAbstractUndoableEdit) e;
-						final double t = (x.getTimestamp() - t0) * 0.001;
-						totalCount[(int) (t / binSize)]++;
-					}
+		}
+
+		// find the time bounds
+		long t0 = Long.MAX_VALUE;
+		long t1 = -Long.MAX_VALUE;
+		if (!events.isEmpty()) {
+			for (final MyEvent x : events) {
+				if (x.getTimestamp() < t0) {
+					t0 = x.getTimestamp();
 				}
-				for (int i = 0; i < totalCount.length; i++) {
-					if (totalCount[i] > ymax) {
-						ymax = totalCount[i];
-					}
+				if (x.getTimestamp() > t1) {
+					t1 = x.getTimestamp();
+				}
+			}
+		}
+
+		if (t0 != Long.MAX_VALUE && t1 != -Long.MAX_VALUE) {
+			final double duration = (t1 - t0) * 0.001;
+			binSize = Math.max(duration * 0.05, 1);
+			xmax = Math.max(duration + binSize, 10 * binSize);
+			totalCount = new int[(int) Math.round(xmax / binSize)];
+			for (final MyEvent e : events) {
+				final double t = (e.getTimestamp() - t0) * 0.001;
+				totalCount[(int) (t / binSize)]++;
+			}
+			for (int i = 0; i < totalCount.length; i++) {
+				if (totalCount[i] > ymax) {
+					ymax = totalCount[i];
 				}
 			}
 		}

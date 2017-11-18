@@ -38,7 +38,7 @@ public class MainApplication {
 	public static boolean isMacOpeningFile;
 	private static volatile boolean initializing;
 	private static ArrayList<Runnable> shutdownHooks;
-	private static EventLog eventLog;
+	private static EventLog eventLog = new EventLog();
 	private static List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
 	public static void main(final String[] args) {
@@ -154,9 +154,6 @@ public class MainApplication {
 	}
 
 	public static void addEvent(final MyEvent e) {
-		if (eventLog == null) {
-			eventLog = new EventLog();
-		}
 		eventLog.addEvent(e);
 		if (e instanceof MyEvent) {
 			for (final Agent a : agents) {
@@ -164,6 +161,10 @@ public class MainApplication {
 				a.actuate();
 			}
 		}
+	}
+
+	public static EventLog getEventLog() {
+		return eventLog;
 	}
 
 	public static List<Agent> getAgents() {
