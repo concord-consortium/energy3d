@@ -3,6 +3,8 @@ package org.concord.energy3d.gui;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
@@ -13,6 +15,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JToggleButton;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.PopupMenuEvent;
@@ -22,8 +25,13 @@ import javax.swing.text.Element;
 import javax.swing.text.ElementIterator;
 import javax.swing.text.html.HTMLDocument;
 
+import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.EventFrequency;
+import org.concord.energy3d.agents.EventTimeSeries;
+import org.concord.energy3d.agents.QuestionnaireEvent;
+import org.concord.energy3d.agents.QuestionnaireModel;
 import org.concord.energy3d.model.PartGroup;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
@@ -157,6 +165,9 @@ class MyEditorPane {
 				// look for buttons
 				DefaultButtonModel buttonModel = null;
 				String action = null;
+				String question = null;
+				String choice = null;
+				String key = null;
 				while (en.hasMoreElements()) {
 					final Object n = en.nextElement();
 					final Object v = as.getAttribute(n);
@@ -164,17 +175,44 @@ class MyEditorPane {
 						buttonModel = (DefaultButtonModel) v;
 					} else if (n.toString().equals("action")) {
 						action = v.toString();
+					} else if (n.toString().equals("question")) {
+						question = v.toString();
+					} else if (n.toString().equals("choice")) {
+						choice = v.toString();
+					} else if (n.toString().equals("key")) {
+						key = v.toString();
 					}
 				}
 				if (buttonModel != null && action != null) {
-					final String act = action;
-					final DefaultButtonModel model = buttonModel;
-					buttonModel.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(final ActionEvent e) {
-							interpret(act, model);
+					final String a = action;
+					final QuestionnaireModel qm;
+					if (question != null && choice != null) {
+						boolean isKey = false;
+						if ("yes".equalsIgnoreCase(key) || "true".equalsIgnoreCase(key)) {
+							isKey = true;
 						}
-					});
+						qm = new QuestionnaireModel(question, choice, isKey);
+					} else {
+						qm = null;
+					}
+					final DefaultButtonModel bm = buttonModel;
+					if (buttonModel instanceof JToggleButton.ToggleButtonModel) {
+						buttonModel.addItemListener(new ItemListener() {
+							@Override
+							public void itemStateChanged(final ItemEvent e) {
+								if (e.getStateChange() == ItemEvent.SELECTED) {
+									interpret(a, qm, bm);
+								}
+							}
+						});
+					} else {
+						buttonModel.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(final ActionEvent e) {
+								interpret(a, qm, bm);
+							}
+						});
+					}
 				}
 
 			}
@@ -182,7 +220,7 @@ class MyEditorPane {
 
 	}
 
-	private void interpret(final String act, final DefaultButtonModel model) {
+	private void interpret(final String act, final QuestionnaireModel questionnaireModel, final DefaultButtonModel buttonModel) {
 
 		if (act == null) {
 			return;
@@ -197,14 +235,22 @@ class MyEditorPane {
 			EnergyPanel.getInstance().selectInstructionSheet(2);
 		}
 
+		else if ("Questionnaire".equals(act)) {
+			if (questionnaireModel != null) {
+				MainApplication.addEvent(new QuestionnaireEvent(Scene.getURL(), System.currentTimeMillis(), questionnaireModel));
+			}
+		}
+
 		// show actions
 		else if ("Event Frequency".equals(act)) {
 			new EventFrequency().showGui();
+		} else if ("Event Time Series".equals(act)) {
+			new EventTimeSeries().showGui();
 		}
 
 		// heliodon commands
 		else if ("Heliodon".equals(act)) {
-			MainPanel.getInstance().getHeliodonButton().setSelected(model.isSelected());
+			MainPanel.getInstance().getHeliodonButton().setSelected(buttonModel.isSelected());
 		} else if ("Heliodon On".equals(act)) {
 			MainPanel.getInstance().getHeliodonButton().setSelected(true);
 		} else if ("Heliodon Off".equals(act)) {
@@ -213,7 +259,7 @@ class MyEditorPane {
 
 		// sun motion commands
 		else if ("Sun Motion".equals(act)) {
-			MainPanel.getInstance().getSunAnimationButton().setSelected(model.isSelected());
+			MainPanel.getInstance().getSunAnimationButton().setSelected(buttonModel.isSelected());
 		} else if ("Sun Motion On".equals(act)) {
 			MainPanel.getInstance().getSunAnimationButton().setSelected(true);
 		} else if ("Sun Motion Off".equals(act)) {
@@ -222,7 +268,7 @@ class MyEditorPane {
 
 		// shadow commands
 		else if ("Shadow".equals(act)) {
-			MainPanel.getInstance().getShadowButton().setSelected(model.isSelected());
+			MainPanel.getInstance().getShadowButton().setSelected(buttonModel.isSelected());
 		} else if ("Shadow On".equals(act)) {
 			MainPanel.getInstance().getShadowButton().setSelected(true);
 		} else if ("Shadow Off".equals(act)) {

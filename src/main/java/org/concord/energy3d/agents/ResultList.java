@@ -24,6 +24,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -135,6 +136,7 @@ public class ResultList {
 			listModel.addElement(e.getName() + " (" + EnergyPanel.ONE_DECIMAL.format(0.001 * (System.currentTimeMillis() - e.getTimestamp())) + " s ago)");
 		}
 		final JList<String> list = new JList<String>(listModel);
+		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
