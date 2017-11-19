@@ -37,7 +37,7 @@ public class RemoveMultipleShuttersCommand extends MyAbstractUndoableEdit {
 				w.draw();
 			}
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class RemoveMultipleShuttersCommand extends MyAbstractUndoableEdit {
 				w.draw();
 			}
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override

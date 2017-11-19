@@ -413,6 +413,10 @@ public abstract class Graph extends JPanel {
 		return b != null ? b : false;
 	}
 
+	public Map<String, List<Double>> getData() {
+		return data;
+	}
+
 	public List<Double> getData(final String name) {
 		return data.get(name);
 	}

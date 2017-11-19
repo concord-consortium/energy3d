@@ -76,8 +76,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	public static final int TYPE_AUTO_DETECTED = 0;
 	public static final int TYPE_BUILDING = 1;
-	public static final int TYPE_PV_STATION = 2;
-	public static final int TYPE_CSP_STATION = 3;
+	public static final int TYPE_PV_PROJECT = 2;
+	public static final int TYPE_CSP_PROJECT = 3;
 
 	public static final int FERMAT_SPIRAL = 0;
 	public static final int EQUAL_AZIMUTHAL_SPACING = 0;
@@ -2164,7 +2164,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	public int addCircularMirrorArrays(final MirrorCircularFieldLayout layout) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
@@ -2233,7 +2233,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	public int addSpiralMirrorArrays(final MirrorSpiralFieldLayout layout) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
@@ -2277,7 +2277,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	public int addRectangularMirrorArrays(final MirrorRectangularFieldLayout layout) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
@@ -2328,7 +2328,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	public void addSolarPanelArrays(final SolarPanel solarPanel, final double rowSpacing, final double colSpacing, final int rowAxis) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
@@ -2421,7 +2421,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	public void addSolarRackArrays(final SolarPanel panel, double tiltAngle, final double baseHeight, final int panelRowsPerRack, final double rowSpacing, final int rowAxis, final double poleDistanceX, final double poleDistanceY) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Rack.class, SolarPanel.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double az = Math.toRadians(getAzimuth());
@@ -2564,10 +2564,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					return TYPE_BUILDING;
 				}
 				if (p instanceof SolarPanel || p instanceof Rack) {
-					return TYPE_PV_STATION;
+					return TYPE_PV_PROJECT;
 				}
 				if (p instanceof Mirror || p instanceof ParabolicTrough || p instanceof ParabolicDish || p instanceof FresnelReflector) {
-					return TYPE_CSP_STATION;
+					return TYPE_CSP_PROJECT;
 				}
 			}
 		}

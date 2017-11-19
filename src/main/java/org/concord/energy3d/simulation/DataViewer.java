@@ -192,10 +192,10 @@ class DataViewer {
 			} else if (p instanceof Foundation) {
 				final Foundation foundation = (Foundation) p;
 				switch (foundation.getProjectType()) {
-				case Foundation.TYPE_PV_STATION:
+				case Foundation.TYPE_PV_PROJECT:
 					headers.add("PV " + p.getId());
 					break;
-				case Foundation.TYPE_CSP_STATION:
+				case Foundation.TYPE_CSP_PROJECT:
 					headers.add("CSP " + p.getId());
 					break;
 				case Foundation.TYPE_BUILDING:

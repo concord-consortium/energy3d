@@ -23,7 +23,7 @@ import org.concord.energy3d.simulation.CspDesignSpecs;
  * @author Charles Xie
  *
  */
-public class CspStationInfoPanel extends JPanel {
+public class CspProjectInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,7 +31,7 @@ public class CspStationInfoPanel extends JPanel {
 	private final JPanel countPanel, costPanel, packingDensityPanel, moduleCountPanel;
 	private final ColorBar countBar, costBar, packingDensityBar, moduleCountBar;
 
-	public CspStationInfoPanel() {
+	public CspProjectInfoPanel() {
 
 		super(new BorderLayout());
 

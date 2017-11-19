@@ -2671,10 +2671,10 @@ public class MainFrame extends JFrame {
 						i = f.getProjectType();
 					}
 					switch (i) {
-					case Foundation.TYPE_PV_STATION:
+					case Foundation.TYPE_PV_PROJECT:
 						PvProjectCost.getInstance().showGraph();
 						break;
-					case Foundation.TYPE_CSP_STATION:
+					case Foundation.TYPE_CSP_PROJECT:
 						CspProjectCost.getInstance().showGraph();
 						break;
 					default:
@@ -3025,7 +3025,7 @@ public class MainFrame extends JFrame {
 	void importFile() {
 		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, false);
 		if (file != null) {
-			EnergyPanel.getInstance().clearRadiationHeatMap();
+			EnergyPanel.getInstance().updateRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
@@ -3043,7 +3043,7 @@ public class MainFrame extends JFrame {
 	void importColladaFile() {
 		final File file = FileChooser.getInstance().showDialog(".dae", daeFilter, false);
 		if (file != null) {
-			EnergyPanel.getInstance().clearRadiationHeatMap();
+			EnergyPanel.getInstance().updateRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
@@ -3061,7 +3061,7 @@ public class MainFrame extends JFrame {
 	private void exportObjFile() {
 		final File file = FileChooser.getInstance().showDialog(".obj", objFilter, true);
 		if (file != null) {
-			EnergyPanel.getInstance().clearRadiationHeatMap();
+			EnergyPanel.getInstance().updateRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {

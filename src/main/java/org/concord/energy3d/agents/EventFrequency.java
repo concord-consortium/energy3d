@@ -52,7 +52,7 @@ public class EventFrequency extends JComponent {
 		setPreferredSize(new Dimension(400, 600));
 		setBackground(Color.DARK_GRAY);
 
-		final Map<String, List<MyEvent>> events = new EventList().getEvents();
+		final Map<String, List<MyEvent>> events = EventUtil.getEventNameMap();
 		if (!events.isEmpty()) {
 			eventCounts = new HashMap<String, Integer>();
 			for (final String key : events.keySet()) {

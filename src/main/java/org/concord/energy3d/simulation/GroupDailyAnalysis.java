@@ -176,7 +176,7 @@ public class GroupDailyAnalysis extends DailyAnalysis {
 					final boolean mean = group.getType().endsWith("(Mean)");
 					final Foundation foundation = (Foundation) p;
 					switch (foundation.getProjectType()) {
-					case Foundation.TYPE_PV_STATION:
+					case Foundation.TYPE_PV_PROJECT:
 						double pv = foundation.getPhotovoltaicNow();
 						if (mean) {
 							pv /= foundation.getNumberOfSolarPanels();
@@ -193,7 +193,7 @@ public class GroupDailyAnalysis extends DailyAnalysis {
 							}
 						}
 						break;
-					case Foundation.TYPE_CSP_STATION:
+					case Foundation.TYPE_CSP_PROJECT:
 						double csp = foundation.getCspNow();
 						if (mean) {
 							csp /= foundation.countParts(new Class[] { Mirror.class, ParabolicTrough.class, ParabolicDish.class });
@@ -270,10 +270,10 @@ public class GroupDailyAnalysis extends DailyAnalysis {
 			} else if (p instanceof Foundation) {
 				final Foundation foundation = (Foundation) p;
 				switch (foundation.getProjectType()) {
-				case Foundation.TYPE_PV_STATION:
+				case Foundation.TYPE_PV_PROJECT:
 					names.add("PV " + p.getId());
 					break;
-				case Foundation.TYPE_CSP_STATION:
+				case Foundation.TYPE_CSP_PROJECT:
 					names.add("CSP " + p.getId());
 					break;
 				case Foundation.TYPE_BUILDING:

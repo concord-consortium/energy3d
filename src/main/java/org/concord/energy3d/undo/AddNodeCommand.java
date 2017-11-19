@@ -44,7 +44,7 @@ public class AddNodeCommand extends MyAbstractUndoableEdit {
 		if (node != null) {
 			foundation.deleteNode(node);
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class AddNodeCommand extends MyAbstractUndoableEdit {
 		if (node != null) {
 			foundation.addNode(node, nodeState);
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override

@@ -24,14 +24,14 @@ public class PastePartCommand extends MyAbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		Scene.getInstance().remove(housePart, true);
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().add(housePart, true);
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override

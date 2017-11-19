@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -90,6 +91,10 @@ public class BuildingDailyEnergyGraph extends JPanel {
 
 	public Foundation getBuilding() {
 		return building;
+	}
+
+	public Map<String, List<Double>> getData() {
+		return graph.getData();
 	}
 
 	public double getResult(final String name) {

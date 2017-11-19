@@ -1091,7 +1091,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void move(final Vector3 v) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final MovePartCommand c = new MovePartCommand(selectedPart, v);
 		if (selectedPart == null) {
 			for (final HousePart p : Scene.getInstance().getParts()) {
@@ -1454,7 +1454,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		heliodonControl = selected;
 		Heliodon.getInstance().setVisible(selected);
 		enableDisableRotationControl();
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 
 	}
 
@@ -2065,7 +2065,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (selectedPart.isDrawable()) {
 								selectedPart.complete();
 								if (editPartCommand != null && editPartCommand.isReallyEdited()) {
-									EnergyPanel.getInstance().clearRadiationHeatMap();
+									EnergyPanel.getInstance().updateRadiationHeatMap();
 								}
 							} else {
 								if (editPartCommand != null) {
@@ -2146,7 +2146,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (operationStick) {
 								operationFlag = true;
 							}
-							EnergyPanel.getInstance().clearRadiationHeatMap();
+							EnergyPanel.getInstance().updateRadiationHeatMap();
 						}
 						if (!operationFlag) {
 							MainPanel.getInstance().defaultTool();
@@ -2272,7 +2272,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	public void setSolarHeatMap(final boolean solarHeatMap) {
 		setSolarHeatMapWithoutUpdate(solarHeatMap);
 		EnergyPanel.getInstance().clearAlreadyRendered();
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		// For some reason, rack's texture doesn't change correctly until it is redrawn. Rack has to change between a repeated texture (solar panel) and a single texture (solar radiation)
 		SceneManager.getTaskManager().update(new Callable<Object>() {
 			@Override
@@ -2367,7 +2367,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void rotate(final double angle) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		taskManager.update(new Callable<Object>() {
 			@Override
 			public Object call() {

@@ -27,9 +27,9 @@ public abstract class ProjectCost {
 			return BuildingCost.getPartCost(p);
 		}
 		switch (f.getProjectType()) {
-		case Foundation.TYPE_PV_STATION:
+		case Foundation.TYPE_PV_PROJECT:
 			return PvProjectCost.getPartCost(p);
-		case Foundation.TYPE_CSP_STATION:
+		case Foundation.TYPE_CSP_PROJECT:
 			return CspProjectCost.getPartCost(p);
 		default:
 			return BuildingCost.getPartCost(p);

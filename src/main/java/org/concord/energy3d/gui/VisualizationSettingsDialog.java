@@ -108,7 +108,7 @@ class VisualizationSettingsDialog extends JDialog {
 				s.setHeatVectorLength(heatVectorLength);
 				s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getAnnotationScale());
 				s.setEdited(true);
-				EnergyPanel.getInstance().clearRadiationHeatMap();
+				EnergyPanel.getInstance().updateRadiationHeatMap();
 				VisualizationSettingsDialog.this.dispose();
 			}
 		};

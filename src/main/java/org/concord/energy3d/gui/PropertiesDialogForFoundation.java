@@ -73,10 +73,10 @@ class PropertiesDialogForFoundation extends PropertiesDialogFactory {
 		case Foundation.TYPE_BUILDING:
 			project = "Building";
 			break;
-		case Foundation.TYPE_PV_STATION:
+		case Foundation.TYPE_PV_PROJECT:
 			project = "PV";
 			break;
-		case Foundation.TYPE_CSP_STATION:
+		case Foundation.TYPE_CSP_PROJECT:
 			project = "CSP";
 			break;
 		}

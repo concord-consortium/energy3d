@@ -45,7 +45,7 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 		if (housePart.getContainer() != null) {
 			housePart.getContainer().draw();
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 		if (housePart.getContainer() != null) {
 			housePart.getContainer().draw();
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override

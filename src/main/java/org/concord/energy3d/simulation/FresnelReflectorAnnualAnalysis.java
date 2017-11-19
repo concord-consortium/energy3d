@@ -15,7 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 
-import org.concord.energy3d.gui.CspStationDailyEnergyGraph;
+import org.concord.energy3d.gui.CspProjectDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
@@ -68,7 +68,7 @@ public class FresnelReflectorAnnualAnalysis extends AnnualAnalysis {
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Foundation) { // synchronize with daily graph
-							final CspStationDailyEnergyGraph g = e.getCspStationDailyEnergyGraph();
+							final CspProjectDailyEnergyGraph g = e.getCspProjectDailyEnergyGraph();
 							if (g.hasGraph()) {
 								g.setCalendar(today);
 								g.updateGraph();
@@ -80,8 +80,8 @@ public class FresnelReflectorAnnualAnalysis extends AnnualAnalysis {
 							public void run() {
 								e.getDateSpinner().setValue(c.getTime());
 								if (selectedPart instanceof Foundation) {
-									final CspStationDailyEnergyGraph g = e.getCspStationDailyEnergyGraph();
-									e.getCspStationTabbedPane().setSelectedComponent(g);
+									final CspProjectDailyEnergyGraph g = e.getCspProjectDailyEnergyGraph();
+									e.getCspProjectTabbedPane().setSelectedComponent(g);
 									if (!g.hasGraph()) {
 										g.setCalendar(today2);
 										g.addGraph((Foundation) selectedPart);

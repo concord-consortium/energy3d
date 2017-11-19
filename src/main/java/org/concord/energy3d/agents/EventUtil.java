@@ -15,12 +15,23 @@ import org.concord.energy3d.undo.MyAbstractUndoableEdit;
  * @author Charles Xie
  *
  */
-public class EventList {
+public class EventUtil {
 
-	private final Map<String, List<MyEvent>> events;
+	private EventUtil() {
+	}
 
-	public EventList() {
-		events = new HashMap<String, List<MyEvent>>();
+	public static List<MyEvent> getEvents() {
+		final List<MyEvent> events = new ArrayList<MyEvent>(MainApplication.getEventLog().getEvents());
+		for (final UndoableEdit x : SceneManager.getInstance().getUndoManager().getEdits()) {
+			if (x instanceof MyEvent) {
+				events.add((MyEvent) x);
+			}
+		}
+		return events;
+	}
+
+	public static Map<String, List<MyEvent>> getEventNameMap() {
+		final Map<String, List<MyEvent>> events = new HashMap<String, List<MyEvent>>();
 		for (final UndoableEdit e : SceneManager.getInstance().getUndoManager().getEdits()) {
 			if (e instanceof MyAbstractUndoableEdit) {
 				final MyAbstractUndoableEdit e2 = (MyAbstractUndoableEdit) e;
@@ -40,9 +51,6 @@ public class EventList {
 			}
 			list.add(e);
 		}
-	}
-
-	public Map<String, List<MyEvent>> getEvents() {
 		return events;
 	}
 

@@ -391,13 +391,13 @@ class CustomPricesDialog extends JDialog {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart != null) {
 					if (selectedPart instanceof Foundation) {
-						EnergyPanel.getInstance().getPvStationInfoPanel().update((Foundation) selectedPart);
-						EnergyPanel.getInstance().getCspStationInfoPanel().update((Foundation) selectedPart);
+						EnergyPanel.getInstance().getPvProjectInfoPanel().update((Foundation) selectedPart);
+						EnergyPanel.getInstance().getCspProjectInfoPanel().update((Foundation) selectedPart);
 					} else {
 						final Foundation foundation = selectedPart.getTopContainer();
 						if (foundation != null) {
-							EnergyPanel.getInstance().getPvStationInfoPanel().update(foundation);
-							EnergyPanel.getInstance().getCspStationInfoPanel().update(foundation);
+							EnergyPanel.getInstance().getPvProjectInfoPanel().update(foundation);
+							EnergyPanel.getInstance().getCspProjectInfoPanel().update(foundation);
 						}
 					}
 				}
@@ -424,10 +424,10 @@ class CustomPricesDialog extends JDialog {
 			@Override
 			public void windowActivated(final WindowEvent e) {
 				switch (Scene.getInstance().getProjectType()) {
-				case Foundation.TYPE_PV_STATION:
+				case Foundation.TYPE_PV_PROJECT:
 					tabbedPane.setSelectedComponent(pvSystemPanel);
 					break;
-				case Foundation.TYPE_CSP_STATION:
+				case Foundation.TYPE_CSP_PROJECT:
 					tabbedPane.setSelectedComponent(cspSystemPanel);
 					break;
 				}

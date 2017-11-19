@@ -105,7 +105,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
 						if (file != null) {
-							EnergyPanel.getInstance().clearRadiationHeatMap();
+							EnergyPanel.getInstance().updateRadiationHeatMap();
 							SceneManager.getTaskManager().update(new Callable<Object>() {
 								@Override
 								public Object call() throws Exception {
@@ -1475,7 +1475,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						foundation.setProjectType(Foundation.TYPE_PV_STATION);
+						foundation.setProjectType(Foundation.TYPE_PV_PROJECT);
 					}
 				}
 			});
@@ -1489,7 +1489,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						foundation.setProjectType(Foundation.TYPE_CSP_STATION);
+						foundation.setProjectType(Foundation.TYPE_CSP_PROJECT);
 					}
 				}
 			});
@@ -1847,10 +1847,10 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						case Foundation.TYPE_BUILDING:
 							Util.selectSilently(rbmiTypeBuilding, true);
 							break;
-						case Foundation.TYPE_PV_STATION:
+						case Foundation.TYPE_PV_PROJECT:
 							Util.selectSilently(rbmiTypePvStation, true);
 							break;
-						case Foundation.TYPE_CSP_STATION:
+						case Foundation.TYPE_CSP_PROJECT:
 							Util.selectSilently(rbmiTypeCspStation, true);
 							break;
 						default:

@@ -170,7 +170,7 @@ class ScaleDialog extends JDialog {
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 							ScaleDialog.this.dispose();
 							Scene.getInstance().redrawAll();
-							EnergyPanel.getInstance().clearRadiationHeatMap();
+							EnergyPanel.getInstance().updateRadiationHeatMap();
 						} catch (final NumberFormatException err) {
 							err.printStackTrace();
 							JOptionPane.showMessageDialog(ScaleDialog.this, "Invalid input: " + err.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);

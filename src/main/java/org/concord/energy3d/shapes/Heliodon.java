@@ -442,7 +442,7 @@ public class Heliodon {
 				}
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
-					EnergyPanel.getInstance().clearRadiationHeatMap();
+					EnergyPanel.getInstance().updateRadiationHeatMap();
 				}
 			}
 		}));

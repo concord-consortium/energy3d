@@ -60,7 +60,7 @@ public class RemoveMultiplePartsCommand extends MyAbstractUndoableEdit {
 				Scene.getInstance().add(p, true);
 			}
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class RemoveMultiplePartsCommand extends MyAbstractUndoableEdit {
 		for (final HousePart p : parts) {
 			Scene.getInstance().remove(p, true);
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override

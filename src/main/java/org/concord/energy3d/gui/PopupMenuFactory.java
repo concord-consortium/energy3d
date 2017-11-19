@@ -533,7 +533,7 @@ public abstract class PopupMenuFactory {
 
 	static void updateAfterEdit() {
 		EnergyPanel.getInstance().updateProperties();
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		Scene.getInstance().setEdited(true);
 	}
 

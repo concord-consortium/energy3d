@@ -16,7 +16,6 @@ import java.awt.event.WindowEvent;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -27,11 +26,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.undo.UndoableEdit;
 
-import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.ClipImage;
 
 /**
@@ -52,7 +48,6 @@ public class EventTimeSeries extends JComponent {
 	private double binSize = 1; // in seconds
 	private double xmax; // in seconds
 	private int ymax = 0;
-	private final List<MyEvent> events;
 	private int[] totalCount;
 
 	public EventTimeSeries() {
@@ -61,13 +56,7 @@ public class EventTimeSeries extends JComponent {
 		setPreferredSize(new Dimension(800, 500));
 		setBackground(Color.DARK_GRAY);
 
-		// combine the events first
-		events = new ArrayList<MyEvent>(MainApplication.getEventLog().getEvents());
-		for (final UndoableEdit x : SceneManager.getInstance().getUndoManager().getEdits()) {
-			if (x instanceof MyEvent) {
-				events.add((MyEvent) x);
-			}
-		}
+		final List<MyEvent> events = EventUtil.getEvents();
 
 		// find the time bounds
 		long t0 = Long.MAX_VALUE;

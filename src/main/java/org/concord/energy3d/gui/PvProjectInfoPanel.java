@@ -21,7 +21,7 @@ import org.concord.energy3d.simulation.PvDesignSpecs;
  * @author Charles Xie
  *
  */
-public class PvStationInfoPanel extends JPanel {
+public class PvProjectInfoPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class PvStationInfoPanel extends JPanel {
 	private final JPanel countPanel, costPanel, landAreaPanel, panelAreaPanel;
 	private final ColorBar countBar, costBar, landAreaBar, panelAreaBar;
 
-	public PvStationInfoPanel() {
+	public PvProjectInfoPanel() {
 
 		super(new BorderLayout());
 

@@ -78,7 +78,7 @@ public class CspProjectCost extends ProjectCost {
 
 	@Override
 	public double getCostByFoundation(final Foundation foundation) {
-		if (foundation == null || foundation.getProjectType() != Foundation.TYPE_CSP_STATION) {
+		if (foundation == null || foundation.getProjectType() != Foundation.TYPE_CSP_PROJECT) {
 			return 0;
 		}
 		double sum = getPartCost(foundation);

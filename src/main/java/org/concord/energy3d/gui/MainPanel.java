@@ -836,10 +836,10 @@ public class MainPanel extends JPanel {
 					} else {
 						p.getBuildingDailyEnergyGraph().clearData();
 						p.getBuildingDailyEnergyGraph().removeGraph();
-						p.getPvStationDailyEnergyGraph().clearData();
-						p.getPvStationDailyEnergyGraph().removeGraph();
-						p.getCspStationDailyEnergyGraph().clearData();
-						p.getCspStationDailyEnergyGraph().removeGraph();
+						p.getPvProjectDailyEnergyGraph().clearData();
+						p.getPvProjectDailyEnergyGraph().removeGraph();
+						p.getCspProjectDailyEnergyGraph().clearData();
+						p.getCspProjectDailyEnergyGraph().removeGraph();
 					}
 					SceneManager.getInstance().computeEnergyView(energyViewButton.isSelected());
 				}

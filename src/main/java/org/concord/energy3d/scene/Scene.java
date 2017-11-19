@@ -268,16 +268,16 @@ public class Scene implements Serializable {
 						e.getBuildingDailyEnergyGraph().addGraph(f);
 						e.validate();
 						break;
-					case Foundation.TYPE_PV_STATION:
+					case Foundation.TYPE_PV_PROJECT:
 						e.getPvProjectCostGraph().addGraph(f);
-						e.getPvStationDailyEnergyGraph().clearData();
-						e.getPvStationDailyEnergyGraph().addGraph(f);
+						e.getPvProjectDailyEnergyGraph().clearData();
+						e.getPvProjectDailyEnergyGraph().addGraph(f);
 						e.validate();
 						break;
-					case Foundation.TYPE_CSP_STATION:
+					case Foundation.TYPE_CSP_PROJECT:
 						e.getCspProjectCostGraph().addGraph(f);
-						e.getCspStationDailyEnergyGraph().clearData();
-						e.getCspStationDailyEnergyGraph().addGraph(f);
+						e.getCspProjectDailyEnergyGraph().clearData();
+						e.getCspProjectDailyEnergyGraph().addGraph(f);
 						e.validate();
 						break;
 					}
@@ -996,7 +996,7 @@ public class Scene implements Serializable {
 	}
 
 	public void setCopyBuffer(final HousePart p) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) { // exclude these types
 			return;
 		}
@@ -1020,7 +1020,7 @@ public class Scene implements Serializable {
 		if (copyBuffer instanceof Foundation) {
 			return;
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final HousePart c = copyBuffer.copy(true);
 		if (c == null) {
 			return;
@@ -1028,12 +1028,12 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		EnergyPanel.getInstance().update();
 	}
 
 	public void pasteToPickedLocationOnLand() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		if (copyBuffer == null) {
 			return;
 		}
@@ -1097,7 +1097,7 @@ public class Scene implements Serializable {
 	}
 
 	public void pasteToPickedLocationOnWall() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (!(selectedPart instanceof Wall)) {
 			return;
@@ -1155,7 +1155,7 @@ public class Scene implements Serializable {
 	}
 
 	public void pasteToPickedLocationOnRoof() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		if (copyBuffer == null) {
 			return;
 		}
@@ -1206,7 +1206,7 @@ public class Scene implements Serializable {
 		if (!(copyBuffer instanceof SolarPanel)) {
 			return;
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final HousePart c = copyBuffer.copy(false);
 		if (c == null) {
 			return;
@@ -1232,7 +1232,7 @@ public class Scene implements Serializable {
 	}
 
 	public void pasteToPickedLocationOnFoundation() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (!(selectedPart instanceof Foundation)) {
 			return;
@@ -1305,7 +1305,7 @@ public class Scene implements Serializable {
 	}
 
 	public void pasteToPickedLocationOnMesh(final Mesh mesh) {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		if (copyBuffer == null) {
 			return;
 		}

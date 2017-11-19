@@ -59,14 +59,14 @@ public class RemovePartCommand extends MyAbstractUndoableEdit {
 			}
 		}
 		SceneManager.getInstance().setSelectedPart(housePart);
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().remove(housePart, true);
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override

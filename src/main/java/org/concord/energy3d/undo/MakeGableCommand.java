@@ -30,14 +30,14 @@ public class MakeGableCommand extends EditPartCommand {
 		saveNewPoints();
 		roof.setGable(wall, false, false, roofPartMeshUpperPoints);
 		super.undo();
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		roof.setGable(wall, true, false, roofPartMeshUpperPoints);
 		super.redo();
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override

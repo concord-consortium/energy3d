@@ -657,17 +657,17 @@ class SpecsDialog extends JDialog {
 					case Foundation.TYPE_BUILDING:
 						EnergyPanel.getInstance().getBuildingInfoPanel().update(foundation);
 						break;
-					case Foundation.TYPE_PV_STATION:
-						EnergyPanel.getInstance().getPvStationInfoPanel().update(foundation);
+					case Foundation.TYPE_PV_PROJECT:
+						EnergyPanel.getInstance().getPvProjectInfoPanel().update(foundation);
 						break;
-					case Foundation.TYPE_CSP_STATION:
-						EnergyPanel.getInstance().getCspStationInfoPanel().update(foundation);
+					case Foundation.TYPE_CSP_PROJECT:
+						EnergyPanel.getInstance().getCspProjectInfoPanel().update(foundation);
 						break;
 					}
 				}
 
 				Scene.getInstance().setEdited(true);
-				EnergyPanel.getInstance().clearRadiationHeatMap();
+				EnergyPanel.getInstance().updateRadiationHeatMap();
 
 				SpecsDialog.this.dispose();
 

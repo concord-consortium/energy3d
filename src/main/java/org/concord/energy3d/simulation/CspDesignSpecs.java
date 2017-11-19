@@ -49,7 +49,7 @@ public class CspDesignSpecs implements Serializable {
 			@Override
 			public void run() {
 				EnergyPanel.getInstance().getCspProjectCostGraph().updateBudget();
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateBudgetMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateBudgetMaximum();
 			}
 		});
 	}
@@ -64,7 +64,7 @@ public class CspDesignSpecs implements Serializable {
 			@Override
 			public void run() {
 				EnergyPanel.getInstance().getCspProjectCostGraph().updateBudget();
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateBudgetMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateBudgetMaximum();
 			}
 		});
 	}
@@ -78,7 +78,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateMirrorNumberMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateMirrorNumberMaximum();
 			}
 		});
 	}
@@ -92,7 +92,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateMirrorNumberMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateMirrorNumberMaximum();
 			}
 		});
 	}
@@ -106,7 +106,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateParabolicTroughNumberMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateParabolicTroughNumberMaximum();
 			}
 		});
 	}
@@ -120,7 +120,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspStationInfoPanel().updateParabolicTroughNumberMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateParabolicTroughNumberMaximum();
 			}
 		});
 	}

@@ -1034,7 +1034,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	public void addSolarPanels() {
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final AddArrayCommand command = new AddArrayCommand(removeAllChildren(), this, new Class[] { SolarPanel.class });
 		if (monolithic) {
 			ensureFullSolarPanels(false);

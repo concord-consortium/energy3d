@@ -114,7 +114,7 @@ class SimulationSettingsDialog extends JDialog {
 				s.setTimeStep(timeStep);
 				s.setEdited(true);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
-				EnergyPanel.getInstance().clearRadiationHeatMap();
+				EnergyPanel.getInstance().updateRadiationHeatMap();
 				SimulationSettingsDialog.this.dispose();
 			}
 		};

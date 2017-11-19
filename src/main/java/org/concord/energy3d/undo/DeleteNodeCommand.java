@@ -45,7 +45,7 @@ public class DeleteNodeCommand extends MyAbstractUndoableEdit {
 				Scene.getInstance().add(p, true);
 			}
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class DeleteNodeCommand extends MyAbstractUndoableEdit {
 				Scene.getInstance().remove(p, true);
 			}
 		}
-		EnergyPanel.getInstance().clearRadiationHeatMap();
+		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
