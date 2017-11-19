@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -26,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.simulation.BuildingEnergyAnnualGraph;
@@ -36,6 +38,7 @@ import org.concord.energy3d.simulation.Graph;
 import org.concord.energy3d.simulation.PartEnergyAnnualGraph;
 import org.concord.energy3d.simulation.PartEnergyDailyGraph;
 import org.concord.energy3d.util.ClipImage;
+import org.concord.energy3d.util.Util;
 
 /**
  * @author Charles Xie
@@ -45,7 +48,8 @@ public class ResultList {
 
 	private Graph graph;
 	private final List<AnalysisEvent> events;
-	private JPanel panel;
+	private JPanel graphContainer;
+	private JLabel fileLabel;
 
 	public ResultList() {
 		events = EventUtil.getAnalysisEvents();
@@ -64,6 +68,8 @@ public class ResultList {
 		if (daily) {
 			if (EnergyDailyAnalysis.class.getSimpleName().equals(e.getName())) {
 				graph = results.size() > 2 ? new BuildingEnergyDailyGraph() : new PartEnergyDailyGraph();
+			} else if (BuildingDailyEnergyGraph.class.getSimpleName().equals(e.getName())) {
+				graph = new BuildingEnergyDailyGraph();
 			} else {
 				graph = new PartEnergyDailyGraph();
 			}
@@ -106,14 +112,14 @@ public class ResultList {
 		});
 		menu.add(mi);
 
-		panel = new JPanel(new BorderLayout());
-		panel.setBorder(BorderFactory.createEtchedBorder());
-		contentPane.add(panel, BorderLayout.CENTER);
+		graphContainer = new JPanel(new BorderLayout());
+		graphContainer.setBorder(BorderFactory.createEtchedBorder());
+		contentPane.add(graphContainer, BorderLayout.CENTER);
 
 		if (graph != null) {
 			graph.setPreferredSize(new Dimension(600, 400));
 			graph.setBackground(Color.WHITE);
-			panel.add(graph, BorderLayout.CENTER);
+			graphContainer.add(graph, BorderLayout.CENTER);
 		}
 
 		final DefaultListModel<String> listModel = new DefaultListModel<String>();
@@ -125,13 +131,14 @@ public class ResultList {
 			@Override
 			public void valueChanged(final ListSelectionEvent e) {
 				if (graph != null) {
-					panel.remove(graph);
+					graphContainer.remove(graph);
 				}
 				final int i = list.getSelectedIndex();
 				final AnalysisEvent a = events.get(i);
 				setGraph(a);
-				panel.add(graph, BorderLayout.CENTER);
-				panel.validate();
+				fileLabel.setText("File: " + Util.getFileName(a.getFile().getPath()));
+				graphContainer.add(graph, BorderLayout.CENTER);
+				graphContainer.validate();
 				final Map<String, List<Double>> r = a.getResults();
 				graph.clearData();
 				final Map<String, List<Double>> d = graph.getData();
@@ -143,10 +150,13 @@ public class ResultList {
 		});
 		final JScrollPane scrollPane = new JScrollPane(list);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		panel.add(scrollPane, BorderLayout.WEST);
+		graphContainer.add(scrollPane, BorderLayout.WEST);
 
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
+
+		fileLabel = new JLabel();
+		buttonPanel.add(fileLabel);
 
 		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
