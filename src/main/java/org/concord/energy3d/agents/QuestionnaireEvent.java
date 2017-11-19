@@ -7,7 +7,7 @@ import java.net.URL;
  * @author Charles Xie
  *
  */
-public class QuestionnaireEvent implements MyEvent {
+public class QuestionnaireEvent implements NonundoableEvent {
 
 	QuestionnaireModel model;
 	long timestamp;

@@ -4,7 +4,7 @@ import java.net.URL;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import org.concord.energy3d.agents.MyEvent;
+import org.concord.energy3d.agents.UndoableEvent;
 import org.concord.energy3d.scene.Scene;
 
 /**
@@ -13,7 +13,7 @@ import org.concord.energy3d.scene.Scene;
  * @author Charles Xie
  *
  */
-public abstract class MyAbstractUndoableEdit extends AbstractUndoableEdit implements MyEvent {
+public abstract class MyAbstractUndoableEdit extends AbstractUndoableEdit implements UndoableEvent {
 
 	private static final long serialVersionUID = 1L;
 	protected long timestamp;

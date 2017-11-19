@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 
 import org.concord.energy3d.Designer;
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.gui.MainPanel;
@@ -352,6 +353,11 @@ public class Scene implements Serializable {
 				MainPanel.getInstance().getAnnotationButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 				SceneManager.getInstance().cursorWait(false);
+				if (file != null) {
+					final HashMap<String, Object> attributes = new HashMap<String, Object>();
+					attributes.put("Open File", Scene.getURL());
+					MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "Open file", attributes));
+				}
 			}
 		});
 

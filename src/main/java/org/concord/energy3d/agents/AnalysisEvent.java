@@ -13,7 +13,7 @@ import java.util.Map;
  * @author Charles Xie
  *
  */
-public class AnalysisEvent implements MyEvent {
+public class AnalysisEvent implements NonundoableEvent {
 
 	String name;
 	long timestamp;

@@ -4,18 +4,17 @@ import java.net.URL;
 import java.util.Map;
 
 /**
- * 
  * @author Charles Xie
  *
  */
-public class InquiryEvent implements MyEvent {
+public class OperationEvent implements NonundoableEvent {
 
 	String name;
 	long timestamp;
 	URL file;
 	Map<String, ?> attributes;
 
-	public InquiryEvent(final URL file, final long timestamp, final String name, final Map<String, ?> attributes) {
+	public OperationEvent(final URL file, final long timestamp, final String name, final Map<String, ?> attributes) {
 		this.file = file;
 		this.timestamp = timestamp;
 		this.name = name;

@@ -63,6 +63,7 @@ import javax.swing.undo.UndoableEdit;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.EventFrequency;
 import org.concord.energy3d.agents.EventTimeSeries;
+import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.agents.ResultList;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
@@ -694,6 +695,7 @@ public class MainFrame extends JFrame {
 											EnergyPanel.getInstance().update();
 											EnergyPanel.getInstance().clearAllGraphs();
 											EnergyPanel.getInstance().selectInstructionSheet(0);
+											MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "New file", null));
 										}
 									});
 								} catch (final Throwable err) {

@@ -1,5 +1,6 @@
 package org.concord.energy3d.undo;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.undo.CannotRedoException;
@@ -10,6 +11,7 @@ import javax.swing.undo.UndoableEdit;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.Agent;
 import org.concord.energy3d.agents.MyEvent;
+import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
@@ -49,6 +51,9 @@ public class MyUndoManager extends UndoManager {
 		SaveCommand.setGloabalSignificant(false);
 		refreshUndoRedoGui();
 		TimeSeriesLogger.getInstance().logUndo();
+		final HashMap<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put("Action", getPresentationName());
+		MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "Undo", attributes));
 	}
 
 	@Override
@@ -59,6 +64,9 @@ public class MyUndoManager extends UndoManager {
 		SaveCommand.setGloabalSignificant(false);
 		refreshUndoRedoGui();
 		TimeSeriesLogger.getInstance().logRedo();
+		final HashMap<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put("Action", getPresentationName());
+		MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "Redo", attributes));
 	}
 
 	@Override
