@@ -22,7 +22,7 @@ public class AnnualSensorData extends EnergyAnnualAnalysis {
 	public AnnualSensorData() {
 		super();
 		graph = new PartEnergyAnnualGraph();
-		graph.type = Graph.SENSOR;
+		graph.instrumentType = Graph.SENSOR;
 		graph.setPreferredSize(new Dimension(600, 400));
 		graph.setBackground(Color.white);
 		graph.yAxisLabel = "Energy Density (kWh/m\u00B2)";

@@ -94,7 +94,7 @@ class DataViewer {
 			} else if (selectedPart instanceof Window) {
 				header = new String[] { "Hour", "Solar", "Heat Gain" };
 			}
-			if (graph.type == Graph.SENSOR) {
+			if (graph.instrumentType == Graph.SENSOR) {
 				final List<HousePart> parts = Scene.getInstance().getParts();
 				final List<String> sensorList = new ArrayList<String>();
 				for (final HousePart p : parts) {
@@ -121,7 +121,7 @@ class DataViewer {
 			} else if (selectedPart instanceof Window) {
 				header = new String[] { "Month", "Solar", "Heat Gain" };
 			}
-			if (graph.type == Graph.SENSOR) {
+			if (graph.instrumentType == Graph.SENSOR) {
 				final List<HousePart> parts = Scene.getInstance().getParts();
 				final List<String> sensorList = new ArrayList<String>();
 				for (final HousePart p : parts) {

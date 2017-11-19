@@ -54,8 +54,8 @@ public abstract class Graph extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	final static byte DEFAULT = 0;
-	final static byte SENSOR = 1;
+	public final static byte DEFAULT = 0;
+	public final static byte SENSOR = 1;
 
 	public final static int LINE_CHART = 0;
 	public final static int AREA_CHART = 1;
@@ -84,7 +84,7 @@ public abstract class Graph extends JPanel {
 	int numberOfTicks = 12;
 	String xAxisLabel = "Month";
 	String yAxisLabel = "Energy (kWh)";
-	byte type = DEFAULT;
+	byte instrumentType = DEFAULT;
 	static Map<String, Color> colors;
 	JDialog parent;
 	Calendar today;
@@ -135,7 +135,7 @@ public abstract class Graph extends JPanel {
 					@Override
 					public void itemStateChanged(final ItemEvent e) {
 						if (e.getStateChange() == ItemEvent.SELECTED) {
-							setType(Graph.LINE_CHART);
+							setGraphType(Graph.LINE_CHART);
 							Graph.this.repaint();
 						}
 					}
@@ -149,7 +149,7 @@ public abstract class Graph extends JPanel {
 					@Override
 					public void itemStateChanged(final ItemEvent e) {
 						if (e.getStateChange() == ItemEvent.SELECTED) {
-							setType(Graph.AREA_CHART);
+							setGraphType(Graph.AREA_CHART);
 							Graph.this.repaint();
 						}
 					}
@@ -301,12 +301,20 @@ public abstract class Graph extends JPanel {
 		popupMenu.show(this, e.getX(), e.getY());
 	}
 
-	public void setType(final int type) {
+	public void setGraphType(final int type) {
 		graphType = type;
 	}
 
-	public int getType() {
+	public int getGraphType() {
 		return graphType;
+	}
+
+	public void setInstrumentType(final byte type) {
+		instrumentType = type;
+	}
+
+	public int getInstrumentType() {
+		return instrumentType;
 	}
 
 	/** Is this graph going to be in a popup window that allows for more drawing space? */
@@ -870,7 +878,7 @@ public abstract class Graph extends JPanel {
 							yLabel -= 8;
 						}
 						g2.setStroke(thin);
-						switch (type) {
+						switch (instrumentType) {
 						case SENSOR:
 							for (int i = 0; i < list.size(); i++) {
 								dataX = left + dx * i;
@@ -976,7 +984,7 @@ public abstract class Graph extends JPanel {
 		legendY = y0;
 		legendText = "<html><h4>Energy (kWh):</h4><hr><ul>";
 
-		switch (type) {
+		switch (instrumentType) {
 		case SENSOR:
 			String s = "Light";
 			if (containsSensorType(s)) {

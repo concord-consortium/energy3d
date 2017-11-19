@@ -58,28 +58,28 @@ abstract class DailyAnalysis extends Analysis {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					graph.setType(Graph.LINE_CHART);
+					graph.setGraphType(Graph.LINE_CHART);
 					graph.repaint();
 				}
 			}
 		});
 		chartMenu.add(miLine);
 		chartGroup.add(miLine);
-		miLine.setSelected(graph.getType() == Graph.LINE_CHART);
+		miLine.setSelected(graph.getGraphType() == Graph.LINE_CHART);
 
 		final JRadioButtonMenuItem miArea = new JRadioButtonMenuItem("Area");
 		miArea.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					graph.setType(Graph.AREA_CHART);
+					graph.setGraphType(Graph.AREA_CHART);
 					graph.repaint();
 				}
 			}
 		});
 		chartMenu.add(miArea);
 		chartGroup.add(miArea);
-		miArea.setSelected(graph.getType() == Graph.AREA_CHART);
+		miArea.setSelected(graph.getGraphType() == Graph.AREA_CHART);
 
 		final JCheckBoxMenuItem miMilitaryTime = new JCheckBoxMenuItem("Military Time");
 		miMilitaryTime.addItemListener(new ItemListener() {

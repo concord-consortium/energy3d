@@ -86,7 +86,7 @@ public class CspProjectDailyEnergyGraph extends JPanel {
 								final DailyGraph dg = (DailyGraph) g;
 								dg.setMilitaryTime(graph.getMilitaryTime());
 							}
-							g.setType(graph.getType());
+							g.setGraphType(graph.getGraphType());
 							analysis.show();
 						} else if (f.countParts(ParabolicDish.class) > 0) {
 							final ParabolicDishDailyAnalysis analysis = new ParabolicDishDailyAnalysis();
@@ -96,7 +96,7 @@ public class CspProjectDailyEnergyGraph extends JPanel {
 								final DailyGraph dg = (DailyGraph) g;
 								dg.setMilitaryTime(graph.getMilitaryTime());
 							}
-							g.setType(graph.getType());
+							g.setGraphType(graph.getGraphType());
 							analysis.show();
 						} else if (f.countParts(FresnelReflector.class) > 0) {
 							final FresnelReflectorDailyAnalysis analysis = new FresnelReflectorDailyAnalysis();
@@ -106,7 +106,7 @@ public class CspProjectDailyEnergyGraph extends JPanel {
 								final DailyGraph dg = (DailyGraph) g;
 								dg.setMilitaryTime(graph.getMilitaryTime());
 							}
-							g.setType(graph.getType());
+							g.setGraphType(graph.getGraphType());
 							analysis.show();
 						} else if (f.countParts(Mirror.class) > 0) {
 							final MirrorDailyAnalysis analysis = new MirrorDailyAnalysis();
@@ -116,7 +116,7 @@ public class CspProjectDailyEnergyGraph extends JPanel {
 								final DailyGraph dg = (DailyGraph) g;
 								dg.setMilitaryTime(graph.getMilitaryTime());
 							}
-							g.setType(graph.getType());
+							g.setGraphType(graph.getGraphType());
 							analysis.show();
 						}
 					}

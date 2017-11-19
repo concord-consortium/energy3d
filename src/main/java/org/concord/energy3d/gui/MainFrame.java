@@ -1112,7 +1112,7 @@ public class MainFrame extends JFrame {
 
 			final JMenuItem miUpdate = new JMenuItem("Check Update..."); // the automatic updater can fail sometimes. This provides an independent check.
 			helpMenu.add(miUpdate);
-			miUpdate.setEnabled(!Config.isWebStart());
+			miUpdate.setEnabled(!Config.isWebStart() && !Config.isEclipse());
 			miUpdate.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1327,12 +1327,12 @@ public class MainFrame extends JFrame {
 			fresnelReflectorsMenu.add(getDailyFresnelReflectorAnalysisMenuItem());
 			fresnelReflectorsMenu.add(getAnnualFresnelReflectorAnalysisMenuItem());
 
+			analysisMenu.addSeparator();
+
 			final JMenu sensorsMenu = new JMenu("Sensors");
 			analysisMenu.add(sensorsMenu);
 			sensorsMenu.add(getDailySensorMenuItem());
 			sensorsMenu.add(getAnnualSensorMenuItem());
-
-			analysisMenu.addSeparator();
 
 			final JMenu groupMenu = new JMenu("Group");
 			analysisMenu.add(groupMenu);

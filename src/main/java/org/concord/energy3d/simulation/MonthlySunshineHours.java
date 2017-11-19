@@ -16,6 +16,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,9 +26,12 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
+import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.agents.InquiryEvent;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.util.ClipImage;
 
@@ -199,6 +203,9 @@ public class MonthlySunshineHours extends JPanel {
 		dialog.setVisible(true);
 
 		TimeSeriesLogger.getInstance().logAnalysis(this);
+		final HashMap<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put("Location", Scene.getInstance().getCity());
+		MainApplication.addEvent(new InquiryEvent(Scene.getURL(), System.currentTimeMillis(), getClass().getSimpleName(), attributes));
 
 	}
 

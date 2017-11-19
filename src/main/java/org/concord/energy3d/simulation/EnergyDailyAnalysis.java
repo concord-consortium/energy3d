@@ -163,7 +163,7 @@ public class EnergyDailyAnalysis extends DailyAnalysis {
 		int cost = -1;
 		if (selectedPart != null) {
 			cost = (int) BuildingCost.getPartCost(selectedPart);
-			if (graph.type == Graph.SENSOR) {
+			if (graph.instrumentType == Graph.SENSOR) {
 				SceneManager.getInstance().setSelectedPart(null);
 			} else {
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);

@@ -30,8 +30,10 @@ import javax.swing.event.ListSelectionListener;
 import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.simulation.AnnualSensorData;
 import org.concord.energy3d.simulation.BuildingEnergyAnnualGraph;
 import org.concord.energy3d.simulation.BuildingEnergyDailyGraph;
+import org.concord.energy3d.simulation.DailySensorData;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.Graph;
@@ -72,12 +74,18 @@ public class ResultList {
 				graph = new BuildingEnergyDailyGraph();
 			} else {
 				graph = new PartEnergyDailyGraph();
+				if (DailySensorData.class.getSimpleName().equals(e.getName())) {
+					graph.setInstrumentType(Graph.SENSOR);
+				}
 			}
 		} else {
 			if (EnergyAnnualAnalysis.class.getSimpleName().equals(e.getName())) {
 				graph = results.size() > 2 ? new BuildingEnergyAnnualGraph() : new PartEnergyAnnualGraph();
 			} else {
 				graph = new PartEnergyAnnualGraph();
+				if (AnnualSensorData.class.getSimpleName().equals(e.getName())) {
+					graph.setInstrumentType(Graph.SENSOR);
+				}
 			}
 		}
 	}

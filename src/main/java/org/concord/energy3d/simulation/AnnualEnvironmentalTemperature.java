@@ -32,6 +32,8 @@ import javax.swing.JPanel;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.agents.InquiryEvent;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.TimeSeriesLogger;
@@ -516,6 +518,9 @@ public class AnnualEnvironmentalTemperature extends JPanel {
 		dialog.setVisible(true);
 
 		TimeSeriesLogger.getInstance().logAnalysis(this);
+		final HashMap<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put("Location", Scene.getInstance().getCity());
+		MainApplication.addEvent(new InquiryEvent(Scene.getURL(), System.currentTimeMillis(), getClass().getSimpleName(), attributes));
 
 	}
 

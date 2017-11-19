@@ -48,4 +48,5 @@ public class AnalysisEvent implements MyEvent {
 	public URL getFile() {
 		return file;
 	}
+
 }
