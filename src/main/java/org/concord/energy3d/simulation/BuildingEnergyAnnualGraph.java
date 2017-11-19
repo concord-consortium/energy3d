@@ -8,19 +8,21 @@ import java.awt.Graphics2D;
  * @author Charles Xie
  * 
  */
-class BuildingEnergyAnnualGraph extends AnnualGraph {
+public class BuildingEnergyAnnualGraph extends AnnualGraph {
 
 	private static final long serialVersionUID = 1L;
 
-	BuildingEnergyAnnualGraph() {
+	public BuildingEnergyAnnualGraph() {
 		super();
 	}
 
-	void drawLegends(Graphics2D g2) {
+	@Override
+	void drawLegends(final Graphics2D g2) {
 		drawBuildingLegends(g2);
 	}
 
-	void drawCurves(Graphics2D g2) {
+	@Override
+	void drawCurves(final Graphics2D g2) {
 		drawBuildingCurves(g2);
 	}
 

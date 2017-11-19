@@ -63,6 +63,7 @@ import javax.swing.undo.UndoableEdit;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.EventFrequency;
 import org.concord.energy3d.agents.EventTimeSeries;
+import org.concord.energy3d.agents.ResultList;
 import org.concord.energy3d.logger.DesignReplay;
 import org.concord.energy3d.logger.PlayControl;
 import org.concord.energy3d.logger.PostProcessor;
@@ -1099,6 +1100,12 @@ public class MainFrame extends JFrame {
 			userHistoryMenu.add(userResultsMenu);
 
 			mi = new JMenuItem("Analysis Results");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new ResultList().showGui();
+				}
+			});
 			userResultsMenu.add(mi);
 
 			// Energy3D web pages

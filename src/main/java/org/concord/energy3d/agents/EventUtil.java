@@ -30,6 +30,16 @@ public class EventUtil {
 		return events;
 	}
 
+	public static List<AnalysisEvent> getAnalysisEvents() {
+		final List<AnalysisEvent> list = new ArrayList<AnalysisEvent>();
+		for (final MyEvent e : MainApplication.getEventLog().getEvents()) {
+			if (e instanceof AnalysisEvent) {
+				list.add((AnalysisEvent) e);
+			}
+		}
+		return list;
+	}
+
 	public static Map<String, List<MyEvent>> getEventNameMap() {
 		final Map<String, List<MyEvent>> events = new HashMap<String, List<MyEvent>>();
 		for (final UndoableEdit e : SceneManager.getInstance().getUndoManager().getEdits()) {
