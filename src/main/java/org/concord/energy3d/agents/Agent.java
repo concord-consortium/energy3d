@@ -10,4 +10,6 @@ public interface Agent {
 
 	public void actuate();
 
+	public String getName();
+
 }

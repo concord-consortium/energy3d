@@ -26,6 +26,7 @@ import javax.swing.text.ElementIterator;
 import javax.swing.text.html.HTMLDocument;
 
 import org.concord.energy3d.MainApplication;
+import org.concord.energy3d.agents.Agent;
 import org.concord.energy3d.agents.EventFrequency;
 import org.concord.energy3d.agents.EventTimeSeries;
 import org.concord.energy3d.agents.QuestionnaireEvent;
@@ -233,11 +234,22 @@ class MyEditorPane {
 			EnergyPanel.getInstance().selectInstructionSheet(1);
 		} else if ("Sheet 3".equals(act)) {
 			EnergyPanel.getInstance().selectInstructionSheet(2);
+		} else if ("Sheet 4".equals(act)) {
+			EnergyPanel.getInstance().selectInstructionSheet(3);
+		} else if ("Sheet 5".equals(act)) {
+			EnergyPanel.getInstance().selectInstructionSheet(4);
 		}
 
 		else if ("Questionnaire".equals(act)) {
 			if (questionnaireModel != null) {
 				MainApplication.addEvent(new QuestionnaireEvent(Scene.getURL(), System.currentTimeMillis(), questionnaireModel));
+			}
+		}
+
+		else if ("Agent Test".equals(act)) {
+			final Agent a = MainApplication.getAgent(act);
+			if (a != null) {
+				a.actuate();
 			}
 		}
 

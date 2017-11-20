@@ -32,7 +32,6 @@ public class MyUndoManager extends UndoManager {
 		if (edit instanceof MyEvent) {
 			for (final Agent a : MainApplication.getAgents()) {
 				a.sense((MyEvent) edit);
-				a.actuate();
 			}
 		}
 		if (saveFlag) {

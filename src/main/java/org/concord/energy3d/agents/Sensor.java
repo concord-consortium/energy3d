@@ -6,6 +6,8 @@ package org.concord.energy3d.agents;
  */
 public interface Sensor {
 
-	public void sense();
+	public void sense(MyEvent e);
+
+	public String getName();
 
 }

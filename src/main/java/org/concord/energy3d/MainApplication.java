@@ -49,7 +49,8 @@ public class MainApplication {
 		startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();
-		agents.add(new SimpleReflexAgent());
+		final SimpleReflexAgent a = new SimpleReflexAgent("Agent Test");
+		agents.add(a);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
@@ -158,9 +159,17 @@ public class MainApplication {
 		if (e instanceof MyEvent) {
 			for (final Agent a : agents) {
 				a.sense(e);
-				a.actuate();
 			}
 		}
+	}
+
+	public static Agent getAgent(final String name) {
+		for (final Agent a : agents) {
+			if (name.equals(a.getName())) {
+				return a;
+			}
+		}
+		return null;
 	}
 
 	public static EventLog getEventLog() {

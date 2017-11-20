@@ -695,7 +695,7 @@ public class MainFrame extends JFrame {
 											EnergyPanel.getInstance().update();
 											EnergyPanel.getInstance().clearAllGraphs();
 											EnergyPanel.getInstance().selectInstructionSheet(0);
-											MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "New file", null));
+											MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "New File", null));
 										}
 									});
 								} catch (final Throwable err) {

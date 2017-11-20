@@ -156,7 +156,7 @@ public class EnergyPanel extends JPanel {
 	private CspProjectInfoPanel cspProjectInfoPanel;
 	private JTabbedPane buildingTabbedPane, pvProjectTabbedPane, cspProjectTabbedPane, instructionTabbedPane;
 	private JPanel buildingPanel, pvProjectPanel, cspProjectPanel, instructionPanel;
-	private final MyEditorPane[] instructionSheets = new MyEditorPane[3];
+	private final MyEditorPane[] instructionSheets = new MyEditorPane[Scene.INSTRUCTION_SHEET_NUMBER];
 	private boolean disableDateSpinner;
 	private long computingStartMillis;
 

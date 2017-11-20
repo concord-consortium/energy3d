@@ -8,4 +8,6 @@ public interface Actuator {
 
 	public void actuate();
 
+	public String getName();
+
 }

@@ -1,8 +1,9 @@
 package org.concord.energy3d.agents;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import org.concord.energy3d.undo.ChangePartUValueCommand;
 
 /**
  * @author Charles Xie
@@ -10,12 +11,22 @@ import java.util.List;
  */
 public class SimpleReflexAgent implements Agent {
 
+	private final String name;
 	private final List<Sensor> sensors;
 	private final List<Actuator> actuators;
 
-	public SimpleReflexAgent() {
+	public SimpleReflexAgent(final String name) {
+		this.name = name;
 		sensors = new ArrayList<Sensor>();
 		actuators = new ArrayList<Actuator>();
+		final EventCounter counter = new EventCounter(ChangePartUValueCommand.class);
+		sensors.add(counter);
+		actuators.add(new EventCounterActuator(counter));
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	public void addSensor(final Sensor s) {
@@ -36,15 +47,13 @@ public class SimpleReflexAgent implements Agent {
 
 	@Override
 	public void sense(final MyEvent e) {
-		System.out.println(this + ": sensing " + e.getFile() + ":" + e.getName() + " @" + new Date(e.getTimestamp()));
 		for (final Sensor s : sensors) {
-			s.sense();
+			s.sense(e);
 		}
 	}
 
 	@Override
 	public void actuate() {
-		System.out.println(this + ": actuating");
 		for (final Actuator a : actuators) {
 			a.actuate();
 		}

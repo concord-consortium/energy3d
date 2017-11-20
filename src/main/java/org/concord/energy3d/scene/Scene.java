@@ -99,6 +99,8 @@ public class Scene implements Serializable {
 	public static final int GRASSLAND_THEME = 2;
 	public static final int FOREST_THEME = 3;
 
+	public static final int INSTRUCTION_SHEET_NUMBER = 4;
+
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("Model Root");
 	private static final Node originalHouseRoot = new Node("Original Model Root");
@@ -356,7 +358,7 @@ public class Scene implements Serializable {
 				if (file != null) {
 					final HashMap<String, Object> attributes = new HashMap<String, Object>();
 					attributes.put("Open File", Scene.getURL());
-					MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "Open file", attributes));
+					MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "Open File", attributes));
 				}
 			}
 		});
@@ -504,6 +506,22 @@ public class Scene implements Serializable {
 		}
 		if (Util.isZero(solarContrast)) {
 			solarContrast = 50;
+		}
+
+		// in case we need to have more instruction sheets
+		if (instructionSheetText != null) {
+			if (instructionSheetText.length < INSTRUCTION_SHEET_NUMBER) {
+				final String[] tmp = new String[INSTRUCTION_SHEET_NUMBER];
+				System.arraycopy(instructionSheetText, 0, tmp, 0, instructionSheetText.length);
+				instructionSheetText = tmp;
+			}
+		}
+		if (instructionSheetTextType != null) {
+			if (instructionSheetTextType.length < INSTRUCTION_SHEET_NUMBER) {
+				final String[] tmp = new String[INSTRUCTION_SHEET_NUMBER];
+				System.arraycopy(instructionSheetTextType, 0, tmp, 0, instructionSheetTextType.length);
+				instructionSheetTextType = tmp;
+			}
 		}
 
 		setEdited(false);
@@ -3915,7 +3933,7 @@ public class Scene implements Serializable {
 
 	public void setInstructionSheetText(final int i, final String text) {
 		if (instructionSheetText == null) {
-			instructionSheetText = new String[3];
+			instructionSheetText = new String[INSTRUCTION_SHEET_NUMBER];
 		}
 		if (i < instructionSheetText.length) {
 			instructionSheetText[i] = text;
@@ -3934,7 +3952,7 @@ public class Scene implements Serializable {
 
 	public void setInstructionSheetTextType(final int i, final String type) {
 		if (instructionSheetTextType == null) {
-			instructionSheetTextType = new String[3];
+			instructionSheetTextType = new String[INSTRUCTION_SHEET_NUMBER];
 		}
 		if (i < instructionSheetTextType.length) {
 			instructionSheetTextType[i] = type;
