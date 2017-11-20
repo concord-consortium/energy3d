@@ -1,6 +1,7 @@
 package org.concord.energy3d.simulation;
 
 import java.awt.Point;
+import java.util.List;
 
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
@@ -15,6 +16,17 @@ public abstract class ProjectCost {
 	abstract void showPieChart();
 
 	public abstract double getCostByFoundation(final Foundation foundation);
+
+	public double getTotalCost() {
+		double cost = 0;
+		final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+		if (!foundations.isEmpty()) {
+			for (final Foundation f : foundations) {
+				cost += getCostByFoundation(f);
+			}
+		}
+		return cost;
+	}
 
 	public void showGraph() {
 		showPieChart();

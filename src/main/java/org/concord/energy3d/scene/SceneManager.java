@@ -1855,7 +1855,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							previousSelectedHousePart.setGridsVisible(false);
 						}
 						if (selectedPart != null) {
-							selectedPart.complete(); // to undo edit flag set by SelectUtil above
+							selectedPart.complete(); // to undo edit flag set by SelectUtil above. FIXME: This taints the wall's heat map texture
 							if (!PrintController.getInstance().isPrintPreview()) {
 								selectedPart.setEditPointsVisible(true);
 							}

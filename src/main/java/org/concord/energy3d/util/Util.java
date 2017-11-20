@@ -63,6 +63,7 @@ import org.poly2tri.geometry.primitives.Point;
 import com.ardor3d.bounding.BoundingVolume;
 import com.ardor3d.bounding.BoundingVolume.Type;
 import com.ardor3d.bounding.OrientedBoundingBox;
+import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Ray3;
 import com.ardor3d.math.Vector2;
@@ -120,6 +121,14 @@ public class Util {
 		g2d.drawImage(tmp, 0, 0, null);
 		g2d.dispose();
 		return bi2;
+	}
+
+	public static ColorRGBA getColorRGB(final int r, final int g, final int b) {
+		return new ColorRGBA(r / 255f, g / 255f, b / 255f, 1f);
+	}
+
+	public static ColorRGBA getColorRGBA(final int r, final int g, final int b, final int a) {
+		return new ColorRGBA(r / 255f, g / 255f, b / 255f, a / 255f);
 	}
 
 	public static double[][] cloneArray(final double[][] src) {

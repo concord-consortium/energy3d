@@ -240,7 +240,7 @@ public class Scene implements Serializable {
 			public Object call() throws Exception {
 				instance.add(new Human(Human.JACK, 1));
 				final Foundation f = new Foundation(xLength, yLength);
-				f.setColor(ColorRGBA.GRAY);
+				f.setColor(instance.getFoundationColor());
 				instance.add(f, true);
 				return null;
 			}
@@ -2147,7 +2147,7 @@ public class Scene implements Serializable {
 	/** get the default color for foundations */
 	public ReadOnlyColorRGBA getFoundationColor() {
 		if (foundationColor == null) {
-			return ColorRGBA.WHITE;
+			return Util.getColorRGB(180, 180, 180);
 		}
 		return foundationColor;
 	}
@@ -2160,7 +2160,7 @@ public class Scene implements Serializable {
 	/** get the default color for walls */
 	public ReadOnlyColorRGBA getWallColor() {
 		if (wallColor == null) {
-			return ColorRGBA.LIGHT_GRAY;
+			return Util.getColorRGB(241, 237, 225);
 		}
 		return wallColor;
 	}
@@ -2199,7 +2199,7 @@ public class Scene implements Serializable {
 	/** get the default color for roofs */
 	public ReadOnlyColorRGBA getRoofColor() {
 		if (roofColor == null) {
-			return ColorRGBA.WHITE;
+			return Util.getColorRGB(90, 97, 116);
 		}
 		return roofColor;
 	}

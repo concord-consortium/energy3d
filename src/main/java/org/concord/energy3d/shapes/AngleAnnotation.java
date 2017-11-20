@@ -30,11 +30,11 @@ public class AngleAnnotation extends Annotation {
 		draw();
 	}
 
-	public void setCustomText(String customText) {
+	public void setCustomText(final String customText) {
 		this.customText = customText;
 	}
 
-	public void setCustomRadius(double customRadius) {
+	public void setCustomRadius(final double customRadius) {
 		this.customRadius = customRadius;
 	}
 
@@ -57,9 +57,9 @@ public class AngleAnnotation extends Annotation {
 			angle = Util.angleBetween(bFlat, aFlat, Vector3.UNIT_Z);
 		}
 		final double end = start + angle;
-		final long angleDegrees = Math.round((end - start) * 180.0 / Math.PI);
+		final long angleDegrees = Math.round(Math.toDegrees(end - start));
 
-		double radius = customRadius > 0 ? customRadius : (end == start ? 0.0 : 3.0 / Math.sqrt(end - start));
+		final double radius = customRadius > 0 ? customRadius : (end == start ? 0.0 : 3.0 / Math.sqrt(end - start));
 		if (angleDegrees == 90) {
 			final ReadOnlyVector3[] p = new ReadOnlyVector3[3];
 			p[0] = a.normalize(null).multiplyLocal(2.0);
@@ -70,8 +70,9 @@ public class AngleAnnotation extends Annotation {
 			buf.limit(9);
 			mesh.getMeshData().updateVertexCount();
 			buf.rewind();
-			for (final ReadOnlyVector3 v : p)
+			for (final ReadOnlyVector3 v : p) {
 				buf.put(v.getXf()).put(v.getYf()).put(v.getZf());
+			}
 			mesh.setRotation(new Matrix3());
 			detachChild(label);
 		} else {

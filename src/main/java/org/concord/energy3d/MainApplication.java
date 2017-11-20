@@ -49,8 +49,7 @@ public class MainApplication {
 		startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();
-		final SimpleReflexAgent a = new SimpleReflexAgent("Agent Test");
-		agents.add(a);
+		agents.add(new SimpleReflexAgent("Agent Test"));
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.

@@ -16,12 +16,22 @@ public class SimpleReflexAgent implements Agent {
 	private final List<Actuator> actuators;
 
 	public SimpleReflexAgent(final String name) {
+
 		this.name = name;
 		sensors = new ArrayList<Sensor>();
 		actuators = new ArrayList<Actuator>();
-		final EventCounter counter = new EventCounter(ChangePartUValueCommand.class);
-		sensors.add(counter);
-		actuators.add(new EventCounterActuator(counter));
+
+		// test code below
+
+		final EventCounter uValueCounter = new EventCounter(ChangePartUValueCommand.class);
+		final EventCounter analysisEventCounter = new EventCounter(AnalysisEvent.class);
+		final List<EventCounter> counters = new ArrayList<EventCounter>();
+		counters.add(uValueCounter);
+		counters.add(analysisEventCounter);
+		actuators.add(new EventCounterActuator(counters));
+
+		sensors.addAll(counters);
+
 	}
 
 	@Override

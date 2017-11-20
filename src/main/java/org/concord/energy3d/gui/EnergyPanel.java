@@ -82,10 +82,12 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualEnvironmentalTemperature;
+import org.concord.energy3d.simulation.CspProjectCost;
 import org.concord.energy3d.simulation.DailyEnvironmentalTemperature;
 import org.concord.energy3d.simulation.HeatLoad;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
+import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.simulation.Weather;
 import org.concord.energy3d.undo.ChangeCityCommand;
@@ -1608,9 +1610,9 @@ public class EnergyPanel extends JPanel {
 						partProperty1Label.setText("  Total Number:");
 						partProperty1TextField.setText("" + numberOfSolarPanels);
 						partProperty1TextField.setToolTipText("Total number of solar panels");
-						partProperty2Label.setText("  -");
-						partProperty2TextField.setText("");
-						partProperty2TextField.setToolTipText(null);
+						partProperty2Label.setText("  Total Cost:");
+						partProperty2TextField.setText("$" + TWO_DECIMALS.format(PvProjectCost.getInstance().getTotalCost()));
+						partProperty2TextField.setToolTipText("Total cost of solar panels");
 						partProperty3Label.setText("  -");
 						partProperty3TextField.setText("");
 						partProperty3TextField.setToolTipText(null);
@@ -1621,9 +1623,9 @@ public class EnergyPanel extends JPanel {
 							partProperty1Label.setText("  Total Number:");
 							partProperty1TextField.setText("" + numberOfMirrors);
 							partProperty1TextField.setToolTipText("Total number of mirrors");
-							partProperty2Label.setText("  -");
-							partProperty2TextField.setText("");
-							partProperty2TextField.setToolTipText(null);
+							partProperty2Label.setText("  Total Cost:");
+							partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+							partProperty2TextField.setToolTipText("Total cost of mirrors");
 							partProperty3Label.setText("  -");
 							partProperty3TextField.setText("");
 							partProperty3TextField.setToolTipText(null);
@@ -1634,9 +1636,9 @@ public class EnergyPanel extends JPanel {
 								partProperty1Label.setText("  Total Number:");
 								partProperty1TextField.setText("" + numberOfParabolicTroughs);
 								partProperty1TextField.setToolTipText("Total number of parabolic troughs");
-								partProperty2Label.setText("  -");
-								partProperty2TextField.setText("");
-								partProperty2TextField.setToolTipText(null);
+								partProperty2Label.setText("  Total Cost:");
+								partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+								partProperty2TextField.setToolTipText("Total cost of parabolic troughs");
 								partProperty3Label.setText("  -");
 								partProperty3TextField.setText("");
 								partProperty3TextField.setToolTipText(null);
@@ -1647,36 +1649,50 @@ public class EnergyPanel extends JPanel {
 									partProperty1Label.setText("  Total Number:");
 									partProperty1TextField.setText("" + numberOfParabolicDishes);
 									partProperty1TextField.setToolTipText("Total number of parabolic dishes");
-									partProperty2Label.setText("  -");
-									partProperty2TextField.setText("");
-									partProperty2TextField.setToolTipText(null);
+									partProperty2Label.setText("  Total Cost:");
+									partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+									partProperty2TextField.setToolTipText("Total cost of parabolic dishes");
 									partProperty3Label.setText("  -");
 									partProperty3TextField.setText("");
 									partProperty3TextField.setToolTipText(null);
 								} else {
-									final int numberOfNodes = Scene.getInstance().countNodes();
-									if (numberOfNodes > 0) {
-										partPanelBorder.setTitle("Structures");
-										partProperty1Label.setText("  Total Nodes:");
-										partProperty1TextField.setText("" + numberOfNodes);
-										partProperty1TextField.setToolTipText("Total number of structure nodes");
-										partProperty2Label.setText("  Total Meshes:");
-										partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
-										partProperty2TextField.setToolTipText("Total number of structure meshes");
+									final int numberOfFresnelReflectors = Scene.getInstance().countParts(FresnelReflector.class);
+									if (numberOfFresnelReflectors > 0) {
+										partPanelBorder.setTitle("Fresnel Reflectors");
+										partProperty1Label.setText("  Total Number:");
+										partProperty1TextField.setText("" + numberOfFresnelReflectors);
+										partProperty1TextField.setToolTipText("Total number of Fresnel reflectors");
+										partProperty2Label.setText("  Total Cost:");
+										partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
+										partProperty2TextField.setToolTipText("Total cost of Fresnel reflectors");
 										partProperty3Label.setText("  -");
 										partProperty3TextField.setText("");
 										partProperty3TextField.setToolTipText(null);
 									} else {
-										partPanelBorder.setTitle("Part");
-										partProperty1Label.setText("  -");
-										partProperty1TextField.setText("");
-										partProperty1TextField.setToolTipText(null);
-										partProperty2Label.setText("  -");
-										partProperty2TextField.setText("");
-										partProperty2TextField.setToolTipText(null);
-										partProperty3Label.setText("  -");
-										partProperty3TextField.setText("");
-										partProperty3TextField.setToolTipText(null);
+										final int numberOfNodes = Scene.getInstance().countNodes();
+										if (numberOfNodes > 0) {
+											partPanelBorder.setTitle("Structures");
+											partProperty1Label.setText("  Total Nodes:");
+											partProperty1TextField.setText("" + numberOfNodes);
+											partProperty1TextField.setToolTipText("Total number of structure nodes");
+											partProperty2Label.setText("  Total Meshes:");
+											partProperty2TextField.setText("" + Scene.getInstance().countMeshes());
+											partProperty2TextField.setToolTipText("Total number of structure meshes");
+											partProperty3Label.setText("  -");
+											partProperty3TextField.setText("");
+											partProperty3TextField.setToolTipText(null);
+										} else {
+											partPanelBorder.setTitle("Part");
+											partProperty1Label.setText("  -");
+											partProperty1TextField.setText("");
+											partProperty1TextField.setToolTipText(null);
+											partProperty2Label.setText("  -");
+											partProperty2TextField.setText("");
+											partProperty2TextField.setToolTipText(null);
+											partProperty3Label.setText("  -");
+											partProperty3TextField.setText("");
+											partProperty3TextField.setToolTipText(null);
+										}
 									}
 								}
 							}

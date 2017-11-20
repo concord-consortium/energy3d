@@ -13,6 +13,11 @@ public class EventCounter implements Sensor {
 		clazz = c;
 	}
 
+	public Class<?> getClazz() {
+		return clazz;
+	}
+
+	@Override
 	public String getName() {
 		return clazz.getSimpleName();
 	}
