@@ -87,7 +87,6 @@ public class Heliodon {
 	private final Mesh base;
 	private final Mesh baseTicks;
 	private final Calendar calendar = Calendar.getInstance();
-	private final double baseAngle = 0;
 	private double hourAngle;
 	private double declinationAngle;
 	private double latitude = DEFAULT_LATITUDE / 180.0 * Math.PI;
@@ -442,6 +441,7 @@ public class Heliodon {
 				}
 				if (declinationChanged || hourAngleChanged) {
 					setSunLocation(newSunLocation);
+					drawSunTriangle();
 					EnergyPanel.getInstance().updateRadiationHeatMap();
 				}
 			}
@@ -450,10 +450,6 @@ public class Heliodon {
 
 	public Node getRoot() {
 		return root;
-	}
-
-	public double getBaseAngle() {
-		return baseAngle;
 	}
 
 	public double getHourAngle() {
