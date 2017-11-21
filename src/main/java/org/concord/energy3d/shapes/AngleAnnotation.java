@@ -48,7 +48,7 @@ public class AngleAnnotation extends Annotation {
 		final ReadOnlyVector3 aFlat = toFlat.applyPost(a, null);
 		final ReadOnlyVector3 bFlat = toFlat.applyPost(b, null);
 
-		final double start, angle;
+		double start, angle;
 		if (Util.angleBetween(aFlat, bFlat, Vector3.UNIT_Z) >= 0) {
 			start = Util.angleBetween(Vector3.UNIT_X, aFlat, Vector3.UNIT_Z);
 			angle = Util.angleBetween(aFlat, bFlat, Vector3.UNIT_Z);
@@ -56,7 +56,7 @@ public class AngleAnnotation extends Annotation {
 			start = Util.angleBetween(Vector3.UNIT_X, bFlat, Vector3.UNIT_Z);
 			angle = Util.angleBetween(bFlat, aFlat, Vector3.UNIT_Z);
 		}
-		final double end = start + angle;
+		double end = start + angle;
 		final long angleDegrees = Math.round(Math.toDegrees(end - start));
 
 		final double radius = customRadius > 0 ? customRadius : (end == start ? 0.0 : 3.0 / Math.sqrt(end - start));
@@ -76,13 +76,24 @@ public class AngleAnnotation extends Annotation {
 			mesh.setRotation(new Matrix3());
 			detachChild(label);
 		} else {
+			boolean special = false;
+			if ("A".equals(customText) && Util.isEqual(start, Math.PI / 2)) { // special case for azimuth
+				angle = angle - Math.PI * 2;
+				if (Util.isEqual(Math.abs(angle), 2 * Math.PI)) {
+					angle = 0;
+				}
+				end = start + angle;
+				label.setText("A=" + (angleDegrees == 0 ? 0 : (360 - angleDegrees)) + "\u00B0");
+				special = true;
+			} else {
+				label.setText((customText != null ? customText + "=" : "") + angleDegrees + "\u00B0");
+			}
 			((Arc) mesh).set(radius, start, end);
 			mesh.setRotation(toFlat.invertLocal());
-			label.setText((customText != null ? customText + "=" : "") + angleDegrees + "\u00B0");
 			final double start360 = start < 0 ? MathUtils.TWO_PI + start : start;
 			final double angle360 = angle < 0 ? MathUtils.TWO_PI + angle : angle;
 			final double end360 = start360 + angle360;
-			final Matrix3 rotMatrix = toFlat.multiplyLocal(new Matrix3().fromAngles(-Math.PI / 2.0, 0, -Math.PI / 2.0 + (start360 + end360) / 2.0));
+			final Matrix3 rotMatrix = toFlat.multiplyLocal(new Matrix3().fromAngles(-Math.PI / 2, 0, (special ? Math.PI / 2 : -Math.PI / 2) + (start360 + end360) / 2));
 			label.setRotation(rotMatrix);
 			final Vector3 trans = new Vector3(0, 0, radius / 1.7);
 			label.setTranslation(rotMatrix.applyPost(trans, trans));
