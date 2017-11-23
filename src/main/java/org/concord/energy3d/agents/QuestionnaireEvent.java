@@ -34,6 +34,11 @@ public class QuestionnaireEvent implements NonundoableEvent {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'Q';
+	}
+
+	@Override
 	public URL getFile() {
 		return file;
 	}

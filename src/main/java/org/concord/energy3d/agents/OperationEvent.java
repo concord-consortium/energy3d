@@ -36,6 +36,11 @@ public class OperationEvent implements NonundoableEvent {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'O';
+	}
+
+	@Override
 	public URL getFile() {
 		return file;
 	}

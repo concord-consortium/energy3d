@@ -60,6 +60,7 @@ public class SimpleReflexAgent implements Agent {
 		for (final Sensor s : sensors) {
 			s.sense(e);
 		}
+		System.out.println(">>>" + EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000));
 	}
 
 	@Override

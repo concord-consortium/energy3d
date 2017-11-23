@@ -45,6 +45,11 @@ public class AnalysisEvent implements NonundoableEvent {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'A';
+	}
+
+	@Override
 	public URL getFile() {
 		return file;
 	}

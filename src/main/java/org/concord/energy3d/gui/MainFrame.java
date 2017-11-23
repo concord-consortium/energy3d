@@ -62,6 +62,7 @@ import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.EventFrequency;
+import org.concord.energy3d.agents.EventString;
 import org.concord.energy3d.agents.EventTimeSeries;
 import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.agents.ResultList;
@@ -1080,7 +1081,16 @@ public class MainFrame extends JFrame {
 			final JMenu userEventsMenu = new JMenu("Events");
 			userHistoryMenu.add(userEventsMenu);
 
-			JMenuItem mi = new JMenuItem("Event Time Series");
+			JMenuItem mi = new JMenuItem("Event String");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					new EventString().showGui();
+				}
+			});
+			userEventsMenu.add(mi);
+
+			mi = new JMenuItem("Event Time Series");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1478,6 +1488,8 @@ public class MainFrame extends JFrame {
 
 			final JMenu buildingBasicsMenu = new JMenu("Building Science Basics");
 			tutorialsMenu.add(buildingBasicsMenu);
+			addModel(buildingBasicsMenu, "The Effect of U-Value", "tutorials/ia-learn-u-value.ng3");
+			buildingBasicsMenu.addSeparator();
 			addModel(buildingBasicsMenu, "Two Houses of Different Sizes", "tutorials/building-size.ng3");
 			addModel(buildingBasicsMenu, "Two Houses of Different Shapes", "tutorials/building-shape.ng3");
 			addModel(buildingBasicsMenu, "Two Houses with Different Roof Insulations", "tutorials/building-roof-insulation.ng3");

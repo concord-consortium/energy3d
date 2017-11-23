@@ -12,6 +12,8 @@ public interface MyEvent {
 
 	public String getName();
 
+	public char getOneLetterCode();
+
 	public URL getFile();
 
 }

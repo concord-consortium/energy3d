@@ -36,6 +36,11 @@ public abstract class MyAbstractUndoableEdit extends AbstractUndoableEdit implem
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return getName().charAt(0);
+	}
+
+	@Override
 	public URL getFile() {
 		return file;
 	}

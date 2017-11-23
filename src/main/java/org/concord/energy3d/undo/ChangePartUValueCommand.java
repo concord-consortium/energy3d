@@ -27,6 +27,10 @@ public class ChangePartUValueCommand extends MyAbstractUndoableEdit {
 		return oldValue;
 	}
 
+	public double getNewValue() {
+		return newValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
@@ -42,6 +46,11 @@ public class ChangePartUValueCommand extends MyAbstractUndoableEdit {
 		if (part instanceof Thermal) {
 			((Thermal) part).setUValue(newValue);
 		}
+	}
+
+	@Override
+	public char getOneLetterCode() {
+		return 'U';
 	}
 
 	@Override

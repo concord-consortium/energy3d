@@ -1,6 +1,8 @@
 package org.concord.energy3d.agents;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +19,46 @@ import org.concord.energy3d.undo.MyAbstractUndoableEdit;
  */
 public class EventUtil {
 
+	private final static char IDLE_LETTER = '-';
+	private final static char BACKGROUND_LETTER = '*';
+
 	private EventUtil() {
+	}
+
+	public static String eventsToString(final Class<?>[] selection, final int idleTimeInMillis) {
+		String s = "";
+		final List<MyEvent> events = getEvents();
+		MyEvent lastEvent = null;
+		if (selection == null) {
+			for (final MyEvent e : events) {
+				if (lastEvent != null) {
+					if (e.getTimestamp() - lastEvent.getTimestamp() > idleTimeInMillis) {
+						s += IDLE_LETTER;
+					}
+				}
+				s += e.getOneLetterCode();
+				lastEvent = e;
+			}
+		} else {
+			char x;
+			for (final MyEvent e : events) {
+				x = BACKGROUND_LETTER;
+				for (final Class<?> c : selection) {
+					if (c.isInstance(e)) {
+						x = e.getOneLetterCode();
+						break;
+					}
+				}
+				if (lastEvent != null) {
+					if (e.getTimestamp() - lastEvent.getTimestamp() > idleTimeInMillis) {
+						s += IDLE_LETTER;
+					}
+				}
+				s += x;
+				lastEvent = e;
+			}
+		}
+		return s;
 	}
 
 	public static List<MyEvent> getEvents() {
@@ -27,6 +68,12 @@ public class EventUtil {
 				events.add((MyEvent) x);
 			}
 		}
+		Collections.sort(events, new Comparator<MyEvent>() {
+			@Override
+			public int compare(final MyEvent e1, final MyEvent e2) {
+				return new Long(e1.getTimestamp()).compareTo(new Long(e2.getTimestamp()));
+			}
+		});
 		return events;
 	}
 
