@@ -39,6 +39,11 @@ public class ChangeDateCommand extends MyAbstractUndoableEdit {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'C';
+	}
+
+	@Override
 	public String getPresentationName() {
 		return "Change Date";
 	}

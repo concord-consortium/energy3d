@@ -42,17 +42,20 @@ import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.util.Util;
 
 /**
- * This is a JEditorPane that has extra user interface such as a pop-up menu and extra functionalities such as opening hyperlinks with an external browser.
+ * This contains a JEditorPane that has extra user interface such as a pop-up menu and extra functionalities such as opening hyperlinks with an external browser.
  * 
  * @author Charles Xie
  *
  */
-class MyEditorPane {
+public class MyEditorPane {
 
 	private final JEditorPane editorPane;
 	private final JPopupMenu popupMenu;
+	private final int id;
 
-	MyEditorPane(final int id) {
+	public MyEditorPane(final int id, final boolean popup) {
+
+		this.id = id;
 
 		editorPane = new JEditorPane();
 		editorPane.setEditable(false);
@@ -120,7 +123,9 @@ class MyEditorPane {
 		miEdit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
-				new InstructionSheetDialog(MyEditorPane.this, "Sheet " + (id + 1), id, true).setVisible(true);
+				if (!popup) {
+					new InstructionSheetDialog(MyEditorPane.this, "Sheet " + (id + 1), id, true).setVisible(true);
+				}
 			}
 		});
 		popupMenu.add(miEdit);
@@ -128,15 +133,19 @@ class MyEditorPane {
 		editorPane.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(final MouseEvent e) {
-				if (e.getClickCount() >= 2) {
-					new InstructionSheetDialog(MyEditorPane.this, "Sheet " + (id + 1), id, false).setVisible(true);
+				if (!popup) {
+					if (e.getClickCount() >= 2) {
+						new InstructionSheetDialog(MyEditorPane.this, "Sheet " + (id + 1), id, false).setVisible(true);
+					}
 				}
 			}
 
 			@Override
 			public void mouseReleased(final MouseEvent e) {
-				if (Util.isRightClick(e)) {
-					popupMenu.show(editorPane, e.getX(), e.getY());
+				if (!popup) {
+					if (Util.isRightClick(e)) {
+						popupMenu.show(editorPane, e.getX(), e.getY());
+					}
 				}
 			}
 		});
@@ -144,6 +153,10 @@ class MyEditorPane {
 
 	public void repaint() {
 		editorPane.repaint();
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	public JEditorPane getEditorPane() {
@@ -392,6 +405,10 @@ class MyEditorPane {
 
 	public String getText() {
 		return editorPane.getText();
+	}
+
+	public void setEditable(final boolean editable) {
+		editorPane.setEditable(editable);
 	}
 
 	public void setContentType(final String type) {

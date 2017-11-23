@@ -1356,10 +1356,8 @@ public abstract class HousePart implements Serializable {
 			final MaterialState material = new MaterialState();
 			material.setDiffuse(mesh.getDefaultColor());
 			newMesh.setRenderState(material);
-
 			newMesh.getMeshData().transformVertices((Transform) mesh.getWorldTransform());
 			newMesh.getMeshData().transformNormals((Transform) mesh.getWorldTransform(), true);
-
 			list.add(newMesh);
 		}
 	}

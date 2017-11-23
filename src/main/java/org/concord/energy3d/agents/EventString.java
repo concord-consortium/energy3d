@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.ClipImage;
 
@@ -44,22 +45,25 @@ public class EventString extends JPanel {
 		html.setContentType("text/html");
 		add(html, BorderLayout.CENTER);
 
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000);
+		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000);
 		String text = "<html><table border=0 cellpadding=0 cellspacing=0><tr>";
 		for (int i = 0; i < eventString.length(); i++) {
 			final char c = eventString.charAt(i);
 			switch (c) {
 			case 'A':
-				text += "<td bgcolor=#aa7722><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<td bgcolor=#993322><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				break;
+			case 'C':
+				text += "<td bgcolor=#339922><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
 				break;
 			case 'U':
-				text += "<td bgcolor=#224488><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<td bgcolor=#226699><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
 				break;
-			case '-':
+			case '_':
 				text += "<td bgcolor=#dddddd><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
 				break;
 			default:
-				text += "<td bgcolor=#888888><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<td bgcolor=#333333><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
 			}
 			text += "</td>";
 		}

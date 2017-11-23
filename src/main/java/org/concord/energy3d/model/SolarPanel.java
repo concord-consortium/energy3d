@@ -24,12 +24,14 @@ import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.Matrix3;
+import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.Camera;
 import com.ardor3d.renderer.Camera.ProjectionMode;
 import com.ardor3d.renderer.IndexMode;
+import com.ardor3d.renderer.state.MaterialState;
 import com.ardor3d.renderer.state.OffsetState;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
@@ -1340,6 +1342,31 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	public boolean getLabelEnergyOutput() {
 		return labelEnergyOutput;
+	}
+
+	@Override
+	protected void addPrintMesh(final List<Mesh> list, final Mesh mesh) {
+		if (mesh.getSceneHints().getCullHint() != CullHint.Always) {
+			final Mesh newMesh = mesh.makeCopy(false);
+			final MaterialState material = new MaterialState();
+			switch (colorOption) {
+			case COLOR_OPTION_BLACK:
+				material.setDiffuse(ColorRGBA.BLACK);
+				break;
+			case COLOR_OPTION_BLUE:
+				material.setDiffuse(ColorRGBA.BLUE);
+				break;
+			case COLOR_OPTION_GRAY:
+				material.setDiffuse(ColorRGBA.GRAY);
+				break;
+			default:
+				material.setDiffuse(mesh.getDefaultColor());
+			}
+			newMesh.setRenderState(material);
+			newMesh.getMeshData().transformVertices((Transform) mesh.getWorldTransform());
+			newMesh.getMeshData().transformNormals((Transform) mesh.getWorldTransform(), true);
+			list.add(newMesh);
+		}
 	}
 
 	@Override

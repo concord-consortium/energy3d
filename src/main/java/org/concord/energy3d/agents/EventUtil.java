@@ -19,7 +19,7 @@ import org.concord.energy3d.undo.MyAbstractUndoableEdit;
  */
 public class EventUtil {
 
-	private final static char IDLE_LETTER = '-';
+	private final static char IDLE_LETTER = '_';
 	private final static char BACKGROUND_LETTER = '*';
 
 	private EventUtil() {

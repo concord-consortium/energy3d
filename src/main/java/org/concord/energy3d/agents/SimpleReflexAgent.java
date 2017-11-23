@@ -3,6 +3,7 @@ package org.concord.energy3d.agents;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 
 /**
@@ -60,7 +61,7 @@ public class SimpleReflexAgent implements Agent {
 		for (final Sensor s : sensors) {
 			s.sense(e);
 		}
-		System.out.println(">>>" + EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000));
+		System.out.println(this + ":" + e.getName() + ">>> " + EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000));
 	}
 
 	@Override

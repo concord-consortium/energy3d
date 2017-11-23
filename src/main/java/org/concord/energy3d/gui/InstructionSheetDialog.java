@@ -94,12 +94,12 @@ class InstructionSheetDialog extends JDialog {
 
 		} else {
 
-			final JEditorPane editorPane = new JEditorPane();
-			editorPane.setContentType(sheet.getContentType());
-			editorPane.setText(sheet.getText());
-			editorPane.setBorder(new EmptyBorder(10, 10, 10, 10));
-			editorPane.setEditable(false);
-			scroller = new JScrollPane(editorPane);
+			final MyEditorPane myEditor = new MyEditorPane(sheet.getId(), true);
+			myEditor.setContentType(sheet.getContentType());
+			myEditor.setText(sheet.getText());
+			myEditor.setEditable(false);
+			myEditor.getEditorPane().setBorder(new EmptyBorder(10, 10, 10, 10));
+			scroller = new JScrollPane(myEditor.getEditorPane());
 
 			final JButton editButton = new JButton("Edit");
 			editButton.addActionListener(new ActionListener() {

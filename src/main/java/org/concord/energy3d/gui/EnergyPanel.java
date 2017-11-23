@@ -680,7 +680,7 @@ public class EnergyPanel extends JPanel {
 		instructionPanel.add(instructionTabbedPane);
 
 		for (int i = 0; i < instructionSheets.length; i++) {
-			instructionSheets[i] = new MyEditorPane(i);
+			instructionSheets[i] = new MyEditorPane(i, false);
 			instructionSheets[i].setContentType("text/plain");
 			((DefaultCaret) instructionSheets[i].getEditorPane().getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 			final JScrollPane scroller = new JScrollPane(instructionSheets[i].getEditorPane());
