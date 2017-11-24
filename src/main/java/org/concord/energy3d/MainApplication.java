@@ -16,7 +16,9 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.agents.Agent;
+import org.concord.energy3d.agents.ConformanceAgent;
 import org.concord.energy3d.agents.EventMiner;
+import org.concord.energy3d.agents.EventMiner2;
 import org.concord.energy3d.agents.MyEvent;
 import org.concord.energy3d.etc.oneinstance.OneInstance;
 import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
@@ -49,8 +51,10 @@ public class MainApplication {
 		startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();
+		agents.add(new ConformanceAgent("Conformance Agent"));
 		agents.add(new EventMiner("Event Miner"));
-		// System.out.println("~~~~~~~~~" + Util.countMatch(Pattern.compile("(A[_\\*]*U)+?").matcher("*A_****UAUAUA")));
+		agents.add(new EventMiner2("Event Miner 2"));
+		// System.out.println("~~~~~~~~~" + Util.countMatch(Pattern.compile("(A[_\\*]*U)+?").matcher("*A_****U__***AUA")));
 		// System.exit(0);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");

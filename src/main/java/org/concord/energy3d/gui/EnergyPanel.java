@@ -1770,7 +1770,9 @@ public class EnergyPanel extends JPanel {
 					for (int i = 0; i < instructionSheets.length; i++) {
 						final String contentType = Scene.getInstance().getInstructionSheetTextType(i);
 						instructionSheets[i].setContentType(contentType == null ? "text/plain" : contentType);
-						instructionSheets[i].setText(Scene.getInstance().getInstructionSheetText(i));
+						if (!instructionSheets[i].getText().equals(Scene.getInstance().getInstructionSheetText(i))) {
+							instructionSheets[i].setText(Scene.getInstance().getInstructionSheetText(i));
+						}
 					}
 				}
 				dataPanel.validate();

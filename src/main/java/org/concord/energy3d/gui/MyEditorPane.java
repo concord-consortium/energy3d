@@ -28,6 +28,7 @@ import javax.swing.text.html.HTMLDocument;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.Agent;
 import org.concord.energy3d.agents.EventFrequency;
+import org.concord.energy3d.agents.EventString;
 import org.concord.energy3d.agents.EventTimeSeries;
 import org.concord.energy3d.agents.QuestionnaireEvent;
 import org.concord.energy3d.agents.QuestionnaireModel;
@@ -259,7 +260,7 @@ public class MyEditorPane {
 			}
 		}
 
-		else if ("Event Miner".equals(act)) {
+		else if ("Event Miner".equals(act) || "Event Miner 2".equals(act) || "Conformance Agent".equals(act)) {
 			final Agent a = MainApplication.getAgent(act);
 			if (a != null) {
 				a.actuate();
@@ -271,6 +272,8 @@ public class MyEditorPane {
 			new EventFrequency().showGui();
 		} else if ("Event Time Series".equals(act)) {
 			new EventTimeSeries().showGui();
+		} else if ("Event String".equals(act)) {
+			new EventString().showGui();
 		}
 
 		// heliodon commands

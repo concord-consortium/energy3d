@@ -30,7 +30,7 @@ public class QuestionnaireEvent implements NonundoableEvent {
 
 	@Override
 	public String getName() {
-		return model.getQuestion();
+		return model.getQuestion() + ":" + model.getChoice();
 	}
 
 	@Override
