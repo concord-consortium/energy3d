@@ -45,7 +45,7 @@ public class EventString extends JPanel {
 		html.setContentType("text/html");
 		add(html, BorderLayout.CENTER);
 
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000);
+		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
 		String text = "<html><table border=0 cellpadding=0 cellspacing=0><tr>";
 		for (int i = 0; i < eventString.length(); i++) {
 			final char c = eventString.charAt(i);

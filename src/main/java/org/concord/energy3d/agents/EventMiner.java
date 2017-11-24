@@ -1,12 +1,12 @@
 package org.concord.energy3d.agents;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.Util;
 
@@ -16,8 +16,8 @@ import org.concord.energy3d.util.Util;
  */
 public class EventMiner implements Agent {
 
-	private final String name;
-	private String eventString;
+	final String name;
+	String eventString;
 
 	public EventMiner(final String name) {
 		this.name = name;
@@ -30,7 +30,7 @@ public class EventMiner implements Agent {
 
 	@Override
 	public void sense(final MyEvent e) {
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000);
+		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 
@@ -55,7 +55,7 @@ public class EventMiner implements Agent {
 				c = Util.countMatch(m);
 				switch (c) {
 				case 0:
-					msg += "You should run an analysis after changing U-value.";
+					msg += "You should run analysis after changing U-value.";
 					break;
 				case 1:
 					msg += "You ran only one analysis after changing U-value.<br>Is it sufficient to draw a conclusion?";
@@ -70,6 +70,29 @@ public class EventMiner implements Agent {
 			}
 		}
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	MyEvent idChangeEvent() {
+		final List<MyEvent> u = EventUtil.getEvents(ChangePartUValueCommand.class);
+		if (u.size() < 2) {
+			return null;
+		}
+		long oldId = -1;
+		long newId = -1;
+		for (final MyEvent x : u) {
+			if (x instanceof ChangePartUValueCommand) {
+				final ChangePartUValueCommand command = (ChangePartUValueCommand) x;
+				newId = command.getPart().getId();
+				if (oldId == -1) { // first
+					oldId = newId;
+				} else {
+					if (newId != oldId) {
+						return x;
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override

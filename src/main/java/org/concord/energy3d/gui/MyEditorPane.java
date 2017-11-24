@@ -101,22 +101,26 @@ public class MyEditorPane {
 		});
 
 		final JMenuItem miEdit = new JMenuItem("Edit");
+		final JMenuItem miCopy = new JMenuItem("Copy");
 		popupMenu = new JPopupMenu();
 		popupMenu.setInvoker(editorPane);
 		popupMenu.addPopupMenuListener(new PopupMenuListener() {
 			@Override
 			public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
 				// miEdit.setEnabled(!Scene.getInstance().isStudentMode());
+				miCopy.setEnabled(editorPane.getSelectedText() != null && !editorPane.getSelectedText().equals(""));
 			}
 
 			@Override
 			public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
 				miEdit.setEnabled(true);
+				miCopy.setEnabled(true);
 			}
 
 			@Override
 			public void popupMenuCanceled(final PopupMenuEvent e) {
 				miEdit.setEnabled(true);
+				miCopy.setEnabled(true);
 			}
 
 		});
@@ -130,6 +134,17 @@ public class MyEditorPane {
 			}
 		});
 		popupMenu.add(miEdit);
+
+		miCopy.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final ActionEvent ae = new ActionEvent(editorPane, ActionEvent.ACTION_PERFORMED, "copy");
+				if (ae != null) {
+					editorPane.getActionMap().get(ae.getActionCommand()).actionPerformed(ae);
+				}
+			}
+		});
+		popupMenu.add(miCopy);
 
 		editorPane.addMouseListener(new MouseAdapter() {
 			@Override
@@ -260,7 +275,7 @@ public class MyEditorPane {
 			}
 		}
 
-		else if ("Event Miner".equals(act) || "Event Miner 2".equals(act) || "Conformance Agent".equals(act)) {
+		else if (act.startsWith("Event Miner") || "Conformance Agent".equals(act)) {
 			final Agent a = MainApplication.getAgent(act);
 			if (a != null) {
 				a.actuate();

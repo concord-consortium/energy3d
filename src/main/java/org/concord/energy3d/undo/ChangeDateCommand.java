@@ -23,6 +23,10 @@ public class ChangeDateCommand extends MyAbstractUndoableEdit {
 		return oldDate;
 	}
 
+	public Date getNewDate() {
+		return newDate;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();

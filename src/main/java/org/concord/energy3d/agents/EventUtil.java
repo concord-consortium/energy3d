@@ -25,7 +25,7 @@ public class EventUtil {
 	private EventUtil() {
 	}
 
-	public static String eventsToString(final Class<?>[] selection, final int idleTimeInMillis) {
+	public static String eventsToString(final Class<?>[] selection, final int idleTimeInMillis, final MyEvent startEvent) {
 		String s = "";
 		final List<MyEvent> events = getEvents();
 		MyEvent lastEvent = null;
@@ -36,7 +36,9 @@ public class EventUtil {
 						s += IDLE_LETTER;
 					}
 				}
-				s += e.getOneLetterCode();
+				if (startEvent == null || e.getTimestamp() >= startEvent.getTimestamp()) {
+					s += e.getOneLetterCode();
+				}
 				lastEvent = e;
 			}
 		} else {
@@ -54,11 +56,34 @@ public class EventUtil {
 						s += IDLE_LETTER;
 					}
 				}
-				s += x;
+				if (startEvent == null || e.getTimestamp() >= startEvent.getTimestamp()) {
+					s += x;
+				}
 				lastEvent = e;
 			}
 		}
 		return s;
+	}
+
+	public static List<MyEvent> getEvents(final Class<?> c) {
+		final List<MyEvent> events = new ArrayList<MyEvent>();
+		for (final MyEvent x : MainApplication.getEventLog().getEvents()) {
+			if (c.isInstance(x)) {
+				events.add(x);
+			}
+		}
+		for (final UndoableEdit x : SceneManager.getInstance().getUndoManager().getEdits()) {
+			if (x instanceof MyEvent && c.isInstance(x)) {
+				events.add((MyEvent) x);
+			}
+		}
+		Collections.sort(events, new Comparator<MyEvent>() {
+			@Override
+			public int compare(final MyEvent e1, final MyEvent e2) {
+				return new Long(e1.getTimestamp()).compareTo(new Long(e2.getTimestamp()));
+			}
+		});
+		return events;
 	}
 
 	public static List<MyEvent> getEvents() {

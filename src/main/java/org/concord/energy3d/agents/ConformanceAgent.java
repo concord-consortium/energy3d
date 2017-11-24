@@ -32,7 +32,7 @@ public class ConformanceAgent implements Agent {
 	@Override
 	public void sense(final MyEvent e) {
 		final Class<?>[] c = new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class, QuestionnaireEvent.class, OperationEvent.class };
-		eventString = EventUtil.eventsToString(c, 10000);
+		eventString = EventUtil.eventsToString(c, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 

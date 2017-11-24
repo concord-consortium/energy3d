@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.Util;
 
@@ -14,15 +13,15 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-public class EventMiner2 extends EventMiner {
+public class EventMiner3 extends EventMiner {
 
-	public EventMiner2(final String name) {
+	public EventMiner3(final String name) {
 		super(name);
 	}
 
 	@Override
 	public void sense(final MyEvent e) {
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
+		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 
@@ -30,17 +29,17 @@ public class EventMiner2 extends EventMiner {
 	public void actuate() {
 		System.out.println(this + " Actuating: " + eventString);
 		String msg = "<html>";
-		final int i = eventString.lastIndexOf('C');
-		if (i == -1) {
-			msg += "This investigation requires change to a different season.";
+		final MyEvent startEvent = idChangeEvent();
+		if (startEvent == null) {
+			msg += "This investigation requires choosing a different wall.";
 		} else {
-			final String s = eventString.substring(i + 1);
+			final String s = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000, startEvent);
 			final Pattern p = Pattern.compile("(U[_\\*]*A)+?");
 			final Matcher m = p.matcher(s);
 			final int c = Util.countMatch(m);
 			switch (c) {
 			case 0:
-				msg += "You should change U-value and then run analysis.";
+				msg += "You have selected a different wall. You should change<br>its U-value and then run analysis.";
 				break;
 			case 1:
 				msg += "You ran only one analysis after changing U-value.<br>Is it sufficient to draw a conclusion?";

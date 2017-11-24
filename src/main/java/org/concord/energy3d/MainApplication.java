@@ -19,6 +19,7 @@ import org.concord.energy3d.agents.Agent;
 import org.concord.energy3d.agents.ConformanceAgent;
 import org.concord.energy3d.agents.EventMiner;
 import org.concord.energy3d.agents.EventMiner2;
+import org.concord.energy3d.agents.EventMiner3;
 import org.concord.energy3d.agents.MyEvent;
 import org.concord.energy3d.etc.oneinstance.OneInstance;
 import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
@@ -51,9 +52,11 @@ public class MainApplication {
 		startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();
+		// TODO: temporary test code below
 		agents.add(new ConformanceAgent("Conformance Agent"));
 		agents.add(new EventMiner("Event Miner"));
 		agents.add(new EventMiner2("Event Miner 2"));
+		agents.add(new EventMiner3("Event Miner 3"));
 		// System.out.println("~~~~~~~~~" + Util.countMatch(Pattern.compile("(A[_\\*]*U)+?").matcher("*A_****U__***AUA")));
 		// System.exit(0);
 
