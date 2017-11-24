@@ -259,7 +259,7 @@ public class MyEditorPane {
 			}
 		}
 
-		else if ("Agent Test".equals(act)) {
+		else if ("Event Miner".equals(act)) {
 			final Agent a = MainApplication.getAgent(act);
 			if (a != null) {
 				a.actuate();

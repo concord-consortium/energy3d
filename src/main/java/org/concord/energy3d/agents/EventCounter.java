@@ -13,6 +13,7 @@ public class EventCounter implements Sensor {
 		clazz = c;
 	}
 
+	@Override
 	public Class<?> getClazz() {
 		return clazz;
 	}

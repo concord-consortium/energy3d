@@ -16,8 +16,8 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.agents.Agent;
+import org.concord.energy3d.agents.EventMiner;
 import org.concord.energy3d.agents.MyEvent;
-import org.concord.energy3d.agents.SimpleReflexAgent;
 import org.concord.energy3d.etc.oneinstance.OneInstance;
 import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
 import org.concord.energy3d.gui.Mac;
@@ -49,7 +49,9 @@ public class MainApplication {
 		startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();
-		agents.add(new SimpleReflexAgent("Agent Test"));
+		agents.add(new EventMiner("Event Miner"));
+		// System.out.println("~~~~~~~~~" + Util.countMatch(Pattern.compile("(A[_\\*]*U)+?").matcher("*A_****UAUAUA")));
+		// System.exit(0);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.

@@ -8,6 +8,8 @@ public interface Sensor {
 
 	public void sense(MyEvent e);
 
+	public Class<?> getClazz();
+
 	public String getName();
 
 }

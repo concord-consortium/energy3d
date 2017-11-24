@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.regex.Matcher;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -96,6 +97,15 @@ public class Util {
 			return true;
 		}
 		return false;
+	}
+
+	public static int countMatch(final Matcher m) {
+		int count = 0;
+		while (m.find()) {
+			count++;
+		}
+		m.reset();
+		return count;
 	}
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(final Map<K, V> map, final boolean ascending) {
