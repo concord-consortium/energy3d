@@ -1544,6 +1544,7 @@ public class MainFrame extends JFrame {
 			addModel(pvMenu, "Photovoltaic Solar Farm: Cost-Effectiveness", "tutorials/solar-rack-why-array.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: The Effect of Inter-Row Spacing", "tutorials/solar-rack-array-row-spacing.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: Landscape vs. Portrait Arrays", "tutorials/solar-rack-array-row-spacing-portrait.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: Layout for Dual-Axis Trackers", "tutorials/azdat-layout.ng3");
 
 			final JMenu cspMenu = new JMenu("Concentrated Solar Power");
 			tutorialsMenu.add(cspMenu);

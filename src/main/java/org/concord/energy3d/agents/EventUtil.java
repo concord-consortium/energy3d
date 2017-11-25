@@ -20,6 +20,7 @@ import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 public class EventUtil {
 
 	private final static char IDLE_LETTER = '_';
+	private final static char AGENT_LETTER = '?';
 	private final static char BACKGROUND_LETTER = '*';
 
 	private EventUtil() {
@@ -44,7 +45,7 @@ public class EventUtil {
 		} else {
 			char x;
 			for (final MyEvent e : events) {
-				x = BACKGROUND_LETTER;
+				x = e.getOneLetterCode() == '?' ? AGENT_LETTER : BACKGROUND_LETTER;
 				for (final Class<?> c : selection) {
 					if (c.isInstance(e)) {
 						x = e.getOneLetterCode();

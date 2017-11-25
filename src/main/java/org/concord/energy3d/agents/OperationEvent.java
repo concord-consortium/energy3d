@@ -10,6 +10,7 @@ import java.util.Map;
 public class OperationEvent implements NonundoableEvent {
 
 	String name;
+	char oneLetterCode = 'O';
 	long timestamp;
 	URL file;
 	Map<String, ?> attributes;
@@ -17,6 +18,14 @@ public class OperationEvent implements NonundoableEvent {
 	public OperationEvent(final URL file, final long timestamp, final String name, final Map<String, ?> attributes) {
 		this.file = file;
 		this.timestamp = timestamp;
+		this.name = name;
+		this.attributes = attributes;
+	}
+
+	public OperationEvent(final URL file, final long timestamp, final char oneLetterCode, final String name, final Map<String, ?> attributes) {
+		this.file = file;
+		this.timestamp = timestamp;
+		this.oneLetterCode = oneLetterCode;
 		this.name = name;
 		this.attributes = attributes;
 	}
@@ -37,7 +46,7 @@ public class OperationEvent implements NonundoableEvent {
 
 	@Override
 	public char getOneLetterCode() {
-		return 'O';
+		return oneLetterCode;
 	}
 
 	@Override

@@ -35,7 +35,7 @@ public class EventMiner2 extends EventMiner {
 			msg += "This investigation requires change to a different season.";
 		} else {
 			final String s = eventString.substring(i + 1);
-			final Pattern p = Pattern.compile("(U[_\\*]*A)+?");
+			final Pattern p = Pattern.compile(targePattern);
 			final Matcher m = p.matcher(s);
 			final int c = Util.countMatch(m);
 			switch (c) {

@@ -37,7 +37,7 @@ public class EventString extends JPanel {
 	public EventString() {
 
 		super();
-		setPreferredSize(new Dimension(600, 400));
+		setPreferredSize(new Dimension(400, 300));
 		setLayout(new BorderLayout());
 
 		html = new JEditorPane();
@@ -46,8 +46,12 @@ public class EventString extends JPanel {
 		add(html, BorderLayout.CENTER);
 
 		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
-		String text = "<html><table border=0 cellpadding=0 cellspacing=0><tr>";
+		String text = "<html><table border=0 cellpadding=0 cellspacing=0>";
+		final int columns = 20;
 		for (int i = 0; i < eventString.length(); i++) {
+			if (i % columns == 0) {
+				text += "<tr>";
+			}
 			final char c = eventString.charAt(i);
 			switch (c) {
 			case 'A':

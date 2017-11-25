@@ -8,6 +8,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultButtonModel;
@@ -30,6 +31,7 @@ import org.concord.energy3d.agents.Agent;
 import org.concord.energy3d.agents.EventFrequency;
 import org.concord.energy3d.agents.EventString;
 import org.concord.energy3d.agents.EventTimeSeries;
+import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.agents.QuestionnaireEvent;
 import org.concord.energy3d.agents.QuestionnaireModel;
 import org.concord.energy3d.model.PartGroup;
@@ -265,8 +267,6 @@ public class MyEditorPane {
 			EnergyPanel.getInstance().selectInstructionSheet(2);
 		} else if ("Sheet 4".equals(act)) {
 			EnergyPanel.getInstance().selectInstructionSheet(3);
-		} else if ("Sheet 5".equals(act)) {
-			EnergyPanel.getInstance().selectInstructionSheet(4);
 		}
 
 		else if ("Questionnaire".equals(act)) {
@@ -279,6 +279,9 @@ public class MyEditorPane {
 			final Agent a = MainApplication.getAgent(act);
 			if (a != null) {
 				a.actuate();
+				final HashMap<String, Object> attributes = new HashMap<String, Object>();
+				attributes.put("Agent", act);
+				MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), '?', a.getName(), attributes));
 			}
 		}
 

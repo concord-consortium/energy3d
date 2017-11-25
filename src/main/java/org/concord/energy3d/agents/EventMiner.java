@@ -18,6 +18,7 @@ public class EventMiner implements Agent {
 
 	final String name;
 	String eventString;
+	String targePattern = "(U[_\\*\\?]*A)+?";
 
 	public EventMiner(final String name) {
 		this.name = name;
@@ -50,7 +51,7 @@ public class EventMiner implements Agent {
 			if (c == 0) {
 				msg += "You haven't changed the U-value.";
 			} else {
-				p = Pattern.compile("(U[_\\*]*A)+?");
+				p = Pattern.compile(targePattern);
 				m = p.matcher(eventString);
 				c = Util.countMatch(m);
 				switch (c) {

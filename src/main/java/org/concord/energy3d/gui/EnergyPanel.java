@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -58,6 +59,7 @@ import javax.swing.text.DefaultCaret;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.AnalysisEvent;
+import org.concord.energy3d.agents.OperationEvent;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
@@ -677,6 +679,16 @@ public class EnergyPanel extends JPanel {
 
 		instructionTabbedPane = new JTabbedPane();
 		instructionTabbedPane.setFont(new Font(instructionTabbedPane.getFont().getName(), Font.PLAIN, instructionTabbedPane.getFont().getSize() - 1));
+		instructionTabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(final ChangeEvent e) {
+				if (instructionTabbedPane.isShowing()) {
+					final HashMap<String, Object> attributes = new HashMap<String, Object>();
+					attributes.put("Sheet", instructionTabbedPane.getSelectedIndex());
+					MainApplication.addEvent(new OperationEvent(Scene.getURL(), System.currentTimeMillis(), "Instruction Sheet Selection", attributes));
+				}
+			}
+		});
 		instructionPanel.add(instructionTabbedPane);
 
 		for (int i = 0; i < instructionSheets.length; i++) {

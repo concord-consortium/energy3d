@@ -167,6 +167,11 @@ public class SolarRadiation {
 					collidables.add(s);
 					collidablesToParts.put(s, wall);
 				}
+			} else if (part instanceof Door) {
+				final Door door = (Door) part;
+				final Spatial s = door.getRadiationCollisionSpatial();
+				collidables.add(s);
+				collidablesToParts.put(s, door);
 			} else if (part instanceof Roof) {
 				final Roof roof = (Roof) part;
 				for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
@@ -223,6 +228,8 @@ public class SolarRadiation {
 							if (((Wall) part).getType() == Wall.SOLID_WALL) {
 								computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 							}
+						} else if (part instanceof Door) {
+							// FIXME: computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						} else if (part instanceof Foundation) {
 							final Foundation foundation = (Foundation) part;
 							for (int i = 0; i < 5; i++) {
@@ -1958,7 +1965,7 @@ public class SolarRadiation {
 				applyTexture(part.getRadiationMesh());
 			} else {
 				if (!Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
-					if (part instanceof Wall) {
+					if (part instanceof Wall || part instanceof Door) {
 						applyTexture(part.getRadiationMesh());
 					} else if (part instanceof Foundation) {
 						final Foundation foundation = (Foundation) part;
