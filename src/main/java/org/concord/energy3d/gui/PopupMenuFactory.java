@@ -386,17 +386,30 @@ public abstract class PopupMenuFactory {
 							if (val <= 0) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "U-value must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else {
+								boolean changed = val != t.getUValue();
 								if (rb1.isSelected()) {
-									final ChangePartUValueCommand c = new ChangePartUValueCommand(selectedPart);
-									t.setUValue(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangePartUValueCommand c = new ChangePartUValueCommand(selectedPart);
+										t.setUValue(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 								} else {
-									final ChangeBuildingUValueCommand c = new ChangeBuildingUValueCommand(selectedPart);
-									Scene.getInstance().setUValuesOfSameTypeInBuilding(selectedPart, val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									for (final HousePart x : Scene.getInstance().getPartsOfSameTypeInBuilding(selectedPart)) {
+										if (val != ((Thermal) x).getUValue()) {
+											changed = true;
+											break;
+										}
+									}
+									if (changed) {
+										final ChangeBuildingUValueCommand c = new ChangeBuildingUValueCommand(selectedPart);
+										Scene.getInstance().setUValuesOfSameTypeInBuilding(selectedPart, val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 								}
-								updateAfterEdit();
-								EnergyPanel.getInstance().getBuildingCostGraph().updateBudget();
+								if (changed) {
+									updateAfterEdit();
+									EnergyPanel.getInstance().getBuildingCostGraph().updateBudget();
+								}
 								break;
 							}
 						} catch (final NumberFormatException exception) {
@@ -436,10 +449,12 @@ public abstract class PopupMenuFactory {
 							if (val <= 0) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Volumeric heat capacity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 							} else {
-								final ChangeVolumetricHeatCapacityCommand c = new ChangeVolumetricHeatCapacityCommand(selectedPart);
-								t.setVolumetricHeatCapacity(val);
-								updateAfterEdit();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (val != t.getVolumetricHeatCapacity()) {
+									final ChangeVolumetricHeatCapacityCommand c = new ChangeVolumetricHeatCapacityCommand(selectedPart);
+									t.setVolumetricHeatCapacity(val);
+									updateAfterEdit();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								break;
 							}
 						} catch (final NumberFormatException exception) {

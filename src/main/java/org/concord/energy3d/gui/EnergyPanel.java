@@ -1611,11 +1611,7 @@ public class EnergyPanel extends JPanel {
 						public void run() {
 							partPanelBorder.setTitle("Floor (" + floor.getId() + ")");
 							partProperty1Label.setText("  Area & Center");
-							String s = ONE_DECIMAL.format(floor.getArea()) + lengthUnit + "\u00B2";
-							if (!Double.isNaN(cx) && !Double.isNaN(cy)) {
-								s += ", (" + ONE_DECIMAL.format(cx * scale) + ", " + ONE_DECIMAL.format(cy * scale) + ", " + ONE_DECIMAL.format(cz * scale) + ")" + lengthUnit;
-							}
-							partProperty1TextField.setText(s);
+							partProperty1TextField.setText(ONE_DECIMAL.format(floor.getArea()) + lengthUnit + "\u00B2, (" + ONE_DECIMAL.format(cx * scale) + ", " + ONE_DECIMAL.format(cy * scale) + ", " + ONE_DECIMAL.format(cz * scale) + ")" + lengthUnit);
 							partProperty1TextField.putClientProperty("tooltip", "The area and center of the floor");
 							partProperty2Label.setText("  Thermal:");
 							partProperty2TextField.setText("N.A.");

@@ -537,6 +537,7 @@ public class Scene implements Serializable {
 				MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
 				MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 				SceneManager.getInstance().getUndoManager().discardAllEdits();
+				MainApplication.getEventLog().clear();
 			}
 		});
 

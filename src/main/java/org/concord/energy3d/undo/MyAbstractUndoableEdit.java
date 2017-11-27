@@ -37,6 +37,9 @@ public abstract class MyAbstractUndoableEdit extends AbstractUndoableEdit implem
 
 	@Override
 	public char getOneLetterCode() {
+		if (getName().length() <= 0) {
+			return '*';
+		}
 		return getName().charAt(0);
 	}
 

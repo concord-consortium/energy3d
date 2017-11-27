@@ -20,8 +20,23 @@ public class EventMiner implements Agent {
 	String eventString;
 	String targePattern = "(U[_\\*\\?]*A)+?";
 
+	FeedbackPool feedbackOnAnalysisCheck;
+	FeedbackPool feedbackOnUValueCheck;
+	FeedbackPool feedbackOnTargetPattern;
+
 	public EventMiner(final String name) {
 		this.name = name;
+		feedbackOnAnalysisCheck = new FeedbackPool(1, 2);
+		feedbackOnAnalysisCheck.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
+		feedbackOnAnalysisCheck.setItem(0, 1, "Did you forget to run analysis?");
+		feedbackOnUValueCheck = new FeedbackPool(1, 2);
+		feedbackOnUValueCheck.setItem(0, 0, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
+		feedbackOnUValueCheck.setItem(0, 1, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
+		feedbackOnTargetPattern = new FeedbackPool(4, 1);
+		feedbackOnTargetPattern.setItem(0, 0, "You should run analysis after changing U-value.");
+		feedbackOnTargetPattern.setItem(1, 0, "You ran only one analysis after changing U-value.<br>Is it sufficient to draw a conclusion?");
+		feedbackOnTargetPattern.setItem(2, 0, "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
+		feedbackOnTargetPattern.setItem(3, 0, "You have run at least three analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
 	}
 
 	@Override
@@ -43,31 +58,23 @@ public class EventMiner implements Agent {
 		Matcher m = p.matcher(eventString);
 		int c = Util.countMatch(m);
 		if (c == 0) {
-			msg += "Did you forget to run analysis?";
+			msg += feedbackOnAnalysisCheck.getCurrentItem(0);
+			feedbackOnAnalysisCheck.forward(0);
 		} else {
 			p = Pattern.compile("U+?");
 			m = p.matcher(eventString);
 			c = Util.countMatch(m);
 			if (c == 0) {
-				msg += "You haven't changed the U-value.";
+				msg += feedbackOnUValueCheck.getCurrentItem(0);
+				feedbackOnUValueCheck.forward(0);
 			} else {
 				p = Pattern.compile(targePattern);
 				m = p.matcher(eventString);
 				c = Util.countMatch(m);
-				switch (c) {
-				case 0:
-					msg += "You should run analysis after changing U-value.";
-					break;
-				case 1:
-					msg += "You ran only one analysis after changing U-value.<br>Is it sufficient to draw a conclusion?";
-					break;
-				case 2:
-					msg += "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?";
-					break;
-				default:
-					msg += "You have run " + c + " analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?";
-					break;
+				if (c >= feedbackOnTargetPattern.getNumberOfCases()) {
+					c = feedbackOnTargetPattern.getNumberOfCases() - 1;
 				}
+				msg += feedbackOnTargetPattern.getCurrentItem(c);
 			}
 		}
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
