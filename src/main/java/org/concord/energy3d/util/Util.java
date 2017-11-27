@@ -9,7 +9,6 @@ import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
@@ -543,8 +542,7 @@ public class Util {
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), get(), "Notice", JOptionPane.INFORMATION_MESSAGE);
 			} catch (final Exception e) { // backup solution
 				e.printStackTrace();
-				final Clipboard clpbrd = Toolkit.getDefaultToolkit().getSystemClipboard();
-				clpbrd.setContents(new StringSelection(text), null);
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
 			}
 			// attempt to fix problems

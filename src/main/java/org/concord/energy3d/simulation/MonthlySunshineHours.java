@@ -161,8 +161,8 @@ public class MonthlySunshineHours extends JPanel {
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
-		final JMenu menuAction = new JMenu("Action");
-		menuBar.add(menuAction);
+		final JMenu menuExport = new JMenu("Export");
+		menuBar.add(menuExport);
 
 		final JMenuItem mi = new JMenuItem("Copy Image");
 		mi.addActionListener(new ActionListener() {
@@ -171,7 +171,7 @@ public class MonthlySunshineHours extends JPanel {
 				new ClipImage().copyImageToClipboard(MonthlySunshineHours.this);
 			}
 		});
-		menuAction.add(mi);
+		menuExport.add(mi);
 
 		final JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());

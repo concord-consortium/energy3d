@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -87,10 +89,35 @@ public class EventString extends JPanel {
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
-		final JMenu menu = new JMenu("View");
+		final JMenu menu = new JMenu("Export");
 		menuBar.add(menu);
 
-		final JMenuItem mi = new JMenuItem("Copy Image");
+		JMenuItem mi = new JMenuItem("Copy Colored String");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				html.selectAll();
+				final ActionEvent ae = new ActionEvent(html, ActionEvent.ACTION_PERFORMED, "copy");
+				if (ae != null) {
+					html.getActionMap().get(ae.getActionCommand()).actionPerformed(ae);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "The string is now ready for pasting.", "Copy String", JOptionPane.INFORMATION_MESSAGE);
+					html.select(0, 0);
+				}
+			}
+		});
+		menu.add(mi);
+
+		mi = new JMenuItem("Copy Plain String");
+		mi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(eventString), null);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "The string is now ready for pasting.", "Copy String", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		menu.add(mi);
+
+		mi = new JMenuItem("Copy Image");
 		mi.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -108,24 +135,7 @@ public class EventString extends JPanel {
 		final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPanel, BorderLayout.SOUTH);
 
-		JButton button = new JButton("Copy String");
-		button.setEnabled(!eventString.equals(""));
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				html.selectAll();
-				final ActionEvent ae = new ActionEvent(html, ActionEvent.ACTION_PERFORMED, "copy");
-				if (ae != null) {
-					html.getActionMap().get(ae.getActionCommand()).actionPerformed(ae);
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "The string is now ready for pasting.", "Copy String", JOptionPane.INFORMATION_MESSAGE);
-					html.select(0, 0);
-				}
-			}
-		});
-		button.setToolTipText("Copy data to the system clipboard");
-		buttonPanel.add(button);
-
-		button = new JButton("Close");
+		final JButton button = new JButton("Close");
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {

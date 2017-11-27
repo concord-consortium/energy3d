@@ -1459,24 +1459,24 @@ public class EnergyPanel extends JPanel {
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							partProperty1Label.setText("  Area:");
-							partProperty1TextField.setText(TWO_DECIMALS.format(area) + lengthUnit + "\u00B2");
-							partProperty2Label.setText("  Rise:");
-							partProperty2TextField.setText(TWO_DECIMALS.format(roof.getHeight() * scale) + lengthUnit);
-							partProperty1TextField.setToolTipText("The total area of the roof");
-							partProperty2TextField.setToolTipText("<html>The rise of the roof<br>(the highest point of the roof to the top of the walls</html>");
-							final String id = "Roof (" + roof.getId() + ")";
+							partPanelBorder.setTitle("Roof (" + roof.getId() + ")");
+							partProperty1Label.setText("  Area & Rise:");
+							partProperty1TextField.setText("Area = " + TWO_DECIMALS.format(area) + lengthUnit + "\u00B2, Rise = " + TWO_DECIMALS.format(roof.getHeight() * scale) + lengthUnit);
+							partProperty1TextField.putClientProperty("tooltip", "The total area and the rise of the roof<br>(The rise is the highest point of the roof to the top of the walls.)");
+							partProperty2Label.setText("  Thermal:");
+							partProperty3Label.setText("  Solar:");
 							final String rval = ONE_DECIMAL.format(Util.toUsRValue(roof.getUValue()));
+							final float absorptance = 1 - roof.getAlbedo();
 							if (energyViewShown) {
-								partPanelBorder.setTitle(id + " - R-value = " + rval);
-								partProperty3Label.setText("  Solar:");
-								partProperty3TextField.setText(TWO_DECIMALS.format(roof.getSolarPotentialToday() * (1 - roof.getAlbedo())) + " kWh");
-								partProperty3TextField.setToolTipText("The solar potential of the roof of the day");
+								partProperty2TextField.setText("R-value = " + rval + ", Gain = " + TWO_DECIMALS.format(-roof.getTotalHeatLoss()) + " kWh");
+								partProperty2TextField.putClientProperty("tooltip", "The R-value and daily thermal gain of the roof");
+								partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance) + ", Absorption = " + TWO_DECIMALS.format(roof.getSolarPotentialToday() * absorptance) + " kWh");
+								partProperty3TextField.putClientProperty("tooltip", "The absorptance and daily solar heat gain of the roof surface");
 							} else {
-								partPanelBorder.setTitle(id);
-								partProperty3Label.setText("  R-value:");
-								partProperty3TextField.setText(rval + " (US system)");
-								partProperty3TextField.setToolTipText("The R-value of the roof");
+								partProperty2TextField.setText("R-value = " + rval + " (US system)");
+								partProperty2TextField.putClientProperty("tooltip", "The R-value of the roof");
+								partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance));
+								partProperty3TextField.putClientProperty("tooltip", "The absorptance of the roof surface");
 							}
 						}
 					});
@@ -1495,24 +1495,23 @@ public class EnergyPanel extends JPanel {
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
+							partPanelBorder.setTitle("Window (" + window.getId() + ")");
 							partProperty1Label.setText("  Size & Center:");
 							partProperty1TextField.setText(TWO_DECIMALS.format(lx) + "\u00d7" + (TWO_DECIMALS.format(ly)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly) + lengthUnit + "\u00B2, (" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ", " + TWO_DECIMALS.format(cz * scale) + ")" + lengthUnit);
-							partProperty2Label.setText("  U-value:");
-							partProperty2TextField.setText(TWO_DECIMALS.format(Util.toUsUValue(window.getUValue())) + " (US system)");
-							partProperty1TextField.setToolTipText("The width and height of the window");
-							partProperty2TextField.setToolTipText("The U-value of the window");
-							final String id = "Window (" + window.getId() + ")";
+							partProperty1TextField.putClientProperty("tooltip", "The width, height, and center of the window");
+							partProperty2Label.setText("  Thermal:");
+							partProperty3Label.setText("  Solar:");
 							final String shgc = TWO_DECIMALS.format(window.getSolarHeatGainCoefficient());
 							if (energyViewShown) {
-								partPanelBorder.setTitle(id + " - SHGC = " + shgc);
-								partProperty3Label.setText("  Gain:");
-								partProperty3TextField.setText(TWO_DECIMALS.format(window.getSolarPotentialToday() * window.getSolarHeatGainCoefficient()) + " kWh");
-								partProperty3TextField.setToolTipText("The solar heat gain of the window of the day");
+								partProperty2TextField.setText("U-Value = " + TWO_DECIMALS.format(Util.toUsUValue(window.getUValue())) + ", Gain = " + TWO_DECIMALS.format(-window.getTotalHeatLoss()) + " kWh");
+								partProperty2TextField.putClientProperty("tooltip", "The U-value and daily thermal gain of the window");
+								partProperty3TextField.setText("SHGC = " + shgc + ", Gain = " + TWO_DECIMALS.format(window.getSolarPotentialToday() * window.getSolarHeatGainCoefficient()) + " kWh");
+								partProperty3TextField.putClientProperty("tooltip", "The SHGC value and daily solar gain of the window");
 							} else {
-								partPanelBorder.setTitle(id);
-								partProperty3Label.setText("  SHGC:");
-								partProperty3TextField.setText(shgc);
-								partProperty3TextField.setToolTipText("The solar heat gain coefficient (SHGC) of the window");
+								partProperty2TextField.setText("U-Value = " + TWO_DECIMALS.format(Util.toUsUValue(window.getUValue())) + " (US system)");
+								partProperty2TextField.putClientProperty("tooltip", "The U-value of the window");
+								partProperty3TextField.setText("SHGC = " + shgc);
+								partProperty3TextField.putClientProperty("tooltip", "The solar heat gain coefficient (SHGC) of the window");
 							}
 						}
 					});
@@ -1525,29 +1524,30 @@ public class EnergyPanel extends JPanel {
 					final Vector3 v3 = wall.getAbsPoint(3);
 					final double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
 					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double cz = 0.25 * (v.getZ() + v1.getZ() + v2.getZ() + v3.getZ());
 					final double lx = v.distance(v2);
 					final double ly = v.distance(v1);
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							partProperty1Label.setText("  Size:");
-							partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly * scale * scale) + lengthUnit + " \u00B2");
-							partProperty2Label.setText("  Position:");
-							partProperty2TextField.setText("(" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ")" + lengthUnit);
-							partProperty1TextField.setToolTipText("The width and height of the wall");
-							partProperty2TextField.setToolTipText("The (x, y) coordinate of the center of the wall");
-							final String id = "Wall (" + wall.getId() + ")";
+							partPanelBorder.setTitle("Wall (" + wall.getId() + ")");
+							partProperty1Label.setText("  Size & Center:");
+							partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly * scale * scale) + lengthUnit + " \u00B2, " + "(" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ", " + TWO_DECIMALS.format(cz * scale) + ")" + lengthUnit);
+							partProperty1TextField.putClientProperty("tooltip", "The width, height, and center of the wall");
+							partProperty2Label.setText("  Thermal:");
+							partProperty3Label.setText("  Solar:");
 							final String rval = ONE_DECIMAL.format(Util.toUsRValue(wall.getUValue()));
+							final float absorptance = 1 - wall.getAlbedo();
 							if (energyViewShown) {
-								partPanelBorder.setTitle(id + " - R-value = " + rval);
-								partProperty3Label.setText("  Solar:");
-								partProperty3TextField.setText(TWO_DECIMALS.format(wall.getSolarPotentialToday() * (1 - wall.getAlbedo())) + " kWh");
-								partProperty3TextField.setToolTipText("The solar potential of the wall");
+								partProperty2TextField.setText("R-Value = " + rval + ", Gain = " + TWO_DECIMALS.format(-wall.getTotalHeatLoss()) + " kWh");
+								partProperty2TextField.putClientProperty("tooltip", "The R-value and daily thermal gain of the wall");
+								partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance) + ", Absorption = " + TWO_DECIMALS.format(wall.getSolarPotentialToday() * absorptance) + " kWh");
+								partProperty3TextField.putClientProperty("tooltip", "The absorptance and daily solar heat gain of the wall surface");
 							} else {
-								partPanelBorder.setTitle(id);
-								partProperty3Label.setText("  R-value:");
-								partProperty3TextField.setText(rval + " (US system)");
-								partProperty3TextField.setToolTipText("The R-value of the wall");
+								partProperty2TextField.setText("R-Value = " + rval + " (US system)");
+								partProperty2TextField.putClientProperty("tooltip", "The R-value of the wall");
+								partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance));
+								partProperty3TextField.putClientProperty("tooltip", "The absorptance of the wall surface");
 							}
 						}
 					});
@@ -1560,21 +1560,31 @@ public class EnergyPanel extends JPanel {
 					final Vector3 v3 = door.getAbsPoint(3);
 					final double cx = 0.25 * (v.getX() + v1.getX() + v2.getX() + v3.getX());
 					final double cy = 0.25 * (v.getY() + v1.getY() + v2.getY() + v3.getY());
+					final double cz = 0.25 * (v.getZ() + v1.getZ() + v2.getZ() + v3.getZ());
 					final double lx = v.distance(v2);
 					final double ly = v.distance(v1);
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
 							partPanelBorder.setTitle("Door (" + door.getId() + ")");
-							partProperty1Label.setText("  Size:");
-							partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly * scale * scale) + lengthUnit + "\u00B2");
-							partProperty2Label.setText("  Position:");
-							partProperty2TextField.setText("(" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ")" + lengthUnit);
-							partProperty3Label.setText("  U-value:");
-							partProperty3TextField.setText(TWO_DECIMALS.format(Util.toUsUValue(door.getUValue())) + " (US system)");
-							partProperty1TextField.setToolTipText("The width and height of the door");
-							partProperty2TextField.setToolTipText("The (x, y) coordinates of the center of the door");
-							partProperty3TextField.setToolTipText("The U-value of the wall");
+							partProperty1Label.setText("  Size & Center:");
+							partProperty1TextField.setText(TWO_DECIMALS.format(lx * scale) + "\u00d7" + (TWO_DECIMALS.format(ly * scale)) + lengthUnit + " \u2248 " + TWO_DECIMALS.format(lx * ly * scale * scale) + lengthUnit + "\u00B2, (" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ", " + TWO_DECIMALS.format(cz * scale) + ")" + lengthUnit);
+							partProperty1TextField.putClientProperty("tooltip", "The width, height, and center of the door");
+							partProperty2Label.setText("  Thermal:");
+							partProperty3Label.setText("  Solar:");
+							final String uval = TWO_DECIMALS.format(Util.toUsUValue(door.getUValue()));
+							final float absorptance = 1 - door.getAlbedo();
+							if (energyViewShown) {
+								partProperty2TextField.setText("U-Value = " + uval + ", Gain = " + TWO_DECIMALS.format(-door.getTotalHeatLoss()) + " kWh");
+								partProperty2TextField.putClientProperty("tooltip", "The R-value and daily thermal gain of the door");
+								partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance) + ", Absorption = " + TWO_DECIMALS.format(door.getSolarPotentialToday() * absorptance) + " kWh");
+								partProperty3TextField.putClientProperty("tooltip", "The absorptance and daily solar heat gain of the door surface");
+							} else {
+								partProperty2TextField.setText("U-Value = " + uval + " (US system)");
+								partProperty2TextField.putClientProperty("tooltip", "The U-value of the door");
+								partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance));
+								partProperty3TextField.putClientProperty("tooltip", "The absorptance of the door surface");
+							}
 						}
 					});
 				}
@@ -1948,6 +1958,13 @@ public class EnergyPanel extends JPanel {
 	private JTextField createTextField() {
 		final JTextField text = new JTextField();
 		text.setFont(new Font(text.getFont().getName(), Font.PLAIN, text.getFont().getSize() - 1));
+		text.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(final MouseEvent e) {
+				final Object tooltip = text.getClientProperty("tooltip");
+				text.setToolTipText("<html>" + (tooltip == null ? "" : (String) tooltip) + "<hr>" + text.getText() + "</html>");
+			}
+		});
 		return text;
 	}
 

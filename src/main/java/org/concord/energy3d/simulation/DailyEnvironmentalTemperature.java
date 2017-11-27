@@ -374,8 +374,8 @@ public class DailyEnvironmentalTemperature extends JPanel {
 			menuView.add(cbmiGroundTemperature[i]);
 		}
 
-		final JMenu menuAction = new JMenu("Action");
-		menuBar.add(menuAction);
+		final JMenu menuExport = new JMenu("Export");
+		menuBar.add(menuExport);
 
 		final JMenuItem mi = new JMenuItem("Copy Image");
 		mi.addActionListener(new ActionListener() {
@@ -384,7 +384,7 @@ public class DailyEnvironmentalTemperature extends JPanel {
 				new ClipImage().copyImageToClipboard(DailyEnvironmentalTemperature.this);
 			}
 		});
-		menuAction.add(mi);
+		menuExport.add(mi);
 
 		final JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());

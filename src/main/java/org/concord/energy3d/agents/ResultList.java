@@ -107,7 +107,7 @@ public class ResultList {
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
 
-		final JMenu menu = new JMenu("View");
+		final JMenu menu = new JMenu("Export");
 		menuBar.add(menu);
 
 		final JMenuItem mi = new JMenuItem("Copy Image");
