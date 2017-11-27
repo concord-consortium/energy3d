@@ -229,7 +229,7 @@ public class SolarRadiation {
 								computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 							}
 						} else if (part instanceof Door) {
-							// FIXME: computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
+							computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						} else if (part instanceof Foundation) {
 							final Foundation foundation = (Foundation) part;
 							for (int i = 0; i < 5; i++) {
@@ -1585,11 +1585,14 @@ public class SolarRadiation {
 					} else {
 						final ReadOnlyVector2 p = originXY.add(uXY.multiply(col * solarStep, null), null).add(vXY.multiply(row * solarStep, null), null);
 						boolean isInside = false;
-						if (points.size() >= 3) { // FIXME: sometimes we can end up with less than three points
-							for (int i = 0; i < points.size(); i += 3) {
-								if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
-									isInside = true;
-									break;
+						final int numberOfPoints = points.size();
+						if (numberOfPoints >= 3) { // FIXME: sometimes we can end up with less than three points
+							for (int i = 0; i < numberOfPoints; i += 3) {
+								if (i + 2 < points.size()) {
+									if (Util.isPointInsideTriangle(p, points.get(i), points.get(i + 1), points.get(i + 2))) {
+										isInside = true;
+										break;
+									}
 								}
 							}
 						}
