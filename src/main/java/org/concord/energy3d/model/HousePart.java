@@ -916,6 +916,9 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public double getArea() {
+		if (Util.isZero(area)) {
+			computeArea();
+		}
 		return area;
 	}
 

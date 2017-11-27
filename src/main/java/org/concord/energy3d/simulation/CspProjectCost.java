@@ -66,7 +66,7 @@ public class CspProjectCost extends ProjectCost {
 
 		if (part instanceof Foundation) {
 			final Foundation f = (Foundation) part;
-			if (f.hasSolarReceiver()) {
+			if (f.hasSolarReceiver()) { // TODO: solar receiver height may not be accurate while the model is still loading
 				return price.getTowerUnitPrice() * f.getSolarReceiverHeight(0) * Scene.getInstance().getAnnotationScale();
 			}
 			return f.getArea() * price.getLandUnitPrice() * price.getLifespan();
