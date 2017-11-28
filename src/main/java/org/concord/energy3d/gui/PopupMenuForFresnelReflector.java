@@ -247,30 +247,55 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								} else {
 									if (p instanceof Foundation) {
 										final Foundation target = (Foundation) p;
+										boolean changed = target != r.getAbsorber();
 										if (rb1.isSelected()) {
-											final Foundation oldTarget = r.getAbsorber();
-											final ChangeFresnelReflectorAbsorberCommand c = new ChangeFresnelReflectorAbsorberCommand(r);
-											r.setAbsorber(target);
-											r.draw();
-											if (oldTarget != null) {
-												oldTarget.drawSolarReceiver();
+											if (changed) {
+												final Foundation oldTarget = r.getAbsorber();
+												final ChangeFresnelReflectorAbsorberCommand c = new ChangeFresnelReflectorAbsorberCommand(r);
+												r.setAbsorber(target);
+												r.draw();
+												if (oldTarget != null) {
+													oldTarget.drawSolarReceiver();
+												}
+												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
-											SceneManager.getInstance().getUndoManager().addEdit(c);
 											selectedScopeIndex = 0;
 										} else if (rb2.isSelected()) {
 											final Foundation foundation = r.getTopContainer();
-											final ChangeFoundationFresnelReflectorAbsorberCommand c = new ChangeFoundationFresnelReflectorAbsorberCommand(foundation);
-											foundation.setAbsorberForFresnelReflectors(target);
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+											if (!changed) {
+												for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+													if (x.getAbsorber() != target) {
+														changed = true;
+														break;
+													}
+												}
+											}
+											if (changed) {
+												final ChangeFoundationFresnelReflectorAbsorberCommand c = new ChangeFoundationFresnelReflectorAbsorberCommand(foundation);
+												foundation.setAbsorberForFresnelReflectors(target);
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 											selectedScopeIndex = 1;
 										} else if (rb3.isSelected()) {
-											final ChangeAbsorberForAllFresnelReflectorsCommand c = new ChangeAbsorberForAllFresnelReflectorsCommand();
-											Scene.getInstance().setAbsorberForAllFresnelReflectors(target);
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+											if (!changed) {
+												for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+													if (x.getAbsorber() != target) {
+														changed = true;
+														break;
+													}
+												}
+											}
+											if (changed) {
+												final ChangeAbsorberForAllFresnelReflectorsCommand c = new ChangeAbsorberForAllFresnelReflectorsCommand();
+												Scene.getInstance().setAbsorberForAllFresnelReflectors(target);
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 											selectedScopeIndex = 2;
 										}
-										target.drawSolarReceiver();
-										updateAfterEdit();
+										if (changed) {
+											target.drawSolarReceiver();
+											updateAfterEdit();
+										}
 										if (choice == options[0]) {
 											break;
 										}
@@ -351,25 +376,50 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								if (length < 1 || length > 1000) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = length != r.getLength();
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(r);
-										r.setLength(length);
-										r.ensureFullModules(false);
-										r.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(r);
+											r.setLength(length);
+											r.ensureFullModules(false);
+											r.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-										foundation.setSizeForFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+												if (x.getLength() != length) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
+											foundation.setSizeForFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-										Scene.getInstance().setSizeForAllFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+												if (x.getLength() != length) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
+											Scene.getInstance().setSizeForAllFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -449,25 +499,50 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								if (moduleWidth < 1 || moduleWidth > 20) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = moduleWidth != r.getModuleWidth();
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(r);
-										r.setModuleWidth(moduleWidth);
-										r.ensureFullModules(false);
-										r.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(r);
+											r.setModuleWidth(moduleWidth);
+											r.ensureFullModules(false);
+											r.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-										foundation.setSizeForFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+												if (x.getModuleWidth() != moduleWidth) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
+											foundation.setSizeForFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-										Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+												if (x.getModuleWidth() != moduleWidth) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
+											Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -547,25 +622,50 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								if (moduleLength < 1 || moduleLength > 50) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module length must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = moduleLength != r.getModuleLength();
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(r);
-										r.setModuleLength(moduleLength);
-										r.ensureFullModules(false);
-										r.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(r);
+											r.setModuleLength(moduleLength);
+											r.ensureFullModules(false);
+											r.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-										foundation.setSizeForFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+												if (x.getModuleLength() != moduleLength) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
+											foundation.setSizeForFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-										Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+												if (x.getModuleLength() != moduleLength) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
+											Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -642,24 +742,49 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
+								boolean changed = val != r.getBaseHeight();
 								if (rb1.isSelected()) {
-									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(r);
-									r.setBaseHeight(val);
-									r.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(r);
+										r.setBaseHeight(val);
+										r.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationFresnelReflectorBaseHeightCommand c = new ChangeFoundationFresnelReflectorBaseHeightCommand(foundation);
-									foundation.setBaseHeightForFresnelReflectors(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+											if (x.getBaseHeight() != val) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationFresnelReflectorBaseHeightCommand c = new ChangeFoundationFresnelReflectorBaseHeightCommand(foundation);
+										foundation.setBaseHeightForFresnelReflectors(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeBaseHeightForAllFresnelReflectorsCommand c = new ChangeBaseHeightForAllFresnelReflectorsCommand();
-									Scene.getInstance().setBaseHeightForAllFresnelReflectors(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+											if (x.getBaseHeight() != val) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeBaseHeightForAllFresnelReflectorsCommand c = new ChangeBaseHeightForAllFresnelReflectorsCommand();
+										Scene.getInstance().setBaseHeightForAllFresnelReflectors(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -833,24 +958,49 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Fresnel reflector reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - r.getReflectance()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeFresnelReflectorReflectanceCommand c = new ChangeFresnelReflectorReflectanceCommand(r);
-										r.setReflectance(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeFresnelReflectorReflectanceCommand c = new ChangeFresnelReflectorReflectanceCommand(r);
+											r.setReflectance(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = r.getTopContainer();
-										final ChangeFoundationFresnelReflectorReflectanceCommand c = new ChangeFoundationFresnelReflectorReflectanceCommand(foundation);
-										foundation.setReflectanceForFresnelReflectors(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+												if (Math.abs(x.getReflectance() - val * 0.01) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationFresnelReflectorReflectanceCommand c = new ChangeFoundationFresnelReflectorReflectanceCommand(foundation);
+											foundation.setReflectanceForFresnelReflectors(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeReflectanceForAllFresnelReflectorsCommand c = new ChangeReflectanceForAllFresnelReflectorsCommand();
-										Scene.getInstance().setReflectanceForAllFresnelReflectors(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+												if (Math.abs(x.getReflectance() - val * 0.01) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeReflectanceForAllFresnelReflectorsCommand c = new ChangeReflectanceForAllFresnelReflectorsCommand();
+											Scene.getInstance().setReflectanceForAllFresnelReflectors(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -929,24 +1079,49 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Fresnel reflector absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - r.getAbsorptance()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeFresnelReflectorAbsorptanceCommand c = new ChangeFresnelReflectorAbsorptanceCommand(r);
-										r.setAbsorptance(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeFresnelReflectorAbsorptanceCommand c = new ChangeFresnelReflectorAbsorptanceCommand(r);
+											r.setAbsorptance(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = r.getTopContainer();
-										final ChangeFoundationFresnelReflectorAbsorptanceCommand c = new ChangeFoundationFresnelReflectorAbsorptanceCommand(foundation);
-										foundation.setAbsorptanceForFresnelReflectors(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+												if (Math.abs(x.getAbsorptance() - val * 0.01) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationFresnelReflectorAbsorptanceCommand c = new ChangeFoundationFresnelReflectorAbsorptanceCommand(foundation);
+											foundation.setAbsorptanceForFresnelReflectors(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeAbsorptanceForAllFresnelReflectorsCommand c = new ChangeAbsorptanceForAllFresnelReflectorsCommand();
-										Scene.getInstance().setAbsorptanceForAllFresnelReflectors(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+												if (Math.abs(x.getAbsorptance() - val * 0.01) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeAbsorptanceForAllFresnelReflectorsCommand c = new ChangeAbsorptanceForAllFresnelReflectorsCommand();
+											Scene.getInstance().setAbsorptanceForAllFresnelReflectors(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}

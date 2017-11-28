@@ -1580,16 +1580,18 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								} else if (lz1 < 0.01) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be greater than 0.01.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									f.rescale(lx1 / lx0, ly1 / ly0, 1);
-									f.setHeight(lz1 / Scene.getInstance().getAnnotationScale());
-									f.draw();
-									f.drawChildren();
-									SceneManager.getInstance().refresh();
-									SceneManager.getInstance().getUndoManager().addEdit(new ChangeFoundationSizeCommand(f, lx0, lx1, ly0, ly1, lz0, lz1));
-									updateAfterEdit();
-									lx0 = lx1;
-									ly0 = ly1;
-									lz0 = lz1;
+									if (lx1 != lx0 || ly1 != ly0 || lz1 != lz0) {
+										f.rescale(lx1 / lx0, ly1 / ly0, 1);
+										f.setHeight(lz1 / Scene.getInstance().getAnnotationScale());
+										f.draw();
+										f.drawChildren();
+										SceneManager.getInstance().refresh();
+										SceneManager.getInstance().getUndoManager().addEdit(new ChangeFoundationSizeCommand(f, lx0, lx1, ly0, ly1, lz0, lz1));
+										updateAfterEdit();
+										lx0 = lx1;
+										ly0 = ly1;
+										lz0 = lz1;
+									}
 									if (choice == options[0]) {
 										break;
 									}

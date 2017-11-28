@@ -195,10 +195,12 @@ class PopupMenuForLand extends PopupMenuFactory {
 								if (val < 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Albedo value must be in 0-1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									final ChangeBackgroundAlbedoCommand c = new ChangeBackgroundAlbedoCommand();
-									Scene.getInstance().getGround().setAlbedo(val);
-									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (val != Scene.getInstance().getGround().getAlbedo()) {
+										final ChangeBackgroundAlbedoCommand c = new ChangeBackgroundAlbedoCommand();
+										Scene.getInstance().getGround().setAlbedo(val);
+										updateAfterEdit();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									break;
 								}
 							} catch (final NumberFormatException exception) {
@@ -274,10 +276,12 @@ class PopupMenuForLand extends PopupMenuFactory {
 								if (val <= 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Ground thermal diffusivity must be positive.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
-									Scene.getInstance().getGround().setThermalDiffusivity(val);
-									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (val != Scene.getInstance().getGround().getThermalDiffusivity()) {
+										final ChangeGroundThermalDiffusivityCommand c = new ChangeGroundThermalDiffusivityCommand();
+										Scene.getInstance().getGround().setThermalDiffusivity(val);
+										updateAfterEdit();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									break;
 								}
 							} catch (final NumberFormatException exception) {

@@ -162,9 +162,11 @@ class RescaleBuildingDialog extends JDialog {
 						return null;
 					}
 				});
-				SceneManager.getInstance().getUndoManager().addEdit(new RescaleBuildingCommand(foundation, oldX, newX, oldY, newY, oldZ, newZ));
-				Scene.getInstance().setEdited(true);
-				EnergyPanel.getInstance().update();
+				if (scaleX != 1 || scaleY != 1 || scaleZ != 1) {
+					SceneManager.getInstance().getUndoManager().addEdit(new RescaleBuildingCommand(foundation, oldX, newX, oldY, newY, oldZ, newZ));
+					Scene.getInstance().setEdited(true);
+					EnergyPanel.getInstance().update();
+				}
 			}
 		};
 
