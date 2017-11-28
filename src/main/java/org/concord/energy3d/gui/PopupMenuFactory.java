@@ -394,10 +394,12 @@ public abstract class PopupMenuFactory {
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 								} else {
-									for (final HousePart x : Scene.getInstance().getPartsOfSameTypeInBuilding(selectedPart)) {
-										if (val != ((Thermal) x).getUValue()) {
-											changed = true;
-											break;
+									if (!changed) {
+										for (final HousePart x : Scene.getInstance().getPartsOfSameTypeInBuilding(selectedPart)) {
+											if (val != ((Thermal) x).getUValue()) {
+												changed = true;
+												break;
+											}
 										}
 									}
 									if (changed) {

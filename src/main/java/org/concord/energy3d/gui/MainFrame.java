@@ -81,6 +81,7 @@ import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.PartGroup;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
+import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -135,6 +136,7 @@ import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.math.ColorRGBA;
 import com.ardor3d.math.MathUtils;
@@ -3411,12 +3413,14 @@ public class MainFrame extends JFrame {
 			colorActionListener = new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final ChangeLandColorCommand cmd = new ChangeLandColorCommand();
-					final Color c = colorChooser.getColor();
-					final float[] newColor = c.getComponents(null);
-					Scene.getInstance().setLandColor(new ColorRGBA(newColor[0], newColor[1], newColor[2], 0.5f));
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(cmd);
+					final float[] newColor = colorChooser.getColor().getComponents(null);
+					final ColorRGBA rgba = new ColorRGBA(newColor[0], newColor[1], newColor[2], 0.5f);
+					if (!Scene.getInstance().getLandColor().equals(rgba)) {
+						final ChangeLandColorCommand cmd = new ChangeLandColorCommand();
+						Scene.getInstance().setLandColor(rgba);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(cmd);
+					}
 				}
 			};
 		} else {
@@ -3432,6 +3436,8 @@ public class MainFrame extends JFrame {
 				colorChooser.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue()));
 			}
 			colorActionListener = new ActionListener() {
+
+				private boolean changed;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -3466,29 +3472,66 @@ public class MainFrame extends JFrame {
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Wall Color");
 						while (true) {
+							changed = false;
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
 							if (choice == options[1]) {
 								break;
 							} else {
+								changed = !color.equals(selectedPart.getColor());
 								if (rb1.isSelected()) { // apply to only this part
-									final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-									selectedPart.setColor(color);
-									selectedPart.draw();
-									SceneManager.getInstance().refresh();
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									if (changed) {
+										final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+										selectedPart.setColor(color);
+										selectedPart.draw();
+										SceneManager.getInstance().refresh();
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								} else if (rb2.isSelected()) {
-									final ChangeColorOfConnectedWallsCommand cmd = new ChangeColorOfConnectedWallsCommand((Wall) selectedPart);
-									Scene.getInstance().setColorOfConnectedWalls((Wall) selectedPart, color);
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									final Wall w = (Wall) selectedPart;
+									if (!changed) {
+										w.visitNeighbors(new WallVisitor() {
+											@Override
+											public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+												if (!color.equals(currentWall.getColor())) {
+													changed = true;
+												}
+											}
+										});
+									}
+									if (changed) {
+										final ChangeColorOfConnectedWallsCommand cmd = new ChangeColorOfConnectedWallsCommand(w);
+										Scene.getInstance().setColorOfConnectedWalls(w, color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								} else if (rb3.isSelected()) {
-									final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
-									Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									if (!changed) {
+										for (final HousePart x : Scene.getInstance().getPartsOfSameTypeInBuilding(selectedPart)) {
+											if (!color.equals(x.getColor())) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(selectedPart);
+										Scene.getInstance().setPartColorOfBuilding(selectedPart, color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								} else if (rb4.isSelected()) {
-									final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-									Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									if (!changed) {
+										for (final HousePart x : Scene.getInstance().getAllPartsOfSameType(selectedPart)) {
+											if (!color.equals(x.getColor())) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+										Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								}
 								Scene.getInstance().setWallColor(color); // remember the color decision for the next wall to be added
 								if (choice == options[0]) {
@@ -3510,21 +3553,35 @@ public class MainFrame extends JFrame {
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Roof Color");
 						while (true) {
+							changed = false;
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
 							if (choice == options[1]) {
 								break;
 							} else {
+								changed = !color.equals(selectedPart.getColor());
 								if (rb1.isSelected()) { // apply to only this part
-									final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-									selectedPart.setColor(color);
-									selectedPart.draw();
-									SceneManager.getInstance().refresh();
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									if (changed) {
+										final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+										selectedPart.setColor(color);
+										selectedPart.draw();
+										SceneManager.getInstance().refresh();
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								} else {
-									final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-									Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									if (!changed) {
+										for (final HousePart x : Scene.getInstance().getAllPartsOfSameType(selectedPart)) {
+											if (!color.equals(x.getColor())) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+										Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								}
 								Scene.getInstance().setRoofColor(color); // remember the color decision for the next roof to be added
 								if (choice == options[0]) {
@@ -3546,21 +3603,35 @@ public class MainFrame extends JFrame {
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Foundation Color");
 						while (true) {
+							changed = false;
 							dialog.setVisible(true);
 							final Object choice = optionPane.getValue();
 							if (choice == options[1]) {
 								break;
 							} else {
+								changed = !color.equals(selectedPart.getColor());
 								if (rb1.isSelected()) { // apply to only this part
-									final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-									selectedPart.setColor(color);
-									selectedPart.draw();
-									SceneManager.getInstance().refresh();
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									if (changed) {
+										final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+										selectedPart.setColor(color);
+										selectedPart.draw();
+										SceneManager.getInstance().refresh();
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								} else {
-									final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
-									Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
-									SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									if (!changed) {
+										for (final HousePart x : Scene.getInstance().getAllPartsOfSameType(selectedPart)) {
+											if (!color.equals(x.getColor())) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeColorOfAllPartsOfSameTypeCommand cmd = new ChangeColorOfAllPartsOfSameTypeCommand(selectedPart);
+										Scene.getInstance().setColorOfAllPartsOfSameType(selectedPart, color);
+										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+									}
 								}
 								Scene.getInstance().setFoundationColor(color); // remember the color decision for the next foundation to be added
 								if (choice == options[0]) {
@@ -3570,15 +3641,18 @@ public class MainFrame extends JFrame {
 						}
 
 					} else {
-						final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
-						selectedPart.setColor(color);
-						selectedPart.draw();
-						SceneManager.getInstance().refresh();
-						SceneManager.getInstance().getUndoManager().addEdit(cmd);
-						if (selectedPart instanceof Door) { // remember the color decision for the next part
-							Scene.getInstance().setDoorColor(color);
-						} else if (selectedPart instanceof Floor) {
-							Scene.getInstance().setFloorColor(color);
+						changed = !color.equals(selectedPart.getColor());
+						if (changed) {
+							final ChangePartColorCommand cmd = new ChangePartColorCommand(selectedPart);
+							selectedPart.setColor(color);
+							selectedPart.draw();
+							SceneManager.getInstance().refresh();
+							SceneManager.getInstance().getUndoManager().addEdit(cmd);
+							if (selectedPart instanceof Door) { // remember the color decision for the next part
+								Scene.getInstance().setDoorColor(color);
+							} else if (selectedPart instanceof Floor) {
+								Scene.getInstance().setFloorColor(color);
+							}
 						}
 					}
 
@@ -3587,7 +3661,7 @@ public class MainFrame extends JFrame {
 						PrintController.getInstance().restartAnimation();
 					}
 					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
-					Scene.getInstance().setEdited(true);
+					Scene.getInstance().setEdited(changed);
 				}
 
 			};
