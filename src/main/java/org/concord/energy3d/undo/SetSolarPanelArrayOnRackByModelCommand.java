@@ -14,13 +14,20 @@ public class SetSolarPanelArrayOnRackByModelCommand extends MyAbstractUndoableEd
 	private final double oldRackWidth, oldRackHeight;
 	private PvModuleSpecs newModel;
 	private double newRackWidth, newRackHeight;
+	private final boolean oldRotated;
+	private boolean newRotated;
+	private final double oldInverterEfficiency;
+	private double newInverterEfficiency;
 	private final Rack rack;
 
 	public SetSolarPanelArrayOnRackByModelCommand(final Rack rack) {
 		this.rack = rack;
-		oldModel = rack.getSolarPanel().getPvModuleSpecs();
+		final SolarPanel s = rack.getSolarPanel();
+		oldModel = s.getPvModuleSpecs();
 		oldRackWidth = rack.getRackWidth();
 		oldRackHeight = rack.getRackHeight();
+		oldRotated = s.isRotated();
+		oldInverterEfficiency = s.getInverterEfficiency();
 	}
 
 	public Rack getRack() {
@@ -38,7 +45,11 @@ public class SetSolarPanelArrayOnRackByModelCommand extends MyAbstractUndoableEd
 		newModel = s.getPvModuleSpecs();
 		newRackWidth = rack.getRackWidth();
 		newRackHeight = rack.getRackHeight();
+		newRotated = s.isRotated();
+		newInverterEfficiency = s.getInverterEfficiency();
 		s.setPvModuleSpecs(oldModel);
+		s.setRotated(oldRotated);
+		s.setInverterEfficiency(oldInverterEfficiency);
 		rack.setRackWidth(oldRackWidth);
 		rack.setRackHeight(oldRackHeight);
 		rack.ensureFullSolarPanels(false);
@@ -50,6 +61,8 @@ public class SetSolarPanelArrayOnRackByModelCommand extends MyAbstractUndoableEd
 		super.redo();
 		final SolarPanel s = rack.getSolarPanel();
 		s.setPvModuleSpecs(newModel);
+		s.setRotated(newRotated);
+		s.setInverterEfficiency(newInverterEfficiency);
 		rack.setRackWidth(newRackWidth);
 		rack.setRackHeight(newRackHeight);
 		rack.ensureFullSolarPanels(false);

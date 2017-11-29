@@ -227,40 +227,65 @@ class PopupMenuForRack extends PopupMenuFactory {
 									} else if (Util.isZero(val + 90)) {
 										val = -89.999;
 									}
+									boolean changed = val != rack.getTiltAngle();
 									if (rb1.isSelected()) {
-										final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(rack);
-										rack.setTiltAngle(val);
-										rack.draw();
-										if (rack.checkContainerIntersection()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(rack);
+											rack.setTiltAngle(val);
+											rack.draw();
+											if (rack.checkContainerIntersection()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = rack.getTopContainer();
-										final ChangeFoundationRackTiltAngleCommand c = new ChangeFoundationRackTiltAngleCommand(foundation);
-										foundation.setTiltAngleForRacks(val);
-										if (foundation.checkContainerIntersectionForRacks()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (x.getTiltAngle() != val) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationRackTiltAngleCommand c = new ChangeFoundationRackTiltAngleCommand(foundation);
+											foundation.setTiltAngleForRacks(val);
+											if (foundation.checkContainerIntersectionForRacks()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeTiltAngleForAllRacksCommand c = new ChangeTiltAngleForAllRacksCommand();
-										Scene.getInstance().setTiltAngleForAllRacks(val);
-										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (x.getTiltAngle() != val) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeTiltAngleForAllRacksCommand c = new ChangeTiltAngleForAllRacksCommand();
+											Scene.getInstance().setTiltAngleForAllRacks(val);
+											if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -343,24 +368,49 @@ class PopupMenuForRack extends PopupMenuFactory {
 								if (a < 0) {
 									a += 360;
 								}
+								boolean changed = a != rack.getRelativeAzimuth();
 								if (rb1.isSelected()) {
-									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
-									rack.setRelativeAzimuth(a);
-									rack.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
+										rack.setRelativeAzimuth(a);
+										rack.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
-									foundation.setAzimuthForRacks(a);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Rack x : foundation.getRacks()) {
+											if (x.getRelativeAzimuth() != a) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
+										foundation.setAzimuthForRacks(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
-									Scene.getInstance().setAzimuthForAllRacks(a);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Rack x : Scene.getInstance().getAllRacks()) {
+											if (x.getRelativeAzimuth() != a) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
+										Scene.getInstance().setAzimuthForAllRacks(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -471,41 +521,66 @@ class PopupMenuForRack extends PopupMenuFactory {
 								} else if (h < 1 || h > 20) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = w != rack.getRackWidth() || h != rack.getRackHeight();
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(rack);
-										rack.setRackWidth(w);
-										rack.setRackHeight(h);
-										rack.ensureFullSolarPanels(false);
-										rack.draw();
-										if (rack.checkContainerIntersection()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as the rack would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(rack);
+											rack.setRackWidth(w);
+											rack.setRackHeight(h);
+											rack.ensureFullSolarPanels(false);
+											rack.draw();
+											if (rack.checkContainerIntersection()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as the rack would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
-										foundation.setSizeForRacks(w, h);
-										if (foundation.checkContainerIntersectionForRacks()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (x.getRackWidth() != w || x.getRackHeight() != h) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
+											foundation.setSizeForRacks(w, h);
+											if (foundation.checkContainerIntersectionForRacks()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
-										Scene.getInstance().setSizeForAllRacks(w, h);
-										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (x.getRackWidth() != w || x.getRackHeight() != h) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
+											Scene.getInstance().setSizeForAllRacks(w, h);
+											if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -582,39 +657,64 @@ class PopupMenuForRack extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
+								boolean changed = val != rack.getBaseHeight();
 								if (rb1.isSelected()) {
-									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
-									rack.setBaseHeight(val);
-									rack.draw();
-									if (rack.checkContainerIntersection()) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-										c.undo();
-									} else {
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
+										rack.setBaseHeight(val);
+										rack.draw();
+										if (rack.checkContainerIntersection()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationRackBaseHeightCommand c = new ChangeFoundationRackBaseHeightCommand(foundation);
-									foundation.setBaseHeightForRacks(val);
-									if (foundation.checkContainerIntersectionForRacks()) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-										c.undo();
-									} else {
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Rack x : foundation.getRacks()) {
+											if (x.getBaseHeight() != val) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationRackBaseHeightCommand c = new ChangeFoundationRackBaseHeightCommand(foundation);
+										foundation.setBaseHeightForRacks(val);
+										if (foundation.checkContainerIntersectionForRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeBaseHeightForAllRacksCommand c = new ChangeBaseHeightForAllRacksCommand();
-									Scene.getInstance().setBaseHeightForAllRacks(val);
-									if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-										c.undo();
-									} else {
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Rack x : Scene.getInstance().getAllRacks()) {
+											if (x.getBaseHeight() != val) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeBaseHeightForAllRacksCommand c = new ChangeBaseHeightForAllRacksCommand();
+										Scene.getInstance().setBaseHeightForAllRacks(val);
+										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -705,27 +805,52 @@ class PopupMenuForRack extends PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Dy must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									final boolean visible = visibleComboBox.getSelectedIndex() == 0;
+									boolean changed = dx != rack.getPoleDistanceX() || dy != rack.getPoleDistanceY();
 									if (rb1.isSelected()) {
-										final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
-										rack.setPoleDistanceX(dx);
-										rack.setPoleDistanceY(dy);
-										rack.setPoleVisible(visible);
-										rack.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeRackPoleSettingsCommand c = new ChangeRackPoleSettingsCommand(rack);
+											rack.setPoleDistanceX(dx);
+											rack.setPoleDistanceY(dy);
+											rack.setPoleVisible(visible);
+											rack.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = rack.getTopContainer();
-										final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
-										foundation.setPoleSpacingForRacks(dx, dy, visible);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (x.getPoleDistanceX() != dx || x.getPoleDistanceY() != dy) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangePoleSettingsForRacksOnFoundationCommand c = new ChangePoleSettingsForRacksOnFoundationCommand(foundation);
+											foundation.setPoleSpacingForRacks(dx, dy, visible);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
-										Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (x.getPoleDistanceX() != dx || x.getPoleDistanceY() != dy) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangePoleSettingsForAllRacksCommand c = new ChangePoleSettingsForAllRacksCommand();
+											Scene.getInstance().setPoleSpacingForAllRacks(dx, dy, visible);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -923,53 +1048,84 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 
 				private void setBrandSolarPanels(final String modelName) {
-					final SolarPanel solarPanel = rack.getSolarPanel();
-					final SetSolarPanelArrayOnRackByModelCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackByModelCommand(rack) : null;
-					solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
-					solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
-					solarPanel.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							rack.addSolarPanels();
-							if (command != null) {
-								SceneManager.getInstance().getUndoManager().addEdit(command);
+					final SolarPanel s = rack.getSolarPanel();
+					final boolean changed = !modelName.equals(s.getPvModuleSpecs().getModel()) || Math.abs(inverterEfficiency * 0.01 - s.getInverterEfficiency()) > 0.000001 || ((orientationComboBox.getSelectedIndex() == 1) ^ s.isRotated());
+					if (changed) {
+						final SetSolarPanelArrayOnRackByModelCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackByModelCommand(rack) : null;
+						s.setRotated(orientationComboBox.getSelectedIndex() == 1);
+						s.setInverterEfficiency(inverterEfficiency * 0.01);
+						s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() {
+								rack.addSolarPanels();
+								if (command != null) {
+									SceneManager.getInstance().getUndoManager().addEdit(command);
+								}
+								return null;
 							}
-							return null;
-						}
-					});
-					updateAfterEdit();
+						});
+						updateAfterEdit();
+					}
 				}
 
 				private void setCustomSolarPanels() {
-					final SolarPanel solarPanel = rack.getSolarPanel();
-					solarPanel.setModelName("Custom");
-					solarPanel.setBrandName("Custom");
-					final SetSolarPanelArrayOnRackCustomCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackCustomCommand(rack) : null;
+					final SolarPanel s = rack.getSolarPanel();
 					final int i = sizeComboBox.getSelectedIndex();
-					solarPanel.setPanelWidth(solarPanelNominalSize.getNominalWidths()[i]);
-					solarPanel.setPanelHeight(solarPanelNominalSize.getNominalHeights()[i]);
-					solarPanel.setNumberOfCellsInX(solarPanelNominalSize.getCellNx()[i]);
-					solarPanel.setNumberOfCellsInY(solarPanelNominalSize.getCellNy()[i]);
-					solarPanel.setRotated(orientationComboBox.getSelectedIndex() == 1);
-					solarPanel.setCellType(cellTypeComboBox.getSelectedIndex());
-					solarPanel.setColorOption(colorOptionComboBox.getSelectedIndex());
-					solarPanel.setCellEfficiency(cellEfficiency * 0.01);
-					solarPanel.setInverterEfficiency(inverterEfficiency * 0.01);
-					solarPanel.setTemperatureCoefficientPmax(pmax * 0.01);
-					solarPanel.setNominalOperatingCellTemperature(noct);
-					solarPanel.setShadeTolerance(shadeToleranceComboBox.getSelectedIndex());
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							rack.addSolarPanels();
-							if (command != null) {
-								SceneManager.getInstance().getUndoManager().addEdit(command);
+					boolean changed = !"Custom".equals(s.getModelName());
+					if (s.getPanelWidth() != solarPanelNominalSize.getNominalWidths()[i]) {
+						changed = true;
+					} else if (s.getPanelHeight() != solarPanelNominalSize.getNominalHeights()[i]) {
+						changed = true;
+					} else if (s.getNumberOfCellsInX() != solarPanelNominalSize.getCellNx()[i]) {
+						changed = true;
+					} else if (s.getNumberOfCellsInY() != solarPanelNominalSize.getCellNy()[i]) {
+						changed = true;
+					} else if (s.isRotated() ^ orientationComboBox.getSelectedIndex() == 1) {
+						changed = true;
+					} else if (s.getCellType() != cellTypeComboBox.getSelectedIndex()) {
+						changed = true;
+					} else if (s.getColorOption() != colorOptionComboBox.getSelectedIndex()) {
+						changed = true;
+					} else if (Math.abs(s.getCellEfficiency() - cellEfficiency * 0.01) > 0.000001) {
+						changed = true;
+					} else if (Math.abs(s.getInverterEfficiency() - inverterEfficiency * 0.01) > 0.000001) {
+						changed = true;
+					} else if (Math.abs(s.getTemperatureCoefficientPmax() - pmax * 0.01) > 0.000001) {
+						changed = true;
+					} else if (Math.abs(s.getNominalOperatingCellTemperature() - noct) > 0.000001) {
+						changed = true;
+					} else if (s.getShadeTolerance() != shadeToleranceComboBox.getSelectedIndex()) {
+						changed = true;
+					}
+					if (changed) {
+						s.setModelName("Custom");
+						s.setBrandName("Custom");
+						final SetSolarPanelArrayOnRackCustomCommand command = rack.isMonolithic() ? new SetSolarPanelArrayOnRackCustomCommand(rack) : null;
+						s.setPanelWidth(solarPanelNominalSize.getNominalWidths()[i]);
+						s.setPanelHeight(solarPanelNominalSize.getNominalHeights()[i]);
+						s.setNumberOfCellsInX(solarPanelNominalSize.getCellNx()[i]);
+						s.setNumberOfCellsInY(solarPanelNominalSize.getCellNy()[i]);
+						s.setRotated(orientationComboBox.getSelectedIndex() == 1);
+						s.setCellType(cellTypeComboBox.getSelectedIndex());
+						s.setColorOption(colorOptionComboBox.getSelectedIndex());
+						s.setCellEfficiency(cellEfficiency * 0.01);
+						s.setInverterEfficiency(inverterEfficiency * 0.01);
+						s.setTemperatureCoefficientPmax(pmax * 0.01);
+						s.setNominalOperatingCellTemperature(noct);
+						s.setShadeTolerance(shadeToleranceComboBox.getSelectedIndex());
+						SceneManager.getTaskManager().update(new Callable<Object>() {
+							@Override
+							public Object call() {
+								rack.addSolarPanels();
+								if (command != null) {
+									SceneManager.getInstance().getUndoManager().addEdit(command);
+								}
+								return null;
 							}
-							return null;
-						}
-					});
-					updateAfterEdit();
+						});
+						updateAfterEdit();
+					}
 				}
 
 			});

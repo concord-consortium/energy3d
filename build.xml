@@ -2,11 +2,11 @@
 <!DOCTYPE xml>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<property name="app.name" value="Energy3D"/>
-	<property name="app.version" value="6.x"/>
+	<property name="app.version" value="7.x"/>
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
-	<property name="jdk" value="jdk1.8.0_144" />
+	<property name="jdk" value="jdk1.8.0_152" />
 	<property name="bit64" value="false" />
 	
 	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\${jdk}\">
@@ -21,7 +21,7 @@
 			<istrue value="${bit64}" />
 		</and>
 	</condition>
-	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_144.jdk/Contents/Home">
+	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home">
 		<os family="mac" />
 	</condition>
 	<condition property="JAVA_HOME" value="">
