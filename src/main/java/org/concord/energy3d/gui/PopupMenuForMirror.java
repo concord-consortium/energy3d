@@ -164,7 +164,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 									if (p instanceof Foundation) {
 										target = (Foundation) p;
 									} else {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "ID Error", JOptionPane.ERROR_MESSAGE);
 									}
 								}
 							}

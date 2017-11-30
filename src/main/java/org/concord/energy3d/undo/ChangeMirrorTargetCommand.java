@@ -37,6 +37,12 @@ public class ChangeMirrorTargetCommand extends MyAbstractUndoableEdit {
 		newValue = mirror.getHeliostatTarget();
 		mirror.setHeliostatTarget(oldValue);
 		mirror.draw();
+		if (oldValue != null) {
+			oldValue.drawSolarReceiver();
+		}
+		if (newValue != null) {
+			newValue.drawSolarReceiver();
+		}
 	}
 
 	@Override
@@ -44,6 +50,12 @@ public class ChangeMirrorTargetCommand extends MyAbstractUndoableEdit {
 		super.redo();
 		mirror.setHeliostatTarget(newValue);
 		mirror.draw();
+		if (oldValue != null) {
+			oldValue.drawSolarReceiver();
+		}
+		if (newValue != null) {
+			newValue.drawSolarReceiver();
+		}
 	}
 
 	@Override

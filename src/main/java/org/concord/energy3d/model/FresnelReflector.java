@@ -360,7 +360,7 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 			final Vector3 p = r.subtractLocal(center).normalizeLocal();
 			normal = p.add(s, null).multiplyLocal(0.5).normalizeLocal();
 		} else {
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalize(null);
+			setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
 		}
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
@@ -390,6 +390,21 @@ public class FresnelReflector extends HousePart implements SolarCollector, Label
 		CollisionTreeManager.INSTANCE.removeCollisionTree(reflector);
 		root.updateGeometricState(0);
 
+	}
+
+	private void setNormal(final double angle, final double azimuth) {
+		final Foundation foundation = getTopContainer();
+		Vector3 v = foundation.getAbsPoint(0);
+		final Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
+		final Vector3 vy = foundation.getAbsPoint(1).subtractLocal(v); // y direction
+		final Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
+		final Vector3 v1 = m.applyPost(vx, null);
+		final Vector3 v2 = m.applyPost(vy, null);
+		v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
+		if (v.getZ() < 0) {
+			v.negateLocal();
+		}
+		normal = v.normalizeLocal();
 	}
 
 	@Override

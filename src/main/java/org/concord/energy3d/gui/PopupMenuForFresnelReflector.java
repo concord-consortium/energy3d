@@ -6,11 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -213,94 +215,110 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(r.getAbsorber() != null ? r.getAbsorber().getId() + "" : "");
-					gui.add(inputField, BorderLayout.SOUTH);
 
-					final String title = "<html>Set the ID of the absorber foundation for " + partInfo + "</html>";
+					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+					final JComboBox<String> comboBox = new JComboBox<String>();
+					comboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+
+						}
+					});
+					comboBox.addItem("None");
+					for (final Foundation x : foundations) {
+						if (!x.getChildren().isEmpty()) {
+							comboBox.addItem(x.getId() + "");
+						}
+					}
+					if (r.getAbsorber() != null) {
+						comboBox.setSelectedItem(r.getAbsorber().getId() + "");
+					}
+					gui.add(comboBox, BorderLayout.SOUTH);
+
+					final String title = "<html>Select the ID of the absorber<br>foundation for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>The sunlight reflected by this Fresnel reflector will focus on the top of<br>the target foundation, where the absorber tube is located.<hr></html>";
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Absorber");
 
 					while (true) {
-						inputField.selectAll();
-						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
-							int id = 0;
-							boolean ok = true;
-							try {
-								id = Integer.parseInt(inputField.getText());
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-								ok = false;
-							}
-							if (ok) {
-								final HousePart p = Scene.getInstance().getPart(id);
-								if (id < 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (!(p instanceof Foundation)) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
+							Foundation absorber = null;
+							if (comboBox.getSelectedIndex() > 0) {
+								int id = -1;
+								boolean ok = true;
+								try {
+									id = Integer.parseInt((String) comboBox.getSelectedItem());
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), comboBox.getSelectedItem() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
+									final HousePart p = Scene.getInstance().getPart(id);
 									if (p instanceof Foundation) {
-										final Foundation target = (Foundation) p;
-										boolean changed = target != r.getAbsorber();
-										if (rb1.isSelected()) {
-											if (changed) {
-												final Foundation oldTarget = r.getAbsorber();
-												final ChangeFresnelReflectorAbsorberCommand c = new ChangeFresnelReflectorAbsorberCommand(r);
-												r.setAbsorber(target);
-												r.draw();
-												if (oldTarget != null) {
-													oldTarget.drawSolarReceiver();
-												}
-												SceneManager.getInstance().getUndoManager().addEdit(c);
-											}
-											selectedScopeIndex = 0;
-										} else if (rb2.isSelected()) {
-											final Foundation foundation = r.getTopContainer();
-											if (!changed) {
-												for (final FresnelReflector x : foundation.getFresnelReflectors()) {
-													if (x.getAbsorber() != target) {
-														changed = true;
-														break;
-													}
-												}
-											}
-											if (changed) {
-												final ChangeFoundationFresnelReflectorAbsorberCommand c = new ChangeFoundationFresnelReflectorAbsorberCommand(foundation);
-												foundation.setAbsorberForFresnelReflectors(target);
-												SceneManager.getInstance().getUndoManager().addEdit(c);
-											}
-											selectedScopeIndex = 1;
-										} else if (rb3.isSelected()) {
-											if (!changed) {
-												for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
-													if (x.getAbsorber() != target) {
-														changed = true;
-														break;
-													}
-												}
-											}
-											if (changed) {
-												final ChangeAbsorberForAllFresnelReflectorsCommand c = new ChangeAbsorberForAllFresnelReflectorsCommand();
-												Scene.getInstance().setAbsorberForAllFresnelReflectors(target);
-												SceneManager.getInstance().getUndoManager().addEdit(c);
-											}
-											selectedScopeIndex = 2;
-										}
-										if (changed) {
-											target.drawSolarReceiver();
-											updateAfterEdit();
-										}
-										if (choice == options[0]) {
+										absorber = (Foundation) p;
+									} else {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "ID Error", JOptionPane.ERROR_MESSAGE);
+									}
+								}
+							}
+							boolean changed = absorber != r.getAbsorber();
+							if (rb1.isSelected()) {
+								if (changed) {
+									final Foundation oldTarget = r.getAbsorber();
+									final ChangeFresnelReflectorAbsorberCommand c = new ChangeFresnelReflectorAbsorberCommand(r);
+									r.setAbsorber(absorber);
+									r.draw();
+									if (oldTarget != null) {
+										oldTarget.drawSolarReceiver();
+									}
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final Foundation foundation = r.getTopContainer();
+								if (!changed) {
+									for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+										if (x.getAbsorber() != absorber) {
+											changed = true;
 											break;
 										}
 									}
 								}
+								if (changed) {
+									final ChangeFoundationFresnelReflectorAbsorberCommand c = new ChangeFoundationFresnelReflectorAbsorberCommand(foundation);
+									foundation.setAbsorberForFresnelReflectors(absorber);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								if (!changed) {
+									for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+										if (x.getAbsorber() != absorber) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeAbsorberForAllFresnelReflectorsCommand c = new ChangeAbsorberForAllFresnelReflectorsCommand();
+									Scene.getInstance().setAbsorberForAllFresnelReflectors(absorber);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
+								selectedScopeIndex = 2;
+							}
+							if (changed) {
+								if (absorber != null) {
+									absorber.drawSolarReceiver();
+								}
+								updateAfterEdit();
+							}
+							if (choice == options[0]) {
+								break;
 							}
 						}
 					}

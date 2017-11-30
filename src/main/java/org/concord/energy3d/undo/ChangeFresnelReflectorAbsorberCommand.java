@@ -37,6 +37,12 @@ public class ChangeFresnelReflectorAbsorberCommand extends MyAbstractUndoableEdi
 		newValue = reflector.getAbsorber();
 		reflector.setAbsorber(oldValue);
 		reflector.draw();
+		if (oldValue != null) {
+			oldValue.drawSolarReceiver();
+		}
+		if (newValue != null) {
+			newValue.drawSolarReceiver();
+		}
 	}
 
 	@Override
@@ -44,6 +50,12 @@ public class ChangeFresnelReflectorAbsorberCommand extends MyAbstractUndoableEdi
 		super.redo();
 		reflector.setAbsorber(newValue);
 		reflector.draw();
+		if (oldValue != null) {
+			oldValue.drawSolarReceiver();
+		}
+		if (newValue != null) {
+			newValue.drawSolarReceiver();
+		}
 	}
 
 	@Override

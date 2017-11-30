@@ -41,6 +41,12 @@ public class ChangeFoundationFresnelReflectorAbsorberCommand extends MyAbstractU
 			newValues[i] = r.getAbsorber();
 			r.setAbsorber(oldValues[i]);
 			r.draw();
+			if (oldValues[i] != null) {
+				oldValues[i].drawSolarReceiver();
+			}
+			if (newValues[i] != null) {
+				newValues[i].drawSolarReceiver();
+			}
 		}
 		SceneManager.getInstance().refresh();
 	}
@@ -53,6 +59,12 @@ public class ChangeFoundationFresnelReflectorAbsorberCommand extends MyAbstractU
 			final FresnelReflector r = reflectors.get(i);
 			r.setAbsorber(newValues[i]);
 			r.draw();
+			if (oldValues[i] != null) {
+				oldValues[i].drawSolarReceiver();
+			}
+			if (newValues[i] != null) {
+				newValues[i].drawSolarReceiver();
+			}
 		}
 		SceneManager.getInstance().refresh();
 	}
