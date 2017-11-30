@@ -12,7 +12,6 @@ import java.util.concurrent.Callable;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -24,9 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 import javax.swing.SpringLayout;
 
 import org.concord.energy3d.model.Foundation;
@@ -47,13 +44,10 @@ import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForSolarPanelRowCommand;
-import org.concord.energy3d.undo.ChangeCellNumbersCommand;
-import org.concord.energy3d.undo.ChangeCellNumbersForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCellPropertiesCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelCellNumbersCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelModelCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
@@ -143,25 +137,50 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = sp.getShadeTolerance() != SolarPanel.HIGH_SHADE_TOLERANCE;
 							if (rb1.isSelected()) {
-								final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
-								sp.setShadeTolerance(SolarPanel.HIGH_SHADE_TOLERANCE);
-								sp.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
+									sp.setShadeTolerance(SolarPanel.HIGH_SHADE_TOLERANCE);
+									sp.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
-								foundation.setShadeToleranceForSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (x.getShadeTolerance() != SolarPanel.HIGH_SHADE_TOLERANCE) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
+									foundation.setShadeToleranceForSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
-								Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (x.getShadeTolerance() != SolarPanel.HIGH_SHADE_TOLERANCE) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
+									Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.HIGH_SHADE_TOLERANCE);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -219,25 +238,50 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = sp.getShadeTolerance() != SolarPanel.PARTIAL_SHADE_TOLERANCE;
 							if (rb1.isSelected()) {
-								final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
-								sp.setShadeTolerance(SolarPanel.PARTIAL_SHADE_TOLERANCE);
-								sp.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
+									sp.setShadeTolerance(SolarPanel.PARTIAL_SHADE_TOLERANCE);
+									sp.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
-								foundation.setShadeToleranceForSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (x.getShadeTolerance() != SolarPanel.PARTIAL_SHADE_TOLERANCE) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
+									foundation.setShadeToleranceForSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
-								Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (x.getShadeTolerance() != SolarPanel.PARTIAL_SHADE_TOLERANCE) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
+									Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.PARTIAL_SHADE_TOLERANCE);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -295,25 +339,50 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = sp.getShadeTolerance() != SolarPanel.NO_SHADE_TOLERANCE;
 							if (rb1.isSelected()) {
-								final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
-								sp.setShadeTolerance(SolarPanel.NO_SHADE_TOLERANCE);
-								sp.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetShadeToleranceCommand c = new SetShadeToleranceCommand(sp);
+									sp.setShadeTolerance(SolarPanel.NO_SHADE_TOLERANCE);
+									sp.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
-								foundation.setShadeToleranceForSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (x.getShadeTolerance() != SolarPanel.NO_SHADE_TOLERANCE) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetShadeToleranceForSolarPanelsOnFoundationCommand c = new SetShadeToleranceForSolarPanelsOnFoundationCommand(foundation);
+									foundation.setShadeToleranceForSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
-								Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (x.getShadeTolerance() != SolarPanel.NO_SHADE_TOLERANCE) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetShadeToleranceForAllSolarPanelsCommand c = new SetShadeToleranceForAllSolarPanelsCommand();
+									Scene.getInstance().setShadeToleranceForAllSolarPanels(SolarPanel.NO_SHADE_TOLERANCE);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -744,11 +813,13 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							return;
 						}
 						final SolarPanel s = (SolarPanel) selectedPart;
-						final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
-						s.setRotated(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-						s.draw();
-						updateAfterEdit();
+						if (!s.isRotated()) {
+							final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+							s.setRotated(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							s.draw();
+							updateAfterEdit();
+						}
 					}
 				}
 			});
@@ -765,11 +836,13 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							return;
 						}
 						final SolarPanel s = (SolarPanel) selectedPart;
-						final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
-						s.setRotated(false);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
-						s.draw();
-						updateAfterEdit();
+						if (s.isRotated()) {
+							final RotateSolarPanelCommand c = new RotateSolarPanelCommand(s);
+							s.setRotated(false);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							s.draw();
+							updateAfterEdit();
+						}
 					}
 				}
 			});
@@ -1007,61 +1080,96 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 									} else if (Util.isZero(val + 90)) {
 										val = -89.999;
 									}
+									boolean changed = Math.abs(val - sp.getTiltAngle()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(sp);
-										sp.setTiltAngle(val);
-										sp.draw();
-										SceneManager.getInstance().refresh();
-										if (sp.checkContainerIntersection()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as the solar panel would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(sp);
+											sp.setTiltAngle(val);
+											sp.draw();
+											SceneManager.getInstance().refresh();
+											if (sp.checkContainerIntersection()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as the solar panel would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final List<SolarPanel> row = sp.getRow();
-										final ChangeTiltAngleForSolarPanelRowCommand c = new ChangeTiltAngleForSolarPanelRowCommand(row);
-										boolean intersected = false;
-										for (final SolarPanel x : row) {
-											x.setTiltAngle(val);
-											x.draw();
-											if (x.checkContainerIntersection()) {
-												intersected = true;
-												break;
+										if (!changed) {
+											for (final SolarPanel x : row) {
+												if (Math.abs(val - x.getTiltAngle()) > 0.000001) {
+													changed = true;
+													break;
+												}
 											}
 										}
-										SceneManager.getInstance().refresh();
-										if (intersected) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeTiltAngleForSolarPanelRowCommand c = new ChangeTiltAngleForSolarPanelRowCommand(row);
+											boolean intersected = false;
+											for (final SolarPanel x : row) {
+												x.setTiltAngle(val);
+												x.draw();
+												if (x.checkContainerIntersection()) {
+													intersected = true;
+													break;
+												}
+											}
+											SceneManager.getInstance().refresh();
+											if (intersected) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final Foundation foundation = sp.getTopContainer();
-										final ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
-										foundation.setTiltAngleForSolarPanels(val);
-										if (foundation.checkContainerIntersectionForSolarPanels()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : foundation.getSolarPanels()) {
+												if (Math.abs(val - x.getTiltAngle()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarPanelTiltAngleCommand c = new ChangeFoundationSolarPanelTiltAngleCommand(foundation);
+											foundation.setTiltAngleForSolarPanels(val);
+											if (foundation.checkContainerIntersectionForSolarPanels()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 2;
 									} else if (rb4.isSelected()) {
-										final ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
-										Scene.getInstance().setTiltAngleForAllSolarPanels(val);
-										if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+												if (Math.abs(val - x.getTiltAngle()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeTiltAngleForAllSolarPanelsCommand c = new ChangeTiltAngleForAllSolarPanelsCommand();
+											Scene.getInstance().setTiltAngleForAllSolarPanels(val);
+											if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
 										selectedScopeIndex = 3;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1147,25 +1255,50 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								if (a < 0) {
 									a += 360;
 								}
+								boolean changed = Math.abs(a - sp.getRelativeAzimuth()) > 0.000001;
 								if (rb1.isSelected()) {
-									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(sp);
-									sp.setRelativeAzimuth(a);
-									sp.draw();
-									SceneManager.getInstance().refresh();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(sp);
+										sp.setRelativeAzimuth(a);
+										sp.draw();
+										SceneManager.getInstance().refresh();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationSolarPanelAzimuthCommand c = new ChangeFoundationSolarPanelAzimuthCommand(foundation);
-									foundation.setAzimuthForSolarPanels(a);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final SolarPanel x : foundation.getSolarPanels()) {
+											if (Math.abs(a - x.getRelativeAzimuth()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationSolarPanelAzimuthCommand c = new ChangeFoundationSolarPanelAzimuthCommand(foundation);
+										foundation.setAzimuthForSolarPanels(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeAzimuthForAllSolarPanelsCommand c = new ChangeAzimuthForAllSolarPanelsCommand();
-									Scene.getInstance().setAzimuthForAllSolarPanels(a);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+											if (Math.abs(a - x.getRelativeAzimuth()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeAzimuthForAllSolarPanelsCommand c = new ChangeAzimuthForAllSolarPanelsCommand();
+										Scene.getInstance().setAzimuthForAllSolarPanels(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -1199,107 +1332,22 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), gui, "Set Size", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
-					final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
 					final int i = sizeComboBox.getSelectedIndex();
-					s.setPanelWidth(solarPanelNominalSize.getNominalWidths()[i]);
-					s.setPanelHeight(solarPanelNominalSize.getNominalHeights()[i]);
-					s.setNumberOfCellsInX(solarPanelNominalSize.getCellNx()[i]);
-					s.setNumberOfCellsInY(solarPanelNominalSize.getCellNy()[i]);
-					s.draw();
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-					updateAfterEdit();
-				}
-			});
-
-			// @deprecated: module structure is related to size and may not be set independently
-			final JMenuItem miModuleStructure = new JMenuItem("Module Structure...");
-			miModuleStructure.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof SolarPanel)) {
-						return;
-					}
-					final SolarPanel s = (SolarPanel) selectedPart;
-					final Foundation foundation = s.getTopContainer();
-					int nx = s.getNumberOfCellsInX();
-					int ny = s.getNumberOfCellsInY();
-					final String partInfo = s.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
-					final JPanel inputFields = new JPanel();
-					inputFields.setBorder(BorderFactory.createTitledBorder("Cell Numbers for " + partInfo));
-					final JSpinner nxSpinner = new JSpinner(new SpinnerNumberModel(nx, 1, 20, 1));
-					inputFields.add(nxSpinner);
-					inputFields.add(new JLabel("  \u00D7  "));
-					final JSpinner nySpinner = new JSpinner(new SpinnerNumberModel(ny, 1, 20, 1));
-					inputFields.add(nySpinner);
-					nxSpinner.setEnabled(false);
-					nySpinner.setEnabled(false);
-					final JPanel scopeFields = new JPanel();
-					scopeFields.setLayout(new BoxLayout(scopeFields, BoxLayout.Y_AXIS));
-					scopeFields.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Solar Panel", true);
-					final JRadioButton rb2 = new JRadioButton("All Solar Panels on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Solar Panels");
-					scopeFields.add(rb1);
-					scopeFields.add(rb2);
-					scopeFields.add(rb3);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					switch (selectedScopeIndex) {
-					case 0:
-						rb1.setSelected(true);
-						break;
-					case 1:
-						rb2.setSelected(true);
-						break;
-					case 2:
-						rb3.setSelected(true);
-						break;
-					}
-					final JPanel panel = new JPanel(new BorderLayout(0, 8));
-					panel.add(inputFields, BorderLayout.NORTH);
-					panel.add(new JLabel(new ImageIcon(PopupMenuFactory.class.getResource("icons/solarcells.png"))));
-					panel.add(scopeFields, BorderLayout.SOUTH);
-
-					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Solar Cells of Module");
-
-					while (true) {
-						dialog.setVisible(true);
-						final Object choice = optionPane.getValue();
-						if (choice == options[1] || choice == null) {
-							break;
-						} else {
-							nx = (Integer) nxSpinner.getValue();
-							ny = (Integer) nySpinner.getValue();
-							if (rb1.isSelected()) {
-								final ChangeCellNumbersCommand c = new ChangeCellNumbersCommand(s);
-								s.setNumberOfCellsInX(nx);
-								s.setNumberOfCellsInY(ny);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								selectedScopeIndex = 0;
-							} else if (rb2.isSelected()) {
-								final ChangeFoundationSolarPanelCellNumbersCommand c = new ChangeFoundationSolarPanelCellNumbersCommand(foundation);
-								foundation.setCellNumbersForSolarPanels(nx, ny);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								selectedScopeIndex = 1;
-							} else if (rb3.isSelected()) {
-								final ChangeCellNumbersForAllSolarPanelsCommand c = new ChangeCellNumbersForAllSolarPanelsCommand();
-								Scene.getInstance().setCellNumbersForAllSolarPanels(nx, ny);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
-								selectedScopeIndex = 2;
-							}
-							updateAfterEdit();
-							if (choice == options[0]) {
-								break;
-							}
+					boolean changed = s.getNumberOfCellsInX() != solarPanelNominalSize.getCellNx()[i] || s.getNumberOfCellsInY() != solarPanelNominalSize.getCellNy()[i];
+					if (!changed) {
+						if (Math.abs(s.getPanelWidth() - solarPanelNominalSize.getNominalWidths()[i]) > 0.000001 || Math.abs(s.getPanelHeight() - solarPanelNominalSize.getNominalHeights()[i]) > 0.000001) {
+							changed = true;
 						}
+					}
+					if (changed) {
+						final ChooseSolarPanelSizeCommand c = new ChooseSolarPanelSizeCommand(s);
+						s.setPanelWidth(solarPanelNominalSize.getNominalWidths()[i]);
+						s.setPanelHeight(solarPanelNominalSize.getNominalHeights()[i]);
+						s.setNumberOfCellsInX(solarPanelNominalSize.getCellNx()[i]);
+						s.setNumberOfCellsInY(solarPanelNominalSize.getCellNy()[i]);
+						s.draw();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						updateAfterEdit();
 					}
 				}
 			});
@@ -1377,60 +1425,89 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
+								boolean changed = Math.abs(val - sp.getBaseHeight()) > 0.000001;
 								if (rb1.isSelected()) {
-									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
-									sp.setBaseHeight(val);
-									sp.draw();
-									SceneManager.getInstance().refresh();
-									if (sp.checkContainerIntersection()) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-										c.undo();
-									} else {
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
+										sp.setBaseHeight(val);
+										sp.draw();
+										SceneManager.getInstance().refresh();
+										if (sp.checkContainerIntersection()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
 									final List<SolarPanel> row = sp.getRow();
-									final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
-									boolean intersected = false;
 									for (final SolarPanel x : row) {
-										x.setBaseHeight(val);
-										x.draw();
-										if (x.checkContainerIntersection()) {
-											intersected = true;
+										if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+											changed = true;
 											break;
 										}
 									}
-									SceneManager.getInstance().refresh();
-									if (intersected) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-										c.undo();
-									} else {
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
+										boolean intersected = false;
+										for (final SolarPanel x : row) {
+											x.setBaseHeight(val);
+											x.draw();
+											if (x.checkContainerIntersection()) {
+												intersected = true;
+												break;
+											}
+										}
+										SceneManager.getInstance().refresh();
+										if (intersected) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
-									foundation.setBaseHeightForSolarPanels(val);
-									if (foundation.checkContainerIntersectionForSolarPanels()) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-										c.undo();
-									} else {
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+											changed = true;
+											break;
+										}
+									}
+									if (changed) {
+										final ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
+										foundation.setBaseHeightForSolarPanels(val);
+										if (foundation.checkContainerIntersectionForSolarPanels()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									}
 									selectedScopeIndex = 2;
 								} else if (rb4.isSelected()) {
-									final ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
-									Scene.getInstance().setBaseHeightForAllSolarPanels(val);
-									if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-										c.undo();
-									} else {
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+											changed = true;
+											break;
+										}
+									}
+									if (changed) {
+										final ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
+										Scene.getInstance().setBaseHeightForAllSolarPanels(val);
+										if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									}
 									selectedScopeIndex = 3;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
