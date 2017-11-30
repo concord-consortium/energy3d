@@ -91,9 +91,9 @@ class PopupMenuForMirror extends PopupMenuFactory {
 					}
 					final Mirror m = (Mirror) selectedPart;
 					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
-					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel gui = new JPanel(new BorderLayout(0, 20));
 					final JPanel panel = new JPanel();
-					gui.add(panel, BorderLayout.CENTER);
+					gui.add(panel, BorderLayout.SOUTH);
 					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
 					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
@@ -135,10 +135,10 @@ class PopupMenuForMirror extends PopupMenuFactory {
 					if (m.getHeliostatTarget() != null) {
 						comboBox.setSelectedItem(m.getHeliostatTarget().getId() + "");
 					}
-					gui.add(comboBox, BorderLayout.SOUTH);
+					gui.add(comboBox, BorderLayout.CENTER);
 
 					final String title = "<html>Select the ID of the foundation<br>of the target tower for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will<br>focus at the top of the target.<hr></html>";
+					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will<br>focus on the top of the target.<hr></html>";
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Heliostat Target");
