@@ -47,7 +47,7 @@ class PopupMenuForSky extends PopupMenuFactory {
 			final JMenuItem miInfo = new JMenuItem("Sky");
 			miInfo.setEnabled(false);
 			miInfo.setOpaque(true);
-			miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
+			miInfo.setBackground(Config.isMac() ? Color.DARK_GRAY : Color.GRAY);
 			miInfo.setForeground(Color.WHITE);
 
 			final JCheckBoxMenuItem miHeliodon = new JCheckBoxMenuItem("Heliodon");
