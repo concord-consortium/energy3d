@@ -6,11 +6,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -115,156 +117,67 @@ class PopupMenuForMirror extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final JTextField inputField = new JTextField(m.getHeliostatTarget() != null ? m.getHeliostatTarget().getId() + "" : "");
-					gui.add(inputField, BorderLayout.SOUTH);
 
-					final String title = "<html>Set the ID of the foundation of the target tower for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will focus on the top of the target foundation.<hr></html>";
+					final List<Foundation> foundations = Scene.getInstance().getAllFoundations();
+					final JComboBox<String> comboBox = new JComboBox<String>();
+					comboBox.addItemListener(new ItemListener() {
+						@Override
+						public void itemStateChanged(final ItemEvent e) {
+
+						}
+					});
+					comboBox.addItem("None");
+					for (final Foundation x : foundations) {
+						if (!x.getChildren().isEmpty()) {
+							comboBox.addItem(x.getId() + "");
+						}
+					}
+					if (m.getHeliostatTarget() != null) {
+						comboBox.setSelectedItem(m.getHeliostatTarget().getId() + "");
+					}
+					gui.add(comboBox, BorderLayout.SOUTH);
+
+					final String title = "<html>Select the ID of the foundation<br>of the target tower for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The sunlight reflected by this mirror will<br>focus at the top of the target.<hr></html>";
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Heliostat Target");
 
 					while (true) {
-						inputField.selectAll();
-						inputField.requestFocusInWindow();
 						dialog.setVisible(true);
 						final Object choice = optionPane.getValue();
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
-							int id = 0;
-							boolean ok = true;
-							try {
-								id = Integer.parseInt(inputField.getText());
-							} catch (final NumberFormatException exception) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
-								ok = false;
-							}
-							if (ok) {
-								final HousePart p = Scene.getInstance().getPart(id);
-								if (id < 0) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (!(p instanceof Foundation)) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else {
+							Foundation target = null;
+							if (comboBox.getSelectedIndex() > 0) {
+								boolean ok = true;
+								int id = -1;
+								try {
+									id = Integer.parseInt((String) comboBox.getSelectedItem());
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), comboBox.getSelectedItem() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
+									final HousePart p = Scene.getInstance().getPart(id);
 									if (p instanceof Foundation) {
-										final Foundation target = (Foundation) p;
-										boolean changed = target != m.getHeliostatTarget();
-										if (rb1.isSelected()) {
-											if (changed) {
-												final Foundation oldTarget = m.getHeliostatTarget();
-												final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-												m.setHeliostatTarget(target);
-												m.draw();
-												if (oldTarget != null) {
-													oldTarget.drawSolarReceiver();
-												}
-												SceneManager.getInstance().getUndoManager().addEdit(c);
-											}
-											selectedScopeIndex = 0;
-										} else if (rb2.isSelected()) {
-											final Foundation foundation = m.getTopContainer();
-											if (!changed) {
-												for (final Mirror x : foundation.getMirrors()) {
-													if (target != x.getHeliostatTarget()) {
-														changed = true;
-														break;
-													}
-												}
-											}
-											if (changed) {
-												final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-												foundation.setTargetForMirrors(target);
-												SceneManager.getInstance().getUndoManager().addEdit(c);
-											}
-											selectedScopeIndex = 1;
-										} else if (rb3.isSelected()) {
-											if (!changed) {
-												for (final Mirror x : Scene.getInstance().getAllMirrors()) {
-													if (target != x.getHeliostatTarget()) {
-														changed = true;
-														break;
-													}
-												}
-											}
-											if (changed) {
-												final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-												Scene.getInstance().setTargetForAllMirrors(target);
-												SceneManager.getInstance().getUndoManager().addEdit(c);
-											}
-											selectedScopeIndex = 2;
-										}
-										if (changed) {
-											target.drawSolarReceiver();
-											updateAfterEdit();
-										}
-										if (choice == options[0]) {
-											break;
-										}
+										target = (Foundation) p;
+									} else {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "ID must be that of a foundation.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									}
 								}
 							}
-						}
-					}
-				}
-			});
-
-			final JMenuItem miDisableHeliostat = new JMenuItem("Disable Heliostat...");
-			miDisableHeliostat.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
-
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (!(selectedPart instanceof Mirror)) {
-						return;
-					}
-					final Mirror m = (Mirror) selectedPart;
-					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
-					final JPanel panel = new JPanel();
-					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Mirror", true);
-					final JRadioButton rb2 = new JRadioButton("All Mirrors on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Mirrors");
-					panel.add(rb1);
-					panel.add(rb2);
-					panel.add(rb3);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					switch (selectedScopeIndex) {
-					case 0:
-						rb1.setSelected(true);
-						break;
-					case 1:
-						rb2.setSelected(true);
-						break;
-					case 2:
-						rb3.setSelected(true);
-						break;
-					}
-					final String title = "<html>Disable heliostat for " + partInfo + "</html>";
-					final String footnote = "<html><hr></html>";
-					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Disable Heliostat");
-
-					while (true) {
-						dialog.setVisible(true);
-						final Object choice = optionPane.getValue();
-						if (choice == options[1] || choice == null) {
-							break;
-						} else {
-							boolean changed = m.getHeliostatTarget() != null;
+							boolean changed = target != m.getHeliostatTarget();
 							if (rb1.isSelected()) {
 								if (changed) {
+									final Foundation oldTarget = m.getHeliostatTarget();
 									final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-									m.getHeliostatTarget().drawSolarReceiver();
-									m.setHeliostatTarget(null);
+									m.setHeliostatTarget(target);
 									m.draw();
+									if (oldTarget != null) {
+										oldTarget.drawSolarReceiver();
+									}
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -272,7 +185,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								final Foundation foundation = m.getTopContainer();
 								if (!changed) {
 									for (final Mirror x : foundation.getMirrors()) {
-										if (x.getHeliostatTarget() != null) {
+										if (target != x.getHeliostatTarget()) {
 											changed = true;
 											break;
 										}
@@ -280,14 +193,14 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								}
 								if (changed) {
 									final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-									foundation.setTargetForMirrors(null);
+									foundation.setTargetForMirrors(target);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
 								if (!changed) {
 									for (final Mirror x : Scene.getInstance().getAllMirrors()) {
-										if (x.getHeliostatTarget() != null) {
+										if (target != x.getHeliostatTarget()) {
 											changed = true;
 											break;
 										}
@@ -295,12 +208,15 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								}
 								if (changed) {
 									final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-									Scene.getInstance().setTargetForAllMirrors(null);
+									Scene.getInstance().setTargetForAllMirrors(target);
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 2;
 							}
 							if (changed) {
+								if (target != null) {
+									target.drawSolarReceiver();
+								}
 								updateAfterEdit();
 							}
 							if (choice == options[0]) {
@@ -902,11 +818,9 @@ class PopupMenuForMirror extends PopupMenuFactory {
 					if (m.getHeliostatTarget() == null) {
 						miZenith.setEnabled(true);
 						miAzimuth.setEnabled(true);
-						miDisableHeliostat.setEnabled(false);
 					} else {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
-						miDisableHeliostat.setEnabled(true);
 					}
 					Util.selectSilently(cbmiDrawSunBeam, m.isSunBeamVisible());
 					Util.selectSilently(miLabelNone, !m.isLabelVisible());
@@ -1039,17 +953,15 @@ class PopupMenuForMirror extends PopupMenuFactory {
 
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSetHeliostat);
-			popupMenuForMirror.add(miDisableHeliostat);
-			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miZenith);
 			popupMenuForMirror.add(miAzimuth);
-			popupMenuForMirror.addSeparator();
-			popupMenuForMirror.add(cbmiDrawSunBeam);
-			popupMenuForMirror.add(labelMenu);
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSize);
 			popupMenuForMirror.add(miBaseHeight);
 			popupMenuForMirror.add(miReflectance);
+			popupMenuForMirror.addSeparator();
+			popupMenuForMirror.add(cbmiDrawSunBeam);
+			popupMenuForMirror.add(labelMenu);
 			popupMenuForMirror.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");

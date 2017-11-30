@@ -36,6 +36,12 @@ public class ChangeTargetForAllMirrorsCommand extends MyAbstractUndoableEdit {
 			newValues[i] = m.getHeliostatTarget();
 			m.setHeliostatTarget(oldValues[i]);
 			m.draw();
+			if (oldValues[i] != null) {
+				oldValues[i].drawSolarReceiver();
+			}
+			if (newValues[i] != null) {
+				newValues[i].drawSolarReceiver();
+			}
 		}
 		SceneManager.getInstance().refresh();
 	}
@@ -48,6 +54,12 @@ public class ChangeTargetForAllMirrorsCommand extends MyAbstractUndoableEdit {
 			final Mirror m = mirrors.get(i);
 			m.setHeliostatTarget(newValues[i]);
 			m.draw();
+			if (oldValues[i] != null) {
+				oldValues[i].drawSolarReceiver();
+			}
+			if (newValues[i] != null) {
+				newValues[i].drawSolarReceiver();
+			}
 		}
 		SceneManager.getInstance().refresh();
 	}
