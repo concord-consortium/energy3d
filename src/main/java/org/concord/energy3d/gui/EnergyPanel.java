@@ -253,23 +253,25 @@ public class EnergyPanel extends JPanel {
 		regionComboBox.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
-				final String city = (String) regionComboBox.getSelectedItem();
-				if (city.equals("")) {
-					updateRadiationHeatMap();
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "No region is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
-					Scene.getInstance().setCity(city);
-				} else {
-					final ChangeCityCommand c = new ChangeCityCommand();
-					setLatitude((int) LocationData.getInstance().getLatitudes().get(regionComboBox.getSelectedItem()).floatValue());
-					updateRadiationHeatMap();
-					Scene.getInstance().setCity(city);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
-					final LocationData ld = LocationData.getInstance();
-					regionComboBox.setToolTipText("<html>(" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final String city = (String) regionComboBox.getSelectedItem();
+					if (city.equals("")) {
+						updateRadiationHeatMap();
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No region is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
+						Scene.getInstance().setCity(city);
+					} else {
+						final ChangeCityCommand c = new ChangeCityCommand();
+						setLatitude((int) LocationData.getInstance().getLatitudes().get(regionComboBox.getSelectedItem()).floatValue());
+						updateRadiationHeatMap();
+						Scene.getInstance().setCity(city);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+						final LocationData ld = LocationData.getInstance();
+						regionComboBox.setToolTipText("<html>(" + ld.getLatitudes().get(city) + "&deg;, " + ld.getLongitudes().get(city) + "&deg;), elevation " + ld.getAltitudes().get(city).intValue() + "m<br>Use Edit>Set Region... to select country and region.</html>");
+					}
+					Scene.getInstance().updateTrackables();
+					Scene.getInstance().updateTreeLeaves();
+					Scene.getInstance().setEdited(true);
 				}
-				Scene.getInstance().updateTrackables();
-				Scene.getInstance().updateTreeLeaves();
-				Scene.getInstance().setEdited(true);
 			}
 		});
 		regionComboBox.addMouseListener(new MouseAdapter() {

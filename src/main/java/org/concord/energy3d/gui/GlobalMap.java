@@ -8,6 +8,8 @@ import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -96,21 +98,23 @@ class GlobalMap extends JDialog {
 		final JComboBox<String> regionsComboBox = new JComboBox<String>();
 		final JComboBox<String> countriesComboBox = new JComboBox<String>();
 		final JLabel regionsLabel = new JLabel("Regions:");
-		final ActionListener listener = new ActionListener() {
+		final ItemListener listener = new ItemListener() {
 			@Override
-			public void actionPerformed(final ActionEvent e) {
-				if (regionsComboBox.getSelectedItem() != null) {
-					if ("United States".equals(countriesComboBox.getSelectedItem())) {
-						EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
-					} else {
-						if (regionsComboBox.getSelectedItem().equals(countriesComboBox.getSelectedItem())) {
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (regionsComboBox.getSelectedItem() != null) {
+						if ("United States".equals(countriesComboBox.getSelectedItem())) {
 							EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
 						} else {
-							EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem() + ", " + countriesComboBox.getSelectedItem());
+							if (regionsComboBox.getSelectedItem().equals(countriesComboBox.getSelectedItem())) {
+								EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem());
+							} else {
+								EnergyPanel.getInstance().getCityComboBox().setSelectedItem(regionsComboBox.getSelectedItem() + ", " + countriesComboBox.getSelectedItem());
+							}
 						}
 					}
+					mapImageView.repaint();
 				}
-				mapImageView.repaint();
 			}
 		};
 
@@ -164,7 +168,6 @@ class GlobalMap extends JDialog {
 		topPanel.add(countriesComboBox);
 
 		topPanel.add(regionsLabel);
-		regionsComboBox.addActionListener(listener);
 		topPanel.add(regionsComboBox);
 
 		final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -193,6 +196,8 @@ class GlobalMap extends JDialog {
 
 		pack();
 		setLocationRelativeTo(owner);
+
+		regionsComboBox.addItemListener(listener);
 
 		new SwingWorker<BufferedImage, Void>() {
 

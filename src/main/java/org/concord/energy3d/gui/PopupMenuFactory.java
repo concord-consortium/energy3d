@@ -474,7 +474,7 @@ public abstract class PopupMenuFactory {
 		final JMenuItem miInfo = new JMenuItem();
 		miInfo.setEnabled(false);
 		miInfo.setOpaque(true);
-		miInfo.setBackground(Config.isMac() ? Color.BLACK : Color.GRAY);
+		miInfo.setBackground(Config.isMac() ? Color.DARK_GRAY : Color.GRAY);
 		miInfo.setForeground(Color.WHITE);
 
 		final JPopupMenu popupMenu = new JPopupMenu();
