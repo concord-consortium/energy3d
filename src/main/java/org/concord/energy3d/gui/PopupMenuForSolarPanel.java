@@ -1627,30 +1627,55 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								} else {
 									final int cellType = typeComboBox.getSelectedIndex();
 									final int colorOption = colorComboBox.getSelectedIndex();
+									boolean changed = cellType != solarPanel.getCellType() || colorOption != solarPanel.getColorOption() || Math.abs(val * 0.01 - solarPanel.getCellEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeSolarCellPropertiesCommand c = new ChangeSolarCellPropertiesCommand(solarPanel);
-										solarPanel.setCellEfficiency(val * 0.01);
-										solarPanel.setCellType(cellType);
-										solarPanel.setColorOption(colorOption);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarCellPropertiesCommand c = new ChangeSolarCellPropertiesCommand(solarPanel);
+											solarPanel.setCellEfficiency(val * 0.01);
+											solarPanel.setCellType(cellType);
+											solarPanel.setColorOption(colorOption);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										final ChangeFoundationSolarCellPropertiesCommand c = new ChangeFoundationSolarCellPropertiesCommand(foundation);
-										foundation.setSolarCellEfficiency(val * 0.01);
-										foundation.setCellTypeForSolarPanels(cellType);
-										foundation.setColorForSolarPanels(colorOption);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : foundation.getSolarPanels()) {
+												if (cellType != x.getCellType() || colorOption != x.getColorOption() || Math.abs(val * 0.01 - x.getCellEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarCellPropertiesCommand c = new ChangeFoundationSolarCellPropertiesCommand(foundation);
+											foundation.setSolarCellEfficiency(val * 0.01);
+											foundation.setCellTypeForSolarPanels(cellType);
+											foundation.setColorForSolarPanels(colorOption);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeSolarCellPropertiesForAllCommand c = new ChangeSolarCellPropertiesForAllCommand();
-										Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
-										Scene.getInstance().setCellTypeForAllSolarPanels(cellType);
-										Scene.getInstance().setColorForAllSolarPanels(colorOption);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+												if (cellType != x.getCellType() || colorOption != x.getColorOption() || Math.abs(val * 0.01 - x.getCellEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeSolarCellPropertiesForAllCommand c = new ChangeSolarCellPropertiesForAllCommand();
+											Scene.getInstance().setSolarCellEfficiencyForAll(val * 0.01);
+											Scene.getInstance().setCellTypeForAllSolarPanels(cellType);
+											Scene.getInstance().setColorForAllSolarPanels(colorOption);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1746,27 +1771,52 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								} else if (pmax < -1 || pmax > 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1% and 0% per Celsius degree.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(noct - solarPanel.getNominalOperatingCellTemperature()) > 0.000001 || Math.abs(pmax * 0.01 - solarPanel.getTemperatureCoefficientPmax()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetTemperatureEffectsCommand c = new SetTemperatureEffectsCommand(solarPanel);
-										solarPanel.setTemperatureCoefficientPmax(pmax * 0.01);
-										solarPanel.setNominalOperatingCellTemperature(noct);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetTemperatureEffectsCommand c = new SetTemperatureEffectsCommand(solarPanel);
+											solarPanel.setTemperatureCoefficientPmax(pmax * 0.01);
+											solarPanel.setNominalOperatingCellTemperature(noct);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										final SetFoundationTemperatureEffectsCommand c = new SetFoundationTemperatureEffectsCommand(foundation);
-										foundation.setTemperatureCoefficientPmax(pmax * 0.01);
-										foundation.setNominalOperatingCellTemperature(noct);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : foundation.getSolarPanels()) {
+												if (Math.abs(noct - x.getNominalOperatingCellTemperature()) > 0.000001 || Math.abs(pmax * 0.01 - x.getTemperatureCoefficientPmax()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetFoundationTemperatureEffectsCommand c = new SetFoundationTemperatureEffectsCommand(foundation);
+											foundation.setTemperatureCoefficientPmax(pmax * 0.01);
+											foundation.setNominalOperatingCellTemperature(noct);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetTemperatrureEffectsForAllCommand c = new SetTemperatrureEffectsForAllCommand();
-										Scene.getInstance().setTemperatureCoefficientPmaxForAll(pmax * 0.01);
-										Scene.getInstance().setNominalOperatingCellTemperatureForAll(noct);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+												if (Math.abs(noct - x.getNominalOperatingCellTemperature()) > 0.000001 || Math.abs(pmax * 0.01 - x.getTemperatureCoefficientPmax()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetTemperatrureEffectsForAllCommand c = new SetTemperatrureEffectsForAllCommand();
+											Scene.getInstance().setTemperatureCoefficientPmaxForAll(pmax * 0.01);
+											Scene.getInstance().setNominalOperatingCellTemperatureForAll(noct);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1846,24 +1896,49 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								if (val < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || val >= SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be greater than " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and less than " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - solarPanel.getInverterEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeInverterEfficiencyCommand c = new ChangeInverterEfficiencyCommand(solarPanel);
-										solarPanel.setInverterEfficiency(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeInverterEfficiencyCommand c = new ChangeInverterEfficiencyCommand(solarPanel);
+											solarPanel.setInverterEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = solarPanel.getTopContainer();
-										final ChangeFoundationInverterEfficiencyCommand c = new ChangeFoundationInverterEfficiencyCommand(foundation);
-										foundation.setSolarPanelInverterEfficiency(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : foundation.getSolarPanels()) {
+												if (Math.abs(val * 0.01 - x.getInverterEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationInverterEfficiencyCommand c = new ChangeFoundationInverterEfficiencyCommand(foundation);
+											foundation.setSolarPanelInverterEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeInverterEfficiencyForAllCommand c = new ChangeInverterEfficiencyForAllCommand();
-										Scene.getInstance().setSolarPanelInverterEfficiencyForAll(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+												if (Math.abs(val * 0.01 - x.getInverterEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeInverterEfficiencyForAllCommand c = new ChangeInverterEfficiencyForAllCommand();
+											Scene.getInstance().setSolarPanelInverterEfficiencyForAll(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1906,6 +1981,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						models[++i] = key;
 					}
 					final PvModuleSpecs specs = s.getPvModuleSpecs();
+					modelName = specs.getModel();
 					final JPanel gui = new JPanel(new BorderLayout(5, 5));
 					gui.setBorder(BorderFactory.createTitledBorder("Model for " + partInfo));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(models);
@@ -1955,24 +2031,49 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = !modelName.equals(s.getModelName());
 							if (rb1.isSelected()) {
-								final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(s);
-								s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
-								s.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(s);
+									s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+									s.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final ChangeFoundationSolarPanelModelCommand c = new ChangeFoundationSolarPanelModelCommand(foundation);
-								foundation.setModelForSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (!modelName.equals(x.getModelName())) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeFoundationSolarPanelModelCommand c = new ChangeFoundationSolarPanelModelCommand(foundation);
+									foundation.setModelForSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final ChangeModelForAllSolarPanelsCommand c = new ChangeModelForAllSolarPanelsCommand();
-								Scene.getInstance().setModelForAllSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (!modelName.equals(x.getModelName())) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeModelForAllSolarPanelsCommand c = new ChangeModelForAllSolarPanelsCommand();
+									Scene.getInstance().setModelForAllSolarPanels(PvModulesData.getInstance().getModuleSpecs(modelName));
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}

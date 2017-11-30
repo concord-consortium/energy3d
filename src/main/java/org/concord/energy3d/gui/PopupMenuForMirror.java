@@ -149,30 +149,55 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								} else {
 									if (p instanceof Foundation) {
 										final Foundation target = (Foundation) p;
+										boolean changed = target != m.getHeliostatTarget();
 										if (rb1.isSelected()) {
-											final Foundation oldTarget = m.getHeliostatTarget();
-											final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-											m.setHeliostatTarget(target);
-											m.draw();
-											if (oldTarget != null) {
-												oldTarget.drawSolarReceiver();
+											if (changed) {
+												final Foundation oldTarget = m.getHeliostatTarget();
+												final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
+												m.setHeliostatTarget(target);
+												m.draw();
+												if (oldTarget != null) {
+													oldTarget.drawSolarReceiver();
+												}
+												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
-											SceneManager.getInstance().getUndoManager().addEdit(c);
 											selectedScopeIndex = 0;
 										} else if (rb2.isSelected()) {
 											final Foundation foundation = m.getTopContainer();
-											final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-											foundation.setTargetForMirrors(target);
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+											if (!changed) {
+												for (final Mirror x : foundation.getMirrors()) {
+													if (target != x.getHeliostatTarget()) {
+														changed = true;
+														break;
+													}
+												}
+											}
+											if (changed) {
+												final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
+												foundation.setTargetForMirrors(target);
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 											selectedScopeIndex = 1;
 										} else if (rb3.isSelected()) {
-											final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-											Scene.getInstance().setTargetForAllMirrors(target);
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+											if (!changed) {
+												for (final Mirror x : Scene.getInstance().getAllMirrors()) {
+													if (target != x.getHeliostatTarget()) {
+														changed = true;
+														break;
+													}
+												}
+											}
+											if (changed) {
+												final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
+												Scene.getInstance().setTargetForAllMirrors(target);
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 											selectedScopeIndex = 2;
 										}
-										target.drawSolarReceiver();
-										updateAfterEdit();
+										if (changed) {
+											target.drawSolarReceiver();
+											updateAfterEdit();
+										}
 										if (choice == options[0]) {
 											break;
 										}
@@ -233,28 +258,51 @@ class PopupMenuForMirror extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = m.getHeliostatTarget() != null;
 							if (rb1.isSelected()) {
-								final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
-								if (m.getHeliostatTarget() != null) {
+								if (changed) {
+									final ChangeMirrorTargetCommand c = new ChangeMirrorTargetCommand(m);
 									m.getHeliostatTarget().drawSolarReceiver();
+									m.setHeliostatTarget(null);
+									m.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
-								m.setHeliostatTarget(null);
-								m.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = m.getTopContainer();
-								final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
-								foundation.setTargetForMirrors(null);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Mirror x : foundation.getMirrors()) {
+										if (x.getHeliostatTarget() != null) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeFoundationMirrorTargetCommand c = new ChangeFoundationMirrorTargetCommand(foundation);
+									foundation.setTargetForMirrors(null);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
-								Scene.getInstance().setTargetForAllMirrors(null);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Mirror x : Scene.getInstance().getAllMirrors()) {
+										if (x.getHeliostatTarget() != null) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeTargetForAllMirrorsCommand c = new ChangeTargetForAllMirrorsCommand();
+									Scene.getInstance().setTargetForAllMirrors(null);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -336,25 +384,50 @@ class PopupMenuForMirror extends PopupMenuFactory {
 									} else if (Util.isZero(val + 90)) {
 										val = -89.999;
 									}
+									boolean changed = Math.abs(val - m.getTiltAngle()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(m);
-										m.setTiltAngle(val);
-										m.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(m);
+											m.setTiltAngle(val);
+											m.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = m.getTopContainer();
-										final ChangeFoundationMirrorTiltAngleCommand c = new ChangeFoundationMirrorTiltAngleCommand(foundation);
-										foundation.setZenithAngleForMirrors(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Mirror x : foundation.getMirrors()) {
+												if (Math.abs(val - x.getTiltAngle()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationMirrorTiltAngleCommand c = new ChangeFoundationMirrorTiltAngleCommand(foundation);
+											foundation.setZenithAngleForMirrors(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeTiltAngleForAllMirrorsCommand c = new ChangeTiltAngleForAllMirrorsCommand();
-										Scene.getInstance().setTiltAngleForAllMirrors(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Mirror x : Scene.getInstance().getAllMirrors()) {
+												if (Math.abs(val - x.getTiltAngle()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeTiltAngleForAllMirrorsCommand c = new ChangeTiltAngleForAllMirrorsCommand();
+											Scene.getInstance().setTiltAngleForAllMirrors(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -439,24 +512,49 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								if (a < 0) {
 									a += 360;
 								}
+								boolean changed = Math.abs(a - mirror.getRelativeAzimuth()) > 0.000001;
 								if (rb1.isSelected()) {
-									final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
-									mirror.setRelativeAzimuth(a);
-									mirror.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
+										mirror.setRelativeAzimuth(a);
+										mirror.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
-									foundation.setAzimuthForMirrors(a);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Mirror x : foundation.getMirrors()) {
+											if (Math.abs(a - x.getRelativeAzimuth()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationMirrorAzimuthCommand c = new ChangeFoundationMirrorAzimuthCommand(foundation);
+										foundation.setAzimuthForMirrors(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
-									Scene.getInstance().setAzimuthForAllMirrors(a);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Mirror x : Scene.getInstance().getAllMirrors()) {
+											if (Math.abs(a - x.getRelativeAzimuth()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeAzimuthForAllMirrorsCommand c = new ChangeAzimuthForAllMirrorsCommand();
+										Scene.getInstance().setAzimuthForAllMirrors(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -541,25 +639,50 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								} else if (h < 1 || h > 50) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(w - m.getMirrorWidth()) > 0.000001 || Math.abs(h - m.getMirrorHeight()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(m);
-										m.setMirrorWidth(w);
-										m.setMirrorHeight(h);
-										m.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(m);
+											m.setMirrorWidth(w);
+											m.setMirrorHeight(h);
+											m.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
-										foundation.setSizeForMirrors(w, h);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Mirror x : foundation.getMirrors()) {
+												if (Math.abs(w - x.getMirrorWidth()) > 0.000001 || Math.abs(h - x.getMirrorHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForMirrorsOnFoundationCommand c = new SetSizeForMirrorsOnFoundationCommand(foundation);
+											foundation.setSizeForMirrors(w, h);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
-										Scene.getInstance().setSizeForAllMirrors(w, h);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Mirror x : Scene.getInstance().getAllMirrors()) {
+												if (Math.abs(w - x.getMirrorWidth()) > 0.000001 || Math.abs(h - x.getMirrorHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForAllMirrorsCommand c = new SetSizeForAllMirrorsCommand();
+											Scene.getInstance().setSizeForAllMirrors(w, h);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -636,24 +759,49 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
+								boolean changed = Math.abs(val - m.getBaseHeight()) > 0.000001;
 								if (rb1.isSelected()) {
-									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(m);
-									m.setBaseHeight(val);
-									m.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(m);
+										m.setBaseHeight(val);
+										m.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
-									foundation.setBaseHeightForMirrors(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Mirror x : foundation.getMirrors()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
+										foundation.setBaseHeightForMirrors(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
-									Scene.getInstance().setBaseHeightForAllMirrors(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final Mirror x : Scene.getInstance().getAllMirrors()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
+										Scene.getInstance().setBaseHeightForAllMirrors(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -836,24 +984,49 @@ class PopupMenuForMirror extends PopupMenuFactory {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - m.getReflectance()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeMirrorReflectanceCommand c = new ChangeMirrorReflectanceCommand(m);
-										m.setReflectance(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeMirrorReflectanceCommand c = new ChangeMirrorReflectanceCommand(m);
+											m.setReflectance(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = m.getTopContainer();
-										final ChangeFoundationMirrorReflectanceCommand c = new ChangeFoundationMirrorReflectanceCommand(foundation);
-										foundation.setReflectanceForMirrors(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Mirror x : foundation.getMirrors()) {
+												if (Math.abs(val * 0.01 - x.getReflectance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationMirrorReflectanceCommand c = new ChangeFoundationMirrorReflectanceCommand(foundation);
+											foundation.setReflectanceForMirrors(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeReflectanceForAllMirrorsCommand c = new ChangeReflectanceForAllMirrorsCommand();
-										Scene.getInstance().setReflectanceForAllMirrors(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Mirror x : Scene.getInstance().getAllMirrors()) {
+												if (Math.abs(val * 0.01 - x.getReflectance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeReflectanceForAllMirrorsCommand c = new ChangeReflectanceForAllMirrorsCommand();
+											Scene.getInstance().setReflectanceForAllMirrors(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}

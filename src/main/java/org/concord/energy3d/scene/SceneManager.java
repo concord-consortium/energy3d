@@ -2197,6 +2197,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void deleteCurrentSelection() {
+		if (selectedPart == null) {
+			return;
+		}
 		if (selectedPart instanceof Foundation) {
 			final Foundation foundation = (Foundation) selectedPart;
 			if (foundation.getLockEdit()) {
@@ -2208,10 +2211,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				}
 			}
 		}
-		if (selectedPart != null) {
-			taskManager.update(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
+		taskManager.update(new Callable<Object>() {
+			@Override
+			public Object call() throws Exception {
+				if (selectedPart != null) { // sometimes selectedPart can be null after the callable is sent to the task manager
 					if (selectedPart instanceof Foundation && ((Foundation) selectedPart).getSelectedMesh() != null) { // a mesh is selected, instead of a part
 						final Foundation f = (Foundation) selectedPart;
 						final Mesh m = f.getSelectedMesh();
@@ -2251,10 +2254,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
 						}
 					});
-					return null;
 				}
-			});
-		}
+				return null;
+			}
+		});
 	}
 
 	public Camera getCamera() {
