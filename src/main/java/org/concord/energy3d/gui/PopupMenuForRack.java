@@ -1161,6 +1161,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					gui.setBorder(BorderFactory.createTitledBorder("Solar Panel Model for " + partInfo));
 					final JComboBox<String> typeComboBox = new JComboBox<String>(models);
 					typeComboBox.setSelectedItem(specs.getModel());
+					modelName = specs.getModel();
 					typeComboBox.addItemListener(new ItemListener() {
 						@Override
 						public void itemStateChanged(final ItemEvent e) {
@@ -1206,25 +1207,50 @@ class PopupMenuForRack extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = !modelName.equals(s.getModelName());
 							if (rb1.isSelected()) {
-								final ChangeSolarPanelModelForRackCommand c = new ChangeSolarPanelModelForRackCommand(r);
-								s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
-								r.ensureFullSolarPanels(false);
-								r.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final ChangeSolarPanelModelForRackCommand c = new ChangeSolarPanelModelForRackCommand(r);
+									s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
+									r.ensureFullSolarPanels(false);
+									r.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final ChangeSolarPanelModelForRacksOnFoundationCommand c = new ChangeSolarPanelModelForRacksOnFoundationCommand(foundation);
-								foundation.setSolarPanelModelForRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : foundation.getRacks()) {
+										if (!modelName.equals(x.getSolarPanel().getModelName())) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeSolarPanelModelForRacksOnFoundationCommand c = new ChangeSolarPanelModelForRacksOnFoundationCommand(foundation);
+									foundation.setSolarPanelModelForRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final ChangeSolarPanelModelForAllRacksCommand c = new ChangeSolarPanelModelForAllRacksCommand();
-								Scene.getInstance().setSolarPanelModelForAllRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : Scene.getInstance().getAllRacks()) {
+										if (!modelName.equals(x.getSolarPanel().getModelName())) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeSolarPanelModelForAllRacksCommand c = new ChangeSolarPanelModelForAllRacksCommand();
+									Scene.getInstance().setSolarPanelModelForAllRacks(PvModulesData.getInstance().getModuleSpecs(modelName));
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -1306,28 +1332,66 @@ class PopupMenuForRack extends PopupMenuFactory {
 							final double h = solarPanelNominalSize.getNominalHeights()[i];
 							final int numberOfCellsInX = solarPanelNominalSize.getCellNx()[i];
 							final int numberOfCellsInY = solarPanelNominalSize.getCellNy()[i];
+							boolean changed = numberOfCellsInX != s.getNumberOfCellsInX() || numberOfCellsInY != s.getNumberOfCellsInY();
+							if (Math.abs(s.getPanelWidth() - w) > 0.000001 || Math.abs(s.getPanelHeight() - h) > 0.000001) {
+								changed = true;
+							}
 							if (rb1.isSelected()) {
-								final ChooseSolarPanelSizeForRackCommand c = new ChooseSolarPanelSizeForRackCommand(r);
-								s.setPanelWidth(w);
-								s.setPanelHeight(h);
-								s.setNumberOfCellsInX(numberOfCellsInX);
-								s.setNumberOfCellsInY(numberOfCellsInY);
-								r.ensureFullSolarPanels(false);
-								r.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final ChooseSolarPanelSizeForRackCommand c = new ChooseSolarPanelSizeForRackCommand(r);
+									s.setPanelWidth(w);
+									s.setPanelHeight(h);
+									s.setNumberOfCellsInX(numberOfCellsInX);
+									s.setNumberOfCellsInY(numberOfCellsInY);
+									r.ensureFullSolarPanels(false);
+									r.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final SetSolarPanelSizeForRacksOnFoundationCommand c = new SetSolarPanelSizeForRacksOnFoundationCommand(foundation);
-								foundation.setSolarPanelSizeForRacks(w, h, numberOfCellsInX, numberOfCellsInY);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : foundation.getRacks()) {
+										final SolarPanel p = x.getSolarPanel();
+										if (numberOfCellsInX != p.getNumberOfCellsInX() || numberOfCellsInY != p.getNumberOfCellsInY()) {
+											changed = true;
+											break;
+										}
+										if (Math.abs(p.getPanelWidth() - w) > 0.000001 || Math.abs(p.getPanelHeight() - h) > 0.000001) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelSizeForRacksOnFoundationCommand c = new SetSolarPanelSizeForRacksOnFoundationCommand(foundation);
+									foundation.setSolarPanelSizeForRacks(w, h, numberOfCellsInX, numberOfCellsInY);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarPanelSizeForAllRacksCommand c = new SetSolarPanelSizeForAllRacksCommand();
-								Scene.getInstance().setSolarPanelSizeForAllRacks(w, h, numberOfCellsInX, numberOfCellsInY);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : Scene.getInstance().getAllRacks()) {
+										final SolarPanel p = x.getSolarPanel();
+										if (numberOfCellsInX != p.getNumberOfCellsInX() || numberOfCellsInY != p.getNumberOfCellsInY()) {
+											changed = true;
+											break;
+										}
+										if (Math.abs(p.getPanelWidth() - w) > 0.000001 || Math.abs(p.getPanelHeight() - h) > 0.000001) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelSizeForAllRacksCommand c = new SetSolarPanelSizeForAllRacksCommand();
+									Scene.getInstance().setSolarPanelSizeForAllRacks(w, h, numberOfCellsInX, numberOfCellsInY);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -1393,24 +1457,50 @@ class PopupMenuForRack extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							final int selectedIndex = cellTypeComboBox.getSelectedIndex();
+							boolean changed = selectedIndex != s.getCellType();
 							if (rb1.isSelected()) {
-								final SetSolarPanelCellTypeForRackCommand c = new SetSolarPanelCellTypeForRackCommand(r);
-								s.setCellType(cellTypeComboBox.getSelectedIndex());
-								r.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetSolarPanelCellTypeForRackCommand c = new SetSolarPanelCellTypeForRackCommand(r);
+									s.setCellType(selectedIndex);
+									r.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final SetSolarPanelCellTypeForRacksOnFoundationCommand c = new SetSolarPanelCellTypeForRacksOnFoundationCommand(foundation);
-								foundation.setSolarPanelCellTypeForRacks(cellTypeComboBox.getSelectedIndex());
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : foundation.getRacks()) {
+										if (x.getSolarPanel().getCellType() != selectedIndex) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelCellTypeForRacksOnFoundationCommand c = new SetSolarPanelCellTypeForRacksOnFoundationCommand(foundation);
+									foundation.setSolarPanelCellTypeForRacks(selectedIndex);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarPanelCellTypeForAllRacksCommand c = new SetSolarPanelCellTypeForAllRacksCommand();
-								Scene.getInstance().setSolarPanelCellTypeForAllRacks(cellTypeComboBox.getSelectedIndex());
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : Scene.getInstance().getAllRacks()) {
+										if (x.getSolarPanel().getCellType() != selectedIndex) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelCellTypeForAllRacksCommand c = new SetSolarPanelCellTypeForAllRacksCommand();
+									Scene.getInstance().setSolarPanelCellTypeForAllRacks(selectedIndex);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -1476,24 +1566,50 @@ class PopupMenuForRack extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							final int selectedIndex = colorComboBox.getSelectedIndex();
+							boolean changed = selectedIndex != s.getColorOption();
 							if (rb1.isSelected()) {
-								final SetSolarPanelColorForRackCommand c = new SetSolarPanelColorForRackCommand(r);
-								s.setColorOption(colorComboBox.getSelectedIndex());
-								r.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetSolarPanelColorForRackCommand c = new SetSolarPanelColorForRackCommand(r);
+									s.setColorOption(selectedIndex);
+									r.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final SetSolarPanelColorForRacksOnFoundationCommand c = new SetSolarPanelColorForRacksOnFoundationCommand(foundation);
-								foundation.setSolarPanelColorForRacks(colorComboBox.getSelectedIndex());
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : foundation.getRacks()) {
+										if (x.getSolarPanel().getColorOption() != selectedIndex) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelColorForRacksOnFoundationCommand c = new SetSolarPanelColorForRacksOnFoundationCommand(foundation);
+									foundation.setSolarPanelColorForRacks(selectedIndex);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarPanelColorForAllRacksCommand c = new SetSolarPanelColorForAllRacksCommand();
-								Scene.getInstance().setSolarPanelColorForAllRacks(colorComboBox.getSelectedIndex());
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : Scene.getInstance().getAllRacks()) {
+										if (x.getSolarPanel().getColorOption() != selectedIndex) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelColorForAllRacksCommand c = new SetSolarPanelColorForAllRacksCommand();
+									Scene.getInstance().setSolarPanelColorForAllRacks(selectedIndex);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -1571,23 +1687,48 @@ class PopupMenuForRack extends PopupMenuFactory {
 								if (solarCellEfficiencyPercentage < SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE || solarCellEfficiencyPercentage > SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar cell efficiency must be between " + SolarPanel.MIN_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_SOLAR_CELL_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(solarCellEfficiencyPercentage * 0.01 - s.getCellEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetSolarCellEfficiencyForRackCommand c = new SetSolarCellEfficiencyForRackCommand(r);
-										s.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetSolarCellEfficiencyForRackCommand c = new SetSolarCellEfficiencyForRackCommand(r);
+											s.setCellEfficiency(solarCellEfficiencyPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetSolarCellEfficiencyForRacksOnFoundationCommand c = new SetSolarCellEfficiencyForRacksOnFoundationCommand(foundation);
-										foundation.setSolarCellEfficiencyForRacks(solarCellEfficiencyPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (Math.abs(solarCellEfficiencyPercentage * 0.01 - x.getSolarPanel().getCellEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSolarCellEfficiencyForRacksOnFoundationCommand c = new SetSolarCellEfficiencyForRacksOnFoundationCommand(foundation);
+											foundation.setSolarCellEfficiencyForRacks(solarCellEfficiencyPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSolarCellEfficiencyForAllRacksCommand c = new SetSolarCellEfficiencyForAllRacksCommand();
-										Scene.getInstance().setSolarCellEfficiencyForAllRacks(solarCellEfficiencyPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (Math.abs(solarCellEfficiencyPercentage * 0.01 - x.getSolarPanel().getCellEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSolarCellEfficiencyForAllRacksCommand c = new SetSolarCellEfficiencyForAllRacksCommand();
+											Scene.getInstance().setSolarCellEfficiencyForAllRacks(solarCellEfficiencyPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1667,23 +1808,48 @@ class PopupMenuForRack extends PopupMenuFactory {
 								if (solarPanelNominalOperatingCellTemperature < 33 || solarPanelNominalOperatingCellTemperature > 58) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Nominal Operating Cell Temperature must be between 33 and 58 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(solarPanelNominalOperatingCellTemperature - s.getNominalOperatingCellTemperature()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetNoctForRackCommand c = new SetNoctForRackCommand(r);
-										s.setNominalOperatingCellTemperature(solarPanelNominalOperatingCellTemperature);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetNoctForRackCommand c = new SetNoctForRackCommand(r);
+											s.setNominalOperatingCellTemperature(solarPanelNominalOperatingCellTemperature);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetNoctForRacksOnFoundationCommand c = new SetNoctForRacksOnFoundationCommand(foundation);
-										foundation.setNominalOperatingCellTemperatureForRacks(solarPanelNominalOperatingCellTemperature);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (Math.abs(solarPanelNominalOperatingCellTemperature - x.getSolarPanel().getNominalOperatingCellTemperature()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetNoctForRacksOnFoundationCommand c = new SetNoctForRacksOnFoundationCommand(foundation);
+											foundation.setNominalOperatingCellTemperatureForRacks(solarPanelNominalOperatingCellTemperature);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetNoctForAllRacksCommand c = new SetNoctForAllRacksCommand();
-										Scene.getInstance().setNominalOperatingCellTemperatureForAllRacks(solarPanelNominalOperatingCellTemperature);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (Math.abs(solarPanelNominalOperatingCellTemperature - x.getSolarPanel().getNominalOperatingCellTemperature()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetNoctForAllRacksCommand c = new SetNoctForAllRacksCommand();
+											Scene.getInstance().setNominalOperatingCellTemperatureForAllRacks(solarPanelNominalOperatingCellTemperature);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1763,23 +1929,48 @@ class PopupMenuForRack extends PopupMenuFactory {
 								if (solarPanelTemperatureCoefficientPmaxPercentage < -1 || solarPanelTemperatureCoefficientPmaxPercentage > 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Temperature coefficient of Pmax must be between -1 and 0", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(solarPanelTemperatureCoefficientPmaxPercentage * 0.01 - s.getTemperatureCoefficientPmax()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetTemperatureCoefficientPmaxForRackCommand c = new SetTemperatureCoefficientPmaxForRackCommand(r);
-										s.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetTemperatureCoefficientPmaxForRackCommand c = new SetTemperatureCoefficientPmaxForRackCommand(r);
+											s.setTemperatureCoefficientPmax(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetTemperatureCoefficientPmaxForRacksOnFoundationCommand c = new SetTemperatureCoefficientPmaxForRacksOnFoundationCommand(foundation);
-										foundation.setTemperatureCoefficientPmaxForRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (Math.abs(solarPanelTemperatureCoefficientPmaxPercentage * 0.01 - x.getSolarPanel().getTemperatureCoefficientPmax()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetTemperatureCoefficientPmaxForRacksOnFoundationCommand c = new SetTemperatureCoefficientPmaxForRacksOnFoundationCommand(foundation);
+											foundation.setTemperatureCoefficientPmaxForRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetTemperatureCoefficientPmaxForAllRacksCommand c = new SetTemperatureCoefficientPmaxForAllRacksCommand();
-										Scene.getInstance().setTemperatureCoefficientPmaxForAllRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (Math.abs(solarPanelTemperatureCoefficientPmaxPercentage * 0.01 - x.getSolarPanel().getTemperatureCoefficientPmax()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetTemperatureCoefficientPmaxForAllRacksCommand c = new SetTemperatureCoefficientPmaxForAllRacksCommand();
+											Scene.getInstance().setTemperatureCoefficientPmaxForAllRacks(solarPanelTemperatureCoefficientPmaxPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1847,23 +2038,49 @@ class PopupMenuForRack extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							final int selectedIndex = toleranceComboBox.getSelectedIndex();
+							boolean changed = selectedIndex != s.getShadeTolerance();
 							if (rb1.isSelected()) {
-								final SetSolarPanelShadeToleranceForRackCommand c = new SetSolarPanelShadeToleranceForRackCommand(r);
-								s.setShadeTolerance(toleranceComboBox.getSelectedIndex());
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetSolarPanelShadeToleranceForRackCommand c = new SetSolarPanelShadeToleranceForRackCommand(r);
+									s.setShadeTolerance(selectedIndex);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final SetSolarPanelShadeToleranceForRacksOnFoundationCommand c = new SetSolarPanelShadeToleranceForRacksOnFoundationCommand(foundation);
-								foundation.setSolarPanelShadeToleranceForRacks(toleranceComboBox.getSelectedIndex());
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : foundation.getRacks()) {
+										if (selectedIndex != x.getSolarPanel().getShadeTolerance()) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelShadeToleranceForRacksOnFoundationCommand c = new SetSolarPanelShadeToleranceForRacksOnFoundationCommand(foundation);
+									foundation.setSolarPanelShadeToleranceForRacks(selectedIndex);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarPanelShadeToleranceForAllRacksCommand c = new SetSolarPanelShadeToleranceForAllRacksCommand();
-								Scene.getInstance().setSolarPanelShadeToleranceForAllRacks(toleranceComboBox.getSelectedIndex());
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : Scene.getInstance().getAllRacks()) {
+										if (selectedIndex != x.getSolarPanel().getShadeTolerance()) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarPanelShadeToleranceForAllRacksCommand c = new SetSolarPanelShadeToleranceForAllRacksCommand();
+									Scene.getInstance().setSolarPanelShadeToleranceForAllRacks(selectedIndex);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -1931,25 +2148,51 @@ class PopupMenuForRack extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							final boolean b = orientationComboBox.getSelectedIndex() == 1;
+							boolean changed = b ^ s.isRotated();
 							if (rb1.isSelected()) {
-								final RotateSolarPanelsForRackCommand c = new RotateSolarPanelsForRackCommand(r);
-								s.setRotated(orientationComboBox.getSelectedIndex() == 1);
-								r.ensureFullSolarPanels(false);
-								r.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final RotateSolarPanelsForRackCommand c = new RotateSolarPanelsForRackCommand(r);
+									s.setRotated(orientationComboBox.getSelectedIndex() == 1);
+									r.ensureFullSolarPanels(false);
+									r.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final RotateSolarPanelsForRacksOnFoundationCommand c = new RotateSolarPanelsForRacksOnFoundationCommand(foundation);
-								foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : foundation.getRacks()) {
+										if (b ^ x.getSolarPanel().isRotated()) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final RotateSolarPanelsForRacksOnFoundationCommand c = new RotateSolarPanelsForRacksOnFoundationCommand(foundation);
+									foundation.rotateSolarPanelsOnRacks(orientationComboBox.getSelectedIndex() == 1);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final RotateSolarPanelsForAllRacksCommand c = new RotateSolarPanelsForAllRacksCommand();
-								Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final Rack x : Scene.getInstance().getAllRacks()) {
+										if (b ^ x.getSolarPanel().isRotated()) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final RotateSolarPanelsForAllRacksCommand c = new RotateSolarPanelsForAllRacksCommand();
+									Scene.getInstance().rotateSolarPanelsOnAllRacks(orientationComboBox.getSelectedIndex() == 1);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -2027,23 +2270,48 @@ class PopupMenuForRack extends PopupMenuFactory {
 								if (inverterEfficiencyPercentage < SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE || inverterEfficiencyPercentage > SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Inverter efficiency must be between " + SolarPanel.MIN_INVERTER_EFFICIENCY_PERCENTAGE + "% and " + SolarPanel.MAX_INVERTER_EFFICIENCY_PERCENTAGE + "%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(inverterEfficiencyPercentage * 0.01 - s.getInverterEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetInverterEfficiencyForRackCommand c = new SetInverterEfficiencyForRackCommand(r);
-										s.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetInverterEfficiencyForRackCommand c = new SetInverterEfficiencyForRackCommand(r);
+											s.setInverterEfficiency(inverterEfficiencyPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetInverterEfficiencyForRacksOnFoundationCommand c = new SetInverterEfficiencyForRacksOnFoundationCommand(foundation);
-										foundation.setInverterEfficiencyForRacks(inverterEfficiencyPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (Math.abs(inverterEfficiencyPercentage * 0.01 - x.getSolarPanel().getInverterEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetInverterEfficiencyForRacksOnFoundationCommand c = new SetInverterEfficiencyForRacksOnFoundationCommand(foundation);
+											foundation.setInverterEfficiencyForRacks(inverterEfficiencyPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetInverterEfficiencyForAllRacksCommand c = new SetInverterEfficiencyForAllRacksCommand();
-										Scene.getInstance().setInverterEfficiencyForAllRacks(inverterEfficiencyPercentage * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (Math.abs(inverterEfficiencyPercentage * 0.01 - x.getSolarPanel().getInverterEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetInverterEfficiencyForAllRacksCommand c = new SetInverterEfficiencyForAllRacksCommand();
+											Scene.getInstance().setInverterEfficiencyForAllRacks(inverterEfficiencyPercentage * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -2094,31 +2362,56 @@ class PopupMenuForRack extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Disable tracker for " + partInfo + "</html>";
+					final String title = "<html>Remove tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>No tracker will be used.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Disable solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Remove solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
+					boolean changed = rack.getTracker() != Trackable.NO_TRACKER;
 					if (rb1.isSelected()) {
-						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack);
-						rack.setTracker(Trackable.NO_TRACKER);
-						rack.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (changed) {
+							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "No Tracker");
+							rack.setTracker(Trackable.NO_TRACKER);
+							rack.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
-						foundation.setTrackerForRacks(Trackable.NO_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : foundation.getRacks()) {
+								if (x.getTracker() != Trackable.NO_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "No Tracker for All Racks on Selected Foundation");
+							foundation.setTrackerForRacks(Trackable.NO_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
-						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
-						Scene.getInstance().setTrackerForAllRacks(Trackable.NO_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : Scene.getInstance().getAllRacks()) {
+								if (x.getTracker() != Trackable.NO_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "No Tracker for All Racks");
+							Scene.getInstance().setTrackerForAllRacks(Trackable.NO_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 2;
 					}
-					updateAfterEdit();
+					if (changed) {
+						updateAfterEdit();
+					}
 				}
 			});
 
@@ -2160,26 +2453,26 @@ class PopupMenuForRack extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Enable horizontal single-axis tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2><hr></html>";
+					final String title = "<html>Set horizontal single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>A horizontal single-axis tracker (HSAT) rotates about the north-south axis<br>to follow the sun from east to west during the day.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable horizontal single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set horizontal single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
 					if (rb1.isSelected()) {
-						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack);
+						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Horizontal Single-Axis Tracker");
 						rack.setTracker(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						rack.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Horizontal Single-Axis Tracker for All Racks on Selected Foundation");
 						foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
-						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Horizontal Single-Axis Tracker for All Racks");
 						Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 2;
@@ -2226,26 +2519,26 @@ class PopupMenuForRack extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Enable vertical single-axis tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2><hr></html>";
+					final String title = "<html>Set vertical single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>A vertical single-axis tracker (VSAT) rotates about an axis perpendicular to the ground<br>and follow the sun from east to west during the day.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable vertical single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set vertical single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
 					if (rb1.isSelected()) {
-						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack);
+						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Vertical Single-Axis Tracker");
 						rack.setTracker(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						rack.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Vertical Single-Axis Tracker for All Racks on Selected Foundation");
 						foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
-						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Vertical Single-Axis Tracker for All Racks");
 						Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 2;
@@ -2292,26 +2585,26 @@ class PopupMenuForRack extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Enable altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
+					final String title = "<html>Set altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun<br>all the time during the day.<hr></html>";
 					final Object[] params = { title, footnote, panel };
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Enable altitude-azimuth dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set altitude-azimuth dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
 					if (rb1.isSelected()) {
-						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack);
+						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Dual-Axis Tracker");
 						rack.setTracker(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						rack.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack);
+						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Dual-Axis Tracker for All Racks on Selected Foundation");
 						foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
-						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack);
+						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Dual-Axis Tracker for All Racks");
 						Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						selectedScopeIndex = 2;

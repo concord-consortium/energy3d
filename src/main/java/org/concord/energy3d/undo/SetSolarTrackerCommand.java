@@ -12,10 +12,12 @@ public class SetSolarTrackerCommand extends MyAbstractUndoableEdit {
 	private final int oldValue;
 	private int newValue;
 	private final Trackable tracker;
+	private final String presentationName;
 
-	public SetSolarTrackerCommand(final Trackable tracker) {
+	public SetSolarTrackerCommand(final Trackable tracker, final String presentationName) {
 		this.tracker = tracker;
 		oldValue = tracker.getTracker();
+		this.presentationName = presentationName;
 	}
 
 	public Trackable getTracker() {
@@ -47,16 +49,7 @@ public class SetSolarTrackerCommand extends MyAbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		switch (oldValue) {
-		case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			return "Enable Dual-Axis Tracker";
-		case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-			return "Enable Horizontal Single-Axis Tracker";
-		case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-			return "Enable Vertical Single-Axis Tracker";
-		default:
-			return "Disable Tracker";
-		}
+		return presentationName;
 	}
 
 }

@@ -362,7 +362,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Disable tracker for " + partInfo + "</html>";
+					final String title = "<html>Remove tracker for " + partInfo + "</html>";
 					final String footnote = "<html><hr><font size=2>No tracker will be used.<hr></html>";
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -374,19 +374,19 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "No Tracker");
 								sp.setTracker(Trackable.NO_TRACKER);
 								sp.draw();
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
+								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "No Tracker for All Solar Panels on Selected Foundation");
 								foundation.setTrackerForSolarPanels(Trackable.NO_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
+								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "No Tracker for All Solar Panels");
 								Scene.getInstance().setTrackerForAllSolarPanels(Trackable.NO_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;
@@ -438,8 +438,8 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Enable horizontal single-axis tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2><hr></html>";
+					final String title = "<html>Set horizontal single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>A horizontal single-axis tracker (HSAT) rotates about the north-south axis<br>to follow the sun from east to west during the day.<hr></html>";
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Horizontal Single-Axis Tracker");
@@ -450,7 +450,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Horizontal Single-Axis Tracker");
 								sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 								sp.draw();
 								SceneManager.getInstance().refresh();
@@ -458,12 +458,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
+								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Horizontal Single-Axis Tracker for All Solar Panels on Selected Foundation");
 								foundation.setTrackerForSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
+								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Horizontal Single-Axis Tracker for All Solar Panels");
 								Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;
@@ -515,8 +515,8 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Enable vertical single-axis tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2><hr></html>";
+					final String title = "<html>Set vertical single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>A vertical single-axis tracker (VSAT) rotates about an axis perpendicular to the ground<br>and follow the sun from east to west during the day.<hr></html>";
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Vertical Single-Axis Tracker");
@@ -527,7 +527,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Vertical Single-Axis Tracker");
 								sp.setTracker(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 								sp.draw();
 								SceneManager.getInstance().refresh();
@@ -535,12 +535,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
+								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Vertical Single-Axis Tracker for All Solar Panels on Selected Foundation");
 								foundation.setTrackerForSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
+								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Vertical Single-Axis Tracker for All Solar Panels");
 								Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;
@@ -592,8 +592,8 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						rb3.setSelected(true);
 						break;
 					}
-					final String title = "<html>Enable altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun exactly.<hr></html>";
+					final String title = "<html>Set altitude-azimuth dual-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The Alt/Az dual-axis solar tracker will rotate the solar panel to face the sun<br>all the time during the day.<hr></html>";
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, panel }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
 					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Altitude-Azimuth Dual-Axis Tracker");
@@ -604,7 +604,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							break;
 						} else {
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp);
+								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Dual-Axis Tracker");
 								sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 								sp.draw();
 								SceneManager.getInstance().refresh();
@@ -612,12 +612,12 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp);
+								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Dual-Axis Tracker for All Solar Panels on Selected Foundation");
 								foundation.setTrackerForSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp);
+								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Dual-Axis Tracker for All Solar Panels");
 								Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;

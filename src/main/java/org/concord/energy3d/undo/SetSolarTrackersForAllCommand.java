@@ -19,8 +19,9 @@ public class SetSolarTrackersForAllCommand extends MyAbstractUndoableEdit {
 	private final List<SolarPanel> panels;
 	private List<Rack> racks;
 	private final Trackable tracker;
+	private final String presentationName;
 
-	public SetSolarTrackersForAllCommand(final Trackable tracker) {
+	public SetSolarTrackersForAllCommand(final Trackable tracker, final String presentationName) {
 		if (tracker instanceof SolarPanel) {
 			panels = Scene.getInstance().getAllSolarPanels();
 			final int n = panels.size();
@@ -43,6 +44,7 @@ public class SetSolarTrackersForAllCommand extends MyAbstractUndoableEdit {
 			oldValues = null;
 		}
 		this.tracker = tracker;
+		this.presentationName = presentationName;
 	}
 
 	public Trackable getTracker() {
@@ -97,31 +99,7 @@ public class SetSolarTrackersForAllCommand extends MyAbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		if (panels != null) {
-			switch (panels.get(0).getTracker()) {
-			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-				return "Enable Dual-Axis Tracker for All Solar Panels";
-			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-				return "Enable Horizontal Single-Axis Tracker for All Solar Panels";
-			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-				return "Enable Vertical Single-Axis Tracker for All Solar Panels";
-			default:
-				return "Disable Tracker for All Solar Panels";
-			}
-		} else if (racks != null) {
-			switch (racks.get(0).getTracker()) {
-			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-				return "Enable Dual-Axis Tracker for All Racks";
-			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-				return "Enable Horizontal Single-Axis Tracker for All Racks";
-			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-				return "Enable Vertical Single-Axis Tracker for All Racks";
-			default:
-				return "Disable Tracker for All Racks";
-			}
-		} else {
-			return "Change Trackers";
-		}
+		return presentationName;
 	}
 
 }

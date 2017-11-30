@@ -20,8 +20,9 @@ public class SetSolarTrackersOnFoundationCommand extends MyAbstractUndoableEdit 
 	private final List<SolarPanel> solarPanels;
 	private final List<Rack> racks;
 	private final Trackable tracker;
+	private final String presentationName;
 
-	public SetSolarTrackersOnFoundationCommand(final Foundation foundation, final Trackable tracker) {
+	public SetSolarTrackersOnFoundationCommand(final Foundation foundation, final Trackable tracker, final String presentationName) {
 		this.foundation = foundation;
 		int n = 0;
 		if (tracker instanceof SolarPanel) {
@@ -46,6 +47,7 @@ public class SetSolarTrackersOnFoundationCommand extends MyAbstractUndoableEdit 
 			oldValues = null;
 		}
 		this.tracker = tracker;
+		this.presentationName = presentationName;
 	}
 
 	public Trackable getTracker() {
@@ -104,30 +106,7 @@ public class SetSolarTrackersOnFoundationCommand extends MyAbstractUndoableEdit 
 
 	@Override
 	public String getPresentationName() {
-		if (solarPanels != null) {
-			switch (solarPanels.get(0).getTracker()) {
-			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-				return "Enable Dual-Axis Tracker for All Solar Panels on Selected Foundation";
-			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-				return "Enable Horizontal Single-Axis Tracker for All Solar Panels on Selected Foundation";
-			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-				return "Enable Vertical Single-Axis Tracker for All Solar Panels on Selected Foundation";
-			default:
-				return "Disable Tracker for All Solar Panels on Selected Foundation";
-			}
-		} else if (racks != null) {
-			switch (racks.get(0).getTracker()) {
-			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
-				return "Enable Dual-Axis Tracker for All Racks on Selected Foundation";
-			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
-				return "Enable Horizontal Single-Axis Tracker for All Racks on Selected Foundation";
-			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
-				return "Enable Vertical Single-Axis Tracker for All Racks on Selected Foundation";
-			default:
-				return "Disable Tracker for All Racks on Selected Foundation";
-			}
-		}
-		return "Change Tracker on Selected Foundation";
+		return presentationName;
 	}
 
 }
