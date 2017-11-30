@@ -87,14 +87,16 @@ class PopupMenuForRoof extends PopupMenuFactory {
 								if (val < 0 || val > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Overhang value must be between " + min + " and 10.", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									final ChangeRoofOverhangCommand c = new ChangeRoofOverhangCommand(roof);
-									roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
-									roof.draw();
-									final Foundation f = roof.getTopContainer();
-									f.drawChildren();
-									SceneManager.getInstance().refresh();
-									updateAfterEdit();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (Math.abs(val - roof.getOverhangLength() * Scene.getInstance().getAnnotationScale()) > 0.000001) {
+										final ChangeRoofOverhangCommand c = new ChangeRoofOverhangCommand(roof);
+										roof.setOverhangLength(val / Scene.getInstance().getAnnotationScale());
+										roof.draw();
+										final Foundation f = roof.getTopContainer();
+										f.drawChildren();
+										SceneManager.getInstance().refresh();
+										updateAfterEdit();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									break;
 								}
 							} catch (final NumberFormatException exception) {

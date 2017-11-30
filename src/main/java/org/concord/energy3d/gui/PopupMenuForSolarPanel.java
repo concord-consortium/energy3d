@@ -373,25 +373,50 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = sp.getTracker() != Trackable.NO_TRACKER;
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "No Tracker");
-								sp.setTracker(Trackable.NO_TRACKER);
-								sp.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "No Tracker");
+									sp.setTracker(Trackable.NO_TRACKER);
+									sp.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "No Tracker for All Solar Panels on Selected Foundation");
-								foundation.setTrackerForSolarPanels(Trackable.NO_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (x.getTracker() != Trackable.NO_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "No Tracker for All Solar Panels on Selected Foundation");
+									foundation.setTrackerForSolarPanels(Trackable.NO_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "No Tracker for All Solar Panels");
-								Scene.getInstance().setTrackerForAllSolarPanels(Trackable.NO_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (x.getTracker() != Trackable.NO_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "No Tracker for All Solar Panels");
+									Scene.getInstance().setTrackerForAllSolarPanels(Trackable.NO_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -449,26 +474,51 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = sp.getTracker() != Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER;
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Horizontal Single-Axis Tracker");
-								sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
-								sp.draw();
-								SceneManager.getInstance().refresh();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Horizontal Single-Axis Tracker");
+									sp.setTracker(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+									sp.draw();
+									SceneManager.getInstance().refresh();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Horizontal Single-Axis Tracker for All Solar Panels on Selected Foundation");
-								foundation.setTrackerForSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (x.getTracker() != Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Horizontal Single-Axis Tracker for All Solar Panels on Selected Foundation");
+									foundation.setTrackerForSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Horizontal Single-Axis Tracker for All Solar Panels");
-								Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (x.getTracker() != Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Horizontal Single-Axis Tracker for All Solar Panels");
+									Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.HORIZONTAL_SINGLE_AXIS_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -526,26 +576,51 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = sp.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER;
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Vertical Single-Axis Tracker");
-								sp.setTracker(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
-								sp.draw();
-								SceneManager.getInstance().refresh();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Vertical Single-Axis Tracker");
+									sp.setTracker(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+									sp.draw();
+									SceneManager.getInstance().refresh();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Vertical Single-Axis Tracker for All Solar Panels on Selected Foundation");
-								foundation.setTrackerForSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (x.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Vertical Single-Axis Tracker for All Solar Panels on Selected Foundation");
+									foundation.setTrackerForSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Vertical Single-Axis Tracker for All Solar Panels");
-								Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (x.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Vertical Single-Axis Tracker for All Solar Panels");
+									Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.VERTICAL_SINGLE_AXIS_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -603,26 +678,51 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
+							boolean changed = sp.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER;
 							if (rb1.isSelected()) {
-								final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Dual-Axis Tracker");
-								sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-								sp.draw();
-								SceneManager.getInstance().refresh();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "Dual-Axis Tracker");
+									sp.setTracker(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+									sp.draw();
+									SceneManager.getInstance().refresh();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
 								final Foundation foundation = sp.getTopContainer();
-								final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Dual-Axis Tracker for All Solar Panels on Selected Foundation");
-								foundation.setTrackerForSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : foundation.getSolarPanels()) {
+										if (x.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, sp, "Dual-Axis Tracker for All Solar Panels on Selected Foundation");
+									foundation.setTrackerForSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Dual-Axis Tracker for All Solar Panels");
-								Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+										if (x.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(sp, "Dual-Axis Tracker for All Solar Panels");
+									Scene.getInstance().setTrackerForAllSolarPanels(SolarPanel.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}

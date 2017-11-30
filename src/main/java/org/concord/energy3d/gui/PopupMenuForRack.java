@@ -2459,25 +2459,50 @@ class PopupMenuForRack extends PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set horizontal single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
+					boolean changed = rack.getTracker() != Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER;
 					if (rb1.isSelected()) {
-						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Horizontal Single-Axis Tracker");
-						rack.setTracker(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
-						rack.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (changed) {
+							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Horizontal Single-Axis Tracker");
+							rack.setTracker(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+							rack.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Horizontal Single-Axis Tracker for All Racks on Selected Foundation");
-						foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : foundation.getRacks()) {
+								if (x.getTracker() != Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Horizontal Single-Axis Tracker for All Racks on Selected Foundation");
+							foundation.setTrackerForRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
-						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Horizontal Single-Axis Tracker for All Racks");
-						Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : Scene.getInstance().getAllRacks()) {
+								if (x.getTracker() != Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Horizontal Single-Axis Tracker for All Racks");
+							Scene.getInstance().setTrackerForAllRacks(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 2;
 					}
-					updateAfterEdit();
+					if (changed) {
+						updateAfterEdit();
+					}
 				}
 			});
 
@@ -2525,25 +2550,50 @@ class PopupMenuForRack extends PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set vertical single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
+					boolean changed = rack.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER;
 					if (rb1.isSelected()) {
-						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Vertical Single-Axis Tracker");
-						rack.setTracker(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-						rack.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (changed) {
+							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Vertical Single-Axis Tracker");
+							rack.setTracker(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+							rack.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Vertical Single-Axis Tracker for All Racks on Selected Foundation");
-						foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : foundation.getRacks()) {
+								if (x.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Vertical Single-Axis Tracker for All Racks on Selected Foundation");
+							foundation.setTrackerForRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
-						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Vertical Single-Axis Tracker for All Racks");
-						Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : Scene.getInstance().getAllRacks()) {
+								if (x.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Vertical Single-Axis Tracker for All Racks");
+							Scene.getInstance().setTrackerForAllRacks(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 2;
 					}
-					updateAfterEdit();
+					if (changed) {
+						updateAfterEdit();
+					}
 				}
 			});
 
@@ -2591,25 +2641,50 @@ class PopupMenuForRack extends PopupMenuFactory {
 					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set altitude-azimuth dual-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 						return;
 					}
+					boolean changed = rack.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER;
 					if (rb1.isSelected()) {
-						final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Dual-Axis Tracker");
-						rack.setTracker(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-						rack.draw();
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (changed) {
+							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Dual-Axis Tracker");
+							rack.setTracker(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+							rack.draw();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 0;
 					} else if (rb2.isSelected()) {
 						final Foundation foundation = rack.getTopContainer();
-						final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Dual-Axis Tracker for All Racks on Selected Foundation");
-						foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : foundation.getRacks()) {
+								if (x.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Dual-Axis Tracker for All Racks on Selected Foundation");
+							foundation.setTrackerForRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 1;
 					} else if (rb3.isSelected()) {
-						final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Dual-Axis Tracker for All Racks");
-						Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+						if (!changed) {
+							for (final Rack x : Scene.getInstance().getAllRacks()) {
+								if (x.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Dual-Axis Tracker for All Racks");
+							Scene.getInstance().setTrackerForAllRacks(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 						selectedScopeIndex = 2;
 					}
-					updateAfterEdit();
+					if (changed) {
+						updateAfterEdit();
+					}
 				}
 			});
 
