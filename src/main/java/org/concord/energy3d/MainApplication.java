@@ -16,7 +16,7 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.agents.Agent;
-import org.concord.energy3d.agents.ConformanceAgent;
+import org.concord.energy3d.agents.ConformanceChecker;
 import org.concord.energy3d.agents.EventMiner;
 import org.concord.energy3d.agents.EventMiner2;
 import org.concord.energy3d.agents.EventMiner3;
@@ -53,7 +53,7 @@ public class MainApplication {
 
 		agents = new ArrayList<Agent>();
 		// TODO: temporary test code below
-		agents.add(new ConformanceAgent("Conformance Agent"));
+		agents.add(new ConformanceChecker("Conformance Checker"));
 		agents.add(new EventMiner("Event Miner"));
 		agents.add(new EventMiner2("Event Miner 2"));
 		agents.add(new EventMiner3("Event Miner 3"));

@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.undo.UndoableEdit;
 
+import org.concord.energy3d.agents.EventUtil;
 import org.concord.energy3d.gui.BuildingDailyEnergyGraph;
 import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Building;
@@ -1095,9 +1096,14 @@ public class TimeSeriesLogger {
 
 	public void close() {
 		if (writer != null) {
+			logEventString();
 			writer.write("]\n}");
 			writer.close();
 		}
+	}
+
+	private void logEventString() {
+		writer.write(",{\"Event String\":" + "\"" + EventUtil.eventsToString(null, 10000, null) + "\"}");
 	}
 
 	public void logAction() {

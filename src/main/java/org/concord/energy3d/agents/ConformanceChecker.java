@@ -1,5 +1,6 @@
 package org.concord.energy3d.agents;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
@@ -10,17 +11,17 @@ import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.Util;
 
 /**
- * Conformance analysis
+ * Conformance checking (https://en.wikipedia.org/wiki/Conformance_checking) is a process mining technique to compare a process model with an event log of the same process.
  * 
  * @author Charles Xie
  *
  */
-public class ConformanceAgent implements Agent {
+public class ConformanceChecker implements Agent {
 
 	private final String name;
 	private String eventString;
 
-	public ConformanceAgent(final String name) {
+	public ConformanceChecker(final String name) {
 		this.name = name;
 	}
 
@@ -36,6 +37,29 @@ public class ConformanceAgent implements Agent {
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 
+	MyEvent idChangeEvent() {
+		final List<MyEvent> u = EventUtil.getEvents(ChangePartUValueCommand.class);
+		if (u.size() < 2) {
+			return null;
+		}
+		long oldId = -1;
+		long newId = -1;
+		for (final MyEvent x : u) {
+			if (x instanceof ChangePartUValueCommand) {
+				final ChangePartUValueCommand command = (ChangePartUValueCommand) x;
+				newId = command.getPart().getId();
+				if (oldId == -1) { // first
+					oldId = newId;
+				} else {
+					if (newId != oldId) {
+						return x;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public void actuate() {
 		System.out.println(this + " Actuating: " + eventString);
@@ -45,15 +69,20 @@ public class ConformanceAgent implements Agent {
 		final int countQ = Util.countMatch(Pattern.compile("Q+?").matcher(eventString));
 		final int countU = Util.countMatch(Pattern.compile("U+?").matcher(eventString));
 		if (countQ < 2) {
-			msg += "Did you forget to answer all the questions?";
+			msg += "Did you forget to answer the pre/post-test questions?";
 		} else if (countA == 0) {
-			msg += "You have never run analysis.";
+			msg += "You have never run an analysis.";
 		} else if (countU == 0) {
-			msg += "You have never changed U-value";
+			msg += "You have never changed the U-value.";
 		} else if (countC == 0) {
-			msg += "Did you forget to investigate the relationship between U-value and season?";
+			msg += "Did you forget to investigate the effect of the U-value in a different season?";
 		} else {
-			msg += "Thank you for taking this task!";
+			final MyEvent startEvent = idChangeEvent();
+			if (startEvent == null) {
+				msg += "Did you forget to investigate the effect of the U-value of a different wall?";
+			} else {
+				msg += "Thank you for completing this task!";
+			}
 		}
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
 	}

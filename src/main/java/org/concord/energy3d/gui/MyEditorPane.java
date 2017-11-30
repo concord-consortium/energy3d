@@ -63,7 +63,6 @@ public class MyEditorPane {
 		editorPane = new JEditorPane();
 		editorPane.setEditable(false);
 		editorPane.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-		editorPane.setToolTipText("<html>Double-click to enlarge this window<br>Right-click to open a popup menu for editing</html>");
 		editorPane.addHyperlinkListener(new HyperlinkListener() {
 			@Override
 			public void hyperlinkUpdate(final HyperlinkEvent e) {
@@ -165,6 +164,11 @@ public class MyEditorPane {
 						popupMenu.show(editorPane, e.getX(), e.getY());
 					}
 				}
+			}
+
+			@Override
+			public void mouseEntered(final MouseEvent e) {
+				editorPane.setToolTipText("<html>Double-click to enlarge this window" + (Scene.isInternalFile() ? "" : "<br>Right-click to open a popup menu for editing") + "</html>");
 			}
 		});
 	}
@@ -275,7 +279,7 @@ public class MyEditorPane {
 			}
 		}
 
-		else if (act.startsWith("Event Miner") || "Conformance Agent".equals(act)) {
+		else if (act.startsWith("Event Miner") || act.startsWith("Conformance Checker")) {
 			final Agent a = MainApplication.getAgent(act);
 			if (a != null) {
 				a.actuate();
