@@ -237,17 +237,17 @@ public class MyEditorPane {
 						document.addDocumentListener(new DocumentListener() {
 							@Override
 							public void removeUpdate(final DocumentEvent e) {
-								takeTextFieldAction(a, n, d);
+								textFieldUpdated(a, n, d);
 							}
 
 							@Override
 							public void insertUpdate(final DocumentEvent e) {
-								takeTextFieldAction(a, n, d);
+								textFieldUpdated(a, n, d);
 							}
 
 							@Override
 							public void changedUpdate(final DocumentEvent e) {
-								takeTextFieldAction(a, n, d);
+								textFieldUpdated(a, n, d);
 							}
 						});
 					}
@@ -268,7 +268,7 @@ public class MyEditorPane {
 								@Override
 								public void itemStateChanged(final ItemEvent e) {
 									if (e.getStateChange() == ItemEvent.SELECTED) {
-										takeButtonAction(a, qm, bm);
+										buttonActionPerformed(a, qm, bm);
 									}
 								}
 							});
@@ -276,7 +276,7 @@ public class MyEditorPane {
 							buttonModel.addActionListener(new ActionListener() {
 								@Override
 								public void actionPerformed(final ActionEvent e) {
-									takeButtonAction(a, qm, bm);
+									buttonActionPerformed(a, qm, bm);
 								}
 							});
 						}
@@ -288,7 +288,7 @@ public class MyEditorPane {
 
 	}
 
-	private void takeTextFieldAction(final String act, final String name, final PlainDocument document) {
+	private void textFieldUpdated(final String act, final String name, final PlainDocument document) {
 		if ("Data Collector".equals(act)) {
 			String t = null;
 			try {
@@ -302,7 +302,7 @@ public class MyEditorPane {
 		}
 	}
 
-	private void takeButtonAction(final String act, final QuestionnaireModel questionnaireModel, final DefaultButtonModel buttonModel) {
+	private void buttonActionPerformed(final String act, final QuestionnaireModel questionnaireModel, final DefaultButtonModel buttonModel) {
 
 		if (act == null) {
 			return;

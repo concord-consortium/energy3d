@@ -35,13 +35,13 @@ import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeMirrorReflectanceCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
-import org.concord.energy3d.undo.ChangeReflectanceForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllMirrorsCommand;
@@ -901,7 +901,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 									boolean changed = Math.abs(val * 0.01 - m.getReflectance()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeMirrorReflectanceCommand c = new ChangeMirrorReflectanceCommand(m);
+											final ChangeSolarReflectorReflectanceCommand c = new ChangeSolarReflectorReflectanceCommand(m);
 											m.setReflectance(val * 0.01);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
@@ -917,7 +917,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 											}
 										}
 										if (changed) {
-											final ChangeFoundationMirrorReflectanceCommand c = new ChangeFoundationMirrorReflectanceCommand(foundation);
+											final ChangeFoundationSolarReflectorReflectanceCommand c = new ChangeFoundationSolarReflectorReflectanceCommand(foundation, m.getClass());
 											foundation.setReflectanceForMirrors(val * 0.01);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
@@ -932,7 +932,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 											}
 										}
 										if (changed) {
-											final ChangeReflectanceForAllMirrorsCommand c = new ChangeReflectanceForAllMirrorsCommand();
+											final ChangeReflectanceForAllSolarReflectorsCommand c = new ChangeReflectanceForAllSolarReflectorsCommand(m.getClass());
 											Scene.getInstance().setReflectanceForAllSolarReflectors(val * 0.01, m.getClass());
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}

@@ -306,7 +306,7 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(createLabel("Time: "), gbc_timeLabel);
 
 		timeSpinner = createSpinner(new SpinnerDateModel());
-		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "H:mm"));
+		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "h:mm a"));
 		timeSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
 			private Date lastDate;
