@@ -18,10 +18,11 @@ public class EventMiner implements Agent {
 
 	final String name;
 	String eventString;
-	String targePattern = "(U[_\\*\\?]*A)+?";
+	String targePattern = "(U[_\\*\\?D]*A)+?";
 
 	FeedbackPool feedbackOnAnalysisCheck;
 	FeedbackPool feedbackOnUValueCheck;
+	FeedbackPool feedbackOnDataCollectorCheck;
 	FeedbackPool feedbackOnTargetPattern;
 
 	public EventMiner(final String name) {
@@ -32,6 +33,8 @@ public class EventMiner implements Agent {
 		feedbackOnUValueCheck = new FeedbackPool(1, 2);
 		feedbackOnUValueCheck.setItem(0, 0, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
 		feedbackOnUValueCheck.setItem(0, 1, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
+		feedbackOnDataCollectorCheck = new FeedbackPool(1, 1);
+		feedbackOnDataCollectorCheck.setItem(0, 0, "You haven't collected any data in the data tables yet.");
 		feedbackOnTargetPattern = new FeedbackPool(4, 1);
 		feedbackOnTargetPattern.setItem(0, 0, "You should run analysis after changing U-value.");
 		feedbackOnTargetPattern.setItem(1, 0, "You ran only one analysis after changing U-value.<br>Is it sufficient to draw a conclusion?");
@@ -46,7 +49,7 @@ public class EventMiner implements Agent {
 
 	@Override
 	public void sense(final MyEvent e) {
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000, null);
+		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class }, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 
@@ -61,20 +64,28 @@ public class EventMiner implements Agent {
 			msg += feedbackOnAnalysisCheck.getCurrentItem(0);
 			feedbackOnAnalysisCheck.forward(0);
 		} else {
-			p = Pattern.compile("U+?");
+			p = Pattern.compile("D+?");
 			m = p.matcher(eventString);
 			c = Util.countMatch(m);
 			if (c == 0) {
-				msg += feedbackOnUValueCheck.getCurrentItem(0);
-				feedbackOnUValueCheck.forward(0);
+				msg += feedbackOnDataCollectorCheck.getCurrentItem(0);
+				feedbackOnDataCollectorCheck.forward(0);
 			} else {
-				p = Pattern.compile(targePattern);
+				p = Pattern.compile("U+?");
 				m = p.matcher(eventString);
 				c = Util.countMatch(m);
-				if (c >= feedbackOnTargetPattern.getNumberOfCases()) {
-					c = feedbackOnTargetPattern.getNumberOfCases() - 1;
+				if (c == 0) {
+					msg += feedbackOnUValueCheck.getCurrentItem(0);
+					feedbackOnUValueCheck.forward(0);
+				} else {
+					p = Pattern.compile(targePattern);
+					m = p.matcher(eventString);
+					c = Util.countMatch(m);
+					if (c >= feedbackOnTargetPattern.getNumberOfCases()) {
+						c = feedbackOnTargetPattern.getNumberOfCases() - 1;
+					}
+					msg += feedbackOnTargetPattern.getCurrentItem(c);
 				}
-				msg += feedbackOnTargetPattern.getCurrentItem(c);
 			}
 		}
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);

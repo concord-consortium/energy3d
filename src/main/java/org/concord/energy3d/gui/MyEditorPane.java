@@ -17,17 +17,22 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.ElementIterator;
+import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.agents.Agent;
+import org.concord.energy3d.agents.DataCollectionEvent;
 import org.concord.energy3d.agents.EventFrequency;
 import org.concord.energy3d.agents.EventString;
 import org.concord.energy3d.agents.EventTimeSeries;
@@ -198,17 +203,20 @@ public class MyEditorPane {
 				final AttributeSet as = element.getAttributes();
 				final Enumeration<?> en = as.getAttributeNames();
 
-				// look for buttons
 				DefaultButtonModel buttonModel = null;
+				PlainDocument document = null;
 				String action = null;
 				String question = null;
 				String choice = null;
 				String key = null;
+				String dataName = null;
 				while (en.hasMoreElements()) {
 					final Object n = en.nextElement();
 					final Object v = as.getAttribute(n);
 					if (v instanceof DefaultButtonModel) {
 						buttonModel = (DefaultButtonModel) v;
+					} else if (v instanceof PlainDocument) {
+						document = (PlainDocument) v;
 					} else if (n.toString().equals("action")) {
 						action = v.toString();
 					} else if (n.toString().equals("question")) {
@@ -217,37 +225,61 @@ public class MyEditorPane {
 						choice = v.toString();
 					} else if (n.toString().equals("key")) {
 						key = v.toString();
+					} else if (n.toString().equals("data")) {
+						dataName = v.toString();
 					}
 				}
-				if (buttonModel != null && action != null) {
+				if (action != null) {
 					final String a = action;
-					final QuestionnaireModel qm;
-					if (question != null && choice != null) {
-						boolean isKey = false;
-						if ("yes".equalsIgnoreCase(key) || "true".equalsIgnoreCase(key)) {
-							isKey = true;
-						}
-						qm = new QuestionnaireModel(question, choice, isKey);
-					} else {
-						qm = null;
+					if (document != null) {
+						final String n = dataName;
+						final PlainDocument d = document;
+						document.addDocumentListener(new DocumentListener() {
+							@Override
+							public void removeUpdate(final DocumentEvent e) {
+								takeTextFieldAction(a, n, d);
+							}
+
+							@Override
+							public void insertUpdate(final DocumentEvent e) {
+								takeTextFieldAction(a, n, d);
+							}
+
+							@Override
+							public void changedUpdate(final DocumentEvent e) {
+								takeTextFieldAction(a, n, d);
+							}
+						});
 					}
-					final DefaultButtonModel bm = buttonModel;
-					if (buttonModel instanceof JToggleButton.ToggleButtonModel) {
-						buttonModel.addItemListener(new ItemListener() {
-							@Override
-							public void itemStateChanged(final ItemEvent e) {
-								if (e.getStateChange() == ItemEvent.SELECTED) {
-									interpret(a, qm, bm);
+					if (buttonModel != null) {
+						final QuestionnaireModel qm;
+						if (question != null && choice != null) {
+							boolean isKey = false;
+							if ("yes".equalsIgnoreCase(key) || "true".equalsIgnoreCase(key)) {
+								isKey = true;
+							}
+							qm = new QuestionnaireModel(question, choice, isKey);
+						} else {
+							qm = null;
+						}
+						final DefaultButtonModel bm = buttonModel;
+						if (buttonModel instanceof JToggleButton.ToggleButtonModel) {
+							buttonModel.addItemListener(new ItemListener() {
+								@Override
+								public void itemStateChanged(final ItemEvent e) {
+									if (e.getStateChange() == ItemEvent.SELECTED) {
+										takeButtonAction(a, qm, bm);
+									}
 								}
-							}
-						});
-					} else {
-						buttonModel.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(final ActionEvent e) {
-								interpret(a, qm, bm);
-							}
-						});
+							});
+						} else {
+							buttonModel.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(final ActionEvent e) {
+									takeButtonAction(a, qm, bm);
+								}
+							});
+						}
 					}
 				}
 
@@ -256,7 +288,21 @@ public class MyEditorPane {
 
 	}
 
-	private void interpret(final String act, final QuestionnaireModel questionnaireModel, final DefaultButtonModel buttonModel) {
+	private void takeTextFieldAction(final String act, final String name, final PlainDocument document) {
+		if ("Data Collector".equals(act)) {
+			String t = null;
+			try {
+				t = document.getText(0, document.getLength());
+			} catch (final BadLocationException e) {
+				e.printStackTrace();
+			}
+			if (t != null) {
+				MainApplication.addEvent(new DataCollectionEvent(Scene.getURL(), System.currentTimeMillis(), name, t));
+			}
+		}
+	}
+
+	private void takeButtonAction(final String act, final QuestionnaireModel questionnaireModel, final DefaultButtonModel buttonModel) {
 
 		if (act == null) {
 			return;

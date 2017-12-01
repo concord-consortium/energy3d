@@ -32,7 +32,7 @@ public class ConformanceChecker implements Agent {
 
 	@Override
 	public void sense(final MyEvent e) {
-		final Class<?>[] c = new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class, QuestionnaireEvent.class, OperationEvent.class };
+		final Class<?>[] c = new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class, QuestionnaireEvent.class, OperationEvent.class, DataCollectionEvent.class };
 		eventString = EventUtil.eventsToString(c, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
@@ -66,6 +66,7 @@ public class ConformanceChecker implements Agent {
 		String msg = "<html>";
 		final int countA = Util.countMatch(Pattern.compile("A+?").matcher(eventString));
 		final int countC = Util.countMatch(Pattern.compile("C+?").matcher(eventString));
+		final int countD = Util.countMatch(Pattern.compile("D+?").matcher(eventString));
 		final int countQ = Util.countMatch(Pattern.compile("Q+?").matcher(eventString));
 		final int countU = Util.countMatch(Pattern.compile("U+?").matcher(eventString));
 		if (countQ < 2) {
@@ -74,6 +75,8 @@ public class ConformanceChecker implements Agent {
 			msg += "You have never run an analysis.";
 		} else if (countU == 0) {
 			msg += "You have never changed the U-value.";
+		} else if (countD == 0) {
+			msg += "You have never collected any data.";
 		} else if (countC == 0) {
 			msg += "Did you forget to investigate the effect of the U-value in a different season?";
 		} else {
