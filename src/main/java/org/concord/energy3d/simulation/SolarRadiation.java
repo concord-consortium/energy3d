@@ -1605,17 +1605,21 @@ public class SolarRadiation {
 
 			data.u = data.p2.subtract(data.p0, null).normalizeLocal();
 			data.v = data.p1.subtract(data.p0, null).normalizeLocal();
+			onMesh.put(drawMesh, data);
+			if (updateTexture) {
+				updateTextureCoords(drawMesh);
+			}
 
 		}
 
-		// TODO: Temporarily allow the program to move forward behind this point even if normal is null
+		// TODO: Temporarily allow the program to move forward behind this point even if normal is null?
+		// onMesh.put(drawMesh, data);
+		// if (updateTexture) {
+		// updateTextureCoords(drawMesh);
+		// }
 
-		onMesh.put(drawMesh, data);
-
-		if (updateTexture) {
-			updateTextureCoords(drawMesh);
-		}
 		return data;
+
 	}
 
 	private MeshDataStore initMeshTextureDataOnRectangle(final Mesh mesh, final int rows, final int cols) {

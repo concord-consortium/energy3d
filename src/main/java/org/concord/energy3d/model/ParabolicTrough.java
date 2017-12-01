@@ -47,7 +47,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class ParabolicTrough extends HousePart implements SolarCollector, Labelable {
+public class ParabolicTrough extends HousePart implements SolarReflector, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private static final ColorRGBA SKY_BLUE = new ColorRGBA(135f / 256f, 206f / 256f, 250f / 256f, 1);
@@ -717,41 +717,49 @@ public class ParabolicTrough extends HousePart implements SolarCollector, Labela
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setOpticalEfficiency(final double opticalEfficiency) {
 		this.opticalEfficiency = opticalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getOpticalEfficiency() {
 		return opticalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setThermalEfficiency(final double thermalEfficiency) {
 		this.thermalEfficiency = thermalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getThermalEfficiency() {
 		return thermalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setReflectance(final double reflectance) {
 		this.reflectance = reflectance;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getReflectance() {
 		return reflectance;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setAbsorptance(final double absorptance) {
 		this.absorptance = absorptance;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getAbsorptance() {
 		return absorptance;
 	}

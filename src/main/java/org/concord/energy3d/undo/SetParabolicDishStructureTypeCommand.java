@@ -21,8 +21,12 @@ public class SetParabolicDishStructureTypeCommand extends MyAbstractUndoableEdit
 		return dish;
 	}
 
-	public double getOldValue() {
+	public int getOldValue() {
 		return oldValue;
+	}
+
+	public int getNewValue() {
+		return newValue;
 	}
 
 	@Override

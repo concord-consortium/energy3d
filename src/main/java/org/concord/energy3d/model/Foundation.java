@@ -1786,16 +1786,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return utilityBill;
 	}
 
-	public List<SolarCollector> getSolarCollectors() {
-		final List<SolarCollector> list = new ArrayList<SolarCollector>();
-		for (final HousePart p : children) {
-			if (p instanceof SolarCollector) {
-				list.add((SolarCollector) p);
-			}
-		}
-		return list;
-	}
-
 	// assuming that there may be multiple roofs on this foundation, return a list of them
 	public List<Roof> getRoofs() {
 		final List<Roof> roofs = new ArrayList<Roof>();
@@ -3005,48 +2995,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	// change properties of all the parabolic troughs on this foundation
 
-	public void setReflectanceForParabolicTroughs(final double reflectance) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setReflectance(reflectance);
-			}
-		}
-	}
-
-	public void setAbsorptanceForParabolicTroughs(final double absorptance) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setAbsorptance(absorptance);
-			}
-		}
-	}
-
-	public void setOpticalEfficiencyForParabolicTroughs(final double efficiency) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setOpticalEfficiency(efficiency);
-			}
-		}
-	}
-
-	public void setThermalEfficiencyForParabolicTroughs(final double efficiency) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setThermalEfficiency(efficiency);
-			}
-		}
-	}
-
-	public void setBaseHeightForParabolicTroughs(final double baseHeight) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setBaseHeight(baseHeight);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
-	}
-
 	public void setSizeForParabolicTroughs(final double length, final double width, final double unitLength) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicTrough) {
@@ -3109,22 +3057,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
-	public void setOpticalEfficiencyForParabolicDishes(final double efficiency) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setOpticalEfficiency(efficiency);
-			}
-		}
-	}
-
-	public void setThermalEfficiencyForParabolicDishes(final double efficiency) {
-		for (final HousePart p : children) {
-			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setThermalEfficiency(efficiency);
-			}
-		}
-	}
-
 	public void setBaseHeightForParabolicDishes(final double baseHeight) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicDish) {
@@ -3179,30 +3111,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	// change properties of all the Fresnel reflectors on this foundation
-
-	public void setReflectanceForFresnelReflectors(final double reflectance) {
-		for (final HousePart p : children) {
-			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setReflectance(reflectance);
-			}
-		}
-	}
-
-	public void setAbsorptanceForFresnelReflectors(final double absorptance) {
-		for (final HousePart p : children) {
-			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setAbsorptance(absorptance);
-			}
-		}
-	}
-
-	public void setOpticalEfficiencyForFresnelReflectors(final double efficiency) {
-		for (final HousePart p : children) {
-			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setOpticalEfficiency(efficiency);
-			}
-		}
-	}
 
 	public void setBaseHeightForFresnelReflectors(final double baseHeight) {
 		for (final HousePart p : children) {
@@ -3262,6 +3170,80 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	// common methods for solar collectors and reflectors
+
+	public List<SolarCollector> getSolarCollectors() {
+		final List<SolarCollector> list = new ArrayList<SolarCollector>();
+		for (final HousePart p : children) {
+			if (p instanceof SolarCollector) {
+				list.add((SolarCollector) p);
+			}
+		}
+		return list;
+	}
+
+	public List<SolarCollector> getSolarCollectors(final Class<?> c) {
+		final List<SolarCollector> list = new ArrayList<SolarCollector>();
+		for (final HousePart p : children) {
+			if (p instanceof SolarCollector && c.isInstance(p)) {
+				list.add((SolarCollector) p);
+			}
+		}
+		return list;
+	}
+
+	public List<SolarReflector> getSolarReflectors(final Class<?> c) {
+		final List<SolarReflector> list = new ArrayList<SolarReflector>();
+		for (final HousePart p : children) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				list.add((SolarReflector) p);
+			}
+		}
+		return list;
+	}
+
+	public void setBaseHeightForSolarCollectors(final double baseHeight, final Class<?> c) {
+		for (final HousePart p : children) {
+			if (p instanceof SolarCollector && c.isInstance(p)) {
+				((SolarCollector) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setReflectanceForSolarReflectors(final double reflectance, final Class<?> c) {
+		for (final HousePart p : children) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForSolarReflectors(final double absorptance, final Class<?> c) {
+		for (final HousePart p : children) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForSolarReflectors(final double efficiency, final Class<?> c) {
+		for (final HousePart p : children) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setThermalEfficiencyForSolarReflectors(final double efficiency, final Class<?> c) {
+		for (final HousePart p : children) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setThermalEfficiency(efficiency);
+			}
+		}
 	}
 
 	// change properties of all walls on this foundation

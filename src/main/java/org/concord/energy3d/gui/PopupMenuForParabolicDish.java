@@ -29,17 +29,32 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.ParabolicDishAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
+import org.concord.energy3d.undo.ChangeAbsorptanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllParabolicDishesCommand;
-import org.concord.energy3d.undo.ChangeFoundationParabolicDishBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationParabolicDishStructureTypeCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorAbsorptanceCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorThermalEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorAbsorptanceCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorOpticalEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorThermalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeStructureTypeForAllParabolicDishesCommand;
+import org.concord.energy3d.undo.ChangeThermalEfficiencyForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.SetFocalLengthForAllParabolicDishesCommand;
 import org.concord.energy3d.undo.SetFocalLengthForParabolicDishesOnFoundationCommand;
 import org.concord.energy3d.undo.SetParabolicDishFocalLengthCommand;
 import org.concord.energy3d.undo.SetParabolicDishLabelCommand;
+import org.concord.energy3d.undo.SetParabolicDishRibsCommand;
 import org.concord.energy3d.undo.SetParabolicDishStructureTypeCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
+import org.concord.energy3d.undo.SetRibsForAllParabolicDishesCommand;
+import org.concord.energy3d.undo.SetRibsForParabolicDishesOnFoundationCommand;
 import org.concord.energy3d.undo.SetRimRadiusForAllParabolicDishesCommand;
 import org.concord.energy3d.undo.SetRimRadiusForParabolicDishesOnFoundationCommand;
 import org.concord.energy3d.undo.ShowSunBeamCommand;
@@ -228,24 +243,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								if (nrib < 0) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Number of ribs cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = nrib != d.getNumberOfRibs();
 									if (rb1.isSelected()) {
-										// final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										d.setNumberOfRibs(nrib);
-										d.draw();
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetParabolicDishRibsCommand c = new SetParabolicDishRibsCommand(d);
+											d.setNumberOfRibs(nrib);
+											d.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setNumberOfRibsForParabolicDishes(nrib);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (x.getNumberOfRibs() != nrib) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetRibsForParabolicDishesOnFoundationCommand c = new SetRibsForParabolicDishesOnFoundationCommand(foundation);
+											foundation.setNumberOfRibsForParabolicDishes(nrib);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setNumberOfRibsForAllParabolicDishes(nrib);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (x.getNumberOfRibs() != nrib) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetRibsForAllParabolicDishesCommand c = new SetRibsForAllParabolicDishesCommand();
+											Scene.getInstance().setNumberOfRibsForAllParabolicDishes(nrib);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -344,24 +384,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								if (r < 1 || r > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish rim radius must be between 1 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(r - d.getRimRadius()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(d);
-										d.setRimRadius(r);
-										d.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(d);
+											d.setRimRadius(r);
+											d.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetRimRadiusForParabolicDishesOnFoundationCommand c = new SetRimRadiusForParabolicDishesOnFoundationCommand(foundation);
-										foundation.setRimRadiusForParabolicDishes(r);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (Math.abs(r - x.getRimRadius()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetRimRadiusForParabolicDishesOnFoundationCommand c = new SetRimRadiusForParabolicDishesOnFoundationCommand(foundation);
+											foundation.setRimRadiusForParabolicDishes(r);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetRimRadiusForAllParabolicDishesCommand c = new SetRimRadiusForAllParabolicDishesCommand();
-										Scene.getInstance().setRimRadiusForAllParabolicDishes(r);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (Math.abs(r - x.getRimRadius()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetRimRadiusForAllParabolicDishesCommand c = new SetRimRadiusForAllParabolicDishesCommand();
+											Scene.getInstance().setRimRadiusForAllParabolicDishes(r);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -441,24 +506,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								if (fl < 0.5 || fl > 10) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Focal length must be between 0.5 and 10 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(fl - d.getFocalLength()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetParabolicDishFocalLengthCommand c = new SetParabolicDishFocalLengthCommand(d);
-										d.setFocalLength(fl);
-										d.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetParabolicDishFocalLengthCommand c = new SetParabolicDishFocalLengthCommand(d);
+											d.setFocalLength(fl);
+											d.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetFocalLengthForParabolicDishesOnFoundationCommand c = new SetFocalLengthForParabolicDishesOnFoundationCommand(foundation);
-										foundation.setFocalLengthForParabolicDishes(fl);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (Math.abs(fl - x.getFocalLength()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetFocalLengthForParabolicDishesOnFoundationCommand c = new SetFocalLengthForParabolicDishesOnFoundationCommand(foundation);
+											foundation.setFocalLengthForParabolicDishes(fl);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetFocalLengthForAllParabolicDishesCommand c = new SetFocalLengthForAllParabolicDishesCommand();
-										Scene.getInstance().setFocalLengthForAllParabolicDishes(fl);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (Math.abs(fl - x.getFocalLength()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetFocalLengthForAllParabolicDishesCommand c = new SetFocalLengthForAllParabolicDishesCommand();
+											Scene.getInstance().setFocalLengthForAllParabolicDishes(fl);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -535,24 +625,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
+								boolean changed = Math.abs(val - d.getBaseHeight()) > 0.000001;
 								if (rb1.isSelected()) {
-									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(d);
-									d.setBaseHeight(val);
-									d.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(d);
+										d.setBaseHeight(val);
+										d.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationParabolicDishBaseHeightCommand c = new ChangeFoundationParabolicDishBaseHeightCommand(foundation);
-									foundation.setBaseHeightForParabolicDishes(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final ParabolicDish x : foundation.getParabolicDishes()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, d.getClass());
+										foundation.setBaseHeightForParabolicDishes(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeBaseHeightForAllParabolicDishesCommand c = new ChangeBaseHeightForAllParabolicDishesCommand();
-									Scene.getInstance().setBaseHeightForAllParabolicDishes(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(d.getClass());
+										Scene.getInstance().setBaseHeightForAllParabolicDishes(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -618,24 +733,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 							break;
 						} else {
 							final int structureType = comboBox.getSelectedIndex();
+							boolean changed = structureType != d.getStructureType();
 							if (rb1.isSelected()) {
-								final SetParabolicDishStructureTypeCommand c = new SetParabolicDishStructureTypeCommand(d);
-								d.setStructureType(structureType);
-								d.draw();
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (changed) {
+									final SetParabolicDishStructureTypeCommand c = new SetParabolicDishStructureTypeCommand(d);
+									d.setStructureType(structureType);
+									d.draw();
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
-								final ChangeFoundationParabolicDishStructureTypeCommand c = new ChangeFoundationParabolicDishStructureTypeCommand(foundation);
-								foundation.setStructureTypeForParabolicDishes(structureType);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final ParabolicDish x : foundation.getParabolicDishes()) {
+										if (structureType != x.getStructureType()) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeFoundationParabolicDishStructureTypeCommand c = new ChangeFoundationParabolicDishStructureTypeCommand(foundation);
+									foundation.setStructureTypeForParabolicDishes(structureType);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
-								final ChangeStructureTypeForAllParabolicDishesCommand c = new ChangeStructureTypeForAllParabolicDishesCommand();
-								Scene.getInstance().setStructureTypeForAllParabolicDishes(structureType);
-								SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (!changed) {
+									for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+										if (structureType != x.getStructureType()) {
+											changed = true;
+											break;
+										}
+									}
+								}
+								if (changed) {
+									final ChangeStructureTypeForAllParabolicDishesCommand c = new ChangeStructureTypeForAllParabolicDishesCommand();
+									Scene.getInstance().setStructureTypeForAllParabolicDishes(structureType);
+									SceneManager.getInstance().getUndoManager().addEdit(c);
+								}
 								selectedScopeIndex = 2;
 							}
-							updateAfterEdit();
+							if (changed) {
+								updateAfterEdit();
+							}
 							if (choice == options[0]) {
 								break;
 							}
@@ -807,24 +947,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - d.getReflectance()) > 0.000001;
 									if (rb1.isSelected()) {
-										// final ChangeParabolicTroughReflectanceCommand c = new ChangeParabolicTroughReflectanceCommand(t);
-										d.setReflectance(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorReflectanceCommand c = new ChangeSolarReflectorReflectanceCommand(d);
+											d.setReflectance(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final Foundation foundation = t.getTopContainer();
-										// final ChangeFoundationParabolicTroughReflectanceCommand c = new ChangeFoundationParabolicTroughReflectanceCommand(foundation);
-										// foundation.setReflectanceForParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final Foundation foundation = d.getTopContainer();
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getReflectance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorReflectanceCommand c = new ChangeFoundationSolarReflectorReflectanceCommand(foundation, d.getClass());
+											foundation.setReflectanceForSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final ChangeReflectanceForAllParabolicTroughsCommand c = new ChangeReflectanceForAllParabolicTroughsCommand();
-										// Scene.getInstance().setReflectanceForAllParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getReflectance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeReflectanceForAllSolarReflectorsCommand c = new ChangeReflectanceForAllSolarReflectorsCommand(d.getClass());
+											Scene.getInstance().setReflectanceForAllSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -903,24 +1068,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - d.getAbsorptance()) > 0.000001;
 									if (rb1.isSelected()) {
-										// final ChangeParabolicTroughAbsorptanceCommand c = new ChangeParabolicTroughAbsorptanceCommand(t);
-										d.setAbsorptance(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorAbsorptanceCommand c = new ChangeSolarReflectorAbsorptanceCommand(d);
+											d.setAbsorptance(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final Foundation foundation = t.getTopContainer();
-										// final ChangeFoundationParabolicTroughAbsorptanceCommand c = new ChangeFoundationParabolicTroughAbsorptanceCommand(foundation);
-										// foundation.setAbsorptanceForParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final Foundation foundation = d.getTopContainer();
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getAbsorptance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorAbsorptanceCommand c = new ChangeFoundationSolarReflectorAbsorptanceCommand(foundation, d.getClass());
+											foundation.setAbsorptanceForSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final ChangeAbsorptanceForAllParabolicTroughsCommand c = new ChangeAbsorptanceForAllParabolicTroughsCommand();
-										// Scene.getInstance().setAbsorptanceForAllParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getAbsorptance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeAbsorptanceForAllSolarReflectorsCommand c = new ChangeAbsorptanceForAllSolarReflectorsCommand(d.getClass());
+											Scene.getInstance().setAbsorptanceForAllSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -999,24 +1189,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								if (val < 20 || val > 80) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish optical efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - d.getOpticalEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										// final ChangeParabolicTroughOpticalEfficiencyCommand c = new ChangeParabolicTroughOpticalEfficiencyCommand(t);
-										d.setOpticalEfficiency(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorOpticalEfficiencyCommand c = new ChangeSolarReflectorOpticalEfficiencyCommand(d);
+											d.setOpticalEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										// final Foundation foundation = t.getTopContainer();
-										// final ChangeFoundationParabolicTroughOpticalEfficiencyCommand c = new ChangeFoundationParabolicTroughOpticalEfficiencyCommand(foundation);
-										// foundation.setOpticalEfficiencyForParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final Foundation foundation = d.getTopContainer();
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getOpticalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorOpticalEfficiencyCommand c = new ChangeFoundationSolarReflectorOpticalEfficiencyCommand(foundation, d.getClass());
+											foundation.setOpticalEfficiencyForSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final ChangeOpticalEfficiencyForAllParabolicTroughsCommand c = new ChangeOpticalEfficiencyForAllParabolicTroughsCommand();
-										// Scene.getInstance().setOpticalEfficiencyForAllParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getOpticalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeOpticalEfficiencyForAllSolarReflectorsCommand c = new ChangeOpticalEfficiencyForAllSolarReflectorsCommand(d.getClass());
+											Scene.getInstance().setOpticalEfficiencyForAllSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1095,24 +1310,49 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								if (val < 20 || val > 80) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish thermal efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - d.getThermalEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										// final ChangeParabolicTroughThermalEfficiencyCommand c = new ChangeParabolicTroughThermalEfficiencyCommand(t);
-										d.setThermalEfficiency(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorThermalEfficiencyCommand c = new ChangeSolarReflectorThermalEfficiencyCommand(d);
+											d.setThermalEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										/// final Foundation foundation = t.getTopContainer();
-										// final ChangeFoundationParabolicTroughThermalEfficiencyCommand c = new ChangeFoundationParabolicTroughThermalEfficiencyCommand(foundation);
-										// foundation.setThermalEfficiencyForParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										final Foundation foundation = d.getTopContainer();
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getThermalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorThermalEfficiencyCommand c = new ChangeFoundationSolarReflectorThermalEfficiencyCommand(foundation, d.getClass());
+											foundation.setThermalEfficiencyForSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										// final ChangeThermalEfficiencyForAllParabolicTroughsCommand c = new ChangeThermalEfficiencyForAllParabolicTroughsCommand();
-										// Scene.getInstance().setThermalEfficiencyForAllParabolicTroughs(val * 0.01);
-										// SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (Math.abs(val * 0.01 - x.getThermalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeThermalEfficiencyForAllSolarReflectorsCommand c = new ChangeThermalEfficiencyForAllSolarReflectorsCommand(d.getClass());
+											Scene.getInstance().setThermalEfficiencyForAllSolarReflectors(val * 0.01, d.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}

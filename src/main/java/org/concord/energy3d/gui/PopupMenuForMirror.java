@@ -33,12 +33,12 @@ import org.concord.energy3d.simulation.MirrorDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllMirrorsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationMirrorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationMirrorTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeMirrorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllMirrorsCommand;
@@ -694,7 +694,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeFoundationMirrorBaseHeightCommand c = new ChangeFoundationMirrorBaseHeightCommand(foundation);
+										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, m.getClass());
 										foundation.setBaseHeightForMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
@@ -709,7 +709,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeBaseHeightForAllMirrorsCommand c = new ChangeBaseHeightForAllMirrorsCommand();
+										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(m.getClass());
 										Scene.getInstance().setBaseHeightForAllMirrors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
@@ -933,7 +933,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 										}
 										if (changed) {
 											final ChangeReflectanceForAllMirrorsCommand c = new ChangeReflectanceForAllMirrorsCommand();
-											Scene.getInstance().setReflectanceForAllMirrors(val * 0.01);
+											Scene.getInstance().setReflectanceForAllSolarReflectors(val * 0.01, m.getClass());
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;

@@ -41,7 +41,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class ParabolicDish extends HousePart implements SolarCollector, Labelable {
+public class ParabolicDish extends HousePart implements SolarReflector, Labelable {
 
 	public static final int STRUCTURE_CENTRAL_POLE = 0;
 	public static final int STRUCTURE_TRIPOD = 1;
@@ -618,41 +618,49 @@ public class ParabolicDish extends HousePart implements SolarCollector, Labelabl
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setOpticalEfficiency(final double opticalEfficiency) {
 		this.opticalEfficiency = opticalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getOpticalEfficiency() {
 		return opticalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setThermalEfficiency(final double thermalEfficiency) {
 		this.thermalEfficiency = thermalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getThermalEfficiency() {
 		return thermalEfficiency;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setReflectance(final double reflectance) {
 		this.reflectance = reflectance;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getReflectance() {
 		return reflectance;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setAbsorptance(final double absorptance) {
 		this.absorptance = absorptance;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getAbsorptance() {
 		return absorptance;
 	}

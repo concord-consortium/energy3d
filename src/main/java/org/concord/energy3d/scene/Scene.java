@@ -47,6 +47,7 @@ import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.SolarReflector;
 import org.concord.energy3d.model.Thermal;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
@@ -2744,14 +2745,6 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setReflectanceForAllMirrors(final double reflectance) {
-		for (final HousePart p : parts) {
-			if (p instanceof Mirror) {
-				((Mirror) p).setReflectance(reflectance);
-			}
-		}
-	}
-
 	public void setTargetForAllMirrors(final Foundation target) {
 		final List<Foundation> oldTargets = new ArrayList<Foundation>();
 		for (final HousePart p : parts) {
@@ -2817,38 +2810,6 @@ public class Scene implements Serializable {
 			}
 		}
 		SceneManager.getInstance().refresh();
-	}
-
-	public void setReflectanceForAllParabolicTroughs(final double reflectance) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setReflectance(reflectance);
-			}
-		}
-	}
-
-	public void setAbsorptanceForAllParabolicTroughs(final double absorptance) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setAbsorptance(absorptance);
-			}
-		}
-	}
-
-	public void setOpticalEfficiencyForAllParabolicTroughs(final double efficiency) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setOpticalEfficiency(efficiency);
-			}
-		}
-	}
-
-	public void setThermalEfficiencyForAllParabolicTroughs(final double efficiency) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicTrough) {
-				((ParabolicTrough) p).setThermalEfficiency(efficiency);
-			}
-		}
 	}
 
 	public void setBaseHeightForAllParabolicTroughs(final double baseHeight) {
@@ -2918,38 +2879,6 @@ public class Scene implements Serializable {
 		}
 	}
 
-	public void setReflectanceForAllParabolicDishes(final double reflectance) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setReflectance(reflectance);
-			}
-		}
-	}
-
-	public void setAbsorptanceForAllParabolicDishes(final double absorptance) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setAbsorptance(absorptance);
-			}
-		}
-	}
-
-	public void setOpticalEfficiencyForAllParabolicDishes(final double efficiency) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setOpticalEfficiency(efficiency);
-			}
-		}
-	}
-
-	public void setThermalEfficiencyForAllParabolicDishes(final double efficiency) {
-		for (final HousePart p : parts) {
-			if (p instanceof ParabolicDish) {
-				((ParabolicDish) p).setThermalEfficiency(efficiency);
-			}
-		}
-	}
-
 	public void setBaseHeightForAllParabolicDishes(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof ParabolicDish) {
@@ -3014,30 +2943,6 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setReflectanceForAllFresnelReflectors(final double reflectance) {
-		for (final HousePart p : parts) {
-			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setReflectance(reflectance);
-			}
-		}
-	}
-
-	public void setAbsorptanceForAllFresnelReflectors(final double absorptance) {
-		for (final HousePart p : parts) {
-			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setAbsorptance(absorptance);
-			}
-		}
-	}
-
-	public void setOpticalEfficiencyForAllFresnelReflectors(final double efficiency) {
-		for (final HousePart p : parts) {
-			if (p instanceof FresnelReflector) {
-				((FresnelReflector) p).setOpticalEfficiency(efficiency);
-			}
-		}
-	}
-
 	public void setAbsorberForAllFresnelReflectors(final Foundation target) {
 		final List<Foundation> oldTargets = new ArrayList<Foundation>();
 		for (final HousePart p : parts) {
@@ -3096,6 +3001,60 @@ public class Scene implements Serializable {
 			}
 		}
 		SceneManager.getInstance().refresh();
+	}
+
+	// common methods for solar collectors and reflectors
+
+	public List<SolarCollector> getAllSolarCollectors(final Class<?> c) {
+		final List<SolarCollector> list = new ArrayList<SolarCollector>();
+		for (final HousePart p : parts) {
+			if (p instanceof SolarCollector && c.isInstance(p)) {
+				list.add((SolarCollector) p);
+			}
+		}
+		return list;
+	}
+
+	public List<SolarReflector> getAllSolarReflectors(final Class<?> c) {
+		final List<SolarReflector> list = new ArrayList<SolarReflector>();
+		for (final HousePart p : parts) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				list.add((SolarReflector) p);
+			}
+		}
+		return list;
+	}
+
+	public void setReflectanceForAllSolarReflectors(final double reflectance, final Class<?> c) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setReflectance(reflectance);
+			}
+		}
+	}
+
+	public void setAbsorptanceForAllSolarReflectors(final double absorptance, final Class<?> c) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setAbsorptance(absorptance);
+			}
+		}
+	}
+
+	public void setOpticalEfficiencyForAllSolarReflectors(final double efficiency, final Class<?> c) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setOpticalEfficiency(efficiency);
+			}
+		}
+	}
+
+	public void setThermalEfficiencyForAllSolarReflectors(final double efficiency, final Class<?> c) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				((SolarReflector) p).setThermalEfficiency(efficiency);
+			}
+		}
 	}
 
 	// walls

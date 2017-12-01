@@ -31,17 +31,17 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAbsorberForAllFresnelReflectorsCommand;
-import org.concord.energy3d.undo.ChangeAbsorptanceForAllFresnelReflectorsCommand;
+import org.concord.energy3d.undo.ChangeAbsorptanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllFresnelReflectorsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorAbsorberCommand;
-import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorAbsorptanceCommand;
-import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorReflectanceCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorAbsorptanceCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFresnelReflectorAbsorberCommand;
-import org.concord.energy3d.undo.ChangeFresnelReflectorAbsorptanceCommand;
-import org.concord.energy3d.undo.ChangeFresnelReflectorReflectanceCommand;
-import org.concord.energy3d.undo.ChangeReflectanceForAllFresnelReflectorsCommand;
+import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorAbsorptanceCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.SetFresnelReflectorLabelCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForAllFresnelReflectorsCommand;
@@ -779,7 +779,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeFoundationFresnelReflectorBaseHeightCommand c = new ChangeFoundationFresnelReflectorBaseHeightCommand(foundation);
+										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, r.getClass());
 										foundation.setBaseHeightForFresnelReflectors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
@@ -794,7 +794,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeBaseHeightForAllFresnelReflectorsCommand c = new ChangeBaseHeightForAllFresnelReflectorsCommand();
+										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(r.getClass());
 										Scene.getInstance().setBaseHeightForAllFresnelReflectors(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
@@ -979,7 +979,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 									boolean changed = Math.abs(val * 0.01 - r.getReflectance()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeFresnelReflectorReflectanceCommand c = new ChangeFresnelReflectorReflectanceCommand(r);
+											final ChangeSolarReflectorReflectanceCommand c = new ChangeSolarReflectorReflectanceCommand(r);
 											r.setReflectance(val * 0.01);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
@@ -995,8 +995,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 											}
 										}
 										if (changed) {
-											final ChangeFoundationFresnelReflectorReflectanceCommand c = new ChangeFoundationFresnelReflectorReflectanceCommand(foundation);
-											foundation.setReflectanceForFresnelReflectors(val * 0.01);
+											final ChangeFoundationSolarReflectorReflectanceCommand c = new ChangeFoundationSolarReflectorReflectanceCommand(foundation, r.getClass());
+											foundation.setReflectanceForSolarReflectors(val * 0.01, r.getClass());
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -1010,8 +1010,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 											}
 										}
 										if (changed) {
-											final ChangeReflectanceForAllFresnelReflectorsCommand c = new ChangeReflectanceForAllFresnelReflectorsCommand();
-											Scene.getInstance().setReflectanceForAllFresnelReflectors(val * 0.01);
+											final ChangeReflectanceForAllSolarReflectorsCommand c = new ChangeReflectanceForAllSolarReflectorsCommand(r.getClass());
+											Scene.getInstance().setReflectanceForAllSolarReflectors(val * 0.01, r.getClass());
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -1100,7 +1100,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 									boolean changed = Math.abs(val * 0.01 - r.getAbsorptance()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
-											final ChangeFresnelReflectorAbsorptanceCommand c = new ChangeFresnelReflectorAbsorptanceCommand(r);
+											final ChangeSolarReflectorAbsorptanceCommand c = new ChangeSolarReflectorAbsorptanceCommand(r);
 											r.setAbsorptance(val * 0.01);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
@@ -1116,8 +1116,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 											}
 										}
 										if (changed) {
-											final ChangeFoundationFresnelReflectorAbsorptanceCommand c = new ChangeFoundationFresnelReflectorAbsorptanceCommand(foundation);
-											foundation.setAbsorptanceForFresnelReflectors(val * 0.01);
+											final ChangeFoundationSolarReflectorAbsorptanceCommand c = new ChangeFoundationSolarReflectorAbsorptanceCommand(foundation, r.getClass());
+											foundation.setAbsorptanceForSolarReflectors(val * 0.01, r.getClass());
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -1131,8 +1131,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 											}
 										}
 										if (changed) {
-											final ChangeAbsorptanceForAllFresnelReflectorsCommand c = new ChangeAbsorptanceForAllFresnelReflectorsCommand();
-											Scene.getInstance().setAbsorptanceForAllFresnelReflectors(val * 0.01);
+											final ChangeAbsorptanceForAllSolarReflectorsCommand c = new ChangeAbsorptanceForAllSolarReflectorsCommand(r.getClass());
+											Scene.getInstance().setAbsorptanceForAllSolarReflectors(val * 0.01, r.getClass());
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;

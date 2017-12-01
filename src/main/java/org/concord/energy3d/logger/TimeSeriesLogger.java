@@ -437,6 +437,14 @@ public class TimeSeriesLogger {
 
 				/* common actions for tilt, azimuth, and base */
 
+				else if (lastEdit instanceof ChangeFoundationSolarCollectorBaseHeightCommand) {
+					final ChangeFoundationSolarCollectorBaseHeightCommand c = (ChangeFoundationSolarCollectorBaseHeightCommand) lastEdit;
+					stateValue = "{\"Foundation\": " + c.getFoundation().getId() + ", \"New Value\": " + c.getFirstSolarCollector().getBaseHeight() + "}";
+				} else if (lastEdit instanceof ChangeBaseHeightForAllSolarCollectorsCommand) {
+					final ChangeBaseHeightForAllSolarCollectorsCommand c = (ChangeBaseHeightForAllSolarCollectorsCommand) lastEdit;
+					stateValue = "{\"New Value\": " + c.getFirstSolarCollector().getBaseHeight() + "}";
+				}
+
 				else if (lastEdit instanceof ChangeTiltAngleCommand) {
 					final ChangeTiltAngleCommand c = (ChangeTiltAngleCommand) lastEdit;
 					final HousePart p = c.getPart();
@@ -594,15 +602,6 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeAzimuthForAllSolarPanelsCommand) {
 					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
 					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getRelativeAzimuth()) + "}";
-				}
-
-				else if (lastEdit instanceof ChangeFoundationSolarPanelBaseHeightCommand) {
-					final Foundation f = ((ChangeFoundationSolarPanelBaseHeightCommand) lastEdit).getFoundation();
-					final List<SolarPanel> solarPanels = f.getSolarPanels();
-					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getBaseHeight()) + "}";
-				} else if (lastEdit instanceof ChangeBaseHeightForAllSolarPanelsCommand) {
-					final List<SolarPanel> solarPanels = Scene.getInstance().getAllSolarPanels();
-					stateValue = "{\"New Value\": " + (solarPanels.isEmpty() ? -1 : solarPanels.get(0).getBaseHeight()) + "}";
 				}
 
 				else if (lastEdit instanceof ChangeFoundationSolarPanelModelCommand) {
@@ -783,15 +782,6 @@ public class TimeSeriesLogger {
 					stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getRelativeAzimuth()) + "}";
 				}
 
-				else if (lastEdit instanceof ChangeFoundationRackBaseHeightCommand) {
-					final Foundation f = ((ChangeFoundationRackBaseHeightCommand) lastEdit).getFoundation();
-					final List<Rack> racks = f.getRacks();
-					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getBaseHeight()) + "}";
-				} else if (lastEdit instanceof ChangeBaseHeightForAllRacksCommand) {
-					final List<Rack> racks = Scene.getInstance().getAllRacks();
-					stateValue = "{\"New Value\": " + (racks.isEmpty() ? -1 : racks.get(0).getBaseHeight()) + "}";
-				}
-
 				else if (lastEdit instanceof SetSolarPanelSizeForRacksOnFoundationCommand) {
 					final Foundation f = ((SetSolarPanelSizeForRacksOnFoundationCommand) lastEdit).getFoundation();
 					final List<Rack> racks = f.getRacks();
@@ -904,15 +894,6 @@ public class TimeSeriesLogger {
 				} else if (lastEdit instanceof ChangeAzimuthForAllMirrorsCommand) {
 					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
 					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getRelativeAzimuth()) + "}";
-				}
-
-				else if (lastEdit instanceof ChangeFoundationMirrorBaseHeightCommand) {
-					final Foundation f = ((ChangeFoundationMirrorBaseHeightCommand) lastEdit).getFoundation();
-					final List<Mirror> mirrors = f.getMirrors();
-					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getBaseHeight()) + "}";
-				} else if (lastEdit instanceof ChangeBaseHeightForAllMirrorsCommand) {
-					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
-					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getBaseHeight()) + "}";
 				}
 
 				/* parabolic trough properties */

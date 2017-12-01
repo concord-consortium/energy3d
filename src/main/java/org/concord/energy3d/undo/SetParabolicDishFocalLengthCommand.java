@@ -25,6 +25,10 @@ public class SetParabolicDishFocalLengthCommand extends MyAbstractUndoableEdit {
 		return oldValue;
 	}
 
+	public double getNewValue() {
+		return newValue;
+	}
+
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();

@@ -28,21 +28,21 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
-import org.concord.energy3d.undo.ChangeAbsorptanceForAllParabolicTroughsCommand;
+import org.concord.energy3d.undo.ChangeAbsorptanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllParabolicTroughsCommand;
-import org.concord.energy3d.undo.ChangeFoundationParabolicTroughAbsorptanceCommand;
-import org.concord.energy3d.undo.ChangeFoundationParabolicTroughBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationParabolicTroughOpticalEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeFoundationParabolicTroughReflectanceCommand;
-import org.concord.energy3d.undo.ChangeFoundationParabolicTroughThermalEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllParabolicTroughsCommand;
-import org.concord.energy3d.undo.ChangeParabolicTroughAbsorptanceCommand;
-import org.concord.energy3d.undo.ChangeParabolicTroughOpticalEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeParabolicTroughReflectanceCommand;
-import org.concord.energy3d.undo.ChangeParabolicTroughThermalEfficiencyCommand;
-import org.concord.energy3d.undo.ChangeReflectanceForAllParabolicTroughsCommand;
-import org.concord.energy3d.undo.ChangeThermalEfficiencyForAllParabolicTroughsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorAbsorptanceCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorThermalEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorAbsorptanceCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorOpticalEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorThermalEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeThermalEfficiencyForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.SetParabolicTroughLabelCommand;
 import org.concord.energy3d.undo.SetParabolicTroughSemilatusRectumCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
@@ -253,25 +253,50 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (l < 1 || l > 1000) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(l - t.getTroughLength()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setTroughLength(l);
-										t.ensureFullModules(false);
-										t.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(t);
+											t.setTroughLength(l);
+											t.ensureFullModules(false);
+											t.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSizeForParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(l - x.getTroughLength()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+											foundation.setSizeForParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSizeForAllParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(l - x.getTroughLength()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+											Scene.getInstance().setSizeForAllParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -351,25 +376,50 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (w < 1 || w > 20) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough aperture width must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(w - t.getApertureWidth()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setApertureWidth(w);
-										t.ensureFullModules(false);
-										t.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(t);
+											t.setApertureWidth(w);
+											t.ensureFullModules(false);
+											t.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSizeForParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(w - x.getApertureWidth()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+											foundation.setSizeForParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(w - x.getApertureWidth()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+											Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -449,25 +499,50 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (u < 1 || u > 20) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar collector module length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(u - t.getModuleLength()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(t);
-										t.setModuleLength(u);
-										t.ensureFullModules(false);
-										t.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(t);
+											t.setModuleLength(u);
+											t.ensureFullModules(false);
+											t.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSizeForParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(u - x.getModuleLength()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+											foundation.setSizeForParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(u - x.getModuleLength()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+											Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -547,24 +622,49 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (f < 0.5 || f > 5) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Focal length must be between 0.5 and 5 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(2 * f - t.getSemilatusRectum()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetParabolicTroughSemilatusRectumCommand c = new SetParabolicTroughSemilatusRectumCommand(t);
-										t.setSemilatusRectum(2 * f); // semilatus rectum p = 2f
-										t.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetParabolicTroughSemilatusRectumCommand c = new SetParabolicTroughSemilatusRectumCommand(t);
+											t.setSemilatusRectum(2 * f); // semilatus rectum p = 2f
+											t.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-										foundation.setSemilatusRectumForParabolicTroughs(2 * f);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(2 * f - x.getSemilatusRectum()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
+											foundation.setSemilatusRectumForParabolicTroughs(2 * f);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-										Scene.getInstance().setSemilatusRectumForAllParabolicTroughs(2 * f);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(2 * f - x.getSemilatusRectum()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
+											Scene.getInstance().setSemilatusRectumForAllParabolicTroughs(2 * f);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -641,24 +741,49 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
+								boolean changed = Math.abs(val - t.getBaseHeight()) > 0.000001;
 								if (rb1.isSelected()) {
-									final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(t);
-									t.setBaseHeight(val);
-									t.draw();
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (changed) {
+										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(t);
+										t.setBaseHeight(val);
+										t.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 0;
 								} else if (rb2.isSelected()) {
-									final ChangeFoundationParabolicTroughBaseHeightCommand c = new ChangeFoundationParabolicTroughBaseHeightCommand(foundation);
-									foundation.setBaseHeightForParabolicTroughs(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, t.getClass());
+										foundation.setBaseHeightForSolarCollectors(val, t.getClass());
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 1;
 								} else if (rb3.isSelected()) {
-									final ChangeBaseHeightForAllParabolicTroughsCommand c = new ChangeBaseHeightForAllParabolicTroughsCommand();
-									Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
-									SceneManager.getInstance().getUndoManager().addEdit(c);
+									if (!changed) {
+										for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(t.getClass());
+										Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
 									selectedScopeIndex = 2;
 								}
-								updateAfterEdit();
+								if (changed) {
+									updateAfterEdit();
+								}
 								if (choice == options[0]) {
 									break;
 								}
@@ -832,24 +957,49 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough reflectance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - t.getReflectance()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeParabolicTroughReflectanceCommand c = new ChangeParabolicTroughReflectanceCommand(t);
-										t.setReflectance(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorReflectanceCommand c = new ChangeSolarReflectorReflectanceCommand(t);
+											t.setReflectance(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = t.getTopContainer();
-										final ChangeFoundationParabolicTroughReflectanceCommand c = new ChangeFoundationParabolicTroughReflectanceCommand(foundation);
-										foundation.setReflectanceForParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getReflectance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorReflectanceCommand c = new ChangeFoundationSolarReflectorReflectanceCommand(foundation, t.getClass());
+											foundation.setReflectanceForSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeReflectanceForAllParabolicTroughsCommand c = new ChangeReflectanceForAllParabolicTroughsCommand();
-										Scene.getInstance().setReflectanceForAllParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getReflectance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeReflectanceForAllSolarReflectorsCommand c = new ChangeReflectanceForAllSolarReflectorsCommand(t.getClass());
+											Scene.getInstance().setReflectanceForAllSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -928,24 +1078,49 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (val < 50 || val > 99) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - t.getAbsorptance()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeParabolicTroughAbsorptanceCommand c = new ChangeParabolicTroughAbsorptanceCommand(t);
-										t.setAbsorptance(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorAbsorptanceCommand c = new ChangeSolarReflectorAbsorptanceCommand(t);
+											t.setAbsorptance(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = t.getTopContainer();
-										final ChangeFoundationParabolicTroughAbsorptanceCommand c = new ChangeFoundationParabolicTroughAbsorptanceCommand(foundation);
-										foundation.setAbsorptanceForParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getAbsorptance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorAbsorptanceCommand c = new ChangeFoundationSolarReflectorAbsorptanceCommand(foundation, t.getClass());
+											foundation.setAbsorptanceForSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeAbsorptanceForAllParabolicTroughsCommand c = new ChangeAbsorptanceForAllParabolicTroughsCommand();
-										Scene.getInstance().setAbsorptanceForAllParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getAbsorptance()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeAbsorptanceForAllSolarReflectorsCommand c = new ChangeAbsorptanceForAllSolarReflectorsCommand(t.getClass());
+											Scene.getInstance().setAbsorptanceForAllSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1024,24 +1199,49 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (val < 20 || val > 80) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough optical efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - t.getOpticalEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeParabolicTroughOpticalEfficiencyCommand c = new ChangeParabolicTroughOpticalEfficiencyCommand(t);
-										t.setOpticalEfficiency(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorOpticalEfficiencyCommand c = new ChangeSolarReflectorOpticalEfficiencyCommand(t);
+											t.setOpticalEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = t.getTopContainer();
-										final ChangeFoundationParabolicTroughOpticalEfficiencyCommand c = new ChangeFoundationParabolicTroughOpticalEfficiencyCommand(foundation);
-										foundation.setOpticalEfficiencyForParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getOpticalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorOpticalEfficiencyCommand c = new ChangeFoundationSolarReflectorOpticalEfficiencyCommand(foundation, t.getClass());
+											foundation.setOpticalEfficiencyForSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeOpticalEfficiencyForAllParabolicTroughsCommand c = new ChangeOpticalEfficiencyForAllParabolicTroughsCommand();
-										Scene.getInstance().setOpticalEfficiencyForAllParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getOpticalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeOpticalEfficiencyForAllSolarReflectorsCommand c = new ChangeOpticalEfficiencyForAllSolarReflectorsCommand(t.getClass());
+											Scene.getInstance().setOpticalEfficiencyForAllSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -1120,24 +1320,49 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								if (val < 20 || val > 80) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough thermal efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val * 0.01 - t.getThermalEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeParabolicTroughThermalEfficiencyCommand c = new ChangeParabolicTroughThermalEfficiencyCommand(t);
-										t.setThermalEfficiency(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeSolarReflectorThermalEfficiencyCommand c = new ChangeSolarReflectorThermalEfficiencyCommand(t);
+											t.setThermalEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = t.getTopContainer();
-										final ChangeFoundationParabolicTroughThermalEfficiencyCommand c = new ChangeFoundationParabolicTroughThermalEfficiencyCommand(foundation);
-										foundation.setThermalEfficiencyForParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getThermalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorThermalEfficiencyCommand c = new ChangeFoundationSolarReflectorThermalEfficiencyCommand(foundation, t.getClass());
+											foundation.setThermalEfficiencyForSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeThermalEfficiencyForAllParabolicTroughsCommand c = new ChangeThermalEfficiencyForAllParabolicTroughsCommand();
-										Scene.getInstance().setThermalEfficiencyForAllParabolicTroughs(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(val * 0.01 - x.getThermalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeThermalEfficiencyForAllSolarReflectorsCommand c = new ChangeThermalEfficiencyForAllSolarReflectorsCommand(t.getClass());
+											Scene.getInstance().setThermalEfficiencyForAllSolarReflectors(val * 0.01, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}

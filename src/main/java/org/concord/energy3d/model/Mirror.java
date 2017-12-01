@@ -40,7 +40,7 @@ import com.ardor3d.util.geom.BufferUtils;
  *
  */
 
-public class Mirror extends HousePart implements SolarCollector, Labelable {
+public class Mirror extends HousePart implements SolarReflector, Labelable {
 
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
@@ -50,6 +50,9 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 	private transient Cylinder post;
 	private transient BMText label;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
+	private double absorptance = 0.95;
+	private double opticalEfficiency = 0.7;
+	private double thermalEfficiency = 0.6;
 	private double mirrorWidth = 5;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
@@ -442,13 +445,51 @@ public class Mirror extends HousePart implements SolarCollector, Labelable {
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public void setReflectance(final double reflectance) {
 		this.reflectance = reflectance;
 	}
 
 	/** a number between 0 and 1 */
+	@Override
 	public double getReflectance() {
 		return reflectance;
+	}
+
+	/** a number between 0 and 1 */
+	@Override
+	public void setAbsorptance(final double absorptance) {
+		this.absorptance = absorptance;
+	}
+
+	/** a number between 0 and 1 */
+	@Override
+	public double getAbsorptance() {
+		return absorptance;
+	}
+
+	/** a number between 0 and 1 */
+	@Override
+	public void setOpticalEfficiency(final double opticalEfficiency) {
+		this.opticalEfficiency = opticalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	@Override
+	public double getOpticalEfficiency() {
+		return opticalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	@Override
+	public void setThermalEfficiency(final double thermalEfficiency) {
+		this.thermalEfficiency = thermalEfficiency;
+	}
+
+	/** a number between 0 and 1 */
+	@Override
+	public double getThermalEfficiency() {
+		return thermalEfficiency;
 	}
 
 	public void setMirrorWidth(final double mirrorWidth) {

@@ -45,10 +45,10 @@ import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllRacksCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllRacksCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationRackBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForAllRacksCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.ChangeRackPoleSettingsCommand;
@@ -681,7 +681,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeFoundationRackBaseHeightCommand c = new ChangeFoundationRackBaseHeightCommand(foundation);
+										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, rack.getClass());
 										foundation.setBaseHeightForRacks(val);
 										if (foundation.checkContainerIntersectionForRacks()) {
 											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
@@ -701,7 +701,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeBaseHeightForAllRacksCommand c = new ChangeBaseHeightForAllRacksCommand();
+										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(rack.getClass());
 										Scene.getInstance().setBaseHeightForAllRacks(val);
 										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
 											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);

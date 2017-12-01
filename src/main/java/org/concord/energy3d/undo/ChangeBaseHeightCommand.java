@@ -52,7 +52,7 @@ public class ChangeBaseHeightCommand extends MyAbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Change Base Height";
+		return "Change Base Height for " + part.getClass().getSimpleName();
 	}
 
 }

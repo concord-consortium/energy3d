@@ -42,12 +42,12 @@ import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllSolarPanelsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarPanelsCommand;
+import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForSolarPanelRowCommand;
 import org.concord.energy3d.undo.ChangeFoundationInverterEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCellPropertiesCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelAzimuthCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarPanelBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelModelCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarPanelTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeInverterEfficiencyCommand;
@@ -1476,7 +1476,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeFoundationSolarPanelBaseHeightCommand c = new ChangeFoundationSolarPanelBaseHeightCommand(foundation);
+										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, sp.getClass());
 										foundation.setBaseHeightForSolarPanels(val);
 										if (foundation.checkContainerIntersectionForSolarPanels()) {
 											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
@@ -1494,7 +1494,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 										}
 									}
 									if (changed) {
-										final ChangeBaseHeightForAllSolarPanelsCommand c = new ChangeBaseHeightForAllSolarPanelsCommand();
+										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(sp.getClass());
 										Scene.getInstance().setBaseHeightForAllSolarPanels(val);
 										if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
 											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
