@@ -28,6 +28,7 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -264,6 +265,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 
 			final JMenuItem miShutterColor = new JMenuItem("Color...");
 			miShutterColor.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -295,6 +299,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							bg.add(rb1);
 							bg.add(rb2);
 							bg.add(rb3);
+							switch (selectedScopeIndex) {
+							case 0:
+								rb1.setSelected(true);
+								break;
+							case 1:
+								rb2.setSelected(true);
+								break;
+							case 2:
+								rb3.setSelected(true);
+								break;
+							}
 
 							final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 							final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -306,22 +321,62 @@ class PopupMenuForWindow extends PopupMenuFactory {
 								if (choice == options[1] || choice == null) {
 									break;
 								} else {
+									boolean changed = !color.equals(window.getShutterColor());
 									if (rb1.isSelected()) { // apply to only this window
-										final ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
-										window.setShutterColor(color);
-										window.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										if (changed) {
+											final ChangeShutterColorCommand cmd = new ChangeShutterColorCommand(window);
+											window.setShutterColor(color);
+											window.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
-										Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, true);
-										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										if (!changed) {
+											if (window.getContainer() instanceof Wall) {
+												final Wall wall = (Wall) window.getContainer();
+												for (final Window x : wall.getWindows()) {
+													if (!color.equals(x.getShutterColor())) {
+														changed = true;
+														break;
+													}
+												}
+											} else if (window.getContainer() instanceof Roof) {
+												final Roof roof = (Roof) window.getContainer();
+												for (final Window x : roof.getWindows()) {
+													if (!color.equals(x.getShutterColor())) {
+														changed = true;
+														break;
+													}
+												}
+											}
+										}
+										if (changed) {
+											final ChangeContainerShutterColorCommand cmd = new ChangeContainerShutterColorCommand(window.getContainer());
+											Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, true);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 1;
 									} else {
-										final ChangeBuildingShutterColorCommand cmd = new ChangeBuildingShutterColorCommand(window);
-										Scene.getInstance().setShutterColorOfBuilding(window, color);
-										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										final Foundation foundation = window.getTopContainer();
+										if (!changed) {
+											for (final Window x : foundation.getWindows()) {
+												if (!color.equals(x.getShutterColor())) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeBuildingShutterColorCommand cmd = new ChangeBuildingShutterColorCommand(window);
+											Scene.getInstance().setShutterColorOfBuilding(window, color);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 2;
 									}
-									Scene.getInstance().setEdited(true);
-									SceneManager.getInstance().refresh();
+									if (changed) {
+										Scene.getInstance().setEdited(true);
+										SceneManager.getInstance().refresh();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -336,6 +391,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 
 			final JMenuItem miShutterLength = new JMenuItem("Relative Length...");
 			miShutterLength.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -360,6 +418,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(panel, BorderLayout.CENTER);
 					final JTextField inputField = new JTextField(window.getShutterLength() + "");
 					gui.add(inputField, BorderLayout.SOUTH);
@@ -388,18 +457,58 @@ class PopupMenuForWindow extends PopupMenuFactory {
 								if (val <= 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Relative shutter length must be within (0, 1).", "Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(val - window.getShutterLength()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeShutterLengthCommand c = new ChangeShutterLengthCommand(window);
-										window.setShutterLength(val);
-										window.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeShutterLengthCommand c = new ChangeShutterLengthCommand(window);
+											window.setShutterLength(val);
+											window.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										Scene.getInstance().setShutterLengthInContainer(window.getContainer(), val);
+										if (!changed) {
+											if (window.getContainer() instanceof Wall) {
+												final Wall wall = (Wall) window.getContainer();
+												for (final Window x : wall.getWindows()) {
+													if (Math.abs(val - x.getShutterLength()) > 0.000001) {
+														changed = true;
+														break;
+													}
+												}
+											} else if (window.getContainer() instanceof Roof) {
+												final Roof roof = (Roof) window.getContainer();
+												for (final Window x : roof.getWindows()) {
+													if (Math.abs(val - x.getShutterLength()) > 0.000001) {
+														changed = true;
+														break;
+													}
+												}
+											}
+										}
+										if (changed) {
+											Scene.getInstance().setShutterLengthInContainer(window.getContainer(), val);
+										}
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										Scene.getInstance().setShutterLengthOfBuilding(window, val);
+										final Foundation foundation = window.getTopContainer();
+										if (!changed) {
+											for (final Window x : foundation.getWindows()) {
+												if (Math.abs(val - x.getShutterLength()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											Scene.getInstance().setShutterLengthOfBuilding(window, val);
+										}
+										selectedScopeIndex = 2;
 									}
-									SceneManager.getInstance().refresh();
-									Scene.getInstance().setEdited(true);
+									if (changed) {
+										SceneManager.getInstance().refresh();
+										Scene.getInstance().setEdited(true);
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -438,6 +547,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 
 			final JMenuItem miShgc = new JMenuItem("Solar Heat Gain Coefficient...");
 			miShgc.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -462,6 +574,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(panel, BorderLayout.CENTER);
 					final JTextField inputField = new JTextField(window.getSolarHeatGainCoefficient() + "");
 					gui.add(inputField, BorderLayout.SOUTH);
@@ -490,27 +613,56 @@ class PopupMenuForWindow extends PopupMenuFactory {
 								if (val < 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									final boolean changed = Math.abs(val - window.getSolarHeatGainCoefficient()) > 0.000001;
+									boolean changed = Math.abs(val - window.getSolarHeatGainCoefficient()) > 0.000001;
 									if (rb1.isSelected()) {
 										if (changed) {
 											final ChangeWindowShgcCommand c = new ChangeWindowShgcCommand(window);
 											window.setSolarHeatGainCoefficient(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											if (window.getContainer() instanceof Wall) {
 												final Wall wall = (Wall) window.getContainer();
+												for (final Window x : wall.getWindows()) {
+													if (Math.abs(val - x.getSolarHeatGainCoefficient()) > 0.000001) {
+														changed = true;
+														break;
+													}
+												}
+											} else if (window.getContainer() instanceof Roof) {
+												final Roof roof = (Roof) window.getContainer();
+												for (final Window x : roof.getWindows()) {
+													if (Math.abs(val - x.getSolarHeatGainCoefficient()) > 0.000001) {
+														changed = true;
+														break;
+													}
+												}
 											}
 										}
-										final ChangeContainerWindowShgcCommand c = new ChangeContainerWindowShgcCommand(window.getContainer());
-										Scene.getInstance().setWindowShgcInContainer(window.getContainer(), val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeContainerWindowShgcCommand c = new ChangeContainerWindowShgcCommand(window.getContainer());
+											Scene.getInstance().setWindowShgcInContainer(window.getContainer(), val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final Foundation foundation = window.getTopContainer();
-										final ChangeBuildingWindowShgcCommand c = new ChangeBuildingWindowShgcCommand(foundation);
-										Scene.getInstance().setWindowShgcOfBuilding(foundation, val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Window x : foundation.getWindows()) {
+												if (Math.abs(val - x.getSolarHeatGainCoefficient()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeBuildingWindowShgcCommand c = new ChangeBuildingWindowShgcCommand(foundation);
+											Scene.getInstance().setWindowShgcOfBuilding(foundation, val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 2;
 									}
 									if (changed) {
 										updateAfterEdit();
@@ -527,6 +679,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 
 			final JMenuItem miTint = new JMenuItem("Tint...");
 			miTint.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -558,6 +713,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							bg.add(rb1);
 							bg.add(rb2);
 							bg.add(rb3);
+							switch (selectedScopeIndex) {
+							case 0:
+								rb1.setSelected(true);
+								break;
+							case 1:
+								rb2.setSelected(true);
+								break;
+							case 2:
+								rb3.setSelected(true);
+								break;
+							}
 
 							final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 							final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
@@ -569,20 +735,60 @@ class PopupMenuForWindow extends PopupMenuFactory {
 								if (choice == options[1] || choice == null) {
 									break;
 								} else {
+									boolean changed = !Util.isRGBEqual(color, window.getColor());
 									if (rb1.isSelected()) { // apply to only this window
-										final ChangePartColorCommand cmd = new ChangePartColorCommand(window);
-										window.setColor(color);
-										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										if (changed) {
+											final ChangePartColorCommand cmd = new ChangePartColorCommand(window);
+											window.setColor(color);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
-										Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, false);
-										SceneManager.getInstance().getUndoManager().addEdit(cmd);
-									} else {
-										final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(window);
-										Scene.getInstance().setPartColorOfBuilding(window, color);
-										SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										if (!changed) {
+											if (window.getContainer() instanceof Wall) {
+												final Wall wall = (Wall) window.getContainer();
+												for (final Window x : wall.getWindows()) {
+													if (!Util.isRGBEqual(color, x.getColor())) {
+														changed = true;
+														break;
+													}
+												}
+											} else if (window.getContainer() instanceof Roof) {
+												final Roof roof = (Roof) window.getContainer();
+												for (final Window x : roof.getWindows()) {
+													if (!Util.isRGBEqual(color, x.getColor())) {
+														changed = true;
+														break;
+													}
+												}
+											}
+										}
+										if (changed) {
+											final ChangeContainerWindowColorCommand cmd = new ChangeContainerWindowColorCommand(window.getContainer());
+											Scene.getInstance().setWindowColorInContainer(window.getContainer(), color, false);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										final Foundation foundation = window.getTopContainer();
+										if (!changed) {
+											for (final Window x : foundation.getWindows()) {
+												if (!Util.isRGBEqual(color, x.getColor())) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeBuildingColorCommand cmd = new ChangeBuildingColorCommand(window);
+											Scene.getInstance().setPartColorOfBuilding(window, color);
+											SceneManager.getInstance().getUndoManager().addEdit(cmd);
+										}
+										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -596,6 +802,8 @@ class PopupMenuForWindow extends PopupMenuFactory {
 
 			final JMenuItem miSize = new JMenuItem("Size...");
 			miSize.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -630,6 +838,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 					bg.add(rb1);
 					bg.add(rb2);
 					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
@@ -665,23 +884,62 @@ class PopupMenuForWindow extends PopupMenuFactory {
 								} else if (h < 0.1 || h > hmax) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Height must be between 0.1 and " + (int) hmax + " m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									boolean changed = Math.abs(w - window.getWindowWidth()) > 0.000001 || Math.abs(h - window.getWindowHeight()) > 0.000001;
 									if (rb1.isSelected()) {
-										final SetPartSizeCommand c = new SetPartSizeCommand(window);
-										window.setWindowWidth(w);
-										window.setWindowHeight(h);
-										window.draw();
-										window.getContainer().draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(window);
+											window.setWindowWidth(w);
+											window.setWindowHeight(h);
+											window.draw();
+											window.getContainer().draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final ChangeContainerWindowSizeCommand c = new ChangeContainerWindowSizeCommand(window.getContainer());
-										Scene.getInstance().setWindowSizeInContainer(window.getContainer(), w, h);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											if (window.getContainer() instanceof Wall) {
+												final Wall wall = (Wall) window.getContainer();
+												for (final Window x : wall.getWindows()) {
+													if (Math.abs(w - x.getWindowWidth()) > 0.000001 || Math.abs(h - x.getWindowHeight()) > 0.000001) {
+														changed = true;
+														break;
+													}
+												}
+											} else if (window.getContainer() instanceof Roof) {
+												final Roof roof = (Roof) window.getContainer();
+												for (final Window x : roof.getWindows()) {
+													if (Math.abs(w - x.getWindowWidth()) > 0.000001 || Math.abs(h - x.getWindowHeight()) > 0.000001) {
+														changed = true;
+														break;
+													}
+												}
+											}
+										}
+										if (changed) {
+											final ChangeContainerWindowSizeCommand c = new ChangeContainerWindowSizeCommand(window.getContainer());
+											Scene.getInstance().setWindowSizeInContainer(window.getContainer(), w, h);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final SetSizeForWindowsOnFoundationCommand c = new SetSizeForWindowsOnFoundationCommand(foundation);
-										foundation.setSizeForWindows(w, h);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Window x : foundation.getWindows()) {
+												if (Math.abs(w - x.getWindowWidth()) > 0.000001 || Math.abs(h - x.getWindowHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForWindowsOnFoundationCommand c = new SetSizeForWindowsOnFoundationCommand(foundation);
+											foundation.setSizeForWindows(w, h);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}

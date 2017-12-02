@@ -132,6 +132,10 @@ public class Util {
 		return bi2;
 	}
 
+	public static boolean isRGBEqual(final ReadOnlyColorRGBA c1, final ReadOnlyColorRGBA c2) {
+		return Util.isEqual(c1.getRed(), c2.getRed()) && Util.isEqual(c1.getGreen(), c2.getGreen()) && Util.isEqual(c1.getBlue(), c2.getBlue());
+	}
+
 	public static ColorRGBA getColorRGB(final int r, final int g, final int b) {
 		return new ColorRGBA(r / 255f, g / 255f, b / 255f, 1f);
 	}

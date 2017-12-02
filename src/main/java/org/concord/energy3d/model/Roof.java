@@ -1409,6 +1409,16 @@ public abstract class Roof extends HousePart implements Thermal {
 		return volumetricHeatCapacity;
 	}
 
+	public List<Window> getWindows() {
+		final List<Window> windows = new ArrayList<Window>();
+		for (final HousePart x : children) {
+			if (x instanceof Window) {
+				windows.add((Window) x);
+			}
+		}
+		return windows;
+	}
+
 	@Override
 	protected boolean fits(final HousePart window) {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {

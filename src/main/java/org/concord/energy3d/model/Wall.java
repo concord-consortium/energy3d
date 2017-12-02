@@ -1844,6 +1844,16 @@ public class Wall extends HousePart implements Thermal {
 		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
 	}
 
+	public List<Window> getWindows() {
+		final List<Window> windows = new ArrayList<Window>();
+		for (final HousePart x : children) {
+			if (x instanceof Window) {
+				windows.add((Window) x);
+			}
+		}
+		return windows;
+	}
+
 	@Override
 	public void addPrintMeshes(final List<Mesh> list) {
 		addPrintMesh(list, mesh);
