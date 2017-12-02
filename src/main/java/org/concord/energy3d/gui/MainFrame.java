@@ -1257,7 +1257,17 @@ public class MainFrame extends JFrame {
 			aboutDialog.setTitle("About");
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
-			p.add(new JLabel("<html><h2>Energy3D</h2><h4><i>Learning to build a sustainable world</i></h4><br>Version: " + MainApplication.VERSION + ", Copyright &copy; 2011-" + Calendar.getInstance().get(Calendar.YEAR) + "<br>The Engineering Computation Laboratory, Concord Consortium<hr><h3>Developers</h3>This program is brought to you by:<ul><li>Dr. Charles Xie (2010-present) <li>Dr. Saeid Nourian (2010-2017)</ul><p>and the people who created Ardor3D, Getdown, JOGL, and Poly2tri.<br>The program is provided as it is to you under the MIT License.<h3>Funders</h3>Funding is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by<br>General Motors through grant 34871079. Any opinions, findings, and<br>conclusions or recommendations expressed in the materials associated<br>with this program are those of the author(s) and do not necessarily reflect<br>the views of the National Science Foundation or General Motors.<h3>Source Code</h3> https://github.com/concord-consortium/energy3d</html>"), BorderLayout.CENTER);
+			final String title = "<h3>Energy3D</h3><h4><i>Learning to build a sustainable world</i></h4>Version: " + MainApplication.VERSION + ", &copy; 2011-" + Calendar.getInstance().get(Calendar.YEAR);
+			final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:<ul><li>Dr. Charles Xie (2010-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Ardor3D, Getdown, JOGL, and Poly2tri.";
+			final String license = "<br>The program is provided as it is to you under the MIT License.";
+			final String funder = "<h4>Funders</h4>Funding is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by<br>General Motors through grant 34871079 awarded to Charles Xie. Any<br>opinions, findings, and conclusions or recommendations expressed in the<br>materials associated with this program are those of the author(s) and do<br>not necessarily reflect the views of the National Science Foundation or<br>General Motors.";
+			final String source = "<h4>Source Code</h4>https://github.com/concord-consortium/energy3d";
+			String acknowledge = "<h4>Acknowledgement</h4>";
+			acknowledge += "<font size=2>The help from the following people to improve this program is appreciated:<br>";
+			acknowledge += "Katie Armstrong, Siobhan Bailey, Jie Chao, Guanhua Chen, Maya Haigis,<br>";
+			acknowledge += "Shiyan Jiang, Alex Lee, Shasha Liu, Jeff Lockwood, Joy Massicotte,<br>";
+			acknowledge += "Ethan McElroy, Scott Ogle, Cormac Paterson, Corey Schimpf, Zhenghui Sha";
+			p.add(new JLabel("<html>" + title + developer + license + funder + source + acknowledge + "</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
 				@Override

@@ -1,6 +1,7 @@
 package org.concord.energy3d.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -39,6 +40,8 @@ class CustomPricesDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT = new DecimalFormat("#0.##");
+	private final static Color pvBackgroundColor = new Color(169, 223, 191);
+	private final static Color cspBackgroundColor = new Color(252, 243, 207);
 
 	class PvModulePricesPanel extends JPanel {
 
@@ -54,14 +57,14 @@ class CustomPricesDialog extends JDialog {
 			priceFields = new JTextField[modules.size()];
 			int i = 0;
 			for (final String key : modules.keySet()) {
-				add(new JLabel(key + ": "));
+				add(createPvLabel(key + ": "));
 				add(new JLabel("$"));
 				priceFields[i] = new JTextField(FORMAT.format(price.getPvModelPrice(key)), 6);
 				add(priceFields[i]);
 				add(new JLabel(modules.get(key).getBrand()));
 				i++;
 			}
-			SpringUtilities.makeCompactGrid(this, i, 4, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, i, 4, 6, 6, 6, 3);
 
 		}
 
@@ -86,55 +89,55 @@ class CustomPricesDialog extends JDialog {
 
 			final PvCustomPrice price = Scene.getInstance().getPvCustomPrice();
 
-			add(new JLabel("Life Span: "));
+			add(createPvLabel("Life Span: "));
 			add(new JLabel());
 			lifespanField = new JTextField(FORMAT.format(price.getLifespan()), 6);
 			add(lifespanField);
 			add(new JLabel("<html>Years</html>"));
 
-			add(new JLabel("Land Cost: "));
+			add(createPvLabel("Land Cost: "));
 			add(new JLabel("$"));
 			landCostField = new JTextField(FORMAT.format(price.getLandUnitPrice()), 6);
 			add(landCostField);
 			add(new JLabel("<html>Per year per m<sup>2</sup></html>"));
 
-			add(new JLabel("Custom Solar Panel: "));
+			add(createPvLabel("Custom Solar Panel: "));
 			add(new JLabel("$"));
 			solarPanelField = new JTextField(FORMAT.format(price.getSolarPanelPrice()), 6);
 			add(solarPanelField);
 			add(new JLabel("<html>Per panel</html>"));
 
-			add(new JLabel("Rack Base (Below 1m): "));
+			add(createPvLabel("Rack Base (Below 1m): "));
 			add(new JLabel("$"));
 			rackBaseField = new JTextField(FORMAT.format(price.getSolarPanelRackBasePrice()), 6);
 			add(rackBaseField);
 			add(new JLabel("<html>Per panel</html>"));
 
-			add(new JLabel("Rack Extra Height (Beyond 1m): "));
+			add(createPvLabel("Rack Extra Height (Beyond 1m): "));
 			add(new JLabel("$"));
 			rackHeightField = new JTextField(FORMAT.format(price.getSolarPanelRackHeightPrice()), 6);
 			add(rackHeightField);
 			add(new JLabel("<html>Per meter per panel</html>"));
 
-			add(new JLabel("Horizontal Single-Axis Tracker: "));
+			add(createPvLabel("Horizontal Single-Axis Tracker: "));
 			add(new JLabel("$"));
 			hsatField = new JTextField(FORMAT.format(price.getSolarPanelHsatPrice()), 6);
 			add(hsatField);
 			add(new JLabel("<html>Per panel</html>"));
 
-			add(new JLabel("Vertical Single-Axis Tracker: "));
+			add(createPvLabel("Vertical Single-Axis Tracker: "));
 			add(new JLabel("$"));
 			vsatField = new JTextField(FORMAT.format(price.getSolarPanelVsatPrice()), 6);
 			add(vsatField);
 			add(new JLabel("<html>Per panel</html>"));
 
-			add(new JLabel("Azimuth–Altitude Dual-Axis Tracker: "));
+			add(createPvLabel("Azimuth–Altitude Dual-Axis Tracker: "));
 			add(new JLabel("$"));
 			aadatField = new JTextField(FORMAT.format(price.getSolarPanelAadatPrice()), 6);
 			add(aadatField);
 			add(new JLabel("<html>Per panel</html>"));
 
-			SpringUtilities.makeCompactGrid(this, 8, 4, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, 8, 4, 6, 6, 6, 3);
 
 		}
 
@@ -158,52 +161,66 @@ class CustomPricesDialog extends JDialog {
 
 			final CspCustomPrice price = Scene.getInstance().getCspCustomPrice();
 
-			add(new JLabel("Life Span: "));
+			add(createCspLabel("Life Span: "));
 			add(new JLabel());
 			lifespanField = new JTextField(FORMAT.format(price.getLifespan()), 6);
 			add(lifespanField);
 			add(new JLabel("<html>Years</html>"));
 
-			add(new JLabel("Land Cost: "));
+			add(createCspLabel("Land Cost: "));
 			add(new JLabel("$"));
 			landCostField = new JTextField(FORMAT.format(price.getLandUnitPrice()), 6);
 			add(landCostField);
 			add(new JLabel("<html>Per year per m<sup>2</sup></html>"));
 
-			add(new JLabel("Mirror (Heliostat): "));
+			add(createCspLabel("Mirror (Heliostat): "));
 			add(new JLabel("$"));
 			heliostatField = new JTextField(FORMAT.format(price.getHeliostatUnitPrice()), 6);
 			add(heliostatField);
 			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
-			add(new JLabel("Tower: "));
+			add(createCspLabel("Tower: "));
 			add(new JLabel("$"));
 			towerField = new JTextField(FORMAT.format(price.getTowerUnitPrice()), 6);
 			add(towerField);
 			add(new JLabel("<html>Per meter height</html>"));
 
-			add(new JLabel("Parabolic Trough: "));
+			add(createCspLabel("Parabolic Trough: "));
 			add(new JLabel("$"));
 			parabolicTroughField = new JTextField(FORMAT.format(price.getParabolicTroughUnitPrice()), 6);
 			add(parabolicTroughField);
 			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
-			add(new JLabel("Parabolic Dish: "));
+			add(createCspLabel("Parabolic Dish: "));
 			add(new JLabel("$"));
 			parabolicDishField = new JTextField(FORMAT.format(price.getParabolicDishUnitPrice()), 6);
 			add(parabolicDishField);
 			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
-			add(new JLabel("Fresnel Reflector: "));
+			add(createCspLabel("Fresnel Reflector: "));
 			add(new JLabel("$"));
 			fresnelReflectorField = new JTextField(FORMAT.format(price.getFresnelReflectorUnitPrice()), 6);
 			add(fresnelReflectorField);
 			add(new JLabel("<html>Per m<sup>2</sup></html>"));
 
-			SpringUtilities.makeCompactGrid(this, 7, 4, 6, 6, 6, 6);
+			SpringUtilities.makeCompactGrid(this, 7, 4, 6, 6, 6, 3);
 
 		}
 
+	}
+
+	private JLabel createPvLabel(final String text) {
+		final JLabel l = new JLabel(text);
+		l.setOpaque(true);
+		l.setBackground(pvBackgroundColor);
+		return l;
+	}
+
+	private JLabel createCspLabel(final String text) {
+		final JLabel l = new JLabel(text);
+		l.setOpaque(true);
+		l.setBackground(cspBackgroundColor);
+		return l;
 	}
 
 	public CustomPricesDialog() {
