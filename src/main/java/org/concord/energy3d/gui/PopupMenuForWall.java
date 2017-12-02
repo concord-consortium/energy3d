@@ -5,6 +5,8 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.Callable;
 
@@ -28,6 +30,7 @@ import javax.swing.event.MenuListener;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
@@ -45,6 +48,7 @@ import org.concord.energy3d.undo.ChangeWallThicknessCommand;
 import org.concord.energy3d.undo.ChangeWallTypeCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.WallVisitor;
 
 class PopupMenuForWall extends PopupMenuFactory {
 
@@ -172,25 +176,50 @@ class PopupMenuForWall extends PopupMenuFactory {
 								} else {
 									val /= Scene.getInstance().getAnnotationScale();
 									Wall.setDefaultThickess(val);
+									boolean changed = Math.abs(val - w.getThickness()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeWallThicknessCommand c = new ChangeWallThicknessCommand(w);
-										w.setThickness(val);
-										w.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeWallThicknessCommand c = new ChangeWallThicknessCommand(w);
+											w.setThickness(val);
+											w.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										final Foundation foundation = w.getTopContainer();
-										final ChangeFoundationWallThicknessCommand c = new ChangeFoundationWallThicknessCommand(foundation);
-										foundation.setThicknessOfWalls(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Wall x : foundation.getWalls()) {
+												if (Math.abs(val - x.getThickness()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationWallThicknessCommand c = new ChangeFoundationWallThicknessCommand(foundation);
+											foundation.setThicknessOfWalls(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
-										final ChangeThicknessForAllWallsCommand c = new ChangeThicknessForAllWallsCommand(w);
-										Scene.getInstance().setThicknessForAllWalls(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Wall x : Scene.getInstance().getAllWalls()) {
+												if (Math.abs(val - x.getThickness()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeThicknessForAllWallsCommand c = new ChangeThicknessForAllWallsCommand(w);
+											Scene.getInstance().setThicknessForAllWalls(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -207,6 +236,8 @@ class PopupMenuForWall extends PopupMenuFactory {
 			miHeight.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+				private boolean changed;
+				private double val;
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -265,7 +296,6 @@ class PopupMenuForWall extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
-							double val = 0;
 							boolean ok = true;
 							try {
 								val = Double.parseDouble(inputField.getText());
@@ -278,30 +308,67 @@ class PopupMenuForWall extends PopupMenuFactory {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The height of a wall must be between 1 and 1000 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									val /= Scene.getInstance().getAnnotationScale();
+									changed = Math.abs(val - w.getHeight()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeWallHeightCommand c = new ChangeWallHeightCommand(w);
-										w.setHeight(val, true);
-										w.draw();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeWallHeightCommand c = new ChangeWallHeightCommand(w);
+											w.setHeight(val, true);
+											w.draw();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
-										final ChangeHeightForConnectedWallsCommand c = new ChangeHeightForConnectedWallsCommand(w);
-										Scene.getInstance().setHeightOfConnectedWalls(w, val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											w.visitNeighbors(new WallVisitor() {
+												@Override
+												public void visit(final Wall currentWall, final Snap prev, final Snap next) {
+													if (Math.abs(val - currentWall.getHeight()) > 0.000001) {
+														changed = true;
+													}
+												}
+											});
+										}
+										if (changed) {
+											final ChangeHeightForConnectedWallsCommand c = new ChangeHeightForConnectedWallsCommand(w);
+											Scene.getInstance().setHeightOfConnectedWalls(w, val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 1;
 									} else if (rb3.isSelected()) {
 										final Foundation foundation = w.getTopContainer();
-										final ChangeFoundationWallHeightCommand c = new ChangeFoundationWallHeightCommand(foundation);
-										foundation.setHeightOfWalls(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Wall x : foundation.getWalls()) {
+												if (Math.abs(val - x.getHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationWallHeightCommand c = new ChangeFoundationWallHeightCommand(foundation);
+											foundation.setHeightOfWalls(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 2;
 									} else if (rb4.isSelected()) {
-										final ChangeHeightForAllWallsCommand c = new ChangeHeightForAllWallsCommand(w);
-										Scene.getInstance().setHeightForAllWalls(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (!changed) {
+											for (final Wall x : Scene.getInstance().getAllWalls()) {
+												if (Math.abs(val - x.getHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeHeightForAllWallsCommand c = new ChangeHeightForAllWallsCommand(w);
+											Scene.getInstance().setHeightForAllWalls(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 										selectedScopeIndex = 3;
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}
@@ -436,17 +503,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			final ButtonGroup typeGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem rbmiSolidWall = new JRadioButtonMenuItem("Solid Wall");
-			rbmiSolidWall.addActionListener(new ActionListener() {
+			rbmiSolidWall.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.SOLID_WALL);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.SOLID_WALL);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -454,17 +523,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			typeGroup.add(rbmiSolidWall);
 
 			final JRadioButtonMenuItem rbmiEmpty = new JRadioButtonMenuItem("Empty");
-			rbmiEmpty.addActionListener(new ActionListener() {
+			rbmiEmpty.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.EMPTY);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.EMPTY);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -472,17 +543,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			typeGroup.add(rbmiEmpty);
 
 			final JRadioButtonMenuItem rbmiEdges = new JRadioButtonMenuItem("Vertical Edges");
-			rbmiEdges.addActionListener(new ActionListener() {
+			rbmiEdges.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.VERTICAL_EDGES_ONLY);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.VERTICAL_EDGES_ONLY);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -490,17 +563,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			typeGroup.add(rbmiEdges);
 
 			final JRadioButtonMenuItem rbmiColumns = new JRadioButtonMenuItem("Columns");
-			rbmiColumns.addActionListener(new ActionListener() {
+			rbmiColumns.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.COLUMNS_ONLY);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.COLUMNS_ONLY);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -508,17 +583,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			typeGroup.add(rbmiColumns);
 
 			final JRadioButtonMenuItem rbmiRails = new JRadioButtonMenuItem("Rails");
-			rbmiRails.addActionListener(new ActionListener() {
+			rbmiRails.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.RAILS_ONLY);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.RAILS_ONLY);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -526,17 +603,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			typeGroup.add(rbmiRails);
 
 			final JRadioButtonMenuItem rbmiColumnsAndRailings = new JRadioButtonMenuItem("Columns & Railings");
-			rbmiColumnsAndRailings.addActionListener(new ActionListener() {
+			rbmiColumnsAndRailings.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.COLUMNS_RAILS);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.COLUMNS_RAILS);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -544,17 +623,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			typeGroup.add(rbmiColumnsAndRailings);
 
 			final JRadioButtonMenuItem rbmiFence = new JRadioButtonMenuItem("Fence");
-			rbmiFence.addActionListener(new ActionListener() {
+			rbmiFence.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.FENCE);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.FENCE);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -562,17 +643,19 @@ class PopupMenuForWall extends PopupMenuFactory {
 			typeGroup.add(rbmiFence);
 
 			final JRadioButtonMenuItem rbmiSteelFrame = new JRadioButtonMenuItem("Steel Frame");
-			rbmiSteelFrame.addActionListener(new ActionListener() {
+			rbmiSteelFrame.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Wall) {
-						final Wall wall = (Wall) selectedPart;
-						final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-						wall.setType(Wall.STEEL_FRAME);
-						wall.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Wall) {
+							final Wall wall = (Wall) selectedPart;
+							final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							wall.setType(Wall.STEEL_FRAME);
+							wall.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -651,4 +734,5 @@ class PopupMenuForWall extends PopupMenuFactory {
 		return popupMenuForWall;
 
 	}
+
 }

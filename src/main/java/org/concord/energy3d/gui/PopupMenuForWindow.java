@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -74,30 +76,34 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			final JMenu muntinMenu = new JMenu("Muntins");
 
 			final JCheckBoxMenuItem cbmiHorizontalBars = new JCheckBoxMenuItem("Horizontal Bars");
-			cbmiHorizontalBars.addActionListener(new ActionListener() {
+			cbmiHorizontalBars.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						w.setHorizontalBars(cbmiHorizontalBars.isSelected());
-						w.draw();
-						Scene.getInstance().setEdited(true);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							w.setHorizontalBars(cbmiHorizontalBars.isSelected());
+							w.draw();
+							Scene.getInstance().setEdited(true);
+						}
 					}
 				}
 			});
 			muntinMenu.add(cbmiHorizontalBars);
 
 			final JCheckBoxMenuItem cbmiVerticalBars = new JCheckBoxMenuItem("Vertical Bars");
-			cbmiVerticalBars.addActionListener(new ActionListener() {
+			cbmiVerticalBars.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						w.setVerticalBars(cbmiVerticalBars.isSelected());
-						w.draw();
-						Scene.getInstance().setEdited(true);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							w.setVerticalBars(cbmiVerticalBars.isSelected());
+							w.draw();
+							Scene.getInstance().setEdited(true);
+						}
 					}
 				}
 			});
@@ -107,15 +113,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			final ButtonGroup muntinButtonGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem miMoreBars = new JRadioButtonMenuItem("More Bars");
-			miMoreBars.addActionListener(new ActionListener() {
+			miMoreBars.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						w.setStyle(Window.MORE_MUNTIN_BARS);
-						w.draw();
-						Scene.getInstance().setEdited(true);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							w.setStyle(Window.MORE_MUNTIN_BARS);
+							w.draw();
+							Scene.getInstance().setEdited(true);
+						}
 					}
 				}
 			});
@@ -123,15 +131,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			muntinMenu.add(miMoreBars);
 
 			final JRadioButtonMenuItem miMediumBars = new JRadioButtonMenuItem("Medium Bars");
-			miMediumBars.addActionListener(new ActionListener() {
+			miMediumBars.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						w.setStyle(Window.MEDIUM_MUNTIN_BARS);
-						w.draw();
-						Scene.getInstance().setEdited(true);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							w.setStyle(Window.MEDIUM_MUNTIN_BARS);
+							w.draw();
+							Scene.getInstance().setEdited(true);
+						}
 					}
 				}
 			});
@@ -139,15 +149,17 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			muntinMenu.add(miMediumBars);
 
 			final JRadioButtonMenuItem miLessBars = new JRadioButtonMenuItem("Less Bars");
-			miLessBars.addActionListener(new ActionListener() {
+			miLessBars.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						w.setStyle(Window.LESS_MUNTIN_BARS);
-						w.draw();
-						Scene.getInstance().setEdited(true);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							w.setStyle(Window.LESS_MUNTIN_BARS);
+							w.draw();
+							Scene.getInstance().setEdited(true);
+						}
 					}
 				}
 			});
@@ -194,50 +206,56 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			final JCheckBoxMenuItem cbmiLeftShutter = new JCheckBoxMenuItem("Left Shutter");
 			final JCheckBoxMenuItem cbmiRightShutter = new JCheckBoxMenuItem("Right Shutter");
 
-			cbmiLeftShutter.addActionListener(new ActionListener() {
+			cbmiLeftShutter.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
-						w.setLeftShutter(cbmiLeftShutter.isSelected());
-						w.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+							w.setLeftShutter(cbmiLeftShutter.isSelected());
+							w.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
 			shutterMenu.add(cbmiLeftShutter);
 
-			cbmiRightShutter.addActionListener(new ActionListener() {
+			cbmiRightShutter.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
-						w.setRightShutter(cbmiRightShutter.isSelected());
-						w.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+							w.setRightShutter(cbmiRightShutter.isSelected());
+							w.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
 			shutterMenu.add(cbmiRightShutter);
 
-			cbmiBothShutters.addActionListener(new ActionListener() {
+			cbmiBothShutters.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Window) {
-						final Window w = (Window) selectedPart;
-						final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
-						w.setLeftShutter(cbmiBothShutters.isSelected());
-						w.setRightShutter(cbmiBothShutters.isSelected());
-						w.draw();
-						Scene.getInstance().setEdited(true);
-						SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Window) {
+							final Window w = (Window) selectedPart;
+							final ChangeWindowShuttersCommand c = new ChangeWindowShuttersCommand(w);
+							w.setLeftShutter(cbmiBothShutters.isSelected());
+							w.setRightShutter(cbmiBothShutters.isSelected());
+							w.draw();
+							Scene.getInstance().setEdited(true);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
 					}
 				}
 			});
@@ -472,11 +490,19 @@ class PopupMenuForWindow extends PopupMenuFactory {
 								if (val < 0 || val > 1) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar heat gain coefficient must be between 0 and 1.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
+									final boolean changed = Math.abs(val - window.getSolarHeatGainCoefficient()) > 0.000001;
 									if (rb1.isSelected()) {
-										final ChangeWindowShgcCommand c = new ChangeWindowShgcCommand(window);
-										window.setSolarHeatGainCoefficient(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeWindowShgcCommand c = new ChangeWindowShgcCommand(window);
+											window.setSolarHeatGainCoefficient(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
 									} else if (rb2.isSelected()) {
+										if (!changed) {
+											if (window.getContainer() instanceof Wall) {
+												final Wall wall = (Wall) window.getContainer();
+											}
+										}
 										final ChangeContainerWindowShgcCommand c = new ChangeContainerWindowShgcCommand(window.getContainer());
 										Scene.getInstance().setWindowShgcInContainer(window.getContainer(), val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -486,7 +512,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 										Scene.getInstance().setWindowShgcOfBuilding(foundation, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
-									updateAfterEdit();
+									if (changed) {
+										updateAfterEdit();
+									}
 									if (choice == options[0]) {
 										break;
 									}

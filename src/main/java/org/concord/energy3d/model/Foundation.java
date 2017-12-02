@@ -71,6 +71,7 @@ import com.ardor3d.util.geom.BufferUtils;
 import com.ardor3d.util.resource.URLResourceSource;
 
 public class Foundation extends HousePart implements Thermal, Labelable {
+
 	private static final long serialVersionUID = 1L;
 	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
@@ -1799,6 +1800,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 		}
 		return roofs;
+	}
+
+	public List<Wall> getWalls() {
+		final List<Wall> list = new ArrayList<Wall>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Wall && p.getTopContainer() == this) {
+				list.add((Wall) p);
+			}
+		}
+		return list;
 	}
 
 	public List<Window> getWindows() {

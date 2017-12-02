@@ -96,52 +96,60 @@ class PopupMenuForSky extends PopupMenuFactory {
 			final ButtonGroup themeButtonGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem miBlueSky = new JRadioButtonMenuItem("Blue Sky");
-			miBlueSky.addActionListener(new ActionListener() {
+			miBlueSky.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(miBlueSky);
 			themeMenu.add(miBlueSky);
 
 			final JRadioButtonMenuItem miDesert = new JRadioButtonMenuItem("Desert");
-			miDesert.addActionListener(new ActionListener() {
+			miDesert.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.DESERT_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.DESERT_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(miDesert);
 			themeMenu.add(miDesert);
 
 			final JRadioButtonMenuItem miGrassland = new JRadioButtonMenuItem("Grassland");
-			miGrassland.addActionListener(new ActionListener() {
+			miGrassland.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(miGrassland);
 			themeMenu.add(miGrassland);
 
 			final JRadioButtonMenuItem miForest = new JRadioButtonMenuItem("Forest");
-			miForest.addActionListener(new ActionListener() {
+			miForest.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.FOREST_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.FOREST_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(miForest);
@@ -204,12 +212,21 @@ class PopupMenuForSky extends PopupMenuFactory {
 							}
 						}
 						if (pass) {
-							final ChangeAtmosphericDustLossCommand c = new ChangeAtmosphericDustLossCommand();
+							boolean changed = false;
 							for (int i = 0; i < 12; i++) {
-								Scene.getInstance().getAtmosphere().setDustLoss(val[i], i);
+								if (Math.abs(Scene.getInstance().getAtmosphere().getDustLoss(i) - val[i]) > 0.000001) {
+									changed = true;
+									break;
+								}
 							}
-							updateAfterEdit();
-							SceneManager.getInstance().getUndoManager().addEdit(c);
+							if (changed) {
+								final ChangeAtmosphericDustLossCommand c = new ChangeAtmosphericDustLossCommand();
+								for (int i = 0; i < 12; i++) {
+									Scene.getInstance().getAtmosphere().setDustLoss(val[i], i);
+								}
+								updateAfterEdit();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+							}
 							break;
 						}
 					}

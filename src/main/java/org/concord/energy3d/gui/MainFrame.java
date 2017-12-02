@@ -3337,13 +3337,15 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getBlueSkyMenuItem() {
 		if (blueSkyMenuItem == null) {
 			blueSkyMenuItem = new JRadioButtonMenuItem("Blue Sky");
-			blueSkyMenuItem.addActionListener(new ActionListener() {
+			blueSkyMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.BLUE_SKY_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(blueSkyMenuItem);
@@ -3354,13 +3356,15 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getDesertMenuItem() {
 		if (desertMenuItem == null) {
 			desertMenuItem = new JRadioButtonMenuItem("Desert");
-			desertMenuItem.addActionListener(new ActionListener() {
+			desertMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.DESERT_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.DESERT_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(desertMenuItem);
@@ -3371,13 +3375,15 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getGrasslandMenuItem() {
 		if (grasslandMenuItem == null) {
 			grasslandMenuItem = new JRadioButtonMenuItem("Grassland");
-			grasslandMenuItem.addActionListener(new ActionListener() {
+			grasslandMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.GRASSLAND_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(grasslandMenuItem);
@@ -3388,13 +3394,15 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getForestMenuItem() {
 		if (forestMenuItem == null) {
 			forestMenuItem = new JRadioButtonMenuItem("Forest");
-			forestMenuItem.addActionListener(new ActionListener() {
+			forestMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeThemeCommand c = new ChangeThemeCommand();
-					Scene.getInstance().setTheme(Scene.FOREST_THEME);
-					Scene.getInstance().setEdited(true);
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeThemeCommand c = new ChangeThemeCommand();
+						Scene.getInstance().setTheme(Scene.FOREST_THEME);
+						Scene.getInstance().setEdited(true);
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
 				}
 			});
 			themeButtonGroup.add(forestMenuItem);

@@ -3059,6 +3059,16 @@ public class Scene implements Serializable {
 
 	// walls
 
+	public List<Wall> getAllWalls() {
+		final List<Wall> list = new ArrayList<Wall>();
+		for (final HousePart p : parts) {
+			if (p instanceof Wall) {
+				list.add((Wall) p);
+			}
+		}
+		return list;
+	}
+
 	public void setThicknessForAllWalls(final double thickness) {
 		for (final HousePart p : parts) {
 			if (p instanceof Wall) {
