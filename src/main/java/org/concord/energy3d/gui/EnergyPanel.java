@@ -476,7 +476,7 @@ public class EnergyPanel extends JPanel {
 		// part panel
 
 		partPanel = new JPanel(new BorderLayout(10, 0));
-		partPanel.setBorder(createTitledBorder("Part", true));
+		partPanel.setBorder(createTitledBorder("-", true));
 		partPanel.setMaximumSize(new Dimension(partPanel.getMaximumSize().width, partPanel.getPreferredSize().height));
 		dataPanel.add(partPanel);
 
@@ -1707,7 +1707,7 @@ public class EnergyPanel extends JPanel {
 											partProperty3TextField.setText("");
 											partProperty3TextField.putClientProperty("tooltip", null);
 										} else {
-											partPanelBorder.setTitle("Part");
+											partPanelBorder.setTitle(" -");
 											partProperty1Label.setText("  -");
 											partProperty1TextField.setText("");
 											partProperty1TextField.putClientProperty("tooltip", null);

@@ -267,7 +267,11 @@ public class MyEditorPane {
 							buttonModel.addItemListener(new ItemListener() {
 								@Override
 								public void itemStateChanged(final ItemEvent e) {
-									if (e.getStateChange() == ItemEvent.SELECTED) {
+									if (qm != null) { // fire only one for questionnaires
+										if (e.getStateChange() == ItemEvent.SELECTED) {
+											buttonActionPerformed(a, qm, bm);
+										}
+									} else {
 										buttonActionPerformed(a, qm, bm);
 									}
 								}

@@ -1258,7 +1258,7 @@ public class MainFrame extends JFrame {
 			final JPanel p = new JPanel(new BorderLayout(10, 10));
 			p.setBorder(BorderFactory.createEmptyBorder(10, 20, 20, 20));
 			final String title = "<h3>Energy3D</h3><h4><i>Learning to build a sustainable world</i></h4>Version: " + MainApplication.VERSION + ", &copy; 2011-" + Calendar.getInstance().get(Calendar.YEAR);
-			final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:<ul><li>Dr. Charles Xie (2010-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Ardor3D, Getdown, JOGL, and Poly2tri.";
+			final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:<ul><li>Dr. Charles Xie (2009-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Ardor3D, Getdown, JOGL, and Poly2tri.";
 			final String license = "<br>The program is provided as it is to you under the MIT License.";
 			final String funder = "<h4>Funders</h4>Funding is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by<br>General Motors through grant 34871079 awarded to Charles Xie. Any<br>opinions, findings, and conclusions or recommendations expressed in the<br>materials associated with this program are those of the author(s) and do<br>not necessarily reflect the views of the National Science Foundation or<br>General Motors.";
 			final String source = "<h4>Source Code</h4>https://github.com/concord-consortium/energy3d";
@@ -1633,6 +1633,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
 					MainPanel.getInstance().defaultTool();
+					sunAnglesMenuItem.setEnabled(Heliodon.getInstance().isVisible());
 				}
 			});
 
@@ -1911,7 +1912,7 @@ public class MainFrame extends JFrame {
 
 	private JCheckBoxMenuItem getSunAnglesMenuItem() {
 		if (sunAnglesMenuItem == null) {
-			sunAnglesMenuItem = new JCheckBoxMenuItem("Sun Angles");
+			sunAnglesMenuItem = new JCheckBoxMenuItem("Sun Angles with Heliodon");
 			sunAnglesMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
@@ -3307,16 +3308,18 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getNoTextureMenuItem() {
 		if (noTextureMenuItem == null) {
 			noTextureMenuItem = new JRadioButtonMenuItem("No Texture");
-			noTextureMenuItem.addActionListener(new ActionListener() {
+			noTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeTextureCommand c = new ChangeTextureCommand();
-					Scene.getInstance().setTextureMode(TextureMode.None);
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeTextureCommand c = new ChangeTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.None);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 			textureButtonGroup.add(noTextureMenuItem);
@@ -3327,16 +3330,18 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getSimpleTextureMenuItem() {
 		if (simpleTextureMenuItem == null) {
 			simpleTextureMenuItem = new JRadioButtonMenuItem("Simple Texture");
-			simpleTextureMenuItem.addActionListener(new ActionListener() {
+			simpleTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeTextureCommand c = new ChangeTextureCommand();
-					Scene.getInstance().setTextureMode(TextureMode.Simple);
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeTextureCommand c = new ChangeTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.Simple);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
 			textureButtonGroup.add(simpleTextureMenuItem);
@@ -3347,19 +3352,20 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getFullTextureMenuItem() {
 		if (fullTextureMenuItem == null) {
 			fullTextureMenuItem = new JRadioButtonMenuItem("Full Texture");
-			fullTextureMenuItem.addActionListener(new ActionListener() {
+			fullTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final ChangeTextureCommand c = new ChangeTextureCommand();
-					Scene.getInstance().setTextureMode(TextureMode.Full);
-					Scene.getInstance().setEdited(true);
-					if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeTextureCommand c = new ChangeTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.Full);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
+							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
-					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
-			fullTextureMenuItem.setSelected(true);
 			textureButtonGroup.add(fullTextureMenuItem);
 		}
 		return fullTextureMenuItem;

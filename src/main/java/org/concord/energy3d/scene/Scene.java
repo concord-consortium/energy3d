@@ -343,16 +343,16 @@ public class Scene implements Serializable {
 		instance.init();
 		instance.applyGroundImage();
 
+		if (instance.textureMode == TextureMode.Simple) {
+			Util.selectSilently(MainFrame.getInstance().getSimpleTextureMenuItem(), true);
+		} else if (instance.textureMode == TextureMode.Full) {
+			Util.selectSilently(MainFrame.getInstance().getFullTextureMenuItem(), true);
+		} else {
+			Util.selectSilently(MainFrame.getInstance().getNoTextureMenuItem(), true);
+		}
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
 			@Override
 			public void run() {
-				if (instance.textureMode == TextureMode.None) {
-					MainFrame.getInstance().getNoTextureMenuItem().setSelected(true);
-				} else if (instance.textureMode == TextureMode.Simple) {
-					MainFrame.getInstance().getSimpleTextureMenuItem().setSelected(true);
-				} else {
-					MainFrame.getInstance().getFullTextureMenuItem().setSelected(true);
-				}
 				MainPanel.getInstance().getAnnotationButton().setSelected(instance.isAnnotationsVisible);
 				MainFrame.getInstance().updateTitleBar();
 				SceneManager.getInstance().cursorWait(false);
@@ -395,7 +395,7 @@ public class Scene implements Serializable {
 		if (calendar != null) {
 			calendar.set(Calendar.SECOND, 0);
 			calendar.set(Calendar.MILLISECOND, 0);
-			if (url == null && Heliodon.getInstance().isNightTime()) {
+			if (url == null) { // if a new file is created, its default time is always set to noon so that the user does not get a dark night scene
 				calendar.set(Calendar.HOUR_OF_DAY, 12);
 				calendar.set(Calendar.MINUTE, 0);
 			}
