@@ -145,12 +145,12 @@ public class MainPanel extends JPanel {
 		initialize();
 
 		// create roof menu
-		final JCheckBoxMenuItem miPyramidRoof = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/roof_pyramid.png")), true);
-		final JCheckBoxMenuItem miHipRoof = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/roof_hip.png")));
-		final JCheckBoxMenuItem miShedRoof = new JCheckBoxMenuItem("Shed Roof", new ImageIcon(getClass().getResource("icons/roof_shed.png")));
-		final JCheckBoxMenuItem miGambrelRoof = new JCheckBoxMenuItem("Gambrel Roof", new ImageIcon(getClass().getResource("icons/roof_gambler.png")));
-		final JCheckBoxMenuItem miCustomRoof = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/roof_custom.png")));
-		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Conversion", new ImageIcon(getClass().getResource("icons/roof_gable.png")));
+		final JCheckBoxMenuItem miPyramidRoof = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/pyramid_roof.png")), true);
+		final JCheckBoxMenuItem miHipRoof = new JCheckBoxMenuItem("Hip Roof", new ImageIcon(getClass().getResource("icons/hip_roof.png")));
+		final JCheckBoxMenuItem miShedRoof = new JCheckBoxMenuItem("Shed Roof", new ImageIcon(getClass().getResource("icons/shed_roof.png")));
+		final JCheckBoxMenuItem miGambrelRoof = new JCheckBoxMenuItem("Gambrel Roof", new ImageIcon(getClass().getResource("icons/gambler_roof.png")));
+		final JCheckBoxMenuItem miCustomRoof = new JCheckBoxMenuItem("Custom Roof", new ImageIcon(getClass().getResource("icons/custom_roof.png")));
+		final JCheckBoxMenuItem miGableRoof = new JCheckBoxMenuItem("Gable Conversion", new ImageIcon(getClass().getResource("icons/gable.png")));
 		final ActionListener roofAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -340,7 +340,7 @@ public class MainPanel extends JPanel {
 
 		// create solar menu
 		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Panel Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
-		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Single Solar Panel", new ImageIcon(getClass().getResource("icons/solarpanel.png")));
+		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Single Solar Panel", new ImageIcon(getClass().getResource("icons/solar_panel.png")));
 		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Planar Mirror (Heliostat)", new ImageIcon(getClass().getResource("icons/mirror.png")));
 		final JCheckBoxMenuItem miParabolicTrough = new JCheckBoxMenuItem("Parabolic Trough", new ImageIcon(getClass().getResource("icons/parabolic_trough.png")));
 		final JCheckBoxMenuItem miParabolicDish = new JCheckBoxMenuItem("Parabolic Dish", new ImageIcon(getClass().getResource("icons/parabolic_dish.png")));
@@ -629,7 +629,7 @@ public class MainPanel extends JPanel {
 		if (heliodonButton == null) {
 			heliodonButton = new JToggleButton();
 			heliodonButton.addMouseListener(refreshUponMouseExit);
-			heliodonButton.setIcon(new ImageIcon(getClass().getResource("icons/sun_heliodon.png")));
+			heliodonButton.setIcon(new ImageIcon(getClass().getResource("icons/heliodon.png")));
 			heliodonButton.setToolTipText("Show heliodon");
 			heliodonButton.setFocusable(false);
 			heliodonButton.addItemListener(new ItemListener() {
@@ -822,7 +822,7 @@ public class MainPanel extends JPanel {
 		if (energyViewButton == null) {
 			energyViewButton = new JToggleButton("");
 			energyViewButton.setToolTipText("Calculate energy of the day");
-			energyViewButton.setIcon(new ImageIcon(getClass().getResource("icons/heatmap.png")));
+			energyViewButton.setIcon(new ImageIcon(getClass().getResource("icons/calculate.png")));
 			energyViewButton.addMouseListener(refreshUponMouseExit);
 			energyViewButton.setFocusable(false);
 			energyViewButton.addItemListener(new ItemListener() {
@@ -1019,7 +1019,7 @@ public class MainPanel extends JPanel {
 	private JToggleButton getRoofButton() {
 		if (roofButton == null) {
 			roofButton = new JToggleButton();
-			roofButton.setIcon(new ImageIcon(getClass().getResource("icons/roof_pyramid.png")));
+			roofButton.setIcon(new ImageIcon(getClass().getResource("icons/pyramid_roof.png")));
 			roofButton.setToolTipText("Draw pyramid roof");
 			roofButton.setFocusable(false);
 			roofButton.addActionListener(new ActionListener() {
