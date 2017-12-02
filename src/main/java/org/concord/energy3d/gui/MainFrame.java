@@ -55,6 +55,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileFilter;
@@ -1141,20 +1142,40 @@ public class MainFrame extends JFrame {
 					if (!jarFile.toString().endsWith("energy3d.jar")) {
 						return;
 					}
-					URLConnection connection = null;
-					try {
-						connection = new URL("http://energy.concord.org/energy3d/update/energy3d.jar").openConnection();
-					} catch (final Exception e1) {
-						e1.printStackTrace();
-						JOptionPane.showMessageDialog(instance, e1.getMessage(), "URL Error (remote energy3d.jar)", JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if (connection.getLastModified() <= jarFile.lastModified()) {
-						JOptionPane.showMessageDialog(instance, "Your software is up to date.", "Update Status", JOptionPane.INFORMATION_MESSAGE);
-					} else {
-						JOptionPane.showMessageDialog(instance, "<html>Your software is out of date. But for some reason, it cannot update itself.<br>Please go to http://energy3d.concord.org to download and reinstall the latest version.</html>", "Update Status", JOptionPane.INFORMATION_MESSAGE);
-						Util.openBrowser("http://energy3d.concord.org");
-					}
+					final long localLastModified = jarFile.lastModified();
+					new SwingWorker<Void, Void>() {
+
+						URLConnection connection = null;
+						String msg = null;
+						long remoteLastModified;
+
+						@Override
+						protected Void doInBackground() throws Exception {
+							try {
+								connection = new URL("http://energy.concord.org/energy3d/update/energy3d.jar").openConnection();
+								remoteLastModified = connection.getLastModified();
+							} catch (final Exception e1) {
+								e1.printStackTrace();
+								msg = e1.getMessage();
+							}
+							return null;
+						}
+
+						@Override
+						protected void done() {
+							if (connection == null) {
+								JOptionPane.showMessageDialog(instance, msg, "URL Error (remote energy3d.jar)", JOptionPane.ERROR_MESSAGE);
+							} else {
+								if (remoteLastModified <= localLastModified) {
+									JOptionPane.showMessageDialog(instance, "Your software is up to date.", "Update Status", JOptionPane.INFORMATION_MESSAGE);
+								} else {
+									JOptionPane.showMessageDialog(instance, "<html>Your software is out of date. But for some reason, it cannot update itself.<br>Please go to http://energy3d.concord.org to download and reinstall the latest version.</html>", "Update Status", JOptionPane.INFORMATION_MESSAGE);
+									Util.openBrowser("http://energy3d.concord.org");
+								}
+							}
+						}
+
+					}.execute();
 				}
 			});
 
