@@ -48,35 +48,34 @@ public class EventString extends JPanel {
 		add(html, BorderLayout.CENTER);
 
 		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
-		String text = "<html><table border=0 cellpadding=0 cellspacing=0>";
+		String text = "<html>";
 		final int columns = 20;
 		for (int i = 0; i < eventString.length(); i++) {
-			if (i % columns == 0) {
-				text += "<tr>";
+			if (i != 0 && i % columns == 0) {
+				text += "<br>";
 			}
 			final char c = eventString.charAt(i);
 			switch (c) {
 			case 'A':
-				text += "<td bgcolor=#9933aa><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<span style=\"background-color: #9933aa\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			case 'C':
-				text += "<td bgcolor=#339922><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<span style=\"background-color: #339922\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			case 'D':
-				text += "<td bgcolor=#aa9922><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<span style=\"background-color: #aa9922\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			case 'U':
-				text += "<td bgcolor=#226699><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<span style=\"background-color: #226699\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			case '_':
-				text += "<td bgcolor=#dddddd><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<span style=\"background-color: #dddddd\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			default:
-				text += "<td bgcolor=#333333><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font>";
+				text += "<span style=\"background-color: #333333\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 			}
-			text += "</td>";
 		}
-		text += "</tr></table></html>";
+		text += "</html>";
 		html.setText(text);
 
 	}

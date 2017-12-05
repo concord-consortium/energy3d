@@ -54,6 +54,7 @@ import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
+import org.concord.energy3d.util.Config;
 
 public class MainPanel extends JPanel {
 
@@ -1078,6 +1079,9 @@ public class MainPanel extends JPanel {
 	public JButton getRotateButton() {
 		if (rotateButton == null) {
 			rotateButton = new JButton();
+			if (Config.isMac()) { // for some reason, the newer version of Mac draws border for JButton (but not JToggleButton)
+				rotateButton.setBorderPainted(false);
+			}
 			rotateButton.addMouseListener(refreshUponMouseExit);
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
 			rotateButton.setToolTipText("<html>Rotate in the clockwise direction (change azimuth).<br>Hold down the Ctrl key and press this button for counter-clockwise rotation.<br>Hold down the Shift key while pressing this button to rotate more slowly.<br>If a component is selected, rotate around its center. Otherwise rotate everything around the origin.</html>");

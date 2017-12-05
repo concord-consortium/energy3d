@@ -60,6 +60,8 @@ class PropertiesDialog extends JDialog {
 		}
 		final JComboBox<String> groundImageColorationComboBox = new JComboBox<String>(new String[] { "Dark Colored", "Light Colored" });
 		groundImageColorationComboBox.setSelectedIndex(Scene.getInstance().isGroundImageLightColored() ? 1 : 0);
+		final JComboBox<String> instructionTabComboBox = new JComboBox<String>(new String[] { "Show", "Hide" });
+		instructionTabComboBox.setSelectedIndex(Scene.getInstance().isInstructionTabVisible() ? 0 : 1);
 
 		final ActionListener okListener = new ActionListener() {
 			@Override
@@ -110,6 +112,7 @@ class PropertiesDialog extends JDialog {
 				Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setGroundImageLightColored(groundImageColorationComboBox.getSelectedIndex() == 1);
+				Scene.getInstance().setInstructionTabVisible(instructionTabComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setEdited(true);
 				EnergyPanel.getInstance().updateWeatherData();
 				EnergyPanel.getInstance().update();
@@ -153,7 +156,11 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Ground Image Coloration: "));
 		panel.add(groundImageColorationComboBox);
 
-		SpringUtilities.makeCompactGrid(panel, 9, 2, 8, 8, 8, 8);
+		// instruction tab
+		panel.add(new JLabel("Instruction Tab: "));
+		panel.add(instructionTabComboBox);
+
+		SpringUtilities.makeCompactGrid(panel, 10, 2, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

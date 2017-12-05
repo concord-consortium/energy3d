@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -55,6 +56,8 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.plaf.TabbedPaneUI;
+import javax.swing.plaf.metal.MetalTabbedPaneUI;
 import javax.swing.text.DefaultCaret;
 
 import org.concord.energy3d.MainApplication;
@@ -159,6 +162,7 @@ public class EnergyPanel extends JPanel {
 	private PvProjectInfoPanel pvProjectInfoPanel;
 	private CspProjectInfoPanel cspProjectInfoPanel;
 	private JTabbedPane buildingTabbedPane, pvProjectTabbedPane, cspProjectTabbedPane, instructionTabbedPane;
+	private TabbedPaneUI instructionTabbedPaneUI;
 	private JPanel buildingPanel, pvProjectPanel, cspProjectPanel, instructionPanel;
 	private final MyEditorPane[] instructionSheets = new MyEditorPane[Scene.INSTRUCTION_SHEET_NUMBER];
 	private boolean disableDateSpinner;
@@ -681,6 +685,7 @@ public class EnergyPanel extends JPanel {
 
 		instructionTabbedPane = new JTabbedPane();
 		instructionTabbedPane.setFont(new Font(instructionTabbedPane.getFont().getName(), Font.PLAIN, instructionTabbedPane.getFont().getSize() - 1));
+		instructionTabbedPaneUI = instructionTabbedPane.getUI();
 		instructionTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent e) {
@@ -749,6 +754,23 @@ public class EnergyPanel extends JPanel {
 		progressBar = new JProgressBar();
 		add(progressBar, BorderLayout.SOUTH);
 
+	}
+
+	public void showInstructionTabbedPaneTabs(final boolean b) {
+		if (b) {
+			instructionTabbedPane.setUI(instructionTabbedPaneUI);
+		} else {
+			instructionTabbedPane.setUI(new MetalTabbedPaneUI() {
+				@Override
+				protected int calculateTabAreaHeight(final int tabPlacement, final int horizRunCount, final int maxTabHeight) {
+					return 0;
+				}
+
+				@Override
+				protected void paintTabArea(final Graphics g, final int tabPlacement, final int selectedIndex) {
+				}
+			});
+		}
 	}
 
 	public void compute(final UpdateRadiation updateRadiation) {
@@ -834,6 +856,7 @@ public class EnergyPanel extends JPanel {
 				});
 				return null;
 			}
+
 		});
 	}
 
@@ -1086,6 +1109,7 @@ public class EnergyPanel extends JPanel {
 				final Human human = (Human) selectedPart;
 				if (human.isDrawable()) {
 					EventQueue.invokeLater(new Runnable() {
+
 						@Override
 						public void run() {
 							partPanelBorder.setTitle("Human (" + human.getId() + "): " + human.getHumanName());
@@ -1739,6 +1763,7 @@ public class EnergyPanel extends JPanel {
 			selectedFoundation = selectedPart.getTopContainer();
 		}
 		EventQueue.invokeLater(new Runnable() {
+
 			@Override
 			public void run() {
 				if (selectedFoundation != null) {
@@ -1803,6 +1828,7 @@ public class EnergyPanel extends JPanel {
 				dataPanel.validate();
 				dataPanel.repaint();
 			}
+
 		});
 
 	}
