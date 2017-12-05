@@ -30,6 +30,16 @@ public class AnalysisEvent implements NonundoableEvent {
 		}
 	}
 
+	/** @return true if this is an event related to daily analysis (24 data points) */
+	public boolean isDaily() {
+		for (final String key : data.keySet()) {
+			if (data.get(key).size() > 12) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public Map<String, List<Double>> getResults() {
 		return data;
 	}
@@ -46,7 +56,10 @@ public class AnalysisEvent implements NonundoableEvent {
 
 	@Override
 	public char getOneLetterCode() {
-		return 'A';
+		if (isDaily()) {
+			return 'A';
+		}
+		return 'Y';
 	}
 
 	@Override

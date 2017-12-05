@@ -177,7 +177,7 @@ public class Scene implements Serializable {
 	private transient List<List<Foundation>> foundationGroups;
 	private String[] instructionSheetText;
 	private String[] instructionSheetTextType;
-	private boolean instructionTabInvisible;
+	private boolean instructionTabHeaderInvisible;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -287,7 +287,7 @@ public class Scene implements Serializable {
 						break;
 					}
 				}
-				e.showInstructionTabbedPaneTabs(!instance.instructionTabInvisible);
+				e.showInstructionTabHeaders(!instance.instructionTabHeaderInvisible);
 				MainFrame.getInstance().toFront();
 			}
 		});
@@ -3941,18 +3941,18 @@ public class Scene implements Serializable {
 		return instructionSheetTextType[i];
 	}
 
-	public void setInstructionTabVisible(final boolean b) {
-		instructionTabInvisible = !b;
+	public void setInstructionTabHeaderVisible(final boolean b) {
+		instructionTabHeaderInvisible = !b;
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().showInstructionTabbedPaneTabs(b);
+				EnergyPanel.getInstance().showInstructionTabHeaders(b);
 			}
 		});
 	}
 
-	public boolean isInstructionTabVisible() {
-		return !instructionTabInvisible;
+	public boolean isInstructionTabHeaderVisible() {
+		return !instructionTabHeaderInvisible;
 	}
 
 	public void setDisableShadowInAction(final boolean b) {

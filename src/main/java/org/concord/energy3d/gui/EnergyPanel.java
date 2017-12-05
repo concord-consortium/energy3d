@@ -757,7 +757,7 @@ public class EnergyPanel extends JPanel {
 
 	}
 
-	public void showInstructionTabbedPaneTabs(final boolean b) {
+	public void showInstructionTabHeaders(final boolean b) {
 		if (b) {
 			instructionTabbedPane.setUI(instructionTabbedPaneUI);
 		} else {

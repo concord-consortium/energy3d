@@ -313,14 +313,9 @@ public class MyEditorPane {
 		}
 
 		// instruction sheet selection commands
-		if ("Sheet 1".equals(act)) {
-			EnergyPanel.getInstance().selectInstructionSheet(0);
-		} else if ("Sheet 2".equals(act)) {
-			EnergyPanel.getInstance().selectInstructionSheet(1);
-		} else if ("Sheet 3".equals(act)) {
-			EnergyPanel.getInstance().selectInstructionSheet(2);
-		} else if ("Sheet 4".equals(act)) {
-			EnergyPanel.getInstance().selectInstructionSheet(3);
+		if (act.startsWith("Sheet")) {
+			final int i = Integer.parseInt(act.substring(5).trim());
+			EnergyPanel.getInstance().selectInstructionSheet(i - 1);
 		}
 
 		else if ("Questionnaire".equals(act)) {

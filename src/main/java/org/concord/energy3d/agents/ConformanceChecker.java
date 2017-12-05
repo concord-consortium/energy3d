@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
@@ -85,6 +86,7 @@ public class ConformanceChecker implements Agent {
 				msg += "Did you forget to investigate the effect of the U-value of a different wall?";
 			} else {
 				msg += "Thank you for completing this task!";
+				EnergyPanel.getInstance().showInstructionTabHeaders(true);
 			}
 		}
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
