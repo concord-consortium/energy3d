@@ -100,7 +100,7 @@ public class Scene implements Serializable {
 	public static final int GRASSLAND_THEME = 2;
 	public static final int FOREST_THEME = 3;
 
-	public static final int INSTRUCTION_SHEET_NUMBER = 4;
+	public static final int INSTRUCTION_SHEET_NUMBER = 5;
 
 	private static final long serialVersionUID = 1L;
 	private static final Node root = new Node("Model Root");

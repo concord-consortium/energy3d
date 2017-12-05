@@ -100,6 +100,7 @@ import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
+import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.bounding.OrientedBoundingBox;
@@ -684,7 +685,7 @@ public class EnergyPanel extends JPanel {
 		dataPanel.add(instructionPanel);
 
 		instructionTabbedPane = new JTabbedPane();
-		instructionTabbedPane.setFont(new Font(instructionTabbedPane.getFont().getName(), Font.PLAIN, instructionTabbedPane.getFont().getSize() - 1));
+		instructionTabbedPane.setFont(new Font(instructionTabbedPane.getFont().getName(), Font.PLAIN, instructionTabbedPane.getFont().getSize() - (Config.isMac() ? 3 : 2)));
 		instructionTabbedPaneUI = instructionTabbedPane.getUI();
 		instructionTabbedPane.addChangeListener(new ChangeListener() {
 			@Override
