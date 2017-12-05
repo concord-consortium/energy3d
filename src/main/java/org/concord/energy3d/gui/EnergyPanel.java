@@ -856,7 +856,6 @@ public class EnergyPanel extends JPanel {
 				});
 				return null;
 			}
-
 		});
 	}
 
@@ -1109,7 +1108,6 @@ public class EnergyPanel extends JPanel {
 				final Human human = (Human) selectedPart;
 				if (human.isDrawable()) {
 					EventQueue.invokeLater(new Runnable() {
-
 						@Override
 						public void run() {
 							partPanelBorder.setTitle("Human (" + human.getId() + "): " + human.getHumanName());
@@ -1763,7 +1761,6 @@ public class EnergyPanel extends JPanel {
 			selectedFoundation = selectedPart.getTopContainer();
 		}
 		EventQueue.invokeLater(new Runnable() {
-
 			@Override
 			public void run() {
 				if (selectedFoundation != null) {
@@ -1828,7 +1825,6 @@ public class EnergyPanel extends JPanel {
 				dataPanel.validate();
 				dataPanel.repaint();
 			}
-
 		});
 
 	}
