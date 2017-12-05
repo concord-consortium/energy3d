@@ -2521,9 +2521,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			} else {
 				if (ask) {
 					if (count > 1) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There are multiple buildings. You must select a building first.", "No Selection", JOptionPane.WARNING_MESSAGE);
 					} else {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building.", "No Building", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			}
@@ -2537,7 +2537,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				foundation = (Foundation) topContainer;
 			} else {
 				if (ask) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "You must select a building first.", "No Selection", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 		}

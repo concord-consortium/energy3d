@@ -73,7 +73,7 @@ public class ConformanceChecker implements Agent {
 		if (countQ < 2) {
 			msg += "Did you forget to answer the pre/post-test questions?";
 		} else if (countA == 0) {
-			msg += "You have never run an analysis.";
+			msg += "You have never run a daily energy analysis.";
 		} else if (countU == 0) {
 			msg += "You have never changed the U-value.";
 		} else if (countD == 0) {

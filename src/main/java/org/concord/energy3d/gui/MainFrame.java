@@ -2124,7 +2124,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final PvAnnualAnalysis a = new PvAnnualAnalysis();
@@ -2139,7 +2139,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this foundation to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 								a.setUtilityBill(foundation.getUtilityBill());
@@ -2164,7 +2164,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2178,7 +2178,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(new Class[] { SolarPanel.class, Rack.class });
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel on this foundation to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2204,7 +2204,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(Mirror.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2218,7 +2218,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(Mirror.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this foundation to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2244,7 +2244,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(Mirror.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final MirrorAnnualAnalysis a = new MirrorAnnualAnalysis();
@@ -2259,7 +2259,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(Mirror.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this foundation to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2281,7 +2281,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(ParabolicTrough.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2295,7 +2295,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(ParabolicTrough.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this foundation to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2321,7 +2321,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(ParabolicTrough.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final ParabolicTroughAnnualAnalysis a = new ParabolicTroughAnnualAnalysis();
@@ -2336,7 +2336,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(ParabolicTrough.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough on this foundation to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2358,7 +2358,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(ParabolicDish.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2372,7 +2372,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(ParabolicDish.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this foundation to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2398,7 +2398,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(ParabolicDish.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final ParabolicDishAnnualAnalysis a = new ParabolicDishAnnualAnalysis();
@@ -2413,7 +2413,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(ParabolicDish.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish on this foundation to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2435,7 +2435,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(FresnelReflector.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2449,7 +2449,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(FresnelReflector.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this platform to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this foundation to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2475,7 +2475,7 @@ public class MainFrame extends JFrame {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(FresnelReflector.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final FresnelReflectorAnnualAnalysis a = new FresnelReflectorAnnualAnalysis();
@@ -2490,7 +2490,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(FresnelReflector.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this building to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector on this foundation to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2552,7 +2552,7 @@ public class MainFrame extends JFrame {
 					if (Scene.getInstance().hasSensor()) {
 						new AnnualSensorData().show("Annual Sensor Data");
 					} else {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			});
@@ -2569,7 +2569,7 @@ public class MainFrame extends JFrame {
 					if (Scene.getInstance().hasSensor()) {
 						new DailySensorData().show("Daily Sensor Data");
 					} else {
-						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);
 					}
 				}
 			});

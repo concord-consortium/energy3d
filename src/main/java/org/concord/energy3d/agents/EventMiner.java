@@ -29,7 +29,7 @@ public class EventMiner implements Agent {
 		this.name = name;
 		feedbackOnAnalysisCheck = new FeedbackPool(1, 2);
 		feedbackOnAnalysisCheck.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
-		feedbackOnAnalysisCheck.setItem(0, 1, "Did you forget to run analysis?");
+		feedbackOnAnalysisCheck.setItem(0, 1, "Did you forget to run daily energy analysis?");
 		feedbackOnUValueCheck = new FeedbackPool(1, 2);
 		feedbackOnUValueCheck.setItem(0, 0, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
 		feedbackOnUValueCheck.setItem(0, 1, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");

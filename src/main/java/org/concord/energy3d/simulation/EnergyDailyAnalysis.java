@@ -171,7 +171,7 @@ public class EnergyDailyAnalysis extends DailyAnalysis {
 					cost = (int) BuildingCost.getInstance().getCostByFoundation((Foundation) selectedPart);
 					s = s.replaceAll("Foundation", "Building");
 					if (selectedPart.getChildren().isEmpty()) {
-						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.WARNING_MESSAGE);
 						return;
 					}
 					if (!isBuildingComplete((Foundation) selectedPart)) {
@@ -180,7 +180,7 @@ public class EnergyDailyAnalysis extends DailyAnalysis {
 						}
 					}
 				} else if (selectedPart instanceof Tree) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.WARNING_MESSAGE);
 					return;
 				}
 			}

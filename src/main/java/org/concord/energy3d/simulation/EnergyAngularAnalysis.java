@@ -152,7 +152,7 @@ public class EnergyAngularAnalysis extends Analysis {
 		if (selectedPart instanceof Foundation) {
 			s = s.replaceAll("Foundation", "Building");
 			if (selectedPart.getChildren().isEmpty()) {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this platform.", "No Building", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no building on this foundation.", "No Building", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 			if (!isBuildingComplete((Foundation) selectedPart)) {
@@ -161,7 +161,7 @@ public class EnergyAngularAnalysis extends Analysis {
 				}
 			}
 		} else if (selectedPart instanceof Tree) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy analysis is not applicable to a tree.", "Not Applicable", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), title + ": " + s, true);
