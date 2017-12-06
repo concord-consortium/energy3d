@@ -483,6 +483,22 @@ public class MainPanel extends JPanel {
 					defaultTool();
 				}
 			});
+			if (Config.isMac()) {
+				final Color defaultColor = selectButton.getBackground();
+				selectButton.addMouseListener(new MouseAdapter() {
+
+					@Override
+					public void mouseExited(final MouseEvent e) {
+						selectButton.setBackground(defaultColor);
+					}
+
+					@Override
+					public void mouseEntered(final MouseEvent e) {
+						selectButton.setBackground(Color.GRAY);
+					}
+
+				});
+			}
 		}
 		return selectButton;
 	}

@@ -3187,8 +3187,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	public List<SolarCollector> getSolarCollectors() {
 		final List<SolarCollector> list = new ArrayList<SolarCollector>();
-		for (final HousePart p : children) {
-			if (p instanceof SolarCollector) {
+		// we have to scan the entire list of parts because solar panels and racks may also be the children of roof but not the direct children of foundation
+		// when we have a lot of foundation, we could speed up the search a bit by going to the foundation and then its roofs
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarCollector && p.getTopContainer() == this) {
 				list.add((SolarCollector) p);
 			}
 		}
@@ -3197,32 +3199,35 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	public List<SolarCollector> getSolarCollectors(final Class<?> c) {
 		final List<SolarCollector> list = new ArrayList<SolarCollector>();
-		for (final HousePart p : children) {
-			if (p instanceof SolarCollector && c.isInstance(p)) {
+		// we have to scan the entire list of parts because solar panels and racks may also be the children of roof but not the direct children of foundation
+		// when we have a lot of foundations, we could speed up the search a bit by going to the foundation and then its roofs
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarCollector && p.getTopContainer() == this && c.isInstance(p)) {
 				list.add((SolarCollector) p);
 			}
 		}
 		return list;
 	}
 
+	public void setBaseHeightForSolarCollectors(final double baseHeight, final Class<?> c) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof SolarCollector && p.getTopContainer() == this && c.isInstance(p)) {
+				((SolarCollector) p).setBaseHeight(baseHeight);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public List<SolarReflector> getSolarReflectors(final Class<?> c) {
 		final List<SolarReflector> list = new ArrayList<SolarReflector>();
+		// solar reflectors at this point can only be direct children of the foundation
 		for (final HousePart p : children) {
 			if (p instanceof SolarReflector && c.isInstance(p)) {
 				list.add((SolarReflector) p);
 			}
 		}
 		return list;
-	}
-
-	public void setBaseHeightForSolarCollectors(final double baseHeight, final Class<?> c) {
-		for (final HousePart p : children) {
-			if (p instanceof SolarCollector && c.isInstance(p)) {
-				((SolarCollector) p).setBaseHeight(baseHeight);
-				p.draw();
-			}
-		}
-		SceneManager.getInstance().refresh();
 	}
 
 	public void setReflectanceForSolarReflectors(final double reflectance, final Class<?> c) {
