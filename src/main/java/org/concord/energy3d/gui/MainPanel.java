@@ -14,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -79,7 +80,7 @@ public class MainPanel extends JPanel {
 	private JSplitPane energyCanvasNoteSplitPane;
 	private EnergyPanel energyPanel;
 	private JPanel canvasPanel;
-	private JToggleButton energyViewButton;
+	private JToggleButton energyButton;
 	private JSplitPane canvasNoteSplitPane;
 	private JScrollPane noteScrollPane;
 	private JTextArea noteTextArea;
@@ -453,7 +454,7 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getShadowButton());
 			appToolbar.add(getHeliodonButton());
 			appToolbar.add(getSunAnimationButton());
-			appToolbar.add(getEnergyViewButton());
+			appToolbar.add(getEnergyButton());
 			final ButtonGroup bg = new ButtonGroup();
 			bg.add(selectButton);
 			bg.add(zoomButton);
@@ -467,6 +468,24 @@ public class MainPanel extends JPanel {
 			bg.add(miscButton);
 		}
 		return appToolbar;
+	}
+
+	private static void addMouseOverEffect(final AbstractButton button) {
+		if (Config.isMac()) { // Mac OS X does not have the same behavior as Windows 10, so we mimic it for Mac
+			final Color defaultColor = button.getBackground();
+			button.setOpaque(true);
+			button.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseExited(final MouseEvent e) {
+					button.setBackground(defaultColor);
+				}
+
+				@Override
+				public void mouseEntered(final MouseEvent e) {
+					button.setBackground(Color.GRAY);
+				}
+			});
+		}
 	}
 
 	public JToggleButton getSelectButton() {
@@ -483,22 +502,7 @@ public class MainPanel extends JPanel {
 					defaultTool();
 				}
 			});
-			if (Config.isMac()) {
-				final Color defaultColor = selectButton.getBackground();
-				selectButton.addMouseListener(new MouseAdapter() {
-
-					@Override
-					public void mouseExited(final MouseEvent e) {
-						selectButton.setBackground(defaultColor);
-					}
-
-					@Override
-					public void mouseEntered(final MouseEvent e) {
-						selectButton.setBackground(Color.GRAY);
-					}
-
-				});
-			}
+			addMouseOverEffect(selectButton);
 		}
 		return selectButton;
 	}
@@ -517,6 +521,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			wallButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(wallButton);
 		}
 		return wallButton;
 	}
@@ -536,6 +541,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			miscButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(miscButton);
 		}
 		return miscButton;
 	}
@@ -573,6 +579,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			windowButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(windowButton);
 		}
 		return windowButton;
 	}
@@ -591,6 +598,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			foundationButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(foundationButton);
 		}
 		return foundationButton;
 	}
@@ -619,6 +627,7 @@ public class MainPanel extends JPanel {
 					// org.concord.energy3d.util.Util.reportError(new RuntimeException("Error from Xie"));
 				}
 			});
+			addMouseOverEffect(shadowButton);
 		}
 		return shadowButton;
 	}
@@ -638,6 +647,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
+			addMouseOverEffect(spinViewButton);
 		}
 		return spinViewButton;
 	}
@@ -660,6 +670,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
+			addMouseOverEffect(heliodonButton);
 		}
 		return heliodonButton;
 	}
@@ -684,7 +695,7 @@ public class MainPanel extends JPanel {
 			sunAnimButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					energyViewButton.setSelected(false);
+					energyButton.setSelected(false);
 					final AnimateSunCommand c = new AnimateSunCommand();
 					SceneManager.getInstance().setSunAnimation(sunAnimButton.isSelected());
 					if (shadowButton.isSelected()) {
@@ -694,6 +705,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
+			addMouseOverEffect(sunAnimButton);
 		}
 		return sunAnimButton;
 	}
@@ -717,6 +729,7 @@ public class MainPanel extends JPanel {
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
+			addMouseOverEffect(previewButton);
 		}
 		return previewButton;
 	}
@@ -751,6 +764,7 @@ public class MainPanel extends JPanel {
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 			});
+			addMouseOverEffect(annotationButton);
 		}
 		return annotationButton;
 	}
@@ -774,6 +788,7 @@ public class MainPanel extends JPanel {
 					}
 				}
 			});
+			addMouseOverEffect(zoomButton);
 		}
 		return zoomButton;
 	}
@@ -798,7 +813,7 @@ public class MainPanel extends JPanel {
 			@Override
 			public void run() {
 				for (final Component c : getAppToolbar().getComponents()) {
-					if (c != getNoteButton() && c != getShadowButton() && c != getEnergyViewButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
+					if (c != getNoteButton() && c != getShadowButton() && c != getEnergyButton() && c != getHeliodonButton() && c != getSelectButton() && c != getAnnotationButton() && c != getZoomButton() && c != getSpinViewButton()) {
 						if (!enabled || c != getSunAnimationButton() || getShadowButton().isSelected() || getHeliodonButton().isSelected()) {
 							c.setEnabled(enabled);
 						}
@@ -835,19 +850,19 @@ public class MainPanel extends JPanel {
 		return canvasPanel;
 	}
 
-	public JToggleButton getEnergyViewButton() {
-		if (energyViewButton == null) {
-			energyViewButton = new JToggleButton("");
-			energyViewButton.setToolTipText("Calculate energy of the day");
-			energyViewButton.setIcon(new ImageIcon(getClass().getResource("icons/calculate.png")));
-			energyViewButton.addMouseListener(refreshUponMouseExit);
-			energyViewButton.setFocusable(false);
-			energyViewButton.addItemListener(new ItemListener() {
+	public JToggleButton getEnergyButton() {
+		if (energyButton == null) {
+			energyButton = new JToggleButton("");
+			energyButton.setToolTipText("Calculate energy of the day");
+			energyButton.setIcon(new ImageIcon(getClass().getResource("icons/calculate.png")));
+			energyButton.addMouseListener(refreshUponMouseExit);
+			energyButton.setFocusable(false);
+			energyButton.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final EnergyPanel p = EnergyPanel.getInstance();
-					p.showHeatMapContrastSlider(energyViewButton.isSelected());
-					if (energyViewButton.isSelected()) {
+					p.showHeatMapContrastSlider(energyButton.isSelected());
+					if (energyButton.isSelected()) {
 						defaultTool();
 						SceneManager.getInstance().autoSelectBuilding(false);
 					} else {
@@ -858,11 +873,12 @@ public class MainPanel extends JPanel {
 						p.getCspProjectDailyEnergyGraph().clearData();
 						p.getCspProjectDailyEnergyGraph().removeGraph();
 					}
-					SceneManager.getInstance().computeEnergyView(energyViewButton.isSelected());
+					SceneManager.getInstance().computeEnergyView(energyButton.isSelected());
 				}
 			});
+			addMouseOverEffect(energyButton);
 		}
-		return energyViewButton;
+		return energyButton;
 	}
 
 	private JSplitPane getCanvasNoteSplitPane() {
@@ -973,6 +989,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			solarButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(solarButton);
 		}
 		return solarButton;
 	}
@@ -1010,6 +1027,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			treeButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(treeButton);
 		}
 		return treeButton;
 	}
@@ -1047,6 +1065,7 @@ public class MainPanel extends JPanel {
 				}
 			});
 			roofButton.addMouseListener(operationStickAndRefreshUponExit);
+			addMouseOverEffect(roofButton);
 		}
 		return roofButton;
 	}
@@ -1088,6 +1107,7 @@ public class MainPanel extends JPanel {
 					}
 				}
 			});
+			addMouseOverEffect(resizeButton);
 		}
 		return resizeButton;
 	}
@@ -1102,12 +1122,13 @@ public class MainPanel extends JPanel {
 			rotateButton.setIcon(new ImageIcon(getClass().getResource("icons/rotate_cw.png")));
 			rotateButton.setToolTipText("<html>Rotate in the clockwise direction (change azimuth).<br>Hold down the Ctrl key and press this button for counter-clockwise rotation.<br>Hold down the Shift key while pressing this button to rotate more slowly.<br>If a component is selected, rotate around its center. Otherwise rotate everything around the origin.</html>");
 			rotateButton.setFocusable(false);
+			addMouseOverEffect(rotateButton);
 			rotateButton.addMouseListener(new MouseAdapter() {
 				private volatile boolean mousePressed = false;
 
 				@Override
 				public void mousePressed(final MouseEvent e) {
-					energyViewButton.setSelected(false);
+					energyButton.setSelected(false);
 					mousePressed = true;
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart == null || selectedPart instanceof Tree || selectedPart instanceof Human) {
@@ -1215,6 +1236,7 @@ public class MainPanel extends JPanel {
 					}
 				}
 			});
+			addMouseOverEffect(noteButton);
 		}
 		return noteButton;
 	}

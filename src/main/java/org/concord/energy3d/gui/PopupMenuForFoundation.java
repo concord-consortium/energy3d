@@ -213,7 +213,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -235,7 +235,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -257,7 +257,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -279,7 +279,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -301,7 +301,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -323,7 +323,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -345,7 +345,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -367,7 +367,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -389,7 +389,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -411,7 +411,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -433,7 +433,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -459,7 +459,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 								EventQueue.invokeLater(new Runnable() {
 									@Override
 									public void run() {
-										MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+										MainPanel.getInstance().getEnergyButton().setSelected(false);
 										Scene.getInstance().setEdited(true);
 									}
 								});
@@ -1503,7 +1503,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						MainPanel.getInstance().getEnergyButton().setSelected(false);
 						new ThermostatDialog(foundation).setVisible(true);
 						TimeSeriesLogger.getInstance().logAdjustThermostatButton();
 						Scene.getInstance().setEdited(true);

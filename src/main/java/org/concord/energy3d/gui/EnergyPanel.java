@@ -637,7 +637,7 @@ public class EnergyPanel extends JPanel {
 				} else {
 					foundation = selectedPart.getTopContainer();
 				}
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+				MainPanel.getInstance().getEnergyButton().setSelected(false);
 				new ThermostatDialog(foundation).setVisible(true);
 				TimeSeriesLogger.getInstance().logAdjustThermostatButton();
 			}
@@ -1061,7 +1061,7 @@ public class EnergyPanel extends JPanel {
 		// update part properties
 
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-		final boolean energyViewShown = MainPanel.getInstance().getEnergyViewButton().isSelected();
+		final boolean energyViewShown = MainPanel.getInstance().getEnergyButton().isSelected();
 		final double meterToFoot;
 		final String lengthUnit;
 		switch (Scene.getInstance().getUnit()) {
@@ -1911,7 +1911,7 @@ public class EnergyPanel extends JPanel {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+				MainPanel.getInstance().getEnergyButton().setSelected(false);
 			}
 		});
 	}
@@ -1934,7 +1934,7 @@ public class EnergyPanel extends JPanel {
 			@Override
 			public void run() {
 				if (SceneManager.getInstance().getSolarHeatMap()) {
-					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
 				}
 				SceneManager.getInstance().getSolarLand().setVisible(false);
 				Scene.getInstance().redrawAll();

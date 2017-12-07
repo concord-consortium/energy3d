@@ -137,7 +137,7 @@ public abstract class Analysis {
 	void onStart() {
 		EnergyPanel.getInstance().disableDateSpinner(true);
 		SceneManager.getInstance().setHeatFluxDaily(true);
-		Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), true);
+		Util.selectSilently(MainPanel.getInstance().getEnergyButton(), true);
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(true);
 		SceneManager.getInstance().setHeatFluxVectorsVisible(true);
 		SceneManager.getInstance().getSolarLand().setVisible(Scene.getInstance().getSolarMapForLand());

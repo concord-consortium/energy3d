@@ -2584,7 +2584,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getInstance().setSolarHeatMap(solarRadiationHeatMapMenuItem.isSelected());
-					Util.selectSilently(MainPanel.getInstance().getEnergyViewButton(), solarRadiationHeatMapMenuItem.isSelected());
+					Util.selectSilently(MainPanel.getInstance().getEnergyButton(), solarRadiationHeatMapMenuItem.isSelected());
 				}
 			});
 		}
@@ -2599,7 +2599,7 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(final ItemEvent e) {
 					final boolean b = onlySolarComponentsInSolarMapMenuItem.isSelected();
 					Scene.getInstance().setOnlySolarComponentsInSolarMap(b);
-					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 				}
@@ -2618,7 +2618,7 @@ public class MainFrame extends JFrame {
 					final boolean b = showSolarLandMenuItem.isSelected();
 					SceneManager.getInstance().getSolarLand().setVisible(b);
 					Scene.getInstance().setSolarMapForLand(b);
-					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
 					Scene.getInstance().setEdited(true);
 					Scene.getInstance().redrawAll();
 					// SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -3315,8 +3315,8 @@ public class MainFrame extends JFrame {
 						final ChangeTextureCommand c = new ChangeTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.None);
 						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3337,8 +3337,8 @@ public class MainFrame extends JFrame {
 						final ChangeTextureCommand c = new ChangeTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.Simple);
 						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3359,8 +3359,8 @@ public class MainFrame extends JFrame {
 						final ChangeTextureCommand c = new ChangeTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.Full);
 						Scene.getInstance().setEdited(true);
-						if (MainPanel.getInstance().getEnergyViewButton().isSelected()) {
-							MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
 						}
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 					}
@@ -3705,7 +3705,7 @@ public class MainFrame extends JFrame {
 					if (restartPrintPreview && PrintController.getInstance().isPrintPreview()) {
 						PrintController.getInstance().restartAnimation();
 					}
-					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
 					Scene.getInstance().setEdited(changed);
 				}
 
@@ -3983,7 +3983,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4008,7 +4008,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4033,7 +4033,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4058,7 +4058,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4083,7 +4083,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4108,7 +4108,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4133,7 +4133,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4158,7 +4158,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4183,7 +4183,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4208,7 +4208,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4233,7 +4233,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4258,7 +4258,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4283,7 +4283,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;
@@ -4308,7 +4308,7 @@ public class MainFrame extends JFrame {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 								}
 							});
 							return null;

@@ -84,7 +84,7 @@ class PopupMenuForLand extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -105,7 +105,7 @@ class PopupMenuForLand extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});
@@ -126,7 +126,7 @@ class PopupMenuForLand extends PopupMenuFactory {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
 									Scene.getInstance().setEdited(true);
 								}
 							});

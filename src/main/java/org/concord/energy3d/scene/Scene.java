@@ -538,7 +538,7 @@ public class Scene implements Serializable {
 			public void run() {
 				energyPanel.updateThermostat();
 				MainPanel.getInstance().setNoteVisible(MainPanel.getInstance().isNoteVisible()); // necessary for the scroll bars to show up appropriately
-				MainPanel.getInstance().getEnergyViewButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
+				MainPanel.getInstance().getEnergyButton().setSelected(false); // moved from OpenNow to here to avoid triggering EnergyComputer -> RedrawAllNow before open is completed
 				SceneManager.getInstance().getUndoManager().discardAllEdits();
 				MainApplication.getEventLog().clear();
 			}
@@ -624,7 +624,7 @@ public class Scene implements Serializable {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					MainPanel.getInstance().getEnergyViewButton().setSelected(false);
+					MainPanel.getInstance().getEnergyButton().setSelected(false);
 				}
 			});
 			setEdited(true);
