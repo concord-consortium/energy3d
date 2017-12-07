@@ -57,6 +57,9 @@ public class EventString extends JPanel {
 			final char c = eventString.charAt(i);
 			switch (c) {
 			case 'A':
+				text += "<span style=\"background-color: #99aa33\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
+				break;
+			case 'Y':
 				text += "<span style=\"background-color: #9933aa\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			case 'C':

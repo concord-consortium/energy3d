@@ -40,7 +40,10 @@ class FeedbackPool {
 		}
 	}
 
-	String getCurrentItem(final int iCase) {
+	String getCurrentItem(int iCase) {
+		if (iCase >= feedbackItems.length) {
+			iCase = feedbackItems.length - 1;
+		}
 		return feedbackItems[iCase][level[iCase]];
 	}
 

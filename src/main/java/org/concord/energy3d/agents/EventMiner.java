@@ -2,11 +2,13 @@ package org.concord.energy3d.agents;
 
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.Util;
 
@@ -18,38 +20,44 @@ public class EventMiner implements Agent {
 
 	final String name;
 	String eventString;
-	String targePattern = "(U[_\\*\\?D]*A)+?";
+	String conformanceRegex = "(U.*?A)+?";
+	String violationRegex = "(U.*?[CY]+?.*?A)+?";
 
-	TreeMap<String, FeedbackPool> feedbackMap;
+	TreeMap<String, FeedbackPool> singleIndicatorFeedbackMap;
 	FeedbackPool feedbackOnDailyAnalysis;
 	FeedbackPool feedbackOnUValueChange;
 	FeedbackPool feedbackOnDataCollector;
-	FeedbackPool feedbackOnTargetPattern;
+	FeedbackPool feedbackOnTargetBehavior;
+	FeedbackPool feedbackOnTargetViolation;
 
 	public EventMiner(final String name) {
 		this.name = name;
 
-		feedbackMap = new TreeMap<String, FeedbackPool>();
+		singleIndicatorFeedbackMap = new TreeMap<String, FeedbackPool>();
 
 		feedbackOnDailyAnalysis = new FeedbackPool(1, 2);
 		feedbackOnDailyAnalysis.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
 		feedbackOnDailyAnalysis.setItem(0, 1, "Did you forget to run daily energy analysis?");
-		feedbackMap.put("A+?", feedbackOnDailyAnalysis);
+		singleIndicatorFeedbackMap.put("A+?", feedbackOnDailyAnalysis);
 
 		feedbackOnDataCollector = new FeedbackPool(1, 1);
-		feedbackOnDataCollector.setItem(0, 0, "You haven't collected any data in the data tables yet.");
-		feedbackMap.put("D+?", feedbackOnDataCollector);
+		feedbackOnDataCollector.setItem(0, 0, "Have you input enough data in the table?");
+		singleIndicatorFeedbackMap.put("D{2,}?", feedbackOnDataCollector);
 
 		feedbackOnUValueChange = new FeedbackPool(1, 2);
-		feedbackOnUValueChange.setItem(0, 0, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
-		feedbackOnUValueChange.setItem(0, 1, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
-		feedbackMap.put("U+?", feedbackOnUValueChange);
+		feedbackOnUValueChange.setItem(0, 0, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
+		feedbackOnUValueChange.setItem(0, 1, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
+		singleIndicatorFeedbackMap.put("U+?", feedbackOnUValueChange);
 
-		feedbackOnTargetPattern = new FeedbackPool(4, 1);
-		feedbackOnTargetPattern.setItem(0, 0, "You should run a daily energy analysis after changing U-value.");
-		feedbackOnTargetPattern.setItem(1, 0, "You ran only one analysis after changing U-value.<br>Is it sufficient to draw a conclusion?");
-		feedbackOnTargetPattern.setItem(2, 0, "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
-		feedbackOnTargetPattern.setItem(3, 0, "You have run at least three analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
+		feedbackOnTargetBehavior = new FeedbackPool(4, 1);
+		feedbackOnTargetBehavior.setItem(0, 0, "You should run a daily energy analysis after changing U-value.");
+		feedbackOnTargetBehavior.setItem(1, 0, "You only analyzed U-value change once.<br>Is it sufficient to draw a conclusion?");
+		feedbackOnTargetBehavior.setItem(2, 0, "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
+		feedbackOnTargetBehavior.setItem(3, 0, "You have run {COUNT_PATTERN} analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
+
+		feedbackOnTargetViolation = new FeedbackPool(1, 1);
+		feedbackOnTargetViolation.setItem(0, 0, "You changed other variables than U-value that may invalidate your result.");
+
 	}
 
 	@Override
@@ -59,7 +67,7 @@ public class EventMiner implements Agent {
 
 	@Override
 	public void sense(final MyEvent e) {
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class }, 10000, null);
+		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 
@@ -67,11 +75,11 @@ public class EventMiner implements Agent {
 		return Util.countMatch(Pattern.compile(regex).matcher(eventString));
 	}
 
-	public String x() {
+	public String checkSingleIndicators() {
 		String s = "";
-		for (final String regex : feedbackMap.keySet()) {
+		for (final String regex : singleIndicatorFeedbackMap.keySet()) {
 			if (countMatch(regex) == 0) {
-				final FeedbackPool f = feedbackMap.get(regex);
+				final FeedbackPool f = singleIndicatorFeedbackMap.get(regex);
 				s += f.getCurrentItem(0);
 				f.forward(0);
 				break;
@@ -80,34 +88,45 @@ public class EventMiner implements Agent {
 		return s;
 	}
 
+	private String lastMatch(final String regex, final String string) {
+		final Matcher matcher = Pattern.compile(regex).matcher(string);
+		String lastMatch = null;
+		while (matcher.find()) {
+			lastMatch = matcher.group();
+		}
+		return lastMatch;
+	}
+
 	@Override
 	public void actuate() {
 		System.out.println(this + " Actuating: " + eventString);
-		String msg = "<html>";
-		int c = countMatch("A+?");
-		if (c == 0) {
-			msg += feedbackOnDailyAnalysis.getCurrentItem(0);
-			feedbackOnDailyAnalysis.forward(0);
-		} else {
-			c = countMatch("D+?");
-			if (c == 0) {
-				msg += feedbackOnDataCollector.getCurrentItem(0);
-				feedbackOnDataCollector.forward(0);
-			} else {
-				c = countMatch("U+?");
-				if (c == 0) {
-					msg += feedbackOnUValueChange.getCurrentItem(0);
-					feedbackOnUValueChange.forward(0);
-				} else {
-					c = countMatch(targePattern);
-					if (c >= feedbackOnTargetPattern.getNumberOfCases()) {
-						c = feedbackOnTargetPattern.getNumberOfCases() - 1;
+		String msg = checkSingleIndicators();
+		boolean violated = false;
+		if (msg.equals("")) {
+			String s = "";
+			final int c = countMatch(conformanceRegex);
+			if (c != 0) {
+				final String v = lastMatch(conformanceRegex, eventString);
+				if (v != null) {
+					if (Pattern.compile(violationRegex).matcher(v).find()) {
+						violated = true;
 					}
-					msg += feedbackOnTargetPattern.getCurrentItem(c);
 				}
+				if (violated) {
+					s = feedbackOnTargetViolation.getCurrentItem(0);
+				} else {
+					s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
+				}
+			} else {
+				s = feedbackOnTargetBehavior.getCurrentItem(0);
 			}
+			msg += s;
 		}
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
+		if (violated) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Warning", JOptionPane.WARNING_MESSAGE);
+		} else {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	MyEvent idChangeEvent() {

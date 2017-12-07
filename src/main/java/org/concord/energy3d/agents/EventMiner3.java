@@ -34,7 +34,7 @@ public class EventMiner3 extends EventMiner {
 			msg += "This investigation requires choosing a different wall.";
 		} else {
 			final String s = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000, startEvent);
-			final Pattern p = Pattern.compile(targePattern);
+			final Pattern p = Pattern.compile(conformanceRegex);
 			final Matcher m = p.matcher(s);
 			final int c = Util.countMatch(m);
 			switch (c) {

@@ -178,6 +178,9 @@ public abstract class PopupMenuFactory {
 	static JMenuItem createInsulationMenuItem(final boolean useUValue) {
 		final JMenuItem mi = new JMenuItem("Insulation...");
 		mi.addActionListener(new ActionListener() {
+
+			private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -219,6 +222,14 @@ public abstract class PopupMenuFactory {
 					bg.add(rb2);
 					panel.add(scopePanel);
 					panel.add(Box.createVerticalStrut(5));
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					}
 				}
 
 				final JPanel unitPanel = new JPanel(new GridLayout(2, 3, 5, 5));
@@ -393,6 +404,7 @@ public abstract class PopupMenuFactory {
 										t.setUValue(val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
+									selectedScopeIndex = 0;
 								} else {
 									if (!changed) {
 										for (final HousePart x : Scene.getInstance().getPartsOfSameTypeInBuilding(selectedPart)) {
@@ -407,6 +419,7 @@ public abstract class PopupMenuFactory {
 										Scene.getInstance().setUValuesOfSameTypeInBuilding(selectedPart, val);
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
+									selectedScopeIndex = 1;
 								}
 								if (changed) {
 									updateAfterEdit();
