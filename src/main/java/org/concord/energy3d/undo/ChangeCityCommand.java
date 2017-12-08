@@ -46,6 +46,11 @@ public class ChangeCityCommand extends MyAbstractUndoableEdit {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'C';
+	}
+
+	@Override
 	public String getPresentationName() {
 		return "Change City";
 	}

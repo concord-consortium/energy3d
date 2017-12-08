@@ -44,7 +44,7 @@ public class ChangeDateCommand extends MyAbstractUndoableEdit {
 
 	@Override
 	public char getOneLetterCode() {
-		return 'C';
+		return 'D';
 	}
 
 	@Override

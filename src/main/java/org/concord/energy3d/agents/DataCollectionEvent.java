@@ -37,7 +37,7 @@ public class DataCollectionEvent implements NonundoableEvent {
 
 	@Override
 	public char getOneLetterCode() {
-		return 'D';
+		return '#';
 	}
 
 	@Override

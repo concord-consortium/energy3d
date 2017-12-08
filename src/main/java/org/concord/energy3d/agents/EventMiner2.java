@@ -6,8 +6,6 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.undo.ChangeDateCommand;
-import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -22,7 +20,7 @@ public class EventMiner2 extends EventMiner {
 
 	@Override
 	public void sense(final MyEvent e) {
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
+		eventString = EventUtil.eventsToString(observers, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 

@@ -1,14 +1,17 @@
 package org.concord.energy3d.agents;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
+import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.Util;
 
@@ -20,20 +23,24 @@ public class EventMiner implements Agent {
 
 	final String name;
 	String eventString;
-	String conformanceRegex = "(U.*?A)+?";
-	String violationRegex = "(U.*?[CY]+?.*?A)+?";
+	String conformanceRegex = "((A.*?(?=U))+?)|((U.*?(?=A))+?)";
+	String violation = "CDLY";
+	String violationRegex = "[" + violation + "]+?";
+	String strictConformanceRegex = "(U[^" + violation + "]*?A)+?";
 
-	TreeMap<String, FeedbackPool> singleIndicatorFeedbackMap;
+	Map<String, FeedbackPool> singleIndicatorFeedbackMap;
 	FeedbackPool feedbackOnDailyAnalysis;
 	FeedbackPool feedbackOnUValueChange;
 	FeedbackPool feedbackOnDataCollector;
 	FeedbackPool feedbackOnTargetBehavior;
 	FeedbackPool feedbackOnTargetViolation;
 
+	Class<?>[] observers = new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class, ChangeCityCommand.class, ChangePartColorCommand.class };
+
 	public EventMiner(final String name) {
 		this.name = name;
 
-		singleIndicatorFeedbackMap = new TreeMap<String, FeedbackPool>();
+		singleIndicatorFeedbackMap = new LinkedHashMap<String, FeedbackPool>();
 
 		feedbackOnDailyAnalysis = new FeedbackPool(1, 2);
 		feedbackOnDailyAnalysis.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
@@ -42,7 +49,7 @@ public class EventMiner implements Agent {
 
 		feedbackOnDataCollector = new FeedbackPool(1, 1);
 		feedbackOnDataCollector.setItem(0, 0, "Have you input enough data in the table?");
-		singleIndicatorFeedbackMap.put("D{2,}?", feedbackOnDataCollector);
+		singleIndicatorFeedbackMap.put("#{2,}?", feedbackOnDataCollector);
 
 		feedbackOnUValueChange = new FeedbackPool(1, 2);
 		feedbackOnUValueChange.setItem(0, 0, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
@@ -56,7 +63,7 @@ public class EventMiner implements Agent {
 		feedbackOnTargetBehavior.setItem(3, 0, "You have run {COUNT_PATTERN} analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
 
 		feedbackOnTargetViolation = new FeedbackPool(1, 1);
-		feedbackOnTargetViolation.setItem(0, 0, "You changed other variables than U-value that may invalidate your result.");
+		feedbackOnTargetViolation.setItem(0, 0, "You changed multiple variables besides U-value, which may invalidate<br>your result. You can discard the previous data and collec more new data<br>under the new condition. Make sure to change only the U-value between<br>analyses.");
 
 	}
 
@@ -67,7 +74,7 @@ public class EventMiner implements Agent {
 
 	@Override
 	public void sense(final MyEvent e) {
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
+		eventString = EventUtil.eventsToString(observers, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 
@@ -104,21 +111,17 @@ public class EventMiner implements Agent {
 		boolean violated = false;
 		if (msg.equals("")) {
 			String s = "";
-			final int c = countMatch(conformanceRegex);
-			if (c != 0) {
-				final String v = lastMatch(conformanceRegex, eventString);
-				if (v != null) {
-					if (Pattern.compile(violationRegex).matcher(v).find()) {
-						violated = true;
-					}
+			final String v = lastMatch(conformanceRegex, eventString);
+			if (v != null) {
+				if (Pattern.compile(violationRegex).matcher(v).find()) {
+					violated = true;
 				}
-				if (violated) {
-					s = feedbackOnTargetViolation.getCurrentItem(0);
-				} else {
-					s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
-				}
+			}
+			if (violated) {
+				s = feedbackOnTargetViolation.getCurrentItem(0);
 			} else {
-				s = feedbackOnTargetBehavior.getCurrentItem(0);
+				final int c = countMatch(strictConformanceRegex);
+				s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
 			}
 			msg += s;
 		}

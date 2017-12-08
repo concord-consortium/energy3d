@@ -43,6 +43,11 @@ public class ChangePartColorCommand extends MyAbstractUndoableEdit {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'L';
+	}
+
+	@Override
 	public String getPresentationName() {
 		return "Color Change for Selected Part";
 	}

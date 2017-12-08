@@ -112,7 +112,7 @@ public class MainPanel extends JPanel {
 		}
 	};
 
-	MouseAdapter operationStickAndRefreshUponExit = new MouseAdapter() {
+	private final MouseAdapter operationStickAndRefreshUponExit = new MouseAdapter() {
 		@Override
 		public void mouseClicked(final MouseEvent e) {
 			if (e.getClickCount() > 1) {
@@ -473,6 +473,7 @@ public class MainPanel extends JPanel {
 	private static void addMouseOverEffect(final AbstractButton button) {
 		if (Config.isMac()) { // Mac OS X does not have the same behavior as Windows 10, so we mimic it for Mac
 			final Color defaultColor = button.getBackground();
+			final Color bgColor = new Color(220, 219, 219);
 			button.setOpaque(true);
 			button.addMouseListener(new MouseAdapter() {
 				@Override
@@ -482,7 +483,7 @@ public class MainPanel extends JPanel {
 
 				@Override
 				public void mouseEntered(final MouseEvent e) {
-					button.setBackground(Color.GRAY);
+					button.setBackground(bgColor);
 				}
 			});
 		}

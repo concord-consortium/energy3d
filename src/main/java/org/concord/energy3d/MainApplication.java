@@ -57,13 +57,14 @@ public class MainApplication {
 		agents.add(new EventMiner("Event Miner"));
 		agents.add(new EventMiner2("Event Miner 2"));
 		agents.add(new EventMiner3("Event Miner 3"));
-		// System.out.println(Util.countMatch(Pattern.compile("(U.*?[CY]+?.*?A)+?").matcher("*A_****U_Y_***AU_Y***CCA")));
-		// final Pattern pattern = Pattern.compile("(U.*?[CY]+?.*?A)+?");
+		// final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(U.*?[CY]+?.*?A)+?");
 		// final String s = "*A_****U__C_***AU_Y***CCA";
-		// final Matcher matcher = pattern.matcher(s);
+		// final java.util.regex.Matcher matcher = pattern.matcher(s);
 		// while (matcher.find()) {
 		// System.out.println(matcher.group());
 		// }
+		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?[CY]+?.*?U)+?)|((U.*?[CY]+?.*?A)+?)").matcher("*A*##?UDA?")));
+		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?(?=U))+?)|((U.*?(?=A))+?)").matcher("UA_A_U?")));
 		// System.exit(0);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
