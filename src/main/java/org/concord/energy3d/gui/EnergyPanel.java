@@ -200,7 +200,9 @@ public class EnergyPanel extends JPanel {
 		dateSpinner = createSpinner(new SpinnerDateModel(Calendar.getInstance().getTime(), null, null, Calendar.MONTH));
 		final JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "MMMM dd");
 		dateSpinner.setEditor(dateEditor);
-		dateEditor.getTextField().setColumns((int) ("September 30".length() * 0.7));
+		final JTextField dateEditorField = dateEditor.getTextField();
+		dateEditorField.setFont(new Font(dateEditorField.getFont().getName(), Font.PLAIN, dateEditorField.getFont().getSize() - (Config.isMac() ? 2 : 1)));
+		dateEditorField.setColumns((int) ("September 30".length() * 0.7));
 		dateSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
 			private Date lastDate;
@@ -251,7 +253,7 @@ public class EnergyPanel extends JPanel {
 
 		Arrays.sort(LocationData.getInstance().getCities());
 		regionComboBox = new JComboBox<String>();
-		regionComboBox.setFont(new Font(regionComboBox.getFont().getName(), Font.PLAIN, regionComboBox.getFont().getSize() - 2));
+		regionComboBox.setFont(new Font(regionComboBox.getFont().getName(), Font.PLAIN, regionComboBox.getFont().getSize() - (Config.isMac() ? 4 : 2)));
 		regionComboBox.setModel(new DefaultComboBoxModel<String>(LocationData.getInstance().getCities()));
 		regionComboBox.setSelectedItem("Boston, MA");
 		regionComboBox.setMaximumRowCount(15);
@@ -311,7 +313,10 @@ public class EnergyPanel extends JPanel {
 		timeAndLocationPanel.add(createLabel("Time: "), gbc_timeLabel);
 
 		timeSpinner = createSpinner(new SpinnerDateModel());
-		timeSpinner.setEditor(new JSpinner.DateEditor(timeSpinner, "h:mm a"));
+		final JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(timeSpinner, "h:mm a");
+		timeSpinner.setEditor(timeEditor);
+		final JTextField timeEditorField = timeEditor.getTextField();
+		timeEditorField.setFont(new Font(timeEditorField.getFont().getName(), Font.PLAIN, timeEditorField.getFont().getSize() - (Config.isMac() ? 2 : 1)));
 		timeSpinner.addChangeListener(new ChangeListener() {
 			private boolean firstCall = true;
 			private Date lastDate;
