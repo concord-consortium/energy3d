@@ -132,6 +132,7 @@ import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.ShowSunAnglesCommand;
 import org.concord.energy3d.undo.TopViewCommand;
 import org.concord.energy3d.undo.ZoomCommand;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
@@ -573,7 +574,7 @@ public class MainFrame extends JFrame {
 														updateTitleBar();
 														FileChooser.getInstance().rememberFile(rf.getPath());
 													} catch (final Throwable err) {
-														Util.reportError(err, rf.getAbsolutePath());
+														BugReporter.report(err, rf.getAbsolutePath());
 													}
 													return null;
 												}
@@ -703,7 +704,7 @@ public class MainFrame extends JFrame {
 										}
 									});
 								} catch (final Throwable err) {
-									Util.reportError(err);
+									BugReporter.report(err);
 								}
 								return null;
 							}
@@ -754,7 +755,7 @@ public class MainFrame extends JFrame {
 					Scene.open(file.toURI().toURL());
 					FileChooser.getInstance().rememberFile(file.getPath());
 				} catch (final Throwable err) {
-					Util.reportError(err, file.getAbsolutePath());
+					BugReporter.report(err, file.getAbsolutePath());
 				}
 				return null;
 			}
@@ -784,7 +785,7 @@ public class MainFrame extends JFrame {
 										}
 									});
 								} catch (final Throwable err) {
-									Util.reportError(err, "Recovery error");
+									BugReporter.report(err, "Recovery error");
 								}
 								return null;
 							}
@@ -3088,7 +3089,7 @@ public class MainFrame extends JFrame {
 					try {
 						Scene.getInstance().importFile(file.toURI().toURL());
 					} catch (final Throwable err) {
-						Util.reportError(err);
+						BugReporter.report(err);
 					}
 					return null;
 				}
@@ -3106,7 +3107,7 @@ public class MainFrame extends JFrame {
 					try {
 						Scene.getInstance().importCollada(file);
 					} catch (final Throwable err) {
-						Util.reportError(err);
+						BugReporter.report(err);
 					}
 					return null;
 				}
@@ -3124,7 +3125,7 @@ public class MainFrame extends JFrame {
 					try {
 						Scene.getInstance().exportObj(file);
 					} catch (final Throwable err) {
-						Util.reportError(err);
+						BugReporter.report(err);
 					}
 					return null;
 				}
@@ -3722,7 +3723,7 @@ public class MainFrame extends JFrame {
 					Scene.open(new File(filename).toURI().toURL());
 					FileChooser.getInstance().rememberFile(filename);
 				} catch (final Throwable e) {
-					Util.reportError(e, new File(filename).getAbsolutePath());
+					BugReporter.report(e, new File(filename).getAbsolutePath());
 				}
 				return null;
 			}
@@ -3754,7 +3755,7 @@ public class MainFrame extends JFrame {
 					}
 				});
 			} catch (final Throwable e) {
-				Util.reportError(e);
+				BugReporter.report(e);
 			}
 		}
 	}

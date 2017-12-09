@@ -73,6 +73,7 @@ import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
 import org.concord.energy3d.undo.SaveCommand;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Pair;
 import org.concord.energy3d.util.Util;
@@ -651,7 +652,7 @@ public class Scene implements Serializable {
 				// TODO: automatically center the model at the center
 			}
 		} catch (final Throwable t) {
-			Util.reportError(t);
+			BugReporter.report(t);
 			success = false;
 		}
 		if (success) {
@@ -677,7 +678,7 @@ public class Scene implements Serializable {
 			final String s = file.toString();
 			new ObjExporter().save(objs, new File(s), new File(s.substring(0, s.lastIndexOf(".")) + ".mtl"), null);
 		} catch (final Throwable t) {
-			Util.reportError(t);
+			BugReporter.report(t);
 		}
 	}
 
@@ -849,7 +850,7 @@ public class Scene implements Serializable {
 					try {
 						realSave(url, setAsCurrentFile, notifyUndoManager, logger);
 					} catch (final Throwable e) {
-						Util.reportError(e);
+						BugReporter.report(e);
 					} finally {
 						isSaving = false;
 					}
@@ -860,7 +861,7 @@ public class Scene implements Serializable {
 			try {
 				realSave(url, setAsCurrentFile, notifyUndoManager, logger);
 			} catch (final Throwable e) {
-				Util.reportError(e);
+				BugReporter.report(e);
 			} finally {
 				isSaving = false;
 			}
@@ -923,7 +924,7 @@ public class Scene implements Serializable {
 				in.close();
 			} catch (final Throwable e) {
 				instance.setEdited(true);
-				Util.reportError(e, "Save Verification Error: " + url + " : ");
+				BugReporter.report(e, "Save Verification Error: " + url + " : ");
 			}
 		}
 		System.out.println("done");

@@ -20,7 +20,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.BugReporter;
 
 /**
  * @author Charles Xie
@@ -48,7 +48,7 @@ public class MirrorDailyAnalysis extends DailyAnalysis {
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							Util.reportError(t);
+							BugReporter.report(t);
 						}
 					});
 				}

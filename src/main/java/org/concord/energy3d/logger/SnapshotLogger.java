@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.BugReporter;
 
 /**
  * @author Charles Xie
@@ -61,7 +61,7 @@ public class SnapshotLogger {
 							saveSnapshot();
 						} catch (final Exception e) {
 							e.printStackTrace();
-							Util.reportError(e);
+							BugReporter.report(e);
 							break;
 						}
 						reset();

@@ -49,6 +49,7 @@ import org.concord.energy3d.simulation.ProjectCost;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.undo.*;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.Vector3;
@@ -1079,7 +1080,7 @@ public class TimeSeriesLogger {
 		try {
 			record();
 		} catch (final Throwable t) {
-			Util.reportError(t);
+			BugReporter.report(t);
 		} finally {
 			action = null;
 		}
@@ -1090,7 +1091,7 @@ public class TimeSeriesLogger {
 		try {
 			record();
 		} catch (final Throwable t) {
-			Util.reportError(t);
+			BugReporter.report(t);
 		} finally {
 			analysisRequester = null;
 		}
@@ -1191,7 +1192,7 @@ public class TimeSeriesLogger {
 		try {
 			writer = new PrintWriter(file);
 		} catch (final Exception e) {
-			Util.reportError(e);
+			BugReporter.report(e);
 		}
 		writer.write("{\n\"Activities\": [\n");
 	}

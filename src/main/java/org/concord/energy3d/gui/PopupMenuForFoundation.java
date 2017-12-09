@@ -64,6 +64,7 @@ import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.SetFoundationLabelCommand;
 import org.concord.energy3d.undo.SetGroupMasterCommand;
 import org.concord.energy3d.undo.ShowBorderLineCommand;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.SpringUtilities;
@@ -114,7 +115,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 									try {
 										((Foundation) selectedPart).importCollada(file.toURI().toURL(), position);
 									} catch (final Throwable t) {
-										Util.reportError(t);
+										BugReporter.report(t);
 										success = false;
 									}
 									if (success) {

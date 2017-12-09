@@ -55,6 +55,7 @@ import org.concord.energy3d.simulation.ProjectCost;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.undo.ChangeVolumetricHeatCapacityCommand;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -165,7 +166,7 @@ public abstract class PopupMenuFactory {
 						try {
 							Scene.getInstance().importFile(MainApplication.class.getResource(url));
 						} catch (final Throwable err) {
-							Util.reportError(err);
+							BugReporter.report(err);
 						}
 						return null;
 					}

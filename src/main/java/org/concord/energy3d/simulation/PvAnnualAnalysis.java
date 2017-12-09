@@ -25,7 +25,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.BugReporter;
 
 /**
  * For fast feedback, only 12 days are calculated.
@@ -65,7 +65,7 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									Util.reportError(t);
+									BugReporter.report(t);
 								}
 							});
 						}

@@ -29,6 +29,7 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.undo.DeleteMeshCommand;
 import org.concord.energy3d.undo.DeleteNodeCommand;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.MeshLib;
 import org.concord.energy3d.util.SelectUtil;
@@ -318,7 +319,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					}
 				}
 			} catch (final Throwable t) {
-				Util.reportError(t);
+				BugReporter.report(t);
 			}
 			setRotatedNormalsForImportedMeshes();
 		}

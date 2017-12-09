@@ -28,7 +28,7 @@ import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.shapes.Heliodon;
-import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.BugReporter;
 
 /**
  * This calculates and visualizes the seasonal trend and the yearly sum of all energy items for any selected part or building.
@@ -69,7 +69,7 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
-									Util.reportError(t);
+									BugReporter.report(t);
 								}
 							});
 						}

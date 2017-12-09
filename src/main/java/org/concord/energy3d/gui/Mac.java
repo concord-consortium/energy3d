@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.BugReporter;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent.AboutEvent;
@@ -37,7 +37,7 @@ public class Mac {
 						try {
 							Scene.open(new File(e.getFiles().get(0).toString()).toURI().toURL());
 						} catch (final Throwable err) {
-							Util.reportError(err, e.getFiles().get(0).toString());
+							BugReporter.report(err, e.getFiles().get(0).toString());
 						}
 						return null;
 					}

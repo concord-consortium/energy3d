@@ -30,9 +30,9 @@ import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Updater;
-import org.concord.energy3d.util.Util;
 
 public class MainApplication {
 
@@ -45,7 +45,21 @@ public class MainApplication {
 	private static EventLog eventLog = new EventLog();
 	private static List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
+	static void testRegex() { // temporarily used to test regex
+		final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A([^ADY]*?U+?[^ADY]*?)(?=A))+?");
+		final String s = "*A*#U##?A?UD?A???UA";
+		final java.util.regex.Matcher matcher = pattern.matcher(s);
+		while (matcher.find()) {
+			System.out.println(matcher.group());
+		}
+		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?[CY]+?.*?U)+?)|((U.*?[CY]+?.*?A)+?)").matcher("*A*##?UDA?")));
+		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("(A([^AD]*?U+?[^AD]*?)(?=A))+?").matcher("*A*#U#?A?UD?A???UA")));
+		System.exit(0);
+	}
+
 	public static void main(final String[] args) {
+
+		// testRegex();
 
 		System.out.println("Initiating...");
 		final long t = System.nanoTime();
@@ -58,15 +72,6 @@ public class MainApplication {
 		agents.add(new EventMiner("Event Miner"));
 		agents.add(new EventMiner2("Event Miner 2"));
 		agents.add(new EventMiner3("Event Miner 3"));
-		// final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A([^ADY]*?U+?[^ADY]*?)(?=A))+?");
-		// final String s = "*A*#UY##?A?UD?A???UA";
-		// final java.util.regex.Matcher matcher = pattern.matcher(s);
-		// while (matcher.find()) {
-		// System.out.println(matcher.group());
-		// }
-		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?[CY]+?.*?U)+?)|((U.*?[CY]+?.*?A)+?)").matcher("*A*##?UDA?")));
-		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("(A([^D]+?)(?=A))+?").matcher("*A*#U#?A?UD?A???UA")));
-		// System.exit(0);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
@@ -391,7 +396,7 @@ public class MainApplication {
 						}
 						try {
 							System.err.println(msg);
-							Util.sendError(msg, null);
+							BugReporter.upload(msg, null);
 						} catch (final Exception e) {
 							e.printStackTrace();
 						}

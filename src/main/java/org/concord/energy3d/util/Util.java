@@ -1,25 +1,17 @@
 package org.concord.energy3d.util;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -30,31 +22,21 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 
-import org.concord.energy3d.MainApplication;
-import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.UserData;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -481,110 +463,6 @@ public class Util {
 
 	public static boolean isZero(final double x) {
 		return Math.abs(x) < MathUtils.ZERO_TOLERANCE;
-	}
-
-	public static void reportError(final Throwable e) {
-		reportError(e, "");
-	}
-
-	public static void reportError(final Throwable e, final String header) {
-		if (suppressReportError) {
-			return;
-		}
-		e.printStackTrace();
-		final StringWriter sw = new StringWriter();
-		e.printStackTrace(new PrintWriter(sw));
-		final String msg = sw.toString();
-		final String text = header + "\n" + msg;
-		File file;
-		try {
-			file = SnapshotLogger.getInstance().saveSnapshot("error");
-		} catch (final Exception ex) {
-			ex.printStackTrace();
-			file = null;
-		}
-		final File currentFile = file;
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (msg.indexOf("java.lang.OutOfMemoryError") != -1) { // in this case, we may not have enough resource to send error report. just advise user to restart
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy3D has run out of memory. Please restart.", "Out of Memory", JOptionPane.ERROR_MESSAGE);
-				} else {
-					final JPanel panel = new JPanel(new BorderLayout(10, 10));
-					final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
-					scrollPane.setPreferredSize(new Dimension(400, 400));
-					panel.add(scrollPane, BorderLayout.CENTER);
-					final boolean corrupted = msg.indexOf("java.io.EOFException") != -1;
-					panel.add(new JLabel("<html><b>" + (corrupted ? "Your file is corrupted. Please use <i>Recover from Log</i> under the File Menu to restore it.<br>" : "") + "Report the above error message to the developers?</b></html>"), BorderLayout.SOUTH);
-					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Error", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE) == JOptionPane.YES_OPTION) {
-						new ReportUploader(text, currentFile).execute();
-					}
-				}
-			}
-		});
-	}
-
-	static class ReportUploader extends SwingWorker<String, Void> {
-
-		private final String text;
-		private final File currentFile;
-
-		ReportUploader(final String text, final File currentFile) {
-			super();
-			this.text = text;
-			this.currentFile = currentFile;
-		}
-
-		@Override
-		protected String doInBackground() throws Exception {
-			return sendError(text, currentFile);
-		}
-
-		@Override
-		protected void done() {
-			try {
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), get(), "Notice", JOptionPane.INFORMATION_MESSAGE);
-			} catch (final Exception e) { // backup solution
-				e.printStackTrace();
-				Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html><h1>Error message copied</h1>Please paste it in your email and send it to qxie@concord.org.<br>Thanks for your help for this open-source project!</html>", "Noficiation", JOptionPane.INFORMATION_MESSAGE);
-			}
-			// attempt to fix problems
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() {
-					Scene.getInstance().fixProblems(true);
-					return null;
-				}
-			});
-		}
-	}
-
-	public static String sendError(final String msg, final File currentFile) throws Exception {
-		final MultipartUtility multipart = new MultipartUtility("http://energy3d.concord.org/errors/error.php", "UTF-8");
-		multipart.addFormField("ip_address", InetAddress.getLocalHost().getHostAddress());
-		multipart.addFormField("os_name", System.getProperty("os.name"));
-		multipart.addFormField("user_name", System.getProperty("user.name"));
-		multipart.addFormField("os_version", System.getProperty("os.version"));
-		multipart.addFormField("energy3d_version", MainApplication.VERSION);
-		multipart.addFormField("error_message", msg);
-		if (!Scene.isInternalFile()) {
-			final URL url = Scene.getURL();
-			if (url != null) {
-				final File f = new File(url.toURI());
-				if (f.exists()) {
-					multipart.addFilePart("model_lastsaved", f);
-				}
-			}
-			final File file = SnapshotLogger.getInstance().getLatestSnapshot();
-			if (file != null) {
-				multipart.addFilePart("model_snapshot", file);
-			}
-			if (currentFile != null) {
-				multipart.addFilePart("model_current", currentFile);
-			}
-		}
-		return multipart.finish();
 	}
 
 	public final static void openBrowser(final URL url) {

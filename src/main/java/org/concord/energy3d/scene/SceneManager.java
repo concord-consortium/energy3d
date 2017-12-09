@@ -75,6 +75,7 @@ import org.concord.energy3d.undo.MyUndoManager;
 import org.concord.energy3d.undo.RemovePartCommand;
 import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.util.Blinker;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Config.RenderMode;
 import org.concord.energy3d.util.FontManager;
@@ -402,7 +403,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					frameHandler.updateFrame();
 				} catch (final Throwable e) {
 					e.printStackTrace();
-					Util.reportError(e);
+					BugReporter.report(e);
 					return;
 				}
 				synchronized (this) {
@@ -1688,7 +1689,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			mouseState = null;
 		} catch (final Throwable t) {
 			t.printStackTrace();
-			Util.reportError(t);
+			BugReporter.report(t);
 		}
 		EventQueue.invokeLater(new Runnable() { // this method is run by the main Energy3D thread, so invoke the Swing code later
 			@Override
@@ -1876,7 +1877,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				} catch (final Throwable t) {
 					t.printStackTrace();
-					Util.reportError(t);
+					BugReporter.report(t);
 				}
 				return null;
 			}
@@ -2042,7 +2043,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 				} catch (final Throwable t) {
 					t.printStackTrace();
-					Util.reportError(t);
+					BugReporter.report(t);
 				}
 				return null;
 			}
@@ -2166,7 +2167,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					EnergyPanel.getInstance().update();
 				} catch (final Throwable t) {
 					t.printStackTrace();
-					Util.reportError(t);
+					BugReporter.report(t);
 				}
 				return null;
 			}

@@ -100,6 +100,7 @@ import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangeLatitudeCommand;
 import org.concord.energy3d.undo.ChangeSolarHeatMapColorContrastCommand;
 import org.concord.energy3d.undo.ChangeTimeCommand;
+import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -817,7 +818,7 @@ public class EnergyPanel extends JPanel {
 					}
 				} catch (final Throwable e) {
 					e.printStackTrace();
-					Util.reportError(e);
+					BugReporter.report(e);
 					return null;
 				} finally {
 					EventQueue.invokeLater(new Runnable() {
@@ -938,7 +939,7 @@ public class EnergyPanel extends JPanel {
 			try {
 				sunshineHoursField.setText(ONE_DECIMAL.format(sunshineHours.get(city)[month] / 30.0) + " hours");
 			} catch (final Exception e) {
-				Util.reportError(e);
+				BugReporter.report(e);
 			}
 		}
 	}
