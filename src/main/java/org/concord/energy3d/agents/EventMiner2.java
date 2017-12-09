@@ -33,7 +33,7 @@ public class EventMiner2 extends EventMiner {
 			msg += "This investigation requires change to a different season.";
 		} else {
 			final String s = eventString.substring(i + 1);
-			final Pattern p = Pattern.compile(conformanceRegex);
+			final Pattern p = Pattern.compile(segmentSeparatorRegex);
 			final Matcher m = p.matcher(s);
 			final int c = Util.countMatch(m);
 			switch (c) {

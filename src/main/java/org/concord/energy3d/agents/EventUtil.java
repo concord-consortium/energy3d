@@ -26,7 +26,7 @@ public class EventUtil {
 	private EventUtil() {
 	}
 
-	public static String eventsToString(final Class<?>[] selection, final int idleTimeInMillis, final MyEvent startEvent) {
+	public static String eventsToString(final List<Class<?>> selection, final int idleTimeInMillis, final MyEvent startEvent) {
 		String s = "";
 		final List<MyEvent> events = getEvents();
 		MyEvent lastEvent = null;

@@ -35,6 +35,7 @@ import org.concord.energy3d.util.Updater;
 import org.concord.energy3d.util.Util;
 
 public class MainApplication {
+
 	public static final String VERSION = "7.6.9";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
@@ -57,14 +58,14 @@ public class MainApplication {
 		agents.add(new EventMiner("Event Miner"));
 		agents.add(new EventMiner2("Event Miner 2"));
 		agents.add(new EventMiner3("Event Miner 3"));
-		// final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(U.*?[CY]+?.*?A)+?");
-		// final String s = "*A_****U__C_***AU_Y***CCA";
+		// final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A([^ADY]*?U+?[^ADY]*?)(?=A))+?");
+		// final String s = "*A*#UY##?A?UD?A???UA";
 		// final java.util.regex.Matcher matcher = pattern.matcher(s);
 		// while (matcher.find()) {
 		// System.out.println(matcher.group());
 		// }
 		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?[CY]+?.*?U)+?)|((U.*?[CY]+?.*?A)+?)").matcher("*A*##?UDA?")));
-		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?(?=U))+?)|((U.*?(?=A))+?)").matcher("UA_A_U?")));
+		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("(A([^D]+?)(?=A))+?").matcher("*A*#U#?A?UD?A???UA")));
 		// System.exit(0);
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");

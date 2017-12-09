@@ -1,5 +1,7 @@
 package org.concord.energy3d.agents;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,8 +35,11 @@ public class EventMiner3 extends EventMiner {
 		if (startEvent == null) {
 			msg += "This investigation requires choosing a different wall.";
 		} else {
-			final String s = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class }, 10000, startEvent);
-			final Pattern p = Pattern.compile(conformanceRegex);
+			final List<Class<?>> clazz = new ArrayList<Class<?>>();
+			clazz.add(AnalysisEvent.class);
+			clazz.add(ChangePartUValueCommand.class);
+			final String s = EventUtil.eventsToString(clazz, 10000, startEvent);
+			final Pattern p = Pattern.compile(segmentSeparatorRegex);
 			final Matcher m = p.matcher(s);
 			final int c = Util.countMatch(m);
 			switch (c) {

@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Insets;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -473,7 +474,6 @@ public class MainPanel extends JPanel {
 	private static void addMouseOverEffect(final AbstractButton button) {
 		if (Config.isMac()) { // Mac OS X does not have the same behavior as Windows 10, so we mimic it for Mac
 			final Color defaultColor = button.getBackground();
-			final Color bgColor = new Color(220, 219, 219);
 			button.setOpaque(true);
 			button.addMouseListener(new MouseAdapter() {
 				@Override
@@ -483,7 +483,7 @@ public class MainPanel extends JPanel {
 
 				@Override
 				public void mouseEntered(final MouseEvent e) {
-					button.setBackground(bgColor);
+					button.setBackground(SystemColor.controlHighlight);
 				}
 			});
 		}

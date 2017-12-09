@@ -1,5 +1,6 @@
 package org.concord.energy3d.agents;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -21,9 +22,17 @@ public class ConformanceChecker implements Agent {
 
 	private final String name;
 	private String eventString;
+	private final List<Class<?>> checkList;
 
 	public ConformanceChecker(final String name) {
 		this.name = name;
+		checkList = new ArrayList<Class<?>>();
+		checkList.add(AnalysisEvent.class);
+		checkList.add(ChangePartUValueCommand.class);
+		checkList.add(ChangeDateCommand.class);
+		checkList.add(QuestionnaireEvent.class);
+		checkList.add(OperationEvent.class);
+		checkList.add(DataCollectionEvent.class);
 	}
 
 	@Override
@@ -33,8 +42,7 @@ public class ConformanceChecker implements Agent {
 
 	@Override
 	public void sense(final MyEvent e) {
-		final Class<?>[] c = new Class[] { AnalysisEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class, QuestionnaireEvent.class, OperationEvent.class, DataCollectionEvent.class };
-		eventString = EventUtil.eventsToString(c, 10000, null);
+		eventString = EventUtil.eventsToString(checkList, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 

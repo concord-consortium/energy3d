@@ -1,5 +1,6 @@
 package org.concord.energy3d.agents;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,10 @@ public class EventMiner implements Agent {
 
 	final String name;
 	String eventString;
-	String conformanceRegex = "((A.*?(?=U))+?)|((U.*?(?=A))+?)";
+	String segmentSeparatorRegex = "(A.*?(?=A))+?";
 	String violation = "CDLY";
 	String violationRegex = "[" + violation + "]+?";
-	String strictConformanceRegex = "(U[^" + violation + "]*?A)+?";
+	String strictConformanceRegex = "(A([^A" + violation + "]*?U+?[^A" + violation + "]*?)(?=A))+?";
 
 	Map<String, FeedbackPool> singleIndicatorFeedbackMap;
 	FeedbackPool feedbackOnDailyAnalysis;
@@ -35,7 +36,15 @@ public class EventMiner implements Agent {
 	FeedbackPool feedbackOnTargetBehavior;
 	FeedbackPool feedbackOnTargetViolation;
 
-	Class<?>[] observers = new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class, ChangeCityCommand.class, ChangePartColorCommand.class };
+	static List<Class<?>> observers = new ArrayList<Class<?>>();
+	static {
+		observers.add(AnalysisEvent.class);
+		observers.add(DataCollectionEvent.class);
+		observers.add(ChangePartUValueCommand.class);
+		observers.add(ChangeDateCommand.class);
+		observers.add(ChangeCityCommand.class);
+		observers.add(ChangePartColorCommand.class);
+	}
 
 	public EventMiner(final String name) {
 		this.name = name;
@@ -111,7 +120,7 @@ public class EventMiner implements Agent {
 		boolean violated = false;
 		if (msg.equals("")) {
 			String s = "";
-			final String v = lastMatch(conformanceRegex, eventString);
+			final String v = lastMatch(segmentSeparatorRegex, eventString);
 			if (v != null) {
 				if (Pattern.compile(violationRegex).matcher(v).find()) {
 					violated = true;

@@ -22,8 +22,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
-import org.concord.energy3d.undo.ChangeDateCommand;
-import org.concord.energy3d.undo.ChangePartUValueCommand;
 import org.concord.energy3d.util.ClipImage;
 
 /**
@@ -47,7 +45,7 @@ public class EventString extends JPanel {
 		html.setContentType("text/html");
 		add(html, BorderLayout.CENTER);
 
-		eventString = EventUtil.eventsToString(new Class[] { AnalysisEvent.class, DataCollectionEvent.class, ChangePartUValueCommand.class, ChangeDateCommand.class }, 10000, null);
+		eventString = EventUtil.eventsToString(EventMiner.observers, 10000, null);
 		String text = "<html>";
 		final int columns = 20;
 		for (int i = 0; i < eventString.length(); i++) {
@@ -67,6 +65,9 @@ public class EventString extends JPanel {
 				break;
 			case 'D':
 				text += "<span style=\"background-color: #aa9922\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
+				break;
+			case 'L':
+				text += "<span style=\"background-color: #22aa77\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			case 'U':
 				text += "<span style=\"background-color: #226699\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
