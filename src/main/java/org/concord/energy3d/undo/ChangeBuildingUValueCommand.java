@@ -55,6 +55,11 @@ public class ChangeBuildingUValueCommand extends MyAbstractUndoableEdit {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'U';
+	}
+
+	@Override
 	public String getPresentationName() {
 		return "U-Factor Change for Whole Building";
 	}

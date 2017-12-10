@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
@@ -24,15 +25,12 @@ public class EventMiner implements Agent {
 
 	final String name;
 	String eventString;
-	String segmentSeparatorRegex = "(A.*?(?=A))+?";
-	String violation = "CDLY";
-	String violationRegex = "[" + violation + "]+?";
-	String strictConformanceRegex = "(A([^A" + violation + "]*?U+?[^A" + violation + "]*?)(?=A))+?";
+	String segmentRegex = "(A.*?(?=A))+?";
+	String violationsRegex;
+	String strictConformanceRegex;
 
+	Map<String, FeedbackPool> singleViolatorFeedbackMap;
 	Map<String, FeedbackPool> singleIndicatorFeedbackMap;
-	FeedbackPool feedbackOnDailyAnalysis;
-	FeedbackPool feedbackOnUValueChange;
-	FeedbackPool feedbackOnDataCollector;
 	FeedbackPool feedbackOnTargetBehavior;
 	FeedbackPool feedbackOnTargetViolation;
 
@@ -41,29 +39,32 @@ public class EventMiner implements Agent {
 		observers.add(AnalysisEvent.class);
 		observers.add(DataCollectionEvent.class);
 		observers.add(ChangePartUValueCommand.class);
+		observers.add(ChangeBuildingUValueCommand.class);
 		observers.add(ChangeDateCommand.class);
 		observers.add(ChangeCityCommand.class);
 		observers.add(ChangePartColorCommand.class);
 	}
 
 	public EventMiner(final String name) {
+
 		this.name = name;
 
+		// single indicators
 		singleIndicatorFeedbackMap = new LinkedHashMap<String, FeedbackPool>();
 
-		feedbackOnDailyAnalysis = new FeedbackPool(1, 2);
-		feedbackOnDailyAnalysis.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
-		feedbackOnDailyAnalysis.setItem(0, 1, "Did you forget to run daily energy analysis?");
-		singleIndicatorFeedbackMap.put("A+?", feedbackOnDailyAnalysis);
+		FeedbackPool feedback = new FeedbackPool(1, 2);
+		feedback.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
+		feedback.setItem(0, 1, "Did you forget to run daily energy analysis?");
+		singleIndicatorFeedbackMap.put("A+?", feedback);
 
-		feedbackOnDataCollector = new FeedbackPool(1, 1);
-		feedbackOnDataCollector.setItem(0, 0, "Have you input enough data in the table?");
-		singleIndicatorFeedbackMap.put("#{2,}?", feedbackOnDataCollector);
+		feedback = new FeedbackPool(1, 1);
+		feedback.setItem(0, 0, "Have you input enough data in the table?");
+		singleIndicatorFeedbackMap.put("#{2,}?", feedback);
 
-		feedbackOnUValueChange = new FeedbackPool(1, 2);
-		feedbackOnUValueChange.setItem(0, 0, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
-		feedbackOnUValueChange.setItem(0, 1, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
-		singleIndicatorFeedbackMap.put("U+?", feedbackOnUValueChange);
+		feedback = new FeedbackPool(1, 2);
+		feedback.setItem(0, 0, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
+		feedback.setItem(0, 1, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
+		singleIndicatorFeedbackMap.put("W+?", feedback);
 
 		feedbackOnTargetBehavior = new FeedbackPool(4, 1);
 		feedbackOnTargetBehavior.setItem(0, 0, "You should run a daily energy analysis after changing U-value.");
@@ -73,6 +74,41 @@ public class EventMiner implements Agent {
 
 		feedbackOnTargetViolation = new FeedbackPool(1, 1);
 		feedbackOnTargetViolation.setItem(0, 0, "You changed multiple variables besides U-value, which may invalidate<br>your result. You can discard the previous data and collec more new data<br>under the new condition. Make sure to change only the U-value between<br>analyses.");
+
+		// single violators
+		singleViolatorFeedbackMap = new LinkedHashMap<String, FeedbackPool>();
+
+		FeedbackPool warning = new FeedbackPool(1, 1);
+		warning.setItem(0, 0, "You changed the location. As each location has a different climate,<br>changing the location may affect the result of energy use.");
+		singleViolatorFeedbackMap.put("C", warning);
+
+		warning = new FeedbackPool(1, 1);
+		warning.setItem(0, 0, "You changed the date. As each date has different weather conditions,<br>changing the date may affect the result of energy use.");
+		singleViolatorFeedbackMap.put("D", warning);
+
+		warning = new FeedbackPool(1, 1);
+		warning.setItem(0, 0, "You changed the color of some part of the house. As the color of a house may affect its absorption of solar energy,<br>changing the color may affect the result of energy use.");
+		singleViolatorFeedbackMap.put("L", warning);
+
+		warning = new FeedbackPool(1, 1);
+		warning.setItem(0, 0, "You changed the U-value of an object that is not a wall.<br>In this investigation, you should select a wall and change only its U-value.");
+		singleViolatorFeedbackMap.put("R", warning);
+
+		warning = new FeedbackPool(1, 1);
+		warning.setItem(0, 0, "You changed the U-values of all walls.<br>In this investigation, you should select a wall and change only its U-value.");
+		singleViolatorFeedbackMap.put("U", warning);
+
+		warning = new FeedbackPool(1, 1);
+		warning.setItem(0, 0, "You ran an annual energy analysis.<br>In this investigation, you should run only daily energy analyses.");
+		singleViolatorFeedbackMap.put("Y", warning);
+
+		String violations = "";
+		for (final String x : singleViolatorFeedbackMap.keySet()) {
+			violations += x;
+		}
+
+		violationsRegex = "[" + violations + "]+?";
+		strictConformanceRegex = "(A([^A" + violations + "]*?W+?[^A" + violations + "]*?)(?=A))+?";
 
 	}
 
@@ -120,14 +156,19 @@ public class EventMiner implements Agent {
 		boolean violated = false;
 		if (msg.equals("")) {
 			String s = "";
-			final String v = lastMatch(segmentSeparatorRegex, eventString);
+			final String v = lastMatch(segmentRegex, eventString);
 			if (v != null) {
-				if (Pattern.compile(violationRegex).matcher(v).find()) {
-					violated = true;
+				System.out.println("~~~~~" + v);
+				for (final String x : singleViolatorFeedbackMap.keySet()) {
+					if (Pattern.compile("[" + x + "]+?").matcher(v).find()) {
+						s = singleViolatorFeedbackMap.get(x).getCurrentItem(0);
+						violated = true;
+						break;
+					}
 				}
 			}
 			if (violated) {
-				s = feedbackOnTargetViolation.getCurrentItem(0);
+				// s = feedbackOnTargetViolation.getCurrentItem(0);
 			} else {
 				final int c = countMatch(strictConformanceRegex);
 				s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");

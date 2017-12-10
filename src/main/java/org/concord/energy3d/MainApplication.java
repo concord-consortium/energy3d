@@ -46,8 +46,8 @@ public class MainApplication {
 	private static List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
 	static void testRegex() { // temporarily used to test regex
-		final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A([^ADY]*?U+?[^ADY]*?)(?=A))+?");
-		final String s = "*A*#U##?A?UD?A???UA";
+		final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A([^ADY]*?W+?[^ADY]*?)(?=A))+?");
+		final String s = "*A*#W##?A?WD?A???WA";
 		final java.util.regex.Matcher matcher = pattern.matcher(s);
 		while (matcher.find()) {
 			System.out.println(matcher.group());

@@ -39,7 +39,7 @@ public class EventMiner3 extends EventMiner {
 			clazz.add(AnalysisEvent.class);
 			clazz.add(ChangePartUValueCommand.class);
 			final String s = EventUtil.eventsToString(clazz, 10000, startEvent);
-			final Pattern p = Pattern.compile(segmentSeparatorRegex);
+			final Pattern p = Pattern.compile(segmentRegex);
 			final Matcher m = p.matcher(s);
 			final int c = Util.countMatch(m);
 			switch (c) {

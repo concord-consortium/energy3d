@@ -5,6 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Thermal;
+import org.concord.energy3d.model.Wall;
 
 public class ChangePartUValueCommand extends MyAbstractUndoableEdit {
 
@@ -50,7 +51,10 @@ public class ChangePartUValueCommand extends MyAbstractUndoableEdit {
 
 	@Override
 	public char getOneLetterCode() {
-		return 'U';
+		if (part instanceof Wall) {
+			return 'W';
+		}
+		return 'R';
 	}
 
 	@Override

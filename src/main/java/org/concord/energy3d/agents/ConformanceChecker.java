@@ -74,19 +74,19 @@ public class ConformanceChecker implements Agent {
 		System.out.println(this + " Actuating: " + eventString);
 		String msg = "<html>";
 		final int countA = Util.countMatch(Pattern.compile("A+?").matcher(eventString));
-		final int countC = Util.countMatch(Pattern.compile("C+?").matcher(eventString));
 		final int countD = Util.countMatch(Pattern.compile("D+?").matcher(eventString));
+		final int countI = Util.countMatch(Pattern.compile("#+?").matcher(eventString));
 		final int countQ = Util.countMatch(Pattern.compile("Q+?").matcher(eventString));
-		final int countU = Util.countMatch(Pattern.compile("U+?").matcher(eventString));
+		final int countW = Util.countMatch(Pattern.compile("W+?").matcher(eventString));
 		if (countQ < 2) {
 			msg += "Did you forget to answer the pre/post-test questions?";
 		} else if (countA == 0) {
 			msg += "You have never run a daily energy analysis.";
-		} else if (countU == 0) {
-			msg += "You have never changed the U-value.";
-		} else if (countD == 0) {
+		} else if (countW == 0) {
+			msg += "You have never changed the U-value of a wall.";
+		} else if (countI == 0) {
 			msg += "You have never collected any data.";
-		} else if (countC == 0) {
+		} else if (countD == 0) {
 			msg += "Did you forget to investigate the effect of the U-value in a different season?";
 		} else {
 			final MyEvent startEvent = idChangeEvent();
