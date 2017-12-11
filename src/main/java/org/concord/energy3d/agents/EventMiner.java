@@ -158,7 +158,6 @@ public class EventMiner implements Agent {
 			String s = "";
 			final String v = lastMatch(segmentRegex, eventString);
 			if (v != null) {
-				System.out.println("~~~~~" + v);
 				for (final String x : singleViolatorFeedbackMap.keySet()) {
 					if (Pattern.compile("[" + x + "]+?").matcher(v).find()) {
 						s = singleViolatorFeedbackMap.get(x).getCurrentItem(0);
@@ -167,9 +166,19 @@ public class EventMiner implements Agent {
 					}
 				}
 			}
-			if (violated) {
-				// s = feedbackOnTargetViolation.getCurrentItem(0);
-			} else {
+			if (!violated) {
+				if (eventString.endsWith("?")) {
+					final int lastActuation = eventString.substring(0, eventString.length() - 1).lastIndexOf("?");
+					final String eventStringSinceLastActuation = eventString.substring(lastActuation + 1, eventString.length() - 1);
+					if (!"".equals(eventStringSinceLastActuation)) {
+						if (Pattern.compile(violationsRegex).matcher(eventStringSinceLastActuation).find()) {
+							s = feedbackOnTargetViolation.getCurrentItem(0);
+							violated = true;
+						}
+					}
+				}
+			}
+			if (!violated) {
 				final int c = countMatch(strictConformanceRegex);
 				s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
 			}
