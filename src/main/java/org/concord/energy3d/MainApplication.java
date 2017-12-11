@@ -17,9 +17,8 @@ import javax.swing.UIManager;
 
 import org.concord.energy3d.agents.Agent;
 import org.concord.energy3d.agents.ConformanceChecker;
-import org.concord.energy3d.agents.EventMiner;
-import org.concord.energy3d.agents.EventMiner2;
-import org.concord.energy3d.agents.EventMiner3;
+import org.concord.energy3d.agents.EventMinerSheet2;
+import org.concord.energy3d.agents.EventMinerSheet3;
 import org.concord.energy3d.agents.MyEvent;
 import org.concord.energy3d.etc.oneinstance.OneInstance;
 import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
@@ -36,7 +35,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "7.7.0";
+	public static final String VERSION = "7.7.1";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -70,9 +69,8 @@ public class MainApplication {
 		agents = new ArrayList<Agent>();
 		// TODO: temporary test code below
 		agents.add(new ConformanceChecker("Conformance Checker"));
-		agents.add(new EventMiner("Event Miner"));
-		agents.add(new EventMiner2("Event Miner 2"));
-		agents.add(new EventMiner3("Event Miner 3"));
+		agents.add(new EventMinerSheet2("Event Miner Sheet 2"));
+		agents.add(new EventMinerSheet3("Event Miner Sheet 3"));
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.

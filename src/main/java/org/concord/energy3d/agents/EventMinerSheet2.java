@@ -20,7 +20,7 @@ import org.concord.energy3d.util.Util;
  * @author Charles Xie
  *
  */
-public class EventMiner implements Agent {
+public class EventMinerSheet2 implements Agent {
 
 	final String name;
 	String eventString;
@@ -28,11 +28,10 @@ public class EventMiner implements Agent {
 	// clearly needed
 	Map<String, Feedback> warnings;
 	Map<String, Feedback> reminders;
+	Map<String, FeedbackPool> shortcircuits;
 
-	// not very clear
-	Map<String, FeedbackPool> singleIndicatorFeedbackMap;
 	String conformanceRegex;
-	FeedbackPool feedbackOnTargetBehavior;
+	FeedbackPool feedbackOnConformance;
 
 	static List<Class<?>> observers = new ArrayList<Class<?>>();
 	static {
@@ -45,32 +44,32 @@ public class EventMiner implements Agent {
 		observers.add(ChangePartColorCommand.class);
 	}
 
-	public EventMiner(final String name) {
+	public EventMinerSheet2(final String name) {
 
 		this.name = name;
 
 		// single indicators
-		singleIndicatorFeedbackMap = new LinkedHashMap<String, FeedbackPool>();
+		shortcircuits = new LinkedHashMap<String, FeedbackPool>();
 
 		FeedbackPool feedback = new FeedbackPool(1, 2);
 		feedback.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
 		feedback.setItem(0, 1, "Did you forget to run daily energy analysis?");
-		singleIndicatorFeedbackMap.put("A+?", feedback);
+		shortcircuits.put("A+?", feedback);
 
 		feedback = new FeedbackPool(1, 1);
 		feedback.setItem(0, 0, "Have you input data in the table?");
-		singleIndicatorFeedbackMap.put("#{2,}?", feedback);
+		shortcircuits.put("#{2,}?", feedback);
 
 		feedback = new FeedbackPool(1, 2);
 		feedback.setItem(0, 0, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
 		feedback.setItem(0, 1, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. But you haven't adjusted the U-value.");
-		singleIndicatorFeedbackMap.put("W+?", feedback);
+		shortcircuits.put("W+?", feedback);
 
-		feedbackOnTargetBehavior = new FeedbackPool(4, 1);
-		feedbackOnTargetBehavior.setItem(0, 0, "You should run a daily energy analysis after changing U-value.");
-		feedbackOnTargetBehavior.setItem(1, 0, "You only analyzed U-value change once.<br>Is it sufficient to draw a conclusion?");
-		feedbackOnTargetBehavior.setItem(2, 0, "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
-		feedbackOnTargetBehavior.setItem(3, 0, "You have run {COUNT_PATTERN} correct analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
+		feedbackOnConformance = new FeedbackPool(4, 1);
+		feedbackOnConformance.setItem(0, 0, "You should run a daily energy analysis after changing U-value.");
+		feedbackOnConformance.setItem(1, 0, "You only analyzed U-value change once.<br>Is it sufficient to draw a conclusion?");
+		feedbackOnConformance.setItem(2, 0, "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
+		feedbackOnConformance.setItem(3, 0, "You have run {COUNT_PATTERN} correct analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
 
 		// warning upon the appearance of the specified events
 		warnings = new LinkedHashMap<String, Feedback>();
@@ -169,7 +168,7 @@ public class EventMiner implements Agent {
 			// if no warning or reminder is found, check conformity
 			if ("".equals(s)) {
 				final int c = countMatch(conformanceRegex);
-				s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
+				s = feedbackOnConformance.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
 			}
 
 			msg += s;
@@ -185,9 +184,9 @@ public class EventMiner implements Agent {
 
 	private String checkSingleIndicators() {
 		String s = "";
-		for (final String regex : singleIndicatorFeedbackMap.keySet()) {
+		for (final String regex : shortcircuits.keySet()) {
 			if (countMatch(regex) == 0) {
-				final FeedbackPool f = singleIndicatorFeedbackMap.get(regex);
+				final FeedbackPool f = shortcircuits.get(regex);
 				s += f.getCurrentItem(0);
 				f.forward(0);
 				break;

@@ -45,7 +45,7 @@ public class EventString extends JPanel {
 		html.setContentType("text/html");
 		add(html, BorderLayout.CENTER);
 
-		eventString = EventUtil.eventsToString(EventMiner.observers, 10000, null);
+		eventString = EventUtil.eventsToString(EventMinerSheet2.observers, 10000, null);
 		String text = "<html>";
 		final int columns = 20;
 		for (int i = 0; i < eventString.length(); i++) {

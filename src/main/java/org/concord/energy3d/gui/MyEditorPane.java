@@ -7,6 +7,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
 
@@ -89,11 +91,18 @@ public class MyEditorPane {
 						if (n.toString().equals("a")) {
 							if (v != null) {
 								String s = v.toString();
-								if (s.startsWith("href=goto://")) {
-									s = s.substring(12);
-								}
-								if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-									EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s.trim());
+								if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) { // ad hoc protocols
+									if (s.startsWith("href=goto://")) {
+										s = s.substring(12);
+										EnergyPanel.getInstance().getCityComboBox().setSelectedItem(s.trim());
+									} else if (s.startsWith("href=date://")) {
+										s = s.substring(12);
+										try {
+											EnergyPanel.getInstance().getDateSpinner().setValue(new SimpleDateFormat("MMMM dd").parse(s.trim()));
+										} catch (final ParseException e1) {
+											e1.printStackTrace();
+										}
+									}
 								} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
 									editorPane.setToolTipText(s);
 								} else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {

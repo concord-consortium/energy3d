@@ -36,37 +36,9 @@ public class ConformanceChecker implements Agent {
 	}
 
 	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
 	public void sense(final MyEvent e) {
 		eventString = EventUtil.eventsToString(checkList, 10000, null);
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
-	}
-
-	MyEvent idChangeEvent() {
-		final List<MyEvent> u = EventUtil.getEvents(ChangePartUValueCommand.class);
-		if (u.size() < 2) {
-			return null;
-		}
-		long oldId = -1;
-		long newId = -1;
-		for (final MyEvent x : u) {
-			if (x instanceof ChangePartUValueCommand) {
-				final ChangePartUValueCommand command = (ChangePartUValueCommand) x;
-				newId = command.getPart().getId();
-				if (oldId == -1) { // first
-					oldId = newId;
-				} else {
-					if (newId != oldId) {
-						return x;
-					}
-				}
-			}
-		}
-		return null;
 	}
 
 	@Override
@@ -89,15 +61,15 @@ public class ConformanceChecker implements Agent {
 		} else if (countD == 0) {
 			msg += "Did you forget to investigate the effect of the U-value in a different season?";
 		} else {
-			final MyEvent startEvent = idChangeEvent();
-			if (startEvent == null) {
-				msg += "Did you forget to investigate the effect of the U-value of a different wall?";
-			} else {
-				msg += "Thank you for completing this task!";
-				EnergyPanel.getInstance().showInstructionTabHeaders(true);
-			}
+			msg += "Thank you for completing this task!";
+			EnergyPanel.getInstance().showInstructionTabHeaders(true);
 		}
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
