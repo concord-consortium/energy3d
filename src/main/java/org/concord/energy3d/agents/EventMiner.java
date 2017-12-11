@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
@@ -25,14 +24,15 @@ public class EventMiner implements Agent {
 
 	final String name;
 	String eventString;
-	String segmentRegex = "(A.*?(?=A))+?";
-	String violationsRegex;
-	String strictConformanceRegex;
 
-	Map<String, FeedbackPool> singleViolatorFeedbackMap;
+	// clearly needed
+	Map<String, Feedback> warnings;
+	Map<String, Feedback> reminders;
+
+	// not very clear
 	Map<String, FeedbackPool> singleIndicatorFeedbackMap;
+	String conformanceRegex;
 	FeedbackPool feedbackOnTargetBehavior;
-	FeedbackPool feedbackOnTargetViolation;
 
 	static List<Class<?>> observers = new ArrayList<Class<?>>();
 	static {
@@ -58,7 +58,7 @@ public class EventMiner implements Agent {
 		singleIndicatorFeedbackMap.put("A+?", feedback);
 
 		feedback = new FeedbackPool(1, 1);
-		feedback.setItem(0, 0, "Have you input enough data in the table?");
+		feedback.setItem(0, 0, "Have you input data in the table?");
 		singleIndicatorFeedbackMap.put("#{2,}?", feedback);
 
 		feedback = new FeedbackPool(1, 2);
@@ -70,51 +70,28 @@ public class EventMiner implements Agent {
 		feedbackOnTargetBehavior.setItem(0, 0, "You should run a daily energy analysis after changing U-value.");
 		feedbackOnTargetBehavior.setItem(1, 0, "You only analyzed U-value change once.<br>Is it sufficient to draw a conclusion?");
 		feedbackOnTargetBehavior.setItem(2, 0, "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
-		feedbackOnTargetBehavior.setItem(3, 0, "You have run {COUNT_PATTERN} analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
+		feedbackOnTargetBehavior.setItem(3, 0, "You have run {COUNT_PATTERN} correct analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
 
-		feedbackOnTargetViolation = new FeedbackPool(1, 1);
-		feedbackOnTargetViolation.setItem(0, 0, "You changed multiple variables besides U-value, which may invalidate<br>your result. You can discard the previous data and collec more new data<br>under the new condition. Make sure to change only the U-value between<br>analyses.");
+		// warning upon the appearance of the specified events
+		warnings = new LinkedHashMap<String, Feedback>();
+		warnings.put("C", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the location. As each location has a different climate,<br>changing the location may affect the result of energy use."));
+		warnings.put("D", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the date. As each date has different weather conditions,<br>changing the date may affect the result of energy use."));
+		warnings.put("L", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the color of some part of the house. As the color of a house may affect its absorption of solar energy,<br>changing the color may affect the result of energy use."));
+		warnings.put("R", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the U-value of an object that is not a wall.<br>In this investigation, you should select a wall and change only its U-value."));
+		warnings.put("U", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the U-values of all walls.<br>In this investigation, you should select a wall and change only its U-value."));
+		warnings.put("Y", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You ran an annual energy analysis.<br>In this investigation, you should run only daily energy analyses."));
 
-		// single violators
-		singleViolatorFeedbackMap = new LinkedHashMap<String, FeedbackPool>();
+		// reminding upon the absence of the specified events
+		reminders = new LinkedHashMap<String, Feedback>();
+		reminders.put("#", new Feedback(JOptionPane.INFORMATION_MESSAGE, true, "Did you forget to collect the result of the No. {ANALYSIS_NUMBER} analysis<br>and type it in the table?"));
 
-		FeedbackPool warning = new FeedbackPool(1, 1);
-		warning.setItem(0, 0, "You changed the location. As each location has a different climate,<br>changing the location may affect the result of energy use.");
-		singleViolatorFeedbackMap.put("C", warning);
-
-		warning = new FeedbackPool(1, 1);
-		warning.setItem(0, 0, "You changed the date. As each date has different weather conditions,<br>changing the date may affect the result of energy use.");
-		singleViolatorFeedbackMap.put("D", warning);
-
-		warning = new FeedbackPool(1, 1);
-		warning.setItem(0, 0, "You changed the color of some part of the house. As the color of a house may affect its absorption of solar energy,<br>changing the color may affect the result of energy use.");
-		singleViolatorFeedbackMap.put("L", warning);
-
-		warning = new FeedbackPool(1, 1);
-		warning.setItem(0, 0, "You changed the U-value of an object that is not a wall.<br>In this investigation, you should select a wall and change only its U-value.");
-		singleViolatorFeedbackMap.put("R", warning);
-
-		warning = new FeedbackPool(1, 1);
-		warning.setItem(0, 0, "You changed the U-values of all walls.<br>In this investigation, you should select a wall and change only its U-value.");
-		singleViolatorFeedbackMap.put("U", warning);
-
-		warning = new FeedbackPool(1, 1);
-		warning.setItem(0, 0, "You ran an annual energy analysis.<br>In this investigation, you should run only daily energy analyses.");
-		singleViolatorFeedbackMap.put("Y", warning);
-
+		// compounds
 		String violations = "";
-		for (final String x : singleViolatorFeedbackMap.keySet()) {
+		for (final String x : warnings.keySet()) {
 			violations += x;
 		}
+		conformanceRegex = "(A([^A" + violations + "]*?W+?[^A" + violations + "]*?)(?=A))+?";
 
-		violationsRegex = "[" + violations + "]+?";
-		strictConformanceRegex = "(A([^A" + violations + "]*?W+?[^A" + violations + "]*?)(?=A))+?";
-
-	}
-
-	@Override
-	public String getName() {
-		return name;
 	}
 
 	@Override
@@ -123,11 +100,90 @@ public class EventMiner implements Agent {
 		System.out.println(this + " Sensing:" + e.getName() + ">>> " + eventString);
 	}
 
+	@Override
+	public void actuate() {
+		System.out.println(this + " Actuating: " + eventString);
+		String msg = checkSingleIndicators();
+		int type = JOptionPane.INFORMATION_MESSAGE;
+		if (msg.equals("")) {
+			String s = "";
+
+			// start with the latest segment since the last analysis and work back one segment by another, stopping at the last ask
+			final String[] segments = eventString.split("A+?"); // if no A is found, the entire event string is the only segment returned
+			if (segments != null && segments.length > 0) {
+
+				// warnings are top priority, first scan the warnings
+				outer1: for (int i = segments.length - 1; i >= 0; i--) { // scan the zeroth element as it may contain warnings
+					String seg = segments[i];
+					if ("".equals(seg)) {
+						continue; // skip AA (A followed by A)
+					}
+					// System.out.println("substring: " + i + " = " + seg);
+					if (i == segments.length - 1 && seg.endsWith("?")) { // skip the ask if and only if it is the last event in the whole event string (not the current segment)
+						seg = seg.substring(0, seg.length() - 1);
+					}
+					for (final String x : warnings.keySet()) {
+						boolean find = Pattern.compile("[" + x + "]+?").matcher(seg).find();
+						final Feedback f = warnings.get(x);
+						if (f.getNegate()) {
+							find = !find;
+						}
+						if (find) {
+							s = f.getMessage();
+							type = f.getType();
+							break outer1;
+						}
+					}
+					if (seg.lastIndexOf('?') != -1) { // stop at the last ask
+						break outer1;
+					}
+				}
+
+				if ("".equals(s)) { // if there is no warning, look for reminders
+					outer2: for (int i = segments.length - 1; i > 0; i--) { // no need to scan the zeroth element as no analysis has been run
+						final String seg = segments[i];
+						if ("".equals(seg)) {
+							continue; // skip AA (A followed by A)
+						}
+						for (final String x : reminders.keySet()) {
+							boolean find = Pattern.compile("[" + x + "]+?").matcher(seg).find();
+							final Feedback f = reminders.get(x);
+							if (f.getNegate()) {
+								find = !find;
+							}
+							if (find) {
+								s = f.getMessage();
+								s = s.replaceAll("\\{ANALYSIS_NUMBER\\}", i + ""); // from the start of the string to the first A has the index 0, so the analysis index will start from 1
+								type = f.getType();
+								break outer2;
+							}
+						}
+						if (seg.lastIndexOf('?') != -1) { // stop at the last ask
+							break outer2;
+						}
+					}
+				}
+
+			}
+
+			// if no warning or reminder is found, check conformity
+			if ("".equals(s)) {
+				final int c = countMatch(conformanceRegex);
+				s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
+			}
+
+			msg += s;
+		}
+
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Advice", type);
+
+	}
+
 	private int countMatch(final String regex) {
 		return Util.countMatch(Pattern.compile(regex).matcher(eventString));
 	}
 
-	public String checkSingleIndicators() {
+	private String checkSingleIndicators() {
 		String s = "";
 		for (final String regex : singleIndicatorFeedbackMap.keySet()) {
 			if (countMatch(regex) == 0) {
@@ -138,57 +194,6 @@ public class EventMiner implements Agent {
 			}
 		}
 		return s;
-	}
-
-	private String lastMatch(final String regex, final String string) {
-		final Matcher matcher = Pattern.compile(regex).matcher(string);
-		String lastMatch = null;
-		while (matcher.find()) {
-			lastMatch = matcher.group();
-		}
-		return lastMatch;
-	}
-
-	@Override
-	public void actuate() {
-		System.out.println(this + " Actuating: " + eventString);
-		String msg = checkSingleIndicators();
-		boolean violated = false;
-		if (msg.equals("")) {
-			String s = "";
-			final String v = lastMatch(segmentRegex, eventString);
-			if (v != null) {
-				for (final String x : singleViolatorFeedbackMap.keySet()) {
-					if (Pattern.compile("[" + x + "]+?").matcher(v).find()) {
-						s = singleViolatorFeedbackMap.get(x).getCurrentItem(0);
-						violated = true;
-						break;
-					}
-				}
-			}
-			if (!violated) {
-				if (eventString.endsWith("?")) {
-					final int lastActuation = eventString.substring(0, eventString.length() - 1).lastIndexOf("?");
-					final String eventStringSinceLastActuation = eventString.substring(lastActuation + 1, eventString.length() - 1);
-					if (!"".equals(eventStringSinceLastActuation)) {
-						if (Pattern.compile(violationsRegex).matcher(eventStringSinceLastActuation).find()) {
-							s = feedbackOnTargetViolation.getCurrentItem(0);
-							violated = true;
-						}
-					}
-				}
-			}
-			if (!violated) {
-				final int c = countMatch(strictConformanceRegex);
-				s = feedbackOnTargetBehavior.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
-			}
-			msg += s;
-		}
-		if (violated) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Warning", JOptionPane.WARNING_MESSAGE);
-		} else {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Advice", JOptionPane.INFORMATION_MESSAGE);
-		}
 	}
 
 	MyEvent idChangeEvent() {
@@ -212,6 +217,11 @@ public class EventMiner implements Agent {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override

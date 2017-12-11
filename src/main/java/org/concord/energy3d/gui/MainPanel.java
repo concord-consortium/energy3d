@@ -483,7 +483,7 @@ public class MainPanel extends JPanel {
 
 				@Override
 				public void mouseEntered(final MouseEvent e) {
-					button.setBackground(SystemColor.controlHighlight);
+					button.setBackground(SystemColor.controlLtHighlight);
 				}
 			});
 		}

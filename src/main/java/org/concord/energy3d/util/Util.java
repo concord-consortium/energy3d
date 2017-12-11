@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -87,6 +88,23 @@ public class Util {
 		}
 		m.reset();
 		return count;
+	}
+
+	public static String firstMatch(final String regex, final String string) {
+		final Matcher matcher = Pattern.compile(regex).matcher(string);
+		while (matcher.find()) {
+			return matcher.group();
+		}
+		return null;
+	}
+
+	public static String lastMatch(final String regex, final String string) {
+		final Matcher matcher = Pattern.compile(regex).matcher(string);
+		String lastMatch = null;
+		while (matcher.find()) {
+			lastMatch = matcher.group();
+		}
+		return lastMatch;
 	}
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(final Map<K, V> map, final boolean ascending) {

@@ -17,6 +17,8 @@ import org.concord.energy3d.util.Util;
  */
 public class EventMiner3 extends EventMiner {
 
+	String segmentRegex = "(A.*?(?=A??))+?";
+
 	public EventMiner3(final String name) {
 		super(name);
 	}

@@ -36,7 +36,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "7.6.9";
+	public static final String VERSION = "7.7.0";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -46,12 +46,13 @@ public class MainApplication {
 	private static List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
 	static void testRegex() { // temporarily used to test regex
-		final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A([^ADY]*?W+?[^ADY]*?)(?=A))+?");
-		final String s = "*A*#W##?A?WD?A???WA";
+		final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A)+?");
+		final String s = "*AA*?##?W?";
 		final java.util.regex.Matcher matcher = pattern.matcher(s);
 		while (matcher.find()) {
 			System.out.println(matcher.group());
 		}
+		System.out.println(java.util.Arrays.asList(s.split("B+?")));
 		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?[CY]+?.*?U)+?)|((U.*?[CY]+?.*?A)+?)").matcher("*A*##?UDA?")));
 		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("(A([^AD]*?U+?[^AD]*?)(?=A))+?").matcher("*A*#U#?A?UD?A???UA")));
 		System.exit(0);
