@@ -29,16 +29,15 @@ import org.concord.energy3d.util.Util;
  */
 public class EventMinerSheet2 implements Agent {
 
-	final String name;
 	String eventString;
 
-	// clearly needed
-	Map<String, Feedback> warnings;
-	Map<String, Feedback> reminders;
-	Map<String, FeedbackPool> shortcircuits;
+	private final String name;
 
-	String conformanceRegex;
-	FeedbackPool feedbackOnConformance;
+	private final Map<String, Feedback> warnings;
+	private final Map<String, Feedback> reminders;
+	private final Map<String, FeedbackPool> shortcircuits;
+	private final String progressRegex;
+	private final FeedbackPool progressFeedback;
 
 	static List<Class<?>> observers = new ArrayList<Class<?>>();
 	static {
@@ -62,7 +61,7 @@ public class EventMinerSheet2 implements Agent {
 
 		this.name = name;
 
-		// single indicators
+		// cases that we can immediately decide the feedback
 		shortcircuits = new LinkedHashMap<String, FeedbackPool>();
 
 		FeedbackPool feedback = new FeedbackPool(1, 2);
@@ -79,13 +78,7 @@ public class EventMinerSheet2 implements Agent {
 		feedback.setItem(0, 1, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. Make sure that you adjust the U-value.");
 		shortcircuits.put("A+?.*?W+?", feedback);
 
-		feedbackOnConformance = new FeedbackPool(4, 1);
-		feedbackOnConformance.setItem(0, 0, "You should run a daily energy analysis after changing the U-value.");
-		feedbackOnConformance.setItem(1, 0, "You only analyzed U-value change once.<br>Is it sufficient to draw a conclusion?");
-		feedbackOnConformance.setItem(2, 0, "You have run two correct analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
-		feedbackOnConformance.setItem(3, 0, "You have run {COUNT_PATTERN} correct analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
-
-		// warning upon the appearance of the specified events
+		// warnings upon the occurrence of the specified events
 		warnings = new LinkedHashMap<String, Feedback>();
 		warnings.put("[C]+?", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the location. As each location has a different climate,<br>changing the location may affect the result of energy use."));
 		warnings.put("[D]+?", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the date. As each date has different weather conditions,<br>changing the date may affect the result of energy use."));
@@ -97,16 +90,23 @@ public class EventMinerSheet2 implements Agent {
 		warnings.put("[Y]+?", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You ran an annual energy analysis.<br>In this investigation, you should run only daily energy analyses."));
 		warnings.put("[Z]+?", new Feedback(JOptionPane.WARNING_MESSAGE, false, "Rotation of the house is not recommended for this investigation<br>as it may interfere with the effect of the U-value on energy use."));
 
-		// reminding upon the absence of the specified events
+		// reminders upon the absence of the specified events
 		reminders = new LinkedHashMap<String, Feedback>();
 		reminders.put("#{2,}", new Feedback(JOptionPane.INFORMATION_MESSAGE, true, "Did you collect the U-value of the selected wall and the energy result<br>of the No. {ANALYSIS_NUMBER} analysis and type it in the table?"));
 
-		// compounds
+		// compound regex
 		String violations = "";
 		for (final String x : warnings.keySet()) {
 			violations += x.substring(x.indexOf('[') + 1, x.lastIndexOf(']'));
 		}
-		conformanceRegex = "(A([^A" + violations + "]*?W+?[^A" + violations + "]*?)(?=A))+?";
+		progressRegex = "(A([^A" + violations + "]*?W+?[^A" + violations + "]*?)(?=A))+?";
+
+		// instruction for progress
+		progressFeedback = new FeedbackPool(4, 1);
+		progressFeedback.setItem(0, 0, "You should run a daily energy analysis after changing only the U-value.<br>Your previous analyses might have involved other changes than U-value.");
+		progressFeedback.setItem(1, 0, "Good work! You correctly analyzed the U-value change once.<br>Is it sufficient to draw a conclusion?");
+		progressFeedback.setItem(2, 0, "You have run two correct analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
+		progressFeedback.setItem(3, 0, "You have run {COUNT_PATTERN} correct analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
 
 	}
 
@@ -121,91 +121,66 @@ public class EventMinerSheet2 implements Agent {
 		System.out.println(this + " Actuating: " + eventString);
 		String msg = checkSingleIndicators();
 		int type = JOptionPane.INFORMATION_MESSAGE;
-		if (msg.equals("")) {
-			String s = "";
-
-			// start with the latest segment since the last analysis and work back one segment by another, stopping at the last ask
+		if ("".equals(msg)) {
 			final String[] segments = eventString.split("A+?"); // if no A is found, the entire event string is the only segment returned
 			if (segments != null && segments.length > 0) {
-
-				// warnings are top priority, first scan the warnings
-				outer1: for (int i = segments.length - 1; i > 0; i--) { // forgive the starter as modifying the state before analysis is fine as long as the condition is kept the same throughout
-					String seg = segments[i];
-					if ("".equals(seg)) {
-						continue; // skip AA (A followed by A)
-					}
-					// System.out.println("substring: " + i + " = " + seg);
-					if (i == segments.length - 1 && seg.endsWith("?")) { // skip the ask if and only if it is the last event in the whole event string (not the current segment)
-						seg = seg.substring(0, seg.length() - 1);
-					}
-					seg = new StringBuilder(seg).reverse().toString(); // reverse the order so that the latest can be processed first (WARNING: This applies to only single-character indicators)
-					for (final String regex : warnings.keySet()) {
-						boolean find = Pattern.compile(regex).matcher(seg).find();
-						final Feedback f = warnings.get(regex);
-						if (f.getNegate()) {
-							find = !find;
-						}
-						if (find) {
-							s = f.getMessage();
-							type = f.getType();
-							break outer1;
-						}
-					}
-					if (seg.lastIndexOf('?') != -1) { // stop at the last ask
-						break outer1;
+				Feedback f = getFeedback(segments, warnings); // prioritize warnings
+				if (f != null) {
+					msg = f.getCustomMessage();
+					type = f.getType();
+				} else {
+					f = getFeedback(segments, reminders); // if there is no warning, check reminders
+					if (f != null) {
+						msg = f.getCustomMessage();
+						type = f.getType();
 					}
 				}
-
-				if ("".equals(s)) { // if there is no warning, look for reminders
-					outer2: for (int i = segments.length - 1; i > 0; i--) { // forgive the starter as no analysis has been run
-						String seg = segments[i];
-						if ("".equals(seg)) {
-							continue; // skip AA (A followed by A)
-						}
-						if (i == segments.length - 1 && seg.endsWith("?")) { // skip the ask if and only if it is the last event in the whole event string (not the current segment)
-							seg = seg.substring(0, seg.length() - 1);
-						}
-						seg = new StringBuilder(seg).reverse().toString(); // reverse the order so that the latest can be processed first (WARNING: This applies to only single-character indicators)
-						for (final String regex : reminders.keySet()) {
-							boolean find = Pattern.compile(regex).matcher(seg).find();
-							final Feedback f = reminders.get(regex);
-							if (f.getNegate()) {
-								find = !find;
-							}
-							if (find) {
-								s = f.getMessage();
-								s = s.replaceAll("\\{ANALYSIS_NUMBER\\}", i + ""); // from the start of the string to the first A has the index 0, so the analysis index will start from 1
-								type = f.getType();
-								break outer2;
-							}
-						}
-						if (seg.lastIndexOf('?') != -1) { // stop at the last ask
-							break outer2;
-						}
-					}
-				}
-
 			}
-
-			// if no warning or reminder is found, check conformity
-			if ("".equals(s)) {
+			if ("".equals(msg)) { // if no warning or reminder is found, check progress
 				int n = 0;
 				if (segments != null && segments.length > 0) {
-					final String seg = segments[0];
-					if (seg.indexOf('W') != -1) {
+					final String seg = segments[0]; // special treatment for the starter zone
+					if (seg.indexOf('W') != -1) { // if the wall U-value has been adjusted before the first analysis, hop to the next instruction
 						n = 1;
 					}
 				}
-				final int c = countMatch(conformanceRegex) + n;
-				s = feedbackOnConformance.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
+				final int c = countMatch(progressRegex) + n;
+				msg = progressFeedback.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
 			}
-
-			msg += s;
-
 		}
-
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Advice", type);
+	}
 
+	private Feedback getFeedback(final String[] segments, final Map<String, Feedback> map) {
+		// Forgive the starter (meaning don't use i >= 0 in the for loop) because:
+		// 1) no analysis has been run and 2) modifying the state before analysis is fine as long as the condition is kept the same later.
+		for (int i = segments.length - 1; i > 0; i--) {
+			String seg = segments[i];
+			if ("".equals(seg)) {
+				continue; // skip AA (A immediately followed by A)
+			}
+			if (i == segments.length - 1 && seg.endsWith("?")) { // skip the ask if it is the last event in the whole event string (not the current segment)
+				seg = seg.substring(0, seg.length() - 1);
+			}
+			// reverse the order so that the latest can be processed first (TODO: This applies to only single-character indicators!)
+			seg = new StringBuilder(seg).reverse().toString();
+			for (final String regex : map.keySet()) {
+				boolean find = Pattern.compile(regex).matcher(seg).find();
+				final Feedback f = map.get(regex);
+				if (f.getNegate()) {
+					find = !find;
+				}
+				if (find) {
+					// from the start of the string to the first A has the index 0, so the analysis index will start from 1
+					f.setCustomMessage(f.getMessage().replaceAll("\\{ANALYSIS_NUMBER\\}", i + ""));
+					return f;
+				}
+			}
+			if (seg.lastIndexOf('?') != -1) { // go no further than the last ask
+				break;
+			}
+		}
+		return null;
 	}
 
 	private int countMatch(final String regex) {
