@@ -4,39 +4,60 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.Floor;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.scene.Scene;
 
 public class AddPartCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private final HousePart housePart;
+	private final HousePart part;
 
-	public AddPartCommand(final HousePart housePart) {
-		this.housePart = housePart;
+	public AddPartCommand(final HousePart part) {
+		this.part = part;
 	}
 
 	public HousePart getPart() {
-		return housePart;
+		return part;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		Scene.getInstance().remove(housePart, true);
+		Scene.getInstance().remove(part, true);
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		Scene.getInstance().add(housePart, true);
+		Scene.getInstance().add(part, true);
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		if (part instanceof Floor) {
+			return 'F';
+		}
+		if (part instanceof Human) {
+			return 'H';
+		}
+		if (part instanceof Foundation) {
+			return 'N';
+		}
+		if (part instanceof Sensor) {
+			return 'S';
+		}
+		return 'P';
+	}
+
+	@Override
 	public String getPresentationName() {
-		return "Add " + housePart.getClass().getSimpleName();
+		return "Add " + part.getClass().getSimpleName();
 	}
 
 }

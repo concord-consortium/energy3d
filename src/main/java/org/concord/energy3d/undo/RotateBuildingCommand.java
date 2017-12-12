@@ -58,6 +58,11 @@ public class RotateBuildingCommand extends MyAbstractUndoableEdit {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'Z';
+	}
+
+	@Override
 	public String getPresentationName() {
 		return "Rotate Building";
 	}

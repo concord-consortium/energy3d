@@ -51,6 +51,11 @@ public class AdjustThermostatCommand extends MyAbstractUndoableEdit {
 	}
 
 	@Override
+	public char getOneLetterCode() {
+		return 'T';
+	}
+
+	@Override
 	public String getPresentationName() {
 		return "Thermostat Adjustment";
 	}

@@ -7,11 +7,16 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
+import org.concord.energy3d.model.Sensor;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
@@ -77,10 +82,6 @@ public class MovePartCommand extends MyAbstractUndoableEdit {
 					final Window w = (Window) part;
 					w.move(v);
 					w.draw();
-				} else if (part instanceof Mirror) {
-					final Mirror m = (Mirror) part;
-					m.move(v, part.getGridSize());
-					m.draw();
 				} else if (part instanceof SolarPanel) {
 					final SolarPanel s = (SolarPanel) part;
 					s.move(v, part.getGridSize());
@@ -89,14 +90,43 @@ public class MovePartCommand extends MyAbstractUndoableEdit {
 					final Rack r = (Rack) part;
 					r.move(v, part.getGridSize());
 					r.draw();
+				} else if (part instanceof Mirror) {
+					final Mirror m = (Mirror) part;
+					m.move(v, part.getGridSize());
+					m.draw();
 				} else if (part instanceof ParabolicTrough) {
 					final ParabolicTrough t = (ParabolicTrough) part;
 					t.move(v, part.getGridSize());
 					t.draw();
+				} else if (part instanceof ParabolicDish) {
+					final ParabolicDish d = (ParabolicDish) part;
+					d.move(v, part.getGridSize());
+					d.draw();
+				} else if (part instanceof FresnelReflector) {
+					final FresnelReflector f = (FresnelReflector) part;
+					f.move(v, part.getGridSize());
+					f.draw();
 				}
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public char getOneLetterCode() {
+		if (part instanceof Floor) {
+			return 'F';
+		}
+		if (part instanceof Human) {
+			return 'H';
+		}
+		if (part instanceof Foundation) {
+			return 'N';
+		}
+		if (part instanceof Sensor) {
+			return 'S';
+		}
+		return 'P';
 	}
 
 	@Override

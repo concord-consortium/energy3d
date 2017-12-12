@@ -69,8 +69,17 @@ public class EventString extends JPanel {
 			case 'L':
 				text += "<span style=\"background-color: #22aa77\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
+			case 'P':
+				text += "<span style=\"background-color: #77cc77\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
+				break;
+			case 'T':
+				text += "<span style=\"background-color: #2277aa\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
+				break;
 			case 'W':
 				text += "<span style=\"background-color: #226699\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
+				break;
+			case 'Z':
+				text += "<span style=\"background-color: #aa16a9\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";
 				break;
 			case '#':
 				text += "<span style=\"background-color: #ff3322\"><font size=3 face=\"Courier New\" color=#ffffff>" + c + "</font></span>";

@@ -9,11 +9,17 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.undo.AddPartCommand;
+import org.concord.energy3d.undo.AdjustThermostatCommand;
 import org.concord.energy3d.undo.ChangeBuildingUValueCommand;
 import org.concord.energy3d.undo.ChangeCityCommand;
 import org.concord.energy3d.undo.ChangeDateCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
 import org.concord.energy3d.undo.ChangePartUValueCommand;
+import org.concord.energy3d.undo.MovePartCommand;
+import org.concord.energy3d.undo.PastePartCommand;
+import org.concord.energy3d.undo.RemovePartCommand;
+import org.concord.energy3d.undo.RotateBuildingCommand;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -42,6 +48,12 @@ public class EventMinerSheet2 implements Agent {
 		observers.add(ChangeDateCommand.class);
 		observers.add(ChangeCityCommand.class);
 		observers.add(ChangePartColorCommand.class);
+		observers.add(AddPartCommand.class);
+		observers.add(PastePartCommand.class);
+		observers.add(RemovePartCommand.class);
+		observers.add(MovePartCommand.class);
+		observers.add(RotateBuildingCommand.class);
+		observers.add(AdjustThermostatCommand.class);
 	}
 
 	public EventMinerSheet2(final String name) {
@@ -68,7 +80,7 @@ public class EventMinerSheet2 implements Agent {
 		feedbackOnConformance = new FeedbackPool(4, 1);
 		feedbackOnConformance.setItem(0, 0, "You should run a daily energy analysis after changing U-value.");
 		feedbackOnConformance.setItem(1, 0, "You only analyzed U-value change once.<br>Is it sufficient to draw a conclusion?");
-		feedbackOnConformance.setItem(2, 0, "You have run two analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
+		feedbackOnConformance.setItem(2, 0, "You have run two correct analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
 		feedbackOnConformance.setItem(3, 0, "You have run {COUNT_PATTERN} correct analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
 
 		// warning upon the appearance of the specified events
@@ -76,9 +88,12 @@ public class EventMinerSheet2 implements Agent {
 		warnings.put("C", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the location. As each location has a different climate,<br>changing the location may affect the result of energy use."));
 		warnings.put("D", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the date. As each date has different weather conditions,<br>changing the date may affect the result of energy use."));
 		warnings.put("L", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the color of some part of the house. As the color of a house may affect its absorption of solar energy,<br>changing the color may affect the result of energy use."));
+		warnings.put("P", new Feedback(JOptionPane.WARNING_MESSAGE, false, "Modification of the house (other than the U-value) is not recommended for this investigation<br>as it may interfere with the effect of the U-value on energy use."));
 		warnings.put("R", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the U-value of an object that is not a wall.<br>In this investigation, you should select a wall and change only its U-value."));
+		warnings.put("T", new Feedback(JOptionPane.WARNING_MESSAGE, false, "Adjusting the thermostat is not recommended for this investigation<br>as it may interfere with the effect of the U-value on energy use."));
 		warnings.put("U", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You changed the U-values of all walls.<br>In this investigation, you should select a wall and change only its U-value."));
 		warnings.put("Y", new Feedback(JOptionPane.WARNING_MESSAGE, false, "You ran an annual energy analysis.<br>In this investigation, you should run only daily energy analyses."));
+		warnings.put("Z", new Feedback(JOptionPane.WARNING_MESSAGE, false, "Rotation of the house is not recommended for this investigation<br>as it may interfere with the effect of the U-value on energy use."));
 
 		// reminding upon the absence of the specified events
 		reminders = new LinkedHashMap<String, Feedback>();
