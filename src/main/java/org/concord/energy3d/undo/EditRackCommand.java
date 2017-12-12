@@ -24,7 +24,7 @@ public class EditRackCommand extends EditPartCommand {
 
 	@Override
 	public void undo() throws CannotUndoException {
-		final Rack rack = (Rack) housePart;
+		final Rack rack = (Rack) part;
 		newRackCenter = rack.getPoints().get(0).clone();
 		newRackWidth = rack.getRackWidth();
 		newRackHeight = rack.getRackHeight();
@@ -36,7 +36,7 @@ public class EditRackCommand extends EditPartCommand {
 
 	@Override
 	public void redo() throws CannotRedoException {
-		final Rack rack = (Rack) housePart;
+		final Rack rack = (Rack) part;
 		rack.getPoints().get(0).set(newRackCenter);
 		rack.setRackWidth(newRackWidth);
 		rack.setRackHeight(newRackHeight);

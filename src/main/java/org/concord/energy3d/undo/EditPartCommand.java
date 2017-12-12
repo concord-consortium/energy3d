@@ -6,14 +6,18 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
+import org.concord.energy3d.model.Floor;
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
+import org.concord.energy3d.model.Sensor;
 
 import com.ardor3d.math.Vector3;
 
 public class EditPartCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	final HousePart housePart;
+	final HousePart part;
 	protected final ArrayList<Vector3> orgPoints;
 	private final double orgHeight;
 	private ArrayList<Vector3> newPoints;
@@ -21,7 +25,7 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 	protected final int editPoint;
 
 	public EditPartCommand(final HousePart housePart) {
-		this.housePart = housePart;
+		this.part = housePart;
 		orgHeight = housePart.getHeight();
 		orgPoints = new ArrayList<Vector3>(housePart.getPoints().size());
 		for (final Vector3 p : housePart.getPoints()) {
@@ -31,19 +35,19 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 	}
 
 	public HousePart getPart() {
-		return housePart;
+		return part;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		housePart.setHeight(orgHeight);
+		part.setHeight(orgHeight);
 		for (int i = 0; i < orgPoints.size(); i++) {
-			housePart.getPoints().set(i, orgPoints.get(i).clone());
+			part.getPoints().set(i, orgPoints.get(i).clone());
 		}
-		housePart.draw();
-		if (housePart.getContainer() != null) {
-			housePart.getContainer().draw();
+		part.draw();
+		if (part.getContainer() != null) {
+			part.getContainer().draw();
 		}
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 	}
@@ -51,20 +55,15 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		housePart.setHeight(newHeight);
+		part.setHeight(newHeight);
 		for (int i = 0; i < newPoints.size(); i++) {
-			housePart.getPoints().set(i, newPoints.get(i).clone());
+			part.getPoints().set(i, newPoints.get(i).clone());
 		}
-		housePart.draw();
-		if (housePart.getContainer() != null) {
-			housePart.getContainer().draw();
+		part.draw();
+		if (part.getContainer() != null) {
+			part.getContainer().draw();
 		}
 		EnergyPanel.getInstance().updateRadiationHeatMap();
-	}
-
-	@Override
-	public String getPresentationName() {
-		return "Edit " + housePart.getClass().getSimpleName();
 	}
 
 	public boolean isReallyEdited() {
@@ -73,11 +72,33 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 	}
 
 	public void saveNewPoints() {
-		newHeight = housePart.getHeight();
-		newPoints = new ArrayList<Vector3>(housePart.getPoints().size());
-		for (final Vector3 p : housePart.getPoints()) {
+		newHeight = part.getHeight();
+		newPoints = new ArrayList<Vector3>(part.getPoints().size());
+		for (final Vector3 p : part.getPoints()) {
 			newPoints.add(p.clone());
 		}
+	}
+
+	@Override
+	public char getOneLetterCode() {
+		if (part instanceof Floor) {
+			return 'F';
+		}
+		if (part instanceof Human) {
+			return 'H';
+		}
+		if (part instanceof Foundation) {
+			return 'N';
+		}
+		if (part instanceof Sensor) {
+			return 'S';
+		}
+		return 'P';
+	}
+
+	@Override
+	public String getPresentationName() {
+		return "Edit " + part.getClass().getSimpleName();
 	}
 
 }

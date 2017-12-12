@@ -45,15 +45,15 @@ public class MainApplication {
 	private static List<Agent> agents; // Multiple agents: https://en.wikipedia.org/wiki/Multi-agent_system
 
 	static void testRegex() { // temporarily used to test regex
-		final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A)+?");
-		final String s = "*AA*?##?W?";
+		final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(A([^ACD]*?W+?[^ACD]*?)(?=A))+?");
+		final String s = "**??A?##?W?A?##?_?";
 		final java.util.regex.Matcher matcher = pattern.matcher(s);
 		while (matcher.find()) {
 			System.out.println(matcher.group());
 		}
-		System.out.println(java.util.Arrays.asList(s.split("B+?")));
-		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("((A.*?[CY]+?.*?U)+?)|((U.*?[CY]+?.*?A)+?)").matcher("*A*##?UDA?")));
-		// System.out.println(Util.countMatch(java.util.regex.Pattern.compile("(A([^AD]*?U+?[^AD]*?)(?=A))+?").matcher("*A*#U#?A?UD?A???UA")));
+		// System.out.println(java.util.Arrays.asList(s.split("A+?")));
+		// System.out.println(org.concord.energy3d.util.Util.countMatch(java.util.regex.Pattern.compile("A+?.*?W+?").matcher("*DA***DW")));
+		System.out.println(org.concord.energy3d.util.Util.countMatch(java.util.regex.Pattern.compile("(A([^ACD]*?W+?[^ACD]*?)(?=A))+?").matcher(s)));
 		System.exit(0);
 	}
 
