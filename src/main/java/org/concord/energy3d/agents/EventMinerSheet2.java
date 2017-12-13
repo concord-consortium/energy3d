@@ -92,7 +92,7 @@ public class EventMinerSheet2 implements Agent {
 
 		// instruction for progress
 		progressFeedback = new ArrayList<Feedback>();
-		progressFeedback.add(new Feedback(JOptionPane.QUESTION_MESSAGE, false, "You have run the daily energy analysis only once.<br>Is it enough to draw a conclusion?"));
+		progressFeedback.add(new Feedback(JOptionPane.INFORMATION_MESSAGE, false, "You have only run a valid daily energy analysis.<br>You need to run at least two such analyses."));
 		progressFeedback.add(new Feedback(JOptionPane.QUESTION_MESSAGE, false, "You have run two valid analyses. Did you compare the results to find the relationship<br>between the difference in energy use and the change of the U-value?"));
 		progressFeedback.add(new Feedback(JOptionPane.QUESTION_MESSAGE, false, "You have run {COUNT_PATTERN} valid analyses. What relationship between the energy use<br>of the house and the U-value of the wall did you find?"));
 
@@ -117,9 +117,9 @@ public class EventMinerSheet2 implements Agent {
 		if (f == null) {
 			final String[] segments = eventString.split("A+?"); // if no A is found, the entire event string is the only segment returned
 			if (segments != null && segments.length > 0) {
-				f = getFeedback(segments, warnings); // prioritize warnings
+				f = getFeedbackSingleCharacter(segments, warnings); // prioritize warnings
 				if (f == null) {
-					f = getFeedback(segments, reminders); // if there is no warning, check reminders
+					f = getFeedbackMultiCharacter(segments, reminders); // if there is no warning, check reminders
 				}
 				if (f == null) { // if no warning or reminder is found, check progress
 					boolean latestHandled = false;
@@ -150,7 +150,8 @@ public class EventMinerSheet2 implements Agent {
 		JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Advice", f == null ? JOptionPane.PLAIN_MESSAGE : f.getType());
 	}
 
-	private Feedback getFeedback(final String[] segments, final Map<String, Feedback> map) {
+	// This applies to only single-character indicators
+	private Feedback getFeedbackSingleCharacter(final String[] segments, final Map<String, Feedback> map) {
 		// Forgive the starter (meaning don't use i >= 0 in the for loop) because:
 		// 1) no analysis has been run and 2) modifying the state before analysis is fine as long as the condition is kept the same later.
 		for (int i = segments.length - 1; i > 0; i--) {
@@ -161,7 +162,41 @@ public class EventMinerSheet2 implements Agent {
 			if (i == segments.length - 1 && seg.endsWith("?")) { // skip the ask if it is the last event in the whole event string (not the current segment)
 				seg = seg.substring(0, seg.length() - 1);
 			}
-			// reverse the order so that the latest can be processed first (TODO: This applies to only single-character indicators!)
+			// reverse the order so that the latest can be processed first
+			for (int x = seg.length() - 1; x >= 0; x--) {
+				final String s = Character.toString(seg.charAt(x));
+				for (final String regex : map.keySet()) {
+					boolean find = Pattern.compile(regex).matcher(s).find();
+					final Feedback f = map.get(regex);
+					if (f.getNegate()) {
+						find = !find;
+					}
+					if (find) {
+						// from the start of the string to the first A has the index 0, so the analysis index will start from 1
+						f.setCustomMessage(f.getMessage().replaceAll("\\{ANALYSIS_NUMBER\\}", i + ""));
+						return f;
+					}
+				}
+			}
+			if (seg.lastIndexOf('?') != -1) { // go no further than the last ask
+				break;
+			}
+		}
+		return null;
+	}
+
+	private Feedback getFeedbackMultiCharacter(final String[] segments, final Map<String, Feedback> map) {
+		// Forgive the starter (meaning don't use i >= 0 in the for loop) because:
+		// 1) no analysis has been run and 2) modifying the state before analysis is fine as long as the condition is kept the same later.
+		for (int i = segments.length - 1; i > 0; i--) {
+			String seg = segments[i];
+			if ("".equals(seg)) {
+				continue; // skip AA (A immediately followed by A)
+			}
+			if (i == segments.length - 1 && seg.endsWith("?")) { // skip the ask if it is the last event in the whole event string (not the current segment)
+				seg = seg.substring(0, seg.length() - 1);
+			}
+			// reverse the order so that the latest can be processed first (TODO: This somehow applies to only single-character indicators!)
 			seg = new StringBuilder(seg).reverse().toString();
 			for (final String regex : map.keySet()) {
 				boolean find = Pattern.compile(regex).matcher(seg).find();
