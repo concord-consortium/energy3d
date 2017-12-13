@@ -35,9 +35,9 @@ public class EventMinerSheet2 implements Agent {
 
 	private final Map<String, Feedback> warnings;
 	private final Map<String, Feedback> reminders;
-	private final Map<String, FeedbackPool> shortcircuits;
-	private final String progressRegex;
-	private final FeedbackPool progressFeedback;
+	private final Map<String, Feedback> mustdos;
+	private final String validationRegex;
+	private final List<Feedback> progressFeedback;
 
 	static List<Class<?>> observers = new ArrayList<Class<?>>();
 	static {
@@ -62,21 +62,10 @@ public class EventMinerSheet2 implements Agent {
 		this.name = name;
 
 		// cases that we can immediately decide the feedback
-		shortcircuits = new LinkedHashMap<String, FeedbackPool>();
-
-		FeedbackPool feedback = new FeedbackPool(1, 2);
-		feedback.setItem(0, 0, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building...");
-		feedback.setItem(0, 1, "Did you forget to run daily energy analysis?");
-		shortcircuits.put("A+?", feedback);
-
-		feedback = new FeedbackPool(1, 1);
-		feedback.setItem(0, 0, "Did you collect the U-value of the selected wall and the energy result<br>following the analysis and type it in the table?");
-		shortcircuits.put("#{2,}", feedback);
-
-		feedback = new FeedbackPool(1, 2);
-		feedback.setItem(0, 0, "Have you selected a wall and changed its U-value?<br>Try right-clicking a wall and select \"Insulation...\" from the popup menu.");
-		feedback.setItem(0, 1, "Your task is to investigate how changing U-value of a wall affects the energy use<br>of the house. Make sure that you adjust the U-value.");
-		shortcircuits.put("A+?.*?W+?", feedback);
+		mustdos = new LinkedHashMap<String, Feedback>();
+		mustdos.put("A+?", new Feedback(JOptionPane.INFORMATION_MESSAGE, false, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building..."));
+		mustdos.put("#{2,}", new Feedback(JOptionPane.QUESTION_MESSAGE, false, "Do you want to collect the U-value of the selected wall and the energy result<br>following the analysis and type it in the table?"));
+		mustdos.put("W+?", new Feedback(JOptionPane.INFORMATION_MESSAGE, false, "Your task is to investigate how changing the U-value of a wall affects the energy use of the house.<br>Right-click a wall and select \"Insulation...\" from the popup menu to change its U-value."));
 
 		// warnings upon the occurrence of the specified events
 		warnings = new LinkedHashMap<String, Feedback>();
@@ -92,21 +81,20 @@ public class EventMinerSheet2 implements Agent {
 
 		// reminders upon the absence of the specified events
 		reminders = new LinkedHashMap<String, Feedback>();
-		reminders.put("#{2,}", new Feedback(JOptionPane.INFORMATION_MESSAGE, true, "Did you collect the U-value of the selected wall and the energy result<br>of the No. {ANALYSIS_NUMBER} analysis and type it in the table?"));
+		reminders.put("#{2,}", new Feedback(JOptionPane.QUESTION_MESSAGE, true, "Do you want to collect the U-value of the selected wall and the energy result<br>of the No. {ANALYSIS_NUMBER} analysis and type it in the table?"));
 
 		// compound regex
 		String violations = "";
 		for (final String x : warnings.keySet()) {
 			violations += x.substring(x.indexOf('[') + 1, x.lastIndexOf(']'));
 		}
-		progressRegex = "(A([^A" + violations + "]*?W+?[^A" + violations + "]*?)(?=A))+?";
+		validationRegex = "(A([^" + violations + "]*?W+?[^" + violations + "]*?)(?=A))+?";
 
 		// instruction for progress
-		progressFeedback = new FeedbackPool(4, 1);
-		progressFeedback.setItem(0, 0, "You should run a daily energy analysis after changing only the U-value.<br>Your previous analyses might have involved other changes than U-value.");
-		progressFeedback.setItem(1, 0, "Good work! You correctly analyzed the U-value change once.<br>Is it sufficient to draw a conclusion?");
-		progressFeedback.setItem(2, 0, "You have run two correct analyses after changing U-value.<br>Did you compare the results to find the relationship<br>between the difference of energy use and the change<br>of the U-value?");
-		progressFeedback.setItem(3, 0, "You have run {COUNT_PATTERN} correct analyses after changing U-value.<br>What relationship between the energy use of the house<br>and the U-value of the wall did you find?");
+		progressFeedback = new ArrayList<Feedback>();
+		progressFeedback.add(new Feedback(JOptionPane.QUESTION_MESSAGE, false, "You have run the daily energy analysis only once.<br>Is it enough to draw a conclusion?"));
+		progressFeedback.add(new Feedback(JOptionPane.QUESTION_MESSAGE, false, "You have run two valid analyses. Did you compare the results to find the relationship<br>between the difference in energy use and the change of the U-value?"));
+		progressFeedback.add(new Feedback(JOptionPane.QUESTION_MESSAGE, false, "You have run {COUNT_PATTERN} valid analyses. What relationship between the energy use<br>of the house and the U-value of the wall did you find?"));
 
 	}
 
@@ -119,36 +107,47 @@ public class EventMinerSheet2 implements Agent {
 	@Override
 	public void actuate() {
 		System.out.println(this + " Actuating: " + eventString);
-		String msg = checkSingleIndicators();
-		int type = JOptionPane.INFORMATION_MESSAGE;
-		if ("".equals(msg)) {
-			final String[] segments = eventString.split("A+?"); // if no A is found, the entire event string is the only segment returned
-			if (segments != null && segments.length > 0) {
-				Feedback f = getFeedback(segments, warnings); // prioritize warnings
-				if (f != null) {
-					msg = f.getCustomMessage();
-					type = f.getType();
-				} else {
-					f = getFeedback(segments, reminders); // if there is no warning, check reminders
-					if (f != null) {
-						msg = f.getCustomMessage();
-						type = f.getType();
-					}
-				}
-			}
-			if ("".equals(msg)) { // if no warning or reminder is found, check progress
-				int n = 0;
-				if (segments != null && segments.length > 0) {
-					final String seg = segments[0]; // special treatment for the starter zone
-					if (seg.indexOf('W') != -1) { // if the wall U-value has been adjusted before the first analysis, hop to the next instruction
-						n = 1;
-					}
-				}
-				final int c = countMatch(progressRegex) + n;
-				msg = progressFeedback.getCurrentItem(c).replaceAll("\\{COUNT_PATTERN\\}", c + "");
+		Feedback f = null;
+		for (final String regex : mustdos.keySet()) { // check the must-do's first
+			if (Util.countMatch(Pattern.compile(regex).matcher(eventString)) == 0) {
+				f = mustdos.get(regex);
+				break;
 			}
 		}
-		JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Advice", type);
+		if (f == null) {
+			final String[] segments = eventString.split("A+?"); // if no A is found, the entire event string is the only segment returned
+			if (segments != null && segments.length > 0) {
+				f = getFeedback(segments, warnings); // prioritize warnings
+				if (f == null) {
+					f = getFeedback(segments, reminders); // if there is no warning, check reminders
+				}
+				if (f == null) { // if no warning or reminder is found, check progress
+					boolean latestHandled = false;
+					String latestSegment;
+					if (segments.length == 1) {
+						latestSegment = eventString;
+					} else {
+						latestSegment = segments[segments.length - 1];
+					}
+					if (latestSegment.indexOf('W') != -1) {
+						latestHandled = true;
+						f = new Feedback(JOptionPane.QUESTION_MESSAGE, false, "Looks like that you have adjusted the U-value.<br>Do you want to follow up with an analysis?");
+					}
+					if (!latestHandled) {
+						String s = "";
+						for (int i = 0; i < segments.length - 1; i++) {
+							s += segments[i] + 'A';
+						}
+						final int count = Util.countMatch(Pattern.compile(validationRegex).matcher(s));
+						// System.out.println(">>>" + s + " = " + count + ", " + validationRegex);
+						f = progressFeedback.get(Math.min(count, progressFeedback.size() - 1));
+						f.setCustomMessage(f.getMessage().replaceAll("\\{COUNT_PATTERN\\}", (count + 1) + ""));
+					}
+				}
+			}
+		}
+		final String msg = f == null ? "Oops, I am embarrassed, but I have no advice." : f.getCustomMessage();
+		JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Advice", f == null ? JOptionPane.PLAIN_MESSAGE : f.getType());
 	}
 
 	private Feedback getFeedback(final String[] segments, final Map<String, Feedback> map) {
@@ -181,23 +180,6 @@ public class EventMinerSheet2 implements Agent {
 			}
 		}
 		return null;
-	}
-
-	private int countMatch(final String regex) {
-		return Util.countMatch(Pattern.compile(regex).matcher(eventString));
-	}
-
-	private String checkSingleIndicators() {
-		String s = "";
-		for (final String regex : shortcircuits.keySet()) {
-			if (countMatch(regex) == 0) {
-				final FeedbackPool f = shortcircuits.get(regex);
-				s += f.getCurrentItem(0);
-				f.forward(0);
-				break;
-			}
-		}
-		return s;
 	}
 
 	MyEvent idChangeEvent() {

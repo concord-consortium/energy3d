@@ -15,6 +15,7 @@ public class Feedback {
 		this.type = type;
 		this.negate = negate;
 		this.message = message;
+		this.customMessage = message;
 	}
 
 	public void setCustomMessage(final String customMessage) {
