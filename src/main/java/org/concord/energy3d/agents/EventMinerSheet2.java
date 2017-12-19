@@ -65,7 +65,7 @@ public class EventMinerSheet2 implements Agent {
 		mustdos = new LinkedHashMap<String, Feedback>();
 		mustdos.put("A+?", new Feedback(JOptionPane.INFORMATION_MESSAGE, false, "Try analyzing the energy use of the house using the menu<br>Analysis > Buildings > Dail Energy Analysis for Selected Building..."));
 		mustdos.put("#{2,}", new Feedback(JOptionPane.QUESTION_MESSAGE, false, "Do you want to collect the U-value of the selected wall and the energy result<br>following the analysis and type it in the table?"));
-		mustdos.put("W+?", new Feedback(JOptionPane.INFORMATION_MESSAGE, false, "Your task is to investigate how changing the U-value of a wall affects the energy use of the house.<br>Right-click a wall and select \"Insulation...\" from the popup menu to change its U-value."));
+		mustdos.put("W+?", new Feedback(JOptionPane.INFORMATION_MESSAGE, false, "Your task is to investigate how changing the U-value of a wall affects the energy use of the house.<br>Right-click a wall and select \"Insulation...\" from the popup menu to change its U-value. Don't apply<br>the change to all walls."));
 
 		// warnings upon the occurrence of the specified events
 		warnings = new LinkedHashMap<String, Feedback>();

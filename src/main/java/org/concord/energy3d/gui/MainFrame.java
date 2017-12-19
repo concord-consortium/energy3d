@@ -1206,6 +1206,14 @@ public class MainFrame extends JFrame {
 			helpMenu.add(mi);
 			helpMenu.addSeparator();
 
+			mi = new JMenuItem("Visit User Forum...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Util.openBrowser("https://energy.concord.org/energy3d/forum/");
+				}
+			});
+			helpMenu.add(mi);
 			mi = new JMenuItem("Visit Home Page...");
 			mi.addActionListener(new ActionListener() {
 				@Override
