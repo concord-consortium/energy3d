@@ -213,7 +213,7 @@ public class Scene implements Serializable {
 	};
 
 	public static enum TextureMode {
-		None, Simple, Full
+		None, Simple, Full, BRICK
 	};
 
 	public static Scene getInstance() {
@@ -347,9 +347,11 @@ public class Scene implements Serializable {
 		instance.applyGroundImage();
 
 		if (instance.textureMode == TextureMode.Simple) {
-			Util.selectSilently(MainFrame.getInstance().getSimpleTextureMenuItem(), true);
+			Util.selectSilently(MainFrame.getInstance().getTexture0MenuItem(), true);
 		} else if (instance.textureMode == TextureMode.Full) {
-			Util.selectSilently(MainFrame.getInstance().getFullTextureMenuItem(), true);
+			Util.selectSilently(MainFrame.getInstance().getTexture1MenuItem(), true);
+		} else if (instance.textureMode == TextureMode.BRICK) {
+			Util.selectSilently(MainFrame.getInstance().getTexture2MenuItem(), true);
 		} else {
 			Util.selectSilently(MainFrame.getInstance().getNoTextureMenuItem(), true);
 		}

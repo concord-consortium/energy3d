@@ -242,8 +242,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem zoomOutMenuItem;
 	private JMenu textureMenu;
 	private JRadioButtonMenuItem noTextureMenuItem;
-	private JRadioButtonMenuItem simpleTextureMenuItem;
-	private JRadioButtonMenuItem fullTextureMenuItem;
+	private JRadioButtonMenuItem texture0MenuItem;
+	private JRadioButtonMenuItem texture1MenuItem;
+	private JRadioButtonMenuItem texture2MenuItem;
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
 	private JMenu themeMenu;
 	private JRadioButtonMenuItem blueSkyMenuItem;
@@ -1712,14 +1713,16 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuSelected(final MenuEvent e) {
 					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
-					Util.selectSilently(simpleTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
-					Util.selectSilently(fullTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
+					Util.selectSilently(texture0MenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
+					Util.selectSilently(texture1MenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
+					Util.selectSilently(texture2MenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
 				}
 			});
 
 			textureMenu.add(getNoTextureMenuItem());
-			textureMenu.add(getSimpleTextureMenuItem());
-			textureMenu.add(getFullTextureMenuItem());
+			textureMenu.add(getTexture0MenuItem());
+			textureMenu.add(getTexture1MenuItem());
+			textureMenu.add(getTexture2MenuItem());
 
 		}
 		return textureMenu;
@@ -3336,10 +3339,10 @@ public class MainFrame extends JFrame {
 		return noTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getSimpleTextureMenuItem() {
-		if (simpleTextureMenuItem == null) {
-			simpleTextureMenuItem = new JRadioButtonMenuItem("Simple Texture");
-			simpleTextureMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getTexture0MenuItem() {
+		if (texture0MenuItem == null) {
+			texture0MenuItem = new JRadioButtonMenuItem("Simple Texture");
+			texture0MenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -3353,15 +3356,15 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(simpleTextureMenuItem);
+			textureButtonGroup.add(texture0MenuItem);
 		}
-		return simpleTextureMenuItem;
+		return texture0MenuItem;
 	}
 
-	public JRadioButtonMenuItem getFullTextureMenuItem() {
-		if (fullTextureMenuItem == null) {
-			fullTextureMenuItem = new JRadioButtonMenuItem("Full Texture");
-			fullTextureMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getTexture1MenuItem() {
+		if (texture1MenuItem == null) {
+			texture1MenuItem = new JRadioButtonMenuItem("Texture 1");
+			texture1MenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -3375,9 +3378,31 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(fullTextureMenuItem);
+			textureButtonGroup.add(texture1MenuItem);
 		}
-		return fullTextureMenuItem;
+		return texture1MenuItem;
+	}
+
+	public JRadioButtonMenuItem getTexture2MenuItem() {
+		if (texture2MenuItem == null) {
+			texture2MenuItem = new JRadioButtonMenuItem("Texture 2");
+			texture2MenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeTextureCommand c = new ChangeTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.BRICK);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureButtonGroup.add(texture2MenuItem);
+		}
+		return texture2MenuItem;
 	}
 
 	public JRadioButtonMenuItem getBlueSkyMenuItem() {

@@ -688,7 +688,17 @@ public abstract class Roof extends HousePart implements Thermal {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "roof.png" : "roof_01.png";
+		final TextureMode t = Scene.getInstance().getTextureMode();
+		if (t == TextureMode.Simple) {
+			return "roof.png";
+		}
+		if (t == TextureMode.Full) {
+			return "roof_01.png";
+		}
+		if (t == TextureMode.BRICK) {
+			return "roof_02.png";
+		}
+		return null;
 	}
 
 	protected abstract void processRoofEditPoints(final List<? extends ReadOnlyVector3> wallUpperPoints);

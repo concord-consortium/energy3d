@@ -1451,7 +1451,17 @@ public class Wall extends HousePart implements Thermal {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "wall.png" : "wall_01.png";
+		final TextureMode t = Scene.getInstance().getTextureMode();
+		if (t == TextureMode.Simple) {
+			return "wall.png";
+		}
+		if (t == TextureMode.Full) {
+			return "wall_01.png";
+		}
+		if (t == TextureMode.BRICK) {
+			return "wall_02.png";
+		}
+		return null;
 	}
 
 	public boolean isVisited() {
