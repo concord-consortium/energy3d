@@ -1073,7 +1073,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return getBoundingHeight() + height - offset; // shift a small distance to avoid collision with a possible roof
 	}
 
-	public void drawSideMesh() {
+	private void drawSideMesh() {
 		final FloatBuffer vertexBuffer0 = sideMesh[0].getMeshData().getVertexBuffer();
 		final FloatBuffer vertexBuffer1 = sideMesh[1].getMeshData().getVertexBuffer();
 		final FloatBuffer vertexBuffer2 = sideMesh[2].getMeshData().getVertexBuffer();
@@ -1382,7 +1382,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "foundation.jpg" : null;
+		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "foundation.png" : null;
 	}
 
 	@Override

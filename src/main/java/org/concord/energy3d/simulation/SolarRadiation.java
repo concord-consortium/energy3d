@@ -359,6 +359,10 @@ public class SolarRadiation {
 	// Formula from http://en.wikipedia.org/wiki/Air_mass_(solar_energy)#Solar_intensity
 	private void computeOnMesh(final int minute, final ReadOnlyVector3 directionTowardSun, final HousePart housePart, final Mesh drawMesh, final Mesh collisionMesh, final ReadOnlyVector3 normal) {
 
+		if (normal == null) { // FIXME: normal can be null sometimes, fix it
+			return;
+		}
+
 		if (Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
 			return;
 		}
