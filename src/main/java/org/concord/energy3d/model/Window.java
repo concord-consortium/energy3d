@@ -168,6 +168,9 @@ public class Window extends HousePart implements Thermal {
 		if (foundation != null && foundation.getLockEdit()) {
 			return;
 		}
+		if (points.size() < 4) { // FIXME: Not sure why window has less than four points sometimes
+			return;
+		}
 		int index = editPointIndex;
 		if (index == -1) {
 			if (isFirstPointInserted()) {
