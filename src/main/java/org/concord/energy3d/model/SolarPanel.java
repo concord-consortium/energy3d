@@ -195,7 +195,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		root.attachChild(supportFrame);
 
 		sunBeam = new Line("Sun Beam");
-		sunBeam.setLineWidth(0.01f);
+		sunBeam.setLineWidth(1f);
 		sunBeam.setStipplePattern((short) 0xffff);
 		sunBeam.setModelBound(null);
 		Util.disablePickShadowLight(sunBeam);

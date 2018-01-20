@@ -13,6 +13,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -69,6 +71,7 @@ import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.FresnelReflector;
+import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
@@ -118,6 +121,7 @@ public class EnergyPanel extends JPanel {
 	public static final DecimalFormat NO_DECIMAL = new DecimalFormat();
 	public static final DecimalFormat ONE_DECIMAL = new DecimalFormat();
 	public static final DecimalFormat TWO_DECIMALS = new DecimalFormat();
+	public static final DecimalFormat FIVE_DECIMALS = new DecimalFormat();
 
 	private static final long serialVersionUID = 1L;
 	private static final EnergyPanel instance = new EnergyPanel();
@@ -179,6 +183,7 @@ public class EnergyPanel extends JPanel {
 		NO_DECIMAL.setMaximumFractionDigits(0);
 		ONE_DECIMAL.setMaximumFractionDigits(1);
 		TWO_DECIMALS.setMaximumFractionDigits(2);
+		FIVE_DECIMALS.setMaximumFractionDigits(5);
 
 		setLayout(new BorderLayout());
 		dataPanel = new JPanel();
@@ -392,6 +397,28 @@ public class EnergyPanel extends JPanel {
 				Scene.getInstance().updateTrackables();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().getUndoManager().addEdit(c);
+			}
+		});
+		((JSpinner.DefaultEditor) latitudeSpinner.getEditor()).getTextField().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(final MouseEvent e) {
+				if (Util.isRightClick(e)) {
+					final GeoLocation geo = Scene.getInstance().getGeoLocation();
+					if (geo == null) {
+						return;
+					}
+					final JPopupMenu popupMenu = new JPopupMenu();
+					final JMenuItem mi = new JMenuItem("lat: " + FIVE_DECIMALS.format(geo.getLatitude()) + ", lng: " + FIVE_DECIMALS.format(geo.getLongitude()));
+					mi.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(final ActionEvent e) {
+							Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(mi.getText()), null);
+						}
+					});
+					popupMenu.add(mi);
+					popupMenu.pack();
+					popupMenu.show(latitudeSpinner, 0, 0);
+				}
 			}
 		});
 		final GridBagConstraints gbc_latitudeSpinner = new GridBagConstraints();

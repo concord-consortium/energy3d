@@ -1807,6 +1807,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem getUseEarthViewMenuItem() {
 		if (useEarthViewMenuItem == null) {
 			useEarthViewMenuItem = new JMenuItem("Use Image from Earth View...");
+			useEarthViewMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, Config.isMac() ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK));
 			useEarthViewMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
