@@ -169,7 +169,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2 * (dish.getRSamples() + 1)));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
-		outlines.setLineWidth(0.1f);
+		outlines.setLineWidth(1f);
 		outlines.setStipplePattern((short) 0xffff);
 		Util.disablePickShadowLight(outlines);
 		root.attachChild(outlines);
@@ -186,7 +186,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		}
 
 		lightBeams = new Line("Light Beams");
-		lightBeams.setLineWidth(0.01f);
+		lightBeams.setLineWidth(1f);
 		lightBeams.setStipplePattern((short) 0xffff);
 		lightBeams.setModelBound(null);
 		Util.disablePickShadowLight(lightBeams);

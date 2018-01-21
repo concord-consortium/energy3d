@@ -131,7 +131,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		root.attachChild(outlineMesh);
 
 		sunBeam = new Line("Sun Beam");
-		sunBeam.setLineWidth(0.01f);
+		sunBeam.setLineWidth(1f);
 		sunBeam.setStipplePattern((short) 0xffff);
 		sunBeam.setModelBound(null);
 		Util.disablePickShadowLight(sunBeam);
@@ -140,7 +140,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		root.attachChild(sunBeam);
 
 		normalVector = new Line("Normal Vector");
-		normalVector.setLineWidth(0.01f);
+		normalVector.setLineWidth(1f);
 		normalVector.setStipplePattern((short) 0xffff);
 		normalVector.setModelBound(null);
 		Util.disablePickShadowLight(normalVector);
@@ -161,7 +161,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		angles.attachChild(sunAngle);
 
 		solarPanelOutlines = new Line("Solar Panel Outlines");
-		solarPanelOutlines.setLineWidth(0.01f);
+		solarPanelOutlines.setLineWidth(1f);
 		solarPanelOutlines.setStipplePattern((short) 0xffff);
 		solarPanelOutlines.setModelBound(null);
 		Util.disablePickShadowLight(solarPanelOutlines);

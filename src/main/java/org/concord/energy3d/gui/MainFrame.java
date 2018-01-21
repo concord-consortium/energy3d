@@ -3364,7 +3364,7 @@ public class MainFrame extends JFrame {
 
 	public JRadioButtonMenuItem getTexture1MenuItem() {
 		if (texture1MenuItem == null) {
-			texture1MenuItem = new JRadioButtonMenuItem("Texture 1");
+			texture1MenuItem = new JRadioButtonMenuItem("Gray Siding Shingle");
 			texture1MenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
@@ -3386,7 +3386,7 @@ public class MainFrame extends JFrame {
 
 	public JRadioButtonMenuItem getTexture2MenuItem() {
 		if (texture2MenuItem == null) {
-			texture2MenuItem = new JRadioButtonMenuItem("Texture 2");
+			texture2MenuItem = new JRadioButtonMenuItem("Brick Wall");
 			texture2MenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {

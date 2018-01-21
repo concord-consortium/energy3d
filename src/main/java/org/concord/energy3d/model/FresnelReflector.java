@@ -144,13 +144,13 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		outlines.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(8 + (nModules - 1) * 2));
 		outlines.setDefaultColor(ColorRGBA.BLACK);
 		outlines.setModelBound(new OrientedBoundingBox());
-		outlines.setLineWidth(0.01f);
+		outlines.setLineWidth(1f);
 		outlines.setStipplePattern((short) 0xffff);
 		Util.disablePickShadowLight(outlines);
 		root.attachChild(outlines);
 
 		lightBeams = new Line("Light Beams");
-		lightBeams.setLineWidth(0.01f);
+		lightBeams.setLineWidth(1f);
 		lightBeams.setStipplePattern((short) 0xffff);
 		lightBeams.setModelBound(null);
 		Util.disablePickShadowLight(lightBeams);

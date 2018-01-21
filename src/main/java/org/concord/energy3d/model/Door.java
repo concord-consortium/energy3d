@@ -175,7 +175,20 @@ public class Door extends HousePart implements Thermal {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "door.jpg" : "door.png";
+		final TextureMode t = Scene.getInstance().getTextureMode();
+		if (t == TextureMode.None) {
+			return "door.png";
+		}
+		if (t == TextureMode.Simple) {
+			return "door.png";
+		}
+		if (t == TextureMode.Full) {
+			return "door.jpg";
+		}
+		if (t == TextureMode.BRICK) {
+			return "door.jpg";
+		}
+		return null;
 	}
 
 	@Override

@@ -204,7 +204,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		root.attachChild(sunBeam);
 
 		normalVector = new Line("Normal Vector");
-		normalVector.setLineWidth(0.01f);
+		normalVector.setLineWidth(1f);
 		normalVector.setStipplePattern((short) 0xffff);
 		normalVector.setModelBound(null);
 		Util.disablePickShadowLight(normalVector);
@@ -231,7 +231,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		root.attachChild(label);
 
 		solarCellOutlines = new Line("Solar Cell Outlines");
-		solarCellOutlines.setLineWidth(0.01f);
+		solarCellOutlines.setLineWidth(1f);
 		solarCellOutlines.setStipplePattern((short) 0xffff);
 		solarCellOutlines.setModelBound(null);
 		Util.disablePickShadowLight(solarCellOutlines);
