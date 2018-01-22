@@ -242,9 +242,10 @@ public class MainFrame extends JFrame {
 	private JMenuItem zoomOutMenuItem;
 	private JMenu textureMenu;
 	private JRadioButtonMenuItem noTextureMenuItem;
-	private JRadioButtonMenuItem texture0MenuItem;
-	private JRadioButtonMenuItem texture1MenuItem;
-	private JRadioButtonMenuItem texture2MenuItem;
+	private JRadioButtonMenuItem textureSimpleMenuItem;
+	private JRadioButtonMenuItem textureFullMenuItem;
+	private JRadioButtonMenuItem textureBrickMenuItem;
+	private JRadioButtonMenuItem textureSouthernMenuItem;
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
 	private JMenu themeMenu;
 	private JRadioButtonMenuItem blueSkyMenuItem;
@@ -1713,16 +1714,18 @@ public class MainFrame extends JFrame {
 				@Override
 				public void menuSelected(final MenuEvent e) {
 					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
-					Util.selectSilently(texture0MenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
-					Util.selectSilently(texture1MenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
-					Util.selectSilently(texture2MenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
+					Util.selectSilently(textureSimpleMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
+					Util.selectSilently(textureFullMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
+					Util.selectSilently(textureBrickMenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
+					Util.selectSilently(textureSouthernMenuItem, Scene.getInstance().getTextureMode() == TextureMode.SOUTHERN);
 				}
 			});
 
 			textureMenu.add(getNoTextureMenuItem());
-			textureMenu.add(getTexture0MenuItem());
-			textureMenu.add(getTexture1MenuItem());
-			textureMenu.add(getTexture2MenuItem());
+			textureMenu.add(getTextureSimpleMenuItem());
+			textureMenu.add(getTextureFullMenuItem());
+			textureMenu.add(getTextureBrickMenuItem());
+			textureMenu.add(getTextureSouthernMenuItem());
 
 		}
 		return textureMenu;
@@ -3340,10 +3343,10 @@ public class MainFrame extends JFrame {
 		return noTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTexture0MenuItem() {
-		if (texture0MenuItem == null) {
-			texture0MenuItem = new JRadioButtonMenuItem("Simple Texture");
-			texture0MenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getTextureSimpleMenuItem() {
+		if (textureSimpleMenuItem == null) {
+			textureSimpleMenuItem = new JRadioButtonMenuItem("Simple Texture");
+			textureSimpleMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -3357,15 +3360,15 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(texture0MenuItem);
+			textureButtonGroup.add(textureSimpleMenuItem);
 		}
-		return texture0MenuItem;
+		return textureSimpleMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTexture1MenuItem() {
-		if (texture1MenuItem == null) {
-			texture1MenuItem = new JRadioButtonMenuItem("Gray Siding Shingle");
-			texture1MenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getTextureFullMenuItem() {
+		if (textureFullMenuItem == null) {
+			textureFullMenuItem = new JRadioButtonMenuItem("Gray Siding Shingle");
+			textureFullMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -3379,15 +3382,15 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(texture1MenuItem);
+			textureButtonGroup.add(textureFullMenuItem);
 		}
-		return texture1MenuItem;
+		return textureFullMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTexture2MenuItem() {
-		if (texture2MenuItem == null) {
-			texture2MenuItem = new JRadioButtonMenuItem("Brick Wall");
-			texture2MenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getTextureBrickMenuItem() {
+		if (textureBrickMenuItem == null) {
+			textureBrickMenuItem = new JRadioButtonMenuItem("Brick Wall");
+			textureBrickMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -3401,9 +3404,31 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(texture2MenuItem);
+			textureButtonGroup.add(textureBrickMenuItem);
 		}
-		return texture2MenuItem;
+		return textureBrickMenuItem;
+	}
+
+	public JRadioButtonMenuItem getTextureSouthernMenuItem() {
+		if (textureSouthernMenuItem == null) {
+			textureSouthernMenuItem = new JRadioButtonMenuItem("Southern Style");
+			textureSouthernMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeTextureCommand c = new ChangeTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.SOUTHERN);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureButtonGroup.add(textureSouthernMenuItem);
+		}
+		return textureSouthernMenuItem;
 	}
 
 	public JRadioButtonMenuItem getBlueSkyMenuItem() {

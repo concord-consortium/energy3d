@@ -1544,7 +1544,7 @@ public class EnergyPanel extends JPanel {
 				}
 			} else if (selectedPart instanceof Window) {
 				final Window window = (Window) selectedPart;
-				if (window.isDrawable()) {
+				if (window.isDrawable() && window.getPoints().size() >= 4) {
 					final double lx = window.getWindowWidth();
 					final double ly = window.getWindowHeight();
 					final Vector3 v1 = window.getAbsPoint(1);
