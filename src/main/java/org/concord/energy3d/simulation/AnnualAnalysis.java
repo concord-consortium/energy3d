@@ -17,8 +17,10 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
+import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.util.ClipImage;
 
 /**
@@ -27,10 +29,11 @@ import org.concord.energy3d.util.ClipImage;
  */
 abstract class AnnualAnalysis extends Analysis {
 
-	JMenu createOptionsMenu(final JDialog dialog, final List<HousePart> selectedParts, final boolean selectAll) {
+	JMenu createOptionsMenu(final JDialog dialog, final List<HousePart> selectedParts, final boolean selectAll, final boolean exportStoredResults) {
 
 		final JMenuItem miClear = new JMenuItem("Clear Previous Results");
 		final JMenuItem miView = new JMenuItem("View Raw Data...");
+		final JMenuItem miExportStoredResults = new JMenuItem("Export Stored Hourly Results");
 
 		final JMenu menu = new JMenu("Options");
 		menu.addMenuListener(new MenuListener() {
@@ -38,6 +41,7 @@ abstract class AnnualAnalysis extends Analysis {
 			public void menuSelected(final MenuEvent e) {
 				miClear.setEnabled(graph.hasRecords());
 				miView.setEnabled(graph.hasData());
+				miExportStoredResults.setEnabled(Scene.getInstance().getSolarResults() != null);
 			}
 
 			@Override
@@ -115,6 +119,25 @@ abstract class AnnualAnalysis extends Analysis {
 			}
 		});
 		menu.add(miCopyImage);
+
+		if (exportStoredResults) {
+			miExportStoredResults.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final double[][] solarResults = Scene.getInstance().getSolarResults();
+					if (solarResults != null) {
+						for (int i = 0; i < solarResults.length; i++) {
+							System.out.print("***" + i + "=");
+							for (int j = 0; j < solarResults[i].length; j++) {
+								System.out.print(EnergyPanel.TWO_DECIMALS.format(solarResults[i][j]) + ", ");
+							}
+							System.out.println("");
+						}
+					}
+				}
+			});
+			menu.add(miExportStoredResults);
+		}
 
 		return menu;
 

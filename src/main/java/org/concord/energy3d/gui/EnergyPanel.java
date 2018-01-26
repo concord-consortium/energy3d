@@ -81,6 +81,7 @@ import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Sensor;
+import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.model.UserData;
@@ -918,6 +919,20 @@ public class EnergyPanel extends JPanel {
 			Scene.getInstance().updateTreeLeaves();
 			Scene.getInstance().updateLabels(); // we can't call Scene.getInstance().redrawAll() here as it will screw up the radiation texture
 
+			final double[] hourlyResults = new double[24];
+			final List<SolarCollector> collectors = Scene.getInstance().getAllSolarCollectorsNoSensor();
+			for (int i = 0; i < 24; i++) {
+				SolarRadiation.getInstance().computeEnergyAtHour(i);
+				double output = 0;
+				if (!collectors.isEmpty()) {
+					for (final SolarCollector sc : collectors) {
+						output += sc.getYieldNow();
+					}
+				}
+				hourlyResults[i] = output;
+			}
+			Scene.getInstance().setSolarResults(c.get(Calendar.MONTH), hourlyResults);
+
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
@@ -1544,7 +1559,7 @@ public class EnergyPanel extends JPanel {
 				}
 			} else if (selectedPart instanceof Window) {
 				final Window window = (Window) selectedPart;
-				if (window.isDrawable() && window.getPoints().size() >= 4) {
+				if (window.isDrawable()) {
 					final double lx = window.getWindowWidth();
 					final double ly = window.getWindowHeight();
 					final Vector3 v1 = window.getAbsPoint(1);

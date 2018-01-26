@@ -221,7 +221,7 @@ public class EnergyAnnualAnalysis extends AnnualAnalysis {
 		final JDialog dialog = createDialog(s == null ? title : title + ": " + s + " (Construction cost: $" + cost + ")");
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
-		menuBar.add(createOptionsMenu(dialog, null, false));
+		menuBar.add(createOptionsMenu(dialog, null, false, false));
 		menuBar.add(createTypesMenu());
 		menuBar.add(createRunsMenu());
 		dialog.setVisible(true);

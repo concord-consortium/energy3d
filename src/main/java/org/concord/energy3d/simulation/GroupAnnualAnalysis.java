@@ -246,7 +246,7 @@ public class GroupAnnualAnalysis extends AnnualAnalysis {
 		final JDialog dialog = createDialog(title);
 		final JMenuBar menuBar = new JMenuBar();
 		dialog.setJMenuBar(menuBar);
-		menuBar.add(createOptionsMenu(dialog, selectedParts, true));
+		menuBar.add(createOptionsMenu(dialog, selectedParts, true, false));
 		menuBar.add(createTypesMenu());
 		menuBar.add(createRunsMenu());
 		dialog.setVisible(true);

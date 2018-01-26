@@ -6,7 +6,7 @@
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
-	<property name="jdk" value="jdk1.8.0_152" />
+	<property name="jdk" value="jdk1.8.0_162" />
 	<property name="bit64" value="false" />
 	
 	<condition property="JAVA_HOME" value="C:\Program Files (x86)\Java\${jdk}\">
@@ -21,7 +21,7 @@
 			<istrue value="${bit64}" />
 		</and>
 	</condition>
-	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home">
+	<condition property="JAVA_HOME" value="/Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home">
 		<os family="mac" />
 	</condition>
 	<condition property="JAVA_HOME" value="">
@@ -104,7 +104,7 @@
 			<fx:bundleargument arg="mac.CFBundleIdentifier" value="org.concord.Energy3D"/>
 			<fx:bundleargument arg="mac.CFBundleVersion" value="5.0.0"/>
 			<fx:bundleargument arg="mac.signing-key-developer-id-app" value="Developer ID Application: Concord"/>
-			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2011-2017 Concord Consortium Inc.">
+			<fx:info title="${app.name}" vendor="Concord Consortium Inc." copyright="2011-2018 Concord Consortium Inc.">
 				<fx:association extension="ng3" description="${app.name} File" mimetype="application/energy3d" icon="${icon}">
 				</fx:association>
 			</fx:info>

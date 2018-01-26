@@ -143,6 +143,7 @@ public class Scene implements Serializable {
 	private UtilityBill utilityBill;
 	private String projectName;
 	private int projectType = Foundation.TYPE_BUILDING;
+	private double[][] solarResults;
 	private Designer designer;
 	private String city;
 	private String note;
@@ -3010,6 +3011,16 @@ public class Scene implements Serializable {
 
 	// common methods for solar collectors and reflectors
 
+	public List<SolarCollector> getAllSolarCollectorsNoSensor() {
+		final List<SolarCollector> list = new ArrayList<SolarCollector>();
+		for (final HousePart p : parts) {
+			if (p instanceof SolarCollector && !(p instanceof Sensor)) {
+				list.add((SolarCollector) p);
+			}
+		}
+		return list;
+	}
+
 	public List<SolarCollector> getAllSolarCollectors(final Class<?> c) {
 		final List<SolarCollector> list = new ArrayList<SolarCollector>();
 		for (final HousePart p : parts) {
@@ -3166,6 +3177,19 @@ public class Scene implements Serializable {
 			}
 		}
 		return false;
+	}
+
+	public double[][] getSolarResults() {
+		return solarResults;
+	}
+
+	public void setSolarResults(final int month, final double[] hourlyResults) {
+		if (solarResults == null) {
+			solarResults = new double[12][24];
+		}
+		for (int i = 0; i < 24; i++) {
+			solarResults[month][i] = hourlyResults[i];
+		}
 	}
 
 	public void setProjectType(final int projectType) {
