@@ -1,5 +1,7 @@
 package org.concord.energy3d.simulation;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -126,13 +128,16 @@ abstract class AnnualAnalysis extends Analysis {
 				public void actionPerformed(final ActionEvent e) {
 					final double[][] solarResults = Scene.getInstance().getSolarResults();
 					if (solarResults != null) {
+						String s = "";
 						for (int i = 0; i < solarResults.length; i++) {
-							System.out.print("***" + i + "=");
+							s += "\"" + AnnualGraph.THREE_LETTER_MONTH[i] + "\": \"";
 							for (int j = 0; j < solarResults[i].length; j++) {
-								System.out.print(EnergyPanel.TWO_DECIMALS.format(solarResults[i][j]) + ", ");
+								s += EnergyPanel.FIVE_DECIMALS.format(solarResults[i][j]).replaceAll(",", "") + " ";
 							}
-							System.out.println("");
+							s = s.trim() + "\",\n";
 						}
+						s = s.substring(0, s.length() - 1);
+						Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
 					}
 				}
 			});
