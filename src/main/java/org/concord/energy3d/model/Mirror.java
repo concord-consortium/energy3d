@@ -50,9 +50,6 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 	private transient Cylinder post;
 	private transient BMText label;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double absorptance = 0.95;
-	private double opticalEfficiency = 0.7;
-	private double thermalEfficiency = 0.6;
 	private double mirrorWidth = 5;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
@@ -456,40 +453,37 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		return reflectance;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public void setAbsorptance(final double absorptance) {
-		this.absorptance = absorptance;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public double getAbsorptance() {
-		return absorptance;
+		return 1;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public void setOpticalEfficiency(final double opticalEfficiency) {
-		this.opticalEfficiency = opticalEfficiency;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public double getOpticalEfficiency() {
-		return opticalEfficiency;
+		return 1;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public void setThermalEfficiency(final double thermalEfficiency) {
-		this.thermalEfficiency = thermalEfficiency;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public double getThermalEfficiency() {
-		return thermalEfficiency;
+		return 1;
 	}
 
 	public void setMirrorWidth(final double mirrorWidth) {
@@ -575,10 +569,10 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 	}
 
 	public double getSystemEfficiency() {
-		double e = reflectance;
-		if (heliostatTarget != null) {
-			e *= heliostatTarget.getSolarReceiverEfficiency();
+		if (heliostatTarget == null) {
+			return 0;
 		}
+		double e = reflectance * heliostatTarget.getSolarReceiverEfficiency();
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));

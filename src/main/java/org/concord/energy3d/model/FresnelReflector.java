@@ -60,9 +60,6 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 	private transient double yieldToday;
 	private Foundation absorber;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
-	private double absorptance = 0.95; // the percentage of energy absorbed by the absorber tube
-	private double opticalEfficiency = 0.7;
-	private double thermalEfficiency = 0.6;
 	private double moduleLength = 3;
 	private double moduleWidth = 2;
 	private double length = 2 * moduleLength;
@@ -101,15 +98,6 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		}
 		if (Util.isZero(reflectance)) {
 			reflectance = 0.9;
-		}
-		if (Util.isZero(absorptance)) {
-			absorptance = 0.95;
-		}
-		if (Util.isZero(opticalEfficiency)) {
-			opticalEfficiency = 0.7;
-		}
-		if (Util.isZero(thermalEfficiency)) {
-			thermalEfficiency = 0.6;
 		}
 		if (Util.isZero(nSectionLength)) {
 			nSectionLength = 16;
@@ -617,7 +605,10 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 	}
 
 	public double getSystemEfficiency() {
-		double e = reflectance * absorptance * opticalEfficiency * thermalEfficiency;
+		if (absorber == null) {
+			return 0;
+		}
+		double e = reflectance * absorber.getSolarReceiverEfficiency();
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
@@ -625,28 +616,26 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		return e;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public void setOpticalEfficiency(final double opticalEfficiency) {
-		this.opticalEfficiency = opticalEfficiency;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public double getOpticalEfficiency() {
-		return opticalEfficiency;
+		return 1;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public void setThermalEfficiency(final double thermalEfficiency) {
-		this.thermalEfficiency = thermalEfficiency;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public double getThermalEfficiency() {
-		return thermalEfficiency;
+		return 1;
 	}
 
 	/** a number between 0 and 1 */
@@ -661,16 +650,15 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		return reflectance;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public void setAbsorptance(final double absorptance) {
-		this.absorptance = absorptance;
 	}
 
-	/** a number between 0 and 1 */
+	/** not applicable */
 	@Override
 	public double getAbsorptance() {
-		return absorptance;
+		return 1;
 	}
 
 	@Override

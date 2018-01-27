@@ -31,16 +31,14 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAbsorberForAllFresnelReflectorsCommand;
-import org.concord.energy3d.undo.ChangeAbsorptanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorAbsorberCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
-import org.concord.energy3d.undo.ChangeFoundationSolarReflectorAbsorptanceCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFresnelReflectorAbsorberCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
-import org.concord.energy3d.undo.ChangeSolarReflectorAbsorptanceCommand;
+import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.SetFresnelReflectorLabelCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
@@ -1029,10 +1027,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miAbsorptance = new JMenuItem("Absorptance...");
-			miAbsorptance.addActionListener(new ActionListener() {
-
-				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+			final JMenuItem miConversionEfficiency = new JMenuItem("Absorber Conversion Efficiency...");
+			miConversionEfficiency.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -1040,42 +1036,22 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 					if (!(selectedPart instanceof FresnelReflector)) {
 						return;
 					}
-					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final FresnelReflector r = (FresnelReflector) selectedPart;
-					final String title = "<html>Absorptance (%) of " + partInfo + "</html>";
+					final Foundation absorber = r.getAbsorber();
+					if (absorber == null) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "This reflector does not link to an absorber.", "No Absorber", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final String title = "<html>Light-electricity conversion efficiency (%) of " + partInfo + "'s absorber</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel panel = new JPanel();
-					gui.add(panel, BorderLayout.CENTER);
-					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
-					final JRadioButton rb1 = new JRadioButton("Only this Fresnel Reflector", true);
-					final JRadioButton rb2 = new JRadioButton("All Fresnel Reflectors on this Foundation");
-					final JRadioButton rb3 = new JRadioButton("All Fresnel Reflectors");
-					panel.add(rb1);
-					panel.add(rb2);
-					panel.add(rb3);
-					final ButtonGroup bg = new ButtonGroup();
-					bg.add(rb1);
-					bg.add(rb2);
-					bg.add(rb3);
-					switch (selectedScopeIndex) {
-					case 0:
-						rb1.setSelected(true);
-						break;
-					case 1:
-						rb2.setSelected(true);
-						break;
-					case 2:
-						rb3.setSelected(true);
-						break;
-					}
-					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(r.getAbsorptance() * 100));
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(absorber.getSolarReceiverEfficiency() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Absorber Tube Absorptance");
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Receiver Conversion Efficiency");
 
 					while (true) {
 						inputField.selectAll();
@@ -1094,50 +1070,14 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (val < 50 || val > 99) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Fresnel reflector absorptance must be between 50% and 99%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 5 || val > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Light-electricity conversion efficiency must be between 5% and 50%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = Math.abs(val * 0.01 - r.getAbsorptance()) > 0.000001;
-									if (rb1.isSelected()) {
-										if (changed) {
-											final ChangeSolarReflectorAbsorptanceCommand c = new ChangeSolarReflectorAbsorptanceCommand(r);
-											r.setAbsorptance(val * 0.01);
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
-										selectedScopeIndex = 0;
-									} else if (rb2.isSelected()) {
-										final Foundation foundation = r.getTopContainer();
-										if (!changed) {
-											for (final FresnelReflector x : foundation.getFresnelReflectors()) {
-												if (Math.abs(x.getAbsorptance() - val * 0.01) > 0.000001) {
-													changed = true;
-													break;
-												}
-											}
-										}
-										if (changed) {
-											final ChangeFoundationSolarReflectorAbsorptanceCommand c = new ChangeFoundationSolarReflectorAbsorptanceCommand(foundation, r.getClass());
-											foundation.setAbsorptanceForSolarReflectors(val * 0.01, r.getClass());
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
-										selectedScopeIndex = 1;
-									} else if (rb3.isSelected()) {
-										if (!changed) {
-											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
-												if (Math.abs(x.getAbsorptance() - val * 0.01) > 0.000001) {
-													changed = true;
-													break;
-												}
-											}
-										}
-										if (changed) {
-											final ChangeAbsorptanceForAllSolarReflectorsCommand c = new ChangeAbsorptanceForAllSolarReflectorsCommand(r.getClass());
-											Scene.getInstance().setAbsorptanceForAllSolarReflectors(val * 0.01, r.getClass());
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
-										selectedScopeIndex = 2;
-									}
+									final boolean changed = Math.abs(val * 0.01 - absorber.getSolarReceiverEfficiency()) > 0.000001;
 									if (changed) {
+										final ChangeSolarReceiverEfficiencyCommand c = new ChangeSolarReceiverEfficiencyCommand(absorber);
+										absorber.setSolarReceiverEfficiency(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
 										updateAfterEdit();
 									}
 									if (choice == options[0]) {
@@ -1162,7 +1102,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			popupMenuForFresnelReflector.add(miBaseHeight);
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miReflectance);
-			popupMenuForFresnelReflector.add(miAbsorptance);
+			popupMenuForFresnelReflector.add(miConversionEfficiency);
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miMesh);
 			popupMenuForFresnelReflector.addSeparator();

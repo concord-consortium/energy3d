@@ -116,7 +116,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	private Thermostat thermostat = new Thermostat();
 	private UtilityBill utilityBill;
 	private FoundationPolygon foundationPolygon;
-	private double solarReceiverEfficiency = 0.86;
+	private double solarReceiverEfficiency = 0.2;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.568; // default is R10 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private double childGridSize = 2.5;
@@ -168,7 +168,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			volumetricHeatCapacity = 0.5;
 		}
 		if (Util.isZero(solarReceiverEfficiency)) {
-			solarReceiverEfficiency = 0.86;
+			solarReceiverEfficiency = 0.2;
 		}
 		if (Util.isZero(childGridSize)) {
 			childGridSize = 2.5;

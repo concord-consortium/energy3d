@@ -41,6 +41,7 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeMirrorTargetCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
@@ -951,14 +952,78 @@ class PopupMenuForMirror extends PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miConversionEfficiency = new JMenuItem("Central Receiver Conversion Efficiency...");
+			miConversionEfficiency.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror)) {
+						return;
+					}
+					final Mirror m = (Mirror) selectedPart;
+					final Foundation receiver = m.getHeliostatTarget();
+					if (receiver == null) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "This heliostat does not link to a receiver.", "No Receiver", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final String title = "<html>Light-electricity conversion efficiency (%) of " + partInfo + "'s central receiver</html>";
+					final String footnote = "<html><hr><font size=2><hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(receiver.getSolarReceiverEfficiency() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Receiver Conversion Efficiency");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 5 || val > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Light-electricity conversion efficiency must be between 5% and 50%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									final boolean changed = Math.abs(val * 0.01 - receiver.getSolarReceiverEfficiency()) > 0.000001;
+									if (changed) {
+										final ChangeSolarReceiverEfficiencyCommand c = new ChangeSolarReceiverEfficiencyCommand(receiver);
+										receiver.setSolarReceiverEfficiency(val * 0.01);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+										updateAfterEdit();
+									}
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSetHeliostat);
 			popupMenuForMirror.add(miZenith);
 			popupMenuForMirror.add(miAzimuth);
-			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miSize);
 			popupMenuForMirror.add(miBaseHeight);
+			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(miReflectance);
+			popupMenuForMirror.add(miConversionEfficiency);
 			popupMenuForMirror.addSeparator();
 			popupMenuForMirror.add(cbmiDrawSunBeam);
 			popupMenuForMirror.add(labelMenu);

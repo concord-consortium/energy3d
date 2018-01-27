@@ -1283,15 +1283,16 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  Angles:");
 								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(m.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
 								partProperty2TextField.putClientProperty("tooltip", "The angles of the mirror");
-								final String reflectance = ONE_DECIMAL.format(m.getReflectance() * 100) + "%";
+								final Foundation receiver = m.getHeliostatTarget();
+								final String s = "R=" + ONE_DECIMAL.format(m.getReflectance() * 100) + "%" + (receiver == null ? "" : ", \u03B7=" + ONE_DECIMAL.format(receiver.getSolarReceiverEfficiency() * 100) + "%");
 								if (energyViewShown) {
-									partProperty3Label.setText("  Reflectance & Yield:");
-									partProperty3TextField.setText(reflectance + ", " + ONE_DECIMAL.format(m.getSolarPotentialToday() * m.getSystemEfficiency()) + " kWh");
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance and yield of this mirror");
+									partProperty3Label.setText("  Properties & Yield:");
+									partProperty3TextField.setText(s + ", " + ONE_DECIMAL.format(m.getSolarPotentialToday() * m.getSystemEfficiency()) + " kWh");
+									partProperty3TextField.putClientProperty("tooltip", "The physical properties and electric yield of this mirror");
 								} else {
-									partProperty3Label.setText("  Reflectance:");
-									partProperty3TextField.setText(reflectance);
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance of this mirror");
+									partProperty3Label.setText("  Properties:");
+									partProperty3TextField.setText(s);
+									partProperty3TextField.putClientProperty("tooltip", "The physical properties of this mirror");
 								}
 							}
 						});
@@ -1324,15 +1325,15 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  Parabola Shape:");
 								partProperty2TextField.setText("f=" + ONE_DECIMAL.format(focalLength * meterToFoot) + lengthUnit + ", d=" + ONE_DECIMAL.format(t.getApertureWidth() * meterToFoot) + lengthUnit + ", h=" + ONE_DECIMAL.format(h * meterToFoot) + lengthUnit + ", \u03C6=" + ONE_DECIMAL.format(rimAngle >= 0 ? rimAngle : 180 + rimAngle) + "\u00B0");
 								partProperty2TextField.putClientProperty("tooltip", "Parameters of the parabolic shape");
-								final String reflect = "R=" + ONE_DECIMAL.format(t.getReflectance() * 100) + "%, s=" + ONE_DECIMAL.format(s * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2, a=" + ONE_DECIMAL.format(d * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2";
+								final String str = "R=" + ONE_DECIMAL.format(t.getReflectance() * 100) + "%, s=" + ONE_DECIMAL.format(s * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2, a=" + ONE_DECIMAL.format(d * t.getTroughLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2, \u03B1=" + ONE_DECIMAL.format(t.getAbsorptance() * 100) + "%";
 								if (energyViewShown) {
-									partProperty3Label.setText("  Reflection & Yield:");
-									partProperty3TextField.setText(reflect + ", " + ONE_DECIMAL.format(t.getSolarPotentialToday() * t.getSystemEfficiency()) + " kWh");
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance and yield of this parabolic trough");
+									partProperty3Label.setText("  Properties & Yield:");
+									partProperty3TextField.setText(str + ", " + ONE_DECIMAL.format(t.getSolarPotentialToday() * t.getSystemEfficiency()) + " kWh");
+									partProperty3TextField.putClientProperty("tooltip", "The properties and yield of this parabolic trough");
 								} else {
-									partProperty3Label.setText("  Reflection:");
-									partProperty3TextField.setText(reflect);
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance of this parabolic trough");
+									partProperty3Label.setText("  Properties:");
+									partProperty3TextField.setText(str);
+									partProperty3TextField.putClientProperty("tooltip", "The properties of this parabolic trough");
 								}
 							}
 						});
@@ -1359,15 +1360,15 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  Parabola Shape:");
 								partProperty2TextField.setText("Focal length=" + ONE_DECIMAL.format(focalLength * meterToFoot) + lengthUnit);
 								partProperty2TextField.putClientProperty("tooltip", "Parameters of the parabolic shape");
-								final String reflect = "R=" + ONE_DECIMAL.format(d.getReflectance() * 100) + "%";
+								final String str = "R=" + ONE_DECIMAL.format(d.getReflectance() * 100) + "%, \u03B1=" + ONE_DECIMAL.format(d.getAbsorptance() * 100) + "%";
 								if (energyViewShown) {
-									partProperty3Label.setText("  Reflection & Yield:");
-									partProperty3TextField.setText(reflect + ", " + ONE_DECIMAL.format(d.getSolarPotentialToday() * d.getSystemEfficiency()) + " kWh");
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance and yield of this parabolic dish");
+									partProperty3Label.setText("  Properties & Yield:");
+									partProperty3TextField.setText(str + ", " + ONE_DECIMAL.format(d.getSolarPotentialToday() * d.getSystemEfficiency()) + " kWh");
+									partProperty3TextField.putClientProperty("tooltip", "The properties and yield of this parabolic dish");
 								} else {
-									partProperty3Label.setText("  Reflection:");
-									partProperty3TextField.setText(reflect);
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance of this parabolic dish");
+									partProperty3Label.setText("  Properties:");
+									partProperty3TextField.setText(str);
+									partProperty3TextField.putClientProperty("tooltip", "The properties of this parabolic dish");
 								}
 							}
 						});
@@ -1392,15 +1393,16 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  Width:");
 								partProperty2TextField.setText(ONE_DECIMAL.format(r.getModuleWidth() * meterToFoot) + lengthUnit);
 								partProperty2TextField.putClientProperty("tooltip", "Parameters of the Fresnel reflector");
-								final String reflect = "R=" + ONE_DECIMAL.format(r.getReflectance() * 100) + "%, a=" + ONE_DECIMAL.format(r.getModuleWidth() * r.getLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2";
+								final Foundation receiver = r.getAbsorber();
+								final String str = "R=" + ONE_DECIMAL.format(r.getReflectance() * 100) + "%, a=" + ONE_DECIMAL.format(r.getModuleWidth() * r.getLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2" + (receiver == null ? "" : ", \u03B7=" + ONE_DECIMAL.format(receiver.getSolarReceiverEfficiency() * 100) + "%");
 								if (energyViewShown) {
-									partProperty3Label.setText("  Reflection & Yield:");
-									partProperty3TextField.setText(reflect + ", " + ONE_DECIMAL.format(r.getSolarPotentialToday() * r.getSystemEfficiency()) + " kWh");
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance and yield of this Fresnel reflector");
+									partProperty3Label.setText("  Properties & Yield:");
+									partProperty3TextField.setText(str + ONE_DECIMAL.format(r.getSolarPotentialToday() * r.getSystemEfficiency()) + " kWh");
+									partProperty3TextField.putClientProperty("tooltip", "The properties and yield of this Fresnel reflector");
 								} else {
-									partProperty3Label.setText("  Reflection:");
-									partProperty3TextField.setText(reflect);
-									partProperty3TextField.putClientProperty("tooltip", "The reflectance of this Fresnel reflector");
+									partProperty3Label.setText("  Properties:");
+									partProperty3TextField.setText(str);
+									partProperty3TextField.putClientProperty("tooltip", "The properties of this Fresnel reflector");
 								}
 							}
 						});
