@@ -203,7 +203,14 @@ public class PvCustomPrice implements Serializable {
 	}
 
 	public double getPvModelPrice(final String model) {
-		return pvModelPrices.get(model);
+		final Double a = pvModelPrices.get(model);
+		if (a != null) {
+			return a;
+		}
+		// model is new, not present in the stored prices, so we must add it here
+		final double x = PvModulesData.getInstance().getModules().get(model).getPrice();
+		pvModelPrices.put(model, x);
+		return x;
 	}
 
 }

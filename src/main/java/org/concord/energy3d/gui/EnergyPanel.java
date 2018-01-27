@@ -409,7 +409,7 @@ public class EnergyPanel extends JPanel {
 						return;
 					}
 					final JPopupMenu popupMenu = new JPopupMenu();
-					final JMenuItem mi = new JMenuItem("lat: " + FIVE_DECIMALS.format(geo.getLatitude()) + ", lng: " + FIVE_DECIMALS.format(geo.getLongitude()));
+					final JMenuItem mi = new JMenuItem("\"lat\": " + FIVE_DECIMALS.format(geo.getLatitude()) + ", \"lng\": " + FIVE_DECIMALS.format(geo.getLongitude()));
 					mi.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(final ActionEvent e) {
