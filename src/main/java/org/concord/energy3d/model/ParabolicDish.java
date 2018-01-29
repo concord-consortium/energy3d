@@ -64,7 +64,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
 	private double opticalEfficiency = 0.7;
-	private double thermalEfficiency = 0.6;
+	private double thermalEfficiency = 0.3;
 	private double rimRadius = 3;
 	private double focalLength = 2;
 	private int nrib = 6;
@@ -109,7 +109,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 			opticalEfficiency = 0.7;
 		}
 		if (Util.isZero(thermalEfficiency)) {
-			thermalEfficiency = 0.6;
+			thermalEfficiency = 0.3;
 		}
 		if (Util.isZero(nRadialSections)) {
 			nRadialSections = 32;

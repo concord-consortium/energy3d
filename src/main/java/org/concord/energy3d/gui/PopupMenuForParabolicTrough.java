@@ -1317,8 +1317,8 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (val < 20 || val > 80) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough thermal efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 5 || val > 80) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic trough thermal efficiency must be between 5% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									boolean changed = Math.abs(val * 0.01 - t.getThermalEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {

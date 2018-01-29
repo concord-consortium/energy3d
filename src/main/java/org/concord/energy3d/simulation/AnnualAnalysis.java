@@ -128,16 +128,26 @@ abstract class AnnualAnalysis extends Analysis {
 				public void actionPerformed(final ActionEvent e) {
 					final double[][] solarResults = Scene.getInstance().getSolarResults();
 					if (solarResults != null) {
+						double sum = 0;
+						final double scale = 1.0;
+						for (int i = 0; i < solarResults.length; i++) {
+							for (int j = 0; j < solarResults[i].length; j++) {
+								solarResults[i][j] *= scale;
+								sum += solarResults[i][j];
+							}
+						}
+						sum *= 365.0 / 12.0;
 						String s = "";
 						for (int i = 0; i < solarResults.length; i++) {
 							s += "\"" + AnnualGraph.THREE_LETTER_MONTH[i] + "\": \"";
 							for (int j = 0; j < solarResults[i].length; j++) {
 								s += EnergyPanel.FIVE_DECIMALS.format(solarResults[i][j]).replaceAll(",", "") + " ";
 							}
-							s = s.trim() + "\",\n";
+							s = s.trim() + "\",\n\t";
 						}
 						s = s.substring(0, s.length() - 1);
 						Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(s), null);
+						JOptionPane.showMessageDialog(dialog, "A total of " + EnergyPanel.TWO_DECIMALS.format(sum) + " KWh was copied to the clipboard.", "Export", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}
 			});

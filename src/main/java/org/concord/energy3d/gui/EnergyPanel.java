@@ -1397,7 +1397,7 @@ public class EnergyPanel extends JPanel {
 								final String str = "R=" + ONE_DECIMAL.format(r.getReflectance() * 100) + "%, a=" + ONE_DECIMAL.format(r.getModuleWidth() * r.getLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2" + (receiver == null ? "" : ", \u03B7=" + ONE_DECIMAL.format(receiver.getSolarReceiverEfficiency() * 100) + "%");
 								if (energyViewShown) {
 									partProperty3Label.setText("  Properties & Yield:");
-									partProperty3TextField.setText(str + ONE_DECIMAL.format(r.getSolarPotentialToday() * r.getSystemEfficiency()) + " kWh");
+									partProperty3TextField.setText(str + ", " + ONE_DECIMAL.format(r.getSolarPotentialToday() * r.getSystemEfficiency()) + " kWh");
 									partProperty3TextField.putClientProperty("tooltip", "The properties and yield of this Fresnel reflector");
 								} else {
 									partProperty3Label.setText("  Properties:");

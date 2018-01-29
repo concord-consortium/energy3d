@@ -68,7 +68,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
 	private double absorptance = 0.95; // the percentage of energy absorbed by the tube in the line of focus
 	private double opticalEfficiency = 0.7;
-	private double thermalEfficiency = 0.6;
+	private double thermalEfficiency = 0.3;
 	private double moduleLength = 3;
 	private double troughLength = 2 * moduleLength;
 	private double apertureWidth = 2;
@@ -119,7 +119,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 			opticalEfficiency = 0.7;
 		}
 		if (Util.isZero(thermalEfficiency)) {
-			thermalEfficiency = 0.6;
+			thermalEfficiency = 0.3;
 		}
 		if (Util.isZero(nSectionParabola)) {
 			nSectionParabola = 16;
