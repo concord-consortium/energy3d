@@ -3179,13 +3179,34 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForFresnelReflectors(final double length, final double width, final double moduleLength) {
+	public void setLengthForFresnelReflectors(final double length) {
 		for (final HousePart p : children) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
-				r.setModuleWidth(width);
-				r.setModuleLength(moduleLength);
 				r.setLength(length);
+				r.ensureFullModules(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setModuleWidthForFresnelReflectors(final double moduleWidth) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				r.setModuleWidth(moduleWidth);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setModuleLengthForFresnelReflectors(final double moduleLength) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				r.setModuleLength(moduleLength);
 				r.ensureFullModules(false);
 				r.draw();
 			}

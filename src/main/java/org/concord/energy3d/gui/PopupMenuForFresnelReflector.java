@@ -413,7 +413,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-											foundation.setSizeForFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
+											foundation.setLengthForFresnelReflectors(length);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -428,7 +428,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-											Scene.getInstance().setSizeForAllFresnelReflectors(length, r.getModuleWidth(), r.getModuleLength());
+											Scene.getInstance().setLengthForAllFresnelReflectors(length);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -536,7 +536,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-											foundation.setSizeForFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
+											foundation.setModuleWidthForFresnelReflectors(moduleWidth);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -551,7 +551,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-											Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), moduleWidth, r.getModuleLength());
+											Scene.getInstance().setModuleWidthForAllFresnelReflectors(moduleWidth);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -659,7 +659,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForFresnelReflectorsOnFoundationCommand c = new SetSizeForFresnelReflectorsOnFoundationCommand(foundation);
-											foundation.setSizeForFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
+											foundation.setModuleLengthForFresnelReflectors(moduleLength);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -674,7 +674,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForAllFresnelReflectorsCommand c = new SetSizeForAllFresnelReflectorsCommand();
-											Scene.getInstance().setSizeForAllFresnelReflectors(r.getLength(), r.getModuleWidth(), moduleLength);
+											Scene.getInstance().setModuleLengthForAllFresnelReflectors(moduleLength);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;

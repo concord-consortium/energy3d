@@ -3004,12 +3004,34 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForAllFresnelReflectors(final double length, final double width, final double moduleLength) {
+	public void setLengthForAllFresnelReflectors(final double length) {
 		for (final HousePart p : parts) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
 				r.setLength(length);
-				r.setModuleWidth(width);
+				r.ensureFullModules(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setModuleWidthForAllFresnelReflectors(final double moduleWidth) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
+				r.setModuleWidth(moduleWidth);
+				r.ensureFullModules(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setModuleLengthForAllFresnelReflectors(final double moduleLength) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				final FresnelReflector r = (FresnelReflector) p;
 				r.setModuleLength(moduleLength);
 				r.ensureFullModules(false);
 				r.draw();

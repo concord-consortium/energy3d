@@ -30,18 +30,25 @@ class RescaleBuildingDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 
+	private static double oldX = -1;
+	private static double newX = -1;
+	private static double oldY = -1;
+	private static double newY = -1;
+	private static double oldZ = -1;
+	private static double newZ = -1;
+
 	public RescaleBuildingDialog(final Foundation foundation) {
 
 		super(MainFrame.getInstance(), true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setTitle("Rescale Building #" + foundation.getId());
 
-		final JTextField oldXField = new JTextField(10);
-		final JTextField newXField = new JTextField(10);
-		final JTextField oldYField = new JTextField(10);
-		final JTextField newYField = new JTextField(10);
-		final JTextField oldZField = new JTextField(10);
-		final JTextField newZField = new JTextField(10);
+		final JTextField oldXField = oldX > 0 ? new JTextField(EnergyPanel.FIVE_DECIMALS.format(oldX), 10) : new JTextField(10);
+		final JTextField newXField = newX > 0 ? new JTextField(EnergyPanel.FIVE_DECIMALS.format(newX), 10) : new JTextField(10);
+		final JTextField oldYField = oldY > 0 ? new JTextField(EnergyPanel.FIVE_DECIMALS.format(oldY), 10) : new JTextField(10);
+		final JTextField newYField = newY > 0 ? new JTextField(EnergyPanel.FIVE_DECIMALS.format(newY), 10) : new JTextField(10);
+		final JTextField oldZField = oldZ > 0 ? new JTextField(EnergyPanel.FIVE_DECIMALS.format(oldZ), 10) : new JTextField(10);
+		final JTextField newZField = newZ > 0 ? new JTextField(EnergyPanel.FIVE_DECIMALS.format(newZ), 10) : new JTextField(10);
 
 		getContentPane().setLayout(new BorderLayout());
 		final JPanel panel = new JPanel(new SpringLayout());
@@ -51,7 +58,7 @@ class RescaleBuildingDialog extends JDialog {
 		final Runnable action = new Runnable() {
 			@Override
 			public void run() {
-				double oldX = 1;
+				oldX = 1;
 				String t = oldXField.getText();
 				if (t != null && !t.trim().equals("")) {
 					try {
@@ -66,7 +73,7 @@ class RescaleBuildingDialog extends JDialog {
 						return;
 					}
 				}
-				double newX = 1;
+				newX = 1;
 				t = newXField.getText();
 				if (t != null && !t.trim().equals("")) {
 					try {
@@ -81,7 +88,7 @@ class RescaleBuildingDialog extends JDialog {
 						return;
 					}
 				}
-				double oldY = 1;
+				oldY = 1;
 				t = oldYField.getText();
 				if (t != null && !t.trim().equals("")) {
 					try {
@@ -96,7 +103,7 @@ class RescaleBuildingDialog extends JDialog {
 						return;
 					}
 				}
-				double newY = 1;
+				newY = 1;
 				t = newYField.getText();
 				if (t != null && !t.trim().equals("")) {
 					try {
@@ -111,7 +118,7 @@ class RescaleBuildingDialog extends JDialog {
 						return;
 					}
 				}
-				double oldZ = 1;
+				oldZ = 1;
 				t = oldZField.getText();
 				if (t != null && !t.trim().equals("")) {
 					try {
@@ -126,7 +133,7 @@ class RescaleBuildingDialog extends JDialog {
 						return;
 					}
 				}
-				double newZ = 1;
+				newZ = 1;
 				t = newZField.getText();
 				if (t != null && !t.trim().equals("")) {
 					try {
