@@ -274,7 +274,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-											foundation.setSizeForParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
+											foundation.setLengthForParabolicTroughs(l);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -289,7 +289,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-											Scene.getInstance().setSizeForAllParabolicTroughs(l, t.getApertureWidth(), t.getModuleLength());
+											Scene.getInstance().setLengthForAllParabolicTroughs(l);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -397,7 +397,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-											foundation.setSizeForParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
+											foundation.setApertureForParabolicTroughs(w);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -412,7 +412,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-											Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), w, t.getModuleLength());
+											Scene.getInstance().setApertureForAllParabolicTroughs(w);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
@@ -520,7 +520,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetShapeForParabolicTroughsOnFoundationCommand c = new SetShapeForParabolicTroughsOnFoundationCommand(foundation);
-											foundation.setSizeForParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
+											foundation.setModuleLengthForParabolicTroughs(u);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -535,7 +535,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetShapeForAllParabolicTroughsCommand c = new SetShapeForAllParabolicTroughsCommand();
-											Scene.getInstance().setSizeForAllParabolicTroughs(t.getTroughLength(), t.getApertureWidth(), u);
+											Scene.getInstance().setModuleLengthForAllParabolicTroughs(u);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;

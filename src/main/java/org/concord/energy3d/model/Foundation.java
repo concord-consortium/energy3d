@@ -3007,13 +3007,34 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	// change properties of all the parabolic troughs on this foundation
 
-	public void setSizeForParabolicTroughs(final double length, final double width, final double unitLength) {
+	public void setApertureForParabolicTroughs(final double apertureWidth) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				final ParabolicTrough t = (ParabolicTrough) p;
+				t.setApertureWidth(apertureWidth);
+				t.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setModuleLengthForParabolicTroughs(final double moduleLength) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				final ParabolicTrough t = (ParabolicTrough) p;
+				t.setModuleLength(moduleLength);
+				t.ensureFullModules(false);
+				t.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setLengthForParabolicTroughs(final double length) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicTrough) {
 				final ParabolicTrough t = (ParabolicTrough) p;
 				t.setTroughLength(length);
-				t.setApertureWidth(width);
-				t.setModuleLength(unitLength);
 				t.ensureFullModules(false);
 				t.draw();
 			}
