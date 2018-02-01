@@ -8,6 +8,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -94,7 +95,19 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
 	private static MirrorSpiralFieldLayout mirrorSpiralFieldLayout = new MirrorSpiralFieldLayout();
 
-	static JPopupMenu getPopupMenu() {
+	static JPopupMenu getPopupMenu(final MouseEvent e) {
+
+		if (e.isAltDown()) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					Scene.getInstance().pasteToPickedLocationOnFoundation();
+					Scene.getInstance().setEdited(true);
+					return null;
+				}
+			});
+			return null;
+		}
 
 		if (popupMenuForFoundation == null) {
 

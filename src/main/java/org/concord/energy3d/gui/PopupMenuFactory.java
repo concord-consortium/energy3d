@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.concurrent.Callable;
 
@@ -101,7 +102,7 @@ public abstract class PopupMenuFactory {
 	PopupMenuFactory() {
 	}
 
-	public static JPopupMenu getPopupMenu(final boolean onLand) {
+	public static JPopupMenu getPopupMenu(final MouseEvent e, final boolean onLand) {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart instanceof Window) {
 			return PopupMenuForWindow.getPopupMenu();
@@ -123,7 +124,7 @@ public abstract class PopupMenuFactory {
 			if (f.getSelectedMesh() != null) {
 				return PopupMenuForMesh.getPopupMenu();
 			}
-			return PopupMenuForFoundation.getPopupMenu();
+			return PopupMenuForFoundation.getPopupMenu(e);
 		}
 		if (selectedPart instanceof SolarPanel) {
 			return PopupMenuForSolarPanel.getPopupMenu();

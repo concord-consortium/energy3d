@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 import org.concord.energy3d.MainApplication;
 import org.concord.energy3d.gui.EnergyPanel;
@@ -1872,8 +1873,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						EventQueue.invokeLater(new Runnable() { // seriously, our error log on 6/14/2017 showed that this caused deadlock if not invoked later!
 							@Override
 							public void run() {
-								final JPanel cp = MainPanel.getInstance().getCanvasPanel();
-								PopupMenuFactory.getPopupMenu(pickOnLand).show(cp, mouseStateX, cp.getHeight() - mouseStateY);
+								final JPopupMenu popup = PopupMenuFactory.getPopupMenu(e, pickOnLand);
+								if (popup != null) {
+									final JPanel cp = MainPanel.getInstance().getCanvasPanel();
+									popup.show(cp, mouseStateX, cp.getHeight() - mouseStateY);
+								}
 							}
 						});
 					}
