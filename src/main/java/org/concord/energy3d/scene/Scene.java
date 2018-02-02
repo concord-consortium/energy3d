@@ -955,7 +955,11 @@ public class Scene implements Serializable {
 		}
 		add(part);
 		if (redraw) {
-			redrawAll();
+			if (part instanceof SolarCollector) { // make a special case about solar collectors as their addition will not affect the rendering of other objects
+				part.draw();
+			} else {
+				redrawAll();
+			}
 		}
 	}
 
@@ -1060,7 +1064,6 @@ public class Scene implements Serializable {
 		add(c, true);
 		copyBuffer = c;
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
-		EnergyPanel.getInstance().updateRadiationHeatMap();
 		EnergyPanel.getInstance().update();
 	}
 

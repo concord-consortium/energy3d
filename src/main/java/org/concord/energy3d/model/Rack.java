@@ -1007,12 +1007,14 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	private void moveSolarPanels(final Vector3 d, final ArrayList<Vector3> orgPoints) {
-		int i = 0;
-		for (final HousePart child : children) {
-			if (orgPoints == null) {
-				child.getPoints().get(0).addLocal(d);
-			} else {
-				child.getPoints().get(0).set(orgPoints.get(i++).add(d, null));
+		if (children.size() > 0) {
+			int i = 0;
+			for (final HousePart child : children) {
+				if (orgPoints == null) {
+					child.getPoints().get(0).addLocal(d);
+				} else {
+					child.getPoints().get(0).set(orgPoints.get(i++).add(d, null));
+				}
 			}
 		}
 	}

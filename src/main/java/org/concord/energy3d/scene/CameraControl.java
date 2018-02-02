@@ -140,9 +140,9 @@ public abstract class CameraControl {
 						final boolean right = rightMouseButtonEnabled && mouse.getButtonState(MouseButton.RIGHT) == ButtonState.DOWN;
 						final boolean middle = mouse.getButtonState(MouseButton.MIDDLE) == ButtonState.DOWN;
 						if (left && leftButtonAction == ButtonAction.MOVE || right && rightButtonAction == ButtonAction.MOVE) {
-							final double fac = Camera.getCurrentCamera().getLocation().length() * 150;
+							final double fac = Camera.getCurrentCamera().getLocation().length() * 200; // increase the factor from 150 to speed up moving in the top view
 							final double dx = -mouse.getDx() * fac / Camera.getCurrentCamera().getWidth();
-							final double dy = -mouse.getDy() * fac / Camera.getCurrentCamera().getHeight() / 4.0;
+							final double dy = -mouse.getDy() * fac / Camera.getCurrentCamera().getHeight();
 							move(source.getCanvasRenderer().getCamera(), dx, dy);
 							SceneManager.getInstance().getCameraNode().updateFromCamera();
 							Scene.getInstance().updateEditShapes();

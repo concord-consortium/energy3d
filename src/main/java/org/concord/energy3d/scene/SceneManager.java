@@ -1209,7 +1209,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			up = new Vector3(0, 1, 0);
 			lookAt = new Vector3(0, 0, 0);
 			final double boundLength = Util.findBoundLength(Scene.getRoot().getWorldBound());
-			cameraControl.setMoveSpeed(boundLength / 2);
+			cameraControl.setMoveSpeed(boundLength * 2);
 			resizeCamera(boundLength);
 		} else if (viewMode == ViewMode.PRINT) {
 			camera.setProjectionMode(ProjectionMode.Parallel);
