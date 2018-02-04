@@ -987,15 +987,21 @@ public class Scene implements Serializable {
 		}
 		removeChildren(part);
 		if (redraw) {
-			redrawAll();
+			if (part instanceof SolarCollector) { // special case for solar collectors as they won't affect other objects in the scene
+				part.draw();
+			} else {
+				redrawAll();
+			}
 		}
 	}
 
 	private void removeChildren(final HousePart part) {
 		System.out.println("Removing: " + part);
 		parts.remove(part); // this must happen before call to wall.delete()
-		for (final HousePart child : part.getChildren()) {
-			removeChildren(child);
+		if (!part.getChildren().isEmpty()) {
+			for (final HousePart child : part.getChildren()) {
+				removeChildren(child);
+			}
 		}
 		// originalHouseRoot.detachChild(housePart.getRoot());
 		part.getRoot().removeFromParent();
