@@ -178,6 +178,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem firstPersonMenuItem;
 	private JMenuItem resetCameraMenuItem;
 	private JMenuItem saveasMenuItem;
+	private JMenuItem submitToVsgMenuItem;
 	private JMenu viewMenu;
 	private JMenu analysisMenu;
 	private JMenuItem rescaleMenuItem;
@@ -600,6 +601,7 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getOpenMenuItem());
 			addItemToFileMenu(getSaveMenuItem());
 			addItemToFileMenu(getSaveasMenuItem());
+			addItemToFileMenu(getSubmitToVsgMenuItem());
 			addItemToFileMenu(getRecoveryMenuItem());
 			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getImportMenuItem());
@@ -1307,6 +1309,18 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return saveasMenuItem;
+	}
+
+	private JMenuItem getSubmitToVsgMenuItem() {
+		if (submitToVsgMenuItem == null) {
+			submitToVsgMenuItem = new JMenuItem("Submit to Virtual Solar Grid...");
+			submitToVsgMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+				}
+			});
+		}
+		return submitToVsgMenuItem;
 	}
 
 	private JMenu getAnalysisMenu() {

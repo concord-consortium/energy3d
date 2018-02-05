@@ -2183,6 +2183,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	private boolean isTooFar(final HousePart p) {
+		if (isTopView()) {
+			return false;
+		}
 		final double rc = p.getAbsCenter().length();
 		final Rectangle2D bounds = Scene.getInstance().getFoundationBounds(true);
 		double rmax = SKY_RADIUS / 1000;
