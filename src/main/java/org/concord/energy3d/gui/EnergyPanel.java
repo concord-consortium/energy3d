@@ -1276,23 +1276,23 @@ public class EnergyPanel extends JPanel {
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
-								partPanelBorder.setTitle("Mirror (" + m.getId() + ")");
+								partPanelBorder.setTitle("Heliostat (" + m.getId() + ")");
 								partProperty1Label.setText("  Size & Center:");
 								partProperty1TextField.setText(TWO_DECIMALS.format(m.getMirrorWidth() * meterToFoot) + "\u00d7" + TWO_DECIMALS.format(m.getMirrorHeight() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
-								partProperty1TextField.putClientProperty("tooltip", "The length, width, and center coordinates of the mirror");
+								partProperty1TextField.putClientProperty("tooltip", "The length, width, and center coordinates of the heliostat");
 								partProperty2Label.setText("  Angles:");
 								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(m.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
-								partProperty2TextField.putClientProperty("tooltip", "The angles of the mirror");
+								partProperty2TextField.putClientProperty("tooltip", "The angles of the heliostat");
 								final Foundation receiver = m.getHeliostatTarget();
 								final String s = "R=" + ONE_DECIMAL.format(m.getReflectance() * 100) + "%" + (receiver == null ? "" : ", \u03B7=" + ONE_DECIMAL.format(receiver.getSolarReceiverEfficiency() * 100) + "%");
 								if (energyViewShown) {
 									partProperty3Label.setText("  Properties & Yield:");
 									partProperty3TextField.setText(s + ", " + ONE_DECIMAL.format(m.getSolarPotentialToday() * m.getSystemEfficiency()) + " kWh");
-									partProperty3TextField.putClientProperty("tooltip", "The physical properties and electric yield of this mirror");
+									partProperty3TextField.putClientProperty("tooltip", "The physical properties and electric yield of this heliostat");
 								} else {
 									partProperty3Label.setText("  Properties:");
 									partProperty3TextField.setText(s);
-									partProperty3TextField.putClientProperty("tooltip", "The physical properties of this mirror");
+									partProperty3TextField.putClientProperty("tooltip", "The physical properties of this heliostat");
 								}
 							}
 						});
@@ -1715,15 +1715,15 @@ public class EnergyPanel extends JPanel {
 						partProperty3TextField.setText("");
 						partProperty3TextField.putClientProperty("tooltip", null);
 					} else {
-						final int numberOfMirrors = Scene.getInstance().countParts(Mirror.class);
-						if (numberOfMirrors > 0) {
-							partPanelBorder.setTitle("Mirrors");
+						final int numberOfHeliostats = Scene.getInstance().countParts(Mirror.class);
+						if (numberOfHeliostats > 0) {
+							partPanelBorder.setTitle("Heliostats");
 							partProperty1Label.setText("  Total Number:");
-							partProperty1TextField.setText("" + numberOfMirrors);
-							partProperty1TextField.putClientProperty("tooltip", "Total number of mirrors");
+							partProperty1TextField.setText("" + numberOfHeliostats);
+							partProperty1TextField.putClientProperty("tooltip", "Total number of heliostats");
 							partProperty2Label.setText("  Total Cost:");
 							partProperty2TextField.setText("$" + TWO_DECIMALS.format(CspProjectCost.getInstance().getTotalCost()));
-							partProperty2TextField.putClientProperty("tooltip", "Total cost of mirrors");
+							partProperty2TextField.putClientProperty("tooltip", "Total cost of heliostats");
 							partProperty3Label.setText("  -");
 							partProperty3TextField.setText("");
 							partProperty3TextField.putClientProperty("tooltip", null);
@@ -1938,7 +1938,7 @@ public class EnergyPanel extends JPanel {
 				buildingInfoPanel.updateWallNumberBounds();
 				pvProjectInfoPanel.updateSolarPanelNumberMaximum();
 				pvProjectInfoPanel.updateBudgetMaximum();
-				cspProjectInfoPanel.updateMirrorNumberMaximum();
+				cspProjectInfoPanel.updateHeliostatNumberMaximum();
 				cspProjectInfoPanel.updateParabolicTroughNumberMaximum();
 				cspProjectInfoPanel.updateBudgetMaximum();
 				SceneManager.getTaskManager().update(new Callable<Object>() {

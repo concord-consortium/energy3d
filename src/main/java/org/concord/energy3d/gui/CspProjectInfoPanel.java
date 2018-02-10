@@ -242,7 +242,7 @@ public class CspProjectInfoPanel extends JPanel {
 		costBar.repaint();
 	}
 
-	public void updateMirrorNumberMaximum() {
+	public void updateHeliostatNumberMaximum() {
 		if (Scene.getInstance().countParts(Mirror.class) > 0) {
 			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
 			String t = "Number of mirrors (heliostats)";

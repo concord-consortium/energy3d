@@ -27,7 +27,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.DailyGraph;
 import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.simulation.Graph;
-import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.HeliostatDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughDailyAnalysis;
 import org.concord.energy3d.simulation.PartEnergyDailyGraph;
@@ -109,7 +109,7 @@ public class CspProjectDailyEnergyGraph extends JPanel {
 							g.setGraphType(graph.getGraphType());
 							analysis.show();
 						} else if (f.countParts(Mirror.class) > 0) {
-							final MirrorDailyAnalysis analysis = new MirrorDailyAnalysis();
+							final HeliostatDailyAnalysis analysis = new HeliostatDailyAnalysis();
 							analysis.updateGraph();
 							final Graph g = analysis.getGraph();
 							if (g instanceof DailyGraph) {

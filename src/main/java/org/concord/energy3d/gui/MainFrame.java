@@ -105,8 +105,8 @@ import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.simulation.GroupAnnualAnalysis;
 import org.concord.energy3d.simulation.GroupDailyAnalysis;
-import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
-import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.HeliostatAnnualAnalysis;
+import org.concord.energy3d.simulation.HeliostatDailyAnalysis;
 import org.concord.energy3d.simulation.MonthlySunshineHours;
 import org.concord.energy3d.simulation.ParabolicDishAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
@@ -193,8 +193,8 @@ public class MainFrame extends JFrame {
 	private JMenuItem groupAnnualAnalysisMenuItem;
 	private JMenuItem annualPvAnalysisMenuItem;
 	private JMenuItem dailyPvAnalysisMenuItem;
-	private JMenuItem annualMirrorAnalysisMenuItem;
-	private JMenuItem dailyMirrorAnalysisMenuItem;
+	private JMenuItem annualHeliostatAnalysisMenuItem;
+	private JMenuItem dailyHeliostatAnalysisMenuItem;
 	private JMenuItem annualParabolicTroughAnalysisMenuItem;
 	private JMenuItem dailyParabolicTroughAnalysisMenuItem;
 	private JMenuItem annualParabolicDishAnalysisMenuItem;
@@ -273,7 +273,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllFloorsMenuItem;
 	private JMenuItem removeAllSolarPanelsMenuItem;
 	private JMenuItem removeAllRacksMenuItem;
-	private JMenuItem removeAllMirrorsMenuItem;
+	private JMenuItem removeAllHeliostatsMenuItem;
 	private JMenuItem removeAllParabolicTroughsMenuItem;
 	private JMenuItem removeAllParabolicDishesMenuItem;
 	private JMenuItem removeAllFresnelReflectorsMenuItem;
@@ -1377,10 +1377,10 @@ public class MainFrame extends JFrame {
 			solarPanelsMenu.add(getDailyPvAnalysisMenuItem());
 			solarPanelsMenu.add(getAnnualPvAnalysisMenuItem());
 
-			final JMenu heliostatsMenu = new JMenu("Heliostats (Mirrors)");
+			final JMenu heliostatsMenu = new JMenu("Heliostats");
 			analysisMenu.add(heliostatsMenu);
-			heliostatsMenu.add(getDailyMirrorAnalysisMenuItem());
-			heliostatsMenu.add(getAnnualMirrorAnalysisMenuItem());
+			heliostatsMenu.add(getDailyHeliostatAnalysisMenuItem());
+			heliostatsMenu.add(getAnnualHeliostatAnalysisMenuItem());
 
 			final JMenu parabolicTroughsMenu = new JMenu("Parabolic Troughs");
 			analysisMenu.add(parabolicTroughsMenu);
@@ -2225,16 +2225,16 @@ public class MainFrame extends JFrame {
 		return dailyPvAnalysisMenuItem;
 	}
 
-	private JMenuItem getDailyMirrorAnalysisMenuItem() {
-		if (dailyMirrorAnalysisMenuItem == null) {
-			dailyMirrorAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Heliostats (Mirrors)...");
-			dailyMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getDailyHeliostatAnalysisMenuItem() {
+		if (dailyHeliostatAnalysisMenuItem == null) {
+			dailyHeliostatAnalysisMenuItem = new JMenuItem("Daily Yield Analysis of Heliostats...");
+			dailyHeliostatAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(Mirror.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2248,12 +2248,12 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(Mirror.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this foundation to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat on this foundation to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
 						}
-						final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
+						final HeliostatDailyAnalysis a = new HeliostatDailyAnalysis();
 						if (SceneManager.getInstance().getSolarHeatMap()) {
 							a.updateGraph();
 						}
@@ -2262,22 +2262,22 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return dailyMirrorAnalysisMenuItem;
+		return dailyHeliostatAnalysisMenuItem;
 	}
 
-	private JMenuItem getAnnualMirrorAnalysisMenuItem() {
-		if (annualMirrorAnalysisMenuItem == null) {
-			annualMirrorAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Heliostats (Mirrors)...");
-			annualMirrorAnalysisMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getAnnualHeliostatAnalysisMenuItem() {
+		if (annualHeliostatAnalysisMenuItem == null) {
+			annualHeliostatAnalysisMenuItem = new JMenuItem("Annual Yield Analysis of Heliostats...");
+			annualHeliostatAnalysisMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
 						int n = Scene.getInstance().countParts(Mirror.class);
 						if (n <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
-						final MirrorAnnualAnalysis a = new MirrorAnnualAnalysis();
+						final HeliostatAnnualAnalysis a = new HeliostatAnnualAnalysis();
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart != null) {
 							Foundation foundation;
@@ -2289,7 +2289,7 @@ public class MainFrame extends JFrame {
 							if (foundation != null) {
 								n = foundation.countParts(Mirror.class);
 								if (n <= 0) {
-									JOptionPane.showMessageDialog(MainFrame.this, "There is no mirror on this foundation to analyze.", "No Mirror", JOptionPane.WARNING_MESSAGE);
+									JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat on this foundation to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
 									return;
 								}
 							}
@@ -2299,7 +2299,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return annualMirrorAnalysisMenuItem;
+		return annualHeliostatAnalysisMenuItem;
 	}
 
 	private JMenuItem getDailyParabolicTroughAnalysisMenuItem() {
@@ -2676,7 +2676,7 @@ public class MainFrame extends JFrame {
 
 	private JCheckBoxMenuItem getOnlyReflectionHeatMapMenuItem() {
 		if (onlyReflectionHeatMapMenuItem == null) {
-			onlyReflectionHeatMapMenuItem = new JCheckBoxMenuItem("Show Only Reflected Energy (Mirrors and Fresnel Reflectors)");
+			onlyReflectionHeatMapMenuItem = new JCheckBoxMenuItem("Show Only Reflected Energy (Heliostats and Fresnel Reflectors)");
 			onlyReflectionHeatMapMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2890,7 +2890,7 @@ public class MainFrame extends JFrame {
 			clearMenu.add(getRemoveAllWindowShuttersMenuItem());
 			clearMenu.add(getRemoveAllSolarPanelsMenuItem());
 			clearMenu.add(getRemoveAllRacksMenuItem());
-			clearMenu.add(getRemoveAllMirrorsMenuItem());
+			clearMenu.add(getRemoveAllHeliostatsMenuItem());
 			clearMenu.add(getRemoveAllParabolicTroughsMenuItem());
 			clearMenu.add(getRemoveAllParabolicDishesMenuItem());
 			clearMenu.add(getRemoveAllFresnelReflectorsMenuItem());
@@ -4144,16 +4144,16 @@ public class MainFrame extends JFrame {
 		return removeAllRacksMenuItem;
 	}
 
-	private JMenuItem getRemoveAllMirrorsMenuItem() {
-		if (removeAllMirrorsMenuItem == null) {
-			removeAllMirrorsMenuItem = new JMenuItem("Remove All Mirrors");
-			removeAllMirrorsMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getRemoveAllHeliostatsMenuItem() {
+		if (removeAllHeliostatsMenuItem == null) {
+			removeAllHeliostatsMenuItem = new JMenuItem("Remove All Heliostats");
+			removeAllHeliostatsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().removeAllMirrors();
+							Scene.getInstance().removeAllHeliostats();
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
@@ -4166,7 +4166,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return removeAllMirrorsMenuItem;
+		return removeAllHeliostatsMenuItem;
 	}
 
 	private JMenuItem getRemoveAllParabolicTroughsMenuItem() {

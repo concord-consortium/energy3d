@@ -28,8 +28,8 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
-import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.HeliostatAnnualAnalysis;
+import org.concord.energy3d.simulation.HeliostatDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAzimuthCommand;
 import org.concord.energy3d.undo.ChangeAzimuthForAllMirrorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
@@ -1034,7 +1034,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof Mirror) {
-						new MirrorDailyAnalysis().show();
+						new HeliostatDailyAnalysis().show();
 					}
 				}
 			});
@@ -1045,7 +1045,7 @@ class PopupMenuForMirror extends PopupMenuFactory {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof Mirror) {
-						new MirrorAnnualAnalysis().show();
+						new HeliostatAnnualAnalysis().show();
 					}
 				}
 			});

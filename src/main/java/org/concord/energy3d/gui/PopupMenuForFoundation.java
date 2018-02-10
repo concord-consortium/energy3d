@@ -48,8 +48,8 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
-import org.concord.energy3d.simulation.MirrorAnnualAnalysis;
-import org.concord.energy3d.simulation.MirrorDailyAnalysis;
+import org.concord.energy3d.simulation.HeliostatAnnualAnalysis;
+import org.concord.energy3d.simulation.HeliostatDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicDishAnnualAnalysis;
 import org.concord.energy3d.simulation.ParabolicDishDailyAnalysis;
 import org.concord.energy3d.simulation.ParabolicTroughAnnualAnalysis;
@@ -333,7 +333,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().removeAllMirrors();
+							Scene.getInstance().removeAllHeliostats();
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {
@@ -2003,7 +2003,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
-						final MirrorDailyAnalysis a = new MirrorDailyAnalysis();
+						final HeliostatDailyAnalysis a = new HeliostatDailyAnalysis();
 						if (SceneManager.getInstance().getSolarHeatMap()) {
 							a.updateGraph();
 						}
@@ -2024,7 +2024,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
-						new MirrorAnnualAnalysis().show();
+						new HeliostatAnnualAnalysis().show();
 					}
 				}
 			});

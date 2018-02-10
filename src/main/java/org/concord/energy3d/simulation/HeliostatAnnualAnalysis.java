@@ -32,9 +32,9 @@ import org.concord.energy3d.util.BugReporter;
  * @author Charles Xie
  *
  */
-public class MirrorAnnualAnalysis extends AnnualAnalysis {
+public class HeliostatAnnualAnalysis extends AnnualAnalysis {
 
-	public MirrorAnnualAnalysis() {
+	public HeliostatAnnualAnalysis() {
 		super();
 		graph = new PartEnergyAnnualGraph();
 		graph.setPreferredSize(new Dimension(600, 400));
@@ -188,7 +188,7 @@ public class MirrorAnnualAnalysis extends AnnualAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Annual Yield of All Mirrors";
+		String title = "Annual Yield of All Heliostats";
 		if (selectedPart != null) {
 			if (selectedPart instanceof Mirror) {
 				cost = (int) CspProjectCost.getPartCost(selectedPart);
@@ -212,14 +212,14 @@ public class MirrorAnnualAnalysis extends AnnualAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
 			if (selectedPart instanceof Mirror) {
-				s += ", \"Mirror\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
+				s += ", \"Heliostat\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart instanceof Foundation) {
 				s += ", \"Foundation\": \"" + selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1) + "\"";
 			} else if (selectedPart.getTopContainer() instanceof Foundation) {
 				s += ", \"Foundation\": \"" + selectedPart.getTopContainer().toString().substring(0, selectedPart.getTopContainer().toString().indexOf(')') + 1) + "\"";
 			}
 		} else {
-			s += ", \"Mirror\": \"All\"";
+			s += ", \"Heliostat\": \"All\"";
 		}
 		final String name = "Solar";
 		final List<Double> data = graph.getData(name);

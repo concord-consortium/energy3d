@@ -585,7 +585,7 @@ public abstract class Graph extends JPanel {
 			if (today == null) {
 				today = Heliodon.getInstance().getCalendar();
 			}
-			final String cityAndDate = city + (this instanceof DailyGraph ? " - " + new SimpleDateFormat("MMM").format(today.getTime()) + " " + today.get(Calendar.DAY_OF_MONTH) : "");
+			final String cityAndDate = "Weather data from " + city + (this instanceof DailyGraph ? " - " + new SimpleDateFormat("MMM").format(today.getTime()) + " " + today.get(Calendar.DAY_OF_MONTH) : "");
 			g2.drawString(cityAndDate, (width - fm.stringWidth(cityAndDate)) / 2, popup ? 20 : 10);
 		}
 

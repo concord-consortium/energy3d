@@ -1750,7 +1750,7 @@ public class Scene implements Serializable {
 		edited = true;
 	}
 
-	public void removeAllMirrors() {
+	public void removeAllHeliostats() {
 		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {

@@ -78,7 +78,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspProjectInfoPanel().updateMirrorNumberMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateHeliostatNumberMaximum();
 			}
 		});
 	}
@@ -92,7 +92,7 @@ public class CspDesignSpecs implements Serializable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				EnergyPanel.getInstance().getCspProjectInfoPanel().updateMirrorNumberMaximum();
+				EnergyPanel.getInstance().getCspProjectInfoPanel().updateHeliostatNumberMaximum();
 			}
 		});
 	}
