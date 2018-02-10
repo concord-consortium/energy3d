@@ -9,15 +9,15 @@ import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeAzimuthForAllMirrorsCommand extends MyAbstractUndoableEdit {
+public class ChangeAzimuthForAllHeliostatsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
 	private final List<Mirror> mirrors;
 
-	public ChangeAzimuthForAllMirrorsCommand() {
-		mirrors = Scene.getInstance().getAllMirrors();
+	public ChangeAzimuthForAllHeliostatsCommand() {
+		mirrors = Scene.getInstance().getAllHeliostats();
 		final int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {

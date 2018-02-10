@@ -6,14 +6,14 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 
-public class ChangeMirrorTargetCommand extends MyAbstractUndoableEdit {
+public class ChangeHeliostatTargetCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Foundation oldValue;
 	private Foundation newValue;
 	private final Mirror mirror;
 
-	public ChangeMirrorTargetCommand(final Mirror mirror) {
+	public ChangeHeliostatTargetCommand(final Mirror mirror) {
 		this.mirror = mirror;
 		oldValue = mirror.getHeliostatTarget();
 	}

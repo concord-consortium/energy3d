@@ -9,26 +9,21 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSizeForMirrorsOnFoundationCommand extends MyAbstractUndoableEdit {
+public class ChangeFoundationHeliostatTargetCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
-	private final double[] oldWidths;
-	private double[] newWidths;
-	private final double[] oldHeights;
-	private double[] newHeights;
+	private final Foundation[] oldValues;
+	private Foundation[] newValues;
 	private final Foundation foundation;
 	private final List<Mirror> mirrors;
 
-	public SetSizeForMirrorsOnFoundationCommand(final Foundation foundation) {
+	public ChangeFoundationHeliostatTargetCommand(final Foundation foundation) {
 		this.foundation = foundation;
-		mirrors = foundation.getMirrors();
+		mirrors = foundation.getHeliostats();
 		final int n = mirrors.size();
-		oldWidths = new double[n];
-		oldHeights = new double[n];
+		oldValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
-			final Mirror m = mirrors.get(i);
-			oldWidths[i] = m.getMirrorWidth();
-			oldHeights[i] = m.getMirrorHeight();
+			oldValues[i] = mirrors.get(i).getHeliostatTarget();
 		}
 	}
 
@@ -40,15 +35,18 @@ public class SetSizeForMirrorsOnFoundationCommand extends MyAbstractUndoableEdit
 	public void undo() throws CannotUndoException {
 		super.undo();
 		final int n = mirrors.size();
-		newWidths = new double[n];
-		newHeights = new double[n];
+		newValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
-			newWidths[i] = m.getMirrorWidth();
-			newHeights[i] = m.getMirrorHeight();
-			m.setMirrorWidth(oldWidths[i]);
-			m.setMirrorHeight(oldHeights[i]);
+			newValues[i] = m.getHeliostatTarget();
+			m.setHeliostatTarget(oldValues[i]);
 			m.draw();
+			if (oldValues[i] != null) {
+				oldValues[i].drawSolarReceiver();
+			}
+			if (newValues[i] != null) {
+				newValues[i].drawSolarReceiver();
+			}
 		}
 		SceneManager.getInstance().refresh();
 	}
@@ -59,16 +57,21 @@ public class SetSizeForMirrorsOnFoundationCommand extends MyAbstractUndoableEdit
 		final int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
-			m.setMirrorWidth(newWidths[i]);
-			m.setMirrorHeight(newHeights[i]);
+			m.setHeliostatTarget(newValues[i]);
 			m.draw();
+			if (oldValues[i] != null) {
+				oldValues[i].drawSolarReceiver();
+			}
+			if (newValues[i] != null) {
+				newValues[i].drawSolarReceiver();
+			}
 		}
 		SceneManager.getInstance().refresh();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Set Size for All Mirrors on Selected Foundation";
+		return "Change Target for All Mirrors on Selected Foundation";
 	}
 
 }

@@ -855,8 +855,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			text += (text.equals("") ? "" : "\n") + (Util.isZero(output) ? "Output" : EnergyPanel.NO_DECIMAL.format(output) + " kWh");
 		}
 		if (labelNumberOfMirrors) {
-			final int n = getNumberOfTargetingMirrors();
-			text += n == 0 ? "" : "\n" + n + " Mirrors";
+			final int n = getNumberOfTargetingHeliostats();
+			text += n == 0 ? "" : "\n" + n + " Heliostats";
 		}
 		if (labelNumberOfFresnelReflectors) {
 			final int n = getNumberOfTargetingFresnelReflectors();
@@ -893,7 +893,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	}
 
-	private int getNumberOfTargetingMirrors() {
+	private int getNumberOfTargetingHeliostats() {
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
@@ -949,12 +949,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		if (solarReceiver == null) {
 			return;
 		}
-		int countMirrors = 0;
+		int countHeliostats = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
 				if (m.getHeliostatTarget() == this) {
-					countMirrors++;
+					countHeliostats++;
 				}
 			}
 		}
@@ -967,7 +967,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 		}
-		solarReceiver.setVisible(countMirrors > 0 || countFresnelReflectors > 0);
+		solarReceiver.setVisible(countHeliostats > 0 || countFresnelReflectors > 0);
 		if (solarReceiver.isVisible()) {
 			if (bloomRenderPass == null) {
 				bloomRenderPass = new BloomRenderPass(SceneManager.getInstance().getCamera(), 10);
@@ -1008,8 +1008,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					}
 				}
 			}
-			if (countMirrors > 0) {
-				bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countMirrors, 0.8f));
+			if (countHeliostats > 0) {
+				bloomRenderPass.setBlurIntensityMultiplier(Math.min(0.01f * countHeliostats, 0.8f));
 				solarReceiver.setHeight(getSolarReceiverHeight(0.1) * 0.15);
 				Vector3 o;
 				if (count == 0) {
@@ -1906,7 +1906,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return count;
 	}
 
-	public List<Mirror> getMirrors() {
+	public List<Mirror> getHeliostats() {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
@@ -2931,7 +2931,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	// change properties of all the mirrors on this foundation
 
-	public void setZenithAngleForMirrors(final double angle) {
+	public void setZenithAngleForHeliostats(final double angle) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setTiltAngle(angle);
@@ -2941,7 +2941,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setAzimuthForMirrors(final double angle) {
+	public void setAzimuthForHeliostats(final double angle) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setRelativeAzimuth(angle);
@@ -2951,7 +2951,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setReflectanceForMirrors(final double reflectance) {
+	public void setReflectanceForHeliostatMirrors(final double reflectance) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setReflectance(reflectance);
@@ -2959,7 +2959,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
-	public void setBaseHeightForMirrors(final double baseHeight) {
+	public void setBaseHeightForHeliostats(final double baseHeight) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setBaseHeight(baseHeight);
@@ -2969,7 +2969,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setTargetForMirrors(final Foundation target) {
+	public void setTargetForHeliostats(final Foundation target) {
 		final List<Foundation> oldTargets = new ArrayList<Foundation>();
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
@@ -2993,7 +2993,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForMirrors(final double width, final double height) {
+	public void setSizeForHeliostats(final double width, final double height) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;

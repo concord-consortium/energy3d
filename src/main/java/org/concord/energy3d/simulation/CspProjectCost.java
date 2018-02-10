@@ -119,7 +119,7 @@ public class CspProjectCost extends ProjectCost {
 					count++;
 					if (selectedFoundation == null) {
 						double receiverSum = 0;
-						final List<Mirror> mirrors = foundation.getMirrors();
+						final List<Mirror> mirrors = foundation.getHeliostats();
 						if (!mirrors.isEmpty()) {
 							final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 							for (final Mirror m : mirrors) {
@@ -173,7 +173,7 @@ public class CspProjectCost extends ProjectCost {
 				receiverSum = getPartCost(selectedFoundation);
 			} else {
 				landSum = getPartCost(selectedFoundation);
-				final List<Mirror> mirrors = selectedFoundation.getMirrors();
+				final List<Mirror> mirrors = selectedFoundation.getHeliostats();
 				if (!mirrors.isEmpty()) {
 					final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 					for (final Mirror m : mirrors) {

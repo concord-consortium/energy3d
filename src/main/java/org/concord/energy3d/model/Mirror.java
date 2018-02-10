@@ -34,7 +34,7 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
- * Mirror for solar power towers
+ * Heliostat for solar power towers (this class should have been named as Heliostat). A heliostat may have more than one mirror.
  *
  * @author Charles Xie
  *
@@ -109,7 +109,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		outlineMesh.setModelBound(new OrientedBoundingBox());
 		root.attachChild(outlineMesh);
 
-		post = new Cylinder("Post Cylinder", 2, Scene.getInstance().getAllMirrors().size() < 200 ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		post = new Cylinder("Post Cylinder", 2, Scene.getInstance().getAllHeliostats().size() < 200 ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
 		post.setRadius(0.6);
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRenderState(offsetState);

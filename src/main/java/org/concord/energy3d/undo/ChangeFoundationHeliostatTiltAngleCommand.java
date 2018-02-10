@@ -5,24 +5,30 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeTiltAngleForAllMirrorsCommand extends MyAbstractUndoableEdit {
+public class ChangeFoundationHeliostatTiltAngleCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
 	private double[] newValues;
+	private final Foundation foundation;
 	private final List<Mirror> mirrors;
 
-	public ChangeTiltAngleForAllMirrorsCommand() {
-		mirrors = Scene.getInstance().getAllMirrors();
+	public ChangeFoundationHeliostatTiltAngleCommand(final Foundation foundation) {
+		this.foundation = foundation;
+		mirrors = foundation.getHeliostats();
 		final int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {
 			oldValues[i] = mirrors.get(i).getTiltAngle();
 		}
+	}
+
+	public Foundation getFoundation() {
+		return foundation;
 	}
 
 	@Override
@@ -53,7 +59,7 @@ public class ChangeTiltAngleForAllMirrorsCommand extends MyAbstractUndoableEdit 
 
 	@Override
 	public String getPresentationName() {
-		return "Change Tilt Angle for All Mirrors";
+		return "Change Tilt Angle for All Mirrors on Selected Foundation";
 	}
 
 }

@@ -158,7 +158,7 @@ public class CspProjectInfoPanel extends JPanel {
 			} else {
 				final List<FresnelReflector> fresnels = foundation.getFresnelReflectors();
 				if (fresnels.isEmpty()) {
-					final List<Mirror> mirrors = foundation.getMirrors();
+					final List<Mirror> mirrors = foundation.getHeliostats();
 					countBar.setValue(mirrors.size());
 					moduleCountBar.setValue(mirrors.size());
 					countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors (heliostats)", true));

@@ -9,7 +9,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationMirrorAzimuthCommand extends MyAbstractUndoableEdit {
+public class ChangeFoundationHeliostatAzimuthCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldValues;
@@ -17,9 +17,9 @@ public class ChangeFoundationMirrorAzimuthCommand extends MyAbstractUndoableEdit
 	private final Foundation foundation;
 	private final List<Mirror> mirrors;
 
-	public ChangeFoundationMirrorAzimuthCommand(final Foundation foundation) {
+	public ChangeFoundationHeliostatAzimuthCommand(final Foundation foundation) {
 		this.foundation = foundation;
-		mirrors = foundation.getMirrors();
+		mirrors = foundation.getHeliostats();
 		final int n = mirrors.size();
 		oldValues = new double[n];
 		for (int i = 0; i < n; i++) {

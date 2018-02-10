@@ -133,7 +133,7 @@ public abstract class PopupMenuFactory {
 			return PopupMenuForRack.getPopupMenu();
 		}
 		if (selectedPart instanceof Mirror) {
-			return PopupMenuForMirror.getPopupMenu();
+			return PopupMenuForHeliostat.getPopupMenu();
 		}
 		if (selectedPart instanceof ParabolicTrough) {
 			return PopupMenuForParabolicTrough.getPopupMenu();
@@ -502,13 +502,16 @@ public abstract class PopupMenuFactory {
 				if (selectedPart == null) {
 					return;
 				}
-				final String s = selectedPart.toString();
+				String s = selectedPart.toString();
 				if (selectedPart instanceof SolarPanel) {
 					final SolarPanel sp = (SolarPanel) selectedPart;
 					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + (int) ProjectCost.getCost(selectedPart) + ")");
 				} else if (selectedPart instanceof Rack) {
 					final SolarPanel sp = ((Rack) selectedPart).getSolarPanel();
 					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + ": " + sp.getModelName() + " ($" + (int) ProjectCost.getCost(selectedPart) + ")");
+				} else if (selectedPart instanceof Mirror) {
+					s = s.replace("Mirror", "Heliostat");
+					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + (int) ProjectCost.getCost(selectedPart) + ")");
 				} else {
 					miInfo.setText(s.substring(0, s.indexOf(')') + 1) + " ($" + (int) ProjectCost.getCost(selectedPart) + ")");
 				}

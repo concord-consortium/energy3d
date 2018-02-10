@@ -7,28 +7,23 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class ChangeFoundationMirrorTargetCommand extends MyAbstractUndoableEdit {
+public class ChangeTargetForAllHeliostatsCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final Foundation[] oldValues;
 	private Foundation[] newValues;
-	private final Foundation foundation;
 	private final List<Mirror> mirrors;
 
-	public ChangeFoundationMirrorTargetCommand(final Foundation foundation) {
-		this.foundation = foundation;
-		mirrors = foundation.getMirrors();
+	public ChangeTargetForAllHeliostatsCommand() {
+		mirrors = Scene.getInstance().getAllHeliostats();
 		final int n = mirrors.size();
 		oldValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
 			oldValues[i] = mirrors.get(i).getHeliostatTarget();
 		}
-	}
-
-	public Foundation getFoundation() {
-		return foundation;
 	}
 
 	@Override
@@ -71,7 +66,7 @@ public class ChangeFoundationMirrorTargetCommand extends MyAbstractUndoableEdit 
 
 	@Override
 	public String getPresentationName() {
-		return "Change Target for All Mirrors on Selected Foundation";
+		return "Change Target for All Mirrors";
 	}
 
 }

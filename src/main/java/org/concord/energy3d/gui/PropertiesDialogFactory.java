@@ -54,7 +54,7 @@ public abstract class PropertiesDialogFactory {
 			return PropertiesDialogForRack.getDialog((Rack) selectedPart);
 		}
 		if (selectedPart instanceof Mirror) {
-			return PropertiesDialogForMirror.getDialog((Mirror) selectedPart);
+			return PropertiesDialogForHeliostat.getDialog((Mirror) selectedPart);
 		}
 		if (selectedPart instanceof ParabolicTrough) {
 			return PropertiesDialogForParabolicTrough.getDialog((ParabolicTrough) selectedPart);

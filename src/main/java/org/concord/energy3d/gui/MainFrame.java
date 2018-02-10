@@ -1620,7 +1620,7 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
 			addModel(cspMenu, "Cosine Efficiency", "tutorials/csp-cosine-efficiency.ng3");
 			addModel(cspMenu, "Shadowing and Blocking", "tutorials/csp-shadowing-blocking.ng3");
-			addModel(cspMenu, "Shadowing and Blocking (Reduced Mirror Height)", "tutorials/csp-shadowing-blocking-less.ng3");
+			addModel(cspMenu, "Shadowing and Blocking (Reduced Heliostat Height)", "tutorials/csp-shadowing-blocking-less.ng3");
 			addModel(cspMenu, "Shadowing and Blocking (Increased Radial Spacing)", "tutorials/csp-shadowing-blocking-even-less.ng3");
 			addModel(cspMenu, "The Effect of Solar Tower Height", "tutorials/csp-tower-height.ng3");
 			addModel(cspMenu, "Fermat Spiral Layout of Heliostats (Sunflower Pattern)", "tutorials/csp-spiral-layout.ng3");

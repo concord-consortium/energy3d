@@ -5,7 +5,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Mirror;
 
-public class SetMirrorLabelCommand extends MyAbstractUndoableEdit {
+public class SetHeliostatLabelCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldLabelId;
@@ -16,7 +16,7 @@ public class SetMirrorLabelCommand extends MyAbstractUndoableEdit {
 	private boolean newLabelEnergyOutput;
 	private final Mirror mirror;
 
-	public SetMirrorLabelCommand(final Mirror mirror) {
+	public SetHeliostatLabelCommand(final Mirror mirror) {
 		this.mirror = mirror;
 		oldLabelId = mirror.getLabelId();
 		oldLabelCustom = mirror.getLabelCustom();

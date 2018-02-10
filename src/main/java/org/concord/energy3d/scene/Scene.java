@@ -1751,31 +1751,31 @@ public class Scene implements Serializable {
 	}
 
 	public void removeAllHeliostats() {
-		final ArrayList<HousePart> mirrors = new ArrayList<HousePart>();
+		final ArrayList<HousePart> heliostats = new ArrayList<HousePart>();
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
 				if (part instanceof Mirror && part.getTopContainer() == foundation) {
-					mirrors.add(part);
+					heliostats.add(part);
 				}
 			}
 		} else {
 			for (final HousePart part : parts) {
 				if (part instanceof Mirror) {
-					mirrors.add(part);
+					heliostats.add(part);
 				}
 			}
 		}
-		if (mirrors.isEmpty()) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
+		if (heliostats.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat to remove.", "No Heliostat", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
-		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + mirrors.size() + " mirrors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + heliostats.size() + " heliostats" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 			return;
 		}
-		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(mirrors);
-		for (final HousePart part : mirrors) {
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(heliostats);
+		for (final HousePart part : heliostats) {
 			remove(part, false);
 		}
 		redrawAll();
@@ -1801,7 +1801,7 @@ public class Scene implements Serializable {
 			}
 		}
 		if (troughs.isEmpty()) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic trough to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic trough to remove.", "No Parabolic Trough", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + troughs.size() + " parabolic troughs" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
@@ -1834,7 +1834,7 @@ public class Scene implements Serializable {
 			}
 		}
 		if (dishes.isEmpty()) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic dish to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic dish to remove.", "No Parabolic Dish", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + dishes.size() + " parabolic dishes" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
@@ -1867,7 +1867,7 @@ public class Scene implements Serializable {
 			}
 		}
 		if (reflectors.isEmpty()) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no Fresnel reflector to remove.", "No Mirror", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no Fresnel reflector to remove.", "No Fresnel Reflector", JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
 		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Do you really want to remove all " + reflectors.size() + " Fresnel reflectors" + (selectedPart != null ? " on the selected foundation" : "") + "?", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
@@ -2728,9 +2728,9 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	// mirrors
+	// heliostats
 
-	public List<Mirror> getAllMirrors() {
+	public List<Mirror> getAllHeliostats() {
 		final List<Mirror> list = new ArrayList<Mirror>();
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
@@ -2740,7 +2740,7 @@ public class Scene implements Serializable {
 		return list;
 	}
 
-	public void setTiltAngleForAllMirrors(final double angle) {
+	public void setTiltAngleForAllHeliostats(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setTiltAngle(angle);
@@ -2750,7 +2750,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setAzimuthForAllMirrors(final double angle) {
+	public void setAzimuthForAllHeliostats(final double angle) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setRelativeAzimuth(angle);
@@ -2760,7 +2760,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setTargetForAllMirrors(final Foundation target) {
+	public void setTargetForAllHeliostats(final Foundation target) {
 		final List<Foundation> oldTargets = new ArrayList<Foundation>();
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
@@ -2784,7 +2784,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setBaseHeightForAllMirrors(final double baseHeight) {
+	public void setBaseHeightForAllHeliostats(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setBaseHeight(baseHeight);
@@ -2794,7 +2794,7 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void setSizeForAllMirrors(final double width, final double height) {
+	public void setSizeForAllHeliostats(final double width, final double height) {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setMirrorWidth(width);

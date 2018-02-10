@@ -196,7 +196,7 @@ public class CspProjectDailyEnergyGraph extends JPanel {
 						graph.addData("Solar", output);
 					}
 				} else {
-					final List<Mirror> mirrors = base.getMirrors();
+					final List<Mirror> mirrors = base.getHeliostats();
 					if (!mirrors.isEmpty()) {
 						for (int i = 0; i < 24; i++) {
 							SolarRadiation.getInstance().computeEnergyAtHour(i);

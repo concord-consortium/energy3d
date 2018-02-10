@@ -5,21 +5,23 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class SetSizeForAllMirrorsCommand extends MyAbstractUndoableEdit {
+public class SetSizeForHeliostatsOnFoundationCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final double[] oldWidths;
 	private double[] newWidths;
 	private final double[] oldHeights;
 	private double[] newHeights;
+	private final Foundation foundation;
 	private final List<Mirror> mirrors;
 
-	public SetSizeForAllMirrorsCommand() {
-		mirrors = Scene.getInstance().getAllMirrors();
+	public SetSizeForHeliostatsOnFoundationCommand(final Foundation foundation) {
+		this.foundation = foundation;
+		mirrors = foundation.getHeliostats();
 		final int n = mirrors.size();
 		oldWidths = new double[n];
 		oldHeights = new double[n];
@@ -28,6 +30,10 @@ public class SetSizeForAllMirrorsCommand extends MyAbstractUndoableEdit {
 			oldWidths[i] = m.getMirrorWidth();
 			oldHeights[i] = m.getMirrorHeight();
 		}
+	}
+
+	public Foundation getFoundation() {
+		return foundation;
 	}
 
 	@Override
@@ -39,8 +45,8 @@ public class SetSizeForAllMirrorsCommand extends MyAbstractUndoableEdit {
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
 			newWidths[i] = m.getMirrorWidth();
-			m.setMirrorWidth(oldWidths[i]);
 			newHeights[i] = m.getMirrorHeight();
+			m.setMirrorWidth(oldWidths[i]);
 			m.setMirrorHeight(oldHeights[i]);
 			m.draw();
 		}
@@ -62,7 +68,7 @@ public class SetSizeForAllMirrorsCommand extends MyAbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Set Size for All Mirrors";
+		return "Set Size for All Mirrors on Selected Foundation";
 	}
 
 }

@@ -117,7 +117,7 @@ public class CspProjectCostGraph extends JPanel {
 			receiverSum = CspProjectCost.getPartCost(foundation);
 		} else {
 			landSum = CspProjectCost.getPartCost(foundation);
-			final List<Mirror> mirrors = foundation.getMirrors();
+			final List<Mirror> mirrors = foundation.getHeliostats();
 			if (!mirrors.isEmpty()) {
 				final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 				for (final Mirror m : mirrors) {

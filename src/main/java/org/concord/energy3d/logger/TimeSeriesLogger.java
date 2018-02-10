@@ -829,23 +829,23 @@ public class TimeSeriesLogger {
 
 				/* mirror properties */
 
-				else if (lastEdit instanceof SetSizeForMirrorsOnFoundationCommand) {
-					final Foundation f = ((SetSizeForMirrorsOnFoundationCommand) lastEdit).getFoundation();
-					final List<Mirror> mirrors = f.getMirrors();
+				else if (lastEdit instanceof SetSizeForHeliostatsOnFoundationCommand) {
+					final Foundation f = ((SetSizeForHeliostatsOnFoundationCommand) lastEdit).getFoundation();
+					final List<Mirror> mirrors = f.getHeliostats();
 					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
-				} else if (lastEdit instanceof SetSizeForAllMirrorsCommand) {
-					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+				} else if (lastEdit instanceof SetSizeForAllHeliostatsCommand) {
+					final List<Mirror> mirrors = Scene.getInstance().getAllHeliostats();
 					stateValue = "{\"New Width\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorWidth()) + ", \"New Height\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getMirrorHeight()) + "}";
 				}
 
-				else if (lastEdit instanceof ChangeMirrorTargetCommand) {
-					final ChangeMirrorTargetCommand c = (ChangeMirrorTargetCommand) lastEdit;
+				else if (lastEdit instanceof ChangeHeliostatTargetCommand) {
+					final ChangeHeliostatTargetCommand c = (ChangeHeliostatTargetCommand) lastEdit;
 					final Mirror m = c.getMirror();
 					stateValue = "{\"Foundation\": " + m.getTopContainer().getId() + ", \"ID\": " + m.getId();
 					stateValue += ", \"Old Value\": " + (c.getOldValue() == null ? -1 : c.getOldValue().getId()) + ", \"New Value\": " + (c.getNewValue() == null ? -1 : c.getNewValue().getId()) + "}";
-				} else if (lastEdit instanceof ChangeFoundationMirrorTargetCommand) {
-					final Foundation f = ((ChangeFoundationMirrorTargetCommand) lastEdit).getFoundation();
-					final List<Mirror> mirrors = f.getMirrors();
+				} else if (lastEdit instanceof ChangeFoundationHeliostatTargetCommand) {
+					final Foundation f = ((ChangeFoundationHeliostatTargetCommand) lastEdit).getFoundation();
+					final List<Mirror> mirrors = f.getHeliostats();
 					long newValue = -1;
 					if (!mirrors.isEmpty()) {
 						final Foundation t = mirrors.get(0).getHeliostatTarget();
@@ -854,8 +854,8 @@ public class TimeSeriesLogger {
 						}
 					}
 					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + newValue + "}";
-				} else if (lastEdit instanceof ChangeTargetForAllMirrorsCommand) {
-					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+				} else if (lastEdit instanceof ChangeTargetForAllHeliostatsCommand) {
+					final List<Mirror> mirrors = Scene.getInstance().getAllHeliostats();
 					long newValue = -1;
 					if (!mirrors.isEmpty()) {
 						final Foundation t = mirrors.get(0).getHeliostatTarget();
@@ -866,21 +866,21 @@ public class TimeSeriesLogger {
 					stateValue = "{\"New Value\": " + newValue + "}";
 				}
 
-				else if (lastEdit instanceof ChangeFoundationMirrorTiltAngleCommand) {
-					final Foundation f = ((ChangeFoundationMirrorTiltAngleCommand) lastEdit).getFoundation();
-					final List<Mirror> mirrors = f.getMirrors();
+				else if (lastEdit instanceof ChangeFoundationHeliostatTiltAngleCommand) {
+					final Foundation f = ((ChangeFoundationHeliostatTiltAngleCommand) lastEdit).getFoundation();
+					final List<Mirror> mirrors = f.getHeliostats();
 					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTiltAngle()) + "}";
-				} else if (lastEdit instanceof ChangeTiltAngleForAllMirrorsCommand) {
-					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+				} else if (lastEdit instanceof ChangeTiltAngleForAllHeliostatsCommand) {
+					final List<Mirror> mirrors = Scene.getInstance().getAllHeliostats();
 					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getTiltAngle()) + "}";
 				}
 
-				else if (lastEdit instanceof ChangeFoundationMirrorAzimuthCommand) {
-					final Foundation f = ((ChangeFoundationMirrorAzimuthCommand) lastEdit).getFoundation();
-					final List<Mirror> mirrors = f.getMirrors();
+				else if (lastEdit instanceof ChangeFoundationHeliostatAzimuthCommand) {
+					final Foundation f = ((ChangeFoundationHeliostatAzimuthCommand) lastEdit).getFoundation();
+					final List<Mirror> mirrors = f.getHeliostats();
 					stateValue = "{\"Foundation\": " + f.getId() + ", \"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getRelativeAzimuth()) + "}";
-				} else if (lastEdit instanceof ChangeAzimuthForAllMirrorsCommand) {
-					final List<Mirror> mirrors = Scene.getInstance().getAllMirrors();
+				} else if (lastEdit instanceof ChangeAzimuthForAllHeliostatsCommand) {
+					final List<Mirror> mirrors = Scene.getInstance().getAllHeliostats();
 					stateValue = "{\"New Value\": " + (mirrors.isEmpty() ? -1 : mirrors.get(0).getRelativeAzimuth()) + "}";
 				}
 

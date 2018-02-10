@@ -22,11 +22,11 @@ import org.concord.energy3d.util.SpringUtilities;
  * @author Charles Xie
  *
  */
-class PropertiesDialogForMirror extends PropertiesDialogFactory {
+class PropertiesDialogForHeliostat extends PropertiesDialogFactory {
 
 	static JDialog getDialog(final Mirror mirror) {
 
-		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Mirror (Heliostat)", true);
+		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Heliostat", true);
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		final String info = mirror.toString().substring(0, mirror.toString().indexOf(')') + 1);
 		dialog.setTitle("Properties - " + info);
