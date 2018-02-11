@@ -247,6 +247,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem textureSimpleMenuItem;
 	private JRadioButtonMenuItem textureFullMenuItem;
 	private JRadioButtonMenuItem textureBrickMenuItem;
+	private JRadioButtonMenuItem textureGrayShingleMenuItem;
 	private JRadioButtonMenuItem textureSouthernMenuItem;
 	private final ButtonGroup textureButtonGroup = new ButtonGroup();
 	private JMenu themeMenu;
@@ -1732,6 +1733,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
 					Util.selectSilently(textureSimpleMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
 					Util.selectSilently(textureFullMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
+					Util.selectSilently(textureGrayShingleMenuItem, Scene.getInstance().getTextureMode() == TextureMode.GRAY_SHINGLE_ROOF);
 					Util.selectSilently(textureBrickMenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
 					Util.selectSilently(textureSouthernMenuItem, Scene.getInstance().getTextureMode() == TextureMode.SOUTHERN);
 				}
@@ -1740,6 +1742,7 @@ public class MainFrame extends JFrame {
 			textureMenu.add(getNoTextureMenuItem());
 			textureMenu.add(getTextureSimpleMenuItem());
 			textureMenu.add(getTextureFullMenuItem());
+			textureMenu.add(getTextureGrayShingleMenuItem());
 			textureMenu.add(getTextureBrickMenuItem());
 			textureMenu.add(getTextureSouthernMenuItem());
 
@@ -3445,6 +3448,28 @@ public class MainFrame extends JFrame {
 			textureButtonGroup.add(textureSouthernMenuItem);
 		}
 		return textureSouthernMenuItem;
+	}
+
+	public JRadioButtonMenuItem getTextureGrayShingleMenuItem() {
+		if (textureGrayShingleMenuItem == null) {
+			textureGrayShingleMenuItem = new JRadioButtonMenuItem("Gray Shingle Roof");
+			textureGrayShingleMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeTextureCommand c = new ChangeTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.GRAY_SHINGLE_ROOF);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureButtonGroup.add(textureGrayShingleMenuItem);
+		}
+		return textureGrayShingleMenuItem;
 	}
 
 	public JRadioButtonMenuItem getBlueSkyMenuItem() {

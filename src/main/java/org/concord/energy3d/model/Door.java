@@ -191,6 +191,9 @@ public class Door extends HousePart implements Thermal {
 		if (t == TextureMode.SOUTHERN) {
 			return "door.jpg";
 		}
+		if (t == TextureMode.GRAY_SHINGLE_ROOF) {
+			return "door.jpg";
+		}
 		return null;
 	}
 
