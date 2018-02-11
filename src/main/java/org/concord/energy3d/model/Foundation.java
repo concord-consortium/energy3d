@@ -3031,6 +3031,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	// change properties of all the parabolic troughs on this foundation
 
+	public void setAzimuthForParabolicTroughs(final double angle) {
+		for (final HousePart p : children) {
+			if (p instanceof ParabolicTrough) {
+				((ParabolicTrough) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setApertureForParabolicTroughs(final double apertureWidth) {
 		for (final HousePart p : children) {
 			if (p instanceof ParabolicTrough) {

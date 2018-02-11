@@ -429,6 +429,9 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 
 		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
 		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
+		if (!Util.isZero(relativeAzimuth)) {
+			// rotation.applyRotationZ(Math.toRadians(relativeAzimuth));
+		}
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
 		reflectorBack.setRotation(rotation);

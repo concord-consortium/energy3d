@@ -3,6 +3,7 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicTrough;
@@ -25,6 +26,8 @@ public class ChangeAzimuthCommand extends MyAbstractUndoableEdit {
 			oldValue = ((Mirror) part).getRelativeAzimuth();
 		} else if (part instanceof ParabolicTrough) {
 			oldValue = ((ParabolicTrough) part).getRelativeAzimuth();
+		} else if (part instanceof FresnelReflector) {
+			oldValue = ((FresnelReflector) part).getRelativeAzimuth();
 		}
 	}
 
@@ -45,6 +48,8 @@ public class ChangeAzimuthCommand extends MyAbstractUndoableEdit {
 			newValue = ((Mirror) part).getRelativeAzimuth();
 		} else if (part instanceof ParabolicTrough) {
 			newValue = ((ParabolicTrough) part).getRelativeAzimuth();
+		} else if (part instanceof FresnelReflector) {
+			newValue = ((FresnelReflector) part).getRelativeAzimuth();
 		}
 		return newValue;
 	}
@@ -64,6 +69,9 @@ public class ChangeAzimuthCommand extends MyAbstractUndoableEdit {
 		} else if (part instanceof ParabolicTrough) {
 			newValue = ((ParabolicTrough) part).getRelativeAzimuth();
 			((ParabolicTrough) part).setRelativeAzimuth(oldValue);
+		} else if (part instanceof FresnelReflector) {
+			newValue = ((FresnelReflector) part).getRelativeAzimuth();
+			((FresnelReflector) part).setRelativeAzimuth(oldValue);
 		}
 		part.draw();
 	}
@@ -79,6 +87,8 @@ public class ChangeAzimuthCommand extends MyAbstractUndoableEdit {
 			((Mirror) part).setRelativeAzimuth(newValue);
 		} else if (part instanceof ParabolicTrough) {
 			((ParabolicTrough) part).setRelativeAzimuth(newValue);
+		} else if (part instanceof FresnelReflector) {
+			((FresnelReflector) part).setRelativeAzimuth(newValue);
 		}
 		part.draw();
 	}
