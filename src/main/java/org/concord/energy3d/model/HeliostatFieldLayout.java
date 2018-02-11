@@ -4,10 +4,10 @@ package org.concord.energy3d.model;
  * @author Charles Xie
  *
  */
-public abstract class MirrorFieldLayout {
+public abstract class HeliostatFieldLayout {
 
-	double mirrorWidth = 5;
-	double mirrorHeight = 3;
+	double apertureWidth = 5;
+	double apertureHeight = 3;
 	double startAngle = 0;
 	double endAngle = 360;
 	double axisRoadWidth = 0;
@@ -21,20 +21,20 @@ public abstract class MirrorFieldLayout {
 		return baseHeight;
 	}
 
-	public void setMirrorWidth(final double mirrorWidth) {
-		this.mirrorWidth = mirrorWidth;
+	public void setApertureWidth(final double apertureWidth) {
+		this.apertureWidth = apertureWidth;
 	}
 
-	public double getMirrorWidth() {
-		return mirrorWidth;
+	public double getApertureWidth() {
+		return apertureWidth;
 	}
 
-	public void setMirrorHeight(final double mirrorHeight) {
-		this.mirrorHeight = mirrorHeight;
+	public void setApertureHeight(final double apertureHeight) {
+		this.apertureHeight = apertureHeight;
 	}
 
-	public double getMirrorHeight() {
-		return mirrorHeight;
+	public double getApertureHeight() {
+		return apertureHeight;
 	}
 
 	public void setStartAngle(final double startAngle) {

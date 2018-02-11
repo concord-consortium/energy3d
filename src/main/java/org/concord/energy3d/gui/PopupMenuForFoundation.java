@@ -32,11 +32,11 @@ import javax.swing.SpringLayout;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
+import org.concord.energy3d.model.HeliostatCircularFieldLayout;
+import org.concord.energy3d.model.HeliostatRectangularFieldLayout;
+import org.concord.energy3d.model.HeliostatSpiralFieldLayout;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
-import org.concord.energy3d.model.MirrorCircularFieldLayout;
-import org.concord.energy3d.model.MirrorRectangularFieldLayout;
-import org.concord.energy3d.model.MirrorSpiralFieldLayout;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
@@ -91,9 +91,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 	private static double solarPanelRackBaseHeight = 3;
 	private static double solarPanelTiltAngle = 0;
 	private static int solarPanelShadeTolerance = SolarPanel.PARTIAL_SHADE_TOLERANCE;
-	private static MirrorRectangularFieldLayout mirrorRectangularFieldLayout = new MirrorRectangularFieldLayout();
-	private static MirrorCircularFieldLayout mirrorCircularFieldLayout = new MirrorCircularFieldLayout();
-	private static MirrorSpiralFieldLayout mirrorSpiralFieldLayout = new MirrorSpiralFieldLayout();
+	private static HeliostatRectangularFieldLayout heliostatRectangularFieldLayout = new HeliostatRectangularFieldLayout();
+	private static HeliostatCircularFieldLayout heliostatCircularFieldLayout = new HeliostatCircularFieldLayout();
+	private static HeliostatSpiralFieldLayout heliostatSpiralFieldLayout = new HeliostatSpiralFieldLayout();
 
 	static JPopupMenu getPopupMenu(final MouseEvent e) {
 
@@ -326,8 +326,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			});
 			clearMenu.add(miRemoveAllRacks);
 
-			final JMenuItem miRemoveAllMirrors = new JMenuItem("Remove All Mirrors");
-			miRemoveAllMirrors.addActionListener(new ActionListener() {
+			final JMenuItem miRemoveAllHeliostats = new JMenuItem("Remove All Heliostats");
+			miRemoveAllHeliostats.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -346,7 +346,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					});
 				}
 			});
-			clearMenu.add(miRemoveAllMirrors);
+			clearMenu.add(miRemoveAllHeliostats);
 
 			final JMenuItem miRemoveAllParabolicTroughs = new JMenuItem("Remove All Parabolic Troughs");
 			miRemoveAllParabolicTroughs.addActionListener(new ActionListener() {
@@ -984,9 +984,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			layoutMenu.addSeparator();
 
-			final JMenuItem miMirrorCircularArrays = new JMenuItem("Mirror Circular Layout...");
-			layoutMenu.add(miMirrorCircularArrays);
-			miMirrorCircularArrays.addActionListener(new ActionListener() {
+			final JMenuItem miHeliostatCircularArrays = new JMenuItem("Heliostat Circular Layout...");
+			layoutMenu.add(miHeliostatCircularArrays);
+			miHeliostatCircularArrays.addActionListener(new ActionListener() {
 
 				private Foundation f;
 				private JComboBox<String> typeComboBox;
@@ -997,47 +997,47 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " heliostats on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 
 						final JPanel panel = new JPanel(new SpringLayout());
 						panel.add(new JLabel("Type:"));
 						typeComboBox = new JComboBox<String>(new String[] { "Equal Azimuthal Spacing", "Radial Stagger" });
-						typeComboBox.setSelectedIndex(mirrorCircularFieldLayout.getType());
+						typeComboBox.setSelectedIndex(heliostatCircularFieldLayout.getType());
 						panel.add(typeComboBox);
-						panel.add(new JLabel("Mirror Width:"));
-						final JTextField widthField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorWidth()));
+						panel.add(new JLabel("Aperture Width:"));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getApertureWidth()));
 						panel.add(widthField);
-						panel.add(new JLabel("Mirror Height:"));
-						final JTextField heightField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getMirrorHeight()));
+						panel.add(new JLabel("Aperture Height:"));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getApertureHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("Start Angle (CCW from East):"));
-						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getStartAngle()));
+						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getStartAngle()));
 						panel.add(startAngleField);
 						panel.add(new JLabel("End Angle (CCW from East):"));
-						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getEndAngle()));
+						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getEndAngle()));
 						panel.add(endAngleField);
 						panel.add(new JLabel("Radial Spacing:"));
-						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacing()));
+						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getRadialSpacing()));
 						panel.add(rowSpacingField);
 						panel.add(new JLabel("Radial Spacing Increase Ratio:"));
-						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(mirrorCircularFieldLayout.getRadialSpacingIncrement()));
+						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(heliostatCircularFieldLayout.getRadialSpacingIncrement()));
 						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("Azimuthal Spacing:"));
-						final JTextField azimuthalSpacingField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getAzimuthalSpacing()));
+						final JTextField azimuthalSpacingField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getAzimuthalSpacing()));
 						panel.add(azimuthalSpacingField);
 						panel.add(new JLabel("Axis Road Width:"));
-						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getAxisRoadWidth()));
+						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getAxisRoadWidth()));
 						panel.add(axisRoadWidthField);
 						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorCircularFieldLayout.getBaseHeight()));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatCircularFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
 						SpringUtilities.makeCompactGrid(panel, 10, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Circular Mirror Array Options");
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Circular Heliostat Array Options");
 
 						while (true) {
 							dialog.setVisible(true);
@@ -1047,40 +1047,40 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							} else {
 								boolean ok = true;
 								try {
-									mirrorCircularFieldLayout.setRadialSpacing(Double.parseDouble(rowSpacingField.getText()));
-									mirrorCircularFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
-									mirrorCircularFieldLayout.setAzimuthalSpacing(Double.parseDouble(azimuthalSpacingField.getText()));
-									mirrorCircularFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
-									mirrorCircularFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
-									mirrorCircularFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
-									mirrorCircularFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
-									mirrorCircularFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
-									mirrorCircularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+									heliostatCircularFieldLayout.setRadialSpacing(Double.parseDouble(rowSpacingField.getText()));
+									heliostatCircularFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
+									heliostatCircularFieldLayout.setAzimuthalSpacing(Double.parseDouble(azimuthalSpacingField.getText()));
+									heliostatCircularFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
+									heliostatCircularFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
+									heliostatCircularFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
+									heliostatCircularFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
+									heliostatCircularFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
+									heliostatCircularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
 								}
 								if (ok) {
-									if (mirrorCircularFieldLayout.getRadialSpacing() < 0 || mirrorCircularFieldLayout.getAzimuthalSpacing() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getRadialSpacingIncrement() < 0) {
+									if (heliostatCircularFieldLayout.getRadialSpacing() < 0 || heliostatCircularFieldLayout.getAzimuthalSpacing() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatCircularFieldLayout.getRadialSpacingIncrement() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial spacing increment ratio cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getAxisRoadWidth() < 0) {
+									} else if (heliostatCircularFieldLayout.getAxisRoadWidth() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getStartAngle() < 0 || mirrorCircularFieldLayout.getStartAngle() > 360) {
+									} else if (heliostatCircularFieldLayout.getStartAngle() < 0 || heliostatCircularFieldLayout.getStartAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getEndAngle() < 0 || mirrorCircularFieldLayout.getEndAngle() > 360) {
+									} else if (heliostatCircularFieldLayout.getEndAngle() < 0 || heliostatCircularFieldLayout.getEndAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getEndAngle() <= mirrorCircularFieldLayout.getStartAngle()) {
+									} else if (heliostatCircularFieldLayout.getEndAngle() <= heliostatCircularFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getMirrorWidth() < 1 || mirrorCircularFieldLayout.getMirrorWidth() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getMirrorHeight() < 1 || mirrorCircularFieldLayout.getMirrorHeight() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorCircularFieldLayout.getBaseHeight() < 0) {
+									} else if (heliostatCircularFieldLayout.getApertureWidth() < 1 || heliostatCircularFieldLayout.getApertureWidth() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatCircularFieldLayout.getApertureHeight() < 1 || heliostatCircularFieldLayout.getApertureHeight() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatCircularFieldLayout.getBaseHeight() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										addCircularMirrorArrays();
+										addCircularHeliostatArrays();
 										if (choice == options[0]) {
 											break;
 										}
@@ -1091,14 +1091,14 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 
-				private void addCircularMirrorArrays() {
-					mirrorCircularFieldLayout.setType(typeComboBox.getSelectedIndex());
+				private void addCircularHeliostatArrays() {
+					heliostatCircularFieldLayout.setType(typeComboBox.getSelectedIndex());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							final int count = f.addCircularMirrorArrays(mirrorCircularFieldLayout);
+							final int count = f.addCircularHeliostatArrays(heliostatCircularFieldLayout);
 							if (count == 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 							return null;
 						}
@@ -1108,9 +1108,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			});
 
-			final JMenuItem miMirrorRectangularArrays = new JMenuItem("Mirror Rectangular Layout...");
-			layoutMenu.add(miMirrorRectangularArrays);
-			miMirrorRectangularArrays.addActionListener(new ActionListener() {
+			final JMenuItem miHeliostatRectangularArrays = new JMenuItem("Heliostat Rectangular Layout...");
+			layoutMenu.add(miHeliostatRectangularArrays);
+			miHeliostatRectangularArrays.addActionListener(new ActionListener() {
 
 				private Foundation f;
 				private JComboBox<String> rowAxisComboBox;
@@ -1121,35 +1121,35 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " heliostats on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 
 						final JPanel panel = new JPanel(new SpringLayout());
 						panel.add(new JLabel("Row Axis:"));
 						rowAxisComboBox = new JComboBox<String>(new String[] { "North-South", "East-West" });
-						rowAxisComboBox.setSelectedIndex(mirrorRectangularFieldLayout.getRowAxis());
+						rowAxisComboBox.setSelectedIndex(heliostatRectangularFieldLayout.getRowAxis());
 						panel.add(rowAxisComboBox);
-						panel.add(new JLabel("Mirror Width:"));
-						final JTextField widthField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getMirrorWidth()));
+						panel.add(new JLabel("Aperture Width:"));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getApertureWidth()));
 						panel.add(widthField);
-						panel.add(new JLabel("Mirror Height:"));
-						final JTextField heightField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getMirrorHeight()));
+						panel.add(new JLabel("Aperture Height:"));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getApertureHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("Row Spacing:"));
-						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getRowSpacing()));
+						final JTextField rowSpacingField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getRowSpacing()));
 						panel.add(rowSpacingField);
 						panel.add(new JLabel("Column Spacing:"));
-						final JTextField columnSpacingField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getColumnSpacing()));
+						final JTextField columnSpacingField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getColumnSpacing()));
 						panel.add(columnSpacingField);
 						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorRectangularFieldLayout.getBaseHeight()));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatRectangularFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
 						SpringUtilities.makeCompactGrid(panel, 6, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rectangular Mirror Array Options");
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rectangular Heliostat Array Options");
 
 						while (true) {
 							dialog.setVisible(true);
@@ -1159,26 +1159,26 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							} else {
 								boolean ok = true;
 								try {
-									mirrorRectangularFieldLayout.setRowSpacing(Double.parseDouble(rowSpacingField.getText()));
-									mirrorRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
-									mirrorRectangularFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
-									mirrorRectangularFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
-									mirrorRectangularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+									heliostatRectangularFieldLayout.setRowSpacing(Double.parseDouble(rowSpacingField.getText()));
+									heliostatRectangularFieldLayout.setColumnSpacing(Double.parseDouble(columnSpacingField.getText()));
+									heliostatRectangularFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
+									heliostatRectangularFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
+									heliostatRectangularFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
 								}
 								if (ok) {
-									if (mirrorRectangularFieldLayout.getRowSpacing() < 0 || mirrorRectangularFieldLayout.getColumnSpacing() < 0) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorRectangularFieldLayout.getMirrorWidth() < 1 || mirrorRectangularFieldLayout.getMirrorWidth() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorRectangularFieldLayout.getMirrorHeight() < 1 || mirrorRectangularFieldLayout.getMirrorHeight() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorRectangularFieldLayout.getBaseHeight() < 0) {
+									if (heliostatRectangularFieldLayout.getRowSpacing() < 0 || heliostatRectangularFieldLayout.getColumnSpacing() < 0) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat spacing cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatRectangularFieldLayout.getApertureWidth() < 1 || heliostatRectangularFieldLayout.getApertureWidth() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatRectangularFieldLayout.getApertureHeight() < 1 || heliostatRectangularFieldLayout.getApertureHeight() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatRectangularFieldLayout.getBaseHeight() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										addRectangularMirrorArrays();
+										addRectangularHeliostatArrays();
 										if (choice == options[0]) {
 											break;
 										}
@@ -1189,14 +1189,14 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 
-				private void addRectangularMirrorArrays() {
-					mirrorRectangularFieldLayout.setRowAxis(rowAxisComboBox.getSelectedIndex());
+				private void addRectangularHeliostatArrays() {
+					heliostatRectangularFieldLayout.setRowAxis(rowAxisComboBox.getSelectedIndex());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							final int count = f.addRectangularMirrorArrays(mirrorRectangularFieldLayout);
+							final int count = f.addRectangularHeliostatArrays(heliostatRectangularFieldLayout);
 							if (count == 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 							return null;
 						}
@@ -1206,9 +1206,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 			});
 
-			final JMenuItem miMirrorFermatSpiralArrays = new JMenuItem("Mirror Spiral Layout...");
-			layoutMenu.add(miMirrorFermatSpiralArrays);
-			miMirrorFermatSpiralArrays.addActionListener(new ActionListener() {
+			final JMenuItem miHeliostatFermatSpiralArrays = new JMenuItem("Heliostat Spiral Layout...");
+			layoutMenu.add(miHeliostatFermatSpiralArrays);
+			miHeliostatFermatSpiralArrays.addActionListener(new ActionListener() {
 
 				private Foundation f;
 				private JComboBox<String> typeComboBox;
@@ -1219,47 +1219,47 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						f = (Foundation) selectedPart;
 						final int n = f.countParts(Mirror.class);
-						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " mirrors on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						if (n > 0 && JOptionPane.showConfirmDialog(MainFrame.getInstance(), "All existing " + n + " heliostats on this foundation must be removed before\na new layout can be applied. Do you want to continue?", "Confirmation", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
 							return;
 						}
 
 						final JPanel panel = new JPanel(new SpringLayout());
 						panel.add(new JLabel("Type:"));
 						typeComboBox = new JComboBox<String>(new String[] { "Fermat Spiral" });
-						typeComboBox.setSelectedIndex(mirrorSpiralFieldLayout.getType());
+						typeComboBox.setSelectedIndex(heliostatSpiralFieldLayout.getType());
 						panel.add(typeComboBox);
-						panel.add(new JLabel("Mirror Width:"));
-						final JTextField widthField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorWidth()));
+						panel.add(new JLabel("Aperture Width:"));
+						final JTextField widthField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getApertureWidth()));
 						panel.add(widthField);
-						panel.add(new JLabel("Mirror Height:"));
-						final JTextField heightField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getMirrorHeight()));
+						panel.add(new JLabel("Aperture Height:"));
+						final JTextField heightField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getApertureHeight()));
 						panel.add(heightField);
 						panel.add(new JLabel("Start Turn:"));
-						final JTextField startTurnField = new JTextField(mirrorSpiralFieldLayout.getStartTurn() + "");
+						final JTextField startTurnField = new JTextField(heliostatSpiralFieldLayout.getStartTurn() + "");
 						panel.add(startTurnField);
 						panel.add(new JLabel("Scaling Factor:"));
-						final JTextField scalingFactorField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getScalingFactor()));
+						final JTextField scalingFactorField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getScalingFactor()));
 						panel.add(scalingFactorField);
 						panel.add(new JLabel("Radial Spacing Increase Ratio:"));
-						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(mirrorSpiralFieldLayout.getRadialSpacingIncrement()));
+						final JTextField radialSpacingIncrementField = new JTextField(sixDecimalsFormat.format(heliostatSpiralFieldLayout.getRadialSpacingIncrement()));
 						panel.add(radialSpacingIncrementField);
 						panel.add(new JLabel("Start Angle (CCW from East):"));
-						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getStartAngle()));
+						final JTextField startAngleField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getStartAngle()));
 						panel.add(startAngleField);
 						panel.add(new JLabel("End Angle (CCW from East):"));
-						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getEndAngle()));
+						final JTextField endAngleField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getEndAngle()));
 						panel.add(endAngleField);
 						panel.add(new JLabel("Axis Road Width:"));
-						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getAxisRoadWidth()));
+						final JTextField axisRoadWidthField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getAxisRoadWidth()));
 						panel.add(axisRoadWidthField);
 						panel.add(new JLabel("Base Height:"));
-						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(mirrorSpiralFieldLayout.getBaseHeight()));
+						final JTextField baseHeightField = new JTextField(threeDecimalsFormat.format(heliostatSpiralFieldLayout.getBaseHeight()));
 						panel.add(baseHeightField);
 						SpringUtilities.makeCompactGrid(panel, 10, 2, 6, 6, 6, 6);
 
 						final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
 						final JOptionPane optionPane = new JOptionPane(panel, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Spiral Mirror Array Options");
+						final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Spiral Heliostat Array Options");
 
 						while (true) {
 							dialog.setVisible(true);
@@ -1269,42 +1269,42 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							} else {
 								boolean ok = true;
 								try {
-									mirrorSpiralFieldLayout.setMirrorWidth(Double.parseDouble(widthField.getText()));
-									mirrorSpiralFieldLayout.setMirrorHeight(Double.parseDouble(heightField.getText()));
-									mirrorSpiralFieldLayout.setStartTurn(Integer.parseInt(startTurnField.getText()));
-									mirrorSpiralFieldLayout.setScalingFactor(Double.parseDouble(scalingFactorField.getText()));
-									mirrorSpiralFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
-									mirrorSpiralFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
-									mirrorSpiralFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
-									mirrorSpiralFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
-									mirrorSpiralFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
+									heliostatSpiralFieldLayout.setApertureWidth(Double.parseDouble(widthField.getText()));
+									heliostatSpiralFieldLayout.setApertureHeight(Double.parseDouble(heightField.getText()));
+									heliostatSpiralFieldLayout.setStartTurn(Integer.parseInt(startTurnField.getText()));
+									heliostatSpiralFieldLayout.setScalingFactor(Double.parseDouble(scalingFactorField.getText()));
+									heliostatSpiralFieldLayout.setRadialSpacingIncrement(Double.parseDouble(radialSpacingIncrementField.getText()));
+									heliostatSpiralFieldLayout.setStartAngle(Double.parseDouble(startAngleField.getText()));
+									heliostatSpiralFieldLayout.setEndAngle(Double.parseDouble(endAngleField.getText()));
+									heliostatSpiralFieldLayout.setAxisRoadWidth(Double.parseDouble(axisRoadWidthField.getText()));
+									heliostatSpiralFieldLayout.setBaseHeight(Double.parseDouble(baseHeightField.getText()));
 								} catch (final NumberFormatException exception) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
 									ok = false;
 								}
 								if (ok) {
-									if (mirrorSpiralFieldLayout.getStartTurn() < 0) {
+									if (heliostatSpiralFieldLayout.getStartTurn() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start turn cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getScalingFactor() <= 0) {
+									} else if (heliostatSpiralFieldLayout.getScalingFactor() <= 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Scaling factor must be greater than zero.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getRadialSpacingIncrement() < 0) {
+									} else if (heliostatSpiralFieldLayout.getRadialSpacingIncrement() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Radial spacing increment ratio cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getAxisRoadWidth() < 0) {
+									} else if (heliostatSpiralFieldLayout.getAxisRoadWidth() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Axis road width cannot be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getStartAngle() < 0 || mirrorSpiralFieldLayout.getStartAngle() > 360) {
+									} else if (heliostatSpiralFieldLayout.getStartAngle() < 0 || heliostatSpiralFieldLayout.getStartAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Start angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getEndAngle() < 0 || mirrorSpiralFieldLayout.getEndAngle() > 360) {
+									} else if (heliostatSpiralFieldLayout.getEndAngle() < 0 || heliostatSpiralFieldLayout.getEndAngle() > 360) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be between 0 and 360 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getEndAngle() <= mirrorSpiralFieldLayout.getStartAngle()) {
+									} else if (heliostatSpiralFieldLayout.getEndAngle() <= heliostatSpiralFieldLayout.getStartAngle()) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "End angle must be greater than start angle.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getMirrorWidth() < 1 || mirrorSpiralFieldLayout.getMirrorWidth() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getMirrorHeight() < 1 || mirrorSpiralFieldLayout.getMirrorHeight() > 50) {
-										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-									} else if (mirrorSpiralFieldLayout.getBaseHeight() < 0) {
+									} else if (heliostatSpiralFieldLayout.getApertureWidth() < 1 || heliostatSpiralFieldLayout.getApertureWidth() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture width must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatSpiralFieldLayout.getApertureHeight() < 1 || heliostatSpiralFieldLayout.getApertureHeight() > 50) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Aperture height must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+									} else if (heliostatSpiralFieldLayout.getBaseHeight() < 0) {
 										JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base height can't be negative.", "Range Error", JOptionPane.ERROR_MESSAGE);
 									} else {
-										addSpiralMirrorArrays();
+										addSpiralHeliostatArrays();
 										if (choice == options[0]) {
 											break;
 										}
@@ -1315,14 +1315,14 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 
-				private void addSpiralMirrorArrays() {
-					mirrorSpiralFieldLayout.setType(typeComboBox.getSelectedIndex());
+				private void addSpiralHeliostatArrays() {
+					heliostatSpiralFieldLayout.setType(typeComboBox.getSelectedIndex());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							final int count = f.addSpiralMirrorArrays(mirrorSpiralFieldLayout);
+							final int count = f.addSpiralHeliostatArrays(heliostatSpiralFieldLayout);
 							if (count == 0) {
-								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Mirror array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat array can't be created. Check your parameters.", "Error", JOptionPane.ERROR_MESSAGE);
 							}
 							return null;
 						}
@@ -1777,15 +1777,15 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			final JMenu powerTowerLabelMenu = new JMenu("Power Tower");
 			labelMenu.add(powerTowerLabelMenu);
 
-			final JCheckBoxMenuItem miLabelNumberOfMirrors = new JCheckBoxMenuItem("Number of Mirrors");
-			miLabelNumberOfMirrors.addActionListener(new ActionListener() {
+			final JCheckBoxMenuItem miLabelNumberOfHeliostats = new JCheckBoxMenuItem("Number of Heliostats");
+			miLabelNumberOfHeliostats.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						final SetFoundationLabelCommand c = new SetFoundationLabelCommand(f);
-						f.setLabelNumberOfMirrors(miLabelNumberOfMirrors.isSelected());
+						f.setLabelNumberOfMirrors(miLabelNumberOfHeliostats.isSelected());
 						f.draw();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						Scene.getInstance().setEdited(true);
@@ -1793,7 +1793,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 				}
 			});
-			powerTowerLabelMenu.add(miLabelNumberOfMirrors);
+			powerTowerLabelMenu.add(miLabelNumberOfHeliostats);
 
 			final JCheckBoxMenuItem miLabelPowerTowerHeight = new JCheckBoxMenuItem("Tower Height");
 			miLabelPowerTowerHeight.addActionListener(new ActionListener() {
@@ -1853,7 +1853,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						Util.selectSilently(miLabelId, f.getLabelId());
 						Util.selectSilently(miLabelPowerTowerOutput, f.getLabelPowerTowerOutput());
 						Util.selectSilently(miLabelPowerTowerHeight, f.getLabelPowerTowerHeight());
-						Util.selectSilently(miLabelNumberOfMirrors, f.getLabelNumberOfMirrors());
+						Util.selectSilently(miLabelNumberOfHeliostats, f.getLabelNumberOfMirrors());
 						Util.selectSilently(miLabelSolarPotential, f.getLabelSolarPotential());
 						Util.selectSilently(miLabelPvEnergy, f.getLabelPvEnergy());
 						Util.selectSilently(miLabelNumberOfSolarPanels, f.getLabelNumberOfSolarPanels());
@@ -1990,17 +1990,17 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			});
 			subMenu.add(mi);
 
-			subMenu = new JMenu("Mirrors (Heliostats)");
+			subMenu = new JMenu("Heliostats");
 			analysisMenu.add(subMenu);
 
-			mi = new JMenuItem("Daily Mirror Yield Analysis...");
+			mi = new JMenuItem("Daily Heliostat Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
 						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
 						if (f.countParts(Mirror.class) <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 						final HeliostatDailyAnalysis a = new HeliostatDailyAnalysis();
@@ -2013,7 +2013,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			});
 			subMenu.add(mi);
 
-			mi = new JMenuItem("Annual Mirror Yield Analysis...");
+			mi = new JMenuItem("Annual Heliostat Yield Analysis...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -2021,7 +2021,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					if (selectedPart instanceof Foundation) {
 						final Foundation f = (Foundation) selectedPart;
 						if (f.countParts(Mirror.class) <= 0) {
-							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no mirror on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
 						new HeliostatAnnualAnalysis().show();

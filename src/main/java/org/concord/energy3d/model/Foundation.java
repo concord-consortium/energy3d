@@ -1916,6 +1916,30 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return list;
 	}
 
+	public Mirror getNearestHeliostat(final Mirror mirror) {
+		if (mirror.getTopContainer() != this) {
+			return null;
+		}
+		final List<Mirror> mirrors = getHeliostats();
+		if (mirrors.isEmpty() || (mirrors.size() == 1 && mirrors.get(0) == mirror)) {
+			return null;
+		}
+		Mirror nearest = null;
+		double dmin = Double.MAX_VALUE;
+		final Vector3 o = mirror.getAbsCenter();
+		double d;
+		for (final Mirror m : mirrors) {
+			if (m != mirror) {
+				d = m.getAbsCenter().distanceSquared(o);
+				if (d < dmin) {
+					dmin = d;
+					nearest = m;
+				}
+			}
+		}
+		return nearest;
+	}
+
 	public List<ParabolicTrough> getParabolicTroughs() {
 		final List<ParabolicTrough> list = new ArrayList<ParabolicTrough>();
 		for (final HousePart p : children) {
@@ -2165,14 +2189,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		m.draw();
 	}
 
-	public int addCircularMirrorArrays(final MirrorCircularFieldLayout layout) {
+	public int addCircularHeliostatArrays(final HeliostatCircularFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
 		final Vector3 center = getAbsCenter();
-		final double w = (layout.getMirrorWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getAnnotationScale();
-		final double h = (layout.getMirrorHeight() + layout.getRadialSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double w = (layout.getApertureWidth() + layout.getAzimuthalSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double h = (layout.getApertureHeight() + layout.getRadialSpacing()) / Scene.getInstance().getAnnotationScale();
 		final double rows = a / h;
 		final int nrows = (int) (rows > 2 ? rows - 2 : rows);
 		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
@@ -2194,14 +2218,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 							continue;
 						}
 						final Vector3 p = new Vector3(center.getX() + b * Math.cos(theta), center.getY() + b * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
 					}
 				}
 			}
 			break;
 		case RADIAL_STAGGER: // http://www.powerfromthesun.net/Book/chapter10/chapter10.html#10.1.3%20%20%20Field%20Layout
 			final double rmin = a * (1.0 - (nrows - 5) / rows);
-			final int n = (int) (rmin / layout.getMirrorWidth() * Scene.getInstance().getAnnotationScale());
+			final int n = (int) (rmin / layout.getApertureWidth() * Scene.getInstance().getAnnotationScale());
 			for (int i = 0; i < n; i++) {
 				double theta = i * 2.0 * Math.PI / n;
 				double az = Math.toDegrees(theta);
@@ -2209,7 +2233,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows);
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
 					}
 				}
 				theta = (i + 0.5) * 2.0 * Math.PI / n;
@@ -2218,7 +2242,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					for (int j = 0; j < nrows; j++) {
 						final double r = a * (1.0 - j / rows) - 0.5 * h;
 						final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-						addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+						addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
 					}
 				}
 			}
@@ -2234,12 +2258,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return countParts(Mirror.class);
 	}
 
-	public int addSpiralMirrorArrays(final MirrorSpiralFieldLayout layout) {
+	public int addSpiralHeliostatArrays(final HeliostatSpiralFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
 		final double a = 0.5 * Math.min(getAbsPoint(0).distance(getAbsPoint(2)), getAbsPoint(0).distance(getAbsPoint(1)));
-		final double b = layout.getScalingFactor() * Math.max(layout.getMirrorWidth(), layout.getMirrorHeight()) / Scene.getInstance().getAnnotationScale();
+		final double b = layout.getScalingFactor() * Math.max(layout.getApertureWidth(), layout.getApertureHeight()) / Scene.getInstance().getAnnotationScale();
 		final Vector3 center = getAbsCenter();
 		final double theta0 = layout.getStartTurn() * 2 * Math.PI;
 		final double roadHalfWidth = 0.5 * layout.getAxisRoadWidth() / Scene.getInstance().getAnnotationScale();
@@ -2263,7 +2287,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 						continue;
 					}
 					final Vector3 p = new Vector3(center.getX() + r * Math.cos(theta), center.getY() + r * Math.sin(theta), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
 				}
 			}
 			break;
@@ -2278,7 +2302,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return countParts(Mirror.class);
 	}
 
-	public int addRectangularMirrorArrays(final MirrorRectangularFieldLayout layout) {
+	public int addRectangularHeliostatArrays(final HeliostatRectangularFieldLayout layout) {
 		EnergyPanel.getInstance().updateRadiationHeatMap();
 		final Class<?>[] clazz = new Class[] { Mirror.class };
 		final AddArrayCommand command = new AddArrayCommand(removeChildrenOfClass(clazz), this, clazz);
@@ -2291,8 +2315,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final double b = p0.distance(getAbsPoint(1));
 		final double x0 = Math.min(Math.min(p0.getX(), getAbsPoint(1).getX()), getAbsPoint(2).getX());
 		final double y0 = Math.min(Math.min(p0.getY(), getAbsPoint(1).getY()), getAbsPoint(2).getY());
-		final double w = (layout.getMirrorWidth() + layout.getColumnSpacing()) / Scene.getInstance().getAnnotationScale();
-		final double h = (layout.getMirrorHeight() + layout.getRowSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double w = (layout.getApertureWidth() + layout.getColumnSpacing()) / Scene.getInstance().getAnnotationScale();
+		final double h = (layout.getApertureHeight() + layout.getRowSpacing()) / Scene.getInstance().getAnnotationScale();
 		switch (layout.getRowAxis()) {
 		case 0: // north-south axis
 			int rows = (int) Math.floor(b / w);
@@ -2300,7 +2324,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + h * (c + 0.5), y0 + w * (r + 0.5), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
 				}
 			}
 			break;
@@ -2310,7 +2334,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (int c = 0; c < cols; c++) {
 				for (int r = 0; r < rows; r++) {
 					final Vector3 p = new Vector3(x0 + w * (r + 0.5), y0 + h * (c + 0.5), 0);
-					addMirror(p, layout.getBaseHeight(), layout.getMirrorWidth(), layout.getMirrorHeight(), az);
+					addMirror(p, layout.getBaseHeight(), layout.getApertureWidth(), layout.getApertureHeight(), az);
 				}
 			}
 			break;

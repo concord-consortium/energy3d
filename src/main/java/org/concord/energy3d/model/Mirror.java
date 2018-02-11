@@ -410,35 +410,65 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		if (check) {
 			normal = container.getNormal();
 			if (container instanceof Foundation) {
-				final Vector3 p0 = container.getAbsPoint(0);
-				final Vector3 p1 = container.getAbsPoint(1);
-				final Vector3 p2 = container.getAbsPoint(2);
-				final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
-				final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
-				final double length = (1 + layoutGap) * mirrorWidth / Scene.getInstance().getAnnotationScale();
-				final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
-				final double tx = length / p0.distance(p2);
-				final double ty = length / p0.distance(p1);
-				final double lx = s * v.getX() * tx;
-				final double ly = s * v.getY() * ty;
-				final double newX = points.get(0).getX() + lx;
-				if (newX > 1 - tx || newX < tx) {
-					return null;
-				}
-				final double newY = points.get(0).getY() + ly;
-				if (newY > 1 - ty || newY < ty) {
-					return null;
-				}
-				c.points.get(0).setX(newX);
-				c.points.get(0).setY(newY);
-				final double o = c.overlap();
-				if (o >= 0) {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new mirror is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+				if (!isPositionLegal(c, (Foundation) container)) {
 					return null;
 				}
 			}
 		}
 		return c;
+	}
+
+	private boolean isPositionLegal(final Mirror copy, final Foundation foundation) {
+		final Vector3 p0 = container.getAbsPoint(0);
+		final Vector3 p1 = container.getAbsPoint(1);
+		final Vector3 p2 = container.getAbsPoint(2);
+		boolean defaultPositioning = true;
+		final Mirror nearest = foundation.getNearestHeliostat(this);
+		if (nearest != null) {
+			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
+			final double distance = d.length();
+			if (distance < mirrorWidth * 10 / Scene.getInstance().getAnnotationScale()) {
+				defaultPositioning = false;
+				final double tx = d.getX() / p0.distance(p2);
+				final double ty = d.getY() / p0.distance(p1);
+				final double newX = points.get(0).getX() + tx;
+				if (newX > 1 - tx || newX < tx) {
+					return false;
+				}
+				final double newY = points.get(0).getY() + ty;
+				if (newY > 1 - ty || newY < ty) {
+					return false;
+				}
+				copy.points.get(0).setX(newX);
+				copy.points.get(0).setY(newY);
+			}
+		}
+		if (defaultPositioning) {
+			final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
+			final Vector3 v = new Vector3(Math.cos(a), Math.sin(a), 0);
+			final double length = (1 + layoutGap) * mirrorWidth * 2 / Scene.getInstance().getAnnotationScale();
+			final double s = Math.signum(container.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
+			final double tx = length / p0.distance(p2);
+			final double ty = length / p0.distance(p1);
+			final double lx = s * v.getX() * tx;
+			final double ly = s * v.getY() * ty;
+			final double newX = points.get(0).getX() + lx;
+			if (newX > 1 - tx || newX < tx) {
+				return false;
+			}
+			final double newY = points.get(0).getY() + ly;
+			if (newY > 1 - ty || newY < ty) {
+				return false;
+			}
+			copy.points.get(0).setX(newX);
+			copy.points.get(0).setY(newY);
+		}
+		final double o = copy.overlap();
+		if (o >= 0) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new heliostat is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
 	}
 
 	/** a number between 0 and 1 */

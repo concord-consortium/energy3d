@@ -4,7 +4,7 @@ package org.concord.energy3d.model;
  * @author Charles Xie
  *
  */
-public class MirrorCircularFieldLayout extends MirrorFieldLayout {
+public class HeliostatCircularFieldLayout extends HeliostatFieldLayout {
 
 	private double radialSpacing = 1;
 	private double radialSpacingIncrement = 0;

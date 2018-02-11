@@ -4,7 +4,7 @@ package org.concord.energy3d.model;
  * @author Charles Xie
  *
  */
-public class MirrorSpiralFieldLayout extends MirrorFieldLayout {
+public class HeliostatSpiralFieldLayout extends HeliostatFieldLayout {
 
 	private int type = Foundation.FERMAT_SPIRAL;
 	private int startTurn = 10;

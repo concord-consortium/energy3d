@@ -4,7 +4,7 @@ package org.concord.energy3d.model;
  * @author Charles Xie
  *
  */
-public class MirrorRectangularFieldLayout extends MirrorFieldLayout {
+public class HeliostatRectangularFieldLayout extends HeliostatFieldLayout {
 
 	private double rowSpacing = 1;
 	private double columnSpacing = 1;

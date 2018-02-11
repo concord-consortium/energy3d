@@ -344,7 +344,7 @@ public class MainPanel extends JPanel {
 		// create solar menu
 		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Panel Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
 		final JCheckBoxMenuItem miSolarPanel = new JCheckBoxMenuItem("Single Solar Panel", new ImageIcon(getClass().getResource("icons/solar_panel.png")));
-		final JCheckBoxMenuItem miMirror = new JCheckBoxMenuItem("Planar Mirror (Heliostat)", new ImageIcon(getClass().getResource("icons/mirror.png")));
+		final JCheckBoxMenuItem miHeliostat = new JCheckBoxMenuItem("Heliostat", new ImageIcon(getClass().getResource("icons/mirror.png")));
 		final JCheckBoxMenuItem miParabolicTrough = new JCheckBoxMenuItem("Parabolic Trough", new ImageIcon(getClass().getResource("icons/parabolic_trough.png")));
 		final JCheckBoxMenuItem miParabolicDish = new JCheckBoxMenuItem("Parabolic Dish", new ImageIcon(getClass().getResource("icons/parabolic_dish.png")));
 		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
@@ -362,9 +362,9 @@ public class MainPanel extends JPanel {
 				} else if (selected == miRack) {
 					solaCommand = SceneManager.Operation.DRAW_RACK;
 					solarButton.setToolTipText("Insert a rack of solar panels");
-				} else if (selected == miMirror) {
+				} else if (selected == miHeliostat) {
 					solaCommand = SceneManager.Operation.DRAW_MIRROR;
-					solarButton.setToolTipText("Insert a mirror (heliostat)");
+					solarButton.setToolTipText("Insert a heliostat");
 				} else if (selected == miParabolicTrough) {
 					solaCommand = SceneManager.Operation.DRAW_PARABOLIC_TROUGH;
 					solarButton.setToolTipText("Insert a parabolic trough");
@@ -388,7 +388,7 @@ public class MainPanel extends JPanel {
 		};
 		miSolarPanel.addActionListener(solarAction);
 		miRack.addActionListener(solarAction);
-		miMirror.addActionListener(solarAction);
+		miHeliostat.addActionListener(solarAction);
 		miParabolicTrough.addActionListener(solarAction);
 		miParabolicDish.addActionListener(solarAction);
 		miFresnelReflector.addActionListener(solarAction);
@@ -398,7 +398,7 @@ public class MainPanel extends JPanel {
 		solaMenu.add(miRack);
 		solaMenu.add(miSolarPanel);
 		solaMenu.addSeparator();
-		solaMenu.add(miMirror);
+		solaMenu.add(miHeliostat);
 		solaMenu.add(miParabolicTrough);
 		solaMenu.add(miParabolicDish);
 		solaMenu.add(miFresnelReflector);
@@ -408,7 +408,7 @@ public class MainPanel extends JPanel {
 		bg = new ButtonGroup();
 		bg.add(miSolarPanel);
 		bg.add(miRack);
-		bg.add(miMirror);
+		bg.add(miHeliostat);
 		bg.add(miParabolicTrough);
 		bg.add(miParabolicDish);
 		bg.add(miFresnelReflector);
