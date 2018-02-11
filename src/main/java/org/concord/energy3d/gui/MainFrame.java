@@ -138,6 +138,7 @@ import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Printout;
 import org.concord.energy3d.util.Util;
+import org.concord.energy3d.util.VsgSubmitter;
 import org.concord.energy3d.util.WallVisitor;
 
 import com.ardor3d.math.ColorRGBA;
@@ -1313,10 +1314,11 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getSubmitToVsgMenuItem() {
 		if (submitToVsgMenuItem == null) {
-			submitToVsgMenuItem = new JMenuItem("Submit to Virtual Solar Grid...");
+			submitToVsgMenuItem = new JMenuItem("Submit...");
 			submitToVsgMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					VsgSubmitter.submit();
 				}
 			});
 		}

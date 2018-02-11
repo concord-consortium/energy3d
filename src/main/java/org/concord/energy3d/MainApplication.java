@@ -16,9 +16,6 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import org.concord.energy3d.agents.Agent;
-import org.concord.energy3d.agents.ConformanceChecker;
-import org.concord.energy3d.agents.EventMinerSheet2;
-import org.concord.energy3d.agents.EventMinerSheet3;
 import org.concord.energy3d.agents.MyEvent;
 import org.concord.energy3d.etc.oneinstance.OneInstance;
 import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
@@ -68,9 +65,9 @@ public class MainApplication {
 
 		agents = new ArrayList<Agent>();
 		// TODO: temporary test code below
-		agents.add(new ConformanceChecker("Conformance Checker"));
-		agents.add(new EventMinerSheet2("Event Miner Sheet 2"));
-		agents.add(new EventMinerSheet3("Event Miner Sheet 3"));
+		// agents.add(new ConformanceChecker("Conformance Checker"));
+		// agents.add(new EventMinerSheet2("Event Miner Sheet 2"));
+		// agents.add(new EventMinerSheet3("Event Miner Sheet 3"));
 
 		final File testFile = new File(System.getProperty("user.dir"), "test.txt");
 		// can't use File.canWrite() to check if we can write a file to this folder. So we have to walk extra miles as follows.
