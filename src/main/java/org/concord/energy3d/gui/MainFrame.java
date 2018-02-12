@@ -1186,11 +1186,11 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			mi = new JMenuItem("View Sites...");
+			mi = new JMenuItem("Visit Virtual Solar Grid...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d/sites.html");
+					Util.openBrowser("http://energy.concord.org/energy3d/vsg/syw.html");
 				}
 			});
 			helpMenu.add(mi);
@@ -1315,7 +1315,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getSubmitToVsgMenuItem() {
 		if (submitToVsgMenuItem == null) {
-			submitToVsgMenuItem = new JMenuItem("Submit...");
+			submitToVsgMenuItem = new JMenuItem("Submit to Virtual Solar Grid...");
 			submitToVsgMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

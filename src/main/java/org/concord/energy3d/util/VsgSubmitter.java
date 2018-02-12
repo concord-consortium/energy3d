@@ -135,7 +135,7 @@ public class VsgSubmitter {
 		multipart.addFormField("user_name", System.getProperty("user.name"));
 		multipart.addFormField("os_version", System.getProperty("os.version"));
 		multipart.addFormField("energy3d_version", MainApplication.VERSION);
-		multipart.addFormField("information", info);
+		multipart.addFormField("data", info);
 		if (!Scene.isInternalFile() && currentFile != null) {
 			multipart.addFilePart("model", currentFile);
 		}
