@@ -326,11 +326,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		}
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
-
-		normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalize(null);
-		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
-			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
-		}
+		final double az = Math.toRadians(relativeAzimuth);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		reflector.setSize(apertureWidth / annotationScale, troughLength / annotationScale);
@@ -413,11 +409,14 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 
 		modulesRoot.detachAllChildren();
 		if (nModules > 1) {
+			final Vector3 qd = new Matrix3().applyRotationZ(-az).applyPost(pd, null);
 			for (double u = moduleLength; u < troughLength; u += moduleLength) {
-				final Vector3 p = pd.multiply((u - halfLength) / annotationScale, null);
+				final double step = (u - halfLength) / annotationScale;
+				final Vector3 p = pd.multiply(step, null);
 				steelFrameBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 				steelFrameBuffer.put(p.getXf()).put(p.getYf()).put((float) (p.getZ() + 0.5 * reflector.getSemilatusRectum()));
-				addPole(p.addLocal(center), baseHeight, baseZ);
+				final Vector3 q = qd.multiply(step, null);
+				addPole(q.addLocal(center), baseHeight, baseZ);
 			}
 			steelFrameBuffer.limit((nModules - 1) * 6);
 			steelFrame.getSceneHints().setCullHint(CullHint.Inherit);
@@ -427,20 +426,25 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		}
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
-		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
-		if (!Util.isZero(relativeAzimuth)) {
-			// rotation.applyRotationZ(Math.toRadians(relativeAzimuth));
+		final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 troughAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
+		troughAxis.multiplyLocal(sunDirection.dot(troughAxis));
+		normal = sunDirection.subtractLocal(troughAxis).normalizeLocal();
+		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
+		final Matrix3 rotation = new Matrix3().lookAt(normal, troughAxis);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
 		reflectorBack.setRotation(rotation);
 		reflectorBack.setTranslation(mesh.getTranslation());
 		outlines.setRotation(rotation);
 		outlines.setTranslation(mesh.getTranslation());
-		absorber.setRotation(new Matrix3().applyRotationX(Math.PI / 2));
-		absorber.setTranslation(mesh.getTranslation().add(n.multiply(0.5 * reflector.getSemilatusRectum(), null), null));
-		final Vector3 endShift = n.multiply(0.5 * absorberEnd1.getHeight(), null);
+
+		final Vector3 axis = troughAxis.cross(Vector3.UNIT_Z, null);
+		absorber.setRotation(new Matrix3().fromAngleAxis(Math.acos(troughAxis.dot(Vector3.UNIT_Z)), axis));
+		absorber.setTranslation(mesh.getTranslation().add(normal.multiply(0.5 * reflector.getSemilatusRectum(), null), null));
+		final Vector3 endShift = normal.multiply(0.5 * absorberEnd1.getHeight(), null);
 		absorberEnd1.setTranslation(mesh.getTranslation().add(p1.add(endShift, null), null));
 		absorberEnd2.setTranslation(mesh.getTranslation().add(p2.add(endShift, null), null));
 		absorberEnd1.setRotation(rotation);
