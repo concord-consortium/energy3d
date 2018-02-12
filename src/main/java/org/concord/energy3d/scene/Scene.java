@@ -3003,6 +3003,16 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setAzimuthForAllFresnelReflectors(final double angle) {
+		for (final HousePart p : parts) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setBaseHeightForAllFresnelReflectors(final double baseHeight) {
 		for (final HousePart p : parts) {
 			if (p instanceof FresnelReflector) {

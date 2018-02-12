@@ -26,14 +26,18 @@ import javax.swing.JTextField;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.FresnelReflectorAnnualAnalysis;
 import org.concord.energy3d.simulation.FresnelReflectorDailyAnalysis;
 import org.concord.energy3d.undo.ChangeAbsorberForAllFresnelReflectorsCommand;
+import org.concord.energy3d.undo.ChangeAzimuthCommand;
+import org.concord.energy3d.undo.ChangeAzimuthForAllFresnelReflectorsCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorAbsorberCommand;
+import org.concord.energy3d.undo.ChangeFoundationFresnelReflectorAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeFresnelReflectorAbsorberCommand;
@@ -811,6 +815,133 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
+			miAzimuth.setEnabled(false);
+			miAzimuth.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof FresnelReflector)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final FresnelReflector fresnel = (FresnelReflector) selectedPart;
+					final Foundation foundation = fresnel.getTopContainer();
+					final String title = "<html>Azimuth Angle (&deg;) of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The azimuth angle is measured clockwise from the true north.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Fresnel Reflector", true);
+					final JRadioButton rb2 = new JRadioButton("All Fresnel Reflectors on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Fresnel Reflectors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					double a = fresnel.getRelativeAzimuth() + foundation.getAzimuth();
+					if (a > 360) {
+						a -= 360;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(a));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Fresnel Reflector Azimuth");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								a = val - foundation.getAzimuth();
+								if (a < 0) {
+									a += 360;
+								}
+								boolean changed = Math.abs(a - fresnel.getRelativeAzimuth()) > 0.000001;
+								if (rb1.isSelected()) {
+									if (changed) {
+										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(fresnel);
+										fresnel.setRelativeAzimuth(a);
+										fresnel.draw();
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									selectedScopeIndex = 0;
+								} else if (rb2.isSelected()) {
+									if (!changed) {
+										for (final FresnelReflector x : foundation.getFresnelReflectors()) {
+											if (Math.abs(a - x.getRelativeAzimuth()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationFresnelReflectorAzimuthCommand c = new ChangeFoundationFresnelReflectorAzimuthCommand(foundation);
+										foundation.setAzimuthForParabolicFresnelReflectors(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									selectedScopeIndex = 1;
+								} else if (rb3.isSelected()) {
+									if (!changed) {
+										for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+											if (Math.abs(a - x.getRelativeAzimuth()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+									}
+									if (changed) {
+										final ChangeAzimuthForAllFresnelReflectorsCommand c = new ChangeAzimuthForAllFresnelReflectorsCommand();
+										Scene.getInstance().setAzimuthForAllFresnelReflectors(a);
+										SceneManager.getInstance().getUndoManager().addEdit(c);
+									}
+									selectedScopeIndex = 2;
+								}
+								if (changed) {
+									updateAfterEdit();
+								}
+								if (choice == options[0]) {
+									break;
+								}
+							}
+						}
+					}
+				}
+			});
+
 			final JMenu labelMenu = new JMenu("Label");
 
 			final JCheckBoxMenuItem miLabelNone = new JCheckBoxMenuItem("None", true);
@@ -1100,6 +1231,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			popupMenuForFresnelReflector.add(miModuleWidth);
 			popupMenuForFresnelReflector.add(miModuleLength);
 			popupMenuForFresnelReflector.add(miBaseHeight);
+			popupMenuForFresnelReflector.add(miAzimuth);
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miReflectance);
 			popupMenuForFresnelReflector.add(miConversionEfficiency);

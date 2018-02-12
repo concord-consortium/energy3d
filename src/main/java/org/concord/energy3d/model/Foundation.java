@@ -3179,6 +3179,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	// change properties of all the Fresnel reflectors on this foundation
 
+	public void setAzimuthForParabolicFresnelReflectors(final double angle) {
+		for (final HousePart p : children) {
+			if (p instanceof FresnelReflector) {
+				((FresnelReflector) p).setRelativeAzimuth(angle);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setBaseHeightForFresnelReflectors(final double baseHeight) {
 		for (final HousePart p : children) {
 			if (p instanceof FresnelReflector) {
