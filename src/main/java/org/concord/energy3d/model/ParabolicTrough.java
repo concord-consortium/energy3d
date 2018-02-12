@@ -428,7 +428,8 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 
 		final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 		final Vector3 troughAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
-		troughAxis.multiplyLocal(sunDirection.dot(troughAxis));
+		final double troughSunDot = sunDirection.dot(troughAxis);
+		troughAxis.multiplyLocal(Util.isZero(troughSunDot) ? 0.001 : troughSunDot); // avoid singularity when the direction of the sun is perpendicular to the axis of the trough
 		normal = sunDirection.subtractLocal(troughAxis).normalizeLocal();
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
@@ -445,8 +446,8 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		absorber.setRotation(new Matrix3().fromAngleAxis(Math.acos(troughAxis.dot(Vector3.UNIT_Z)), axis));
 		absorber.setTranslation(mesh.getTranslation().add(normal.multiply(0.5 * reflector.getSemilatusRectum(), null), null));
 		final Vector3 endShift = normal.multiply(0.5 * absorberEnd1.getHeight(), null);
-		absorberEnd1.setTranslation(mesh.getTranslation().add(p1.add(endShift, null), null));
-		absorberEnd2.setTranslation(mesh.getTranslation().add(p2.add(endShift, null), null));
+		absorberEnd1.setTranslation(mesh.getTranslation().add(rotation.applyPost(p1, null).add(endShift, null), null));
+		absorberEnd2.setTranslation(mesh.getTranslation().add(rotation.applyPost(p2, null).add(endShift, null), null));
 		absorberEnd1.setRotation(rotation);
 		absorberEnd2.setRotation(rotation);
 		steelFrame.setRotation(rotation);
