@@ -2,10 +2,13 @@ package org.concord.energy3d.gui;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -23,6 +26,7 @@ import javax.imageio.ImageIO;
 import javax.net.ssl.SSLKeyException;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,6 +45,7 @@ import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.LocationData;
 import org.concord.energy3d.util.ClipImage;
+import org.concord.energy3d.util.Util;
 
 import com.ardor3d.math.MathUtils;
 
@@ -49,33 +54,68 @@ class MapDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
+	private static int extent = 0;
 	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA");
 	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.000001)); // spinner tick must go down to 10^-6 in order to avoid seam lines at zoom level 20
 	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.000001));
 	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
+	private final JComboBox<String> resolutionOptionComboBox = new JComboBox<String>(new String[] { "1\u00D71", "3\u00D73", "5\u00D75" });
 	private final MapImageView mapImageView = new MapImageView();
 	private static MapDialog instance;
 	private volatile boolean lock;
 	private MapLoader mapLoader;
 
 	class MapLoader extends SwingWorker<BufferedImage, Void> {
-		private final boolean export;
-		private final String googleMapUrl;
 
-		public MapLoader(final boolean export) {
+		private final boolean export;
+		private final double lat, lng, latWindow, lngWindow;
+		private final int zoom, w, h;
+		private int extent = 0;
+
+		public MapLoader(final boolean export, final int extent) {
 			if (mapLoader != null) {
 				mapLoader.cancel(true);
 			}
+			this.extent = extent;
 			this.export = export;
-			googleMapUrl = MapImageView.getGoogleMapUrl("satellite", (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue(), mapImageView.getPreferredSize().width, mapImageView.getPreferredSize().height);
+			lng = (Double) longitudeSpinner.getValue();
+			lat = (Double) latitudeSpinner.getValue();
+			zoom = (Integer) zoomSpinner.getValue();
+			w = mapImageView.getPreferredSize().width;
+			h = mapImageView.getPreferredSize().height;
+			lngWindow = 360.0 / Math.pow(2, zoom + 8) * h;
+			latWindow = lngWindow * Math.cos(Math.toRadians(lat));
 			mapImageView.setText("Loading...");
 			mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
 
 		@Override
 		protected BufferedImage doInBackground() throws Exception {
-			return ImageIO.read(new URL(googleMapUrl));
-
+			if (extent <= 0) {
+				final String url = MapImageView.getGoogleMapUrl("satellite", lat, lng, zoom, w, h);
+				return ImageIO.read(new URL(url));
+			}
+			final int size = 2 * extent + 1;
+			final BufferedImage[] images = new BufferedImage[size * size];
+			int index = 0;
+			for (int i = -extent; i <= extent; i++) {
+				for (int j = -extent; j <= extent; j++) {
+					final String url = MapImageView.getGoogleMapUrl("satellite", lat + i * latWindow, lng + j * lngWindow, zoom, w, h);
+					images[index++] = ImageIO.read(new URL(url));
+				}
+			}
+			final int patchWidth = images[0].getWidth();
+			final int patchHeight = images[0].getHeight();
+			final BufferedImage fullImage = new BufferedImage(patchWidth * size, patchHeight * size, images[0].getType());
+			final Graphics2D g2 = fullImage.createGraphics();
+			index = 0;
+			for (int i = 0; i < size; i++) {
+				for (int j = 0; j < size; j++) {
+					g2.drawImage(images[index++], null, j * patchWidth, (size - i - 1) * patchHeight);
+				}
+			}
+			g2.dispose();
+			return fullImage;
 		}
 
 		@Override
@@ -83,20 +123,18 @@ class MapDialog extends JDialog {
 			try {
 				final BufferedImage mapImage = get();
 				if (export) {
-					final double lat = (Double) latitudeSpinner.getValue();
-					final double lon = (Double) longitudeSpinner.getValue();
-					Scene.getInstance().setGeoLocation(lat, lon, (Integer) zoomSpinner.getValue(), addressField.getText());
+					Scene.getInstance().setGeoLocation(lat, lng, zoom, addressField.getText());
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() {
-							Scene.getInstance().setGroundImage(mapImage, getScale());
+							Scene.getInstance().setGroundImage(mapImage, getScale() * (2 * extent + 1));
 							Scene.getInstance().setGroundImageEarthView(true);
 							Scene.getInstance().setEdited(true);
 							return null;
 						}
 					});
 					setVisible(false);
-					final String closestCity = LocationData.getInstance().getClosestCity(lon, lat);
+					final String closestCity = LocationData.getInstance().getClosestCity(lng, lat);
 					if (closestCity != null) {
 						EnergyPanel.getInstance().getCityComboBox().setSelectedItem(closestCity);
 					}
@@ -231,6 +269,20 @@ class MapDialog extends JDialog {
 				updateMap();
 			}
 		});
+		resolutionOptionComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if ((Integer) zoomSpinner.getValue() < 14) {
+						JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large to apply this option.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
+						Util.selectSilently(resolutionOptionComboBox, 0);
+						return;
+					}
+					extent = resolutionOptionComboBox.getSelectedIndex();
+					updateMap();
+				}
+			}
+		});
 		addressField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -285,7 +337,7 @@ class MapDialog extends JDialog {
 					JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large. Please zoom in and try again.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				mapLoader = new MapLoader(true);
+				mapLoader = new MapLoader(true, extent);
 				mapLoader.execute();
 			}
 		});
@@ -296,6 +348,8 @@ class MapDialog extends JDialog {
 				setVisible(false);
 			}
 		});
+		bottomPanel.add(new JLabel("Resolution:"));
+		bottomPanel.add(resolutionOptionComboBox);
 		final JButton imageButton = new JButton("Copy Image");
 		imageButton.addActionListener(new ActionListener() {
 			@Override
@@ -303,9 +357,9 @@ class MapDialog extends JDialog {
 				new ClipImage().copyImageToClipboard(mapImageView);
 			}
 		});
+		bottomPanel.add(imageButton);
 		bottomPanel.add(okButton);
 		bottomPanel.add(cancelButton);
-		bottomPanel.add(imageButton);
 		getContentPane().add(bottomPanel);
 		updateMap();
 		pack();
@@ -323,7 +377,7 @@ class MapDialog extends JDialog {
 	}
 
 	private void updateMap() {
-		mapLoader = new MapLoader(false);
+		mapLoader = new MapLoader(false, extent);
 		mapLoader.execute();
 	}
 
