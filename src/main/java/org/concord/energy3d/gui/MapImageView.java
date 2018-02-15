@@ -31,6 +31,7 @@ class MapImageView extends JComponent {
 	MapImageView() {
 		super();
 		setFocusable(true);
+		setBackground(Color.BLACK);
 		setRequestFocusEnabled(true);
 		setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		point = new Point();
@@ -70,6 +71,8 @@ class MapImageView extends JComponent {
 		final Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+		g2.setColor(getBackground());
+		g2.fillRect(0, 0, getWidth(), getHeight());
 		if (image != null) {
 			g2.drawImage(image, 0, 0, this);
 		}

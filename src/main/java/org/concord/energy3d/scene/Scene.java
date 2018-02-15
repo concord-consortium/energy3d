@@ -176,6 +176,7 @@ public class Scene implements Serializable {
 	private boolean hideGroundImage;
 	private boolean groundImageIsEarthView;
 	private boolean groundImageLightColored; // a parameter that user can choose to improve the contrast of edit points etc. (i.e., no white on white)
+	private int groundImageExtent = 0;
 	private transient List<List<Foundation>> foundationGroups;
 	private String[] instructionSheetText;
 	private String[] instructionSheetTextType;
@@ -3809,6 +3810,14 @@ public class Scene implements Serializable {
 
 	public boolean isGroundImageLightColored() {
 		return groundImageLightColored;
+	}
+
+	public void setGroundImageExtent(final int groundImageExtent) {
+		this.groundImageExtent = groundImageExtent;
+	}
+
+	public int getGroundImageExtent() {
+		return groundImageExtent;
 	}
 
 	/** used by SnapshotLogger */

@@ -18,6 +18,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -54,18 +55,18 @@ class MapDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
-	private static int extent = 0;
 	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA");
 	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.000001)); // spinner tick must go down to 10^-6 in order to avoid seam lines at zoom level 20
 	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.000001));
 	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
-	private final JComboBox<String> resolutionOptionComboBox = new JComboBox<String>(new String[] { "1\u00D71", "3\u00D73", "5\u00D75" });
+	private final JComboBox<String> resolutionOptionComboBox = new JComboBox<String>(new String[] { "1\u00D71", "3\u00D73", "5\u00D75", "7\u00D77", "9\u00D79" });
 	private final MapImageView mapImageView = new MapImageView();
 	private static MapDialog instance;
 	private volatile boolean lock;
 	private MapLoader mapLoader;
+	private int extent = 0;
 
-	class MapLoader extends SwingWorker<BufferedImage, Void> {
+	class MapLoader extends SwingWorker<BufferedImage, Integer> {
 
 		private final boolean export;
 		private final double lat, lng, latWindow, lngWindow;
@@ -90,6 +91,13 @@ class MapDialog extends JDialog {
 		}
 
 		@Override
+		protected void process(final List<Integer> chunks) {
+			final int i = chunks.get(chunks.size() - 1);
+			mapImageView.setText("Loading " + i + "%..."); // The last value in this array is all we care about.
+			mapImageView.repaint();
+		}
+
+		@Override
 		protected BufferedImage doInBackground() throws Exception {
 			if (extent <= 0) {
 				final String url = MapImageView.getGoogleMapUrl("satellite", lat, lng, zoom, w, h);
@@ -100,8 +108,12 @@ class MapDialog extends JDialog {
 			int index = 0;
 			for (int i = -extent; i <= extent; i++) {
 				for (int j = -extent; j <= extent; j++) {
+					if (isCancelled()) {
+						return null;
+					}
 					final String url = MapImageView.getGoogleMapUrl("satellite", lat + i * latWindow, lng + j * lngWindow, zoom, w, h);
 					images[index++] = ImageIO.read(new URL(url));
+					publish((int) (100f * index / (size * size)));
 				}
 			}
 			final int patchWidth = images[0].getWidth();
@@ -111,6 +123,9 @@ class MapDialog extends JDialog {
 			index = 0;
 			for (int i = 0; i < size; i++) {
 				for (int j = 0; j < size; j++) {
+					if (isCancelled()) {
+						return null;
+					}
 					g2.drawImage(images[index++], null, j * patchWidth, (size - i - 1) * patchHeight);
 				}
 			}
@@ -171,6 +186,8 @@ class MapDialog extends JDialog {
 			instance = new MapDialog(MainFrame.getInstance());
 		}
 		instance.setGeoLocation();
+		instance.extent = Scene.getInstance().getGroundImageExtent();
+		Util.selectSilently(instance.resolutionOptionComboBox, instance.extent);
 		instance.updateMap();
 		instance.setVisible(true);
 	}
@@ -279,6 +296,7 @@ class MapDialog extends JDialog {
 						return;
 					}
 					extent = resolutionOptionComboBox.getSelectedIndex();
+					Scene.getInstance().setGroundImageExtent(extent);
 					updateMap();
 				}
 			}
@@ -364,6 +382,14 @@ class MapDialog extends JDialog {
 		updateMap();
 		pack();
 		setLocationRelativeTo(owner);
+	}
+
+	public void setExtent(final int extent) {
+		this.extent = extent;
+	}
+
+	public int getExtent() {
+		return extent;
 	}
 
 	private void setGeoLocation() {
