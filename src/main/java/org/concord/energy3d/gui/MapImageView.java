@@ -83,7 +83,7 @@ class MapImageView extends JComponent {
 	}
 
 	final static String getGoogleMapUrl(final String mapType, final double latitude, final double longitude, final int zoom) {
-		return "https://maps.googleapis.com/maps/api/staticmap?maptype=" + mapType + "&center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=640x640&scale=1&key=AIzaSyBEGiCg33CccHloDdPENWk1JDhwTEQaZQ0";
+		return "https://maps.googleapis.com/maps/api/staticmap?maptype=" + mapType + "&center=" + latitude + "," + longitude + "&zoom=" + zoom + "&size=512x512&scale=1&key=AIzaSyBEGiCg33CccHloDdPENWk1JDhwTEQaZQ0";
 	}
 
 }

@@ -18,22 +18,18 @@ import org.concord.energy3d.simulation.LocationData;
 class MapImageViewWithLocations extends MapImageView {
 
 	private static final long serialVersionUID = 1L;
-	private final int offsetX;
-	private final int offsetY;
 
 	MapImageViewWithLocations() {
 		super();
-		final Dimension d = new Dimension(600, 600);
+		final Dimension d = new Dimension(512, 512);
 		setPreferredSize(d);
-		offsetX = d.width / 10;
-		offsetY = d.height / 10;
 	}
 
 	@Override
 	public void paintComponent(final Graphics g) {
 		super.paintComponent(g);
-		final int width = getWidth() - offsetX * 2;
-		final int height = getHeight() - offsetY * 2;
+		final int width = getWidth();
+		final int height = getHeight();
 		final Set<String> locationNames = LocationData.getInstance().getLatitudes().keySet();
 		float latitude, longitude;
 		double x;
@@ -47,15 +43,15 @@ class MapImageViewWithLocations extends MapImageView {
 			y = height * 0.5 - width * Math.log(Math.tan(0.25 * Math.PI + 0.5 * latitude * Math.PI / 180.0)) / (2 * Math.PI);
 			ellipse.width = 1;
 			ellipse.height = 1;
-			ellipse.x = x + offsetX - ellipse.width * 0.5;
-			ellipse.y = y + offsetY - ellipse.height * 0.5;
+			ellipse.x = x - ellipse.width * 0.5;
+			ellipse.y = y - ellipse.height * 0.5;
 			g2.setColor(Color.YELLOW);
 			g2.fill(ellipse);
 			g2.setColor(Color.DARK_GRAY);
 			ellipse.width += 1;
 			ellipse.height += 1;
-			ellipse.x = x + offsetX - ellipse.width * 0.5;
-			ellipse.y = (s.equals("South Pole") ? height : y) + offsetY - ellipse.height * 0.5;
+			ellipse.x = x - ellipse.width * 0.5;
+			ellipse.y = (s.equals("South Pole") ? height : y) - ellipse.height * 0.5;
 			g2.draw(ellipse);
 		}
 		final String current = (String) EnergyPanel.getInstance().getCityComboBox().getSelectedItem();
@@ -66,15 +62,15 @@ class MapImageViewWithLocations extends MapImageView {
 			y = height * 0.5 - width * Math.log(Math.tan(0.25 * Math.PI + 0.5 * latitude * Math.PI / 180.0)) / (2 * Math.PI);
 			ellipse.width = 5;
 			ellipse.height = 5;
-			ellipse.x = x + offsetX - ellipse.width * 0.5;
-			ellipse.y = y + offsetY - ellipse.height * 0.5;
+			ellipse.x = x - ellipse.width * 0.5;
+			ellipse.y = y - ellipse.height * 0.5;
 			g2.setColor(Color.RED);
 			g2.fill(ellipse);
 			g2.setColor(Color.BLACK);
 			ellipse.width += 1;
 			ellipse.height += 1;
-			ellipse.x = x + offsetX - ellipse.width * 0.5;
-			ellipse.y = y + offsetY - ellipse.height * 0.5;
+			ellipse.x = x - ellipse.width * 0.5;
+			ellipse.y = y - ellipse.height * 0.5;
 			g2.draw(ellipse);
 		}
 	}

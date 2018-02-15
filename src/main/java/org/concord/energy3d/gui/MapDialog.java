@@ -153,57 +153,49 @@ class MapDialog extends JDialog {
 		mapImageView.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(final KeyEvent e) {
-				Double lat = (Double) latitudeSpinner.getValue();
-				Double lng = (Double) longitudeSpinner.getValue();
+				final Double lat = (Double) latitudeSpinner.getValue();
+				final Double lng = (Double) longitudeSpinner.getValue();
 				final Integer zoom = (Integer) zoomSpinner.getValue();
-				final double latDegreesPerPixel = 360.0 / Math.pow(2, zoom + 8) * Math.cos(Math.toRadians(lat)) * 512;
-				final double lngDegreesPerPixel = 360.0 / Math.pow(2, zoom + 8) * 512;
-				System.out.println("****" + latDegreesPerPixel + "," + lngDegreesPerPixel);
+				// Google Maps API returns 512 pixels that represent exactly the length of the equator at zoom level 1
+				// https://maps.googleapis.com/maps/api/staticmap?center=0,0&zoom=1&size=512x512&maptype=satellite
+				// See: https://stackoverflow.com/questions/47106276/converting-pixels-to-latlng-coordinates-from-google-static-image
+				final double lngWindow = 360.0 / Math.pow(2, zoom + 8) * 512;
+				final double latWindow = lngWindow * Math.cos(Math.toRadians(lat));
 				final double delta = getScale() / 10000.0;
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_UP:
 					lock = true;
-					latitudeSpinner.setValue(lat + delta);
+					latitudeSpinner.setValue(lat + (e.isShiftDown() ? latWindow : delta));
 					lock = false;
 					updateMap();
 					break;
 				case KeyEvent.VK_DOWN:
-					lat = (Double) latitudeSpinner.getValue();
 					lock = true;
-					latitudeSpinner.setValue(lat - delta);
+					latitudeSpinner.setValue(lat - (e.isShiftDown() ? latWindow : delta));
 					lock = false;
 					updateMap();
 					break;
 				case KeyEvent.VK_LEFT:
 					lock = true;
-					longitudeSpinner.setValue(lng - delta);
+					longitudeSpinner.setValue(lng - (e.isShiftDown() ? lngWindow : delta));
 					lock = false;
 					updateMap();
 					break;
 				case KeyEvent.VK_RIGHT:
-					lng = (Double) longitudeSpinner.getValue();
 					lock = true;
-					longitudeSpinner.setValue(lng + delta);
+					longitudeSpinner.setValue(lng + (e.isShiftDown() ? lngWindow : delta));
 					lock = false;
 					updateMap();
 					break;
 				case KeyEvent.VK_PAGE_UP:
 					lock = true;
-					if (e.isShiftDown()) {
-						longitudeSpinner.setValue(lng + delta * 5);
-					} else {
-						latitudeSpinner.setValue(lat + delta * 5);
-					}
+					latitudeSpinner.setValue(lat + latWindow);
 					lock = false;
 					updateMap();
 					break;
 				case KeyEvent.VK_PAGE_DOWN:
 					lock = true;
-					if (e.isShiftDown()) {
-						longitudeSpinner.setValue(lng - delta * 5);
-					} else {
-						latitudeSpinner.setValue(lat - delta * 5);
-					}
+					latitudeSpinner.setValue(lat - latWindow);
 					lock = false;
 					updateMap();
 					break;
