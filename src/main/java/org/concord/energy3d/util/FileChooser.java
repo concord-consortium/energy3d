@@ -22,6 +22,13 @@ import org.concord.energy3d.scene.Scene;
  */
 
 public class FileChooser {
+
+	public static final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
+	public static final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
+	public static final ExtensionFileFilter objFilter = new ExtensionFileFilter("Wavefront (*.obj)", "obj");
+	public static final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D (*.ng3)", "ng3");
+	public static final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
+
 	private static final int MAX = 4;
 	private static FileChooser instance;
 	private final List<String> recentFiles = new ArrayList<String>();

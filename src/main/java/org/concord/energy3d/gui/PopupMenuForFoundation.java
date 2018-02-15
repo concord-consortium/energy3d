@@ -117,7 +117,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
-						final File file = FileChooser.getInstance().showDialog(".dae", MainFrame.daeFilter, false);
+						final File file = FileChooser.getInstance().showDialog(".dae", FileChooser.daeFilter, false);
 						if (file != null) {
 							EnergyPanel.getInstance().updateRadiationHeatMap();
 							SceneManager.getTaskManager().update(new Callable<Object>() {

@@ -162,6 +162,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 								}
 								if (ok) {
 									final HousePart p = Scene.getInstance().getPart(id);
+									System.out.println("***" + p);
 									if (p instanceof Foundation) {
 										target = (Foundation) p;
 									} else {

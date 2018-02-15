@@ -22,6 +22,7 @@ import org.concord.energy3d.etc.oneinstance.OneInstanceListener;
 import org.concord.energy3d.gui.Mac;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.logger.EventLog;
+import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -31,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "7.8.0";
+	public static final String VERSION = "7.8.1";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -155,7 +156,7 @@ public class MainApplication {
 			}
 		});
 		TimeSeriesLogger.getInstance().start();
-		// SnapshotLogger.getInstance().start(20);
+		SnapshotLogger.getInstance().start(20);
 
 		System.out.println("Initiatialization phase 2 done.");
 		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);

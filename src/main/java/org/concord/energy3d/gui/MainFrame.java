@@ -58,7 +58,6 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.undo.UndoableEdit;
 
 import org.concord.energy3d.MainApplication;
@@ -151,11 +150,6 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private static final MainFrame instance = new MainFrame();
 	private final List<JComponent> recentFileMenuItems = new ArrayList<JComponent>();
-	private static final ExtensionFileFilter ng3Filter = new ExtensionFileFilter("Energy3D (*.ng3)", "ng3");
-	private static final ExtensionFileFilter zipFilter = new ExtensionFileFilter("Zip (*.zip)", "zip");
-	static final ExtensionFileFilter daeFilter = new ExtensionFileFilter("Collada (*.dae)", "dae");
-	static final ExtensionFileFilter pngFilter = new ExtensionFileFilter("Image (*.png)", "png");
-	static final ExtensionFileFilter objFilter = new ExtensionFileFilter("Wavefront (*.obj)", "obj");
 	private final JColorChooser colorChooser;
 	private int fileMenuItemCount;
 
@@ -183,6 +177,7 @@ public class MainFrame extends JFrame {
 	private JMenu viewMenu;
 	private JMenu analysisMenu;
 	private JMenuItem rescaleMenuItem;
+	private JMenuItem sortIdMenuItem;
 	private JMenuItem overallUtilityBillMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
 	private JMenuItem visualizationSettingsMenuItem;
@@ -308,45 +303,6 @@ public class MainFrame extends JFrame {
 			return name.endsWith(".ng3");
 		}
 	};
-
-	private static class ExtensionFileFilter extends FileFilter {
-		String description;
-		String extensions[];
-
-		public ExtensionFileFilter(final String description, final String extension) {
-			this(description, new String[] { extension });
-		}
-
-		public ExtensionFileFilter(final String description, final String extensions[]) {
-			if (description == null) {
-				this.description = extensions[0] + "{ " + extensions.length + "} ";
-			} else {
-				this.description = description;
-			}
-			this.extensions = extensions.clone();
-		}
-
-		@Override
-		public String getDescription() {
-			return description;
-		}
-
-		@Override
-		public boolean accept(final File file) {
-			if (file.isDirectory()) {
-				return true;
-			} else {
-				final String path = file.getAbsolutePath().toLowerCase();
-				for (int i = 0, n = extensions.length; i < n; i++) {
-					final String extension = extensions[i];
-					if ((path.endsWith(extension) && (path.charAt(path.length() - extension.length() - 1)) == '.')) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-	}
 
 	public static MainFrame getInstance() {
 		return instance;
@@ -750,7 +706,7 @@ public class MainFrame extends JFrame {
 
 	public void open() {
 		SceneManager.getInstance().refresh(1);
-		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, false);
+		final File file = FileChooser.getInstance().showDialog(".ng3", FileChooser.ng3Filter, false);
 		if (file == null) {
 			return;
 		}
@@ -1847,7 +1803,7 @@ public class MainFrame extends JFrame {
 			useImageFileMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final File file = FileChooser.getInstance().showDialog(".png", pngFilter, false);
+					final File file = FileChooser.getInstance().showDialog(".png", FileChooser.pngFilter, false);
 					if (file == null) {
 						return;
 					}
@@ -2043,6 +1999,26 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return rescaleMenuItem;
+	}
+
+	private JMenuItem getSortIdMenuItem() {
+		if (sortIdMenuItem == null) {
+			sortIdMenuItem = new JMenuItem("Sort ID");
+			sortIdMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					if (JOptionPane.showConfirmDialog(MainFrame.this, "Sorting IDs may break scripts. Do you want to continue?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION) {
+						return;
+					}
+					long id = 0;
+					for (final HousePart x : Scene.getInstance().getParts()) {
+						x.setId(id++);
+					}
+					Scene.getInstance().redrawAll();
+				}
+			});
+		}
+		return sortIdMenuItem;
 	}
 
 	private JMenuItem getSimulationSettingsMenuItem() {
@@ -2850,6 +2826,7 @@ public class MainFrame extends JFrame {
 					specificationsMenuItem.setEnabled(true);
 					autoRecomputeEnergyMenuItem.setEnabled(true);
 					rescaleMenuItem.setEnabled(true);
+					sortIdMenuItem.setEnabled(true);
 				}
 
 				@Override
@@ -2882,6 +2859,7 @@ public class MainFrame extends JFrame {
 						specificationsMenuItem.setEnabled(false);
 						autoRecomputeEnergyMenuItem.setEnabled(false);
 						rescaleMenuItem.setEnabled(false);
+						sortIdMenuItem.setEnabled(false);
 					} else {
 						rescaleMenuItem.setEnabled(selectedPart instanceof Foundation || selectedPart == null);
 					}
@@ -2933,6 +2911,7 @@ public class MainFrame extends JFrame {
 			editMenu.add(getEnableAllEditPointsMenuItem());
 			editMenu.add(getDisableAllEditPointsMenuItem());
 			editMenu.add(getFixProblemsMenuItem());
+			editMenu.add(getSortIdMenuItem());
 			editMenu.add(getSnapToGridsMenuItem());
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
@@ -3093,7 +3072,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void saveFile(final boolean outsideTaskManager) {
-		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, true);
+		final File file = FileChooser.getInstance().showDialog(".ng3", FileChooser.ng3Filter, true);
 		if (file == null) {
 			return;
 		}
@@ -3115,7 +3094,7 @@ public class MainFrame extends JFrame {
 	}
 
 	void importFile() {
-		final File file = FileChooser.getInstance().showDialog(".ng3", ng3Filter, false);
+		final File file = FileChooser.getInstance().showDialog(".ng3", FileChooser.ng3Filter, false);
 		if (file != null) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3133,7 +3112,7 @@ public class MainFrame extends JFrame {
 	}
 
 	void importColladaFile() {
-		final File file = FileChooser.getInstance().showDialog(".dae", daeFilter, false);
+		final File file = FileChooser.getInstance().showDialog(".dae", FileChooser.daeFilter, false);
 		if (file != null) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3151,7 +3130,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void exportObjFile() {
-		final File file = FileChooser.getInstance().showDialog(".obj", objFilter, true);
+		final File file = FileChooser.getInstance().showDialog(".obj", FileChooser.objFilter, true);
 		if (file != null) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
 			SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -3896,7 +3875,7 @@ public class MainFrame extends JFrame {
 			exportLogMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final File file = FileChooser.getInstance().showDialog(".zip", zipFilter, true);
+					final File file = FileChooser.getInstance().showDialog(".zip", FileChooser.zipFilter, true);
 					if (file == null) {
 						return;
 					}
@@ -3941,7 +3920,7 @@ public class MainFrame extends JFrame {
 
 	private void exportImage() {
 		System.out.print("Saving snapshot: ");
-		final File file = FileChooser.getInstance().showDialog(".png", pngFilter, true);
+		final File file = FileChooser.getInstance().showDialog(".png", FileChooser.pngFilter, true);
 		if (file == null) {
 			return;
 		}

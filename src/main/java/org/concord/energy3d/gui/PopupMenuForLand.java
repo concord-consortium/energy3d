@@ -332,7 +332,7 @@ class PopupMenuForLand extends PopupMenuFactory {
 			miUseImageFile.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					final File file = FileChooser.getInstance().showDialog(".png", MainFrame.pngFilter, false);
+					final File file = FileChooser.getInstance().showDialog(".png", FileChooser.pngFilter, false);
 					if (file == null) {
 						return;
 					}

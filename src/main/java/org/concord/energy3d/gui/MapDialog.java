@@ -40,10 +40,12 @@ import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.LocationData;
+import org.concord.energy3d.util.ClipImage;
 
 import com.ardor3d.math.MathUtils;
 
 class MapDialog extends JDialog {
+
 	private static final long serialVersionUID = 1L;
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
@@ -147,14 +149,19 @@ class MapDialog extends JDialog {
 		longitudeSpinner.setEditor(lngEditor);
 		setGeoLocation();
 		mapImageView.setAlignmentX(0.5f);
-		mapImageView.setPreferredSize(new Dimension(500, 500));
+		mapImageView.setPreferredSize(new Dimension(512, 512));
 		mapImageView.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(final KeyEvent e) {
+				Double lat = (Double) latitudeSpinner.getValue();
+				Double lng = (Double) longitudeSpinner.getValue();
+				final Integer zoom = (Integer) zoomSpinner.getValue();
+				final double latDegreesPerPixel = 360.0 / Math.pow(2, zoom + 8) * Math.cos(Math.toRadians(lat)) * 512;
+				final double lngDegreesPerPixel = 360.0 / Math.pow(2, zoom + 8) * 512;
+				System.out.println("****" + latDegreesPerPixel + "," + lngDegreesPerPixel);
 				final double delta = getScale() / 10000.0;
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_UP:
-					Double lat = (Double) latitudeSpinner.getValue();
 					lock = true;
 					latitudeSpinner.setValue(lat + delta);
 					lock = false;
@@ -168,7 +175,6 @@ class MapDialog extends JDialog {
 					updateMap();
 					break;
 				case KeyEvent.VK_LEFT:
-					Double lng = (Double) longitudeSpinner.getValue();
 					lock = true;
 					longitudeSpinner.setValue(lng - delta);
 					lock = false;
@@ -178,6 +184,26 @@ class MapDialog extends JDialog {
 					lng = (Double) longitudeSpinner.getValue();
 					lock = true;
 					longitudeSpinner.setValue(lng + delta);
+					lock = false;
+					updateMap();
+					break;
+				case KeyEvent.VK_PAGE_UP:
+					lock = true;
+					if (e.isShiftDown()) {
+						longitudeSpinner.setValue(lng + delta * 5);
+					} else {
+						latitudeSpinner.setValue(lat + delta * 5);
+					}
+					lock = false;
+					updateMap();
+					break;
+				case KeyEvent.VK_PAGE_DOWN:
+					lock = true;
+					if (e.isShiftDown()) {
+						longitudeSpinner.setValue(lng - delta * 5);
+					} else {
+						latitudeSpinner.setValue(lat - delta * 5);
+					}
 					lock = false;
 					updateMap();
 					break;
@@ -277,8 +303,16 @@ class MapDialog extends JDialog {
 				setVisible(false);
 			}
 		});
+		final JButton imageButton = new JButton("Copy Image");
+		imageButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				new ClipImage().copyImageToClipboard(mapImageView);
+			}
+		});
 		bottomPanel.add(okButton);
 		bottomPanel.add(cancelButton);
+		bottomPanel.add(imageButton);
 		getContentPane().add(bottomPanel);
 		updateMap();
 		pack();

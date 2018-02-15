@@ -38,6 +38,7 @@ public class VsgSubmitter {
 		String s = "{\n";
 		s += "\t\"lat\": " + EnergyPanel.FIVE_DECIMALS.format(geo.getLatitude()) + ",\n";
 		s += "\t\"lng\": " + EnergyPanel.FIVE_DECIMALS.format(geo.getLongitude()) + ",\n";
+		s += "\t\"address\": \"" + geo.getAddress() + "\",\n";
 		switch (Scene.getInstance().getProjectType()) {
 		case Foundation.TYPE_PV_PROJECT:
 			s += "\t\"type\": \"PV\",\n";
