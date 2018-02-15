@@ -50,8 +50,8 @@ class MapDialog extends JDialog {
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
 	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA");
-	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.00001));
-	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.00001));
+	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.000001)); // spinner tick must go down to 10^-6 in order to avoid seam lines at zoom level 20
+	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.000001));
 	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
 	private final MapImageView mapImageView = new MapImageView();
 	private static MapDialog instance;
@@ -67,7 +67,7 @@ class MapDialog extends JDialog {
 				mapLoader.cancel(true);
 			}
 			this.export = export;
-			googleMapUrl = MapImageView.getGoogleMapUrl("satellite", (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue());
+			googleMapUrl = MapImageView.getGoogleMapUrl("satellite", (Double) latitudeSpinner.getValue(), (Double) longitudeSpinner.getValue(), (Integer) zoomSpinner.getValue(), mapImageView.getPreferredSize().width, mapImageView.getPreferredSize().height);
 			mapImageView.setText("Loading...");
 			mapImageView.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		}
@@ -149,7 +149,7 @@ class MapDialog extends JDialog {
 		longitudeSpinner.setEditor(lngEditor);
 		setGeoLocation();
 		mapImageView.setAlignmentX(0.5f);
-		mapImageView.setPreferredSize(new Dimension(512, 512));
+		mapImageView.setPreferredSize(new Dimension(640, 640));
 		mapImageView.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(final KeyEvent e) {
@@ -159,7 +159,8 @@ class MapDialog extends JDialog {
 				// Google Maps API returns 512 pixels that represent exactly the length of the equator at zoom level 1
 				// https://maps.googleapis.com/maps/api/staticmap?center=0,0&zoom=1&size=512x512&maptype=satellite
 				// See: https://stackoverflow.com/questions/47106276/converting-pixels-to-latlng-coordinates-from-google-static-image
-				final double lngWindow = 360.0 / Math.pow(2, zoom + 8) * 512;
+				// However, we send a 640x640 request. At 640x640, zoom level 1 returns a map image wider than the full equator length
+				final double lngWindow = 360.0 / Math.pow(2, zoom + 8) * 640;
 				final double latWindow = lngWindow * Math.cos(Math.toRadians(lat));
 				final double delta = getScale() / 10000.0;
 				switch (e.getKeyCode()) {

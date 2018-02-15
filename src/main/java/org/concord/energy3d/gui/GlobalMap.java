@@ -203,7 +203,7 @@ class GlobalMap extends JDialog {
 
 			@Override
 			protected BufferedImage doInBackground() throws Exception {
-				return ImageIO.read(new URL(MapImageView.getGoogleMapUrl("roadmap", 0, 0, 1)));
+				return ImageIO.read(new URL(MapImageView.getGoogleMapUrl("roadmap", 0, 0, 1, mapImageView.getPreferredSize().width, mapImageView.getPreferredSize().height)));
 			}
 
 			@Override
