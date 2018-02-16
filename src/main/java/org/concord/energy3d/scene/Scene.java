@@ -3865,6 +3865,16 @@ public class Scene implements Serializable {
 		return list;
 	}
 
+	public double getTotalFoundationAreas() {
+		double sum = 0;
+		for (final HousePart p : parts) {
+			if (p instanceof Foundation) {
+				sum += p.getArea();
+			}
+		}
+		return sum;
+	}
+
 	public Rectangle2D getFoundationBounds(final boolean excludeSelectedPart) {
 		Rectangle2D bounds = new Rectangle2D.Double(-0.1, -0.1, 0.2, 0.2);
 		if (excludeSelectedPart) {

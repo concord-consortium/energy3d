@@ -1568,6 +1568,7 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Parabolic Trough Focal Line", "tutorials/parabolic-trough-focal-line.ng3");
 			addModel(cspMenu, "Parabolic Trough Rim Angle", "tutorials/parabolic-trough-curvature.ng3");
 			addModel(cspMenu, "Parabolic Trough Arrays", "tutorials/parabolic-trough-array.ng3");
+			addModel(cspMenu, "Parabolic Trough Rhomboid Layout", "tutorials/parabolic-trough-rhomboid-layout.ng3");
 			addModel(cspMenu, "Parabolic Troughs with Different Azimuth Angles", "tutorials/parabolic-trough-azimuth-angles.ng3");
 			cspMenu.addSeparator();
 			addModel(cspMenu, "Parabolic Dish Stirling Engine", "tutorials/parabolic-dish-single.ng3");

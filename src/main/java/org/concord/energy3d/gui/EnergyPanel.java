@@ -894,6 +894,21 @@ public class EnergyPanel extends JPanel {
 		});
 	}
 
+	boolean adjustCellSize() {
+		final double cellSize = Scene.getInstance().getSolarStep() * Scene.getInstance().getAnnotationScale();
+		final int cellCount = (int) (Scene.getInstance().getTotalFoundationAreas() / (cellSize * cellSize));
+		if (cellCount > 1000000) {
+			if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Cell size for others (" + cellSize + "m) is probably too small for this model.<br>Consider adjust it to speed up simulations.</html>", "Cell Size Adjustment Suggestion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+				final VisualizationSettingsDialog v = new VisualizationSettingsDialog();
+				v.getCellSizeField().selectAll();
+				v.getCellSizeField().requestFocusInWindow();
+				v.setVisible(true);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void computeNow() {
 		try {
 			System.out.println("EnergyPanel.computeNow()");

@@ -60,7 +60,9 @@ public class FoundationPolygon extends HousePart {
 			if (editPointIndex < n) {
 				points.get(editPointIndex).set(relativeP);
 			} else {
-				SelectUtil.getCurrentEditPointMesh().setDefaultColor(ColorRGBA.WHITE);
+				if (SelectUtil.getCurrentEditPointMesh() != null) {
+					SelectUtil.getCurrentEditPointMesh().setDefaultColor(ColorRGBA.WHITE);
+				}
 				editPointIndex -= n;
 				final Mesh editPointShape = getEditPointShape(editPointIndex);
 				SelectUtil.setCurrentEditPointMesh(editPointShape);

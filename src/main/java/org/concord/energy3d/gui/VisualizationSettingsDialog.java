@@ -27,6 +27,7 @@ class VisualizationSettingsDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	private final static DecimalFormat FORMAT1 = new DecimalFormat("#0.##");
+	private JTextField cellSizeTextField;
 
 	public VisualizationSettingsDialog() {
 
@@ -44,7 +45,7 @@ class VisualizationSettingsDialog extends JDialog {
 		final JTextField solarPanelNyTextField = new JTextField(s.getSolarPanelNy() + "", 6);
 		final JTextField rackNxTextField = new JTextField(s.getRackNx() + "", 6);
 		final JTextField rackNyTextField = new JTextField(s.getRackNy() + "", 6);
-		final JTextField cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep() * Scene.getInstance().getAnnotationScale()));
+		cellSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getSolarStep() * Scene.getInstance().getAnnotationScale()));
 		final JTextField heatVectorLengthTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorLength()));
 		final JTextField heatVectorGridSizeTextField = new JTextField(FORMAT1.format(Scene.getInstance().getHeatVectorGridSize() * Scene.getInstance().getAnnotationScale()));
 
@@ -181,6 +182,10 @@ class VisualizationSettingsDialog extends JDialog {
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());
 
+	}
+
+	JTextField getCellSizeField() {
+		return cellSizeTextField;
 	}
 
 }

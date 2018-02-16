@@ -57,6 +57,7 @@ import org.concord.energy3d.undo.ShowHeliodonCommand;
 import org.concord.energy3d.undo.ShowShadowCommand;
 import org.concord.energy3d.undo.SpinViewCommand;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Util;
 
 public class MainPanel extends JPanel {
 
@@ -348,7 +349,9 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miParabolicTrough = new JCheckBoxMenuItem("Parabolic Trough", new ImageIcon(getClass().getResource("icons/parabolic_trough.png")));
 		final JCheckBoxMenuItem miParabolicDish = new JCheckBoxMenuItem("Parabolic Dish", new ImageIcon(getClass().getResource("icons/parabolic_dish.png")));
 		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
+		final JCheckBoxMenuItem miTapeMeasure = new JCheckBoxMenuItem("Tape Measure", new ImageIcon(getClass().getResource("icons/tape_measure.png")));
 		miSolarWaterHeater.setEnabled(false);
+		miTapeMeasure.setEnabled(false);
 		final JCheckBoxMenuItem miFresnelReflector = new JCheckBoxMenuItem("Linear Fresnel Reflector", new ImageIcon(getClass().getResource("icons/fresnel_reflector.png")));
 		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
 		final ActionListener solarAction = new ActionListener() {
@@ -377,6 +380,9 @@ public class MainPanel extends JPanel {
 				} else if (selected == miSolarWaterHeater) {
 					solaCommand = SceneManager.Operation.DRAW_SOLAR_WATER_HEATER;
 					solarButton.setToolTipText("Insert a solar water heater");
+				} else if (selected == miTapeMeasure) {
+					solaCommand = SceneManager.Operation.DRAW_TAPE_MEASURE;
+					solarButton.setToolTipText("Insert a tape measure");
 				} else if (selected == miSensor) {
 					solaCommand = SceneManager.Operation.DRAW_SENSOR;
 					solarButton.setToolTipText("Insert a sensor module");
@@ -393,6 +399,7 @@ public class MainPanel extends JPanel {
 		miParabolicDish.addActionListener(solarAction);
 		miFresnelReflector.addActionListener(solarAction);
 		miSolarWaterHeater.addActionListener(solarAction);
+		miTapeMeasure.addActionListener(solarAction);
 		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
 		solaMenu.add(miRack);
@@ -404,6 +411,7 @@ public class MainPanel extends JPanel {
 		solaMenu.add(miFresnelReflector);
 		solaMenu.addSeparator();
 		solaMenu.add(miSolarWaterHeater);
+		solaMenu.add(miTapeMeasure);
 		solaMenu.add(miSensor);
 		bg = new ButtonGroup();
 		bg.add(miSolarPanel);
@@ -413,6 +421,7 @@ public class MainPanel extends JPanel {
 		bg.add(miParabolicDish);
 		bg.add(miFresnelReflector);
 		bg.add(miSolarWaterHeater);
+		bg.add(miTapeMeasure);
 		bg.add(miSensor);
 
 		System.out.println("done");
@@ -866,6 +875,11 @@ public class MainPanel extends JPanel {
 					if (energyButton.isSelected()) {
 						defaultTool();
 						SceneManager.getInstance().autoSelectBuilding(false);
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							Util.selectSilently(energyButton, false);
+						} else {
+							SceneManager.getInstance().computeEnergyView(true);
+						}
 					} else {
 						p.getBuildingDailyEnergyGraph().clearData();
 						p.getBuildingDailyEnergyGraph().removeGraph();
@@ -873,8 +887,8 @@ public class MainPanel extends JPanel {
 						p.getPvProjectDailyEnergyGraph().removeGraph();
 						p.getCspProjectDailyEnergyGraph().clearData();
 						p.getCspProjectDailyEnergyGraph().removeGraph();
+						SceneManager.getInstance().computeEnergyView(false);
 					}
-					SceneManager.getInstance().computeEnergyView(energyButton.isSelected());
 				}
 			});
 			addMouseOverEffect(energyButton);

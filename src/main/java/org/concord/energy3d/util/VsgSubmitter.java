@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.File;
 import java.net.InetAddress;
+import java.util.Calendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -23,6 +24,7 @@ import org.concord.energy3d.logger.SnapshotLogger;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.simulation.AnnualGraph;
 
 /**
@@ -38,6 +40,24 @@ public class VsgSubmitter {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "No geolocation is set for this model. It cannot be submitted.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+
+		final Calendar calendar = Heliodon.getInstance().getCalendar();
+		if (calendar.get(Calendar.DAY_OF_MONTH) != 1) {
+			String msg = "";
+			msg += "All models must have run an annual simulation and the date must be set to be the first day of a month.<br>";
+			msg += "The date of this model is not set to the first day of a month and cannot be accepted.";
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		if (Scene.getInstance().getSolarResults() == null) {
+			String msg = "";
+			msg += "All models must have run an annual simulation, but this model does not<br>";
+			msg += "provide any annual simulation result and cannot be accepted.";
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>" + msg + "</html>", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		String s = "{\n";
 		s += "\t\"lat\": " + EnergyPanel.FIVE_DECIMALS.format(geo.getLatitude()) + ",\n";
 		s += "\t\"lng\": " + EnergyPanel.FIVE_DECIMALS.format(geo.getLongitude()) + ",\n";
@@ -95,7 +115,7 @@ public class VsgSubmitter {
 				final JTextField emailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
 				final JTextField organizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
 				final JPanel personalInfoPanel = new JPanel(new SpringLayout());
-				personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Contributor information"));
+				personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Contributor information (for earning scores and making contact)"));
 				personalInfoPanel.add(new JLabel("Name: "));
 				personalInfoPanel.add(nameField);
 				personalInfoPanel.add(new JLabel("Email: "));
@@ -106,16 +126,19 @@ public class VsgSubmitter {
 				panel.add(personalInfoPanel, BorderLayout.CENTER);
 
 				String s = "<html><font size=2>";
-				s += "By pressing the Yes button below, you will contribute your model to the Virtual Solar Grid, a publicly<br>";
-				s += "accessible site that houses many virtual solar power systems. Your model will be reviewed by experts<br>";
-				s += "before it can be published. However, there is no guarantee that it will be accepted. You will be notified<br>";
-				s += "through the email you provide above. If you agree on these terms, please continue. Otherwise, please<br>";
-				s += "click the No button to quit.</font><br><br>";
+				s += "By pressing the Yes button below, you agree to contribute your model to the Virtual Solar Grid, a publicly<br>";
+				s += "accessible site that houses many virtual solar power systems. Your model will be reviewed by experts before<br>";
+				s += "it can be published in the Grid. However, we cannot guarantee that it will be accepted. You will be notified<br>";
+				s += "about its status through the email you provide above. If you agree on these terms, please continue. Otherwise,<br>";
+				s += "please click the No button to abort.</font><br><br>";
 				s += "<b>Do you want to submit your model to the Virtual Solar Grid now?";
 				s += "</b></html>";
 				panel.add(new JLabel(s), BorderLayout.SOUTH);
 
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Virtual Solar Grid", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.YES_OPTION) {
+					Scene.getInstance().getDesigner().setName(nameField.getText());
+					Scene.getInstance().getDesigner().setEmail(emailField.getText());
+					Scene.getInstance().getDesigner().setOrganization(organizationField.getText());
 					new Uploader(nameField.getText(), emailField.getText(), organizationField.getText(), info, currentFile).execute();
 				}
 			}
