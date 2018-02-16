@@ -6,11 +6,14 @@ import java.awt.EventQueue;
 import java.io.File;
 import java.net.InetAddress;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.SwingWorker;
 
 import org.concord.energy3d.MainApplication;
@@ -80,22 +83,40 @@ public class VsgSubmitter {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+
 				final JTextArea textArea = new JTextArea(info);
 				textArea.setEditable(false);
 				final JPanel panel = new JPanel(new BorderLayout(10, 10));
 				final JScrollPane scrollPane = new JScrollPane(textArea);
 				scrollPane.setPreferredSize(new Dimension(400, 300));
-				panel.add(scrollPane, BorderLayout.CENTER);
+				panel.add(scrollPane, BorderLayout.NORTH);
+
+				final JTextField nameField = new JTextField(Scene.getInstance().getDesigner() == null ? "User" : Scene.getInstance().getDesigner().getName());
+				final JTextField emailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
+				final JTextField organizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
+				final JPanel personalInfoPanel = new JPanel(new SpringLayout());
+				personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Contributor information"));
+				personalInfoPanel.add(new JLabel("Name: "));
+				personalInfoPanel.add(nameField);
+				personalInfoPanel.add(new JLabel("Email: "));
+				personalInfoPanel.add(emailField);
+				personalInfoPanel.add(new JLabel("Organization: "));
+				personalInfoPanel.add(organizationField);
+				SpringUtilities.makeCompactGrid(personalInfoPanel, 3, 2, 8, 8, 8, 8);
+				panel.add(personalInfoPanel, BorderLayout.CENTER);
+
 				String s = "<html><font size=2>";
 				s += "By pressing the Yes button below, you will contribute your model to the Virtual Solar Grid, a publicly<br>";
 				s += "accessible site that houses many virtual solar power systems. Your model will be reviewed by experts<br>";
-				s += "before it can be published. However, there is no guarantee that it will be accepted. If you agree on<br>";
-				s += "this term, please continue. Otherwise, please click the No button.</font><br><br>";
+				s += "before it can be published. However, there is no guarantee that it will be accepted. You will be notified<br>";
+				s += "through the email you provide above. If you agree on these terms, please continue. Otherwise, please<br>";
+				s += "click the No button to quit.</font><br><br>";
 				s += "<b>Do you want to submit your model to the Virtual Solar Grid now?";
 				s += "</b></html>";
 				panel.add(new JLabel(s), BorderLayout.SOUTH);
+
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), panel, "Virtual Solar Grid", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.YES_OPTION) {
-					new Uploader(info, currentFile).execute();
+					new Uploader(nameField.getText(), emailField.getText(), organizationField.getText(), info, currentFile).execute();
 				}
 			}
 		});
@@ -104,18 +125,22 @@ public class VsgSubmitter {
 
 	private static class Uploader extends SwingWorker<String, Void> {
 
+		private final String name, email, organization;
 		private final String text;
 		private final File currentFile;
 
-		Uploader(final String text, final File currentFile) {
+		Uploader(final String name, final String email, final String organization, final String text, final File currentFile) {
 			super();
+			this.name = name;
+			this.email = email;
+			this.organization = organization;
 			this.text = text;
 			this.currentFile = currentFile;
 		}
 
 		@Override
 		protected String doInBackground() throws Exception {
-			return upload(text, currentFile);
+			return upload(name, email, organization, text, currentFile);
 		}
 
 		@Override
@@ -129,11 +154,13 @@ public class VsgSubmitter {
 		}
 	}
 
-	private static String upload(final String info, final File currentFile) throws Exception {
+	private static String upload(final String name, final String email, final String organization, final String info, final File currentFile) throws Exception {
 		final MultipartUtility multipart = new MultipartUtility("http://energy3d.concord.org/vsg/data.php", "UTF-8");
 		multipart.addFormField("ip_address", InetAddress.getLocalHost().getHostAddress());
 		multipart.addFormField("os_name", System.getProperty("os.name"));
-		multipart.addFormField("user_name", System.getProperty("user.name"));
+		multipart.addFormField("user_name", name != null && !name.trim().equals("") ? name : System.getProperty("user.name"));
+		multipart.addFormField("user_email", email);
+		multipart.addFormField("user_organization", organization);
 		multipart.addFormField("os_version", System.getProperty("os.version"));
 		multipart.addFormField("energy3d_version", MainApplication.VERSION);
 		multipart.addFormField("data", info);

@@ -43,21 +43,26 @@ public class BugReporter {
 		final StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
 		final String msg = sw.toString();
-		final String text = header + "\n" + msg;
-		File file;
-		try {
-			file = SnapshotLogger.getInstance().saveSnapshot("error");
-		} catch (final Exception ex) {
-			ex.printStackTrace();
-			file = null;
-		}
-		final File currentFile = file;
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (msg.indexOf("java.lang.OutOfMemoryError") != -1) { // in this case, we may not have enough resource to send error report. just advise user to restart
+		if (msg.indexOf("java.lang.OutOfMemoryError") != -1) { // in this case, we may not have enough resource to send error report. just advise user to restart
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
 					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Energy3D has run out of memory. Please restart.", "Out of Memory", JOptionPane.ERROR_MESSAGE);
-				} else {
+				}
+			});
+		} else {
+			final String text = header + "\n" + msg;
+			File file;
+			try {
+				file = SnapshotLogger.getInstance().saveSnapshot("error");
+			} catch (final Exception ex) {
+				ex.printStackTrace();
+				file = null;
+			}
+			final File currentFile = file;
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
 					final JPanel panel = new JPanel(new BorderLayout(10, 10));
 					final JScrollPane scrollPane = new JScrollPane(new JTextArea(msg));
 					scrollPane.setPreferredSize(new Dimension(400, 400));
@@ -68,8 +73,8 @@ public class BugReporter {
 						new Uploader(text, currentFile).execute();
 					}
 				}
-			}
-		});
+			});
+		}
 	}
 
 	private static class Uploader extends SwingWorker<String, Void> {

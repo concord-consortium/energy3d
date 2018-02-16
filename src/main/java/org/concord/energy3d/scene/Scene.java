@@ -142,6 +142,7 @@ public class Scene implements Serializable {
 	private transient NodeState copyNodeState;
 	private UtilityBill utilityBill;
 	private String projectName;
+	private String projectDescription;
 	private int projectType = Foundation.TYPE_BUILDING;
 	private double[][] solarResults;
 	private Designer designer;
@@ -922,7 +923,7 @@ public class Scene implements Serializable {
 
 		if (!logger) {
 			try {
-				System.out.print("Opening..." + url + "...");
+				System.out.print("Save Verification Opening..." + url + "...");
 				final ObjectInputStream in = new ObjectInputStream(url.openStream());
 				in.readObject();
 				in.close();
@@ -3274,6 +3275,14 @@ public class Scene implements Serializable {
 
 	public String getProjectName() {
 		return projectName;
+	}
+
+	public void setProjectDescription(final String projectDescription) {
+		this.projectDescription = projectDescription;
+	}
+
+	public String getProjectDescription() {
+		return projectDescription;
 	}
 
 	public void setDesigner(final Designer designer) {

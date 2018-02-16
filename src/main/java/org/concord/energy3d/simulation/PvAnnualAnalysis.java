@@ -219,7 +219,7 @@ public class PvAnnualAnalysis extends AnnualAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Annual Yield of All Solar Panels (" + Scene.getInstance().countSolarPanels() + " Solar Panels)";
+		String title = "Annual Yield of All Solar Panels (" + Scene.getInstance().countSolarPanels() + " Panels)";
 		if (selectedPart != null) {
 			if (selectedPart instanceof SolarPanel) {
 				cost = (int) ProjectCost.getCost(selectedPart);

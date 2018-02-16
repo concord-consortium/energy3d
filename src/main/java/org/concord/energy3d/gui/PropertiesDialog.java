@@ -34,10 +34,11 @@ class PropertiesDialog extends JDialog {
 
 		getContentPane().setLayout(new BorderLayout());
 		final JPanel panel = new JPanel(new SpringLayout());
-		panel.setBorder(new EmptyBorder(15, 15, 15, 15));
+		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
 		final JTextField designerNameField = new JTextField(Scene.getInstance().getDesigner() == null ? "User" : Scene.getInstance().getDesigner().getName());
+		final JTextField designerEmailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
 		final JTextField designerOrganizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
 		final JComboBox<String> projectTypeComboBox = new JComboBox<String>(new String[] { "Building", "Photovoltaic Solar Power System", "Concentrated Solar Power System" });
 		projectTypeComboBox.setSelectedIndex(Scene.getInstance().getProjectType() - 1);
@@ -50,6 +51,8 @@ class PropertiesDialog extends JDialog {
 			studentModeComboBox.setSelectedIndex(1);
 		}
 		final JTextField projectNameField = new JTextField(Scene.getInstance().getProjectName());
+		final JTextField projectDescriptionField = new JTextField(Scene.getInstance().getProjectDescription());
+		projectDescriptionField.setColumns(10);
 		final JComboBox<String> foundationOverlapComboBox = new JComboBox<String>(new String[] { "Disallowed", "Allowed" });
 		if (!Scene.getInstance().getDisallowFoundationOverlap()) {
 			foundationOverlapComboBox.setSelectedIndex(1);
@@ -75,6 +78,7 @@ class PropertiesDialog extends JDialog {
 					break;
 				}
 				final String designerName = designerNameField.getText();
+				final String designerEmail = designerEmailField.getText();
 				final String designerOrganization = designerOrganizationField.getText();
 				if (designerName != null && !designerName.trim().equals("")) {
 					Designer designer = Scene.getInstance().getDesigner();
@@ -91,6 +95,21 @@ class PropertiesDialog extends JDialog {
 					}
 					designer.setName("User");
 				}
+				if (designerEmail != null && !designerEmail.trim().equals("")) {
+					Designer designer = Scene.getInstance().getDesigner();
+					if (designer == null) {
+						designer = new Designer();
+						Scene.getInstance().setDesigner(designer);
+					}
+					designer.setEmail(designerEmail);
+				} else {
+					Designer designer = Scene.getInstance().getDesigner();
+					if (designer == null) {
+						designer = new Designer();
+						Scene.getInstance().setDesigner(designer);
+					}
+					designer.setEmail(null);
+				}
 				if (designerOrganization != null && !designerOrganization.trim().equals("")) {
 					Designer designer = Scene.getInstance().getDesigner();
 					if (designer == null) {
@@ -106,8 +125,9 @@ class PropertiesDialog extends JDialog {
 					}
 					designer.setOrganization(null);
 				}
-				Scene.getInstance().setProjectName(projectNameField.getText());
 				Scene.getInstance().setProjectType(projectTypeComboBox.getSelectedIndex() + 1);
+				Scene.getInstance().setProjectName(projectNameField.getText());
+				Scene.getInstance().setProjectDescription(projectDescriptionField.getText());
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
@@ -124,17 +144,25 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Designer Name: "));
 		panel.add(designerNameField);
 
+		// set designer email
+		panel.add(new JLabel("Designer Email: "));
+		panel.add(designerEmailField);
+
 		// set designer organization
 		panel.add(new JLabel("Designer Organization: "));
 		panel.add(designerOrganizationField);
+
+		// set project type
+		panel.add(new JLabel("Project Type: "));
+		panel.add(projectTypeComboBox);
 
 		// set project name
 		panel.add(new JLabel("Project Name: "));
 		panel.add(projectNameField);
 
-		// set project type
-		panel.add(new JLabel("Project Type: "));
-		panel.add(projectTypeComboBox);
+		// set project description
+		panel.add(new JLabel("Project Description: "));
+		panel.add(projectDescriptionField);
 
 		// set student mode
 		panel.add(new JLabel("Student Mode: "));
@@ -160,7 +188,7 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Instruction Tab Header: "));
 		panel.add(instructionTabHeaderComboBox);
 
-		SpringUtilities.makeCompactGrid(panel, 10, 2, 8, 8, 8, 8);
+		SpringUtilities.makeCompactGrid(panel, 12, 2, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

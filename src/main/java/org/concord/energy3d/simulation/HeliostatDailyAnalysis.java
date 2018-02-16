@@ -137,14 +137,16 @@ public class HeliostatDailyAnalysis extends DailyAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Daily Yield of All Heliostats";
+		String title = "Daily Yield of All Heliostats (" + Scene.getInstance().countParts(Mirror.class) + " Heliostats)";
 		if (selectedPart != null) {
 			if (selectedPart instanceof Mirror) {
 				cost = (int) CspProjectCost.getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Daily Yield";
-			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
-				title = "Daily Yield of Selected Foundation";
+			} else if (selectedPart instanceof Foundation) {
+				title = "Daily Yield of Selected Foundation (" + ((Foundation) selectedPart).countParts(Mirror.class) + " Heliostats)";
+			} else if (selectedPart.getTopContainer() instanceof Foundation) {
+				title = "Daily Yield of Selected Foundation (" + selectedPart.getTopContainer().countParts(Mirror.class) + " Heliostats)";
 			}
 		}
 		final JDialog dialog = createDialog(s == null ? title : title + ": " + s + " (Cost: $" + cost + ")");
