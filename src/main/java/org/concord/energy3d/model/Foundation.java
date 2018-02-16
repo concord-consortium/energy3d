@@ -326,6 +326,39 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	}
 
+	public void ensureFoundationPointOrder() {
+		if (points.isEmpty()) {
+			return;
+		}
+		double xmin = Double.MAX_VALUE;
+		double xmax = -Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		double ymax = -Double.MAX_VALUE;
+		for (int i = 0; i < 4; i++) {
+			final Vector3 v = points.get(i);
+			if (v.getX() < xmin) {
+				xmin = v.getX();
+			}
+			if (v.getX() > xmax) {
+				xmax = v.getX();
+			}
+			if (v.getY() < ymin) {
+				ymin = v.getY();
+			}
+			if (v.getY() > ymax) {
+				ymax = v.getY();
+			}
+		}
+		points.get(0).set(xmin, ymin, points.get(0).getZ());
+		points.get(2).set(xmax, ymin, points.get(2).getZ());
+		points.get(1).set(xmin, ymax, points.get(1).getZ());
+		points.get(3).set(xmax, ymax, points.get(3).getZ());
+		points.get(4).set(xmin, ymin, points.get(4).getZ());
+		points.get(6).set(xmax, ymin, points.get(6).getZ());
+		points.get(5).set(xmin, ymax, points.get(5).getZ());
+		points.get(7).set(xmax, ymax, points.get(7).getZ());
+	}
+
 	public void resetImportedMeshColors() {
 		if (importedNodeStates != null) {
 			for (final NodeState ns : importedNodeStates) {

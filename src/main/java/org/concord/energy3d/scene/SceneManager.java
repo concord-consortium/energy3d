@@ -2142,6 +2142,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 										});
 									} else {
 										undoManager.addEdit(addPartCommand);
+										if (selectedPart instanceof Foundation) { // only when we add a new foundation do we ensure the order of its points (later a foundation can be rotated, altering the order)
+											((Foundation) selectedPart).ensureFoundationPointOrder();
+										}
 									}
 								}
 								addPartCommand = null;

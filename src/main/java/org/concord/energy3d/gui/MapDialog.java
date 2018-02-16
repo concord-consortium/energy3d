@@ -363,6 +363,9 @@ class MapDialog extends JDialog {
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
+				if (mapLoader != null) {
+					mapLoader.cancel(true);
+				}
 				setVisible(false);
 			}
 		});

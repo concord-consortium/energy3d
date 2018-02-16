@@ -865,7 +865,7 @@ public abstract class HousePart implements Serializable {
 
 	public Vector3 getAbsPoint(final int index) {
 		if (index >= points.size()) {
-			throw new RuntimeException("Energy3D OutOfBoundException for HousePart: " + this.toString());
+			throw new RuntimeException("Energy3D OutOfBoundException for HousePart: " + toString());
 		}
 		return toAbsolute(points.get(index), null);
 	}

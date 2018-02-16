@@ -799,7 +799,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		if (nearest != null) { // use the nearest rack as the reference to infer next position
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
 			length = d.length();
-			if (rackHeight > length) {
+			if (rackHeight > length * Scene.getInstance().getAnnotationScale()) {
 				inHeight = false;
 			}
 			if (length > Math.min(rackWidth, rackHeight) * 5 / Scene.getInstance().getAnnotationScale()) {
