@@ -1921,6 +1921,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 		}
+		racks.clear();
 		return nearest;
 	}
 
@@ -1970,6 +1971,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 		}
+		mirrors.clear();
 		return nearest;
 	}
 
@@ -2004,6 +2006,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 		}
+		troughs.clear();
 		return nearest;
 	}
 
@@ -2038,6 +2041,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 		}
+		dishes.clear();
 		return nearest;
 	}
 
@@ -2072,6 +2076,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 		}
+		reflectors.clear();
 		return nearest;
 	}
 

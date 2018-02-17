@@ -1207,7 +1207,8 @@ public abstract class HousePart implements Serializable {
 			y += v.getY();
 			z += v.getZ();
 		}
-		return new Vector3(x / n, y / n, z / n);
+		final double invert = 1.0 / n;
+		return new Vector3(x * invert, y * invert, z * invert);
 	}
 
 	protected ReadOnlyVector3 computeNormalAndKeepOnSurface() {

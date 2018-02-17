@@ -1064,7 +1064,9 @@ public class Scene implements Serializable {
 		if (copyBuffer instanceof Foundation) {
 			return;
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		final HousePart c = copyBuffer.copy(true);
 		if (c == null) {
 			return;
@@ -1275,7 +1277,9 @@ public class Scene implements Serializable {
 	}
 
 	public void pasteToPickedLocationOnFoundation() {
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (!(selectedPart instanceof Foundation)) {
 			return;
