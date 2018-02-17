@@ -921,17 +921,18 @@ public class Scene implements Serializable {
 			instance.restoreGroundImageData();
 		}
 
-		if (!logger) {
-			try {
-				System.out.print("Save Verification Opening..." + url + "...");
-				final ObjectInputStream in = new ObjectInputStream(url.openStream());
-				in.readObject();
-				in.close();
-			} catch (final Throwable e) {
-				instance.setEdited(true);
-				BugReporter.report(e, "Save Verification Error: " + url + " : ");
-			}
-		}
+		// if (!logger) {
+		// try {
+		// System.out.print("Save Verification Opening..." + url + "...");
+		// final ObjectInputStream in = new ObjectInputStream(url.openStream());
+		// in.readObject();
+		// in.close();
+		// } catch (final Throwable e) {
+		// instance.setEdited(true);
+		// BugReporter.report(e, "Save Verification Error: " + url + " : ");
+		// }
+		// }
+
 		System.out.println("done");
 	}
 

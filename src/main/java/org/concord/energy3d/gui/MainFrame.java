@@ -2056,6 +2056,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
 							new EnergyAnnualAnalysis().show("Annual Energy");
 						}
@@ -2073,6 +2076,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
 							new EnergyAnnualAnalysis().show("Annual Energy for Selected Part");

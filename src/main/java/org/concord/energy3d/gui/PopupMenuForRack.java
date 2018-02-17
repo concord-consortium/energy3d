@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -422,6 +423,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 
 			final JMenuItem miRotate = new JMenuItem("Rotate 90\u00B0");
 			miRotate.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -429,15 +433,86 @@ class PopupMenuForRack extends PopupMenuFactory {
 						return;
 					}
 					final Rack rack = (Rack) selectedPart;
-					double a = rack.getRelativeAzimuth() + 90;
-					if (a > 360) {
-						a -= 360;
+					final Foundation foundation = rack.getTopContainer();
+					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
 					}
-					final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
-					rack.setRelativeAzimuth(a);
-					rack.draw();
-					SceneManager.getInstance().refresh();
-					SceneManager.getInstance().getUndoManager().addEdit(c);
+					gui.add(scopePanel, BorderLayout.CENTER);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Rotate 90\u00B0 for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rotate Rack");
+					while (true) {
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							if (rb1.isSelected()) {
+								double a = rack.getRelativeAzimuth() + 90;
+								if (a > 360) {
+									a -= 360;
+								}
+								final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
+								rack.setRelativeAzimuth(a);
+								rack.draw();
+								SceneManager.getInstance().refresh();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
+								selectedScopeIndex = 0;
+							} else if (rb2.isSelected()) {
+								final List<Rack> racks = foundation.getRacks();
+								for (final Rack r : racks) {
+									double a = r.getRelativeAzimuth() + 90;
+									if (a > 360) {
+										a -= 360;
+									}
+									r.setRelativeAzimuth(a);
+									r.draw();
+									SceneManager.getInstance().refresh();
+								}
+								selectedScopeIndex = 1;
+							} else if (rb3.isSelected()) {
+								final List<Rack> racks = Scene.getInstance().getAllRacks();
+								for (final Rack r : racks) {
+									double a = r.getRelativeAzimuth() + 90;
+									if (a > 360) {
+										a -= 360;
+									}
+									r.setRelativeAzimuth(a);
+									r.draw();
+									SceneManager.getInstance().refresh();
+								}
+								selectedScopeIndex = 2;
+							}
+							updateAfterEdit();
+							if (choice == options[0]) {
+								break;
+							}
+						}
+					}
 				}
 			});
 
