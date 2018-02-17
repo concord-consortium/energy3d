@@ -2943,6 +2943,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
 						new PvDailyAnalysis().show();
 					}
@@ -2954,6 +2957,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Rack) {
 						new PvAnnualAnalysis().show();
 					}

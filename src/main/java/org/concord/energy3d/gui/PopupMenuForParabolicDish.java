@@ -1385,6 +1385,9 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicDish) {
 						new ParabolicDishDailyAnalysis().show();
 					}
@@ -1396,6 +1399,9 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicDish) {
 						new ParabolicDishAnnualAnalysis().show();
 					}

@@ -1034,6 +1034,9 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Mirror) {
 						new HeliostatDailyAnalysis().show();
 					}
@@ -1045,6 +1048,9 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Mirror) {
 						new HeliostatAnnualAnalysis().show();
 					}

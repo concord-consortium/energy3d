@@ -10,6 +10,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.NodeState;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.scenegraph.Node;
 
@@ -45,7 +46,9 @@ public class DeleteNodeCommand extends MyAbstractUndoableEdit {
 				Scene.getInstance().add(p, true);
 			}
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -57,7 +60,9 @@ public class DeleteNodeCommand extends MyAbstractUndoableEdit {
 				Scene.getInstance().remove(p, true);
 			}
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

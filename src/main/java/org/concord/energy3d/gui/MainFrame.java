@@ -2093,6 +2093,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						if (SceneManager.getInstance().autoSelectBuilding(true) instanceof Foundation) {
 							final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
 							if (SceneManager.getInstance().getSolarHeatMap()) {
@@ -2114,6 +2117,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Window || selectedPart instanceof Wall || selectedPart instanceof Roof || selectedPart instanceof Door || selectedPart instanceof SolarPanel || selectedPart instanceof Rack || selectedPart instanceof Foundation) {
 							new EnergyDailyAnalysis().show("Daily Energy for Selected Part");
@@ -2138,6 +2144,9 @@ public class MainFrame extends JFrame {
 						int n = Scene.getInstance().countParts(new Class[] { SolarPanel.class, Rack.class });
 						if (n <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final PvAnnualAnalysis a = new PvAnnualAnalysis();
@@ -2180,6 +2189,9 @@ public class MainFrame extends JFrame {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no solar panel to analyze.", "No Solar Panel", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart != null) {
 							Foundation foundation;
@@ -2218,6 +2230,9 @@ public class MainFrame extends JFrame {
 						int n = Scene.getInstance().countParts(Mirror.class);
 						if (n <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2260,6 +2275,9 @@ public class MainFrame extends JFrame {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no heliostat to analyze.", "No Heliostat", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final HeliostatAnnualAnalysis a = new HeliostatAnnualAnalysis();
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart != null) {
@@ -2295,6 +2313,9 @@ public class MainFrame extends JFrame {
 						int n = Scene.getInstance().countParts(ParabolicTrough.class);
 						if (n <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2337,6 +2358,9 @@ public class MainFrame extends JFrame {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic trough to analyze.", "No Parabolic Trough", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final ParabolicTroughAnnualAnalysis a = new ParabolicTroughAnnualAnalysis();
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart != null) {
@@ -2372,6 +2396,9 @@ public class MainFrame extends JFrame {
 						int n = Scene.getInstance().countParts(ParabolicDish.class);
 						if (n <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2414,6 +2441,9 @@ public class MainFrame extends JFrame {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no parabolic dish to analyze.", "No Parabolic Dish", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final ParabolicDishAnnualAnalysis a = new ParabolicDishAnnualAnalysis();
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart != null) {
@@ -2449,6 +2479,9 @@ public class MainFrame extends JFrame {
 						int n = Scene.getInstance().countParts(FresnelReflector.class);
 						if (n <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -2491,6 +2524,9 @@ public class MainFrame extends JFrame {
 							JOptionPane.showMessageDialog(MainFrame.this, "There is no Fresnel reflector to analyze.", "No Fresnel Reflector", JOptionPane.WARNING_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final FresnelReflectorAnnualAnalysis a = new FresnelReflectorAnnualAnalysis();
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart != null) {
@@ -2523,6 +2559,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final PartGroup g = new GroupSelector().select();
 						if (g != null) {
 							final GroupDailyAnalysis a = new GroupDailyAnalysis(g);
@@ -2543,6 +2582,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (EnergyPanel.getInstance().checkCity()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final PartGroup g = new GroupSelector().select();
 						if (g != null) {
 							final GroupAnnualAnalysis a = new GroupAnnualAnalysis(g);
@@ -2563,6 +2605,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (Scene.getInstance().hasSensor()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						new AnnualSensorData().show("Annual Sensor Data");
 					} else {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);
@@ -2580,6 +2625,9 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					if (Scene.getInstance().hasSensor()) {
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						new DailySensorData().show("Daily Sensor Data");
 					} else {
 						JOptionPane.showMessageDialog(MainFrame.this, "There is no sensor.", "No sensor", JOptionPane.WARNING_MESSAGE);

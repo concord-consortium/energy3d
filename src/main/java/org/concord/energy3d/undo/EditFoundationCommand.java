@@ -47,7 +47,9 @@ public class EditFoundationCommand extends EditPartCommand {
 		foundation.updateHandlesOfAllFoudations();
 		Scene.getInstance().updateTrackables();
 		SceneManager.getInstance().refresh();
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -68,7 +70,9 @@ public class EditFoundationCommand extends EditPartCommand {
 		foundation.updateHandlesOfAllFoudations();
 		Scene.getInstance().updateTrackables();
 		SceneManager.getInstance().refresh();
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

@@ -36,7 +36,9 @@ public class ChangeSolarPanelModelCommand extends MyAbstractUndoableEdit {
 		solarPanel.draw();
 		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().updateProperties();
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -46,7 +48,9 @@ public class ChangeSolarPanelModelCommand extends MyAbstractUndoableEdit {
 		solarPanel.draw();
 		SceneManager.getInstance().refresh();
 		EnergyPanel.getInstance().updateProperties();
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

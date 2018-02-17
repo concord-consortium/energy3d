@@ -9,6 +9,7 @@ import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class RemoveMultiplePartsCommand extends MyAbstractUndoableEdit {
 
@@ -60,7 +61,9 @@ public class RemoveMultiplePartsCommand extends MyAbstractUndoableEdit {
 				Scene.getInstance().add(p, true);
 			}
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -69,7 +72,9 @@ public class RemoveMultiplePartsCommand extends MyAbstractUndoableEdit {
 		for (final HousePart p : parts) {
 			Scene.getInstance().remove(p, true);
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

@@ -1525,6 +1525,9 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicTrough) {
 						new ParabolicTroughDailyAnalysis().show();
 					}
@@ -1536,6 +1539,9 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof ParabolicTrough) {
 						new ParabolicTroughAnnualAnalysis().show();
 					}

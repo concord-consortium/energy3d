@@ -234,7 +234,9 @@ public class EnergyPanel extends JPanel {
 					}
 					Scene.getInstance().setDate(d);
 					Heliodon.getInstance().setDate(d);
-					updateRadiationHeatMap();
+					if (SceneManager.getInstance().getSolarHeatMap()) {
+						updateRadiationHeatMap();
+					}
 					Scene.getInstance().updateTreeLeaves();
 					Scene.getInstance().updateTrackables();
 					Scene.getInstance().setEdited(true);
@@ -270,13 +272,17 @@ public class EnergyPanel extends JPanel {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					final String city = (String) regionComboBox.getSelectedItem();
 					if (city.equals("")) {
-						updateRadiationHeatMap();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							updateRadiationHeatMap();
+						}
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No region is selected.\nEnergy simulation will not be accurate.", "Warning", JOptionPane.WARNING_MESSAGE);
 						Scene.getInstance().setCity(city);
 					} else {
 						final ChangeCityCommand c = new ChangeCityCommand();
 						setLatitude((int) LocationData.getInstance().getLatitudes().get(regionComboBox.getSelectedItem()).floatValue());
-						updateRadiationHeatMap();
+						if (SceneManager.getInstance().getSolarHeatMap()) {
+							updateRadiationHeatMap();
+						}
 						Scene.getInstance().setCity(city);
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						final LocationData ld = LocationData.getInstance();
@@ -394,7 +400,9 @@ public class EnergyPanel extends JPanel {
 			public void stateChanged(final ChangeEvent e) {
 				final ChangeLatitudeCommand c = new ChangeLatitudeCommand();
 				Heliodon.getInstance().setLatitude(((Double) latitudeSpinner.getValue()) / 180.0 * Math.PI);
-				updateRadiationHeatMap();
+				if (SceneManager.getInstance().getSolarHeatMap()) {
+					updateRadiationHeatMap();
+				}
 				Scene.getInstance().updateTrackables();
 				Scene.getInstance().setEdited(true);
 				SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -898,11 +906,14 @@ public class EnergyPanel extends JPanel {
 		final double cellSize = Scene.getInstance().getSolarStep() * Scene.getInstance().getAnnotationScale();
 		final int cellCount = (int) (Scene.getInstance().getTotalFoundationAreas() / (cellSize * cellSize));
 		if (cellCount > 1000000) {
-			if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Cell size for others (" + cellSize + "m) is probably too small for this model.<br>Consider adjust it to speed up simulations.</html>", "Cell Size Adjustment Suggestion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+			final int x = JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Cell size for others (" + cellSize + "m) is probably too small for this model.<br>Consider adjust it to speed up simulations.</html>", "Cell Size Adjustment Suggestion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (x == JOptionPane.YES_OPTION) {
 				final VisualizationSettingsDialog v = new VisualizationSettingsDialog();
 				v.getCellSizeField().selectAll();
 				v.getCellSizeField().requestFocusInWindow();
 				v.setVisible(true);
+				return true;
+			} else if (x == -1) {
 				return true;
 			}
 		}

@@ -1924,6 +1924,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
 						final EnergyDailyAnalysis analysis = new EnergyDailyAnalysis();
 						if (SceneManager.getInstance().getSolarHeatMap()) {
@@ -1939,6 +1942,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Foundation) {
 						new EnergyAnnualAnalysis().show("Annual Building Energy");
 					}
@@ -1957,6 +1963,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
 						if (f.countParts(new Class[] { SolarPanel.class, Rack.class }) <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final PvDailyAnalysis a = new PvDailyAnalysis();
@@ -1978,6 +1987,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final Foundation f = (Foundation) selectedPart;
 						if (f.countParts(new Class[] { SolarPanel.class, Rack.class }) <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no solar panel on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final PvAnnualAnalysis a = new PvAnnualAnalysis();
@@ -2003,6 +2015,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						final HeliostatDailyAnalysis a = new HeliostatDailyAnalysis();
 						if (SceneManager.getInstance().getSolarHeatMap()) {
 							a.updateGraph();
@@ -2024,6 +2039,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no heliostat on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						new HeliostatAnnualAnalysis().show();
 					}
 				}
@@ -2041,6 +2059,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
 						if (f.countParts(ParabolicTrough.class) <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic trough on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final ParabolicTroughDailyAnalysis a = new ParabolicTroughDailyAnalysis();
@@ -2064,6 +2085,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic trough on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						new ParabolicTroughAnnualAnalysis().show();
 					}
 				}
@@ -2081,6 +2105,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
 						if (f.countParts(ParabolicDish.class) <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic dish on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final ParabolicDishDailyAnalysis a = new ParabolicDishDailyAnalysis();
@@ -2104,6 +2131,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no parabolic dish on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
 							return;
 						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
+							return;
+						}
 						new ParabolicDishAnnualAnalysis().show();
 					}
 				}
@@ -2121,6 +2151,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final Foundation f = (Foundation) SceneManager.getInstance().getSelectedPart();
 						if (f.countParts(FresnelReflector.class) <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no Fresnel reflector on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						final FresnelReflectorDailyAnalysis a = new FresnelReflectorDailyAnalysis();
@@ -2142,6 +2175,9 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						final Foundation f = (Foundation) selectedPart;
 						if (f.countParts(FresnelReflector.class) <= 0) {
 							JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no Fresnel reflector on this foundation to analyze.", "Error", JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						if (EnergyPanel.getInstance().adjustCellSize()) {
 							return;
 						}
 						new FresnelReflectorAnnualAnalysis().show();

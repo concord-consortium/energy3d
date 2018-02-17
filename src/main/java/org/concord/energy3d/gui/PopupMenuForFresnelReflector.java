@@ -1243,6 +1243,9 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof FresnelReflector) {
 						new FresnelReflectorDailyAnalysis().show();
 					}
@@ -1254,6 +1257,9 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof FresnelReflector) {
 						new FresnelReflectorAnnualAnalysis().show();
 					}

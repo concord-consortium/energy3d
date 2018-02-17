@@ -8,6 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.NodeState;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.scenegraph.Node;
 
@@ -44,7 +45,9 @@ public class AddNodeCommand extends MyAbstractUndoableEdit {
 		if (node != null) {
 			foundation.deleteNode(node);
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -53,7 +56,9 @@ public class AddNodeCommand extends MyAbstractUndoableEdit {
 		if (node != null) {
 			foundation.addNode(node, nodeState);
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.SceneManager;
 
 public class RemoveMultipleShuttersCommand extends MyAbstractUndoableEdit {
 
@@ -37,7 +38,9 @@ public class RemoveMultipleShuttersCommand extends MyAbstractUndoableEdit {
 				w.draw();
 			}
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -50,7 +53,9 @@ public class RemoveMultipleShuttersCommand extends MyAbstractUndoableEdit {
 				w.draw();
 			}
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

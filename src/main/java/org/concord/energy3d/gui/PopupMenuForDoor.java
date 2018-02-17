@@ -29,6 +29,9 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Door) {
 						new EnergyDailyAnalysis().show("Daily Energy for Door");
 					}
@@ -40,6 +43,9 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Door) {
 						new EnergyAnnualAnalysis().show("Annual Energy for Door");
 					}

@@ -963,6 +963,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Window) {
 						new EnergyDailyAnalysis().show("Daily Energy for Window");
 					}
@@ -974,6 +977,9 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Window) {
 						new EnergyAnnualAnalysis().show("Annual Energy for Window");
 					}

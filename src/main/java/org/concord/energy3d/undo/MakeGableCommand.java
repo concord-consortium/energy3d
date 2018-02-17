@@ -8,6 +8,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Roof;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.math.type.ReadOnlyVector3;
 
@@ -30,14 +31,18 @@ public class MakeGableCommand extends EditPartCommand {
 		saveNewPoints();
 		roof.setGable(wall, false, false, roofPartMeshUpperPoints);
 		super.undo();
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		roof.setGable(wall, true, false, roofPartMeshUpperPoints);
 		super.redo();
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

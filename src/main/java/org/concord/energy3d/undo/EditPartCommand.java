@@ -11,6 +11,7 @@ import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Sensor;
+import org.concord.energy3d.scene.SceneManager;
 
 import com.ardor3d.math.Vector3;
 
@@ -49,7 +50,9 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 		if (part.getContainer() != null) {
 			part.getContainer().draw();
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -63,7 +66,9 @@ public class EditPartCommand extends MyAbstractUndoableEdit {
 		if (part.getContainer() != null) {
 			part.getContainer().draw();
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	public boolean isReallyEdited() {

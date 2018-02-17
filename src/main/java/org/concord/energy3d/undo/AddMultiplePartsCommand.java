@@ -10,6 +10,7 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class AddMultiplePartsCommand extends MyAbstractUndoableEdit {
 
@@ -36,7 +37,9 @@ public class AddMultiplePartsCommand extends MyAbstractUndoableEdit {
 		for (final HousePart p : parts) {
 			Scene.getInstance().remove(p, true);
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override
@@ -45,7 +48,9 @@ public class AddMultiplePartsCommand extends MyAbstractUndoableEdit {
 		for (final HousePart p : parts) {
 			Scene.getInstance().add(p, true);
 		}
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 	}
 
 	@Override

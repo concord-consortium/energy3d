@@ -78,7 +78,9 @@ public class DesignReplay extends PlayControl {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
 						@Override
 						public Object call() throws Exception {
-							EnergyPanel.getInstance().updateRadiationHeatMap();
+							if (SceneManager.getInstance().getSolarHeatMap()) {
+								EnergyPanel.getInstance().updateRadiationHeatMap();
+							}
 							EventQueue.invokeLater(new Runnable() {
 								@Override
 								public void run() {

@@ -711,6 +711,9 @@ class PopupMenuForWall extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Wall) {
 						new EnergyDailyAnalysis().show("Daily Energy for Wall");
 					}
@@ -722,6 +725,9 @@ class PopupMenuForWall extends PopupMenuFactory {
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
+					if (EnergyPanel.getInstance().adjustCellSize()) {
+						return;
+					}
 					if (SceneManager.getInstance().getSelectedPart() instanceof Wall) {
 						new EnergyAnnualAnalysis().show("Annual Energy for Wall");
 					}
