@@ -596,6 +596,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				compass.setScale(0.1);
 				compass.setTranslation(-1, -0.7, 2);
 				cameraNode.attachChild(compass);
+				final Spatial earth = createEarth();
+				earth.setScale(0.00012);
+				earth.setTranslation(-1, -0.67, 2);
+				cameraNode.attachChild(earth);
 				Scene.getInstance().updateEditShapes();
 				return null;
 			}
@@ -1524,8 +1528,40 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return cameraNode;
 	}
 
+	private Node createEarth() throws IOException {
+		final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "earth.dae");
+		final ColladaImporter colladaImporter = new ColladaImporter();
+		final ColladaStorage storage = colladaImporter.load(source);
+		final Node earth = storage.getScene();
+		final DirectionalLight light = new DirectionalLight();
+		light.setDirection(new Vector3(0, 0, -1));
+		light.setEnabled(true);
+		final LightState lightState = new LightState();
+		lightState.attach(light);
+		earth.setRenderState(lightState);
+		earth.getSceneHints().setLightCombineMode(LightCombineMode.Replace);
+		earth.updateWorldRenderStates(true);
+		final Node node = new Node();
+		node.setRotation(new Matrix3().fromAngles(-MathUtils.HALF_PI, 0.0, 0.0));
+		node.attachChild(earth);
+		earth.addController(new SpatialController<Spatial>() {
+			@Override
+			public void update(final double time, final Spatial caller) {
+				final Vector3 direction = getCamera().getDirection().normalize(null);
+				direction.setZ(0);
+				direction.normalizeLocal();
+				double angle = -direction.smallestAngleBetween(Vector3.UNIT_Y);
+				if (direction.dot(Vector3.UNIT_X) > 0) {
+					angle = -angle;
+				}
+				angle -= MathUtils.HALF_PI;
+				earth.setRotation(new Matrix3().fromAngles(0, 0, angle));
+			}
+		});
+		return node;
+	}
+
 	private Node createCompass() throws IOException {
-		System.out.print("Loading compass...");
 		final ResourceSource source = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "compass.dae");
 		final ColladaImporter colladaImporter = new ColladaImporter();
 
