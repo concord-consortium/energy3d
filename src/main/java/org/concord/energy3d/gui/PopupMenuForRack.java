@@ -483,6 +483,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 0;
 							} else if (rb2.isSelected()) {
+								final ChangeFoundationRackAzimuthCommand c = new ChangeFoundationRackAzimuthCommand(foundation);
 								final List<Rack> racks = foundation.getRacks();
 								for (final Rack r : racks) {
 									double a = r.getRelativeAzimuth() + 90;
@@ -491,10 +492,12 @@ class PopupMenuForRack extends PopupMenuFactory {
 									}
 									r.setRelativeAzimuth(a);
 									r.draw();
-									SceneManager.getInstance().refresh();
 								}
+								SceneManager.getInstance().refresh();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 1;
 							} else if (rb3.isSelected()) {
+								final ChangeAzimuthForAllRacksCommand c = new ChangeAzimuthForAllRacksCommand();
 								final List<Rack> racks = Scene.getInstance().getAllRacks();
 								for (final Rack r : racks) {
 									double a = r.getRelativeAzimuth() + 90;
@@ -503,8 +506,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 									}
 									r.setRelativeAzimuth(a);
 									r.draw();
-									SceneManager.getInstance().refresh();
 								}
+								SceneManager.getInstance().refresh();
+								SceneManager.getInstance().getUndoManager().addEdit(c);
 								selectedScopeIndex = 2;
 							}
 							updateAfterEdit();

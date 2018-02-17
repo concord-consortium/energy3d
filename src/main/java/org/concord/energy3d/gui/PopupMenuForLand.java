@@ -323,7 +323,7 @@ class PopupMenuForLand extends PopupMenuFactory {
 			miUseEarthView.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MapDialog.showDialog();
+					new MapDialog(MainFrame.getInstance()).setVisible(true);
 				}
 			});
 			groundImageMenu.add(miUseEarthView);

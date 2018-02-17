@@ -55,30 +55,28 @@ class MapDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private static final int zoomMin = 0;
 	private static final int zoomMax = 21;
-	private final JTextField addressField = new JTextField("25 Love lane, Concord, MA, USA");
-	private final JSpinner latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.000001)); // spinner tick must go down to 10^-6 in order to avoid seam lines at zoom level 20
-	private final JSpinner longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.000001));
-	private final JSpinner zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
-	private final JComboBox<String> resolutionOptionComboBox = new JComboBox<String>(new String[] { "1\u00D71", "3\u00D73", "5\u00D75", "7\u00D77", "9\u00D79" });
-	private final MapImageView mapImageView = new MapImageView();
-	private static MapDialog instance;
+	private final JTextField addressField;
+	private final JSpinner latitudeSpinner;
+	private final JSpinner longitudeSpinner;
+	private final JSpinner zoomSpinner;
+	private final JComboBox<String> resolutionOptionComboBox;
+	private final MapImageView mapImageView;
 	private volatile boolean lock;
 	private MapLoader mapLoader;
 	private int extent = 0;
+	private BufferedImage mapImage;
 
 	class MapLoader extends SwingWorker<BufferedImage, Integer> {
 
-		private final boolean export;
 		private final double lat, lng, latWindow, lngWindow;
 		private final int zoom, w, h;
 		private int extent = 0;
 
-		public MapLoader(final boolean export, final int extent) {
+		public MapLoader(final int extent) {
 			if (mapLoader != null) {
 				mapLoader.cancel(true);
 			}
 			this.extent = extent;
-			this.export = export;
 			lng = (Double) longitudeSpinner.getValue();
 			lat = (Double) latitudeSpinner.getValue();
 			zoom = (Integer) zoomSpinner.getValue();
@@ -136,28 +134,10 @@ class MapDialog extends JDialog {
 		@Override
 		protected void done() {
 			try {
-				final BufferedImage mapImage = get();
-				if (export) {
-					Scene.getInstance().setGeoLocation(lat, lng, zoom, addressField.getText());
-					SceneManager.getTaskManager().update(new Callable<Object>() {
-						@Override
-						public Object call() {
-							Scene.getInstance().setGroundImage(mapImage, getScale() * (2 * extent + 1));
-							Scene.getInstance().setGroundImageEarthView(true);
-							Scene.getInstance().setEdited(true);
-							return null;
-						}
-					});
-					setVisible(false);
-					final String closestCity = LocationData.getInstance().getClosestCity(lng, lat);
-					if (closestCity != null) {
-						EnergyPanel.getInstance().getCityComboBox().setSelectedItem(closestCity);
-					}
-				} else {
-					final int w = mapImageView.getPreferredSize().width;
-					mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
-					mapImageView.repaint();
-				}
+				mapImage = get();
+				final int w = mapImageView.getPreferredSize().width;
+				mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
+				mapImageView.repaint();
 			} catch (final Exception e) {
 				displayError(e);
 			} finally {
@@ -181,28 +161,14 @@ class MapDialog extends JDialog {
 
 	}
 
-	public static void showDialog() {
-		if (instance == null) {
-			instance = new MapDialog(MainFrame.getInstance());
-		}
-		instance.setGeoLocation();
-		instance.extent = Scene.getInstance().getGroundImageExtent();
-		Util.selectSilently(instance.resolutionOptionComboBox, instance.extent);
-		instance.updateMap();
-		instance.setVisible(true);
-	}
+	public MapDialog(final JFrame owner) {
 
-	private MapDialog(final JFrame owner) {
 		super(owner);
 		setTitle("Earth View");
 		setResizable(false);
-		final JSpinner.NumberEditor latEditor = new JSpinner.NumberEditor(latitudeSpinner, "0.00000");
-		final JSpinner.NumberEditor lngEditor = new JSpinner.NumberEditor(longitudeSpinner, "0.00000");
-		latEditor.getTextField().setColumns(6);
-		lngEditor.getTextField().setColumns(6);
-		latitudeSpinner.setEditor(latEditor);
-		longitudeSpinner.setEditor(lngEditor);
-		setGeoLocation();
+		extent = Scene.getInstance().getGroundImageExtent();
+
+		mapImageView = new MapImageView();
 		mapImageView.setAlignmentX(0.5f);
 		mapImageView.setPreferredSize(new Dimension(640, 640));
 		mapImageView.addKeyListener(new KeyAdapter() {
@@ -286,21 +252,17 @@ class MapDialog extends JDialog {
 				updateMap();
 			}
 		});
-		resolutionOptionComboBox.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(final ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					if ((Integer) zoomSpinner.getValue() < 14) {
-						JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large to apply this option.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
-						Util.selectSilently(resolutionOptionComboBox, 0);
-						return;
-					}
-					extent = resolutionOptionComboBox.getSelectedIndex();
-					Scene.getInstance().setGroundImageExtent(extent);
-					updateMap();
-				}
-			}
-		});
+
+		latitudeSpinner = new JSpinner(new SpinnerNumberModel(42.45661, -90, 90, 0.000001)); // spinner tick must go down to 10^-6 in order to avoid seam lines at zoom level 20
+		longitudeSpinner = new JSpinner(new SpinnerNumberModel(-71.35823, -90, 90, 0.000001));
+		final JSpinner.NumberEditor latEditor = new JSpinner.NumberEditor(latitudeSpinner, "0.00000");
+		final JSpinner.NumberEditor lngEditor = new JSpinner.NumberEditor(longitudeSpinner, "0.00000");
+		latEditor.getTextField().setColumns(6);
+		lngEditor.getTextField().setColumns(6);
+		latitudeSpinner.setEditor(latEditor);
+		longitudeSpinner.setEditor(lngEditor);
+		zoomSpinner = new JSpinner(new SpinnerNumberModel(20, zoomMin, zoomMax, 1));
+		addressField = new JTextField("25 Love lane, Concord, MA, USA");
 		addressField.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -315,18 +277,19 @@ class MapDialog extends JDialog {
 				}
 			}
 		});
+		setGeoLocation(); // set before hooking up with listener to avoid firing an event
 		final ChangeListener changeListener = new ChangeListener() {
 			@Override
 			public void stateChanged(final ChangeEvent event) {
-				if (lock) {
-					return;
+				if (!lock) {
+					updateMap();
 				}
-				updateMap();
 			}
 		};
 		latitudeSpinner.addChangeListener(changeListener);
 		longitudeSpinner.addChangeListener(changeListener);
 		zoomSpinner.addChangeListener(changeListener);
+
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		final JPanel panel1 = new JPanel();
 		panel1.setLayout(new BoxLayout(panel1, BoxLayout.X_AXIS));
@@ -346,6 +309,7 @@ class MapDialog extends JDialog {
 		panel2.add(zoomSpinner);
 		getContentPane().add(panel2);
 		getContentPane().add(mapImageView);
+
 		final JPanel bottomPanel = new JPanel();
 		final JButton okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
@@ -355,8 +319,24 @@ class MapDialog extends JDialog {
 					JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large. Please zoom in and try again.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
 					return;
 				}
-				mapLoader = new MapLoader(true, extent);
-				mapLoader.execute();
+				final double lng = (Double) longitudeSpinner.getValue();
+				final double lat = (Double) latitudeSpinner.getValue();
+				final int zoom = (Integer) zoomSpinner.getValue();
+				Scene.getInstance().setGeoLocation(lat, lng, zoom, addressField.getText());
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() {
+						Scene.getInstance().setGroundImage(mapImage, getScale() * (2 * extent + 1));
+						Scene.getInstance().setGroundImageEarthView(true);
+						Scene.getInstance().setEdited(true);
+						return null;
+					}
+				});
+				final String closestCity = LocationData.getInstance().getClosestCity(lng, lat);
+				if (closestCity != null) {
+					EnergyPanel.getInstance().getCityComboBox().setSelectedItem(closestCity);
+				}
+				dispose();
 			}
 		});
 		final JButton cancelButton = new JButton("Cancel");
@@ -366,7 +346,24 @@ class MapDialog extends JDialog {
 				if (mapLoader != null) {
 					mapLoader.cancel(true);
 				}
-				setVisible(false);
+				dispose();
+			}
+		});
+		resolutionOptionComboBox = new JComboBox<String>(new String[] { "1\u00D71", "3\u00D73", "5\u00D75", "7\u00D77", "9\u00D79" });
+		resolutionOptionComboBox.setSelectedIndex(extent);
+		resolutionOptionComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if ((Integer) zoomSpinner.getValue() < 14) {
+						JOptionPane.showMessageDialog(MapDialog.this, "The selected region is too large to apply this option.", MapDialog.this.getTitle(), JOptionPane.WARNING_MESSAGE);
+						Util.selectSilently(resolutionOptionComboBox, 0);
+						return;
+					}
+					extent = resolutionOptionComboBox.getSelectedIndex();
+					Scene.getInstance().setGroundImageExtent(extent);
+					updateMap();
+				}
 			}
 		});
 		bottomPanel.add(new JLabel("Resolution:"));
@@ -382,9 +379,18 @@ class MapDialog extends JDialog {
 		bottomPanel.add(okButton);
 		bottomPanel.add(cancelButton);
 		getContentPane().add(bottomPanel);
-		updateMap();
+
+		mapImage = Scene.getInstance().getGroundImage();
+		if (mapImage == null) {
+			updateMap();
+		} else {
+			final int w = mapImageView.getPreferredSize().width;
+			mapImageView.setImage(mapImage.getScaledInstance(w, w, Image.SCALE_DEFAULT));
+		}
+
 		pack();
 		setLocationRelativeTo(owner);
+
 	}
 
 	public void setExtent(final int extent) {
@@ -406,7 +412,7 @@ class MapDialog extends JDialog {
 	}
 
 	private void updateMap() {
-		mapLoader = new MapLoader(false, extent);
+		mapLoader = new MapLoader(extent);
 		mapLoader.execute();
 	}
 
@@ -451,4 +457,5 @@ class MapDialog extends JDialog {
 		}
 		return scale;
 	}
+
 }

@@ -1791,7 +1791,7 @@ public class MainFrame extends JFrame {
 			useEarthViewMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					MapDialog.showDialog();
+					new MapDialog(MainFrame.this).setVisible(true);
 				}
 			});
 		}

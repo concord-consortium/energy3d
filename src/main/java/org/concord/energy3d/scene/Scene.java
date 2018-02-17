@@ -3759,6 +3759,10 @@ public class Scene implements Serializable {
 		applyGroundImage();
 	}
 
+	public BufferedImage getGroundImage() {
+		return groundImage;
+	}
+
 	public void setGroundImageScale(final double groundImageScale) {
 		if (isGroundImageEnabled()) {
 			this.groundImageScale = groundImageScale;
