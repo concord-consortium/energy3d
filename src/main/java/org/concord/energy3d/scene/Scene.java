@@ -3512,65 +3512,34 @@ public class Scene implements Serializable {
 	}
 
 	public void updateTrackables() {
+		updateTrackables(null);
+	}
+
+	public void updateTrackables(final Foundation foundation) {
 		if (SceneManager.isTaskManagerThread()) {
-			updateTrackablesImmediately();
+			if (foundation != null) {
+				foundation.updateTrackablesImmediately();
+			} else {
+				final List<Foundation> foundations = getAllFoundations();
+				for (final Foundation f : foundations) {
+					f.updateTrackablesImmediately();
+				}
+			}
 		} else {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					updateTrackablesImmediately();
+					if (foundation != null) {
+						foundation.updateTrackablesImmediately();
+					} else {
+						final List<Foundation> foundations = getAllFoundations();
+						for (final Foundation f : foundations) {
+							f.updateTrackablesImmediately();
+						}
+					}
 					return null;
 				}
 			});
-		}
-	}
-
-	private void updateTrackablesImmediately() {
-		final boolean night = Heliodon.getInstance().isNightTime();
-		for (final HousePart part : parts) {
-			if (part instanceof Mirror) {
-				final Mirror mirror = (Mirror) part;
-				if (night) {
-					mirror.drawSunBeam(); // call this so that the light beams can be set invisible
-				} else {
-					mirror.draw();
-				}
-			} else if (part instanceof ParabolicTrough) {
-				final ParabolicTrough trough = (ParabolicTrough) part;
-				if (night) {
-					trough.drawSunBeam(); // call this so that the light beams can be set invisible
-				} else {
-					trough.draw();
-				}
-			} else if (part instanceof ParabolicDish) {
-				final ParabolicDish dish = (ParabolicDish) part;
-				if (night) {
-					dish.drawSunBeam(); // call this so that the light beams can be set invisible
-				} else {
-					dish.draw();
-				}
-			} else if (part instanceof FresnelReflector) {
-				final FresnelReflector fresnel = (FresnelReflector) part;
-				if (night) {
-					fresnel.drawSunBeam(); // call this so that the light beams can be set invisible
-				} else {
-					fresnel.draw();
-				}
-			} else if (part instanceof SolarPanel) {
-				final SolarPanel panel = (SolarPanel) part;
-				if (night) {
-					panel.drawSunBeam(); // call this so that the sun beam can be set invisible
-				} else {
-					panel.draw();
-				}
-			} else if (part instanceof Rack) {
-				final Rack rack = (Rack) part;
-				if (night) {
-					rack.drawSunBeam(); // call this so that the sun beam can be set invisible
-				} else {
-					rack.draw();
-				}
-			}
 		}
 	}
 

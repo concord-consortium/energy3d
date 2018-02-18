@@ -22,6 +22,7 @@ import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.shapes.Heliodon;
 import org.concord.energy3d.shapes.SizeAnnotation;
 import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.Thermostat;
@@ -3948,6 +3949,55 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			return false;
 		}
 		return super.isDrawable();
+	}
+
+	public void updateTrackablesImmediately() {
+		final boolean night = Heliodon.getInstance().isNightTime();
+		for (final HousePart part : children) {
+			if (part instanceof Mirror) {
+				final Mirror mirror = (Mirror) part;
+				if (night) {
+					mirror.drawSunBeam(); // call this so that the light beams can be set invisible
+				} else {
+					mirror.draw();
+				}
+			} else if (part instanceof ParabolicTrough) {
+				final ParabolicTrough trough = (ParabolicTrough) part;
+				if (night) {
+					trough.drawSunBeam(); // call this so that the light beams can be set invisible
+				} else {
+					trough.draw();
+				}
+			} else if (part instanceof ParabolicDish) {
+				final ParabolicDish dish = (ParabolicDish) part;
+				if (night) {
+					dish.drawSunBeam(); // call this so that the light beams can be set invisible
+				} else {
+					dish.draw();
+				}
+			} else if (part instanceof FresnelReflector) {
+				final FresnelReflector fresnel = (FresnelReflector) part;
+				if (night) {
+					fresnel.drawSunBeam(); // call this so that the light beams can be set invisible
+				} else {
+					fresnel.draw();
+				}
+			} else if (part instanceof SolarPanel) {
+				final SolarPanel panel = (SolarPanel) part;
+				if (night) {
+					panel.drawSunBeam(); // call this so that the sun beam can be set invisible
+				} else {
+					panel.draw();
+				}
+			} else if (part instanceof Rack) {
+				final Rack rack = (Rack) part;
+				if (night) {
+					rack.drawSunBeam(); // call this so that the sun beam can be set invisible
+				} else {
+					rack.draw();
+				}
+			}
+		}
 	}
 
 }

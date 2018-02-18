@@ -2207,7 +2207,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					}
 					updateHeliodonAndAnnotationSize();
 					if (selectedPart instanceof Foundation) {
-						Scene.getInstance().updateTrackables();
+						final Foundation foundation = (Foundation) selectedPart;
+						if (!foundation.getLockEdit()) {
+							Scene.getInstance().updateTrackables(foundation);
+						}
 					} else if (selectedPart instanceof Rack) {
 						((Rack) selectedPart).ensureFullSolarPanels(true);
 					} else if (selectedPart instanceof ParabolicTrough) {

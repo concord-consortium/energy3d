@@ -45,7 +45,7 @@ public class EditFoundationCommand extends EditPartCommand {
 		foundation.draw();
 		foundation.drawChildren();
 		foundation.updateHandlesOfAllFoudations();
-		Scene.getInstance().updateTrackables();
+		Scene.getInstance().updateTrackables(foundation);
 		SceneManager.getInstance().refresh();
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
@@ -68,7 +68,7 @@ public class EditFoundationCommand extends EditPartCommand {
 		foundation.draw();
 		foundation.drawChildren();
 		foundation.updateHandlesOfAllFoudations();
-		Scene.getInstance().updateTrackables();
+		Scene.getInstance().updateTrackables(foundation);
 		SceneManager.getInstance().refresh();
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
