@@ -129,7 +129,7 @@ abstract class AnnualAnalysis extends Analysis {
 					final double[][] solarResults = Scene.getInstance().getSolarResults();
 					if (solarResults != null) {
 						double sum = 0;
-						final double scale = 1.0;
+						final double scale = 1; // Hack to fix the results in case we make a mistake that can be quickly remedied
 						for (int i = 0; i < solarResults.length; i++) {
 							for (int j = 0; j < solarResults[i].length; j++) {
 								solarResults[i][j] *= scale;

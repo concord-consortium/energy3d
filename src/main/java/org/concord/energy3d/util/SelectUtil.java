@@ -40,7 +40,9 @@ public class SelectUtil {
 				PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
 				if (housePart instanceof Foundation) {
 					final Foundation foundation = (Foundation) housePart;
-					PickingUtil.findPick(foundation.getPolygon().getEditPointsRoot(), pickRay, pickResults, false);
+					if (foundation.getPolygon().isVisible()) {
+						PickingUtil.findPick(foundation.getPolygon().getEditPointsRoot(), pickRay, pickResults, false);
+					}
 				}
 			}
 		}

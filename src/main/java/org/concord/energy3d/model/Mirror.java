@@ -85,7 +85,12 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		}
 
 		if (heliostatTarget != null) { // FIXME: Somehow the target, when copied, doesn't point to the right object. This is not a prefect solution, but it fixes the problem.
-			heliostatTarget = (Foundation) Scene.getInstance().getPart(heliostatTarget.getId());
+			final HousePart hp = Scene.getInstance().getPart(heliostatTarget.getId());
+			if (hp instanceof Foundation) {
+				heliostatTarget = (Foundation) hp;
+			} else {
+				heliostatTarget = null;
+			}
 		}
 
 		mesh = new Mesh("Reflecting Mirror");

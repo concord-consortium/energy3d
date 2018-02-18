@@ -56,15 +56,17 @@ public class SnapshotLogger {
 					} catch (final InterruptedException e) {
 						e.printStackTrace();
 					}
-					if (noteEdited || sceneEdited) {
-						try {
-							saveSnapshot();
-						} catch (final Exception e) {
-							e.printStackTrace();
-							BugReporter.report(e);
-							break;
+					if (!Scene.getInstance().getNoSnaphshotLogging()) {
+						if (noteEdited || sceneEdited) {
+							try {
+								saveSnapshot();
+							} catch (final Exception e) {
+								e.printStackTrace();
+								BugReporter.report(e);
+								break;
+							}
+							reset();
 						}
-						reset();
 					}
 				}
 			}

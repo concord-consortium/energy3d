@@ -61,6 +61,10 @@ class PropertiesDialog extends JDialog {
 		if (Scene.getInstance().getOnlySolarAnalysis()) {
 			onlySolarAnalysisComboBox.setSelectedIndex(1);
 		}
+		final JComboBox<String> snapshotLoggingComboBox = new JComboBox<String>(new String[] { "Yes", "No" });
+		if (Scene.getInstance().getNoSnaphshotLogging()) {
+			snapshotLoggingComboBox.setSelectedIndex(1);
+		}
 		final JComboBox<String> groundImageColorationComboBox = new JComboBox<String>(new String[] { "Dark Colored", "Light Colored" });
 		groundImageColorationComboBox.setSelectedIndex(Scene.getInstance().isGroundImageLightColored() ? 1 : 0);
 		final JComboBox<String> instructionTabHeaderComboBox = new JComboBox<String>(new String[] { "Show", "Hide" });
@@ -131,6 +135,7 @@ class PropertiesDialog extends JDialog {
 				Scene.getInstance().setStudentMode(studentModeComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setDisallowFoundationOverlap(foundationOverlapComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setOnlySolarAnalysis(onlySolarAnalysisComboBox.getSelectedIndex() == 1);
+				Scene.getInstance().setNoSnapshotLogging(snapshotLoggingComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setGroundImageLightColored(groundImageColorationComboBox.getSelectedIndex() == 1);
 				Scene.getInstance().setInstructionTabHeaderVisible(instructionTabHeaderComboBox.getSelectedIndex() == 0);
 				Scene.getInstance().setEdited(true);
@@ -180,6 +185,10 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Only Solar Analysis: "));
 		panel.add(onlySolarAnalysisComboBox);
 
+		// enable or disable snapshot logging for UX
+		panel.add(new JLabel("Snapshot Logging: "));
+		panel.add(snapshotLoggingComboBox);
+
 		// ground image color
 		panel.add(new JLabel("Ground Image Coloration: "));
 		panel.add(groundImageColorationComboBox);
@@ -188,7 +197,7 @@ class PropertiesDialog extends JDialog {
 		panel.add(new JLabel("Instruction Tab Header: "));
 		panel.add(instructionTabHeaderComboBox);
 
-		SpringUtilities.makeCompactGrid(panel, 12, 2, 8, 8, 8, 8);
+		SpringUtilities.makeCompactGrid(panel, 13, 2, 8, 8, 8, 8);
 
 		final JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));

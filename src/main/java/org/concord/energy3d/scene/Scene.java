@@ -182,6 +182,7 @@ public class Scene implements Serializable {
 	private String[] instructionSheetText;
 	private String[] instructionSheetTextType;
 	private boolean instructionTabHeaderInvisible;
+	private boolean noSnapshotLogging;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -4087,6 +4088,14 @@ public class Scene implements Serializable {
 
 	public boolean getDisableShadowInAction() {
 		return disableShadowInAction;
+	}
+
+	public void setNoSnapshotLogging(final boolean b) {
+		noSnapshotLogging = b;
+	}
+
+	public boolean getNoSnaphshotLogging() {
+		return noSnapshotLogging;
 	}
 
 	public void setGeoLocation(final double latitude, final double longitude, final int zoom, final String address) {
