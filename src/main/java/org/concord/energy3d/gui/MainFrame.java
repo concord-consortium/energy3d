@@ -54,7 +54,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SpringLayout;
 import javax.swing.SwingWorker;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -136,6 +138,7 @@ import org.concord.energy3d.util.ClipImage;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
 import org.concord.energy3d.util.Printout;
+import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
 import org.concord.energy3d.util.VsgSubmitter;
 import org.concord.energy3d.util.WallVisitor;
@@ -167,6 +170,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem pauseReplayMenuItem;
 	private JMenuItem analyzeFolderMenuItem;
 	private JMenuItem saveMenuItem;
+	private JMenuItem preferencesMenuItem;
 	private JMenuItem printMenuItem;
 	private JCheckBoxMenuItem previewMenuItem;
 	private JRadioButtonMenuItem orbitMenuItem;
@@ -560,7 +564,9 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getSaveMenuItem());
 			addItemToFileMenu(getSaveasMenuItem());
 			addItemToFileMenu(getSubmitToVsgMenuItem());
+			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getRecoveryMenuItem());
+			addItemToFileMenu(getPreferencesMenuItem());
 			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getImportMenuItem());
 			addItemToFileMenu(getImportColladaMenuItem());
@@ -757,6 +763,43 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return recoveryMenuItem;
+	}
+
+	private JMenuItem getPreferencesMenuItem() {
+		if (preferencesMenuItem == null) {
+			preferencesMenuItem = new JMenuItem("System Information & Preferences...");
+			preferencesMenuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+
+					final Runtime runtime = Runtime.getRuntime();
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					JLabel label = new JLabel("Maximum memory: ");
+					inputPanel.add(label);
+					final JTextField maxMemoryField = new JTextField(Math.round(runtime.maxMemory() / (1024.0 * 1024.0)) + " MB");
+					maxMemoryField.setEditable(false);
+					label.setLabelFor(maxMemoryField);
+					inputPanel.add(maxMemoryField);
+					label = new JLabel("Total memory: ");
+					inputPanel.add(label);
+					final JTextField totalMemoryField = new JTextField(Math.round(runtime.totalMemory() / (1024.0 * 1024.0)) + " MB");
+					totalMemoryField.setEditable(false);
+					label.setLabelFor(totalMemoryField);
+					inputPanel.add(totalMemoryField);
+					SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
+
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "System Information & Preferences");
+					dialog.setVisible(true);
+
+				}
+			});
+		}
+		return preferencesMenuItem;
 	}
 
 	private JMenuItem getAnalyzeFolderMenuItem() {

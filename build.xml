@@ -111,6 +111,7 @@
 			<fx:platform basedir="${JAVA_HOME}">
 				<fx:property name="java.library.path" value="./lib/jogl/native/${os}" />
 				<fx:property name="java.ext.dirs" value="${ext}"/>
+			    <fx:jvmarg value="-Xmx512m"/>
 				<fx:jvmarg value="-Xdock:name=${app.name}"/>
 			</fx:platform>
 			<fx:resources>

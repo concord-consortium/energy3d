@@ -24,6 +24,7 @@ import com.ardor3d.input.logical.MouseWheelMovedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TriggerConditions;
 import com.ardor3d.input.logical.TwoInputStates;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Vector3;
 import com.ardor3d.math.type.ReadOnlyVector3;
@@ -222,8 +223,11 @@ public abstract class CameraControl {
 
 	protected void zoom(final Canvas canvas, final double tpf, final double val) {
 		if (Camera.getCurrentCamera().getProjectionMode() == ProjectionMode.Parallel) {
-			final double fac = val > 0 ? 1.1 : 0.9;
 			final Camera camera = canvas.getCanvasRenderer().getCamera();
+			if (val > 0 && Math.abs(camera.getProjectionMatrix().determinant()) <= 2 * MathUtils.EPSILON) { // matrix cannot be inverted at this point
+				return;
+			}
+			final double fac = val > 0 ? 1.1 : 0.9;
 			camera.setFrustumTop(camera.getFrustumTop() * fac);
 			camera.setFrustumBottom(camera.getFrustumBottom() * fac);
 			camera.setFrustumLeft(camera.getFrustumLeft() * fac);
