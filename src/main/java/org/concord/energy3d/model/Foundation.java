@@ -2994,7 +2994,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	// change properties of all the mirrors on this foundation
 
-	public void setZenithAngleForHeliostats(final double angle) {
+	public void setTiltAngleForHeliostats(final double angle) {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				((Mirror) p).setTiltAngle(angle);
@@ -3145,6 +3145,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				((ParabolicDish) p).setStructureType(structureTyp);
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setReflectanceForParabolicDishes(final double reflectance) {

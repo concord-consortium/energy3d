@@ -238,6 +238,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 												JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
+												SceneManager.getInstance().refresh();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
 										}
@@ -375,6 +376,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(rack);
 										rack.setRelativeAzimuth(a);
 										rack.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;
@@ -612,6 +614,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as the rack would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
+												SceneManager.getInstance().refresh();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
 										}
@@ -746,6 +749,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 											JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
 											c.undo();
 										} else {
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 									}
@@ -892,6 +896,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 											rack.setPoleDistanceY(dy);
 											rack.setPoleVisible(visible);
 											rack.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -1424,6 +1429,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 									s.setNumberOfCellsInY(numberOfCellsInY);
 									r.ensureFullSolarPanels(false);
 									r.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -1543,6 +1549,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 									final SetSolarPanelCellTypeForRackCommand c = new SetSolarPanelCellTypeForRackCommand(r);
 									s.setCellType(selectedIndex);
 									r.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -1652,6 +1659,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 									final SetSolarPanelColorForRackCommand c = new SetSolarPanelColorForRackCommand(r);
 									s.setColorOption(selectedIndex);
 									r.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -2235,6 +2243,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 									s.setRotated(orientationComboBox.getSelectedIndex() == 1);
 									r.ensureFullSolarPanels(false);
 									r.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -2453,6 +2462,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "No Tracker");
 							rack.setTracker(Trackable.NO_TRACKER);
 							rack.draw();
+							SceneManager.getInstance().refresh();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 						selectedScopeIndex = 0;
@@ -2544,6 +2554,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Horizontal Single-Axis Tracker");
 							rack.setTracker(Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER);
 							rack.draw();
+							SceneManager.getInstance().refresh();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 						selectedScopeIndex = 0;
@@ -2635,6 +2646,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Vertical Single-Axis Tracker");
 							rack.setTracker(Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
 							rack.draw();
+							SceneManager.getInstance().refresh();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 						selectedScopeIndex = 0;
@@ -2726,6 +2738,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Dual-Axis Tracker");
 							rack.setTracker(Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER);
 							rack.draw();
+							SceneManager.getInstance().refresh();
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 						selectedScopeIndex = 0;

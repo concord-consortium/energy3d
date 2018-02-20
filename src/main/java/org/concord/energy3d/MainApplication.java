@@ -62,7 +62,7 @@ public class MainApplication {
 		System.out.println("Initiating...");
 		final long t = System.nanoTime();
 		checkSingleInstance(MainApplication.class, args);
-		startDeadlockDetectionThread();
+		// startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();
 		// TODO: temporary test code below
@@ -362,7 +362,7 @@ public class MainApplication {
 		});
 	}
 
-	public static void startDeadlockDetectionThread() {
+	static void startDeadlockDetectionThread() {
 		new Thread("Energy3D Deadlock Detection") {
 			@Override
 			public void run() {

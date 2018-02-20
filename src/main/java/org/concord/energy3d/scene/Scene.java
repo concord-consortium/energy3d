@@ -2921,6 +2921,7 @@ public class Scene implements Serializable {
 				((ParabolicDish) p).setStructureType(structureType);
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setBaseHeightForAllParabolicDishes(final double baseHeight) {

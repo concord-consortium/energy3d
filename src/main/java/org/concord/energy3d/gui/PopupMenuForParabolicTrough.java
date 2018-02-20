@@ -144,6 +144,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										t.setNSectionParabola(nSectionParabola);
 										t.setNSectionAxis(nSectionAxis);
 										t.draw();
+										SceneManager.getInstance().refresh();
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
@@ -263,6 +264,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 											t.setTroughLength(l);
 											t.ensureFullModules(false);
 											t.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -386,6 +388,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 											t.setApertureWidth(w);
 											t.ensureFullModules(false);
 											t.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -509,6 +512,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 											t.setModuleLength(u);
 											t.ensureFullModules(false);
 											t.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -631,6 +635,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 											final SetParabolicTroughSemilatusRectumCommand c = new SetParabolicTroughSemilatusRectumCommand(t);
 											t.setSemilatusRectum(2 * f); // semilatus rectum p = 2f
 											t.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -750,6 +755,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(t);
 										t.setBaseHeight(val);
 										t.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;
@@ -877,6 +883,7 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(trough);
 										trough.setRelativeAzimuth(a);
 										trough.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;

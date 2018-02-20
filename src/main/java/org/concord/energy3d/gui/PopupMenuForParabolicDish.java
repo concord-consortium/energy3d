@@ -150,6 +150,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 										d.setNRadialSections(nRadialSections);
 										d.setNAxialSections(nAxialSections);
 										d.draw();
+										SceneManager.getInstance().refresh();
 										// SceneManager.getInstance().getUndoManager().addEdit(c);
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
@@ -249,6 +250,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 											final SetParabolicDishRibsCommand c = new SetParabolicDishRibsCommand(d);
 											d.setNumberOfRibs(nrib);
 											d.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -390,6 +392,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 											final SetPartSizeCommand c = new SetPartSizeCommand(d);
 											d.setRimRadius(r);
 											d.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -512,6 +515,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 											final SetParabolicDishFocalLengthCommand c = new SetParabolicDishFocalLengthCommand(d);
 											d.setFocalLength(fl);
 											d.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -631,6 +635,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(d);
 										d.setBaseHeight(val);
 										d.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;
@@ -739,6 +744,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 									final SetParabolicDishStructureTypeCommand c = new SetParabolicDishStructureTypeCommand(d);
 									d.setStructureType(structureType);
 									d.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;

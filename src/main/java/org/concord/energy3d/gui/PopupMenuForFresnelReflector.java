@@ -140,6 +140,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										r.setNSectionLength(nSectionLength);
 										r.setNSectionWidth(nSectionWidth);
 										r.draw();
+										SceneManager.getInstance().refresh();
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {
 										foundation.setSectionsForFresnelReflectors(nSectionLength, nSectionWidth);
@@ -278,6 +279,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 									if (oldTarget != null) {
 										oldTarget.drawSolarReceiver();
 									}
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -403,6 +405,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 											r.setLength(length);
 											r.ensureFullModules(false);
 											r.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -526,6 +529,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 											r.setModuleWidth(moduleWidth);
 											r.ensureFullModules(false);
 											r.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -649,6 +653,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 											r.setModuleLength(moduleLength);
 											r.ensureFullModules(false);
 											r.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -768,6 +773,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(r);
 										r.setBaseHeight(val);
 										r.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;
@@ -896,6 +902,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(fresnel);
 										fresnel.setRelativeAzimuth(a);
 										fresnel.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;

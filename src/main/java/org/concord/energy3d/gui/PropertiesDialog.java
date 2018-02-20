@@ -221,6 +221,8 @@ class PropertiesDialog extends JDialog {
 
 		pack();
 		setLocationRelativeTo(MainFrame.getInstance());
+		projectNameField.requestFocusInWindow();
+		projectNameField.selectAll();
 
 	}
 

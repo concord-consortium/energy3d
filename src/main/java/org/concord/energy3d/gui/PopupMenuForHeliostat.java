@@ -180,6 +180,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 									if (oldTarget != null) {
 										oldTarget.drawSolarReceiver();
 									}
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -308,6 +309,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 											final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(m);
 											m.setTiltAngle(val);
 											m.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -323,7 +325,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 										}
 										if (changed) {
 											final ChangeFoundationHeliostatTiltAngleCommand c = new ChangeFoundationHeliostatTiltAngleCommand(foundation);
-											foundation.setZenithAngleForHeliostats(val);
+											foundation.setTiltAngleForHeliostats(val);
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 1;
@@ -436,6 +438,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 										final ChangeAzimuthCommand c = new ChangeAzimuthCommand(mirror);
 										mirror.setRelativeAzimuth(a);
 										mirror.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;
@@ -564,6 +567,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 											m.setMirrorWidth(w);
 											m.setMirrorHeight(h);
 											m.draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;
@@ -683,6 +687,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(m);
 										m.setBaseHeight(val);
 										m.draw();
+										SceneManager.getInstance().refresh();
 										SceneManager.getInstance().getUndoManager().addEdit(c);
 									}
 									selectedScopeIndex = 0;

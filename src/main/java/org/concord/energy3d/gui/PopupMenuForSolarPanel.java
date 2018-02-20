@@ -448,6 +448,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 									final SetSolarTrackerCommand c = new SetSolarTrackerCommand(sp, "No Tracker");
 									sp.setTracker(Trackable.NO_TRACKER);
 									sp.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
@@ -818,6 +819,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							s.setRotated(true);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 							s.draw();
+							SceneManager.getInstance().refresh();
 							updateAfterEdit();
 						}
 					}
@@ -841,6 +843,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 							s.setRotated(false);
 							SceneManager.getInstance().getUndoManager().addEdit(c);
 							s.draw();
+							SceneManager.getInstance().refresh();
 							updateAfterEdit();
 						}
 					}
@@ -1086,11 +1089,11 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 											final ChangeTiltAngleCommand c = new ChangeTiltAngleCommand(sp);
 											sp.setTiltAngle(val);
 											sp.draw();
-											SceneManager.getInstance().refresh();
 											if (sp.checkContainerIntersection()) {
 												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as the solar panel would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
+												SceneManager.getInstance().refresh();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
 										}
@@ -1121,6 +1124,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This tilt angle cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
+												SceneManager.getInstance().refresh();
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
 										}
@@ -1346,6 +1350,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						s.setNumberOfCellsInX(solarPanelNominalSize.getCellNx()[i]);
 						s.setNumberOfCellsInY(solarPanelNominalSize.getCellNy()[i]);
 						s.draw();
+						SceneManager.getInstance().refresh();
 						SceneManager.getInstance().getUndoManager().addEdit(c);
 						updateAfterEdit();
 					}
@@ -1431,11 +1436,11 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
 										sp.setBaseHeight(val);
 										sp.draw();
-										SceneManager.getInstance().refresh();
 										if (sp.checkContainerIntersection()) {
 											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
 											c.undo();
 										} else {
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 									}
@@ -1459,11 +1464,11 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 												break;
 											}
 										}
-										SceneManager.getInstance().refresh();
 										if (intersected) {
 											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
 											c.undo();
 										} else {
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 									}
@@ -2037,6 +2042,7 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 									final ChangeSolarPanelModelCommand c = new ChangeSolarPanelModelCommand(s);
 									s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
 									s.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;
