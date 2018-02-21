@@ -323,6 +323,7 @@ class MapDialog extends JDialog {
 				final double lat = (Double) latitudeSpinner.getValue();
 				final int zoom = (Integer) zoomSpinner.getValue();
 				Scene.getInstance().setGeoLocation(lat, lng, zoom, addressField.getText());
+				Scene.getInstance().setGroundImageExtent(extent);
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() {
@@ -361,7 +362,6 @@ class MapDialog extends JDialog {
 						return;
 					}
 					extent = resolutionOptionComboBox.getSelectedIndex();
-					Scene.getInstance().setGroundImageExtent(extent);
 					updateMap();
 				}
 			}

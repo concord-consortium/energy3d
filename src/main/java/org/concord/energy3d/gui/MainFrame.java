@@ -76,6 +76,7 @@ import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
+import org.concord.energy3d.model.GeoLocation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicDish;
@@ -1318,7 +1319,34 @@ public class MainFrame extends JFrame {
 			submitToVsgMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					VsgSubmitter.submit();
+					final GeoLocation geo = Scene.getInstance().getGeoLocation();
+					if (geo == null) {
+						JOptionPane.showMessageDialog(MainFrame.getInstance(), "No geolocation is set for this model. It cannot be submitted.", "Error", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					String legal = "<html><hr><font size=2>";
+					legal += "Please be advised that your submission contains an address that may be sensitive,<br>";
+					legal += "for example under the circumstance that you are under 18 years old and are working<br>";
+					legal += "on a home project. By clicking the Accept Button below, you (and your parent or<br>";
+					legal += "guardian if you are a minor) will authorize the Virtual Solar Grid to publish your<br>";
+					legal += "work in the public domain. Your work will be a valuable contribution to an important<br>";
+					legal += "citizen science project for studying how humanity can be powered by renewable energy.<br>";
+					legal += "<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					String s = "<html><b>Authorization for the Virtual Solar Grid to publish your work</b></html>";
+					s += "";
+					final Object[] options = new Object[] { "Accept", "Decline", "Check Virtual Solar Grid" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { s, legal, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[1]);
+					final JDialog dialog = optionPane.createDialog(instance, "Authorization for Publication");
+					dialog.setVisible(true);
+					final Object choice = optionPane.getValue();
+					if (choice == options[0]) {
+						VsgSubmitter.submit();
+					} else if (choice == options[1] || choice == null) {
+						return;
+					} else if (choice == options[2]) {
+						Util.openBrowser("http://energy.concord.org/energy3d/vsg/syw.html");
+					}
 				}
 			});
 		}

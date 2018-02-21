@@ -1298,6 +1298,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 									s.setPvModuleSpecs(PvModulesData.getInstance().getModuleSpecs(modelName));
 									r.ensureFullSolarPanels(false);
 									r.draw();
+									SceneManager.getInstance().refresh();
 									SceneManager.getInstance().getUndoManager().addEdit(c);
 								}
 								selectedScopeIndex = 0;

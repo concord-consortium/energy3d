@@ -115,7 +115,7 @@ public class VsgSubmitter {
 				final JTextField emailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
 				final JTextField organizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
 				final JPanel personalInfoPanel = new JPanel(new SpringLayout());
-				personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Contributor information (for earning scores and making contact)"));
+				personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Contributor information (for earning scores and making contact only)"));
 				personalInfoPanel.add(new JLabel("Name: "));
 				personalInfoPanel.add(nameField);
 				personalInfoPanel.add(new JLabel("Email: "));
@@ -126,12 +126,11 @@ public class VsgSubmitter {
 				panel.add(personalInfoPanel, BorderLayout.CENTER);
 
 				String s = "<html><font size=2>";
-				s += "By pressing the Yes button below, you agree to contribute your model to the Virtual Solar Grid, a publicly<br>";
-				s += "accessible site that houses many virtual solar power systems. Your model will be reviewed by experts before<br>";
-				s += "it can be published in the Grid. However, we cannot guarantee that it will be accepted. You will be notified<br>";
-				s += "about its status through the email you provide above. If you agree on these terms, please continue. Otherwise,<br>";
-				s += "please click the No button to abort.</font><br><br>";
-				s += "<b>Do you want to submit your model to the Virtual Solar Grid now?";
+				s += "By pressing the Yes button below, you agree to contribute your work to the Virtual Solar Grid, a public<br>";
+				s += "website that collects many virtual solar power systems. Your work will be reviewed by experts to determine<br>";
+				s += "its readiness for publication. You will be notified about its status through the email you provide above.<br>";
+				s += "If you agree on these terms, please continue. Otherwise, click the No button to abort.</font><br><br>";
+				s += "<b>Do you want to submit your work to the Virtual Solar Grid now?";
 				s += "</b></html>";
 				panel.add(new JLabel(s), BorderLayout.SOUTH);
 
