@@ -566,9 +566,6 @@ public class MainFrame extends JFrame {
 			addItemToFileMenu(getSaveasMenuItem());
 			addItemToFileMenu(getSubmitToVsgMenuItem());
 			addItemToFileMenu(new JSeparator());
-			addItemToFileMenu(getRecoveryMenuItem());
-			addItemToFileMenu(getPreferencesMenuItem());
-			addItemToFileMenu(new JSeparator());
 			addItemToFileMenu(getImportMenuItem());
 			addItemToFileMenu(getImportColladaMenuItem());
 			addItemToFileMenu(getCopyImageMenuItem());
@@ -793,7 +790,7 @@ public class MainFrame extends JFrame {
 					SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
 
 					final Object[] options = new Object[] { "OK", "Cancel" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui }, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
 					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "System Information & Preferences");
 					dialog.setVisible(true);
 
@@ -1130,7 +1127,8 @@ public class MainFrame extends JFrame {
 			});
 			userResultsMenu.add(mi);
 
-			// Energy3D web pages
+			helpMenu.add(getPreferencesMenuItem());
+			helpMenu.add(getRecoveryMenuItem());
 
 			final JMenuItem miUpdate = new JMenuItem("Check Update..."); // the automatic updater can fail sometimes. This provides an independent check.
 			helpMenu.add(miUpdate);
@@ -1185,6 +1183,9 @@ public class MainFrame extends JFrame {
 					}.execute();
 				}
 			});
+			helpMenu.addSeparator();
+
+			// Energy3D web pages
 
 			mi = new JMenuItem("Visit Virtual Solar Grid...");
 			mi.addActionListener(new ActionListener() {
@@ -1275,13 +1276,14 @@ public class MainFrame extends JFrame {
 			final String title = "<h3>Energy3D</h3><h4><i>Learning to build a sustainable world</i></h4>Version: " + MainApplication.VERSION + ", &copy; 2011-" + Calendar.getInstance().get(Calendar.YEAR);
 			final String developer = "<br>The Engineering Computation Laboratory, The Concord Consortium<hr><h4>Developers</h4>This program is brought to you by:<ul><li>Dr. Charles Xie (2009-present) <li>Dr. Saeid Nourian (2010-2017)</ul>and the people who created Ardor3D, Getdown, JOGL, and Poly2tri.";
 			final String license = "<br>The program is provided as it is to you under the MIT License.";
-			final String funder = "<h4>Funders</h4>Funding is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by<br>General Motors through grant 34871079 awarded to Charles Xie. Any<br>opinions, findings, and conclusions or recommendations expressed in the<br>materials associated with this program are those of the author(s) and do<br>not necessarily reflect the views of the National Science Foundation or<br>General Motors.";
+			final String funder = "<h4>Funders</h4>Funding is provided by the National Science Foundation through grants<br>0918449, 1304485, 1348530, 1503196, 1512868, and 1721054 and by<br>General Motors through grant 34871079, awarded to Charles Xie. Any<br>opinions, findings, and conclusions or recommendations expressed in the<br>materials associated with this program are those of the author(s) and do<br>not necessarily reflect the views of the National Science Foundation or<br>General Motors.";
 			final String source = "<h4>Source Code</h4>https://github.com/concord-consortium/energy3d";
 			String acknowledge = "<h4>Acknowledgement</h4>";
 			acknowledge += "<font size=2>The help from the following people to improve this program is appreciated:<br>";
 			acknowledge += "Katie Armstrong, Siobhan Bailey, Jie Chao, Guanhua Chen, Maya Haigis,<br>";
-			acknowledge += "Shiyan Jiang, Alex Lee, Shasha Liu, Jeff Lockwood, Joy Massicotte,<br>";
-			acknowledge += "Ethan McElroy, Scott Ogle, Cormac Paterson, Corey Schimpf, Zhenghui Sha";
+			acknowledge += "Xudong Huang, Shiyan Jiang, Alex Lee, Shasha Liu, Jeff Lockwood,<br>";
+			acknowledge += "Joy Massicotte, Ethan McElroy, Scott Ogle, Cormac Paterson, Corey Schimpf<br>";
+			acknowledge += "Zhenghui Sha";
 			p.add(new JLabel("<html>" + title + developer + license + funder + source + acknowledge + "</html>"), BorderLayout.CENTER);
 			final JButton button = new JButton("Close");
 			button.addActionListener(new ActionListener() {
