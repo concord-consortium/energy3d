@@ -2381,7 +2381,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		if (!Util.isZero(az)) {
 			rotate(-az, null, false);
 		}
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawFoundationNow(this);
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -2475,7 +2475,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		if (!Util.isZero(az)) {
 			rotate(-az, null, false);
 		}
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawFoundationNow(this);
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -2586,7 +2586,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		if (!Util.isZero(az)) {
 			rotate(-az, null, false);
 		}
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawFoundationNow(this);
 		SceneManager.getInstance().getUndoManager().addEdit(command);
 		EventQueue.invokeLater(new Runnable() {
 			@Override
@@ -3404,11 +3404,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	public void setHeightOfWalls(final double height) {
 		for (final HousePart p : children) {
 			if (p instanceof Wall) {
-				((Wall) p).setHeight(height, true);
-				p.draw();
+				final Wall w = (Wall) p;
+				w.setHeight(height, true);
 			}
 		}
-		SceneManager.getInstance().refresh();
+		Scene.getInstance().redrawAllWallsNow();
 	}
 
 	public void showOutlineOfWalls(final boolean b) {

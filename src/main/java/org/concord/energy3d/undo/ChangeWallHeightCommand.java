@@ -4,6 +4,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.scene.Scene;
 
 public class ChangeWallHeightCommand extends MyAbstractUndoableEdit {
 
@@ -30,14 +31,14 @@ public class ChangeWallHeightCommand extends MyAbstractUndoableEdit {
 		super.undo();
 		newValue = wall.getHeight();
 		wall.setHeight(oldValue, true);
-		wall.draw();
+		Scene.getInstance().redrawAllWallsNow();
 	}
 
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
 		wall.setHeight(newValue, true);
-		wall.draw();
+		Scene.getInstance().redrawAllWallsNow();
 	}
 
 	@Override

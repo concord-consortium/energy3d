@@ -1176,10 +1176,10 @@ public class MainPanel extends JPanel {
 									@Override
 									public Object call() throws Exception {
 										if (part == null) {
-											SceneManager.getInstance().rotateAllBuildings(rotationAngle);
+											SceneManager.getInstance().rotateAllFoundations(rotationAngle);
 										} else {
 											if (part instanceof Foundation) {
-												SceneManager.getInstance().rotateBuilding(rotationAngle, true);
+												SceneManager.getInstance().rotateFoundation(rotationAngle, true);
 											} else if (part instanceof SolarPanel) {
 												final SolarPanel solarPanel = (SolarPanel) part;
 												solarPanel.setRelativeAzimuth(solarPanel.getRelativeAzimuth() + Math.toDegrees(rotationAngle));

@@ -51,7 +51,7 @@ public class ChangeFoundationWallHeightCommand extends MyAbstractUndoableEdit {
 			newValues[i] = walls.get(i).getHeight();
 			walls.get(i).setHeight(oldValues[i], true);
 		}
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawAllWallsNow();
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class ChangeFoundationWallHeightCommand extends MyAbstractUndoableEdit {
 		for (int i = 0; i < n; i++) {
 			walls.get(i).setHeight(newValues[i], true);
 		}
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawAllWallsNow();
 	}
 
 	@Override

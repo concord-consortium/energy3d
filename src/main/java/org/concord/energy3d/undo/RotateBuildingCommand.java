@@ -52,9 +52,9 @@ public class RotateBuildingCommand extends MyAbstractUndoableEdit {
 			@Override
 			public Object call() throws Exception {
 				if (foundation != null) {
-					SceneManager.getInstance().rotateBuilding(a, true);
+					SceneManager.getInstance().rotateFoundation(a, true);
 				} else {
-					SceneManager.getInstance().rotateAllBuildings(a);
+					SceneManager.getInstance().rotateAllFoundations(a);
 				}
 				return null;
 			}

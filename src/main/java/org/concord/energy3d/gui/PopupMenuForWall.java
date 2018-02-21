@@ -313,7 +313,7 @@ class PopupMenuForWall extends PopupMenuFactory {
 										if (changed) {
 											final ChangeWallHeightCommand c = new ChangeWallHeightCommand(w);
 											w.setHeight(val, true);
-											w.draw();
+											Scene.getInstance().redrawAllWallsNow();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;

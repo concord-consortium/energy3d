@@ -160,11 +160,12 @@ class ScaleDialog extends JDialog {
 					public void actionPerformed(final ActionEvent e) {
 						try {
 							final double scale;
-							if (scaleByMeasurementRadioButton.isSelected())
+							if (scaleByMeasurementRadioButton.isSelected()) {
 								scale = Double.parseDouble(newTextField.getText()) / Double.parseDouble(currentTextField.getText());
-							else
+							} else {
 								scale = Double.parseDouble(scaleTextField.getText());
-							RescaleCommand c = new RescaleCommand();
+							}
+							final RescaleCommand c = new RescaleCommand();
 							Scene.getInstance().setAnnotationScale(Scene.getInstance().getAnnotationScale() * scale);
 							Scene.getInstance().setEdited(true);
 							SceneManager.getInstance().getUndoManager().addEdit(c);

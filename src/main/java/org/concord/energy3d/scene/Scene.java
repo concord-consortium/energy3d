@@ -824,22 +824,24 @@ public class Scene implements Serializable {
 	}
 
 	public void connectWalls() {
+		List<Wall> walls = null;
 		for (final HousePart part : parts) {
 			if (part instanceof Wall) {
+				if (walls == null) {
+					walls = new ArrayList<Wall>();
+				}
+				walls.add((Wall) part);
 				part.reset();
 			}
 		}
-
-		for (final HousePart part : parts) {
-			if (part instanceof Wall) {
-				((Wall) part).connectedWalls();
+		if (walls != null && !walls.isEmpty()) {
+			for (final Wall w : walls) {
+				w.connectedWalls();
 			}
-		}
-
-		for (final HousePart part : parts) {
-			if (part instanceof Wall) {
-				((Wall) part).computeInsideDirectionOfAttachedWalls(false);
+			for (final Wall w : walls) {
+				w.computeInsideDirectionOfAttachedWalls(false);
 			}
+			walls.clear();
 		}
 	}
 
@@ -959,9 +961,16 @@ public class Scene implements Serializable {
 		}
 		add(part);
 		if (redraw) {
-			if (part instanceof SolarCollector) { // make a special case about solar collectors as their addition will not affect the rendering of other objects
+			if (part instanceof SolarCollector || part instanceof Tree || part instanceof Human) { // add these objects will not affect the rendering of other objects
 				part.draw();
+			} else if (part instanceof Foundation) {
+				redrawFoundationNow((Foundation) part);
+			} else if (part instanceof Window) {
+				part.draw();
+				part.getContainer().draw();
 			} else {
+				// what will fall through here?
+				System.out.println("*** Warning: potential performance drag: " + part);
 				redrawAll();
 			}
 		}
@@ -991,10 +1000,8 @@ public class Scene implements Serializable {
 		}
 		removeChildren(part);
 		if (redraw) {
-			if (part instanceof SolarCollector) { // special case for solar collectors as they won't affect other objects in the scene
-				part.draw();
-			} else {
-				redrawAll();
+			if (part instanceof Wall || part instanceof Roof) { // potentially need to refresh the state of the walls and roofs?
+				redrawAllWallsNow();
 			}
 		}
 	}
@@ -1496,6 +1503,7 @@ public class Scene implements Serializable {
 		}
 	}
 
+	/** call to this method should be minimized as it impedes the performance when there are many elements in the scene */
 	public void redrawAll() {
 		redrawAll(false);
 	}
@@ -1518,8 +1526,13 @@ public class Scene implements Serializable {
 		}
 		connectWalls();
 		Snap.clearAnnotationDrawn();
+		List<Roof> roofs = null;
 		for (final HousePart part : parts) {
 			if (part instanceof Roof) {
+				if (roofs == null) {
+					roofs = new ArrayList<Roof>();
+				}
+				roofs.add((Roof) part);
 				part.draw();
 			}
 		}
@@ -1528,11 +1541,11 @@ public class Scene implements Serializable {
 				part.draw();
 			}
 		}
-		// need to draw roof again because roof holes depend on drawn windows
-		for (final HousePart part : parts) {
-			if (part instanceof Roof) {
-				part.draw();
+		if (roofs != null && !roofs.isEmpty()) { // need to draw roof again because roof holes depend on drawn windows
+			for (final Roof r : roofs) {
+				r.draw();
 			}
+			roofs.clear();
 		}
 
 		if (Heliodon.getInstance().isVisible()) {
@@ -1542,6 +1555,67 @@ public class Scene implements Serializable {
 		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
 		// no need for redrawing print parts because they will be regenerated from original parts anyways
 		redrawAll = false;
+	}
+
+	// special case for redrawing walls and roofs that are interconnected (this is needed when we deal with a lot of solar collectors)
+	public void redrawAllWallsNow() {
+		System.out.println("redrawAllWallsNow()");
+		connectWalls();
+		List<Roof> roofs = null;
+		for (final HousePart part : parts) {
+			if (part instanceof Roof) {
+				if (roofs == null) {
+					roofs = new ArrayList<Roof>();
+				}
+				roofs.add((Roof) part);
+				part.draw();
+			}
+		}
+		for (final HousePart part : parts) {
+			if (part instanceof Wall) {
+				part.draw();
+				part.drawChildren();
+			}
+		}
+		if (roofs != null && !roofs.isEmpty()) { // need to draw roof again because roof holes depend on drawn windows
+			for (final Roof r : roofs) {
+				r.draw();
+			}
+			roofs.clear();
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	// special case for redrawing the specified foundation (this is needed when we deal with a lot of solar collectors or a lot of foundations)
+	public void redrawFoundationNow(final Foundation foundation) {
+		System.out.println("redrawFoundationNow()");
+		connectWalls();
+		List<Roof> roofs = null;
+		for (final HousePart part : parts) {
+			if (part instanceof Roof) {
+				if (part.getTopContainer() == foundation) {
+					if (roofs == null) {
+						roofs = new ArrayList<Roof>();
+					}
+					roofs.add((Roof) part);
+					part.draw();
+				}
+			}
+		}
+		for (final HousePart part : parts) {
+			if (!(part instanceof Roof)) {
+				if (part.getTopContainer() == foundation || part == foundation) {
+					part.draw();
+				}
+			}
+		}
+		if (roofs != null && !roofs.isEmpty()) { // need to draw roof again because roof holes depend on drawn windows
+			for (final Roof r : roofs) {
+				r.draw();
+			}
+			roofs.clear();
+		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void updateAllTextures() {
@@ -3169,12 +3243,11 @@ public class Scene implements Serializable {
 	public void setHeightOfConnectedWalls(final Wall w, final double height) {
 		w.visitNeighbors(new WallVisitor() {
 			@Override
-			public void visit(final Wall currentWall, final Snap prev, final Snap next) {
-				currentWall.setHeight(height, true);
-				currentWall.draw();
+			public void visit(final Wall w, final Snap prev, final Snap next) {
+				w.setHeight(height, true);
 			}
 		});
-		SceneManager.getInstance().refresh();
+		redrawAllWallsNow();
 	}
 
 	public void showOutlineOfConnectedWalls(final Wall w, final boolean b) {
@@ -3192,10 +3265,9 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof Wall) {
 				((Wall) p).setHeight(height, true);
-				p.draw();
 			}
 		}
-		SceneManager.getInstance().refresh();
+		redrawAllWallsNow();
 	}
 
 	public void showOutlineForAllWalls(final boolean b) {

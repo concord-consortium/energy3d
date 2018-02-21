@@ -2388,7 +2388,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
-	public void rotateBuilding(final double angle, final boolean redraw) {
+	public void rotateFoundation(final double angle, final boolean redraw) {
 		if (selectedPart != null) {
 			Foundation f;
 			if (selectedPart instanceof Foundation) {
@@ -2407,14 +2407,14 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					f.rotate(angle, null, true);
 				}
 				if (redraw) {
-					Scene.getInstance().redrawAll();
+					Scene.getInstance().redrawFoundationNow(f);
 				}
 			}
 		}
 	}
 
 	/** negative angle for clockwise rotation, positive angle for counter-clockwise rotation */
-	public void rotateAllBuildings(final double angle) {
+	public void rotateAllFoundations(final double angle) {
 		final Vector3 origin = new Vector3();
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Foundation) {
@@ -2437,7 +2437,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 				if (selectedPart instanceof Foundation) {
 					final RotateBuildingCommand c = new RotateBuildingCommand((Foundation) selectedPart, angle);
-					SceneManager.getInstance().rotateBuilding(angle, true);
+					SceneManager.getInstance().rotateFoundation(angle, true);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				} else if (selectedPart instanceof SolarPanel) {
 					final SolarPanel solarPanel = (SolarPanel) selectedPart;
@@ -2459,7 +2459,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				} else if (selectedPart == null) {
 					final RotateBuildingCommand c = new RotateBuildingCommand(null, angle);
-					rotateAllBuildings(angle);
+					rotateAllFoundations(angle);
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 				}
 				EventQueue.invokeLater(new Runnable() {

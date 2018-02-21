@@ -47,7 +47,7 @@ public class ChangeHeightForConnectedWallsCommand extends MyAbstractUndoableEdit
 			newValues[i] = w.getHeight();
 			w.setHeight(oldValues[i], true);
 		}
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawAllWallsNow();
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class ChangeHeightForConnectedWallsCommand extends MyAbstractUndoableEdit
 		for (int i = 0; i < n; i++) {
 			walls.get(i).setHeight(newValues[i], true);
 		}
-		Scene.getInstance().redrawAll();
+		Scene.getInstance().redrawAllWallsNow();
 	}
 
 	@Override

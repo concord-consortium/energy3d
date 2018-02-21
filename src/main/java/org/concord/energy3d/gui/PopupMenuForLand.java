@@ -394,7 +394,7 @@ class PopupMenuForLand extends PopupMenuFactory {
 					SceneManager.getInstance().getGroundImageLand().setVisible(b);
 					Scene.getInstance().setShowGroundImage(b);
 					Scene.getInstance().setEdited(true);
-					Scene.getInstance().redrawAll();
+					SceneManager.getInstance().refresh();
 				}
 			});
 			groundImageMenu.add(miShowImage);

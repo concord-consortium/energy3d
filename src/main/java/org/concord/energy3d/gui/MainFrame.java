@@ -1953,7 +1953,7 @@ public class MainFrame extends JFrame {
 					SceneManager.getInstance().getGroundImageLand().setVisible(b);
 					Scene.getInstance().setShowGroundImage(b);
 					Scene.getInstance().setEdited(true);
-					Scene.getInstance().redrawAll();
+					SceneManager.getInstance().refresh();
 				}
 			});
 		}
