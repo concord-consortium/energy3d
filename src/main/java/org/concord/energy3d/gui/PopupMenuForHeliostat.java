@@ -61,6 +61,71 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 
 		if (popupMenuForHeliostat == null) {
 
+			final JCheckBoxMenuItem cbmiDisableEditPoint = new JCheckBoxMenuItem("Disable Edit Point");
+			cbmiDisableEditPoint.addItemListener(new ItemListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror)) {
+						return;
+					}
+					final boolean disabled = cbmiDisableEditPoint.isSelected();
+					final Mirror m = (Mirror) selectedPart;
+					final String partInfo = m.toString().substring(0, m.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(0, 20));
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.SOUTH);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Heliostat", true);
+					final JRadioButton rb2 = new JRadioButton("All Heliostats on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Heliostats");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+
+					final String title = "<html>" + (disabled ? "Disable" : "Enable") + " edit point for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Disable the edit point of a heliostat prevents it from<br>being unintentionally moved.<hr></html>";
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), (disabled ? "Disable" : "Enable") + " Edit Point");
+					dialog.setVisible(true);
+					if (optionPane.getValue() == options[0]) {
+						if (rb1.isSelected()) {
+							m.setLockEdit(disabled);
+							SceneManager.getInstance().refresh();
+							selectedScopeIndex = 0;
+						} else if (rb2.isSelected()) {
+							final Foundation foundation = m.getTopContainer();
+							foundation.setLockEditForClass(disabled, Mirror.class);
+							selectedScopeIndex = 1;
+						} else if (rb3.isSelected()) {
+							Scene.getInstance().setLockEditForClass(disabled, Mirror.class);
+							selectedScopeIndex = 2;
+						}
+					}
+				}
+
+			});
+
 			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
 			cbmiDrawSunBeam.addItemListener(new ItemListener() {
 				@Override
@@ -162,7 +227,6 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 								}
 								if (ok) {
 									final HousePart p = Scene.getInstance().getPart(id);
-									System.out.println("***" + p);
 									if (p instanceof Foundation) {
 										target = (Foundation) p;
 									} else {
@@ -829,6 +893,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 						miZenith.setEnabled(false);
 						miAzimuth.setEnabled(false);
 					}
+					Util.selectSilently(cbmiDisableEditPoint, m.getLockEdit());
 					Util.selectSilently(cbmiDrawSunBeam, m.isSunBeamVisible());
 					Util.selectSilently(miLabelNone, !m.isLabelVisible());
 					Util.selectSilently(miLabelCustom, m.getLabelCustom());
@@ -1031,6 +1096,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 			popupMenuForHeliostat.add(miReflectance);
 			popupMenuForHeliostat.add(miConversionEfficiency);
 			popupMenuForHeliostat.addSeparator();
+			popupMenuForHeliostat.add(cbmiDisableEditPoint);
 			popupMenuForHeliostat.add(cbmiDrawSunBeam);
 			popupMenuForHeliostat.add(labelMenu);
 			popupMenuForHeliostat.addSeparator();

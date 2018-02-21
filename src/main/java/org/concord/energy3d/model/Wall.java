@@ -278,7 +278,7 @@ public class Wall extends HousePart implements Thermal {
 			points.get(3).setZ(z);
 		}
 
-		Scene.getInstance().connectWalls();
+		foundation.connectWalls();
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
 

@@ -121,7 +121,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.568; // default is R10 (IECC code for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
 	private double childGridSize = 2.5;
-	private boolean lockEdit;
 	private boolean groupMaster;
 	private boolean labelNumberOfMirrors;
 	private boolean labelPowerTowerOutput;
@@ -1682,13 +1681,10 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
+	@Override
 	public void setLockEdit(final boolean b) {
-		lockEdit = b;
-		updateHandles();
-	}
-
-	public boolean getLockEdit() {
-		return lockEdit;
+		super.setLockEdit(b);
+		updateEditPoints();
 	}
 
 	public void drawAzimuthArrow() {
@@ -2100,7 +2096,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		updateHandle(points.get(9), u.negateLocal());
 		updateHandle(points.get(10), v);
 		updateHandle(points.get(11), v.negateLocal());
-		final ColorRGBA disabledColor = new ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f);
+		updateEditPoints();
+	}
+
+	@Override
+	public void updateEditPoints() {
 		final ReadOnlyColorRGBA c = lockEdit ? disabledColor : (Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE);
 		for (int i = 0; i < 8; i++) {
 			getEditPointShape(i).setDefaultColor(c);
@@ -3997,6 +3997,36 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				} else {
 					rack.draw();
 				}
+			}
+		}
+	}
+
+	public void connectWalls() {
+		List<Wall> walls = null;
+		for (final HousePart c : children) {
+			if (c instanceof Wall) {
+				if (walls == null) {
+					walls = new ArrayList<Wall>();
+				}
+				walls.add((Wall) c);
+				c.reset();
+			}
+		}
+		if (walls != null && !walls.isEmpty()) {
+			for (final Wall w : walls) {
+				w.connectedWalls();
+			}
+			for (final Wall w : walls) {
+				w.computeInsideDirectionOfAttachedWalls(false);
+			}
+			walls.clear();
+		}
+	}
+
+	public void setLockEditForClass(final boolean b, final Class<?> c) {
+		for (final HousePart p : children) {
+			if (c.isInstance(p)) {
+				p.setLockEdit(b);
 			}
 		}
 	}

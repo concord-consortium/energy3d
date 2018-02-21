@@ -1589,7 +1589,7 @@ public class Scene implements Serializable {
 	// special case for redrawing the specified foundation (this is needed when we deal with a lot of solar collectors or a lot of foundations)
 	public void redrawFoundationNow(final Foundation foundation) {
 		System.out.println("redrawFoundationNow()");
-		connectWalls();
+		foundation.connectWalls();
 		List<Roof> roofs = null;
 		for (final HousePart part : parts) {
 			if (part instanceof Roof) {
@@ -4160,6 +4160,14 @@ public class Scene implements Serializable {
 
 	public void setSnapToGrids(final boolean snapToGrid) {
 		this.noSnapToGrids = !snapToGrid;
+	}
+
+	public void setLockEditForClass(final boolean b, final Class<?> c) {
+		for (final HousePart x : parts) {
+			if (c.isInstance(x)) {
+				x.setLockEdit(b);
+			}
+		}
 	}
 
 }

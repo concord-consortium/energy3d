@@ -112,6 +112,8 @@ public abstract class HousePart implements Serializable {
 	boolean labelCustom;
 	boolean labelId;
 	String labelCustomText;
+	boolean lockEdit;
+	static final ColorRGBA disabledColor = new ColorRGBA(0.5f, 0.5f, 0.5f, 0.5f);
 
 	transient Line heatFlux;
 	transient ReadOnlyVector3 pickedNormal;
@@ -1364,6 +1366,18 @@ public abstract class HousePart implements Serializable {
 			newMesh.getMeshData().transformNormals((Transform) mesh.getWorldTransform(), true);
 			list.add(newMesh);
 		}
+	}
+
+	public void updateEditPoints() {
+	}
+
+	public void setLockEdit(final boolean b) {
+		lockEdit = b;
+		updateEditPoints();
+	}
+
+	public boolean getLockEdit() {
+		return lockEdit;
 	}
 
 }
