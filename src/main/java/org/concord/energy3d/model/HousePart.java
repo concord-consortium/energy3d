@@ -729,7 +729,6 @@ public abstract class HousePart implements Serializable {
 	public abstract void setPreviewPoint(int x, int y);
 
 	public void delete() {
-		root.detachAllChildren();
 	}
 
 	public void drawAnnotations() {
