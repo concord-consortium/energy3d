@@ -41,6 +41,8 @@ import com.ardor3d.ui.text.BMText.Justify;
 import com.ardor3d.util.geom.BufferUtils;
 
 /**
+ * https://en.wikipedia.org/wiki/Compact_linear_Fresnel_reflector
+ * 
  * @author Charles Xie
  *
  */

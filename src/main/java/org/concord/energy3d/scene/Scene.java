@@ -116,7 +116,7 @@ public class Scene implements Serializable {
 	private static boolean drawAnnotationsInside;
 	private static boolean isSaving;
 	private transient boolean edited;
-	private transient BufferedImage groundImage;
+	private transient BufferedImage groundImage; // this must be transient
 	private transient boolean avoidSavingGroundImage;
 	private final List<HousePart> parts = new ArrayList<HousePart>();
 	private final Calendar calendar = Calendar.getInstance();
@@ -298,6 +298,23 @@ public class Scene implements Serializable {
 		});
 	}
 
+	private void destroy() { // just in case to prevent possible memory leaks
+		for (final HousePart p : parts) {
+			p.delete();
+		}
+		parts.clear();
+		if (groundImage != null) {
+			groundImage.flush();
+			groundImage = null;
+		}
+		if (SceneManager.getInstance().getGroundImageLand() != null) {
+			SceneManager.getInstance().getGroundImageLand().setRenderState(new TextureState());
+		}
+		if (foundationGroups != null) {
+			foundationGroups.clear();
+		}
+	}
+
 	public static void openNow(final URL file) throws Exception {
 		SceneManager.getInstance().clearMouseState();
 		SceneManager.getInstance().cursorWait(true);
@@ -319,8 +336,8 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().setSolarHeatMapWithoutUpdate(false);
 		Wall.resetDefaultWallHeight();
 
-		if (instance != null) {
-			instance.deleteAll();
+		if (instance != null) { // in case of any possible memory leak
+			instance.destroy();
 		}
 
 		if (url == null) {
@@ -708,12 +725,6 @@ public class Scene implements Serializable {
 			redrawAll(true);
 		}
 
-	}
-
-	private void deleteAll() {
-		for (final HousePart p : parts) {
-			p.delete();
-		}
 	}
 
 	private void cleanup() {
@@ -1519,6 +1530,11 @@ public class Scene implements Serializable {
 
 	public void redrawAllNow() {
 		System.out.println("redrawAllNow()");
+		final int n = parts.size();
+		final boolean showProgress = n > 1000;
+		if (showProgress) {
+			SceneManager.getInstance().cursorWait(true);
+		}
 		final long t = System.nanoTime();
 		if (cleanup) {
 			cleanup();
@@ -1536,9 +1552,19 @@ public class Scene implements Serializable {
 				part.draw();
 			}
 		}
+		int i = 0;
 		for (final HousePart part : parts) {
 			if (!(part instanceof Roof)) {
 				part.draw();
+				if (showProgress) {
+					final int index = i++;
+					EventQueue.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							EnergyPanel.getInstance().progress((int) Math.round(100.0 * index / n));
+						}
+					});
+				}
 			}
 		}
 		if (roofs != null && !roofs.isEmpty()) { // need to draw roof again because roof holes depend on drawn windows
@@ -1552,9 +1578,18 @@ public class Scene implements Serializable {
 			Heliodon.getInstance().updateSize();
 		}
 
-		System.out.println("Time = " + (System.nanoTime() - t) / 1000000000.0);
+		System.out.println("Scene rendering time: " + (System.nanoTime() - t) / 1000000000.0);
 		// no need for redrawing print parts because they will be regenerated from original parts anyways
 		redrawAll = false;
+		if (showProgress) {
+			SceneManager.getInstance().cursorWait(false);
+			EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					EnergyPanel.getInstance().progress(0);
+				}
+			});
+		}
 	}
 
 	// special case for redrawing walls and roofs that are interconnected (this is needed when we deal with a lot of solar collectors)
@@ -3891,13 +3926,15 @@ public class Scene implements Serializable {
 		avoidSavingGroundImage = false;
 	}
 
+	// Classes that require special handling during the serialization process must implement a special method with this exact signature
 	private void writeObject(final ObjectOutputStream out) throws IOException {
 		out.defaultWriteObject();
-		if (groundImage != null && !avoidSavingGroundImage) {
+		if (groundImage != null && !avoidSavingGroundImage) { // append the ground image to the serialized stream
 			ImageIO.write(groundImage, "jpg", out);
 		}
 	}
 
+	// Classes that require special handling during the deserialization process must implement a special method with this exact signature
 	private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
 		groundImage = ImageIO.read(in);

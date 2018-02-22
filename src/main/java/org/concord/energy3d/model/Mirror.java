@@ -172,7 +172,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		points.get(0).setZ(getTopContainer().getHeight() + baseHeight);
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		surround.setData(new Vector3(0, 0, 0), 0.5 * mirrorWidth / annotationScale, 0.5 * mirrorHeight / annotationScale, 0.15);
+		surround.setData(new Vector3(), 0.5 * mirrorWidth / annotationScale, 0.5 * mirrorHeight / annotationScale, 0.15);
 		surround.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = surround.getMeshData().getVertexBuffer();
@@ -216,7 +216,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		if (heliostatTarget == null) {
 			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * 0.9999 : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
 		} else {
-			final ReadOnlyVector3 o = heliostatTarget.getSolarReceiverCenter();
+			final ReadOnlyVector3 o = heliostatTarget.getSolarReceiverCenter(); // TODO: cache this so that we don't have to compute the receiver position for every heliostat
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
 			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
@@ -230,7 +230,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		outlineMesh.setRotation(mesh.getRotation());
 
 		post.setHeight(baseHeight - 0.5 * post.getRadius());
-		post.setTranslation(getAbsPoint(0).addLocal(0, 0, post.getHeight() / 2 - baseHeight));
+		post.setTranslation(a.addLocal(0, 0, 0.5 * post.getHeight() - baseHeight));
 
 		drawSunBeam();
 
