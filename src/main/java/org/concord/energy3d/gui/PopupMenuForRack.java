@@ -59,6 +59,9 @@ import org.concord.energy3d.undo.ChangeSolarPanelModelForRacksOnFoundationComman
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllRacksCommand;
 import org.concord.energy3d.undo.ChooseSolarPanelSizeForRackCommand;
+import org.concord.energy3d.undo.LockEditPointsCommand;
+import org.concord.energy3d.undo.LockEditPointsForClassCommand;
+import org.concord.energy3d.undo.LockEditPointsOnFoundationCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForAllRacksCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForRackCommand;
 import org.concord.energy3d.undo.RotateSolarPanelsForRacksOnFoundationCommand;
@@ -2786,6 +2789,78 @@ class PopupMenuForRack extends PopupMenuFactory {
 			trackerMenu.add(miVerticalSingleAxisTracker);
 			trackerMenu.add(miAltazimuthDualAxisTracker);
 
+			final JCheckBoxMenuItem cbmiDisableEditPoints = new JCheckBoxMenuItem("Disable Edit Points");
+			cbmiDisableEditPoints.addItemListener(new ItemListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final boolean disabled = cbmiDisableEditPoints.isSelected();
+					final Rack r = (Rack) selectedPart;
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(0, 20));
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.SOUTH);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+
+					final String title = "<html>" + (disabled ? "Disable" : "Enable") + " edit points for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Disable the edit points of a solar panel rack prevents it<br>from being unintentionally moved.<hr></html>";
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), (disabled ? "Disable" : "Enable") + " Edit Points");
+					dialog.setVisible(true);
+					if (optionPane.getValue() == options[0]) {
+						if (rb1.isSelected()) {
+							final LockEditPointsCommand c = new LockEditPointsCommand(r);
+							r.setLockEdit(disabled);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 0;
+						} else if (rb2.isSelected()) {
+							final Foundation foundation = r.getTopContainer();
+							final LockEditPointsOnFoundationCommand c = new LockEditPointsOnFoundationCommand(foundation, r.getClass());
+							foundation.setLockEditForClass(disabled, r.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 1;
+						} else if (rb3.isSelected()) {
+							final LockEditPointsForClassCommand c = new LockEditPointsForClassCommand(r);
+							Scene.getInstance().setLockEditForClass(disabled, r.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 2;
+						}
+						SceneManager.getInstance().refresh();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+
+			});
+
 			final JCheckBoxMenuItem cbmiDrawSunBeam = new JCheckBoxMenuItem("Draw Sun Beam");
 			cbmiDrawSunBeam.addItemListener(new ItemListener() {
 				@Override
@@ -2994,6 +3069,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 							}
 						}
 					}
+					Util.selectSilently(cbmiDisableEditPoints, rack.getLockEdit());
 					Util.selectSilently(cbmiDrawSunBeam, rack.isSunBeamVisible());
 					Util.selectSilently(miLabelNone, !rack.isLabelVisible());
 					Util.selectSilently(miLabelCustom, rack.getLabelCustom());
@@ -3028,6 +3104,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.add(trackerMenu);
 			popupMenuForRack.addSeparator();
+			popupMenuForRack.add(cbmiDisableEditPoints);
 			popupMenuForRack.add(cbmiDrawSunBeam);
 			popupMenuForRack.add(labelMenu);
 			popupMenuForRack.addSeparator();

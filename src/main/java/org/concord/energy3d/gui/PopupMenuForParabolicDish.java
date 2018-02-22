@@ -46,6 +46,9 @@ import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorThermalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeStructureTypeForAllParabolicDishesCommand;
 import org.concord.energy3d.undo.ChangeThermalEfficiencyForAllSolarReflectorsCommand;
+import org.concord.energy3d.undo.LockEditPointsCommand;
+import org.concord.energy3d.undo.LockEditPointsForClassCommand;
+import org.concord.energy3d.undo.LockEditPointsOnFoundationCommand;
 import org.concord.energy3d.undo.SetFocalLengthForAllParabolicDishesCommand;
 import org.concord.energy3d.undo.SetFocalLengthForParabolicDishesOnFoundationCommand;
 import org.concord.energy3d.undo.SetParabolicDishFocalLengthCommand;
@@ -296,6 +299,78 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 						}
 					}
 				}
+			});
+
+			final JCheckBoxMenuItem cbmiDisableEditPoint = new JCheckBoxMenuItem("Disable Edit Point");
+			cbmiDisableEditPoint.addItemListener(new ItemListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof ParabolicDish)) {
+						return;
+					}
+					final boolean disabled = cbmiDisableEditPoint.isSelected();
+					final ParabolicDish dish = (ParabolicDish) selectedPart;
+					final String partInfo = dish.toString().substring(0, dish.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(0, 20));
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.SOUTH);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Parabolic Dish", true);
+					final JRadioButton rb2 = new JRadioButton("All Parabolic Dishes on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Parabolic Dishes");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+
+					final String title = "<html>" + (disabled ? "Disable" : "Enable") + " edit point for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Disable the edit point of a parabolic dish prevents it<br>from being unintentionally moved.<hr></html>";
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), (disabled ? "Disable" : "Enable") + " Edit Point");
+					dialog.setVisible(true);
+					if (optionPane.getValue() == options[0]) {
+						if (rb1.isSelected()) {
+							final LockEditPointsCommand c = new LockEditPointsCommand(dish);
+							dish.setLockEdit(disabled);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 0;
+						} else if (rb2.isSelected()) {
+							final Foundation foundation = dish.getTopContainer();
+							final LockEditPointsOnFoundationCommand c = new LockEditPointsOnFoundationCommand(foundation, dish.getClass());
+							foundation.setLockEditForClass(disabled, dish.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 1;
+						} else if (rb3.isSelected()) {
+							final LockEditPointsForClassCommand c = new LockEditPointsForClassCommand(dish);
+							Scene.getInstance().setLockEditForClass(disabled, dish.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 2;
+						}
+						SceneManager.getInstance().refresh();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+
 			});
 
 			final JCheckBoxMenuItem cbmiDrawSunBeams = new JCheckBoxMenuItem("Draw Sun Beams");
@@ -882,6 +957,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					Util.selectSilently(miLabelId, d.getLabelId());
 					Util.selectSilently(miLabelEnergyOutput, d.getLabelEnergyOutput());
 					Util.selectSilently(cbmiDrawSunBeams, d.isSunBeamVisible());
+					Util.selectSilently(cbmiDisableEditPoint, d.getLockEdit());
 				}
 			});
 
@@ -1370,6 +1446,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 			});
 
 			popupMenuForParabolicDish.addSeparator();
+			popupMenuForParabolicDish.add(cbmiDisableEditPoint);
 			popupMenuForParabolicDish.add(cbmiDrawSunBeams);
 			popupMenuForParabolicDish.add(labelMenu);
 			popupMenuForParabolicDish.addSeparator();

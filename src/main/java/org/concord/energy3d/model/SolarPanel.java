@@ -245,6 +245,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		if (lockEdit) {
+			return;
+		}
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Roof.class, Wall.class, Foundation.class, Rack.class });
 		if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 			final Vector3 p = picked.getPoint().clone();
@@ -1167,6 +1170,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	}
 
 	public void move(final Vector3 v, final double steplength) {
+		if (lockEdit) {
+			return;
+		}
 		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 p = getAbsPoint(0).addLocal(v);
 		points.get(0).set(toRelative(p));

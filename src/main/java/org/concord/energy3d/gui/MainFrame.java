@@ -4743,7 +4743,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getEnableAllEditPointsMenuItem() {
 		if (enableAllEditPointsMenuItem == null) {
-			enableAllEditPointsMenuItem = new JMenuItem("Enable All Edit Points");
+			enableAllEditPointsMenuItem = new JMenuItem("Enable All Base Edit Points");
 			enableAllEditPointsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
@@ -4766,7 +4766,7 @@ public class MainFrame extends JFrame {
 
 	private JMenuItem getDisableAllEditPointsMenuItem() {
 		if (disableAllEditPointsMenuItem == null) {
-			disableAllEditPointsMenuItem = new JMenuItem("Disable All Edit Points");
+			disableAllEditPointsMenuItem = new JMenuItem("Disable All Base Edit Points");
 			disableAllEditPointsMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {

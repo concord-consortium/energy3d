@@ -46,6 +46,9 @@ import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllHeliostatsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleForAllHeliostatsCommand;
+import org.concord.energy3d.undo.LockEditPointsCommand;
+import org.concord.energy3d.undo.LockEditPointsForClassCommand;
+import org.concord.energy3d.undo.LockEditPointsOnFoundationCommand;
 import org.concord.energy3d.undo.SetHeliostatLabelCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForAllHeliostatsCommand;
@@ -110,17 +113,24 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 					dialog.setVisible(true);
 					if (optionPane.getValue() == options[0]) {
 						if (rb1.isSelected()) {
+							final LockEditPointsCommand c = new LockEditPointsCommand(m);
 							m.setLockEdit(disabled);
-							SceneManager.getInstance().refresh();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 							selectedScopeIndex = 0;
 						} else if (rb2.isSelected()) {
 							final Foundation foundation = m.getTopContainer();
-							foundation.setLockEditForClass(disabled, Mirror.class);
+							final LockEditPointsOnFoundationCommand c = new LockEditPointsOnFoundationCommand(foundation, m.getClass());
+							foundation.setLockEditForClass(disabled, m.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 							selectedScopeIndex = 1;
 						} else if (rb3.isSelected()) {
-							Scene.getInstance().setLockEditForClass(disabled, Mirror.class);
+							final LockEditPointsForClassCommand c = new LockEditPointsForClassCommand(m);
+							Scene.getInstance().setLockEditForClass(disabled, m.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 							selectedScopeIndex = 2;
 						}
+						SceneManager.getInstance().refresh();
+						Scene.getInstance().setEdited(true);
 					}
 				}
 

@@ -1681,12 +1681,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 	}
 
-	@Override
-	public void setLockEdit(final boolean b) {
-		super.setLockEdit(b);
-		updateEditPoints();
-	}
-
 	public void drawAzimuthArrow() {
 		final double cos30 = Math.cos(Math.toRadians(30));
 		final double sin30 = Math.sin(Math.toRadians(30));
@@ -1875,6 +1869,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 		}
 		return count;
+	}
+
+	public List<HousePart> getChildrenOfClass(final Class<?> clazz) {
+		final List<HousePart> selectedChildren = new ArrayList<HousePart>();
+		for (final HousePart p : children) {
+			if (clazz.isInstance(p)) {
+				selectedChildren.add(p);
+			}
+		}
+		return selectedChildren;
 	}
 
 	public List<SolarPanel> getSolarPanels() {

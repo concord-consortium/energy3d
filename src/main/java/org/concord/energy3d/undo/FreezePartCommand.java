@@ -8,14 +8,14 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class LockPartCommand extends MyAbstractUndoableEdit {
+public class FreezePartCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean oldValue;
 	private boolean newValue;
 	private final HousePart part;
 
-	public LockPartCommand(final HousePart part) {
+	public FreezePartCommand(final HousePart part) {
 		this.part = part;
 		oldValue = part.isFrozen();
 	}

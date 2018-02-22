@@ -210,6 +210,9 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		if (lockEdit) {
+			return;
+		}
 		final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
 		if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 			final Vector3 p = picked.getPoint().clone();
@@ -694,6 +697,9 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 	}
 
 	public void move(final Vector3 v, final double steplength) {
+		if (lockEdit) {
+			return;
+		}
 		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 v_rel = toRelativeVector(v);
 		points.get(0).addLocal(v_rel);

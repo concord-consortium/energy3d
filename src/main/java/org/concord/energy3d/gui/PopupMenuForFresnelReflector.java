@@ -44,6 +44,9 @@ import org.concord.energy3d.undo.ChangeFresnelReflectorAbsorberCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
+import org.concord.energy3d.undo.LockEditPointsCommand;
+import org.concord.energy3d.undo.LockEditPointsForClassCommand;
+import org.concord.energy3d.undo.LockEditPointsOnFoundationCommand;
 import org.concord.energy3d.undo.SetFresnelReflectorLabelCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForAllFresnelReflectorsCommand;
@@ -158,6 +161,78 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 						}
 					}
 				}
+			});
+
+			final JCheckBoxMenuItem cbmiDisableEditPoints = new JCheckBoxMenuItem("Disable Edit Points");
+			cbmiDisableEditPoints.addItemListener(new ItemListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof FresnelReflector)) {
+						return;
+					}
+					final boolean disabled = cbmiDisableEditPoints.isSelected();
+					final FresnelReflector r = (FresnelReflector) selectedPart;
+					final String partInfo = r.toString().substring(0, r.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout(0, 20));
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.SOUTH);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Fresnel Reflector", true);
+					final JRadioButton rb2 = new JRadioButton("All Fresnel Reflectors on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Fresnel Reflectors");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+
+					final String title = "<html>" + (disabled ? "Disable" : "Enable") + " edit points for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>Disable the edit points of a Fresnel reflector prevents it<br>from being unintentionally moved.<hr></html>";
+					final Object[] options = new Object[] { "OK", "Cancel" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), (disabled ? "Disable" : "Enable") + " Edit Points");
+					dialog.setVisible(true);
+					if (optionPane.getValue() == options[0]) {
+						if (rb1.isSelected()) {
+							final LockEditPointsCommand c = new LockEditPointsCommand(r);
+							r.setLockEdit(disabled);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 0;
+						} else if (rb2.isSelected()) {
+							final Foundation foundation = r.getTopContainer();
+							final LockEditPointsOnFoundationCommand c = new LockEditPointsOnFoundationCommand(foundation, r.getClass());
+							foundation.setLockEditForClass(disabled, r.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 1;
+						} else if (rb3.isSelected()) {
+							final LockEditPointsForClassCommand c = new LockEditPointsForClassCommand(r);
+							Scene.getInstance().setLockEditForClass(disabled, r.getClass());
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+							selectedScopeIndex = 2;
+						}
+						SceneManager.getInstance().refresh();
+						Scene.getInstance().setEdited(true);
+					}
+				}
+
 			});
 
 			final JCheckBoxMenuItem cbmiDrawBeam = new JCheckBoxMenuItem("Draw Sun Beam");
@@ -1036,6 +1111,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 						return;
 					}
 					final FresnelReflector r = (FresnelReflector) selectedPart;
+					Util.selectSilently(cbmiDisableEditPoints, r.getLockEdit());
 					Util.selectSilently(cbmiDrawBeam, r.isSunBeamVisible());
 					Util.selectSilently(miLabelNone, !r.isLabelVisible());
 					Util.selectSilently(miLabelCustom, r.getLabelCustom());
@@ -1231,6 +1307,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			popupMenuForFresnelReflector.addSeparator();
 			popupMenuForFresnelReflector.add(miSetAbsorber);
 			popupMenuForFresnelReflector.addSeparator();
+			popupMenuForFresnelReflector.add(cbmiDisableEditPoints);
 			popupMenuForFresnelReflector.add(cbmiDrawBeam);
 			popupMenuForFresnelReflector.add(labelMenu);
 			popupMenuForFresnelReflector.addSeparator();

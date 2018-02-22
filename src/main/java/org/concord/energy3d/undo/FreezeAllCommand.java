@@ -6,12 +6,12 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
 
-public class LockAllCommand extends MyAbstractUndoableEdit {
+public class FreezeAllCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean[] oldValues;
 
-	public LockAllCommand() {
+	public FreezeAllCommand() {
 		final int n = Scene.getInstance().getParts().size();
 		oldValues = new boolean[n];
 		for (int i = 0; i < n; i++) {

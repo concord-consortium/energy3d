@@ -551,6 +551,7 @@ public abstract class HousePart implements Serializable {
 			}
 			updateTextureAndColor();
 			updateEditShapes();
+			updateEditPoints();
 			clearAnnotations();
 			if (isDrawable() && !isFrozen()) {
 				drawAnnotations();
@@ -1197,6 +1198,7 @@ public abstract class HousePart implements Serializable {
 		final HousePart c = (HousePart) ObjectCloner.deepCopy(this);
 		c.container = this.container;
 		c.id = Scene.getInstance().nextID();
+		c.lockEdit = false;
 		return c;
 	}
 
@@ -1368,7 +1370,10 @@ public abstract class HousePart implements Serializable {
 		}
 	}
 
-	public void updateEditPoints() {
+	void updateEditPoints() {
+		for (int i = 0; i < pointsRoot.getNumberOfChildren(); i++) {
+			getEditPointShape(i).setDefaultColor(lockEdit ? disabledColor : ColorRGBA.WHITE);
+		}
 	}
 
 	public void setLockEdit(final boolean b) {

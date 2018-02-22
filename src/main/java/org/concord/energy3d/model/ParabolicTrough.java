@@ -232,6 +232,9 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		if (lockEdit) {
+			return;
+		}
 		if (editPointIndex <= 0) {
 			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class });
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
@@ -801,6 +804,9 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 	}
 
 	public void move(final Vector3 v, final double steplength) {
+		if (lockEdit) {
+			return;
+		}
 		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 v_rel = toRelativeVector(v);
 		points.get(0).addLocal(v_rel);
@@ -900,7 +906,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		getEditPointShape(i++).setTranslation(p2);
 		getEditPointShape(i++).setTranslation(p3);
 		getEditPointShape(i++).setTranslation(p4);
-		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE;
+		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : (lockEdit ? disabledColor : ColorRGBA.WHITE);
 		for (i = 1; i < 5; i++) {
 			getEditPointShape(i).setDefaultColor(c);
 		}

@@ -235,7 +235,6 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		drawSunBeam();
 
 		updateLabel();
-		updateEditPoints();
 
 	}
 
@@ -290,11 +289,6 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		if (!bloomRenderPass.contains(lightBeams)) {
 			bloomRenderPass.add(lightBeams);
 		}
-	}
-
-	@Override
-	public void updateEditPoints() {
-		getEditPointShape(0).setDefaultColor(lockEdit ? disabledColor : ColorRGBA.WHITE);
 	}
 
 	@Override

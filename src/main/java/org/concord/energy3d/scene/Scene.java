@@ -68,7 +68,7 @@ import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddNodeCommand;
-import org.concord.energy3d.undo.LockAllCommand;
+import org.concord.energy3d.undo.FreezeAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
@@ -2191,7 +2191,7 @@ public class Scene implements Serializable {
 				return;
 			}
 		}
-		SceneManager.getInstance().getUndoManager().addEdit(new LockAllCommand());
+		SceneManager.getInstance().getUndoManager().addEdit(new FreezeAllCommand());
 		for (final HousePart part : parts) {
 			part.setFreeze(freeze);
 		}

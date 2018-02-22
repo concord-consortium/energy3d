@@ -199,6 +199,9 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		if (lockEdit) {
+			return;
+		}
 		if (moveStartPoint == null) {
 			initSolarPanelsForMove();
 		}
@@ -949,6 +952,9 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	public void move(final Vector3 v, final double steplength) {
+		if (lockEdit) {
+			return;
+		}
 		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 v_rel = toRelativeVector(v);
 		points.get(0).addLocal(v_rel);
@@ -1167,7 +1173,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		getEditPointShape(i++).setTranslation(p2);
 		getEditPointShape(i++).setTranslation(p3);
 		getEditPointShape(i++).setTranslation(p4);
-		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : ColorRGBA.WHITE;
+		final ReadOnlyColorRGBA c = Scene.getInstance().isGroundImageLightColored() ? ColorRGBA.DARK_GRAY : (lockEdit ? disabledColor : ColorRGBA.WHITE);
 		for (i = 1; i < 5; i++) {
 			getEditPointShape(i).setDefaultColor(c);
 		}
