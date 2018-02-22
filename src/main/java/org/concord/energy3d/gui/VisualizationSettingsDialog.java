@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.util.Util;
 
 /**
@@ -109,7 +110,9 @@ class VisualizationSettingsDialog extends JDialog {
 				s.setHeatVectorLength(heatVectorLength);
 				s.setHeatFluxGridSize(heatVectorGridSize / Scene.getInstance().getAnnotationScale());
 				s.setEdited(true);
-				EnergyPanel.getInstance().updateRadiationHeatMap();
+				if (SceneManager.getInstance().getSolarHeatMap()) {
+					EnergyPanel.getInstance().updateRadiationHeatMap();
+				}
 				VisualizationSettingsDialog.this.dispose();
 			}
 		};

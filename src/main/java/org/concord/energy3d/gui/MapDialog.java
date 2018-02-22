@@ -65,6 +65,7 @@ class MapDialog extends JDialog {
 	private MapLoader mapLoader;
 	private int extent = 0;
 	private BufferedImage mapImage;
+	private JButton okButton;
 
 	class MapLoader extends SwingWorker<BufferedImage, Integer> {
 
@@ -73,6 +74,7 @@ class MapDialog extends JDialog {
 		private int extent = 0;
 
 		public MapLoader(final int extent) {
+			okButton.setEnabled(false);
 			if (mapLoader != null) {
 				mapLoader.cancel(true);
 			}
@@ -145,6 +147,7 @@ class MapDialog extends JDialog {
 				mapImageView.setText(null);
 				mapLoader = null;
 			}
+			okButton.setEnabled(true);
 		}
 
 		protected void displayError(final Exception e) {
@@ -311,7 +314,7 @@ class MapDialog extends JDialog {
 		getContentPane().add(mapImageView);
 
 		final JPanel bottomPanel = new JPanel();
-		final JButton okButton = new JButton("OK");
+		okButton = new JButton("OK");
 		okButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {

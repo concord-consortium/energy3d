@@ -1815,12 +1815,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	// assuming that there may be multiple roofs on this foundation, return a list of them
 	public List<Roof> getRoofs() {
 		final List<Roof> roofs = new ArrayList<Roof>();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Wall && p.getTopContainer() == this) {
-				for (final HousePart c : p.getChildren()) {
-					if (c instanceof Roof && !roofs.contains(c)) {
-						roofs.add((Roof) c);
-					}
+		for (final HousePart p : children) {
+			if (p instanceof Wall) {
+				final Roof r = ((Wall) p).getRoof();
+				if (r != null && !roofs.contains(r)) {
+					roofs.add(r);
 				}
 			}
 		}
@@ -1828,13 +1827,13 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	}
 
 	public List<Wall> getWalls() {
-		final List<Wall> list = new ArrayList<Wall>();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p instanceof Wall && p.getTopContainer() == this) {
-				list.add((Wall) p);
+		final List<Wall> walls = new ArrayList<Wall>();
+		for (final HousePart p : children) {
+			if (p instanceof Wall) {
+				walls.add((Wall) p);
 			}
 		}
-		return list;
+		return walls;
 	}
 
 	public List<Window> getWindows() {
@@ -4000,6 +3999,55 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					rack.drawSunBeam(); // call this so that the sun beam can be set invisible
 				} else {
 					rack.draw();
+				}
+			}
+		}
+		// since solar panels can be deployed on a roof or a wall, they are not direct children of a foundation. We need the following special treatment
+		final List<Wall> walls = getWalls();
+		if (!walls.isEmpty()) {
+			for (final Wall wall : walls) {
+				if (!wall.children.isEmpty()) {
+					for (final HousePart x : wall.children) {
+						if (x instanceof SolarPanel) {
+							final SolarPanel panel = (SolarPanel) x;
+							if (night) {
+								panel.drawSunBeam(); // call this so that the sun beam can be set invisible
+							} else {
+								panel.draw();
+							}
+						} else if (x instanceof Rack) {
+							final Rack rack = (Rack) x;
+							if (night) {
+								rack.drawSunBeam(); // call this so that the sun beam can be set invisible
+							} else {
+								rack.draw();
+							}
+						}
+					}
+				}
+			}
+		}
+		final List<Roof> roofs = getRoofs();
+		if (!roofs.isEmpty()) {
+			for (final Roof roof : roofs) {
+				if (!roof.children.isEmpty()) {
+					for (final HousePart x : roof.children) {
+						if (x instanceof SolarPanel) {
+							final SolarPanel panel = (SolarPanel) x;
+							if (night) {
+								panel.drawSunBeam(); // call this so that the sun beam can be set invisible
+							} else {
+								panel.draw();
+							}
+						} else if (x instanceof Rack) {
+							final Rack rack = (Rack) x;
+							if (night) {
+								rack.drawSunBeam(); // call this so that the sun beam can be set invisible
+							} else {
+								rack.draw();
+							}
+						}
+					}
 				}
 			}
 		}

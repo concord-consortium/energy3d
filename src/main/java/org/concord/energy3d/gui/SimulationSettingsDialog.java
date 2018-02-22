@@ -19,6 +19,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.SolarRadiation;
 import org.concord.energy3d.util.SpringUtilities;
 import org.concord.energy3d.util.Util;
@@ -114,7 +115,9 @@ class SimulationSettingsDialog extends JDialog {
 				s.setTimeStep(timeStep);
 				s.setEdited(true);
 				SolarRadiation.getInstance().setAirMassSelection(airMassComboBox.getSelectedIndex() - 1);
-				EnergyPanel.getInstance().updateRadiationHeatMap();
+				if (SceneManager.getInstance().getSolarHeatMap()) {
+					EnergyPanel.getInstance().updateRadiationHeatMap();
+				}
 				SimulationSettingsDialog.this.dispose();
 			}
 		};
