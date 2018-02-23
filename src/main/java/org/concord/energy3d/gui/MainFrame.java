@@ -769,35 +769,36 @@ public class MainFrame extends JFrame {
 			preferencesMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-
-					final Runtime runtime = Runtime.getRuntime();
-					final JPanel gui = new JPanel(new BorderLayout());
-					final JPanel inputPanel = new JPanel(new SpringLayout());
-					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-					gui.add(inputPanel, BorderLayout.CENTER);
-					JLabel label = new JLabel("Maximum memory: ");
-					inputPanel.add(label);
-					final JTextField maxMemoryField = new JTextField(Math.round(runtime.maxMemory() / (1024.0 * 1024.0)) + " MB");
-					maxMemoryField.setEditable(false);
-					label.setLabelFor(maxMemoryField);
-					inputPanel.add(maxMemoryField);
-					label = new JLabel("Total memory: ");
-					inputPanel.add(label);
-					final JTextField totalMemoryField = new JTextField(Math.round(runtime.totalMemory() / (1024.0 * 1024.0)) + " MB");
-					totalMemoryField.setEditable(false);
-					label.setLabelFor(totalMemoryField);
-					inputPanel.add(totalMemoryField);
-					SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
-
-					final Object[] options = new Object[] { "OK", "Cancel" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui }, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "System Information & Preferences");
-					dialog.setVisible(true);
-
+					showPreferences();
 				}
 			});
 		}
 		return preferencesMenuItem;
+	}
+
+	void showPreferences() {
+		final Runtime runtime = Runtime.getRuntime();
+		final JPanel gui = new JPanel(new BorderLayout());
+		final JPanel inputPanel = new JPanel(new SpringLayout());
+		inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		gui.add(inputPanel, BorderLayout.CENTER);
+		JLabel label = new JLabel("Maximum memory: ");
+		inputPanel.add(label);
+		final JTextField maxMemoryField = new JTextField(Math.round(runtime.maxMemory() / (1024.0 * 1024.0)) + " MB");
+		maxMemoryField.setEditable(false);
+		label.setLabelFor(maxMemoryField);
+		inputPanel.add(maxMemoryField);
+		label = new JLabel("Total memory: ");
+		inputPanel.add(label);
+		final JTextField totalMemoryField = new JTextField(Math.round(runtime.totalMemory() / (1024.0 * 1024.0)) + " MB");
+		totalMemoryField.setEditable(false);
+		label.setLabelFor(totalMemoryField);
+		inputPanel.add(totalMemoryField);
+		SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
+		final Object[] options = new Object[] { "OK", "Cancel" };
+		final JOptionPane optionPane = new JOptionPane(new Object[] { "<html><font size=2>System preferences apply to the software.<br>For setting properties of a model, use<br>Edit > Properities.</html>", gui }, JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, options, options[1]);
+		final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "System Information & Preferences");
+		dialog.setVisible(true);
 	}
 
 	private JMenuItem getAnalyzeFolderMenuItem() {
@@ -1127,7 +1128,9 @@ public class MainFrame extends JFrame {
 			});
 			userResultsMenu.add(mi);
 
-			helpMenu.add(getPreferencesMenuItem());
+			if (!Config.isMac()) {
+				helpMenu.add(getPreferencesMenuItem());
+			}
 			helpMenu.add(getRecoveryMenuItem());
 
 			final JMenuItem miUpdate = new JMenuItem("Check Update..."); // the automatic updater can fail sometimes. This provides an independent check.

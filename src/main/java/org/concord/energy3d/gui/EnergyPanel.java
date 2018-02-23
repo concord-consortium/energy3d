@@ -1550,7 +1550,7 @@ public class EnergyPanel extends JPanel {
 								partProperty2TextField.setText("(" + TWO_DECIMALS.format(cx * scale) + ", " + TWO_DECIMALS.format(cy * scale) + ")" + lengthUnit);
 								partProperty2TextField.putClientProperty("tooltip", "The (x, y) coordinate of the center of the foundation");
 								partProperty3Label.setText("  Azimuth:");
-								partProperty3TextField.setText(NO_DECIMAL.format(az) + "\u00B0");
+								partProperty3TextField.setText(TWO_DECIMALS.format(az) + "\u00B0");
 								partProperty3TextField.putClientProperty("tooltip", "The azimuth of the reference edge");
 							}
 						}

@@ -213,6 +213,56 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				}
 			});
 			rotateMenu.add(mi90CCW);
+			rotateMenu.addSeparator();
+
+			final JMenuItem miArbitraryRotation = new JMenuItem("Arbitrary...");
+			rotateMenu.add(miArbitraryRotation);
+			miArbitraryRotation.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final String title = "<html>Rotate " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>Rotate a foundation to any angle by degrees.<br>Note: By convention, the angle for counter-wise<br>rotation (e.g., from north to west) is positive.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JTextField inputField = new JTextField("0");
+					gui.add(inputField, BorderLayout.SOUTH);
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rotation Angle (\u00B0)");
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							boolean ok = true;
+							double a = 0;
+							try {
+								a = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (!Util.isZero(a)) {
+									SceneManager.getInstance().rotate(Math.toRadians(a));
+									updateAfterEdit();
+								}
+								if (choice == options[0]) {
+									break;
+								}
+							}
+						}
+					}
+				}
+			});
 
 			final JMenu clearMenu = new JMenu("Clear");
 

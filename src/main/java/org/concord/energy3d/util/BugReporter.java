@@ -47,7 +47,7 @@ public class BugReporter {
 			EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Energy3D has temporarily run out of memory. If this message<br>appears again, please restart the software.</html>", "Out of Memory", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "<html>Energy3D has temporarily run out of memory. If this message<br>persists, please restart the software.</html>", "Out of Memory", JOptionPane.ERROR_MESSAGE);
 				}
 			});
 		} else {
