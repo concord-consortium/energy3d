@@ -2255,14 +2255,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void deleteCurrentSelection() {
-		if (selectedPart == null) {
+		if (selectedPart == null || selectedPart.getLockEdit()) {
 			return;
 		}
 		if (selectedPart instanceof Foundation) {
 			final Foundation foundation = (Foundation) selectedPart;
-			if (foundation.getLockEdit()) {
-				return;
-			}
 			if (!foundation.getChildren().isEmpty() && foundation.getSelectedMesh() == null) {
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "Deleting the platform also deletes the building on it. Are you sure?", "Confirmation", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 					return;

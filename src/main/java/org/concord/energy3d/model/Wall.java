@@ -278,7 +278,9 @@ public class Wall extends HousePart implements Thermal {
 			points.get(3).setZ(z);
 		}
 
-		foundation.connectWalls();
+		if (foundation != null) {
+			foundation.connectWalls();
+		}
 		drawThisAndNeighbors(false);
 		setEditPointsVisible(true);
 

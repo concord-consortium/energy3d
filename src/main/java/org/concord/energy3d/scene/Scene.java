@@ -298,9 +298,11 @@ public class Scene implements Serializable {
 		});
 	}
 
-	private void destroy() { // just in case to prevent possible memory leaks
+	// just in case to prevent possible memory leaks
+	private void destroy() {
 		for (final HousePart p : parts) {
 			p.delete();
+			p.getRoot().detachAllChildren(); // detachment cannot be put into delete(), we detach all children here to help garbage collection
 		}
 		parts.clear();
 		if (groundImage != null) {

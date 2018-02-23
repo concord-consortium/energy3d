@@ -577,8 +577,8 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (u < 1 || u > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar collector module length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (u < 1 || u > 100) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Solar collector module length must be between 1 and 100 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									boolean changed = Math.abs(u - t.getModuleLength()) > 0.000001;
 									if (rb1.isSelected()) {

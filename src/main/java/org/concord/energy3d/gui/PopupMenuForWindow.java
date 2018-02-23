@@ -80,14 +80,13 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			cbmiHorizontalBars.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Window) {
-							final Window w = (Window) selectedPart;
-							w.setHorizontalBars(cbmiHorizontalBars.isSelected());
-							w.draw();
-							Scene.getInstance().setEdited(true);
-						}
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						final Window w = (Window) selectedPart;
+						w.setHorizontalBars(cbmiHorizontalBars.isSelected());
+						w.draw();
+						SceneManager.getInstance().refresh();
+						Scene.getInstance().setEdited(true);
 					}
 				}
 			});
@@ -97,14 +96,13 @@ class PopupMenuForWindow extends PopupMenuFactory {
 			cbmiVerticalBars.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (selectedPart instanceof Window) {
-							final Window w = (Window) selectedPart;
-							w.setVerticalBars(cbmiVerticalBars.isSelected());
-							w.draw();
-							Scene.getInstance().setEdited(true);
-						}
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Window) {
+						final Window w = (Window) selectedPart;
+						w.setVerticalBars(cbmiVerticalBars.isSelected());
+						w.draw();
+						SceneManager.getInstance().refresh();
+						Scene.getInstance().setEdited(true);
 					}
 				}
 			});
@@ -123,6 +121,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							final Window w = (Window) selectedPart;
 							w.setStyle(Window.MORE_MUNTIN_BARS);
 							w.draw();
+							SceneManager.getInstance().refresh();
 							Scene.getInstance().setEdited(true);
 						}
 					}
@@ -141,6 +140,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							final Window w = (Window) selectedPart;
 							w.setStyle(Window.MEDIUM_MUNTIN_BARS);
 							w.draw();
+							SceneManager.getInstance().refresh();
 							Scene.getInstance().setEdited(true);
 						}
 					}
@@ -159,6 +159,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 							final Window w = (Window) selectedPart;
 							w.setStyle(Window.LESS_MUNTIN_BARS);
 							w.draw();
+							SceneManager.getInstance().refresh();
 							Scene.getInstance().setEdited(true);
 						}
 					}
