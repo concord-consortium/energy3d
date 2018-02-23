@@ -3,13 +3,20 @@ package org.concord.energy3d.gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.Callable;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -23,6 +30,7 @@ import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
 import org.concord.energy3d.util.Config;
+import org.concord.energy3d.util.Util;
 
 class PopupMenuForRoof extends PopupMenuFactory {
 
@@ -108,6 +116,81 @@ class PopupMenuForRoof extends PopupMenuFactory {
 				}
 			});
 
+			final JMenu typeMenu = new JMenu("Type");
+			final ButtonGroup typeGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiSolid = new JRadioButtonMenuItem("Solid");
+			rbmiSolid.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Roof) {
+							final Roof roof = (Roof) selectedPart;
+							// final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							roof.setType(Roof.SOLID);
+							roof.draw();
+							SceneManager.getInstance().refresh();
+							Scene.getInstance().setEdited(true);
+							// SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+					}
+				}
+			});
+			typeMenu.add(rbmiSolid);
+			typeGroup.add(rbmiSolid);
+
+			final JRadioButtonMenuItem rbmiEmpty = new JRadioButtonMenuItem("Empty");
+			rbmiEmpty.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+						if (selectedPart instanceof Roof) {
+							final Roof roof = (Roof) selectedPart;
+							// final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							roof.setType(Roof.EMPTY);
+							roof.draw();
+							SceneManager.getInstance().refresh();
+							Scene.getInstance().setEdited(true);
+							// SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+					}
+				}
+			});
+			typeMenu.add(rbmiEmpty);
+			typeGroup.add(rbmiEmpty);
+
+			typeMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (selectedPart instanceof Roof) {
+						final Roof roof = (Roof) selectedPart;
+						switch (roof.getType()) {
+						case Roof.SOLID:
+							Util.selectSilently(rbmiSolid, true);
+							break;
+						case Roof.EMPTY:
+							Util.selectSilently(rbmiEmpty, true);
+							break;
+						}
+					}
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					typeMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					typeMenu.setEnabled(true);
+				}
+
+			});
+
 			popupMenuForRoof = createPopupMenu(false, false, new Runnable() {
 				@Override
 				public void run() {
@@ -123,6 +206,8 @@ class PopupMenuForRoof extends PopupMenuFactory {
 			popupMenuForRoof.add(colorAction);
 			popupMenuForRoof.add(createInsulationMenuItem(false));
 			popupMenuForRoof.add(createVolumetricHeatCapacityMenuItem());
+			popupMenuForRoof.addSeparator();
+			popupMenuForRoof.add(typeMenu);
 			popupMenuForRoof.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");

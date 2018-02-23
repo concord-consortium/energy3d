@@ -57,6 +57,8 @@ public abstract class Roof extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
 	public static final double OVERHANG_MIN = 0.01;
+	public static final int SOLID = 0;
+	public static final int EMPTY = 1;
 	public static ReadOnlyVector3 nullVector = new Vector3();
 
 	protected transient Node roofPartsRoot;
@@ -74,8 +76,11 @@ public abstract class Roof extends HousePart implements Thermal {
 	private double overhangLength = 2.0;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)
 	private double uValue = 0.15; // default is R38 (IECC for Massachusetts: https://energycode.pnl.gov/EnergyCodeReqs/index.jsp?state=Massachusetts)
+	private int type = SOLID;
 	private transient Path2D.Double underlyingWallPath;
 	private transient List<Vector2> underlyingWallVerticesOnFoundation;
+
+	final static byte REAL_MESH_INDEX = 6;
 
 	protected class EditState {
 		final boolean fitTestRequired;
@@ -196,6 +201,19 @@ public abstract class Roof extends HousePart implements Thermal {
 		}
 		wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
 		drawRoof();
+		switch (type) {
+		case EMPTY:
+			for (final Spatial child : roofPartsRoot.getChildren()) {
+				((Mesh) ((Node) child).getChild(0)).getSceneHints().setCullHint(CullHint.Always);
+				((Mesh) ((Node) child).getChild(REAL_MESH_INDEX)).getSceneHints().setCullHint(CullHint.Always);
+			}
+			break;
+		default:
+			for (final Spatial child : roofPartsRoot.getChildren()) {
+				((Mesh) ((Node) child).getChild(0)).getSceneHints().setCullHint(CullHint.Inherit);
+				((Mesh) ((Node) child).getChild(REAL_MESH_INDEX)).getSceneHints().setCullHint(CullHint.Inherit);
+			}
+		}
 		roofPartsRoot.updateWorldBound(true);
 		drawOutline();
 		if (Scene.getInstance().areDashedLinesOnRoofShown()) {
@@ -210,7 +228,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		}
 	}
 
-	public void drawRoof() {
+	private void drawRoof() {
 		applyOverhang(wallUpperPoints, wallNormals);
 		processRoofEditPoints(wallUpperPoints);
 		computeGableEditPoints();
@@ -223,7 +241,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		int roofPartIndex = 0;
 		for (final Spatial child : roofPartsRoot.getChildren()) {
 			((Mesh) ((Node) child).getChild(0)).setUserData(new UserData(this, roofPartIndex, false));
-			((Mesh) ((Node) child).getChild(6)).setUserData(new UserData(this, roofPartIndex, false));
+			((Mesh) ((Node) child).getChild(REAL_MESH_INDEX)).setUserData(new UserData(this, roofPartIndex, false));
 			roofPartIndex++;
 		}
 		final List<Window> windows = new ArrayList<Window>();
@@ -676,7 +694,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		if (roofPartsRoot != null) {
 			for (final Spatial roofPartNode : roofPartsRoot.getChildren()) {
 				if (roofPartNode.getSceneHints().getCullHint() != CullHint.Always) {
-					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(6), getColor() == null ? Scene.getInstance().getRoofColor() : getColor());
+					updateTextureAndColor((Mesh) ((Node) roofPartNode).getChild(REAL_MESH_INDEX), getColor() == null ? Scene.getInstance().getRoofColor() : getColor());
 				}
 			}
 		}
@@ -1136,7 +1154,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
-				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(6);
+				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(REAL_MESH_INDEX);
 				areaByPartWithOverhang.put(roofPartMesh, Util.computeArea(roofPartMesh));
 				final FloatBuffer vertexBuffer = roofPartMesh.getMeshData().getVertexBuffer();
 				final Vector3 p = new Vector3();
@@ -1216,7 +1234,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 				final Node roofPartNode = (Node) roofPart;
-				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(6);
+				final Mesh roofPartMesh = (Mesh) roofPartNode.getChild(REAL_MESH_INDEX);
 				final Double d = areaByPartWithOverhang.get(roofPartMesh);
 				if (d != null) {
 					a += d;
@@ -1354,7 +1372,7 @@ public abstract class Roof extends HousePart implements Thermal {
 					for (final Spatial child : roofPartsRoot.getChildren()) {
 						if (child.getSceneHints().getCullHint() != CullHint.Always) {
 							node = (Node) child;
-							mesh = (Mesh) node.getChild(6);
+							mesh = (Mesh) node.getChild(REAL_MESH_INDEX);
 							b = findRoofIntersection(mesh, a);
 							if (b != null) {
 								break;
@@ -1469,10 +1487,18 @@ public abstract class Roof extends HousePart implements Thermal {
 	public void addPrintMeshes(final List<Mesh> list) {
 		for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 			if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
-				final Mesh mesh = (Mesh) ((Node) roofPart).getChild(6);
+				final Mesh mesh = (Mesh) ((Node) roofPart).getChild(REAL_MESH_INDEX);
 				addPrintMesh(list, mesh);
 			}
 		}
+	}
+
+	public void setType(final int type) {
+		this.type = type;
+	}
+
+	public int getType() {
+		return type;
 	}
 
 }
