@@ -58,7 +58,7 @@ public abstract class Roof extends HousePart implements Thermal {
 	private static final long serialVersionUID = 1L;
 	public static final double OVERHANG_MIN = 0.01;
 	public static final int SOLID = 0;
-	public static final int EMPTY = 1;
+	public static final int TRANSPARENT = 1;
 	public static ReadOnlyVector3 nullVector = new Vector3();
 
 	protected transient Node roofPartsRoot;
@@ -202,7 +202,7 @@ public abstract class Roof extends HousePart implements Thermal {
 		wallUpperPointsWithoutOverhang = new ArrayList<ReadOnlyVector3>(wallUpperPoints);
 		drawRoof();
 		switch (type) {
-		case EMPTY:
+		case TRANSPARENT:
 			for (final Spatial child : roofPartsRoot.getChildren()) {
 				((Mesh) ((Node) child).getChild(0)).getSceneHints().setCullHint(CullHint.Always);
 				((Mesh) ((Node) child).getChild(REAL_MESH_INDEX)).getSceneHints().setCullHint(CullHint.Always);

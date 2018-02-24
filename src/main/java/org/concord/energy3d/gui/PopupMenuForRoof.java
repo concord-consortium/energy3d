@@ -29,6 +29,7 @@ import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
 import org.concord.energy3d.undo.ChangeRoofOverhangCommand;
+import org.concord.energy3d.undo.ChangeRoofTypeCommand;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.Util;
 
@@ -127,12 +128,12 @@ class PopupMenuForRoof extends PopupMenuFactory {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Roof) {
 							final Roof roof = (Roof) selectedPart;
-							// final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
+							final ChangeRoofTypeCommand c = new ChangeRoofTypeCommand(roof);
 							roof.setType(Roof.SOLID);
 							roof.draw();
 							SceneManager.getInstance().refresh();
 							Scene.getInstance().setEdited(true);
-							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 					}
 				}
@@ -140,26 +141,26 @@ class PopupMenuForRoof extends PopupMenuFactory {
 			typeMenu.add(rbmiSolid);
 			typeGroup.add(rbmiSolid);
 
-			final JRadioButtonMenuItem rbmiEmpty = new JRadioButtonMenuItem("Empty");
-			rbmiEmpty.addItemListener(new ItemListener() {
+			final JRadioButtonMenuItem rbmiTransparent = new JRadioButtonMenuItem("Transparent");
+			rbmiTransparent.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
 						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 						if (selectedPart instanceof Roof) {
 							final Roof roof = (Roof) selectedPart;
-							// final ChangeWallTypeCommand c = new ChangeWallTypeCommand(wall);
-							roof.setType(Roof.EMPTY);
+							final ChangeRoofTypeCommand c = new ChangeRoofTypeCommand(roof);
+							roof.setType(Roof.TRANSPARENT);
 							roof.draw();
 							SceneManager.getInstance().refresh();
 							Scene.getInstance().setEdited(true);
-							// SceneManager.getInstance().getUndoManager().addEdit(c);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
 						}
 					}
 				}
 			});
-			typeMenu.add(rbmiEmpty);
-			typeGroup.add(rbmiEmpty);
+			typeMenu.add(rbmiTransparent);
+			typeGroup.add(rbmiTransparent);
 
 			typeMenu.addMenuListener(new MenuListener() {
 
@@ -172,8 +173,8 @@ class PopupMenuForRoof extends PopupMenuFactory {
 						case Roof.SOLID:
 							Util.selectSilently(rbmiSolid, true);
 							break;
-						case Roof.EMPTY:
-							Util.selectSilently(rbmiEmpty, true);
+						case Roof.TRANSPARENT:
+							Util.selectSilently(rbmiTransparent, true);
 							break;
 						}
 					}
