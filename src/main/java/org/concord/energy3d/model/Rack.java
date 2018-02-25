@@ -1261,6 +1261,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				setRackWidth(nw * a);
 				setRackHeight(nh * b);
 				drawMesh();
+				updateEditShapes();
 			}
 		}
 	}

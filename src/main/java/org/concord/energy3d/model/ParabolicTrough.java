@@ -875,6 +875,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 			}
 			setTroughLength(n * moduleLength);
 			drawMesh();
+			updateEditShapes();
 		}
 	}
 

@@ -758,6 +758,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 			}
 			setLength(n * moduleLength);
 			drawMesh();
+			updateEditShapes();
 		}
 	}
 
