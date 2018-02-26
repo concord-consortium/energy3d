@@ -97,7 +97,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 
 	static JPopupMenu getPopupMenu(final MouseEvent e) {
 
-		if (e.isAltDown()) {
+		if (e.isShiftDown()) {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
