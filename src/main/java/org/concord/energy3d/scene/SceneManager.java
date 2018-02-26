@@ -1497,7 +1497,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public void setSelectedPart(final HousePart p) {
-		if (p == null && selectedPart != null) {
+		if (selectedPart != null) {
 			selectedPart.setEditPointsVisible(false);
 		}
 		selectedPart = p;

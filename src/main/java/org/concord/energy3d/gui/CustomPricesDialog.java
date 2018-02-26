@@ -173,7 +173,7 @@ class CustomPricesDialog extends JDialog {
 			add(landCostField);
 			add(new JLabel("<html>Per year per m<sup>2</sup></html>"));
 
-			add(createCspLabel("Mirror (Heliostat): "));
+			add(createCspLabel("Heliostat: "));
 			add(new JLabel("$"));
 			heliostatField = new JTextField(FORMAT.format(price.getHeliostatUnitPrice()), 6);
 			add(heliostatField);

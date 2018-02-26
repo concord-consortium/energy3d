@@ -1095,6 +1095,7 @@ public class Scene implements Serializable {
 		}
 		add(c, true);
 		copyBuffer = c;
+		SceneManager.getInstance().setSelectedPart(c);
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		EnergyPanel.getInstance().update();
 	}

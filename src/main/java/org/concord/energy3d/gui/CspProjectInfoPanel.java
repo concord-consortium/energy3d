@@ -44,7 +44,7 @@ public class CspProjectInfoPanel extends JPanel {
 		// mirror/trough/dish/Fresnel reflector count on the selected base
 
 		countPanel = new JPanel(new BorderLayout());
-		countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors (heliostats)", true));
+		countPanel.setBorder(EnergyPanel.createTitledBorder("Number of heliostats", true));
 		container.add(countPanel);
 		countBar = new ColorBar(Color.WHITE, Color.LIGHT_GRAY);
 		countBar.setUnit("");
@@ -161,7 +161,7 @@ public class CspProjectInfoPanel extends JPanel {
 					final List<Mirror> mirrors = foundation.getHeliostats();
 					countBar.setValue(mirrors.size());
 					moduleCountBar.setValue(mirrors.size());
-					countPanel.setBorder(EnergyPanel.createTitledBorder("Number of mirrors (heliostats)", true));
+					countPanel.setBorder(EnergyPanel.createTitledBorder("Number of heliostats", true));
 					double cost = 0;
 					double reflectingArea = 0;
 					double mirrorArea = 0;
@@ -245,7 +245,7 @@ public class CspProjectInfoPanel extends JPanel {
 	public void updateHeliostatNumberMaximum() {
 		if (Scene.getInstance().countParts(Mirror.class) > 0) {
 			final CspDesignSpecs specs = Scene.getInstance().getCspDesignSpecs();
-			String t = "Number of mirrors (heliostats)";
+			String t = "Number of heliostats";
 			if (specs.isNumberOfMirrorsEnabled()) {
 				t += " (" + "<" + specs.getMaximumNumberOfMirrors() + ")";
 			}
