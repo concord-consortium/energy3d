@@ -352,7 +352,14 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 
 	@Override
 	protected String getTextureFileName() {
-		return "mirror.png";
+		switch (Scene.getInstance().getHeliostatTextureType()) {
+		case Scene.HELIOSTAT_TEXTURE_TWO_MIRRORS:
+			return "mirror2.png";
+		case Scene.HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS:
+			return "mirror35.png";
+		default:
+			return "mirror.png";
+		}
 	}
 
 	@Override

@@ -6,13 +6,13 @@ import javax.swing.undo.CannotUndoException;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 
-public class ChangeTextureCommand extends MyAbstractUndoableEdit {
+public class ChangeBuildingTextureCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final TextureMode oldValue;
 	private TextureMode newValue;
 
-	public ChangeTextureCommand() {
+	public ChangeBuildingTextureCommand() {
 		oldValue = Scene.getInstance().getTextureMode();
 	}
 
@@ -35,7 +35,7 @@ public class ChangeTextureCommand extends MyAbstractUndoableEdit {
 
 	@Override
 	public String getPresentationName() {
-		return "Texture Change";
+		return "Building Texture Change";
 	}
 
 }

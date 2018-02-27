@@ -329,9 +329,9 @@ public class TimeSeriesLogger {
 					stateValue += ", \"New Time\": \"" + (newCal.get(Calendar.HOUR_OF_DAY)) + ":" + newCal.get(Calendar.MINUTE) + "\"";
 					stateValue += ", \"Old Date\": \"" + (oldCal.get(Calendar.MONTH) + 1) + "/" + oldCal.get(Calendar.DAY_OF_MONTH) + "\"";
 					stateValue += ", \"New Date\": \"" + (newCal.get(Calendar.MONTH) + 1) + "/" + newCal.get(Calendar.DAY_OF_MONTH) + "\"}";
-				} else if (lastEdit instanceof ChangeTextureCommand) {
+				} else if (lastEdit instanceof ChangeBuildingTextureCommand) {
 					stateValue = "{\"Old Value\": ";
-					TextureMode textureMode = ((ChangeTextureCommand) lastEdit).getOldValue();
+					TextureMode textureMode = ((ChangeBuildingTextureCommand) lastEdit).getOldValue();
 					if (textureMode == TextureMode.Full) {
 						stateValue += "\"Full\"";
 					} else if (textureMode == TextureMode.Simple) {

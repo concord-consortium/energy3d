@@ -119,11 +119,12 @@ import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.PvProjectCost;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.ChangeBuildingColorCommand;
+import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
+import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
-import org.concord.energy3d.undo.ChangeTextureCommand;
 import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.MyUndoManager;
@@ -243,13 +244,17 @@ public class MainFrame extends JFrame {
 	private JMenuItem zoomInMenuItem;
 	private JMenuItem zoomOutMenuItem;
 	private JMenu textureMenu;
-	private JRadioButtonMenuItem noTextureMenuItem;
-	private JRadioButtonMenuItem textureSimpleMenuItem;
-	private JRadioButtonMenuItem textureFullMenuItem;
-	private JRadioButtonMenuItem textureBrickMenuItem;
-	private JRadioButtonMenuItem textureGrayShingleMenuItem;
-	private JRadioButtonMenuItem textureSouthernMenuItem;
-	private final ButtonGroup textureButtonGroup = new ButtonGroup();
+	private JRadioButtonMenuItem heliostat1MirrorTextureMenuItem;
+	private JRadioButtonMenuItem heliostat2MirrorTextureMenuItem;
+	private JRadioButtonMenuItem heliostat35MirrorTextureMenuItem;
+	private final ButtonGroup heliostatTextureButtonGroup = new ButtonGroup();
+	private JRadioButtonMenuItem noBuildingTextureMenuItem;
+	private JRadioButtonMenuItem simpleBuildingTextureMenuItem;
+	private JRadioButtonMenuItem graySidingShingleBuildingTextureMenuItem;
+	private JRadioButtonMenuItem brickBuildingTextureMenuItem;
+	private JRadioButtonMenuItem grayShingleRoofBuildingTextureMenuItem;
+	private JRadioButtonMenuItem southernStyleBuildingTextureMenuItem;
+	private final ButtonGroup buildingTextureButtonGroup = new ButtonGroup();
 	private JMenu themeMenu;
 	private JRadioButtonMenuItem blueSkyMenuItem;
 	private JRadioButtonMenuItem desertMenuItem;
@@ -1752,7 +1757,18 @@ public class MainFrame extends JFrame {
 
 		if (textureMenu == null) {
 			textureMenu = new JMenu("Texture");
-			textureMenu.addMenuListener(new MenuListener() {
+			final JMenu buildingTextureMenu = new JMenu("Buildings");
+			textureMenu.add(buildingTextureMenu);
+			final JMenu heliostatTextureMenu = new JMenu("Heliostats");
+			textureMenu.add(heliostatTextureMenu);
+
+			buildingTextureMenu.add(getNoBuildingTextureMenuItem());
+			buildingTextureMenu.add(getSimpleBuildingTextureMenuItem());
+			buildingTextureMenu.add(getGraySidingShingleBuildingTextureMenuItem());
+			buildingTextureMenu.add(getGrayShingleRoofBuildingTextureMenuItem());
+			buildingTextureMenu.add(getBrickBuildingTextureMenuItem());
+			buildingTextureMenu.add(getSouthernStyleBuildingTextureMenuItem());
+			buildingTextureMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
 				}
@@ -1764,21 +1780,43 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
-					Util.selectSilently(noTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
-					Util.selectSilently(textureSimpleMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
-					Util.selectSilently(textureFullMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
-					Util.selectSilently(textureGrayShingleMenuItem, Scene.getInstance().getTextureMode() == TextureMode.GRAY_SHINGLE_ROOF);
-					Util.selectSilently(textureBrickMenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
-					Util.selectSilently(textureSouthernMenuItem, Scene.getInstance().getTextureMode() == TextureMode.SOUTHERN);
+					Util.selectSilently(noBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.None);
+					Util.selectSilently(simpleBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
+					Util.selectSilently(graySidingShingleBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
+					Util.selectSilently(grayShingleRoofBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.GRAY_SHINGLE_ROOF);
+					Util.selectSilently(brickBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
+					Util.selectSilently(southernStyleBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.SOUTHERN);
 				}
 			});
 
-			textureMenu.add(getNoTextureMenuItem());
-			textureMenu.add(getTextureSimpleMenuItem());
-			textureMenu.add(getTextureFullMenuItem());
-			textureMenu.add(getTextureGrayShingleMenuItem());
-			textureMenu.add(getTextureBrickMenuItem());
-			textureMenu.add(getTextureSouthernMenuItem());
+			heliostatTextureMenu.add(getHeliostat1MirrorTextureMenuItem());
+			heliostatTextureMenu.add(getHeliostat2MirrorTextureMenuItem());
+			heliostatTextureMenu.add(getHeliostat35MirrorTextureMenuItem());
+			heliostatTextureMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					switch (Scene.getInstance().getHeliostatTextureType()) {
+					default:
+						Util.selectSilently(heliostat1MirrorTextureMenuItem, true);
+						break;
+					case Scene.HELIOSTAT_TEXTURE_TWO_MIRRORS:
+						Util.selectSilently(heliostat2MirrorTextureMenuItem, true);
+						break;
+					case Scene.HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS:
+						Util.selectSilently(heliostat35MirrorTextureMenuItem, true);
+						break;
+					}
+				}
+			});
 
 		}
 		return textureMenu;
@@ -3451,14 +3489,83 @@ public class MainFrame extends JFrame {
 		return zoomOutMenuItem;
 	}
 
-	public JRadioButtonMenuItem getNoTextureMenuItem() {
-		if (noTextureMenuItem == null) {
-			noTextureMenuItem = new JRadioButtonMenuItem("No Texture");
-			noTextureMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getHeliostat1MirrorTextureMenuItem() {
+		if (heliostat1MirrorTextureMenuItem == null) {
+			heliostat1MirrorTextureMenuItem = new JRadioButtonMenuItem("Whole Mirror");
+			heliostat1MirrorTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeTextureCommand c = new ChangeTextureCommand();
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_ONE_MIRROR);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			heliostatTextureButtonGroup.add(heliostat1MirrorTextureMenuItem);
+		}
+		return heliostat1MirrorTextureMenuItem;
+	}
+
+	public JRadioButtonMenuItem getHeliostat2MirrorTextureMenuItem() {
+		if (heliostat2MirrorTextureMenuItem == null) {
+			heliostat2MirrorTextureMenuItem = new JRadioButtonMenuItem("Two Mirrors");
+			heliostat2MirrorTextureMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_TWO_MIRRORS);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			heliostatTextureButtonGroup.add(heliostat2MirrorTextureMenuItem);
+		}
+		return heliostat2MirrorTextureMenuItem;
+	}
+
+	public JRadioButtonMenuItem getHeliostat35MirrorTextureMenuItem() {
+		if (heliostat35MirrorTextureMenuItem == null) {
+			heliostat35MirrorTextureMenuItem = new JRadioButtonMenuItem("5 \u00D7 7 Mirrors");
+			heliostat35MirrorTextureMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			heliostatTextureButtonGroup.add(heliostat35MirrorTextureMenuItem);
+		}
+		return heliostat35MirrorTextureMenuItem;
+	}
+
+	public JRadioButtonMenuItem getNoBuildingTextureMenuItem() {
+		if (noBuildingTextureMenuItem == null) {
+			noBuildingTextureMenuItem = new JRadioButtonMenuItem("No Texture");
+			noBuildingTextureMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.None);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
@@ -3468,19 +3575,19 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(noTextureMenuItem);
+			buildingTextureButtonGroup.add(noBuildingTextureMenuItem);
 		}
-		return noTextureMenuItem;
+		return noBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTextureSimpleMenuItem() {
-		if (textureSimpleMenuItem == null) {
-			textureSimpleMenuItem = new JRadioButtonMenuItem("Simple Texture");
-			textureSimpleMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getSimpleBuildingTextureMenuItem() {
+		if (simpleBuildingTextureMenuItem == null) {
+			simpleBuildingTextureMenuItem = new JRadioButtonMenuItem("Simple Texture");
+			simpleBuildingTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeTextureCommand c = new ChangeTextureCommand();
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.Simple);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
@@ -3490,19 +3597,19 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(textureSimpleMenuItem);
+			buildingTextureButtonGroup.add(simpleBuildingTextureMenuItem);
 		}
-		return textureSimpleMenuItem;
+		return simpleBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTextureFullMenuItem() {
-		if (textureFullMenuItem == null) {
-			textureFullMenuItem = new JRadioButtonMenuItem("Gray Siding Shingle");
-			textureFullMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getGraySidingShingleBuildingTextureMenuItem() {
+		if (graySidingShingleBuildingTextureMenuItem == null) {
+			graySidingShingleBuildingTextureMenuItem = new JRadioButtonMenuItem("Gray Siding Shingle");
+			graySidingShingleBuildingTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeTextureCommand c = new ChangeTextureCommand();
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.Full);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
@@ -3512,19 +3619,19 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(textureFullMenuItem);
+			buildingTextureButtonGroup.add(graySidingShingleBuildingTextureMenuItem);
 		}
-		return textureFullMenuItem;
+		return graySidingShingleBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTextureBrickMenuItem() {
-		if (textureBrickMenuItem == null) {
-			textureBrickMenuItem = new JRadioButtonMenuItem("Brick Wall");
-			textureBrickMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getBrickBuildingTextureMenuItem() {
+		if (brickBuildingTextureMenuItem == null) {
+			brickBuildingTextureMenuItem = new JRadioButtonMenuItem("Brick Wall");
+			brickBuildingTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeTextureCommand c = new ChangeTextureCommand();
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.BRICK);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
@@ -3534,19 +3641,19 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(textureBrickMenuItem);
+			buildingTextureButtonGroup.add(brickBuildingTextureMenuItem);
 		}
-		return textureBrickMenuItem;
+		return brickBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTextureSouthernMenuItem() {
-		if (textureSouthernMenuItem == null) {
-			textureSouthernMenuItem = new JRadioButtonMenuItem("Southern Style");
-			textureSouthernMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getSouthernStyleBuildingTextureMenuItem() {
+		if (southernStyleBuildingTextureMenuItem == null) {
+			southernStyleBuildingTextureMenuItem = new JRadioButtonMenuItem("Southern Style");
+			southernStyleBuildingTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeTextureCommand c = new ChangeTextureCommand();
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.SOUTHERN);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
@@ -3556,19 +3663,19 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(textureSouthernMenuItem);
+			buildingTextureButtonGroup.add(southernStyleBuildingTextureMenuItem);
 		}
-		return textureSouthernMenuItem;
+		return southernStyleBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getTextureGrayShingleMenuItem() {
-		if (textureGrayShingleMenuItem == null) {
-			textureGrayShingleMenuItem = new JRadioButtonMenuItem("Gray Shingle Roof");
-			textureGrayShingleMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getGrayShingleRoofBuildingTextureMenuItem() {
+		if (grayShingleRoofBuildingTextureMenuItem == null) {
+			grayShingleRoofBuildingTextureMenuItem = new JRadioButtonMenuItem("Gray Shingle Roof");
+			grayShingleRoofBuildingTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final ChangeTextureCommand c = new ChangeTextureCommand();
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
 						Scene.getInstance().setTextureMode(TextureMode.GRAY_SHINGLE_ROOF);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
@@ -3578,9 +3685,9 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			textureButtonGroup.add(textureGrayShingleMenuItem);
+			buildingTextureButtonGroup.add(grayShingleRoofBuildingTextureMenuItem);
 		}
-		return textureGrayShingleMenuItem;
+		return grayShingleRoofBuildingTextureMenuItem;
 	}
 
 	public JRadioButtonMenuItem getBlueSkyMenuItem() {
@@ -3681,11 +3788,11 @@ public class MainFrame extends JFrame {
 				}
 			};
 		} else {
-			if (!noTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
+			if (!noBuildingTextureMenuItem.isSelected()) { // when the user wants to set the color, automatically switch to no texture
 				if (JOptionPane.showConfirmDialog(this, "To set color for an individual part, we have to remove the texture. Is that OK?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION) {
 					return;
 				}
-				noTextureMenuItem.setSelected(true);
+				noBuildingTextureMenuItem.setSelected(true);
 				Scene.getInstance().setTextureMode(TextureMode.None);
 			}
 			final ReadOnlyColorRGBA color = selectedPart.getColor();

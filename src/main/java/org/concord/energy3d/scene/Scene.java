@@ -101,6 +101,10 @@ public class Scene implements Serializable {
 	public static final int GRASSLAND_THEME = 2;
 	public static final int FOREST_THEME = 3;
 
+	public static final int HELIOSTAT_TEXTURE_ONE_MIRROR = 0;
+	public static final int HELIOSTAT_TEXTURE_TWO_MIRRORS = 1;
+	public static final int HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS = 2;
+
 	public static final int INSTRUCTION_SHEET_NUMBER = 5;
 
 	private static final long serialVersionUID = 1L;
@@ -183,6 +187,7 @@ public class Scene implements Serializable {
 	private String[] instructionSheetTextType;
 	private boolean instructionTabHeaderInvisible;
 	private boolean noSnapshotLogging;
+	private int heliostatTextureType = HELIOSTAT_TEXTURE_ONE_MIRROR;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -369,15 +374,6 @@ public class Scene implements Serializable {
 		instance.init();
 		instance.applyGroundImage();
 
-		if (instance.textureMode == TextureMode.Simple) {
-			Util.selectSilently(MainFrame.getInstance().getTextureSimpleMenuItem(), true);
-		} else if (instance.textureMode == TextureMode.Full) {
-			Util.selectSilently(MainFrame.getInstance().getTextureFullMenuItem(), true);
-		} else if (instance.textureMode == TextureMode.BRICK) {
-			Util.selectSilently(MainFrame.getInstance().getTextureBrickMenuItem(), true);
-		} else {
-			Util.selectSilently(MainFrame.getInstance().getNoTextureMenuItem(), true);
-		}
 		EventQueue.invokeLater(new Runnable() { // update GUI must be called in Event Queue to prevent possible deadlocks
 			@Override
 			public void run() {
@@ -1495,6 +1491,14 @@ public class Scene implements Serializable {
 
 	public TextureMode getTextureMode() {
 		return textureMode;
+	}
+
+	public void setHeliostatTextureType(final int heliostatTextureType) {
+		this.heliostatTextureType = heliostatTextureType;
+	}
+
+	public int getHeliostatTextureType() {
+		return heliostatTextureType;
 	}
 
 	public void setDrawThickness(final boolean draw) {
