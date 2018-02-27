@@ -95,6 +95,9 @@ class MapDialog extends JDialog {
 			final int i = chunks.get(chunks.size() - 1);
 			mapImageView.setText("Loading " + i + "%..."); // The last value in this array is all we care about.
 			mapImageView.repaint();
+			if (okButton.isEnabled()) { // sometimes the OK button can be enabled when a new download process terminates the current one
+				okButton.setEnabled(false);
+			}
 		}
 
 		@Override

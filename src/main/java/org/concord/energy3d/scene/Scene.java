@@ -864,6 +864,7 @@ public class Scene implements Serializable {
 
 	public static void save(final URL url, final boolean setAsCurrentFile, final boolean notifyUndoManager, final boolean logger) {
 		isSaving = true;
+		SceneManager.getInstance().cursorWait(true);
 		if (MainApplication.isSceneManagerThreadAlive()) {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
@@ -874,6 +875,7 @@ public class Scene implements Serializable {
 						BugReporter.report(e);
 					} finally {
 						isSaving = false;
+						SceneManager.getInstance().cursorWait(false);
 					}
 					return null;
 				}
@@ -885,6 +887,7 @@ public class Scene implements Serializable {
 				BugReporter.report(e);
 			} finally {
 				isSaving = false;
+				SceneManager.getInstance().cursorWait(false);
 			}
 		}
 	}
@@ -892,12 +895,14 @@ public class Scene implements Serializable {
 	// when saving before exit or saving in the log, don't use a callback through the task manager -- use whatever is the current thread to do the job
 	public static void saveOutsideTaskManager(final URL url) {
 		isSaving = true;
+		SceneManager.getInstance().cursorWait(true);
 		try {
 			realSave(url, false, false, false);
 		} catch (final Throwable e) {
 			e.printStackTrace();
 		} finally {
 			isSaving = false;
+			SceneManager.getInstance().cursorWait(false);
 		}
 	}
 

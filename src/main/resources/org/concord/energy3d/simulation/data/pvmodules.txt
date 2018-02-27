@@ -14,6 +14,7 @@ PV-UJ235GA6,         Mitsubishi,      Polycrystalline,    0.143,      1.658(1.65
 Q.PRO-G4 265,        Q-Cells,         Polycrystalline,    0.1587,     1.67(1.65),      1.0(0.99),      0.032,     10,  6,   265,  30.75, 8.62,  38.01, 9.23,  -0.0041,  45,    18.8,   Blue,   Partial,         800
 SE-F280CzD-3y,       SunEdison,       Monocrystalline,    0.1706,     1.658(1.65),     0.99(0.99),     0.05,      10,  6,   280,  30.4,  9.21,  38,    9.5,   -0.0045,  45,    19,     Blue,   Partial,         800
 SE-R355EzC-4y,       SunEdison,       Monocrystalline,    0.1815,     1.976(1.96),     0.99(0.99),     0.035,     12,  6,   355,  38.3,  9.27,  46.8,  9.64,  -0.0044,  45,    21.2,   Black,  Partial,         800
+Sharp NT-175UC1,     Sharp,           Monocrystalline,    0.134,      1.576(1.65),     0.826(0.99),    0.046,     12,  6,   175,  35.4,  4.95,  44.4,  5.4,   -0.0048,  45,    16,     Blue,   None,            600
 SPR-E20-435-COM,     SunPower,        Monocrystalline,    0.203,      2.073(2.07),     1.072(1.07),    0.046,     16,  8,   435,  72.9,  5.97,  85.6,  6.43,  -0.0035,  45,    25.4,   Black,  Partial,         1000
 SPR-P17-350-COM,     SunPower,        Polycrystalline,    0.1697,     2.067(1.96),     0.998(0.99),    0.046,     12,  6,   350,  43.1,  8.12,  51.7,  8.65,  -0.0037,  45,    23.1,   Blue,   Partial,         1000
 SPR-X21-335-BLK,     SunPower,        Monocrystalline,    0.21,       1.558(1.56),     1.046(1.05),    0.046,     12,  8,   335,  57.3,  5.85,  67.9,  6.23,  -0.0029,  41.5,  18.6,   Black,  High,            800
