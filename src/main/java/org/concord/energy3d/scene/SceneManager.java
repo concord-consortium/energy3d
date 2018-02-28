@@ -241,7 +241,13 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		@Override
 		public void run() {
-			moveWithKey(keyboardState, direction);
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					moveWithKey(keyboardState, direction);
+					return null;
+				}
+			});
 		}
 
 	}
