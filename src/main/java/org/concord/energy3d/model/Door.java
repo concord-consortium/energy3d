@@ -15,6 +15,7 @@ import com.ardor3d.math.type.ReadOnlyVector3;
 import com.ardor3d.renderer.IndexMode;
 import com.ardor3d.scenegraph.Line;
 import com.ardor3d.scenegraph.Mesh;
+import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart implements Thermal {
@@ -54,7 +55,7 @@ public class Door extends HousePart implements Thermal {
 
 		outlineMesh = new Line("Door (Outline)");
 		outlineMesh.setLineWidth(2);
-		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(4));
+		outlineMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(6 + 2 * 4));
 		outlineMesh.setDefaultColor(ColorRGBA.BLACK);
 		outlineMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(outlineMesh);
@@ -148,17 +149,47 @@ public class Door extends HousePart implements Thermal {
 
 		mesh.updateModelBound();
 
-		final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
-		outlineBuffer.rewind();
-		final Vector3 p0 = getAbsPoint(0);
-		final Vector3 p1 = getAbsPoint(1);
-		final Vector3 p2 = getAbsPoint(2);
-		final Vector3 p3 = getAbsPoint(3);
-		outlineBuffer.put(p0.getXf()).put(p0.getYf()).put(p0.getZf());
-		outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
-		outlineBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
-		outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
-		outlineMesh.updateModelBound();
+		if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+
+			outlineMesh.getSceneHints().setCullHint(CullHint.Inherit);
+
+			final FloatBuffer outlineBuffer = outlineMesh.getMeshData().getVertexBuffer();
+			outlineBuffer.rewind();
+			final Vector3 p0 = getAbsPoint(0);
+			final Vector3 p1 = getAbsPoint(1);
+			final Vector3 p2 = getAbsPoint(2);
+			final Vector3 p3 = getAbsPoint(3);
+			outlineBuffer.put(p0.getXf()).put(p0.getYf()).put(p0.getZf());
+			outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+			outlineBuffer.put(p2.getXf()).put(p2.getYf()).put(p2.getZf());
+			outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+			outlineBuffer.put(p1.getXf()).put(p1.getYf()).put(p1.getZf());
+			outlineBuffer.put(p3.getXf()).put(p3.getYf()).put(p3.getZf());
+
+			final double dmin = 0.1 * Math.min(p0.distance(p1), p0.distance(p2));
+
+			final Vector3 d10 = p1.subtract(p0, null).normalizeLocal().multiplyLocal(dmin);
+			final Vector3 d20 = p2.subtract(p0, null).normalizeLocal().multiplyLocal(dmin);
+			final Vector3 v0 = p0.add(d10, null).addLocal(d20);
+			final Vector3 v1 = p1.subtract(d10, null).addLocal(d20);
+			final Vector3 v2 = p2.subtract(d20, null).addLocal(d10);
+			final Vector3 v3 = p3.subtract(d20, null).subtractLocal(d10);
+			outlineBuffer.put(v0.getXf()).put(v0.getYf()).put(v0.getZf());
+			outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
+			outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
+			outlineBuffer.put(v3.getXf()).put(v3.getYf()).put(v3.getZf());
+			outlineBuffer.put(v0.getXf()).put(v0.getYf()).put(v0.getZf());
+			outlineBuffer.put(v2.getXf()).put(v2.getYf()).put(v2.getZf());
+			outlineBuffer.put(v1.getXf()).put(v1.getYf()).put(v1.getZf());
+			outlineBuffer.put(v3.getXf()).put(v3.getYf()).put(v3.getZf());
+
+			outlineMesh.updateModelBound();
+
+		} else {
+
+			outlineMesh.getSceneHints().setCullHint(CullHint.Always);
+
+		}
 
 	}
 
@@ -177,7 +208,7 @@ public class Door extends HousePart implements Thermal {
 	protected String getTextureFileName() {
 		final TextureMode t = Scene.getInstance().getTextureMode();
 		if (t == TextureMode.None) {
-			return "door.png";
+			return null;
 		}
 		if (t == TextureMode.Simple) {
 			return "door.png";

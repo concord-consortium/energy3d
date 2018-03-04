@@ -556,6 +556,27 @@ public class EnergyPanel extends JPanel {
 						popupMenu.pack();
 						popupMenu.show(e.getComponent(), 0, 0);
 					}
+				} else {
+					if (Util.isRightClick(e) && e.getComponent() == partProperty1TextField) { // convenience tool for copying data for virtual solar grid
+						switch (Scene.getInstance().getProjectType()) {
+						case Foundation.TYPE_PV_PROJECT:
+							final JPopupMenu popupMenu = new JPopupMenu();
+							final JMenuItem mi = new JMenuItem("\"module_number\": " + Scene.getInstance().countSolarPanels());
+							mi.addActionListener(new ActionListener() {
+								@Override
+								public void actionPerformed(final ActionEvent e) {
+									Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(mi.getText()), null);
+								}
+							});
+							popupMenu.add(mi);
+							popupMenu.pack();
+							popupMenu.show(e.getComponent(), 0, 0);
+							break;
+						case Foundation.TYPE_CSP_PROJECT:
+							// TODO
+							break;
+						}
+					}
 				}
 			}
 		};

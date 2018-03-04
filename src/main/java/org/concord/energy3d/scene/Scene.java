@@ -1063,7 +1063,9 @@ public class Scene implements Serializable {
 	}
 
 	public void setCopyBuffer(final HousePart p) {
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		// if (SceneManager.getInstance().getSolarHeatMap()) {
+		// EnergyPanel.getInstance().updateRadiationHeatMap(); // I don't think we need this
+		// }
 		if (p instanceof Roof || p instanceof Floor || p instanceof Sensor) { // exclude these types
 			return;
 		}
@@ -1264,6 +1266,7 @@ public class Scene implements Serializable {
 		}
 		add(c, true);
 		copyBuffer = c;
+		SceneManager.getInstance().setSelectedPart(c);
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 

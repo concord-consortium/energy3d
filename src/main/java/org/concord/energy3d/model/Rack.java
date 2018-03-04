@@ -86,7 +86,6 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	private static double normalVectorLength = 5;
 	private static transient BloomRenderPass bloomRenderPass;
 	private transient double baseZ;
-	// private transient boolean isBaseZ;
 	private MeshLocator meshLocator; // if the mesh that this rack rests on is a vertical surface of unknown type (e.g., an imported mesh), store its info for finding it later
 
 	public Rack() {

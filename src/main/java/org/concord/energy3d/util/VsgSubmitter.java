@@ -65,6 +65,7 @@ public class VsgSubmitter {
 		switch (Scene.getInstance().getProjectType()) {
 		case Foundation.TYPE_PV_PROJECT:
 			s += "\t\"type\": \"PV\",\n";
+			s += "\t\"module_number\": " + Scene.getInstance().countSolarPanels() + ",\n";
 			break;
 		case Foundation.TYPE_CSP_PROJECT:
 			s += "\t\"type\": \"CSP\",\n";

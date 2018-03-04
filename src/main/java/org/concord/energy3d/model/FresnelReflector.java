@@ -265,6 +265,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		}
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
+		final double az = Math.toRadians(relativeAzimuth);
 
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
@@ -353,7 +354,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 			final Vector3 p = r.subtractLocal(center).normalizeLocal();
 			normal = p.add(s, null).multiplyLocal(0.5).normalizeLocal();
 		} else {
-			setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the mirror to disappear
+			setNormal(Math.PI / 2 * 0.9999, az); // exactly 90 degrees will cause the mirror to disappear
 		}
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();

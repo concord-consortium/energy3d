@@ -226,7 +226,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private final java.util.Timer keyHolder = new java.util.Timer();
 	private KeyHolderTask arrowKeyHolderTask;
-	private final short keyHolderInterval = 200;
+	private final short keyHolderInterval = 100;
 
 	private class KeyHolderTask extends TimerTask {
 
