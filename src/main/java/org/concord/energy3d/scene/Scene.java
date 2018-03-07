@@ -102,8 +102,9 @@ public class Scene implements Serializable {
 	public static final int FOREST_THEME = 3;
 
 	public static final int HELIOSTAT_TEXTURE_ONE_MIRROR = 0;
-	public static final int HELIOSTAT_TEXTURE_TWO_MIRRORS = 1;
-	public static final int HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS = 2;
+	public static final int HELIOSTAT_TEXTURE_2X1_MIRRORS = 1;
+	public static final int HELIOSTAT_TEXTURE_7X5_MIRRORS = 2;
+	public static final int HELIOSTAT_TEXTURE_1X2_MIRRORS = 3;
 
 	public static final int INSTRUCTION_SHEET_NUMBER = 5;
 

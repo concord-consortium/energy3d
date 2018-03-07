@@ -38,10 +38,13 @@ import org.concord.energy3d.undo.ChangeFoundationHeliostatAzimuthCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeliostatTargetCommand;
 import org.concord.energy3d.undo.ChangeFoundationHeliostatTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTargetCommand;
+import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeTargetForAllHeliostatsCommand;
 import org.concord.energy3d.undo.ChangeTiltAngleCommand;
@@ -1033,6 +1036,127 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 				}
 			});
 
+			final JMenuItem miApertureRatio = new JMenuItem("Aperture Ratio...");
+			miApertureRatio.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Mirror)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Mirror m = (Mirror) selectedPart;
+					final String title = "<html>Aperture percentage of " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>The percentage of the effective area for reflection<br>after deducting the area of gaps, frames, etc.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Heliostat", true);
+					final JRadioButton rb2 = new JRadioButton("All Heliostats on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Heliostats");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(m.getOpticalEfficiency() * 100));
+					gui.add(inputField, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Aperture Percentage of Heliostat Surface");
+
+					while (true) {
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException exception) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), inputField.getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 70 || val > 100) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Heliostat aperature percentage must be between 70% and 100%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									boolean changed = Math.abs(val * 0.01 - m.getOpticalEfficiency()) > 0.000001;
+									if (rb1.isSelected()) {
+										if (changed) {
+											final ChangeSolarReflectorOpticalEfficiencyCommand c = new ChangeSolarReflectorOpticalEfficiencyCommand(m);
+											m.setOpticalEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final Foundation foundation = m.getTopContainer();
+										if (!changed) {
+											for (final Mirror x : foundation.getHeliostats()) {
+												if (Math.abs(val * 0.01 - x.getOpticalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeFoundationSolarReflectorOpticalEfficiencyCommand c = new ChangeFoundationSolarReflectorOpticalEfficiencyCommand(foundation, m.getClass());
+											foundation.setOpticalEfficiencyForSolarReflectors(val * 0.01, m.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										if (!changed) {
+											for (final Mirror x : Scene.getInstance().getAllHeliostats()) {
+												if (Math.abs(val * 0.01 - x.getOpticalEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeOpticalEfficiencyForAllSolarReflectorsCommand c = new ChangeOpticalEfficiencyForAllSolarReflectorsCommand(m.getClass());
+											Scene.getInstance().setOpticalEfficiencyForAllSolarReflectors(val * 0.01, m.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 2;
+									}
+									if (changed) {
+										updateAfterEdit();
+									}
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
 			final JMenuItem miConversionEfficiency = new JMenuItem("Central Receiver Conversion Efficiency...");
 			miConversionEfficiency.addActionListener(new ActionListener() {
 
@@ -1104,6 +1228,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 			popupMenuForHeliostat.add(miBaseHeight);
 			popupMenuForHeliostat.addSeparator();
 			popupMenuForHeliostat.add(miReflectance);
+			popupMenuForHeliostat.add(miApertureRatio);
 			popupMenuForHeliostat.add(miConversionEfficiency);
 			popupMenuForHeliostat.addSeparator();
 			popupMenuForHeliostat.add(cbmiDisableEditPoint);

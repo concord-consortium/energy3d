@@ -50,6 +50,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 	private transient Cylinder post;
 	private transient BMText label;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
+	private double opticalEfficiency = 1.0; // the percentage of the effective reflection area on the heliostat surface (since it is modeled as a whole plate, this factor deducts the areas of gaps, frames, etc.)
 	private double mirrorWidth = 5;
 	private double mirrorHeight = 3;
 	private double relativeAzimuth;
@@ -79,6 +80,9 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		}
 		if (Util.isZero(reflectance)) {
 			reflectance = 0.9;
+		}
+		if (Util.isZero(opticalEfficiency)) {
+			opticalEfficiency = 1;
 		}
 		if (Util.isZero(baseHeight)) {
 			baseHeight = 10;
@@ -353,10 +357,12 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 	@Override
 	protected String getTextureFileName() {
 		switch (Scene.getInstance().getHeliostatTextureType()) {
-		case Scene.HELIOSTAT_TEXTURE_TWO_MIRRORS:
-			return "mirror2.png";
-		case Scene.HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS:
-			return "mirror35.png";
+		case Scene.HELIOSTAT_TEXTURE_2X1_MIRRORS:
+			return "mirror2x1.png";
+		case Scene.HELIOSTAT_TEXTURE_1X2_MIRRORS:
+			return "mirror1x2.png";
+		case Scene.HELIOSTAT_TEXTURE_7X5_MIRRORS:
+			return "mirror7x5.png";
 		default:
 			return "mirror.png";
 		}
@@ -509,15 +515,16 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		return 1;
 	}
 
-	/** not applicable */
+	/** This is defined as the ratio of the area that makes up the effective aperture on a plate that models the facets of the heliostat */
 	@Override
 	public void setOpticalEfficiency(final double opticalEfficiency) {
+		this.opticalEfficiency = opticalEfficiency;
 	}
 
-	/** not applicable */
+	/** This is defined as the ratio of the area that makes up the effective aperture on a plate that models the facets of the heliostat */
 	@Override
 	public double getOpticalEfficiency() {
-		return 1;
+		return opticalEfficiency;
 	}
 
 	/** not applicable */
@@ -620,7 +627,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		if (heliostatTarget == null) {
 			return 0;
 		}
-		double e = reflectance * heliostatTarget.getSolarReceiverEfficiency();
+		double e = reflectance * opticalEfficiency * heliostatTarget.getSolarReceiverEfficiency();
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));

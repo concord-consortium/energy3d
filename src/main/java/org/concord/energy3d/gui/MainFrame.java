@@ -245,8 +245,9 @@ public class MainFrame extends JFrame {
 	private JMenuItem zoomOutMenuItem;
 	private JMenu textureMenu;
 	private JRadioButtonMenuItem heliostat1MirrorTextureMenuItem;
-	private JRadioButtonMenuItem heliostat2MirrorTextureMenuItem;
-	private JRadioButtonMenuItem heliostat35MirrorTextureMenuItem;
+	private JRadioButtonMenuItem heliostat2X1MirrorsTextureMenuItem;
+	private JRadioButtonMenuItem heliostat1X2MirrorsTextureMenuItem;
+	private JRadioButtonMenuItem heliostat7X5MirrorsTextureMenuItem;
 	private final ButtonGroup heliostatTextureButtonGroup = new ButtonGroup();
 	private JRadioButtonMenuItem noBuildingTextureMenuItem;
 	private JRadioButtonMenuItem simpleBuildingTextureMenuItem;
@@ -1790,8 +1791,9 @@ public class MainFrame extends JFrame {
 			});
 
 			heliostatTextureMenu.add(getHeliostat1MirrorTextureMenuItem());
-			heliostatTextureMenu.add(getHeliostat2MirrorTextureMenuItem());
-			heliostatTextureMenu.add(getHeliostat35MirrorTextureMenuItem());
+			heliostatTextureMenu.add(getHeliostat2X1MirrorsTextureMenuItem());
+			heliostatTextureMenu.add(getHeliostat1X2MirrorsTextureMenuItem());
+			heliostatTextureMenu.add(getHeliostat7X5MirrorsTextureMenuItem());
 			heliostatTextureMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
@@ -1808,11 +1810,14 @@ public class MainFrame extends JFrame {
 					default:
 						Util.selectSilently(heliostat1MirrorTextureMenuItem, true);
 						break;
-					case Scene.HELIOSTAT_TEXTURE_TWO_MIRRORS:
-						Util.selectSilently(heliostat2MirrorTextureMenuItem, true);
+					case Scene.HELIOSTAT_TEXTURE_2X1_MIRRORS:
+						Util.selectSilently(heliostat2X1MirrorsTextureMenuItem, true);
 						break;
-					case Scene.HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS:
-						Util.selectSilently(heliostat35MirrorTextureMenuItem, true);
+					case Scene.HELIOSTAT_TEXTURE_1X2_MIRRORS:
+						Util.selectSilently(heliostat1X2MirrorsTextureMenuItem, true);
+						break;
+					case Scene.HELIOSTAT_TEXTURE_7X5_MIRRORS:
+						Util.selectSilently(heliostat7X5MirrorsTextureMenuItem, true);
 						break;
 					}
 				}
@@ -3512,15 +3517,15 @@ public class MainFrame extends JFrame {
 		return heliostat1MirrorTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getHeliostat2MirrorTextureMenuItem() {
-		if (heliostat2MirrorTextureMenuItem == null) {
-			heliostat2MirrorTextureMenuItem = new JRadioButtonMenuItem("Two Mirrors");
-			heliostat2MirrorTextureMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getHeliostat2X1MirrorsTextureMenuItem() {
+		if (heliostat2X1MirrorsTextureMenuItem == null) {
+			heliostat2X1MirrorsTextureMenuItem = new JRadioButtonMenuItem("2 \u00D7 1 Mirrors");
+			heliostat2X1MirrorsTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
 						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
-						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_TWO_MIRRORS);
+						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_2X1_MIRRORS);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
 							MainPanel.getInstance().getEnergyButton().setSelected(false);
@@ -3530,20 +3535,20 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			heliostatTextureButtonGroup.add(heliostat2MirrorTextureMenuItem);
+			heliostatTextureButtonGroup.add(heliostat2X1MirrorsTextureMenuItem);
 		}
-		return heliostat2MirrorTextureMenuItem;
+		return heliostat2X1MirrorsTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getHeliostat35MirrorTextureMenuItem() {
-		if (heliostat35MirrorTextureMenuItem == null) {
-			heliostat35MirrorTextureMenuItem = new JRadioButtonMenuItem("5 \u00D7 7 Mirrors");
-			heliostat35MirrorTextureMenuItem.addItemListener(new ItemListener() {
+	public JRadioButtonMenuItem getHeliostat1X2MirrorsTextureMenuItem() {
+		if (heliostat1X2MirrorsTextureMenuItem == null) {
+			heliostat1X2MirrorsTextureMenuItem = new JRadioButtonMenuItem("1 \u00D7 2 Mirrors");
+			heliostat1X2MirrorsTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
 						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
-						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_THIRTY_FIVE_MIRRORS);
+						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_1X2_MIRRORS);
 						Scene.getInstance().setEdited(true);
 						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
 							MainPanel.getInstance().getEnergyButton().setSelected(false);
@@ -3553,9 +3558,32 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			heliostatTextureButtonGroup.add(heliostat35MirrorTextureMenuItem);
+			heliostatTextureButtonGroup.add(heliostat1X2MirrorsTextureMenuItem);
 		}
-		return heliostat35MirrorTextureMenuItem;
+		return heliostat1X2MirrorsTextureMenuItem;
+	}
+
+	public JRadioButtonMenuItem getHeliostat7X5MirrorsTextureMenuItem() {
+		if (heliostat7X5MirrorsTextureMenuItem == null) {
+			heliostat7X5MirrorsTextureMenuItem = new JRadioButtonMenuItem("7 \u00D7 5 Mirrors");
+			heliostat7X5MirrorsTextureMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Scene.HELIOSTAT_TEXTURE_7X5_MIRRORS);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			heliostatTextureButtonGroup.add(heliostat7X5MirrorsTextureMenuItem);
+		}
+		return heliostat7X5MirrorsTextureMenuItem;
 	}
 
 	public JRadioButtonMenuItem getNoBuildingTextureMenuItem() {
