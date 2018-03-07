@@ -3561,6 +3561,7 @@ public class MainFrame extends JFrame {
 	public JRadioButtonMenuItem getNoBuildingTextureMenuItem() {
 		if (noBuildingTextureMenuItem == null) {
 			noBuildingTextureMenuItem = new JRadioButtonMenuItem("No Texture");
+			noBuildingTextureMenuItem.setSelected(true);
 			noBuildingTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {

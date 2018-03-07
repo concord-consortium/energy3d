@@ -1259,6 +1259,18 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			} else {
 				f.move(v, selectedPart.getGridSize());
 			}
+		} else if (selectedPart instanceof Roof) {
+			if (viewMode == ViewMode.TOP_VIEW) {
+				final Foundation f = selectedPart.getTopContainer();
+				if (f.isGroupMaster()) {
+					final List<Foundation> g = Scene.getInstance().getFoundationGroup(f);
+					for (final Foundation x : g) {
+						x.move(v, selectedPart.getGridSize());
+					}
+				} else {
+					f.move(v, selectedPart.getGridSize());
+				}
+			}
 		} else if (selectedPart instanceof Window) {
 			final Window w = (Window) selectedPart;
 			w.move(v);

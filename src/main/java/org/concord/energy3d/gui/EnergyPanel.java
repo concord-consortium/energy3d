@@ -1592,12 +1592,18 @@ public class EnergyPanel extends JPanel {
 							partProperty2Label.setText("  Thermal:");
 							partProperty3Label.setText("  Solar:");
 							final String rval = ONE_DECIMAL.format(Util.toUsRValue(roof.getUValue()));
+							final boolean isBuildingProject = Scene.getInstance().getProjectType() == Foundation.TYPE_BUILDING;
 							final float absorptance = 1 - roof.getAlbedo();
 							if (energyViewShown) {
 								partProperty2TextField.setText("R-value = " + rval + ", Gain = " + TWO_DECIMALS.format(-roof.getTotalHeatLoss()) + " kWh");
 								partProperty2TextField.putClientProperty("tooltip", "The R-value and daily thermal gain of the roof");
-								partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance) + ", Absorption = " + TWO_DECIMALS.format(roof.getSolarPotentialToday() * absorptance) + " kWh");
-								partProperty3TextField.putClientProperty("tooltip", "The absorptance and daily solar heat gain of the roof surface");
+								if (isBuildingProject) {
+									partProperty3TextField.setText("Absorptance = " + TWO_DECIMALS.format(absorptance) + ", Absorption = " + TWO_DECIMALS.format(roof.getSolarPotentialToday() * absorptance) + " kWh");
+									partProperty3TextField.putClientProperty("tooltip", "The absorptance and daily solar heat gain of the roof surface");
+								} else {
+									partProperty3TextField.setText("Radiation energy = " + TWO_DECIMALS.format(roof.getSolarPotentialToday()) + " kWh");
+									partProperty3TextField.putClientProperty("tooltip", "The solar radiation energy onto this roof surface");
+								}
 							} else {
 								partProperty2TextField.setText("R-value = " + rval + " (US system)");
 								partProperty2TextField.putClientProperty("tooltip", "The R-value of the roof");
