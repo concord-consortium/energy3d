@@ -203,7 +203,7 @@ public class CspProjectCostGraph extends JPanel {
 		} else {
 			data = new double[] { landSum, collectorSum, receiverSum };
 			legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors", "Receivers" };
-			colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE };
+			colors = new Color[] { new Color(250, 128, 114), new Color(135, 206, 250), new Color(169, 169, 169) };
 		}
 
 		pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);

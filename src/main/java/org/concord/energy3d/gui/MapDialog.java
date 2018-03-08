@@ -330,6 +330,7 @@ class MapDialog extends JDialog {
 				final int zoom = (Integer) zoomSpinner.getValue();
 				Scene.getInstance().setGeoLocation(lat, lng, zoom, addressField.getText());
 				Scene.getInstance().setGroundImageExtent(extent);
+				Scene.getInstance().setSnapToGrids(false);
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() {

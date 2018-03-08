@@ -1010,12 +1010,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.backward = true;
 				}
 				if (isTopView()) {
-					if (arrowKeyHolderTask != null) {
-						arrowKeyHolderTask.cancel();
+					if (tooManyPartsToMove()) {
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
+					} else {
+						if (arrowKeyHolderTask != null) {
+							arrowKeyHolderTask.cancel();
+						}
+						arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
+						keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 					}
-					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
-					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-					// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
 				} else {
 					if (selectedPart instanceof Window) {
 						final Vector3 v = selectedPart.getNormal().clone();
@@ -1043,12 +1046,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.backward = true;
 				}
 				if (isTopView()) {
-					if (arrowKeyHolderTask != null) {
-						arrowKeyHolderTask.cancel();
+					if (tooManyPartsToMove()) {
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
+					} else {
+						if (arrowKeyHolderTask != null) {
+							arrowKeyHolderTask.cancel();
+						}
+						arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
+						keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 					}
-					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
-					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-					// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
 				} else {
 					if (selectedPart instanceof Window) {
 						final Vector3 n = selectedPart.getNormal().clone();
@@ -1076,12 +1082,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.forward = true;
 				}
 				if (isTopView()) {
-					if (arrowKeyHolderTask != null) {
-						arrowKeyHolderTask.cancel();
+					if (tooManyPartsToMove()) {
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
+					} else {
+						if (arrowKeyHolderTask != null) {
+							arrowKeyHolderTask.cancel();
+						}
+						arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
+						keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 					}
-					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
-					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-					// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
 				} else {
 					if (selectedPart instanceof Window) {
 						final Vector3 v = selectedPart.getNormal().clone();
@@ -1109,12 +1118,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					PlayControl.forward = true;
 				}
 				if (isTopView()) {
-					if (arrowKeyHolderTask != null) {
-						arrowKeyHolderTask.cancel();
+					if (tooManyPartsToMove()) {
+						moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
+					} else {
+						if (arrowKeyHolderTask != null) {
+							arrowKeyHolderTask.cancel();
+						}
+						arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
+						keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 					}
-					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
-					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-					// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
 				} else {
 					if (selectedPart instanceof Window) {
 						final Vector3 n = selectedPart.getNormal().clone();
@@ -1144,12 +1156,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.W), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (arrowKeyHolderTask != null) {
-					arrowKeyHolderTask.cancel();
+				if (tooManyPartsToMove()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
+				} else {
+					if (arrowKeyHolderTask != null) {
+						arrowKeyHolderTask.cancel();
+					}
+					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
+					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 				}
-				arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
-				keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-				// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(-1, 0, 0));
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.W), new TriggerAction() {
@@ -1164,12 +1179,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.E), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (arrowKeyHolderTask != null) {
-					arrowKeyHolderTask.cancel();
+				if (tooManyPartsToMove()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
+				} else {
+					if (arrowKeyHolderTask != null) {
+						arrowKeyHolderTask.cancel();
+					}
+					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
+					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 				}
-				arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
-				keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-				// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(1, 0, 0));
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.E), new TriggerAction() {
@@ -1184,12 +1202,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.S), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (arrowKeyHolderTask != null) {
-					arrowKeyHolderTask.cancel();
+				if (tooManyPartsToMove()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
+				} else {
+					if (arrowKeyHolderTask != null) {
+						arrowKeyHolderTask.cancel();
+					}
+					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
+					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 				}
-				arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
-				keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-				// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, -1, 0));
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.S), new TriggerAction() {
@@ -1204,12 +1225,15 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.N), new TriggerAction() {
 			@Override
 			public void perform(final Canvas source, final TwoInputStates inputStates, final double tpf) {
-				if (arrowKeyHolderTask != null) {
-					arrowKeyHolderTask.cancel();
+				if (tooManyPartsToMove()) {
+					moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
+				} else {
+					if (arrowKeyHolderTask != null) {
+						arrowKeyHolderTask.cancel();
+					}
+					arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
+					keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
 				}
-				arrowKeyHolderTask = new KeyHolderTask(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
-				keyHolder.scheduleAtFixedRate(arrowKeyHolderTask, 0, keyHolderInterval);
-				// moveWithKey(inputStates.getCurrent().getKeyboardState(), new Vector3(0, 1, 0));
 			}
 		}));
 		logicalLayer.registerTrigger(new InputTrigger(new KeyReleasedCondition(Key.N), new TriggerAction() {
@@ -1221,6 +1245,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			}
 		}));
 
+	}
+
+	// if there are too many parts to move, don't invoke a timer -- a move would be too slow
+	private boolean tooManyPartsToMove() {
+		return (selectedPart == null && Scene.getInstance().getParts().size() > 100) || (selectedPart instanceof Foundation && selectedPart.getChildren().size() > 100);
 	}
 
 	private void moveWithKey(final KeyboardState ks, final Vector3 v) {
