@@ -1249,7 +1249,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	// if there are too many parts to move, don't invoke a timer -- a move would be too slow
 	private boolean tooManyPartsToMove() {
-		return (selectedPart == null && Scene.getInstance().getParts().size() > 100) || (selectedPart instanceof Foundation && selectedPart.getChildren().size() > 100);
+		if (selectedPart == null) {
+			return Scene.getInstance().getParts().size() > 100;
+		}
+		if (selectedPart instanceof Foundation) {
+			final Foundation f = (Foundation) selectedPart;
+			if (f.hasSolarReceiver()) { // a solar receiver could cause all the reflectors that point to it to redraw, which is costly
+				return true;
+			}
+			return f.getChildren().size() > 100;
+		}
+		return false;
 	}
 
 	private void moveWithKey(final KeyboardState ks, final Vector3 v) {
@@ -1920,9 +1930,49 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				if (!zoomLock && (operation == Operation.SELECT || operation == Operation.RESIZE) && hoveredPart != null) {
 					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
 						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+					} else if (hoveredPart instanceof SolarCollector) {
+						if (hoveredPart instanceof ParabolicTrough) { // not sure why parabolic troughs are different
+							switch (pick.getEditPointIndex()) {
+							case 0:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+								break;
+							case 1:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+								break;
+							case 2:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+								break;
+							case 3:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
+								break;
+							case 4:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+								break;
+							}
+						} else {
+							switch (pick.getEditPointIndex()) {
+							case 0:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+								break;
+							case 1:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
+								break;
+							case 2:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
+								break;
+							case 3:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+								break;
+							case 4:
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
+								break;
+							}
+						}
 					} else {
-						if (pick.getEditPointIndex() == -1 && (hoveredPart instanceof SolarCollector || hoveredPart instanceof Window)) {
-							canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+						if (pick.getEditPointIndex() == -1) {
+							if (hoveredPart instanceof Window) { // for windows, there is no apparent move point
+								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+							}
 						}
 					}
 				}

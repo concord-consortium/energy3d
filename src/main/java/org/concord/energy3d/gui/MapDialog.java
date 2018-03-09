@@ -397,6 +397,8 @@ class MapDialog extends JDialog {
 
 		pack();
 		setLocationRelativeTo(owner);
+		addressField.requestFocusInWindow();
+		addressField.selectAll();
 
 	}
 
