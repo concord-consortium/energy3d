@@ -120,7 +120,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		if (Util.isZero(nrib)) {
 			nrib = 6;
 		}
-		detailed = Scene.getInstance().countParts(this.getClass()) < 50;
+		detailed = Scene.getInstance().countParts(getClass()) < 500;
 
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
 		mesh = new Paraboloid("Paraboloid", rimRadius / annotationScale, 2.0 * Math.sqrt(focalLength / annotationScale), nAxialSections, nRadialSections);
@@ -140,7 +140,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		dishBack.setRenderState(cullState);
 		root.attachChild(dishBack);
 
-		post = new Cylinder("Post Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
+		post = new Cylinder("Post Cylinder", 2, detailed ? 10 : 2, 10, 0); // if there are many dishes, reduce the solution of post
 		post.setDefaultColor(ColorRGBA.WHITE);
 		post.setRadius(0.6);
 		post.setRenderState(offsetState);
@@ -156,8 +156,9 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		duct.updateModelBound();
 		root.attachChild(duct);
 
+		final ColorRGBA receiverColor = new ColorRGBA(0.9f, 0.9f, 0.95f, 1);
 		receiver = new Cylinder("Receiver Cylinder", 2, detailed ? 10 : 2, 10, 0, true); // if there are many mirrors, reduce the solution of post
-		receiver.setDefaultColor(ColorRGBA.WHITE);
+		receiver.setDefaultColor(receiverColor);
 		receiver.setRadius(2);
 		receiver.setHeight(3);
 		receiver.setRenderState(offsetState);
@@ -178,7 +179,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 		for (int i = 0; i < 3; i++) {
 			tripod[i] = new Cylinder("Tripod Cylinder " + i, 2, detailed ? 10 : 2, 10, 0); // if there are many mirrors, reduce the solution of post
-			tripod[i].setDefaultColor(ColorRGBA.WHITE);
+			tripod[i].setDefaultColor(receiverColor);
 			tripod[i].setRadius(0.2);
 			tripod[i].setRenderState(offsetState);
 			tripod[i].setModelBound(new BoundingBox());
@@ -201,6 +202,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		root.attachChild(label);
 
 		updateTextureAndColor();
+		setStructureType(structureType);
 
 		if (!points.isEmpty()) {
 			oldDishCenter = points.get(0).clone();

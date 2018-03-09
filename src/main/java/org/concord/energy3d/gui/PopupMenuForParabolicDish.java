@@ -1217,7 +1217,7 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final ParabolicDish d = (ParabolicDish) selectedPart;
 					final String title = "<html>Opitical efficiency (%) of " + partInfo + "</html>";
-					final String footnote = "<html><hr><font size=2><hr></html>";
+					final String footnote = "<html><hr><font size=2>For example, the percentage of the effective area for reflection after deducting<br>the area of facet gaps, module frames, absorber shadow, etc.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
 					final JPanel panel = new JPanel();
 					gui.add(panel, BorderLayout.CENTER);
@@ -1268,8 +1268,8 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (val < 20 || val > 80) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish optical efficiency must be between 20% and 80%.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 50 || val > 100) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Parabolic dish optical efficiency must be between 50% and 100%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									boolean changed = Math.abs(val * 0.01 - d.getOpticalEfficiency()) > 0.000001;
 									if (rb1.isSelected()) {
