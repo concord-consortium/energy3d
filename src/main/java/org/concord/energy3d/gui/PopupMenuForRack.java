@@ -525,8 +525,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miRackSize = new JMenuItem("Size...");
-			miRackSize.addActionListener(new ActionListener() {
+			final JMenuItem miRackWidth = new JMenuItem("Width...");
+			miRackWidth.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -543,17 +543,12 @@ class PopupMenuForRack extends PopupMenuFactory {
 					final JPanel inputPanel = new JPanel(new SpringLayout());
 					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 					gui.add(inputPanel, BorderLayout.CENTER);
-					JLabel label = new JLabel("Width (m): ", JLabel.TRAILING);
+					final JLabel label = new JLabel("Width (m): ", JLabel.TRAILING);
 					inputPanel.add(label);
-					final JTextField widthField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth()));
-					label.setLabelFor(widthField);
-					inputPanel.add(widthField);
-					label = new JLabel("Length (m): ", JLabel.TRAILING);
-					inputPanel.add(label);
-					final JTextField heightField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight()));
-					label.setLabelFor(heightField);
-					inputPanel.add(heightField);
-					SpringUtilities.makeCompactGrid(inputPanel, 2, 2, 6, 6, 6, 6);
+					final JTextField inputField = new JTextField(threeDecimalsFormat.format(rack.getRackHeight())); // rack uses width and height, which should have been named length and width
+					label.setLabelFor(inputField);
+					inputPanel.add(inputField);
+					SpringUtilities.makeCompactGrid(inputPanel, 1, 2, 6, 6, 6, 6);
 					final JPanel scopePanel = new JPanel();
 					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
 					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
@@ -581,8 +576,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 					gui.add(scopePanel, BorderLayout.NORTH);
 
 					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
-					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set Size for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
-					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rack Size");
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set width for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rack Width");
 
 					while (true) {
 						dialog.setVisible(true);
@@ -590,31 +585,27 @@ class PopupMenuForRack extends PopupMenuFactory {
 						if (choice == options[1] || choice == null) {
 							break;
 						} else {
-							double w = 0, h = 0;
+							double val = 0;
 							boolean ok = true;
 							try {
-								w = Double.parseDouble(widthField.getText());
-								h = Double.parseDouble(heightField.getText());
+								val = Double.parseDouble(inputField.getText());
 							} catch (final NumberFormatException x) {
 								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
 								ok = false;
 							}
 							if (ok) {
-								if (w < 1 || w > 500) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 1 and 500 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
-								} else if (h < 1 || h > 20) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 20 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (val < 0.5 || val > 50) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Width must be between 0.5 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									boolean changed = w != rack.getRackWidth() || h != rack.getRackHeight();
+									boolean changed = val != rack.getRackHeight();
 									if (rb1.isSelected()) {
 										if (changed) {
 											final SetPartSizeCommand c = new SetPartSizeCommand(rack);
-											rack.setRackWidth(w);
-											rack.setRackHeight(h);
+											rack.setRackHeight(val);
 											rack.ensureFullSolarPanels(false);
 											rack.draw();
 											if (rack.checkContainerIntersection()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as the rack would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as the rack would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().refresh();
@@ -625,7 +616,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final Rack x : foundation.getRacks()) {
-												if (x.getRackWidth() != w || x.getRackHeight() != h) {
+												if (x.getRackHeight() != val) {
 													changed = true;
 													break;
 												}
@@ -633,9 +624,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
-											foundation.setSizeForRacks(w, h);
+											foundation.setWidthForRacks(val);
 											if (foundation.checkContainerIntersectionForRacks()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().getUndoManager().addEdit(c);
@@ -645,7 +636,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 									} else if (rb3.isSelected()) {
 										if (!changed) {
 											for (final Rack x : Scene.getInstance().getAllRacks()) {
-												if (x.getRackWidth() != w || x.getRackHeight() != h) {
+												if (x.getRackHeight() != val) {
 													changed = true;
 													break;
 												}
@@ -653,13 +644,142 @@ class PopupMenuForRack extends PopupMenuFactory {
 										}
 										if (changed) {
 											final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
-											Scene.getInstance().setSizeForAllRacks(w, h);
+											Scene.getInstance().setWidthForAllRacks(val);
 											if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This size cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This width cannot be set as one or more racks would cut into the underlying surface.", "Illegal Size", JOptionPane.ERROR_MESSAGE);
 												c.undo();
 											} else {
 												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
+										}
+										selectedScopeIndex = 2;
+									}
+									if (changed) {
+										updateAfterEdit();
+									}
+									if (choice == options[0]) {
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miRackLength = new JMenuItem("Length...");
+			miRackLength.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack rack = (Rack) selectedPart;
+					final Foundation foundation = rack.getTopContainer();
+					final String partInfo = rack.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					inputPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+					gui.add(inputPanel, BorderLayout.CENTER);
+					final JLabel label = new JLabel("Length (m): ", JLabel.TRAILING);
+					inputPanel.add(label);
+					final JTextField inputField = new JTextField(threeDecimalsFormat.format(rack.getRackWidth())); // rack uses width and height, which should have been named length and width
+					label.setLabelFor(inputField);
+					inputPanel.add(inputField);
+					SpringUtilities.makeCompactGrid(inputPanel, 1, 2, 6, 6, 6, 6);
+					final JPanel scopePanel = new JPanel();
+					scopePanel.setLayout(new BoxLayout(scopePanel, BoxLayout.Y_AXIS));
+					scopePanel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					scopePanel.add(rb1);
+					scopePanel.add(rb2);
+					scopePanel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(scopePanel, BorderLayout.NORTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { "Set length for " + partInfo, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Rack Length");
+
+					while (true) {
+						dialog.setVisible(true);
+						inputField.selectAll();
+						inputField.requestFocusInWindow();
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							double val = 0;
+							boolean ok = true;
+							try {
+								val = Double.parseDouble(inputField.getText());
+							} catch (final NumberFormatException x) {
+								JOptionPane.showMessageDialog(MainFrame.getInstance(), "Invalid input!", "Error", JOptionPane.ERROR_MESSAGE);
+								ok = false;
+							}
+							if (ok) {
+								if (val < 1 || val > 1000) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Length must be between 1 and 1000 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									boolean changed = val != rack.getRackWidth();
+									if (rb1.isSelected()) {
+										if (changed) {
+											final SetPartSizeCommand c = new SetPartSizeCommand(rack);
+											rack.setRackWidth(val);
+											rack.ensureFullSolarPanels(false);
+											rack.draw();
+											SceneManager.getInstance().refresh();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (x.getRackWidth() != val) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForRacksOnFoundationCommand c = new SetSizeForRacksOnFoundationCommand(foundation);
+											foundation.setLengthForRacks(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (x.getRackWidth() != val) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final SetSizeForAllRacksCommand c = new SetSizeForAllRacksCommand();
+											Scene.getInstance().setLengthForAllRacks(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 2;
 									}
@@ -3099,7 +3219,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 			popupMenuForRack.add(miTiltAngle);
 			popupMenuForRack.add(miAzimuth);
 			popupMenuForRack.add(miRotate);
-			popupMenuForRack.add(miRackSize);
+			popupMenuForRack.add(miRackWidth);
+			popupMenuForRack.add(miRackLength);
 			popupMenuForRack.add(miBaseHeight);
 			popupMenuForRack.add(miPoleSpacing);
 			popupMenuForRack.add(trackerMenu);

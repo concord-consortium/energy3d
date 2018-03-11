@@ -1931,42 +1931,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 					if (hoveredPart instanceof Tree || hoveredPart instanceof Human) {
 						canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
 					} else if (hoveredPart instanceof SolarCollector) {
-						if (hoveredPart instanceof ParabolicTrough) { // not sure why parabolic troughs are different
-							switch (pick.getEditPointIndex()) {
-							case 0:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-								break;
-							case 1:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-								break;
-							case 2:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
-								break;
-							case 3:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
-								break;
-							case 4:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
-								break;
-							}
-						} else {
-							switch (pick.getEditPointIndex()) {
-							case 0:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-								break;
-							case 1:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR));
-								break;
-							case 2:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR));
-								break;
-							case 3:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
-								break;
-							case 4:
-								canvasComponent.setCursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR));
-								break;
-							}
+						if (pick.getEditPointIndex() >= 0) {
+							canvasComponent.setCursor(Cursor.getPredefinedCursor(pick.getEditPointIndex() == 0 ? Cursor.MOVE_CURSOR : Cursor.HAND_CURSOR));
 						}
 					} else {
 						if (pick.getEditPointIndex() == -1) {

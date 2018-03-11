@@ -61,7 +61,7 @@ public class MainApplication {
 
 		System.out.println("Initiating...");
 		final long t = System.nanoTime();
-		checkSingleInstance(MainApplication.class, args);
+		// checkSingleInstance(MainApplication.class, args);
 		// startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();

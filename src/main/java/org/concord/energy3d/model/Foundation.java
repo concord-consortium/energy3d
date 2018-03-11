@@ -2869,6 +2869,30 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setWidthForRacks(final double width) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				final Rack r = (Rack) p;
+				r.setRackHeight(width);
+				r.ensureFullSolarPanels(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setLengthForRacks(final double length) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				final Rack r = (Rack) p;
+				r.setRackWidth(length);
+				r.ensureFullSolarPanels(false);
+				r.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setSolarPanelModelForRacks(final PvModuleSpecs specs) {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {

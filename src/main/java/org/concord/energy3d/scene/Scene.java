@@ -2735,6 +2735,30 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setWidthForAllRacks(final double width) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				final Rack rack = (Rack) p;
+				rack.setRackHeight(width);
+				rack.ensureFullSolarPanels(false);
+				rack.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setLengthForAllRacks(final double length) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				final Rack rack = (Rack) p;
+				rack.setRackWidth(length);
+				rack.ensureFullSolarPanels(false);
+				rack.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public void setSolarPanelModelForAllRacks(final PvModuleSpecs specs) {
 		for (final HousePart p : parts) {
 			if (p instanceof Rack) {
