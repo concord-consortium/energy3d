@@ -1009,6 +1009,7 @@ public class Scene implements Serializable {
 			return;
 		}
 		part.setGridsVisible(false);
+		part.setLinePatternVisible(false);
 		final HousePart container = part.getContainer();
 		if (container != null) {
 			container.getChildren().remove(part);

@@ -56,6 +56,8 @@ import com.ardor3d.math.type.ReadOnlyColorRGBA;
 import com.ardor3d.math.type.ReadOnlyTransform;
 import com.ardor3d.math.type.ReadOnlyVector2;
 import com.ardor3d.math.type.ReadOnlyVector3;
+import com.ardor3d.renderer.queue.RenderBucketType;
+import com.ardor3d.renderer.state.BlendState;
 import com.ardor3d.renderer.state.RenderState.StateType;
 import com.ardor3d.renderer.state.TextureState;
 import com.ardor3d.scenegraph.Line;
@@ -90,7 +92,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	private transient ArrayList<Vector3> orgPoints;
 	private transient Mesh boundingMesh;
 	private transient Mesh outlineMesh;
-	private transient Mesh sideMesh[];
+	private transient Mesh[] sideMesh;
+	transient Mesh linePatternMesh;
 	private transient BMText label;
 	private transient Cylinder solarReceiver; // this is temporarily used to model the receiver of a concentrated power tower (there got to be a better solution)
 	private transient Line azimuthArrow;
@@ -220,6 +223,18 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		outlineMesh.setModelBound(new BoundingBox());
 		Util.disablePickShadowLight(outlineMesh);
 		root.attachChild(outlineMesh);
+
+		linePatternMesh = new Line("Line Pattern");
+		linePatternMesh.getMeshData().setVertexBuffer(BufferUtils.createVector3Buffer(2));
+		linePatternMesh.setDefaultColor(new ColorRGBA(0, 0, 0, 0.75f));
+		linePatternMesh.setModelBound(null);
+		final BlendState blendState = new BlendState();
+		blendState.setBlendEnabled(true);
+		linePatternMesh.setRenderState(blendState);
+		linePatternMesh.getSceneHints().setRenderBucketType(RenderBucketType.Transparent);
+		Util.disablePickShadowLight(linePatternMesh);
+		root.attachChild(linePatternMesh);
+		setLinePatternVisible(false);
 
 		final UserData userData = new UserData(this);
 		mesh.setUserData(userData);
@@ -374,14 +389,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
 		this.resizeHouseMode = resizeHouseMode;
-		if (!lockEdit) {
-			if (resizeHouseMode) {
-				scanChildrenHeight();
-			}
-			setEditPointsVisible(resizeHouseMode);
-			updateLabel();
-			boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
+		if (resizeHouseMode) {
+			scanChildrenHeight();
 		}
+		setEditPointsVisible(resizeHouseMode);
+		updateLabel();
+		boundingMesh.getSceneHints().setCullHint(resizeHouseMode ? CullHint.Inherit : CullHint.Always);
 	}
 
 	public boolean isResizeHouseMode() {
@@ -1298,6 +1311,41 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 
 		gridsMesh.getMeshData().setVertexBuffer(buf);
+	}
+
+	public void drawLinePattern() {
+		final ReadOnlyVector3 p0 = getAbsPoint(0);
+		final ReadOnlyVector3 p1 = getAbsPoint(1);
+		final ReadOnlyVector3 p2 = getAbsPoint(2);
+		final ReadOnlyVector3 width = p2.subtract(p0, null);
+		final ReadOnlyVector3 height = p1.subtract(p0, null);
+		final ArrayList<ReadOnlyVector3> points = new ArrayList<ReadOnlyVector3>();
+		final int count = 10;
+		if (width.length() < height.length()) {
+			final double step = width.length() / count;
+			for (int i = 0; i < count; i++) {
+				final ReadOnlyVector3 lineP1 = width.normalize(null).multiplyLocal(i * step).addLocal(p0);
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(height, null);
+				points.add(lineP2);
+			}
+		} else {
+			final double step = height.length() / count;
+			for (int i = 0; i < count; i++) {
+				final ReadOnlyVector3 lineP1 = height.normalize(null).multiplyLocal(i * step).addLocal(p0);
+				points.add(lineP1);
+				final ReadOnlyVector3 lineP2 = lineP1.add(width, null);
+				points.add(lineP2);
+			}
+		}
+		if (points.size() < 2) {
+			return;
+		}
+		final FloatBuffer buf = BufferUtils.createVector3Buffer(points.size());
+		for (final ReadOnlyVector3 p : points) {
+			buf.put(p.getXf()).put(p.getYf()).put((float) this.height + 0.1f);
+		}
+		linePatternMesh.getMeshData().setVertexBuffer(buf);
 	}
 
 	private void putOutlinePoint(final FloatBuffer buf, final Vector3 p) {

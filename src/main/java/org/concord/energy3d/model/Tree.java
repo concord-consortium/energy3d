@@ -218,6 +218,9 @@ public class Tree extends HousePart {
 
 	@Override
 	public void setPreviewPoint(final int x, final int y) {
+		if (lockEdit) {
+			return;
+		}
 		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
 		if (pick != null) {
 			final Vector3 p = pick.getPoint().clone();
@@ -357,12 +360,18 @@ public class Tree extends HousePart {
 	}
 
 	public void move(final Vector3 d, final ArrayList<Vector3> houseMovePoints) {
+		if (lockEdit) {
+			return;
+		}
 		final Vector3 newP = houseMovePoints.get(0).add(d, null);
 		points.set(0, newP);
 		draw();
 	}
 
 	public void move(final Vector3 v, final double steplength) {
+		if (lockEdit) {
+			return;
+		}
 		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 p = getAbsPoint(0).addLocal(v);
 		points.get(0).set(toRelative(p));

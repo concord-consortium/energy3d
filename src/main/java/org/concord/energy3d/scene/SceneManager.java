@@ -1374,6 +1374,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			part.setEditPointsVisible(false);
 			part.setGridsVisible(false);
+			part.setLinePatternVisible(false);
 		}
 		selectedPart = null;
 		refresh = true;
@@ -1580,7 +1581,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Sensor();
 		} else if (operation == Operation.DRAW_FOUNDATION) {
 			drawn = new Foundation();
-			setGridsVisible(true);
+			setGridsVisible(Scene.getInstance().isSnapToGrids());
 			drawn.setColor(Scene.getInstance().getFoundationColor());
 		} else if (operation == Operation.DRAW_DOGWOOD) {
 			drawn = new Tree(Tree.DOGWOOD);
@@ -2090,6 +2091,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (previousSelectedHousePart != null && previousSelectedHousePart != selectedPart) {
 							previousSelectedHousePart.setEditPointsVisible(false);
 							previousSelectedHousePart.setGridsVisible(false);
+							previousSelectedHousePart.setLinePatternVisible(false);
 						}
 						if (selectedPart != null) {
 							selectedPart.complete(); // to undo edit flag set by SelectUtil above. FIXME: This taints the wall's heat map texture
@@ -2144,9 +2146,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								selectedPart = pick.getHousePart();
 							}
 							if (selectedPart != null) {
-								if (selectedPart.getLockEdit()) {
-									selectedPart = null;
-								}
+								// if (selectedPart.getLockEdit()) {
+								// selectedPart = null;
+								// }
 								if (keyboardState.isDown(Key.LMENU) || keyboardState.isDown(Key.RMENU)) {
 									if (selectedPart instanceof SolarPanel && selectedPart.getContainer() instanceof Rack) { // special case
 										selectedPart = selectedPart.getContainer();
@@ -2241,6 +2243,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (previousSelectedPart != null && previousSelectedPart != selectedPart && operation != Operation.RESIZE) {
 								previousSelectedPart.setEditPointsVisible(false);
 								previousSelectedPart.setGridsVisible(false);
+								previousSelectedPart.setLinePatternVisible(false);
 								final Foundation foundationOfPreviousSelectedPart = previousSelectedPart instanceof Foundation ? (Foundation) previousSelectedPart : previousSelectedPart.getTopContainer();
 								if (foundationOfPreviousSelectedPart != null) {
 									if (selectedPart == null) {
@@ -2255,7 +2258,11 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 							if (selectedPart != null && !PrintController.getInstance().isPrintPreview()) {
 								selectedPart.setEditPointsVisible(true);
 								if (pick.isEditPoint() && pick.getEditPointIndex() != -1 || operation == Operation.RESIZE || selectedPart instanceof Window || selectedPart instanceof Tree) {
-									selectedPart.setGridsVisible(true);
+									if (Scene.getInstance().isSnapToGrids()) {
+										selectedPart.setGridsVisible(true);
+									} else {
+										selectedPart.setLinePatternVisible(true);
+									}
 									if (selectedPart instanceof Foundation) {
 										editPartCommand = new EditFoundationCommand((Foundation) selectedPart, !pick.isEditPoint());
 									} else if (selectedPart instanceof Rack) {
@@ -2299,6 +2306,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				try {
 					if (selectedPart != null) {
 						selectedPart.setGridsVisible(false);
+						selectedPart.setLinePatternVisible(false);
 					}
 					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 						if (selectedPart != null && (!selectedPart.isDrawCompleted() || objectMoveStartPoint != null)) {
