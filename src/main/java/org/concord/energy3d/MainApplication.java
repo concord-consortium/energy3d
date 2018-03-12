@@ -32,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "7.9.4";
+	public static final String VERSION = "7.9.5";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -61,7 +61,7 @@ public class MainApplication {
 
 		System.out.println("Initiating...");
 		final long t = System.nanoTime();
-		// checkSingleInstance(MainApplication.class, args);
+		checkSingleInstance(MainApplication.class, args);
 		// startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();
@@ -122,17 +122,17 @@ public class MainApplication {
 							if (isMacOpeningFile) {
 								return;
 							}
+							// somehow newFile() must be called to set up the scene before we can correctly load the content when an NG3 file is double-clicked without an open instance
+							if (Scene.getURL() == null) {
+								Scene.newFile();
+							}
 							if (Config.isWebStart()) {
 								if (args.length > 1 && !args[args.length - 1].startsWith("-")) {
 									mainFrame.open(args[args.length - 1]);
-								} else {
-									Scene.newFile();
 								}
 							} else {
 								if (args.length > 0) {
 									mainFrame.open(args[0]);
-								} else {
-									Scene.newFile();
 								}
 							}
 						} catch (final Exception e) {

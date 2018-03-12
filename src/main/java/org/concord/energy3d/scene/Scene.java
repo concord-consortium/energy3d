@@ -333,7 +333,7 @@ public class Scene implements Serializable {
 			}
 		}
 
-		Scene.url = file;
+		url = file;
 
 		if (!first) {
 			SceneManager.getInstance().setHeliodonVisible(false);

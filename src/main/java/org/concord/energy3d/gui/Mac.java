@@ -34,6 +34,10 @@ public class Mac {
 				SceneManager.getTaskManager().update(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {
+						// somehow newFile() must be called to set up the scene before we can correctly load the content when an NG3 file is double-clicked without an open instance
+						if (Scene.getURL() == null) {
+							Scene.newFile();
+						}
 						try {
 							Scene.open(new File(e.getFiles().get(0).toString()).toURI().toURL());
 						} catch (final Throwable err) {
