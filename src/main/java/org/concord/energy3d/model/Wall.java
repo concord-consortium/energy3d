@@ -429,7 +429,7 @@ public class Wall extends HousePart implements Thermal {
 		final CullHint drawableSolidWall = drawable && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always;
 		mesh.getSceneHints().setCullHint(drawableSolidWall);
 		outlineMesh.getSceneHints().setCullHint(drawableSolidWall);
-		final CullHint drawableSolidNoneFrozenWall = drawable && !isFrozen() && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always;
+		final CullHint drawableSolidNoneFrozenWall = drawable && type == SOLID_WALL ? CullHint.Inherit : CullHint.Always;
 		backMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
 		surroundMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
 		windowsSurroundMesh.getSceneHints().setCullHint(drawableSolidNoneFrozenWall);
@@ -514,15 +514,13 @@ public class Wall extends HousePart implements Thermal {
 				}
 			}
 			drawOutline(wallAndWindowsPoints);
-			if (!isFrozen()) {
-				if (isDrawBackMesh()) {
-					drawBackMesh(computeWallAndWindowPolygon(true));
-				} else {
-					backMesh.getSceneHints().setCullHint(CullHint.Always);
-				}
-				drawSurroundMesh(thicknessNormal);
-				drawWindowsSurroundMesh(thicknessNormal);
+			if (isDrawBackMesh()) {
+				drawBackMesh(computeWallAndWindowPolygon(true));
+			} else {
+				backMesh.getSceneHints().setCullHint(CullHint.Always);
 			}
+			drawSurroundMesh(thicknessNormal);
+			drawWindowsSurroundMesh(thicknessNormal);
 		}
 		drawPolygon(wallAndWindowsPoints, mesh, true, true, true);
 		drawPolygon(wallAndWindowsPoints, invisibleMesh, false, false, false);
@@ -869,31 +867,30 @@ public class Wall extends HousePart implements Thermal {
 			tp.set(tp.getX(), tp.getY(), z);
 		}
 
-		if (!isFrozen()) {
-			Vector3 direction = null;
-			Vector3 previousStretchPoint = polygon.get(3);
+		Vector3 direction = null;
+		Vector3 previousStretchPoint = polygon.get(3);
 
-			for (double d = length - STRETCH_ROOF_STEP; d > STRETCH_ROOF_STEP; d -= STRETCH_ROOF_STEP) {
-				final Vector3 p = dir.multiply(d, null).addLocal(o);
-				final double findRoofIntersection = findRoofIntersection(p);
+		for (double d = length - STRETCH_ROOF_STEP; d > STRETCH_ROOF_STEP; d -= STRETCH_ROOF_STEP) {
+			final Vector3 p = dir.multiply(d, null).addLocal(o);
+			final double findRoofIntersection = findRoofIntersection(p);
 
-				final Vector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
-				final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
+			final Vector3 currentStretchPoint = new Vector3(p.getX(), p.getY(), findRoofIntersection);
+			final Vector3 currentDirection = currentStretchPoint.subtract(previousStretchPoint, null).normalizeLocal();
 
-				if (direction == null) {
-					direction = currentDirection;
-				} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
-					direction = null;
-					polygon.add(previousStretchPoint);
-					polygon.add(currentStretchPoint);
-				}
-				previousStretchPoint = currentStretchPoint;
-			}
-
-			if (!polygon.get(polygon.size() - 1).equals(previousStretchPoint)) {
+			if (direction == null) {
+				direction = currentDirection;
+			} else if (direction.dot(currentDirection) < 1.0 - MathUtils.ZERO_TOLERANCE) {
+				direction = null;
 				polygon.add(previousStretchPoint);
+				polygon.add(currentStretchPoint);
 			}
+			previousStretchPoint = currentStretchPoint;
 		}
+
+		if (!polygon.get(polygon.size() - 1).equals(previousStretchPoint)) {
+			polygon.add(previousStretchPoint);
+		}
+
 	}
 
 	public double findRoofIntersection(final ReadOnlyVector3 p) {

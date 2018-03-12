@@ -159,7 +159,7 @@ public class BuildingCostGraph extends JPanel {
 				}
 			}
 			if (countBuildings <= 1) {
-				if (p instanceof Tree && !p.isFrozen()) {
+				if (p instanceof Tree && !p.getLockEdit()) {
 					treeSum += BuildingCost.getPartCost(p);
 				}
 			}

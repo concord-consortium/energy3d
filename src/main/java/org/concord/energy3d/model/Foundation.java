@@ -374,7 +374,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	public void setResizeHouseMode(final boolean resizeHouseMode) {
 		this.resizeHouseMode = resizeHouseMode;
-		if (!isFrozen()) {
+		if (!lockEdit) {
 			if (resizeHouseMode) {
 				scanChildrenHeight();
 			}

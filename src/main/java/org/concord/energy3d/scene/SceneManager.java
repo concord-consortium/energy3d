@@ -1909,9 +1909,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 				final HousePart housePart = pick == null ? null : pick.getHousePart();
 				if (pick != null) {
 					hoveredPart = housePart;
-					if (hoveredPart.isFrozen()) {
-						hoveredPart = null;
-					}
 					if (pick.getEditPointIndex() != -1) {
 						lastSelectedEditPointMouseState = mouseState;
 					}
@@ -2147,7 +2144,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 								selectedPart = pick.getHousePart();
 							}
 							if (selectedPart != null) {
-								if (selectedPart.isFrozen()) {
+								if (selectedPart.getLockEdit()) {
 									selectedPart = null;
 								}
 								if (keyboardState.isDown(Key.LMENU) || keyboardState.isDown(Key.RMENU)) {
@@ -2501,6 +2498,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						}
 						undoManager.addEdit(c);
 						Scene.getInstance().remove(selectedPart, true);
+					}
+					if (selectedPart.getContainer() != null) { // redraw its container since we are not calling the costly redrawAll any more
+						selectedPart.getContainer().draw();
 					}
 					selectedPart = null;
 					EventQueue.invokeLater(new Runnable() {

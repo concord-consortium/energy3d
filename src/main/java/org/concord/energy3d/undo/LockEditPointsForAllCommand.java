@@ -3,19 +3,20 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.scene.Scene;
-import org.concord.energy3d.scene.SceneManager;
 
-public class FreezeAllCommand extends MyAbstractUndoableEdit {
+public class LockEditPointsForAllCommand extends MyAbstractUndoableEdit {
 
 	private static final long serialVersionUID = 1L;
 	private final boolean[] oldValues;
+	private boolean[] newValues;
 
-	public FreezeAllCommand() {
+	public LockEditPointsForAllCommand() {
 		final int n = Scene.getInstance().getParts().size();
 		oldValues = new boolean[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = Scene.getInstance().getParts().get(i).isFrozen();
+			oldValues[i] = Scene.getInstance().getParts().get(i).getLockEdit();
 		}
 	}
 
@@ -23,17 +24,12 @@ public class FreezeAllCommand extends MyAbstractUndoableEdit {
 	public void undo() throws CannotUndoException {
 		super.undo();
 		final int n = Scene.getInstance().getParts().size();
-		boolean b = false;
+		newValues = new boolean[n];
 		for (int i = 0; i < n; i++) {
-			Scene.getInstance().getParts().get(i).setFreeze(oldValues[i]);
-			if (oldValues[i]) {
-				b = true;
-			}
+			final HousePart p = Scene.getInstance().getParts().get(i);
+			newValues[i] = p.getLockEdit();
+			p.setLockEdit(oldValues[i]);
 		}
-		if (b) {
-			SceneManager.getInstance().hideAllEditPoints();
-		}
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
@@ -41,15 +37,13 @@ public class FreezeAllCommand extends MyAbstractUndoableEdit {
 		super.redo();
 		final int n = Scene.getInstance().getParts().size();
 		for (int i = 0; i < n; i++) {
-			Scene.getInstance().getParts().get(i).setFreeze(true);
+			Scene.getInstance().getParts().get(i).setLockEdit(newValues[i]);
 		}
-		SceneManager.getInstance().hideAllEditPoints();
-		Scene.getInstance().redrawAll();
 	}
 
 	@Override
 	public String getPresentationName() {
-		return "Lock All";
+		return "Lock All Edit Points";
 	}
 
 }

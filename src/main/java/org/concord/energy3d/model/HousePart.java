@@ -108,7 +108,6 @@ public abstract class HousePart implements Serializable {
 	private ReadOnlyColorRGBA color = ColorRGBA.LIGHT_GRAY; // custom color
 	private double labelOffset = -0.01;
 	private boolean firstPointInserted = false;
-	private boolean freeze;
 	boolean labelCustom;
 	boolean labelId;
 	String labelCustomText;
@@ -553,7 +552,7 @@ public abstract class HousePart implements Serializable {
 			updateEditShapes();
 			updateEditPoints();
 			clearAnnotations();
-			if (isDrawable() && !isFrozen()) {
+			if (isDrawable()) {
 				drawAnnotations();
 			}
 			root.updateGeometricState(0);
@@ -751,7 +750,7 @@ public abstract class HousePart implements Serializable {
 	protected void updateTextureAndColor(final Mesh mesh, final ReadOnlyColorRGBA defaultColor, final TextureMode textureMode) {
 		if (this instanceof Tree) { // special treatment because the same mesh of a tree has two textures (shed or not)
 			final TextureState ts = new TextureState();
-			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, isFrozen());
+			final Texture texture = getTexture(getTextureFileName(), textureMode == TextureMode.Simple, defaultColor, lockEdit);
 			ts.setTexture(texture);
 			mesh.setRenderState(ts);
 		} else {
@@ -761,9 +760,6 @@ public abstract class HousePart implements Serializable {
 						SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getNormal());
 					}
 				}
-			} else if (isFrozen()) {
-				mesh.clearRenderState(StateType.Texture);
-				mesh.setDefaultColor(ColorRGBA.LIGHT_GRAY);
 			} else if (textureMode == TextureMode.None || getTextureFileName() == null) {
 				mesh.clearRenderState(StateType.Texture);
 				mesh.setDefaultColor(defaultColor);
@@ -927,14 +923,6 @@ public abstract class HousePart implements Serializable {
 	}
 
 	protected abstract void computeArea();
-
-	public void setFreeze(final boolean freeze) {
-		this.freeze = freeze;
-	}
-
-	public boolean isFrozen() {
-		return freeze;
-	}
 
 	public long getId() {
 		return id;

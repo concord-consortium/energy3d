@@ -264,7 +264,7 @@ public class Window extends HousePart implements Thermal {
 		setHighlight(!isDrawable);
 		updateEditShapes();
 
-		final boolean drawBars = style != NO_MUNTIN_BAR && !isFrozen() && !Util.isEqual(getAbsPoint(2), getAbsPoint(0)) && !Util.isEqual(getAbsPoint(1), getAbsPoint(0));
+		final boolean drawBars = style != NO_MUNTIN_BAR && !Util.isEqual(getAbsPoint(2), getAbsPoint(0)) && !Util.isEqual(getAbsPoint(1), getAbsPoint(0));
 		final ReadOnlyVector3 meshOffset, barsOffset;
 		if (!isDrawable) {
 			meshOffset = new Vector3();

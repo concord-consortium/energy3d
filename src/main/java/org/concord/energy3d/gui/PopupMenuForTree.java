@@ -10,7 +10,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
-import org.concord.energy3d.undo.FreezePartCommand;
+import org.concord.energy3d.undo.LockEditPointsCommand;
 import org.concord.energy3d.util.Util;
 
 class PopupMenuForTree extends PopupMenuFactory {
@@ -40,9 +40,9 @@ class PopupMenuForTree extends PopupMenuFactory {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Tree) {
 						final Tree tree = (Tree) selectedPart;
-						SceneManager.getInstance().getUndoManager().addEdit(new FreezePartCommand(tree));
+						SceneManager.getInstance().getUndoManager().addEdit(new LockEditPointsCommand(tree));
 						final boolean lock = miLock.isSelected();
-						tree.setFreeze(lock);
+						tree.setLockEdit(lock);
 						if (lock) {
 							SceneManager.getInstance().hideAllEditPoints();
 						}
@@ -58,7 +58,7 @@ class PopupMenuForTree extends PopupMenuFactory {
 					final HousePart p = SceneManager.getInstance().getSelectedPart();
 					if (p instanceof Tree) {
 						Util.selectSilently(miPolygon, ((Tree) p).getShowPolygons());
-						Util.selectSilently(miLock, p.isFrozen());
+						Util.selectSilently(miLock, p.getLockEdit());
 					}
 				}
 			});

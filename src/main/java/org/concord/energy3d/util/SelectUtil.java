@@ -22,6 +22,7 @@ import com.ardor3d.math.Vector3;
 import com.ardor3d.scenegraph.Mesh;
 
 public class SelectUtil {
+
 	private static final PickResults pickResults = new PrimitivePickResults();
 	private static int pickLayer = -1;
 	private static ColorRGBA currentEditPointOriginalColor = new ColorRGBA();
@@ -35,14 +36,12 @@ public class SelectUtil {
 		pickResults.clear();
 		final Ray3 pickRay = SceneManager.getInstance().getCamera().getPickRay(new Vector2(x, y), false, null);
 		for (final HousePart housePart : Scene.getInstance().getParts()) {
-			if (!housePart.isFrozen()) {
-				PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
-				PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
-				if (housePart instanceof Foundation) {
-					final Foundation foundation = (Foundation) housePart;
-					if (foundation.getPolygon().isVisible()) {
-						PickingUtil.findPick(foundation.getPolygon().getEditPointsRoot(), pickRay, pickResults, false);
-					}
+			PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
+			PickingUtil.findPick(housePart.getEditPointsRoot(), pickRay, pickResults, false);
+			if (housePart instanceof Foundation) {
+				final Foundation foundation = (Foundation) housePart;
+				if (foundation.getPolygon().isVisible()) {
+					PickingUtil.findPick(foundation.getPolygon().getEditPointsRoot(), pickRay, pickResults, false);
 				}
 			}
 		}
@@ -86,9 +85,9 @@ public class SelectUtil {
 			if (typeOfHousePart == null) {
 				PickingUtil.findPick(SceneManager.getInstance().getLand(), pickRay, pickResults, false);
 			} else {
-				for (final HousePart housePart : Scene.getInstance().getParts()) {
-					if (!housePart.isFrozen() && typeOfHousePart.isInstance(housePart)) {
-						PickingUtil.findPick(housePart.getCollisionSpatial(), pickRay, pickResults, false);
+				for (final HousePart part : Scene.getInstance().getParts()) {
+					if (!part.getLockEdit() && typeOfHousePart.isInstance(part)) {
+						PickingUtil.findPick(part.getCollisionSpatial(), pickRay, pickResults, false);
 					}
 				}
 			}

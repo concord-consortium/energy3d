@@ -68,7 +68,7 @@ import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddMultiplePartsCommand;
 import org.concord.energy3d.undo.AddNodeCommand;
-import org.concord.energy3d.undo.FreezeAllCommand;
+import org.concord.energy3d.undo.LockEditPointsForAllCommand;
 import org.concord.energy3d.undo.PastePartCommand;
 import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.undo.RemoveMultipleShuttersCommand;
@@ -1718,7 +1718,7 @@ public class Scene implements Serializable {
 	public void removeAllTrees() {
 		final ArrayList<HousePart> trees = new ArrayList<HousePart>();
 		for (final HousePart part : parts) {
-			if (part instanceof Tree && !part.isFrozen()) {
+			if (part instanceof Tree && !part.getLockEdit()) {
 				trees.add(part);
 			}
 		}
@@ -1764,7 +1764,7 @@ public class Scene implements Serializable {
 	public void removeAllRoofs() {
 		final ArrayList<HousePart> roofs = new ArrayList<HousePart>();
 		for (final HousePart part : parts) {
-			if (part instanceof Roof && !part.isFrozen()) {
+			if (part instanceof Roof && !part.getLockEdit()) {
 				roofs.add(part);
 			}
 		}
@@ -1787,7 +1787,7 @@ public class Scene implements Serializable {
 	public void removeAllFloors() {
 		final ArrayList<HousePart> floors = new ArrayList<HousePart>();
 		for (final HousePart part : parts) {
-			if (part instanceof Floor && !part.isFrozen()) {
+			if (part instanceof Floor && !part.getLockEdit()) {
 				floors.add(part);
 			}
 		}
@@ -2054,13 +2054,13 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof Wall && !part.isFrozen() && part.getTopContainer() == foundation) {
+				if (part instanceof Wall && !part.getLockEdit() && part.getTopContainer() == foundation) {
 					walls.add(part);
 				}
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof Wall && !part.isFrozen()) {
+				if (part instanceof Wall && !part.getLockEdit()) {
 					walls.add(part);
 				}
 			}
@@ -2087,13 +2087,13 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation) {
+				if (part instanceof Window && !part.getLockEdit() && part.getTopContainer() == foundation) {
 					windows.add(part);
 				}
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof Window && !part.isFrozen()) {
+				if (part instanceof Window && !part.getLockEdit()) {
 					windows.add(part);
 				}
 			}
@@ -2120,7 +2120,7 @@ public class Scene implements Serializable {
 		if (selectedPart != null) {
 			final Foundation foundation = selectedPart instanceof Foundation ? (Foundation) selectedPart : selectedPart.getTopContainer();
 			for (final HousePart part : parts) {
-				if (part instanceof Window && !part.isFrozen() && part.getTopContainer() == foundation) {
+				if (part instanceof Window && !part.getLockEdit() && part.getTopContainer() == foundation) {
 					final Window w = (Window) part;
 					if (w.getLeftShutter() || w.getRightShutter()) {
 						windows.add(w);
@@ -2129,7 +2129,7 @@ public class Scene implements Serializable {
 			}
 		} else {
 			for (final HousePart part : parts) {
-				if (part instanceof Window && !part.isFrozen()) {
+				if (part instanceof Window && !part.getLockEdit()) {
 					final Window w = (Window) part;
 					if (w.getLeftShutter() || w.getRightShutter()) {
 						windows.add(w);
@@ -2158,7 +2158,7 @@ public class Scene implements Serializable {
 	public void removeAllFoundations() {
 		final ArrayList<HousePart> foundations = new ArrayList<HousePart>();
 		for (final HousePart part : parts) {
-			if (part instanceof Foundation && !part.isFrozen()) {
+			if (part instanceof Foundation && !part.getLockEdit()) {
 				foundations.add(part);
 			}
 		}
@@ -2222,17 +2222,17 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
-	public void lockAll(final boolean freeze) {
+	public void lockAll(final boolean lock) {
 		if (parts.isEmpty()) {
 			return;
 		}
 		int lockCount = 0;
 		for (final HousePart part : parts) {
-			if (part.isFrozen()) {
+			if (part.getLockEdit()) {
 				lockCount++;
 			}
 		}
-		if (!freeze) {
+		if (!lock) {
 			if (lockCount > 0) {
 				if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>A lock prevents a component from being edited.<br>Do you really want to remove all the existing " + lockCount + " locks?</html>", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
 					return;
@@ -2242,11 +2242,11 @@ public class Scene implements Serializable {
 				return;
 			}
 		}
-		SceneManager.getInstance().getUndoManager().addEdit(new FreezeAllCommand());
+		SceneManager.getInstance().getUndoManager().addEdit(new LockEditPointsForAllCommand());
 		for (final HousePart part : parts) {
-			part.setFreeze(freeze);
+			part.setLockEdit(lock);
 		}
-		if (freeze) {
+		if (lock) {
 			SceneManager.getInstance().hideAllEditPoints();
 		}
 		redrawAll();
@@ -3751,10 +3751,10 @@ public class Scene implements Serializable {
 			c = new ColorRGBA(1, 1, 1, 0.5f);
 			break;
 		case GRASSLAND_THEME:
-			c = new ColorRGBA(0, 1, 0, 0.5f);
+			c = new ColorRGBA(0, 0.9f, 0.5f, 0.5f);
 			break;
 		case FOREST_THEME:
-			c = new ColorRGBA(0, 1, 0.2f, 0.5f);
+			c = new ColorRGBA(0, 0.9f, 0.6f, 0.5f);
 			break;
 		default:
 			c = landColor == null ? new ColorRGBA(0, 1, 0.75f, 0.5f) : landColor;

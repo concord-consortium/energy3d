@@ -279,7 +279,7 @@ public abstract class Roof extends HousePart implements Thermal {
 			return;
 		}
 
-		if (isFrozen()) {
+		if (lockEdit) {
 			for (final Spatial roofPart : roofPartsRoot.getChildren()) {
 				if (roofPart.getSceneHints().getCullHint() != CullHint.Always) {
 					final Node roofPartNode = (Node) roofPart;
@@ -1135,7 +1135,7 @@ public abstract class Roof extends HousePart implements Thermal {
 	@Override
 	protected void computeArea() {
 		this.area = 0;
-		if (container == null || isFrozen()) {
+		if (container == null) {
 			return;
 		}
 

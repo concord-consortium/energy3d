@@ -62,6 +62,9 @@ public class RemovePartCommand extends MyAbstractUndoableEdit {
 			}
 		}
 		SceneManager.getInstance().setSelectedPart(part);
+		if (part.getContainer() != null) { // redraw its container since we are not calling the costly redrawAll any more
+			part.getContainer().draw();
+		}
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
 		}
@@ -71,6 +74,9 @@ public class RemovePartCommand extends MyAbstractUndoableEdit {
 	public void redo() throws CannotRedoException {
 		super.redo();
 		Scene.getInstance().remove(part, true);
+		if (part.getContainer() != null) { // redraw its container since we are not calling the costly redrawAll any more
+			part.getContainer().draw();
+		}
 		if (SceneManager.getInstance().getSolarHeatMap()) {
 			EnergyPanel.getInstance().updateRadiationHeatMap();
 		}

@@ -291,7 +291,7 @@ public class MainFrame extends JFrame {
 	private JMenuItem removeAllWindowShuttersMenuItem;
 	private JMenuItem removeAllTreesMenuItem;
 	private JMenuItem removeAllHumansMenuItem;
-	private JMenuItem removeAllLocksMenuItem;
+	private JMenuItem removeAllEditLocksMenuItem;
 	private JMenuItem removeAllUtilityBillsMenuItem;
 	private JMenuItem fixProblemsMenuItem;
 	private JMenuItem moveEastMenuItem;
@@ -2996,7 +2996,7 @@ public class MainFrame extends JFrame {
 					cutMenuItem.setEnabled(true);
 					copyMenuItem.setEnabled(true);
 					pasteMenuItem.setEnabled(true);
-					removeAllLocksMenuItem.setEnabled(true);
+					removeAllEditLocksMenuItem.setEnabled(true);
 					specificationsMenuItem.setEnabled(true);
 					autoRecomputeEnergyMenuItem.setEnabled(true);
 					rescaleMenuItem.setEnabled(true);
@@ -3029,7 +3029,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(snapToGridsMenuItem, Scene.getInstance().isSnapToGrids());
 					MainPanel.getInstance().defaultTool();
 					if (Scene.getInstance().isStudentMode()) {
-						removeAllLocksMenuItem.setEnabled(false);
+						removeAllEditLocksMenuItem.setEnabled(false);
 						specificationsMenuItem.setEnabled(false);
 						autoRecomputeEnergyMenuItem.setEnabled(false);
 						rescaleMenuItem.setEnabled(false);
@@ -3057,7 +3057,7 @@ public class MainFrame extends JFrame {
 			clearMenu.add(getRemoveAllRoofsMenuItem());
 			clearMenu.add(getRemoveAllFloorsMenuItem());
 			clearMenu.add(getRemoveAllSensorsMenuItem());
-			clearMenu.add(getRemoveAllLocksMenuItem());
+			clearMenu.add(getRemoveAllEditLocksMenuItem());
 			clearMenu.add(getRemoveAllUtilityBillsMenuItem());
 
 			final JMenu moveMenu = new JMenu("Move");
@@ -4861,10 +4861,10 @@ public class MainFrame extends JFrame {
 		return fixProblemsMenuItem;
 	}
 
-	private JMenuItem getRemoveAllLocksMenuItem() {
-		if (removeAllLocksMenuItem == null) {
-			removeAllLocksMenuItem = new JMenuItem("Remove All Locks");
-			removeAllLocksMenuItem.addActionListener(new ActionListener() {
+	private JMenuItem getRemoveAllEditLocksMenuItem() {
+		if (removeAllEditLocksMenuItem == null) {
+			removeAllEditLocksMenuItem = new JMenuItem("Remove All Edit Locks");
+			removeAllEditLocksMenuItem.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					SceneManager.getTaskManager().update(new Callable<Object>() {
@@ -4877,7 +4877,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 		}
-		return removeAllLocksMenuItem;
+		return removeAllEditLocksMenuItem;
 	}
 
 	private JMenuItem getEnableAllEditPointsMenuItem() {

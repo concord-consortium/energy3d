@@ -162,7 +162,7 @@ public class BuildingCost extends ProjectCost {
 		}
 		if (buildingCount == 1) {
 			for (final HousePart p : Scene.getInstance().getParts()) { // if there is only one building, trees are included in its cost
-				if (!p.isFrozen() && !(p instanceof Human)) {
+				if (!p.getLockEdit() && !(p instanceof Human)) {
 					sum += getPartCost(p);
 				}
 			}
@@ -238,7 +238,7 @@ public class BuildingCost extends ProjectCost {
 					}
 				}
 				if (count <= 1) {
-					if (p instanceof Tree && !p.isFrozen()) {
+					if (p instanceof Tree && !p.getLockEdit()) {
 						treeSum += getPartCost(p);
 					}
 				}
@@ -260,7 +260,7 @@ public class BuildingCost extends ProjectCost {
 					doorSum += getPartCost(p);
 				} else if (p instanceof SolarPanel || p instanceof Rack) {
 					solarPanelSum += getPartCost(p);
-				} else if (p instanceof Tree && !p.isFrozen()) {
+				} else if (p instanceof Tree && !p.getLockEdit()) {
 					treeSum += getPartCost(p);
 				}
 			}
