@@ -13,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import org.concord.energy3d.gui.CspProjectCostGraph;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
@@ -232,19 +233,16 @@ public class CspProjectCost extends ProjectCost {
 
 		double[] data;
 		String[] legends;
-		Color[] colors;
 		if (Util.isZero(receiverSum)) {
 			data = new double[] { landSum, collectorSum };
 			legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors" };
-			colors = new Color[] { Color.RED, Color.GREEN };
 		} else {
 			data = new double[] { landSum, collectorSum, receiverSum };
 			legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors", "Receivers" };
-			colors = new Color[] { Color.RED, Color.GREEN, Color.BLUE };
 		}
 
 		// show them in a popup window
-		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
+		final PieChart pie = new PieChart(data, CspProjectCostGraph.colors, legends, "$", info, count > 1 ? details : null, true);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Project Costs by Category", true);

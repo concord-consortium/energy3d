@@ -43,6 +43,9 @@ import org.concord.energy3d.util.Util;
  */
 public class BuildingCostGraph extends JPanel {
 
+	public final static String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
+	public final static Color[] colors = new Color[] { new Color(250, 128, 114), new Color(135, 206, 250), new Color(169, 169, 169), new Color(221, 160, 221), new Color(0, 128, 128), new Color(219, 112, 147), new Color(240, 230, 140), new Color(72, 209, 204) };
+
 	private static final long serialVersionUID = 1L;
 
 	private PieChart pie;
@@ -200,8 +203,6 @@ public class BuildingCostGraph extends JPanel {
 		add(budgetPanel, BorderLayout.NORTH);
 
 		final double[] data = new double[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
-		final Color[] colors = new Color[] { new Color(250, 128, 114), new Color(135, 206, 250), new Color(169, 169, 169), new Color(221, 160, 221), new Color(0, 128, 128), new Color(219, 112, 147), new Color(240, 230, 140), new Color(72, 209, 204) };
 
 		pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
 		pie.setBackground(Color.WHITE);

@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import org.concord.energy3d.gui.BuildingCostGraph;
 import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.model.Building;
 import org.concord.energy3d.model.Door;
@@ -267,11 +268,9 @@ public class BuildingCost extends ProjectCost {
 		}
 
 		final double[] data = new double[] { wallSum, windowSum, roofSum, foundationSum, floorSum, doorSum, solarPanelSum, treeSum };
-		final String[] legends = new String[] { "Walls", "Windows", "Roof", "Foundation", "Floors", "Doors", "Solar Panels", "Trees" };
-		final Color[] colors = new Color[] { Color.RED, Color.BLUE, Color.GRAY, Color.MAGENTA, Color.CYAN, Color.PINK, Color.YELLOW, Color.GREEN };
 
 		// show them in a popup window
-		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
+		final PieChart pie = new PieChart(data, BuildingCostGraph.colors, BuildingCostGraph.legends, "$", info, count > 1 ? details : null, true);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Project Costs by Category", true);

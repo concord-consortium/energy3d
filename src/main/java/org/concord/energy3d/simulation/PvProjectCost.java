@@ -12,6 +12,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.concord.energy3d.gui.MainFrame;
+import org.concord.energy3d.gui.PvProjectCostGraph;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
@@ -133,10 +134,9 @@ public class PvProjectCost extends ProjectCost {
 
 		final double[] data = new double[] { landSum, solarPanelSum };
 		final String[] legends = new String[] { "Land (" + Scene.getInstance().getPvCustomPrice().getLifespan() + " years)", "Solar Panels" };
-		final Color[] colors = new Color[] { Color.RED, Color.GREEN };
 
 		// show them in a popup window
-		final PieChart pie = new PieChart(data, colors, legends, "$", info, count > 1 ? details : null, true);
+		final PieChart pie = new PieChart(data, PvProjectCostGraph.colors, legends, "$", info, count > 1 ? details : null, true);
 		pie.setBackground(Color.WHITE);
 		pie.setBorder(BorderFactory.createEtchedBorder());
 		final JDialog dialog = new JDialog(MainFrame.getInstance(), "Project Costs by Category", true);

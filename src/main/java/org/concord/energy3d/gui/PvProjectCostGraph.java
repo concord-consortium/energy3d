@@ -37,6 +37,7 @@ import org.concord.energy3d.util.Util;
  */
 public class PvProjectCostGraph extends JPanel {
 
+	public final static Color[] colors = new Color[] { new Color(250, 128, 114), new Color(135, 206, 250) };
 	private static final long serialVersionUID = 1L;
 
 	private PieChart pie;
@@ -153,7 +154,6 @@ public class PvProjectCostGraph extends JPanel {
 
 		final double[] data = new double[] { landSum, solarPanelSum };
 		final String[] legends = new String[] { "Land (" + Scene.getInstance().getPvCustomPrice().getLifespan() + " years)", "Solar Panels" };
-		final Color[] colors = new Color[] { new Color(250, 128, 114), new Color(135, 206, 250) };
 
 		pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
 		pie.setBackground(Color.WHITE);

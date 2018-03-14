@@ -40,6 +40,7 @@ import org.concord.energy3d.util.Util;
  */
 public class CspProjectCostGraph extends JPanel {
 
+	public final static Color[] colors = new Color[] { new Color(250, 128, 114), new Color(135, 206, 250), new Color(169, 169, 169) };
 	private static final long serialVersionUID = 1L;
 
 	private PieChart pie;
@@ -195,15 +196,12 @@ public class CspProjectCostGraph extends JPanel {
 
 		double[] data;
 		String[] legends;
-		Color[] colors;
 		if (Util.isZero(receiverSum)) {
 			data = new double[] { landSum, collectorSum };
 			legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors" };
-			colors = new Color[] { Color.RED, Color.GREEN };
 		} else {
 			data = new double[] { landSum, collectorSum, receiverSum };
 			legends = new String[] { "Land (" + Scene.getInstance().getCspCustomPrice().getLifespan() + " years)", "Collectors", "Receivers" };
-			colors = new Color[] { new Color(250, 128, 114), new Color(135, 206, 250), new Color(169, 169, 169) };
 		}
 
 		pie = new PieChart(data, colors, legends, "$", null, "Move mouse for more info", false);
