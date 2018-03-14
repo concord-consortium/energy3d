@@ -30,6 +30,7 @@ import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddArrayCommand;
 import org.concord.energy3d.undo.DeleteMeshCommand;
 import org.concord.energy3d.undo.DeleteNodeCommand;
+import org.concord.energy3d.undo.RemoveMultiplePartsCommand;
 import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.FontManager;
 import org.concord.energy3d.util.MeshLib;
@@ -2441,6 +2442,84 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 		});
 		return countParts(Mirror.class);
+	}
+
+	public void resetPolygon() {
+		if (foundationPolygon != null) {
+			foundationPolygon.reset();
+			foundationPolygon.draw();
+		}
+	}
+
+	public void removeAllWithinPolygon() {
+		if (foundationPolygon == null || !foundationPolygon.isVisible()) {
+			return;
+		}
+		final Path2D.Double path = new Path2D.Double();
+		final int n = foundationPolygon.points.size();
+		Vector3 v = foundationPolygon.getAbsPoint(0);
+		path.moveTo(v.getX(), v.getY());
+		for (int i = 1; i < n / 2; i++) { // use only the first half of the vertices from the polygon
+			v = foundationPolygon.getAbsPoint(i);
+			path.lineTo(v.getX(), v.getY());
+		}
+		path.closePath();
+		final List<HousePart> selectedParts = new ArrayList<HousePart>();
+		for (final HousePart child : children) {
+			final Vector3 center = child.getAbsCenter();
+			if (path.contains(center.getX(), center.getY())) {
+				selectedParts.add(child);
+			}
+		}
+		if (selectedParts.isEmpty()) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "There is no object to remove.", "No Object", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Do you really want to remove all " + selectedParts.size() + " objects<br>within the white border line of the selected foundation?</html>", "Confirm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION) {
+			return;
+		}
+		final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(selectedParts);
+		for (final HousePart part : selectedParts) {
+			Scene.getInstance().remove(part, false);
+		}
+		draw();
+		SceneManager.getInstance().getUndoManager().addEdit(c);
+	}
+
+	public void moveAllWithinPolygon(final Vector3 direction) {
+		if (foundationPolygon == null || !foundationPolygon.isVisible()) {
+			return;
+		}
+		final Path2D.Double path = new Path2D.Double();
+		final int n = foundationPolygon.points.size();
+		Vector3 v = foundationPolygon.getAbsPoint(0);
+		path.moveTo(v.getX(), v.getY());
+		for (int i = 1; i < n / 2; i++) { // use only the first half of the vertices from the polygon
+			v = foundationPolygon.getAbsPoint(i);
+			path.lineTo(v.getX(), v.getY());
+		}
+		path.closePath();
+		final List<HousePart> selectedParts = new ArrayList<HousePart>();
+		for (final HousePart child : children) {
+			final Vector3 center = child.getAbsCenter();
+			if (path.contains(center.getX(), center.getY())) {
+				selectedParts.add(child);
+			}
+		}
+		// final RemoveMultiplePartsCommand c = new RemoveMultiplePartsCommand(selectedParts);
+		double steplength = 0;
+		for (final HousePart part : selectedParts) {
+			if (part instanceof SolarCollector) {
+				if (steplength == 0) {
+					steplength = part.getGridSize();
+				}
+				((SolarCollector) part).move(direction, steplength);
+				part.draw();
+			}
+		}
+		foundationPolygon.move(direction, steplength);
+		foundationPolygon.draw();
+		// SceneManager.getInstance().getUndoManager().addEdit(c);
 	}
 
 	public void addSolarPanelArrays(final SolarPanel solarPanel, final double rowSpacing, final double colSpacing, final int rowAxis) {

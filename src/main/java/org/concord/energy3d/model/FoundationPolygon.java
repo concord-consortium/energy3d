@@ -19,6 +19,7 @@ import com.ardor3d.scenegraph.hint.CullHint;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class FoundationPolygon extends HousePart {
+
 	private static final long serialVersionUID = 1L;
 	private boolean visible;
 
@@ -26,6 +27,21 @@ public class FoundationPolygon extends HousePart {
 		super(1, 8, 0, true);
 		this.container = foundation;
 		final double h = foundation.getHeight() + 0.1;// put it a bit higher to ensure that the line floats above the foundation
+		points.get(0).set(0.1, 0.1, h);
+		points.get(1).set(0.9, 0.1, h);
+		points.get(2).set(0.9, 0.9, h);
+		points.get(3).set(0.1, 0.9, h);
+		setVisible(visible); // needed because edit shapes are not creates in init() yet
+	}
+
+	@Override
+	public void reset() {
+		pointsRoot.detachAllChildren();
+		final Object[] o = points.toArray();
+		for (int i = 8; i < o.length; i++) {
+			points.remove(o[i]);
+		}
+		final double h = points.get(0).getZ();
 		points.get(0).set(0.1, 0.1, h);
 		points.get(1).set(0.9, 0.1, h);
 		points.get(2).set(0.9, 0.9, h);
@@ -101,6 +117,17 @@ public class FoundationPolygon extends HousePart {
 		}
 		final double scale = Scene.getInstance().getAnnotationScale();
 		area = Util.getAreaOf2DPolygon(x, y) * scale * scale;
+	}
+
+	public void move(final Vector3 v, final double steplength) {
+		if (lockEdit) {
+			return;
+		}
+		v.normalizeLocal().multiplyLocal(steplength);
+		for (int i = 0; i < points.size(); i++) {
+			final Vector3 p = getAbsPoint(i).addLocal(v);
+			points.get(i).set(toRelative(p));
+		}
 	}
 
 	@Override

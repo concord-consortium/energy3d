@@ -64,7 +64,7 @@ import org.concord.energy3d.undo.ChangeFoundationSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.SetFoundationLabelCommand;
 import org.concord.energy3d.undo.SetGroupMasterCommand;
-import org.concord.energy3d.undo.ShowBorderLineCommand;
+import org.concord.energy3d.undo.ShowFoundationInsetCommand;
 import org.concord.energy3d.util.BugReporter;
 import org.concord.energy3d.util.Config;
 import org.concord.energy3d.util.FileChooser;
@@ -534,6 +534,57 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				}
 			});
 			clearMenu.add(miRemoveAllImportedNodes);
+
+			final JMenuItem miRemoveAllWithinInset = new JMenuItem("Remove All Objects within Inset");
+			miRemoveAllWithinInset.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							((Foundation) selectedPart).removeAllWithinPolygon();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									MainPanel.getInstance().getEnergyButton().setSelected(false);
+									Scene.getInstance().setEdited(true);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miRemoveAllWithinInset);
+
+			final JMenuItem miResetPolygonInset = new JMenuItem("Reset Inset");
+			miResetPolygonInset.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Foundation)) {
+						return;
+					}
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() {
+							((Foundation) selectedPart).resetPolygon();
+							EventQueue.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+									Scene.getInstance().setEdited(true);
+								}
+							});
+							return null;
+						}
+					});
+				}
+			});
+			clearMenu.add(miResetPolygonInset);
 
 			final JMenu layoutMenu = new JMenu("Layout");
 
@@ -1437,15 +1488,15 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 				}
 			});
 
-			final JCheckBoxMenuItem miBorderLine = new JCheckBoxMenuItem("Border Line");
-			miBorderLine.addItemListener(new ItemListener() {
+			final JCheckBoxMenuItem miEnableInset = new JCheckBoxMenuItem("Enable Polygon Inset");
+			miEnableInset.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 					if (selectedPart instanceof Foundation) {
 						final Foundation foundation = (Foundation) selectedPart;
-						SceneManager.getInstance().getUndoManager().addEdit(new ShowBorderLineCommand(foundation));
-						foundation.getPolygon().setVisible(miBorderLine.isSelected());
+						SceneManager.getInstance().getUndoManager().addEdit(new ShowFoundationInsetCommand(foundation));
+						foundation.getPolygon().setVisible(miEnableInset.isSelected());
 						foundation.draw();
 						Scene.getInstance().setEdited(true);
 					}
@@ -1897,7 +1948,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 						miDeleteUtilityBill.setEnabled(f.getUtilityBill() != null);
 						Util.selectSilently(miGroupMaster, f.isGroupMaster());
 						Util.selectSilently(miDisableEditPoints, f.getLockEdit());
-						Util.selectSilently(miBorderLine, f.getPolygon().isVisible());
+						Util.selectSilently(miEnableInset, f.getPolygon().isVisible());
 						Util.selectSilently(miLabelNone, !f.isLabelVisible());
 						Util.selectSilently(miLabelCustom, f.getLabelCustom());
 						Util.selectSilently(miLabelId, f.getLabelId());
@@ -1949,8 +2000,8 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			popupMenuForFoundation.add(layoutMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(miDisableEditPoints);
+			popupMenuForFoundation.add(miEnableInset);
 			popupMenuForFoundation.add(miGroupMaster);
-			popupMenuForFoundation.add(miBorderLine);
 			popupMenuForFoundation.add(optionsMenu);
 			popupMenuForFoundation.add(labelMenu);
 			popupMenuForFoundation.addSeparator();

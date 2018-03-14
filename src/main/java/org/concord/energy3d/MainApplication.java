@@ -32,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "7.9.5";
+	public static final String VERSION = "7.9.6";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -61,7 +61,7 @@ public class MainApplication {
 
 		System.out.println("Initiating...");
 		final long t = System.nanoTime();
-		checkSingleInstance(MainApplication.class, args);
+		// checkSingleInstance(MainApplication.class, args);
 		// startDeadlockDetectionThread();
 
 		agents = new ArrayList<Agent>();

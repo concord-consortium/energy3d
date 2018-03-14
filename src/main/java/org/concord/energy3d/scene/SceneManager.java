@@ -42,6 +42,7 @@ import org.concord.energy3d.model.CustomRoof;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FoundationPolygon;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.GambrelRoof;
 import org.concord.energy3d.model.HipRoof;
@@ -1298,6 +1299,9 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			} else {
 				f.move(v, selectedPart.getGridSize());
 			}
+		} else if (selectedPart instanceof FoundationPolygon) {
+			((Foundation) selectedPart.getContainer()).moveAllWithinPolygon(v);
+
 		} else if (selectedPart instanceof Roof) {
 			if (viewMode == ViewMode.TOP_VIEW) {
 				final Foundation f = selectedPart.getTopContainer();
@@ -1314,30 +1318,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			final Window w = (Window) selectedPart;
 			w.move(v);
 			w.draw();
-		} else if (selectedPart instanceof Mirror) {
-			final Mirror m = (Mirror) selectedPart;
-			m.move(v, selectedPart.getGridSize());
-			m.draw();
-		} else if (selectedPart instanceof SolarPanel) {
-			final SolarPanel s = (SolarPanel) selectedPart;
-			s.move(v, selectedPart.getGridSize());
-			s.draw();
-		} else if (selectedPart instanceof Rack) {
-			final Rack r = (Rack) selectedPart;
-			r.move(v, selectedPart.getGridSize());
-			r.draw();
-		} else if (selectedPart instanceof ParabolicTrough) {
-			final ParabolicTrough t = (ParabolicTrough) selectedPart;
-			t.move(v, selectedPart.getGridSize());
-			t.draw();
-		} else if (selectedPart instanceof ParabolicDish) {
-			final ParabolicDish d = (ParabolicDish) selectedPart;
-			d.move(v, selectedPart.getGridSize());
-			d.draw();
-		} else if (selectedPart instanceof FresnelReflector) {
-			final FresnelReflector f = (FresnelReflector) selectedPart;
-			f.move(v, selectedPart.getGridSize());
-			f.draw();
+		} else if (selectedPart instanceof SolarCollector) {
+			final SolarCollector sc = (SolarCollector) selectedPart;
+			sc.move(v, selectedPart.getGridSize());
+			selectedPart.draw();
 		} else if (selectedPart instanceof Tree) {
 			final Tree t = (Tree) selectedPart;
 			t.move(v, selectedPart.getGridSize());

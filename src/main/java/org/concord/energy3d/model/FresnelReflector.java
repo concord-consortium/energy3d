@@ -695,6 +695,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		return relativeAzimuth;
 	}
 
+	@Override
 	public void move(final Vector3 v, final double steplength) {
 		if (lockEdit) {
 			return;

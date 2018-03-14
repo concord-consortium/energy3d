@@ -1,5 +1,7 @@
 package org.concord.energy3d.model;
 
+import com.ardor3d.math.Vector3;
+
 /**
  * A component that collects solar energy, such as solar panels and mirrors
  * 
@@ -7,6 +9,8 @@ package org.concord.energy3d.model;
  *
  */
 public interface SolarCollector {
+
+	public void move(final Vector3 v, final double steplength);
 
 	public void setBaseHeight(final double baseHeight);
 

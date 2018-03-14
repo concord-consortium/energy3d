@@ -803,6 +803,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		return relativeAzimuth;
 	}
 
+	@Override
 	public void move(final Vector3 v, final double steplength) {
 		if (lockEdit) {
 			return;

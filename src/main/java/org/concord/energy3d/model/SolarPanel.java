@@ -1169,6 +1169,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		}
 	}
 
+	@Override
 	public void move(final Vector3 v, final double steplength) {
 		if (lockEdit) {
 			return;
