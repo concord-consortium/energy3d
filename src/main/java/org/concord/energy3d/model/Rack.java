@@ -353,12 +353,21 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				yRotationAxis = 1;
 				break;
 			}
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalizeLocal();
 			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
-			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
-			final Vector3 b = Vector3.UNIT_Z.cross(a, null);
-			final Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
+			Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
+			Vector3 b = Vector3.UNIT_Z.cross(a, null);
+			Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
+			normal = m.applyPost(a, null);
+			if (normal.getZ() < 0) {
+				normal = normal.negate(null);
+			}
+			break;
+		case TILTED_SINGLE_AXIS_TRACKER:
+			a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalizeLocal();
+			b = Vector3.UNIT_Y.cross(a, null);
+			m = new Matrix3().applyRotation(Math.toRadians(tiltAngle), b.getX(), b.getY(), b.getZ());
 			normal = m.applyPost(a, null);
 			if (normal.getZ() < 0) {
 				normal = normal.negate(null);
@@ -930,6 +939,9 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	private void rotateSolarPanels(final Matrix3 matrix) {
+		if (children.isEmpty()) {
+			return;
+		}
 		final Vector3 center = getAbsPoint(0);
 		for (final HousePart child : children) {
 			final Vector3 v = child.getAbsPoint(0).subtractLocal(center);

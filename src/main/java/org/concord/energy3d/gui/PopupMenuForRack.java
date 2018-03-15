@@ -2812,6 +2812,98 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
+			final JRadioButtonMenuItem miTiltedSingleAxisTracker = new JRadioButtonMenuItem("Tilted Single-Axis Tracker...");
+			trackerButtonGroup.add(miTiltedSingleAxisTracker);
+			miTiltedSingleAxisTracker.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final Rack rack = (Rack) selectedPart;
+					final String partInfo = rack.toString().substring(0, rack.toString().indexOf(')') + 1);
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on this Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					final String title = "<html>Set tilted single-axis tracker for " + partInfo + "</html>";
+					final String footnote = "<html><hr><font size=2>A tilted single-axis tracker (TSAT) rotates about an axis neither parallel nor perpendicular to the ground<br>and follow the sun from east to west during the day.<hr></html>";
+					final Object[] params = { title, footnote, panel };
+					if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), params, "Set tilted single-axis solar tracker", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+						return;
+					}
+					boolean changed = rack.getTracker() != Trackable.TILTED_SINGLE_AXIS_TRACKER;
+					if (rb1.isSelected()) {
+						if (changed) {
+							final SetSolarTrackerCommand c = new SetSolarTrackerCommand(rack, "Tilted Single-Axis Tracker");
+							rack.setTracker(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+							rack.draw();
+							SceneManager.getInstance().refresh();
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						selectedScopeIndex = 0;
+					} else if (rb2.isSelected()) {
+						final Foundation foundation = rack.getTopContainer();
+						if (!changed) {
+							for (final Rack x : foundation.getRacks()) {
+								if (x.getTracker() != Trackable.TILTED_SINGLE_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersOnFoundationCommand c = new SetSolarTrackersOnFoundationCommand(foundation, rack, "Tilted Single-Axis Tracker for All Racks on Selected Foundation");
+							foundation.setTrackerForRacks(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						selectedScopeIndex = 1;
+					} else if (rb3.isSelected()) {
+						if (!changed) {
+							for (final Rack x : Scene.getInstance().getAllRacks()) {
+								if (x.getTracker() != Trackable.TILTED_SINGLE_AXIS_TRACKER) {
+									changed = true;
+									break;
+								}
+							}
+						}
+						if (changed) {
+							final SetSolarTrackersForAllCommand c = new SetSolarTrackersForAllCommand(rack, "Tilted Single-Axis Tracker for All Racks");
+							Scene.getInstance().setTrackerForAllRacks(Trackable.TILTED_SINGLE_AXIS_TRACKER);
+							SceneManager.getInstance().getUndoManager().addEdit(c);
+						}
+						selectedScopeIndex = 2;
+					}
+					if (changed) {
+						updateAfterEdit();
+					}
+				}
+			});
+
 			final JRadioButtonMenuItem miAltazimuthDualAxisTracker = new JRadioButtonMenuItem("Altazimuth Dual-Axis Tracker...");
 			trackerButtonGroup.add(miAltazimuthDualAxisTracker);
 			miAltazimuthDualAxisTracker.addActionListener(new ActionListener() {
@@ -2907,6 +2999,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 			trackerMenu.add(miNoTracker);
 			trackerMenu.add(miHorizontalSingleAxisTracker);
 			trackerMenu.add(miVerticalSingleAxisTracker);
+			trackerMenu.add(miTiltedSingleAxisTracker);
 			trackerMenu.add(miAltazimuthDualAxisTracker);
 
 			final JCheckBoxMenuItem cbmiDisableEditPoints = new JCheckBoxMenuItem("Disable Edit Points");
@@ -3153,6 +3246,9 @@ class PopupMenuForRack extends PopupMenuFactory {
 						break;
 					case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
 						Util.selectSilently(miVerticalSingleAxisTracker, true);
+						break;
+					case Trackable.TILTED_SINGLE_AXIS_TRACKER:
+						Util.selectSilently(miTiltedSingleAxisTracker, true);
 						break;
 					case Trackable.NO_TRACKER:
 						Util.selectSilently(miNoTracker, true);

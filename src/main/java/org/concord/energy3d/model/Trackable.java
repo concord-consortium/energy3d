@@ -12,6 +12,7 @@ public interface Trackable extends SolarCollector {
 	public static final int HORIZONTAL_SINGLE_AXIS_TRACKER = 1;
 	public static final int ALTAZIMUTH_DUAL_AXIS_TRACKER = 2;
 	public static final int VERTICAL_SINGLE_AXIS_TRACKER = 3;
+	public static final int TILTED_SINGLE_AXIS_TRACKER = 4;
 
 	public static final int NORTH_SOUTH_AXIS = 0;
 	public static final int EAST_WEST_AXIS = 1;
