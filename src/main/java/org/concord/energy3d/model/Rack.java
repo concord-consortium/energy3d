@@ -356,19 +356,26 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalizeLocal();
 			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
-			Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
-			Vector3 b = Vector3.UNIT_Z.cross(a, null);
+			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
+			final Vector3 b = Vector3.UNIT_Z.cross(a, null);
 			Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
 			normal = m.applyPost(a, null);
 			if (normal.getZ() < 0) {
 				normal = normal.negate(null);
 			}
 			break;
-		case TILTED_SINGLE_AXIS_TRACKER:
-			a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 0, 1, null).normalizeLocal();
-			b = Vector3.UNIT_Y.cross(a, null);
-			m = new Matrix3().applyRotation(Math.toRadians(tiltAngle), b.getX(), b.getY(), b.getZ());
-			normal = m.applyPost(a, null);
+		case TILTED_SINGLE_AXIS_TRACKER: // TODO: The following does not work
+			final double sunAngleX = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null).dot(Vector3.UNIT_X);
+			System.out.println("*** sun cosx = " + sunAngleX + ", " + Math.toDegrees(Math.asin(sunAngleX)));
+			// rotate the normal according to the tilt angle, at this point, the axis is still north-south
+			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+			System.out.println("*** tilt normal = " + normal);
+			// the following vector should be the rack axis
+			final Vector3 rackAxis = Vector3.UNIT_X.cross(normal, null);
+			System.out.println("*** rack axis = " + rackAxis);
+			m = new Matrix3().fromAngleNormalAxis(Math.asin(sunAngleX), rackAxis);
+			normal = m.applyPost(normal, null);
+			System.out.println("*** final normal = " + normal);
 			if (normal.getZ() < 0) {
 				normal = normal.negate(null);
 			}
@@ -661,10 +668,14 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		Vector3 v = foundation.getAbsPoint(0);
 		final Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
 		final Vector3 vy = foundation.getAbsPoint(1).subtractLocal(v); // y direction
-		final Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
-		final Vector3 v1 = m.applyPost(vx, null);
-		final Vector3 v2 = m.applyPost(vy, null);
-		v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
+		if (Util.isZero(azimuth)) {
+			v = new Matrix3().fromAngleAxis(angle, vx).applyPost(vy, null);
+		} else {
+			final Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
+			final Vector3 v1 = m.applyPost(vx, null);
+			final Vector3 v2 = m.applyPost(vy, null);
+			v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
+		}
 		if (v.getZ() < 0) {
 			v.negateLocal();
 		}
