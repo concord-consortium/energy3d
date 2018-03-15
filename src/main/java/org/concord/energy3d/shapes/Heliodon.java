@@ -574,13 +574,19 @@ public class Heliodon {
 	}
 
 	private Vector3 computeSunLocation(final double hourAngle, final double declinationAngle, final double observerLatitude) {
-		final double altitudeAngle = MathUtils.asin(MathUtils.sin(declinationAngle) * MathUtils.sin(observerLatitude) + MathUtils.cos(declinationAngle) * MathUtils.cos(hourAngle) * MathUtils.cos(observerLatitude));
-		final double x_azm = MathUtils.sin(hourAngle) * MathUtils.cos(declinationAngle);
-		final double y_azm = (-(MathUtils.cos(hourAngle)) * MathUtils.cos(declinationAngle) * MathUtils.sin(observerLatitude)) + (MathUtils.cos(observerLatitude) * MathUtils.sin(declinationAngle));
+		// cache the expensive trig calculations
+		final double cosHourAngle = MathUtils.cos(hourAngle);
+		final double cosDeclinationAngle = MathUtils.cos(declinationAngle);
+		final double sinDeclinationAngle = MathUtils.sin(declinationAngle);
+		final double cosObserverLatitude = MathUtils.cos(observerLatitude);
+		final double sinObserverLatitude = MathUtils.sin(observerLatitude);
+
+		final double altitudeAngle = MathUtils.asin(sinDeclinationAngle * sinObserverLatitude + cosDeclinationAngle * cosHourAngle * cosObserverLatitude);
+		final double x_azm = MathUtils.sin(hourAngle) * cosDeclinationAngle;
+		final double y_azm = cosObserverLatitude * sinDeclinationAngle - cosHourAngle * cosDeclinationAngle * sinObserverLatitude;
 		final double azimuthAngle = Math.atan2(y_azm, x_azm);
 
-		final double r = 5;
-		final Vector3 coords = new Vector3(r, azimuthAngle, altitudeAngle);
+		final Vector3 coords = new Vector3(5, azimuthAngle, altitudeAngle);
 		MathUtils.sphericalToCartesianZ(coords, coords);
 		coords.setX(-coords.getX()); // reverse the x so that sun moves from east to west
 		return coords;
@@ -795,9 +801,8 @@ public class Heliodon {
 	}
 
 	private double computeHourAngle(final Calendar calendar) {
-		final int minutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE) - 12 * 60;
-		final double hourAngle = minutes / (12.0 * 60.0) * Math.PI;
-		return hourAngle;
+		final int minutes = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE) - 720;
+		return minutes / 720.0 * Math.PI;
 	}
 
 	public void setDate(final Date date) {
@@ -813,9 +818,7 @@ public class Heliodon {
 	}
 
 	private double computeDeclinationAngle(final Calendar calendar) {
-		final int days = calendar.get(Calendar.DAY_OF_YEAR);
-		final double declinationAngle = TILT_ANGLE * MathUtils.sin(MathUtils.TWO_PI * (284 + days) / 365.25);
-		return declinationAngle;
+		return TILT_ANGLE * MathUtils.sin(MathUtils.TWO_PI * (284.0 + calendar.get(Calendar.DAY_OF_YEAR)) / 365.25);
 	}
 
 	public void update() {
