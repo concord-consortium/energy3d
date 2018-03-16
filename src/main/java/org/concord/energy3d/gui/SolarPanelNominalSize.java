@@ -2,7 +2,7 @@ package org.concord.energy3d.gui;
 
 class SolarPanelNominalSize {
 
-	private final int n = 6;
+	private final int n = 7;
 	private final String[] nominalStrings = new String[n];
 	private final double[] nominalWidths = new double[n];
 	private final double[] nominalHeights = new double[n];
@@ -36,10 +36,17 @@ class SolarPanelNominalSize {
 		cellNx[4] = 8;
 		cellNy[4] = 16;
 
+		// First Solar Series 2, 4
 		nominalWidths[5] = 0.6;
 		nominalHeights[5] = 1.2;
 		cellNx[5] = 10;
 		cellNy[5] = 20;
+
+		// First Solar Series 6
+		nominalWidths[6] = 1.2;
+		nominalHeights[6] = 2.0;
+		cellNx[6] = 10;
+		cellNy[6] = 20;
 
 		for (int i = 0; i < n; i++) {
 			nominalStrings[i] = PopupMenuFactory.threeDecimalsFormat.format(nominalWidths[i]) + "m \u00D7 " + PopupMenuFactory.threeDecimalsFormat.format(nominalHeights[i]) + "m (" + cellNx[i] + " \u00D7 " + cellNy[i] + " cells)";

@@ -2813,6 +2813,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 			});
 
 			final JRadioButtonMenuItem miTiltedSingleAxisTracker = new JRadioButtonMenuItem("Tilted Single-Axis Tracker...");
+			miTiltedSingleAxisTracker.setEnabled(false);
 			trackerButtonGroup.add(miTiltedSingleAxisTracker);
 			miTiltedSingleAxisTracker.addActionListener(new ActionListener() {
 
