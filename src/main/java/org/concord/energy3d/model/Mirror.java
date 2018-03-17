@@ -222,7 +222,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		} else {
 			final ReadOnlyVector3 o = heliostatTarget.getSolarReceiverCenter(); // TODO: cache this so that we don't have to compute the receiver position for every heliostat
 			final Vector3 p = a.clone().subtractLocal(o).negateLocal().normalizeLocal();
-			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			final Vector3 q = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 			normal = p.add(q, null).multiplyLocal(0.5).normalizeLocal();
 		}
 		mesh.setTranslation(a);
@@ -266,7 +266,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		}
 		final Vector3 o = getAbsPoint(0);
 		final double length = heliostatTarget.getSolarReceiverCenter().distance(o);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 
@@ -613,6 +613,7 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		}
 	}
 
+	@Override
 	public void move(final Vector3 v, final double steplength) {
 		if (lockEdit) {
 			return;

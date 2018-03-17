@@ -343,17 +343,17 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		final double dotE = 0.9999;
 		switch (trackerType) {
 		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 			final Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
 			final double axisSunDot = sunDirection.dot(rotationAxis);
 			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the rotation axis
 			normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
 			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
-			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
+			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiplyLocal(1, 1, 0).normalizeLocal();
 			final Vector3 b = Vector3.UNIT_Z.cross(a, null);
 			Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
 			normal = m.applyPost(a, null);
@@ -362,7 +362,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			}
 			break;
 		case TILTED_SINGLE_AXIS_TRACKER: // TODO: The following does not work
-			final double sunAngleX = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null).dot(Vector3.UNIT_X);
+			final double sunAngleX = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal().dot(Vector3.UNIT_X);
 			System.out.println("*** sun cosx = " + sunAngleX + ", " + Math.toDegrees(Math.asin(sunAngleX)));
 			// rotate the normal according to the tilt angle, at this point, the axis is still north-south
 			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), az); // exactly 90 degrees will cause the solar panel to disappear
@@ -1300,7 +1300,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			return;
 		}
 		final Vector3 o = getAbsPoint(0);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 		Vector3 r = o.clone(); // draw sun vector

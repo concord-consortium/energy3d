@@ -413,17 +413,17 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 
 		switch (trackerType) {
 		case ALTAZIMUTH_DUAL_AXIS_TRACKER:
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 			final Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
 			final double axisSunDot = sunDirection.dot(rotationAxis);
 			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the rotation axis
 			normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
 			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
-			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
+			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiplyLocal(1, 1, 0).normalizeLocal();
 			final Vector3 b = Vector3.UNIT_Z.cross(a, null);
 			final Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
 			normal = m.applyPost(a, null);
@@ -585,7 +585,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			return;
 		}
 		final Vector3 o = (!onFlatSurface() || container instanceof Rack) ? getAbsPoint(0) : getAbsPoint(0).addLocal(0, 0, baseHeight);
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		final FloatBuffer beamsVertices = sunBeam.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
 		Vector3 r = o.clone(); // draw sun vector

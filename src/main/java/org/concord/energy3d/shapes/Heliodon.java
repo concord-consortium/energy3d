@@ -757,7 +757,7 @@ public class Heliodon {
 		}
 	}
 
-	public ReadOnlyVector3 computeSunLocation(final Calendar calendar) {
+	public Vector3 computeSunLocation(final Calendar calendar) {
 		return computeSunLocation(computeHourAngle(calendar), computeDeclinationAngle(calendar), latitude);
 	}
 

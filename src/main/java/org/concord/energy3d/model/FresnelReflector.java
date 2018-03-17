@@ -346,7 +346,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		if (absorber != null) {
-			final Vector3 s = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			final Vector3 s = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 			final Vector3 r = absorber.getSolarReceiverCenter();
 			// how much the reflected light should shift in the direction of the absorber tube?
 			final double shift = s.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (center.getZ() - r.getZ()) * s.getY() / s.getZ();
@@ -409,7 +409,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		}
 		final Vector3 o = getAbsPoint(0);
 		final Vector3 c = absorber.getSolarReceiverCenter();
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		// how much the reflected light should shift in the direction of the absorber tube?
 		final double shift = sunLocation.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (o.getZ() - c.getZ()) * sunLocation.getY() / sunLocation.getZ();
 		c.setY(o.getY() + shift);

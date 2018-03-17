@@ -429,7 +429,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		}
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
-		final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		final Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
 		final double axisSunDot = sunDirection.dot(rotationAxis);
 		rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the axis of the trough
@@ -507,7 +507,7 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		} else {
 			beamsBuffer.rewind();
 		}
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		double dx, dy, dz;
 		final double ny = sunLocation.getY();
 		sunLocation.multiplyLocal(10000);

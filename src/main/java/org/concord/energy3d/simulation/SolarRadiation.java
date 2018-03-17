@@ -203,7 +203,7 @@ public class SolarRadiation {
 		final ReadOnlyVector3[] sunLocations = new ReadOnlyVector3[SolarRadiation.MINUTES_OF_DAY / timeStep];
 		int totalSteps = 0;
 		for (int minute = 0; minute < SolarRadiation.MINUTES_OF_DAY; minute += timeStep) {
-			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalize(null);
+			final ReadOnlyVector3 sunLocation = Heliodon.getInstance().computeSunLocation(today).normalizeLocal();
 			sunLocations[minute / timeStep] = sunLocation;
 			if (sunLocation.getZ() > 0) {
 				totalSteps++;

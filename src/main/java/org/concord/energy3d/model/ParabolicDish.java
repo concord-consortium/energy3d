@@ -261,7 +261,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 
-		normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
@@ -402,7 +402,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		} else {
 			beamsBuffer.rewind();
 		}
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
 		double dx;
 		double dz;
 		sunLocation.multiplyLocal(10000);
@@ -698,6 +698,7 @@ public class ParabolicDish extends HousePart implements SolarReflector, Labelabl
 		return relativeAzimuth;
 	}
 
+	@Override
 	public void move(final Vector3 v, final double steplength) {
 		if (lockEdit) {
 			return;
