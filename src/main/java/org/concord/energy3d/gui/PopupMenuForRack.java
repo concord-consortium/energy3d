@@ -3268,7 +3268,7 @@ class PopupMenuForRack extends PopupMenuFactory {
 					if (rack.getTracker() != Trackable.NO_TRACKER) {
 						miTiltAngle.setEnabled(rack.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || rack.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
 						miAzimuth.setEnabled(rack.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER && rack.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER); // any tracker that will alter the azimuth angle should disable the menu item
-						miRotate.setEnabled(false);
+						miRotate.setEnabled(miAzimuth.isEnabled());
 					} else {
 						miTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);

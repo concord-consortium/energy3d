@@ -347,7 +347,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
-			final Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
+			final Vector3 rotationAxis = new Vector3(Math.cos(az), Math.sin(az), 0); // by default, the rotation axis is in the east-west direction
 			final double axisSunDot = sunDirection.dot(rotationAxis);
 			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the rotation axis
 			normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
@@ -482,13 +482,13 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		polesRoot.detachAllChildren();
 		if (!poleInvisible) {
 			final Vector3 center = getAbsPoint(0);
-			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -az);
 			final double halfRackWidth = rackWidth * 0.5;
 			switch (trackerType) {
 			case Trackable.NO_TRACKER:
-				final HousePart container = getContainerRelative();
+				HousePart container = getContainerRelative();
 				final Vector3 uDir = container.getPoints().get(2).subtract(container.getPoints().get(0), null).normalizeLocal();
 				final Vector3 vDir = container.getPoints().get(1).subtract(container.getPoints().get(0), null).normalizeLocal();
+				final Matrix3 matrix = new Matrix3().fromAngles(0, 0, az);
 				matrix.applyPost(uDir, uDir);
 				matrix.applyPost(vDir, vDir);
 				if (vDir.dot(normal) < 0) {
@@ -540,14 +540,21 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				break;
 			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
 				polesRoot.detachAllChildren();
+				container = getContainerRelative();
 				final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
-				final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
-				final Vector3 pd = p2.subtract(p0, null).normalizeLocal();
-				final int nModules = Math.max(1, (int) (rackWidth / poleDistanceX));
-				if (nModules > 1) {
+				// final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
+				final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (1, 0)
+				final Vector3 pd = p0.subtract(p2, null).normalizeLocal();
+				final int nPoles = Math.max(1, (int) (rackWidth / poleDistanceX));
+				if (nPoles > 1) {
 					final double halfLength = rackWidth * 0.5;
-					final Vector3 qd = new Matrix3().applyRotationZ(-az).applyPost(pd, null);
-					for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+					final Vector3 qd = new Matrix3().applyRotationZ(az).applyPost(pd, null);
+					for (double u = halfLength; u < rackWidth; u += poleDistanceX) {
+						final double step = (u - halfLength) / annotationScale;
+						final Vector3 q = qd.multiply(step, null);
+						addPole(q.addLocal(center), baseHeight, baseZ);
+					}
+					for (double u = halfLength - poleDistanceX; u > 0; u -= poleDistanceX) {
 						final double step = (u - halfLength) / annotationScale;
 						final Vector3 q = qd.multiply(step, null);
 						addPole(q.addLocal(center), baseHeight, baseZ);
@@ -649,16 +656,16 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		polesRoot.attachChild(pole);
 	}
 
-	// ensure that a rack in special cases (on a flat roof or at a tilt angle) will have correct orientation
+	// ensure that a rack in special cases (on a flat roof or at a tilt angle) will have correct orientation. here angle = 90 - tilt (the angle to the z axis)
 	private void setNormal(final double angle, final double azimuth) {
 		final Foundation foundation = getTopContainer();
 		Vector3 v = foundation.getAbsPoint(0);
-		final Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
-		final Vector3 vy = foundation.getAbsPoint(1).subtractLocal(v); // y direction
+		final Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // (1, 0) x direction
+		final Vector3 vy = foundation.getAbsPoint(1).subtractLocal(v); // (2, 0) y direction
 		if (Util.isZero(azimuth)) {
 			v = new Matrix3().fromAngleAxis(angle, vx).applyPost(vy, null);
 		} else {
-			final Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
+			final Matrix3 m = new Matrix3().applyRotationZ(azimuth);
 			final Vector3 v1 = m.applyPost(vx, null);
 			final Vector3 v2 = m.applyPost(vy, null);
 			v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
