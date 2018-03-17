@@ -67,13 +67,13 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	private double rackWidth = 4.95; // 5x1 0.99x1.65 solar panels by default (use only one row so that it can fit a small roof)
 	private double rackHeight = 1.65;
 	private double relativeAzimuth = 0;
+	private transient double oldRelativeAzimuth;
 	private double tiltAngle = 0;
 	private double baseHeight = 15;
 	private double poleDistanceX = 4;
 	private double poleDistanceY = 2;
 	private boolean poleInvisible;
 	private int trackerType = NO_TRACKER;
-	private int rotationAxis;
 	private boolean monolithic = true; // true if the whole rack is covered by solar panels
 	private boolean drawSunBeam;
 	private SolarPanel sampleSolarPanel;
@@ -328,6 +328,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			return;
 		}
 
+		final double az = Math.toRadians(relativeAzimuth);
 		boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		final Mesh host = meshLocator == null ? null : meshLocator.find(); // if this rack rests on an imported mesh or not?
@@ -345,15 +346,11 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			int xRotationAxis = 1;
-			int yRotationAxis = 0;
-			switch (rotationAxis) {
-			case EAST_WEST_AXIS:
-				xRotationAxis = 0;
-				yRotationAxis = 1;
-				break;
-			}
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalizeLocal();
+			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			final Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
+			final double axisSunDot = sunDirection.dot(rotationAxis);
+			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the rotation axis
+			normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
 			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
 			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
@@ -368,7 +365,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			final double sunAngleX = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null).dot(Vector3.UNIT_X);
 			System.out.println("*** sun cosx = " + sunAngleX + ", " + Math.toDegrees(Math.asin(sunAngleX)));
 			// rotate the normal according to the tilt angle, at this point, the axis is still north-south
-			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), az); // exactly 90 degrees will cause the solar panel to disappear
 			System.out.println("*** tilt normal = " + normal);
 			// the following vector should be the rack axis
 			final Vector3 rackAxis = Vector3.UNIT_X.cross(normal, null);
@@ -382,7 +379,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			break;
 		default:
 			if (onFlatSurface) {
-				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the solar panel to disappear
+				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), az); // exactly 90 degrees will cause the solar panel to disappear
 			}
 		}
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
@@ -485,7 +482,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		polesRoot.detachAllChildren();
 		if (!poleInvisible) {
 			final Vector3 center = getAbsPoint(0);
-			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -Math.toRadians(relativeAzimuth));
+			final Matrix3 matrix = new Matrix3().fromAngles(0, 0, -az);
 			final double halfRackWidth = rackWidth * 0.5;
 			switch (trackerType) {
 			case Trackable.NO_TRACKER:
@@ -542,33 +539,23 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				}
 				break;
 			case Trackable.HORIZONTAL_SINGLE_AXIS_TRACKER:
+				polesRoot.detachAllChildren();
 				final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
-				final Vector3 p1 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
 				final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
-				switch (rotationAxis) {
-				case EAST_WEST_AXIS:
-					Vector3 pd = p1.subtract(p0, null).normalizeLocal();
-					for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
-						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-						addPole(position, baseHeight, baseZ);
+				final Vector3 pd = p2.subtract(p0, null).normalizeLocal();
+				final int nModules = Math.max(1, (int) (rackWidth / poleDistanceX));
+				if (nModules > 1) {
+					final double halfLength = rackWidth * 0.5;
+					final Vector3 qd = new Matrix3().applyRotationZ(-az).applyPost(pd, null);
+					for (double u = poleDistanceX; u < rackWidth; u += poleDistanceX) {
+						final double step = (u - halfLength) / annotationScale;
+						final Vector3 q = qd.multiply(step, null);
+						addPole(q.addLocal(center), baseHeight, baseZ);
 					}
-					for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
-						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-						addPole(position, baseHeight, baseZ);
-					}
-					break;
-				case NORTH_SOUTH_AXIS:
-					pd = p2.subtract(p0, null).normalizeLocal();
-					for (double u = halfRackWidth; u < rackWidth; u += poleDistanceX) {
-						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-						addPole(position, baseHeight, baseZ);
-					}
-					for (double u = halfRackWidth - poleDistanceX; u > 0; u -= poleDistanceX) {
-						final Vector3 position = pd.multiply((u - halfRackWidth) / annotationScale, null).addLocal(center);
-						addPole(position, baseHeight, baseZ);
-					}
-					break;
+				} else {
+					addPole(center, baseHeight, baseZ);
 				}
+				polesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 				break;
 			case Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER:
 			case Trackable.VERTICAL_SINGLE_AXIS_TRACKER:
@@ -924,8 +911,6 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		return baseHeight;
 	}
 
-	private transient double oldRelativeAzimuth;
-
 	public void setRelativeAzimuth(double relativeAzimuth) {
 		if (relativeAzimuth < 0) {
 			relativeAzimuth += 360;
@@ -1153,16 +1138,6 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	@Override
 	public int getTracker() {
 		return trackerType;
-	}
-
-	@Override
-	public void setRotationAxis(final int rotationAxis) {
-		this.rotationAxis = rotationAxis;
-	}
-
-	@Override
-	public int getRotationAxis() {
-		return rotationAxis;
 	}
 
 	@Override

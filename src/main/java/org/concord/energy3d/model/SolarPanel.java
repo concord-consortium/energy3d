@@ -90,7 +90,6 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	private int trackerType = NO_TRACKER;
 	private double baseHeight = 5;
 	private boolean drawSunBeam;
-	private int rotationAxis;
 	private int shadeTolerance = PARTIAL_SHADE_TOLERANCE;
 	private boolean labelModelName;
 	private boolean labelCellEfficiency;
@@ -355,6 +354,7 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			return;
 		}
 
+		final double az = Math.toRadians(relativeAzimuth);
 		final boolean heatMap = SceneManager.getInstance().getSolarHeatMap();
 		boolean onFlatSurface = onFlatSurface();
 		final Mesh host = meshLocator == null ? null : meshLocator.find(); // if this solar panel rests on an imported mesh or not?
@@ -416,15 +416,11 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
-			int xRotationAxis = 1;
-			int yRotationAxis = 0;
-			switch (rotationAxis) {
-			case EAST_WEST_AXIS:
-				xRotationAxis = 0;
-				yRotationAxis = 1;
-				break;
-			}
-			normal = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(xRotationAxis, yRotationAxis, 1, null).normalize(null);
+			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
+			final Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
+			final double axisSunDot = sunDirection.dot(rotationAxis);
+			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the rotation axis
+			normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
 			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
 			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiply(1, 1, 0, null).normalizeLocal();
@@ -1079,16 +1075,6 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 	@Override
 	public int getTracker() {
 		return trackerType;
-	}
-
-	@Override
-	public void setRotationAxis(final int rotationAxis) {
-		this.rotationAxis = rotationAxis;
-	}
-
-	@Override
-	public int getRotationAxis() {
-		return rotationAxis;
 	}
 
 	public void setNumberOfCellsInX(final int numberOfCellsInX) {

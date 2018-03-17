@@ -2231,8 +2231,8 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 						miVerticalSingleAxisTracker.setEnabled(false);
 					}
 					if (sp.getTracker() != Trackable.NO_TRACKER) {
-						miTiltAngle.setEnabled(sp.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER);
-						miAzimuth.setEnabled(false);
+						miTiltAngle.setEnabled(sp.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || sp.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
+						miAzimuth.setEnabled(sp.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER && sp.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER); // any tracker that will alter the azimuth angle should disable the menu item
 					} else {
 						miTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);

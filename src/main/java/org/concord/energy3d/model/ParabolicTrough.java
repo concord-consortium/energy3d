@@ -430,14 +430,14 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
 		final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalize(null);
-		final Vector3 troughAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
-		final double troughSunDot = sunDirection.dot(troughAxis);
-		troughAxis.multiplyLocal(Util.isZero(troughSunDot) ? 0.001 : troughSunDot); // avoid singularity when the direction of the sun is perpendicular to the axis of the trough
-		normal = sunDirection.subtractLocal(troughAxis).normalizeLocal();
+		final Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
+		final double axisSunDot = sunDirection.dot(rotationAxis);
+		rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the axis of the trough
+		normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 		}
-		final Matrix3 rotation = new Matrix3().lookAt(normal, troughAxis);
+		final Matrix3 rotation = new Matrix3().lookAt(normal, rotationAxis);
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);
 		reflectorBack.setRotation(rotation);
@@ -445,8 +445,8 @@ public class ParabolicTrough extends HousePart implements SolarReflector, Labela
 		outlines.setRotation(rotation);
 		outlines.setTranslation(mesh.getTranslation());
 
-		final Vector3 axis = troughAxis.cross(Vector3.UNIT_Z, null);
-		absorber.setRotation(new Matrix3().fromAngleAxis(Math.acos(troughAxis.dot(Vector3.UNIT_Z)), axis));
+		final Vector3 axis = rotationAxis.cross(Vector3.UNIT_Z, null);
+		absorber.setRotation(new Matrix3().fromAngleAxis(Math.acos(rotationAxis.dot(Vector3.UNIT_Z)), axis));
 		absorber.setTranslation(mesh.getTranslation().add(normal.multiply(0.5 * reflector.getSemilatusRectum(), null), null));
 		final Vector3 endShift = normal.multiply(0.5 * absorberEnd1.getHeight(), null);
 		absorberEnd1.setTranslation(mesh.getTranslation().add(rotation.applyPost(p1, null).add(endShift, null), null));

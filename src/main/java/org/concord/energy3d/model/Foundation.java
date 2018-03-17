@@ -2550,7 +2550,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			path.closePath();
 		}
 		switch (rowAxis) {
-		case Trackable.NORTH_SOUTH_AXIS:
+		case 0:
 			int rows = (int) Math.floor(b / w);
 			int cols = (int) Math.floor(a / h);
 			double marginx = (a - cols * h) * 0.5;
@@ -2568,7 +2568,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					sp.points.get(0).setX(v.getX());
 					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
-					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
 					sp.setRelativeAzimuth(90);
@@ -2576,7 +2575,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 			break;
-		case Trackable.EAST_WEST_AXIS:
+		case 1:
 			rows = (int) Math.floor(a / w);
 			cols = (int) Math.floor(b / h);
 			marginx = (a - rows * w) * 0.5;
@@ -2594,7 +2593,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 					sp.points.get(0).setX(v.getX());
 					sp.points.get(0).setY(v.getY());
 					sp.points.get(0).setZ(height);
-					sp.setRotationAxis(rowAxis);
 					Scene.getInstance().add(sp, false);
 					sp.complete();
 					sp.draw();
@@ -2646,7 +2644,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		final List<Point2D.Double> intersections = new ArrayList<Point2D.Double>();
 		double[] bounds = null;
 		switch (rowAxis) {
-		case Trackable.EAST_WEST_AXIS:
+		case 1:
 			center.setX((x0 + x1) * 0.5);
 			rackWidth = a * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(b / h);
@@ -2679,7 +2677,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				}
 			}
 			break;
-		case Trackable.NORTH_SOUTH_AXIS:
+		case 0:
 			center.setY((y0 + y1) * 0.5);
 			rackWidth = b * Scene.getInstance().getAnnotationScale() - panelHeight;
 			rows = (int) Math.floor(a / h);
@@ -2737,7 +2735,6 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		// rack.roundUpRackHeight();
 		rack.setTiltAngle(tiltAngle);
 		rack.setBaseHeight(baseHeight / Scene.getInstance().getAnnotationScale());
-		rack.setRotationAxis(rowAxis);
 		rack.setPoleDistanceX(poleDistanceX);
 		rack.setPoleDistanceY(poleDistanceY);
 		Scene.getInstance().add(rack, false);
