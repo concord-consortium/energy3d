@@ -347,7 +347,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
-			final Vector3 rotationAxis = new Vector3(Math.cos(az), Math.sin(az), 0); // by default, the rotation axis is in the east-west direction
+			final Vector3 rotationAxis = new Vector3(Math.cos(az), Math.sin(az), 0); // by default, the rotation axis is in the east-west direction, so az = 0 maps to (1, 0, 0)
 			final double axisSunDot = sunDirection.dot(rotationAxis);
 			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the rotation axis
 			normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
@@ -542,22 +542,17 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				polesRoot.detachAllChildren();
 				container = getContainerRelative();
 				final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
-				// final Vector3 p2 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
-				final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (1, 0)
-				final Vector3 pd = p0.subtract(p2, null).normalizeLocal();
+				final Vector3 p1 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (1, 0)
+				final Vector3 pd = p0.subtract(p1, null).normalizeLocal();
 				final int nPoles = Math.max(1, (int) (rackWidth / poleDistanceX));
 				if (nPoles > 1) {
 					final double halfLength = rackWidth * 0.5;
 					final Vector3 qd = new Matrix3().applyRotationZ(az).applyPost(pd, null);
 					for (double u = halfLength; u < rackWidth; u += poleDistanceX) {
-						final double step = (u - halfLength) / annotationScale;
-						final Vector3 q = qd.multiply(step, null);
-						addPole(q.addLocal(center), baseHeight, baseZ);
+						addPole(qd.multiply((u - halfLength) / annotationScale, null).addLocal(center), baseHeight, baseZ);
 					}
 					for (double u = halfLength - poleDistanceX; u > 0; u -= poleDistanceX) {
-						final double step = (u - halfLength) / annotationScale;
-						final Vector3 q = qd.multiply(step, null);
-						addPole(q.addLocal(center), baseHeight, baseZ);
+						addPole(qd.multiply((u - halfLength) / annotationScale, null).addLocal(center), baseHeight, baseZ);
 					}
 				} else {
 					addPole(center, baseHeight, baseZ);

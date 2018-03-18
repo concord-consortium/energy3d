@@ -272,7 +272,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 
 		final Vector3 center = getAbsPoint(0);
 		final double annotationScale = Scene.getInstance().getAnnotationScale();
-		reflector.setData(new Vector3(0, 0, 0), 0.5 * moduleWidth / annotationScale, 0.5 * length / annotationScale, 0.15);
+		reflector.setData(new Vector3(), 0.5 * moduleWidth / annotationScale, 0.5 * length / annotationScale, 0.15);
 		reflector.updateModelBound();
 
 		final FloatBuffer boxVertexBuffer = reflector.getMeshData().getVertexBuffer();
@@ -324,20 +324,20 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		if (nModules > 1) {
 			final Vector3 p0 = new Vector3(vertexBuffer.get(3), vertexBuffer.get(4), vertexBuffer.get(5)); // (0, 0)
 			final Vector3 p1 = new Vector3(vertexBuffer.get(6), vertexBuffer.get(7), vertexBuffer.get(8)); // (1, 0)
-			final Vector3 pd = p1.subtract(p0, null).normalizeLocal();
-			for (double u = moduleLength; u < length; u += moduleLength) {
-				final Vector3 p = pd.multiply((u - 0.5 * length) / annotationScale, null);
-				addPole(p.addLocal(center), baseHeight, baseZ);
-			}
 			final Vector3 p2 = new Vector3(vertexBuffer.get(0), vertexBuffer.get(1), vertexBuffer.get(2)); // (0, 1)
+			final Vector3 pd = p1.subtract(p0, null).normalizeLocal();
 			final Vector3 pm = p2.add(p0, null).multiplyLocal(0.5);
 			final Vector3 pn = p2.subtract(p0, null).multiplyLocal(0.5);
-			for (double u = moduleLength; u < length; u += moduleLength) {
+			for (double u = moduleLength; u < length; u += moduleLength) { // outline buffer will be rotated later
 				final Vector3 p = pd.multiply(u / annotationScale, null).addLocal(pm);
-				Vector3 q = p.add(pn, null);
+				final Vector3 q = p.add(pn, null);
 				outlineBuffer.put(q.getXf()).put(q.getYf()).put(q.getZf());
-				q = p.subtract(pn, null);
-				outlineBuffer.put(q.getXf()).put(q.getYf()).put(q.getZf());
+				p.subtractLocal(pn);
+				outlineBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
+			}
+			final Vector3 qd = new Matrix3().applyRotationZ(-az - Math.toRadians(getTopContainer().getAzimuth())).applyPost(pd, null);
+			for (double u = moduleLength; u < length; u += moduleLength) {
+				addPole(qd.multiply((u - 0.5 * length) / annotationScale, null).addLocal(center), baseHeight, baseZ);
 			}
 		} else {
 			addPole(center, baseHeight, baseZ);
@@ -345,23 +345,37 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		outlines.updateModelBound();
 		modulesRoot.getSceneHints().setCullHint(CullHint.Inherit);
 
+		Matrix3 rotation;
 		if (absorber != null) {
-			final Vector3 s = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
-			final Vector3 r = absorber.getSolarReceiverCenter();
-			// how much the reflected light should shift in the direction of the absorber tube?
-			final double shift = s.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (center.getZ() - r.getZ()) * s.getY() / s.getZ();
-			r.setY(center.getY() + shift);
-			final Vector3 p = r.subtractLocal(center).normalizeLocal();
-			normal = p.add(s, null).multiplyLocal(0.5).normalizeLocal();
-		} else {
-			setNormal(Math.PI / 2 * 0.9999, az); // exactly 90 degrees will cause the mirror to disappear
-		}
-		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
-			normal = new Vector3(-0.001, 0, 1).normalizeLocal();
-		}
+			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
+			final Vector3 receiverCenter = absorber.getSolarReceiverCenter();
+			Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0); // by default, the rotation axis is in the north-south direction, so az = 0 maps to (0, 1, 0)
+			final double axisSunDot = sunDirection.dot(rotationAxis);
+			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the axis of the trough
+			sunDirection.subtractLocal(rotationAxis).normalizeLocal();
 
-		final ReadOnlyVector3 n = new Vector3(normal.getX(), 0, normal.getZ()).normalizeLocal();
-		final Matrix3 rotation = new Matrix3().lookAt(n, Vector3.UNIT_Y);
+			// how much the reflected light should shift in the direction of the absorber tube?
+			final double shift = sunDirection.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (center.getZ() - receiverCenter.getZ()) * sunDirection.getY() / sunDirection.getZ();
+			receiverCenter.setY(center.getY() + shift * rotationAxis.getY());
+			receiverCenter.setX(receiverCenter.getX() + shift * rotationAxis.getX());
+			final Vector3 centerToCenter = receiverCenter.subtractLocal(center).normalizeLocal();
+			rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
+			final double axisCenter2Dot = centerToCenter.dot(rotationAxis);
+			rotationAxis.multiplyLocal(Util.isZero(axisCenter2Dot) ? 0.001 : axisCenter2Dot);
+			centerToCenter.subtractLocal(rotationAxis).normalizeLocal();
+
+			normal = centerToCenter.add(sunDirection, null).multiplyLocal(0.5).normalizeLocal();
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
+			}
+			rotation = new Matrix3().lookAt(normal, rotationAxis);
+		} else {
+			setNormal(Math.PI / 2 * 0.9999, az); // exactly 90 degrees will cause the reflector to disappear
+			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
+				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
+			}
+			rotation = new Matrix3().lookAt(normal, normal.getX() > 0 ? Vector3.UNIT_Z : Vector3.NEG_UNIT_Z);
+		}
 
 		mesh.setRotation(rotation);
 		mesh.setTranslation(center);

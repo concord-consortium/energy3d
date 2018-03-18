@@ -897,7 +897,6 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			});
 
 			final JMenuItem miAzimuth = new JMenuItem("Azimuth...");
-			miAzimuth.setEnabled(false);
 			miAzimuth.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope

@@ -1355,6 +1355,7 @@ public class EnergyPanel extends JPanel {
 						if (a >= 360) {
 							a -= 360;
 						}
+						final double az = a;
 						// http://www.powerfromthesun.net/Book/chapter08/chapter08.html
 						final double focalLength = t.getSemilatusRectum() * 0.5;
 						final double d = t.getApertureWidth();
@@ -1368,8 +1369,8 @@ public class EnergyPanel extends JPanel {
 							public void run() {
 								partPanelBorder.setTitle("Parabolic Trough (" + t.getId() + ")");
 								partProperty1Label.setText("  Length & Center:");
-								partProperty1TextField.setText(TWO_DECIMALS.format(t.getTroughLength() * meterToFoot) + lengthUnit + ", module:" + TWO_DECIMALS.format(t.getModuleLength() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
-								partProperty1TextField.putClientProperty("tooltip", "Assembly length, module length, and center coordinates of the parabolic trough");
+								partProperty1TextField.setText(TWO_DECIMALS.format(t.getTroughLength() * meterToFoot) + lengthUnit + ", module:" + TWO_DECIMALS.format(t.getModuleLength() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", azimuth:" + ONE_DECIMAL.format(az) + "\u00B0");
+								partProperty1TextField.putClientProperty("tooltip", "Assembly length, module length, center coordinates, and azimith of the parabolic trough");
 								partProperty2Label.setText("  Parabola Shape:");
 								partProperty2TextField.setText("f=" + ONE_DECIMAL.format(focalLength * meterToFoot) + lengthUnit + ", d=" + ONE_DECIMAL.format(t.getApertureWidth() * meterToFoot) + lengthUnit + ", h=" + ONE_DECIMAL.format(h * meterToFoot) + lengthUnit + ", \u03C6=" + ONE_DECIMAL.format(rimAngle >= 0 ? rimAngle : 180 + rimAngle) + "\u00B0");
 								partProperty2TextField.putClientProperty("tooltip", "Parameters of the parabolic shape");
@@ -1431,16 +1432,17 @@ public class EnergyPanel extends JPanel {
 						if (a >= 360) {
 							a -= 360;
 						}
+						final double az = a;
 						EventQueue.invokeLater(new Runnable() {
 							@Override
 							public void run() {
 								partPanelBorder.setTitle("Fresnel Reflector (" + r.getId() + ")");
-								partProperty1Label.setText("  Length & Center:");
-								partProperty1TextField.setText(TWO_DECIMALS.format(r.getLength() * meterToFoot) + lengthUnit + ", module:" + TWO_DECIMALS.format(r.getModuleLength() * meterToFoot) + lengthUnit + ", (" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit);
-								partProperty1TextField.putClientProperty("tooltip", "Assembly length, module length, and center coordinates of the Fresnel reflector");
-								partProperty2Label.setText("  Width:");
-								partProperty2TextField.setText(ONE_DECIMAL.format(r.getModuleWidth() * meterToFoot) + lengthUnit);
-								partProperty2TextField.putClientProperty("tooltip", "Parameters of the Fresnel reflector");
+								partProperty1Label.setText("  Center & Azimuth:");
+								partProperty1TextField.setText("(" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ", " + ONE_DECIMAL.format(v.getZ() * scale) + ")" + lengthUnit + ", azimuth:" + ONE_DECIMAL.format(az) + "\u00B0");
+								partProperty1TextField.putClientProperty("tooltip", "Center coordinates and azimuth of the Fresnel reflector");
+								partProperty2Label.setText("  Length & Width:");
+								partProperty2TextField.setText(TWO_DECIMALS.format(r.getLength() * meterToFoot) + lengthUnit + ", module:" + TWO_DECIMALS.format(r.getModuleLength() * meterToFoot) + lengthUnit + ", " + ONE_DECIMAL.format(r.getModuleWidth() * meterToFoot) + lengthUnit);
+								partProperty2TextField.putClientProperty("tooltip", "Assembly length, module length, and width of the Fresnel reflector");
 								final Foundation receiver = r.getAbsorber();
 								final String str = "R=" + ONE_DECIMAL.format(r.getReflectance() * 100) + "%, a=" + ONE_DECIMAL.format(r.getModuleWidth() * r.getLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2" + (receiver == null ? "" : ", \u03B7=" + ONE_DECIMAL.format(receiver.getSolarReceiverEfficiency() * 100) + "%");
 								if (energyViewShown) {
