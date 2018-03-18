@@ -265,7 +265,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		}
 
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
-		final double az = Math.toRadians(relativeAzimuth);
+		final double absoluteAzimuth = Math.toRadians(relativeAzimuth + getTopContainer().getAzimuth());
 
 		baseZ = container instanceof Foundation ? container.getHeight() : container.getPoints().get(0).getZ();
 		points.get(0).setZ(baseZ + baseHeight);
@@ -335,7 +335,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 				p.subtractLocal(pn);
 				outlineBuffer.put(p.getXf()).put(p.getYf()).put(p.getZf());
 			}
-			final Vector3 qd = new Matrix3().applyRotationZ(-az - Math.toRadians(getTopContainer().getAzimuth())).applyPost(pd, null);
+			final Vector3 qd = new Matrix3().applyRotationZ(-absoluteAzimuth).applyPost(pd, null);
 			for (double u = moduleLength; u < length; u += moduleLength) {
 				addPole(qd.multiply((u - 0.5 * length) / annotationScale, null).addLocal(center), baseHeight, baseZ);
 			}
@@ -347,30 +347,27 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 
 		Matrix3 rotation;
 		if (absorber != null) {
+			final Vector3 absorberCenter = absorber.getSolarReceiverCenter();
 			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
-			final Vector3 receiverCenter = absorber.getSolarReceiverCenter();
-			Vector3 rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0); // by default, the rotation axis is in the north-south direction, so az = 0 maps to (0, 1, 0)
+			final Vector3 rotationAxis = new Vector3(Math.sin(absoluteAzimuth), Math.cos(absoluteAzimuth), 0); // by default, the rotation axis is in the north-south direction, so az = 0 maps to (0, 1, 0)
 			final double axisSunDot = sunDirection.dot(rotationAxis);
-			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the axis of the trough
-			sunDirection.subtractLocal(rotationAxis).normalizeLocal();
+			sunDirection.subtractLocal(rotationAxis.multiply(Util.isZero(axisSunDot) ? 0.001 : axisSunDot, null)).normalizeLocal(); // avoid singularity when the direction of the sun is perpendicular to the axis of the reflector
 
 			// how much the reflected light should shift in the direction of the absorber tube?
-			final double shift = sunDirection.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (center.getZ() - receiverCenter.getZ()) * sunDirection.getY() / sunDirection.getZ();
-			receiverCenter.setY(center.getY() + shift * rotationAxis.getY());
-			receiverCenter.setX(receiverCenter.getX() + shift * rotationAxis.getX());
-			final Vector3 centerToCenter = receiverCenter.subtractLocal(center).normalizeLocal();
-			rotationAxis = new Vector3(Math.sin(az), Math.cos(az), 0);
-			final double axisCenter2Dot = centerToCenter.dot(rotationAxis);
-			rotationAxis.multiplyLocal(Util.isZero(axisCenter2Dot) ? 0.001 : axisCenter2Dot);
-			centerToCenter.subtractLocal(rotationAxis).normalizeLocal();
+			final double shift = sunDirection.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (center.getZ() - absorberCenter.getZ()) * sunDirection.getY() / sunDirection.getZ();
+			absorberCenter.setY(center.getY() + shift * rotationAxis.getY());
+			absorberCenter.setX(absorberCenter.getX() + shift * rotationAxis.getX());
+			final Vector3 reflectorToAbsorberDirection = absorberCenter.subtractLocal(center).normalizeLocal();
+			final double axisRefDot = reflectorToAbsorberDirection.dot(rotationAxis);
+			reflectorToAbsorberDirection.subtractLocal(rotationAxis.multiply(Util.isZero(axisRefDot) ? 0.001 : axisRefDot, null)).normalizeLocal();
 
-			normal = centerToCenter.add(sunDirection, null).multiplyLocal(0.5).normalizeLocal();
+			normal = reflectorToAbsorberDirection.add(sunDirection, null).multiplyLocal(0.5).normalizeLocal();
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 			}
 			rotation = new Matrix3().lookAt(normal, rotationAxis);
 		} else {
-			setNormal(Math.PI / 2 * 0.9999, az); // exactly 90 degrees will cause the reflector to disappear
+			setNormal(Math.PI / 2 * 0.9999, Math.toRadians(relativeAzimuth)); // exactly 90 degrees will cause the reflector to disappear
 			if (Util.isEqual(normal, Vector3.UNIT_Z)) {
 				normal = new Vector3(-0.001, 0, 1).normalizeLocal();
 			}
@@ -405,10 +402,14 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		Vector3 v = foundation.getAbsPoint(0);
 		final Vector3 vx = foundation.getAbsPoint(2).subtractLocal(v); // x direction
 		final Vector3 vy = foundation.getAbsPoint(1).subtractLocal(v); // y direction
-		final Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
-		final Vector3 v1 = m.applyPost(vx, null);
-		final Vector3 v2 = m.applyPost(vy, null);
-		v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
+		if (Util.isZero(azimuth)) {
+			v = new Matrix3().fromAngleAxis(angle, vx).applyPost(vy, null);
+		} else {
+			final Matrix3 m = new Matrix3().applyRotationZ(-azimuth);
+			final Vector3 v1 = m.applyPost(vx, null);
+			final Vector3 v2 = m.applyPost(vy, null);
+			v = new Matrix3().fromAngleAxis(angle, v1).applyPost(v2, null);
+		}
 		if (v.getZ() < 0) {
 			v.negateLocal();
 		}
@@ -421,24 +422,31 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 			lightBeams.setVisible(false);
 			return;
 		}
+		final double absoluteAzimuth = Math.toRadians(relativeAzimuth + getTopContainer().getAzimuth());
 		final Vector3 o = getAbsPoint(0);
 		final Vector3 c = absorber.getSolarReceiverCenter();
-		final Vector3 sunLocation = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
+		final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
+		final Vector3 rotationAxis = new Vector3(Math.sin(absoluteAzimuth), Math.cos(absoluteAzimuth), 0); // by default, the rotation axis is in the north-south direction, so az = 0 maps to (0, 1, 0)
+		final double axisSunDot = sunDirection.dot(rotationAxis);
+		final Vector3 sun2 = sunDirection.subtract(rotationAxis.multiply(Util.isZero(axisSunDot) ? 0.001 : axisSunDot, null), null).normalizeLocal(); // avoid singularity when the direction of the sun is perpendicular to the axis of the reflector
+
 		// how much the reflected light should shift in the direction of the absorber tube?
-		final double shift = sunLocation.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (o.getZ() - c.getZ()) * sunLocation.getY() / sunLocation.getZ();
-		c.setY(o.getY() + shift);
+		final double shift = sunDirection.getZ() < MathUtils.ZERO_TOLERANCE ? 0 : (o.getZ() - c.getZ()) * sunDirection.getY() / sunDirection.getZ();
+		c.setY(o.getY() + shift * rotationAxis.getY());
+		c.setX(c.getX() + shift * rotationAxis.getX());
 		final double length = c.distance(o);
+
 		final FloatBuffer beamsVertices = lightBeams.getMeshData().getVertexBuffer();
 		beamsVertices.rewind();
-
 		final Vector3 r = o.clone();
-		r.addLocal(sunLocation.multiply(5000, null));
+		r.addLocal(sunDirection.multiply(5000, null));
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(r.getXf()).put(r.getYf()).put(r.getZf());
 
-		final Vector3 s = sunLocation.multiplyLocal(length);
+		final Vector3 s = sun2.multiplyLocal(length);
 		final Vector3 p = new Matrix3().fromAngleNormalAxis(Math.PI, normal).applyPost(s, null);
-		p.addLocal(o).addLocal(0, shift * 0, 0);
+		p.addLocal(o);
+		p.addLocal(shift * rotationAxis.getX(), shift * rotationAxis.getY(), 0);
 		beamsVertices.put(o.getXf()).put(o.getYf()).put(o.getZf());
 		beamsVertices.put(p.getXf()).put(p.getYf()).put(p.getZf());
 		lightBeams.updateModelBound();
@@ -609,7 +617,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 			dx = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
 			s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
 		}
-		s *= -Math.signum(Math.cos(Math.toRadians(foundation.getAzimuth())));
+		s *= Math.signum(Math.cos(Math.toRadians(foundation.getAzimuth())));
 		final double tx = dx / p0.distance(p2);
 		final double newX = points.get(0).getX() + s * tx;
 		if (newX > 1 - tx || newX < tx) {

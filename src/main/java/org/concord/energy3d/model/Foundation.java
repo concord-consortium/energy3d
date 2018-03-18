@@ -1026,10 +1026,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 			double rx = 0;
 			double ry = 0;
-			double xmin = Double.MAX_VALUE;
-			double xmax = -Double.MAX_VALUE;
-			double ymin = Double.MAX_VALUE;
-			double ymax = -Double.MAX_VALUE;
+			final Vector3 center = getAbsCenter();
+			double xmin = center.getX();
+			double xmax = center.getX();
+			double ymin = center.getY();
+			double ymax = center.getY();
 			double lmax = -1;
 			int count = 0;
 			for (final HousePart p : children) {
@@ -1075,7 +1076,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				solarReceiver.setRadius(1);
 				solarReceiver.setHeight(lmax);
 				final double az = getAzimuth();
-				final Matrix3 rotateAroundZ = new Matrix3().applyRotationZ(-Math.toRadians(az));
+				final Matrix3 rotateAroundZ = new Matrix3().applyRotationZ(Math.toRadians(-az));
 				final Matrix3 rotateAroundX = new Matrix3().applyRotationX(Math.PI * 0.5);
 				solarReceiver.setRotation(rotateAroundZ.multiplyLocal(rotateAroundX));
 				final Vector3 o = new Vector3((xmin + xmax) * 0.5, (ymin + ymax) * 0.5, getSolarReceiverHeight(solarReceiver.getRadius() * 1.2));
