@@ -62,6 +62,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 	private transient double yieldToday;
 	private Foundation absorber;
 	private double reflectance = 0.9; // a number in (0, 1), iron glass has a reflectance of 0.9 (but dirt and dust reduce it to 0.82, this is accounted for by Atmosphere)
+	private double opticalEfficiency = 0.99; // the percentage of the effective reflection area on the reflecting surface (since it is modeled as a whole plate, this factor deducts the areas of gaps, frames, etc.)
 	private double moduleLength = 3;
 	private double moduleWidth = 2;
 	private double length = 2 * moduleLength;
@@ -100,6 +101,9 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		}
 		if (Util.isZero(reflectance)) {
 			reflectance = 0.9;
+		}
+		if (Util.isZero(opticalEfficiency)) {
+			opticalEfficiency = 0.99;
 		}
 		if (Util.isZero(nSectionLength)) {
 			nSectionLength = 16;
@@ -625,7 +629,7 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		if (absorber == null) {
 			return 0;
 		}
-		double e = reflectance * absorber.getSolarReceiverEfficiency();
+		double e = reflectance * opticalEfficiency * absorber.getSolarReceiverEfficiency();
 		final Atmosphere atm = Scene.getInstance().getAtmosphere();
 		if (atm != null) {
 			e *= 1 - atm.getDustLoss(Heliodon.getInstance().getCalendar().get(Calendar.MONTH));
@@ -633,15 +637,16 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		return e;
 	}
 
-	/** not applicable */
+	/** This is defined as the ratio of the area that makes up the effective aperture on a plate that models the facets of the reflector */
 	@Override
 	public void setOpticalEfficiency(final double opticalEfficiency) {
+		this.opticalEfficiency = opticalEfficiency;
 	}
 
-	/** not applicable */
+	/** This is defined as the ratio of the area that makes up the effective aperture on a plate that models the facets of the reflector */
 	@Override
 	public double getOpticalEfficiency() {
-		return 1;
+		return opticalEfficiency;
 	}
 
 	/** not applicable */

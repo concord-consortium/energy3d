@@ -28,7 +28,9 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Snap;
 import org.concord.energy3d.model.SolarPanel;
@@ -315,6 +317,23 @@ class PopupMenuForWall extends PopupMenuFactory {
 											w.setHeight(val, true);
 											Scene.getInstance().redrawAllWallsNow();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
+											final Foundation foundation = w.getTopContainer();
+											if (foundation.hasSolarReceiver()) {
+												foundation.drawSolarReceiver();
+												for (final HousePart x : Scene.getInstance().getParts()) {
+													if (x instanceof FresnelReflector) {
+														final FresnelReflector reflector = (FresnelReflector) x;
+														if (foundation == reflector.getAbsorber() && reflector.isSunBeamVisible()) {
+															reflector.drawSunBeam();
+														}
+													} else if (x instanceof Mirror) {
+														final Mirror heliostat = (Mirror) x;
+														if (foundation == heliostat.getHeliostatTarget() && heliostat.isSunBeamVisible()) {
+															heliostat.drawSunBeam();
+														}
+													}
+												}
+											}
 										}
 										selectedScopeIndex = 0;
 									} else if (rb2.isSelected()) {

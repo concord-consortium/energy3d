@@ -3561,6 +3561,22 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			}
 		}
 		Scene.getInstance().redrawAllWallsNow();
+		if (hasSolarReceiver()) {
+			drawSolarReceiver();
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof FresnelReflector) {
+					final FresnelReflector reflector = (FresnelReflector) x;
+					if (this == reflector.getAbsorber() && reflector.isSunBeamVisible()) {
+						reflector.drawSunBeam();
+					}
+				} else if (x instanceof Mirror) {
+					final Mirror heliostat = (Mirror) x;
+					if (this == heliostat.getHeliostatTarget() && heliostat.isSunBeamVisible()) {
+						heliostat.drawSunBeam();
+					}
+				}
+			}
+		}
 	}
 
 	public void showOutlineOfWalls(final boolean b) {

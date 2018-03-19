@@ -3324,6 +3324,23 @@ public class Scene implements Serializable {
 			}
 		});
 		redrawAllWallsNow();
+		final Foundation foundation = w.getTopContainer();
+		if (foundation.hasSolarReceiver()) {
+			foundation.drawSolarReceiver();
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof FresnelReflector) {
+					final FresnelReflector reflector = (FresnelReflector) x;
+					if (foundation == reflector.getAbsorber() && reflector.isSunBeamVisible()) {
+						reflector.drawSunBeam();
+					}
+				} else if (x instanceof Mirror) {
+					final Mirror heliostat = (Mirror) x;
+					if (foundation == heliostat.getHeliostatTarget() && heliostat.isSunBeamVisible()) {
+						heliostat.drawSunBeam();
+					}
+				}
+			}
+		}
 	}
 
 	public void showOutlineOfConnectedWalls(final Wall w, final boolean b) {
@@ -3340,7 +3357,8 @@ public class Scene implements Serializable {
 	public void setHeightForAllWalls(final double height) {
 		for (final HousePart p : parts) {
 			if (p instanceof Wall) {
-				((Wall) p).setHeight(height, true);
+				final Wall w = (Wall) p;
+				w.setHeight(height, true);
 			}
 		}
 		redrawAllWallsNow();

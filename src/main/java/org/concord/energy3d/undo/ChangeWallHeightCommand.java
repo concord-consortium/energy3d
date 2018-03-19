@@ -3,6 +3,10 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Foundation;
+import org.concord.energy3d.model.FresnelReflector;
+import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.scene.Scene;
 
@@ -32,6 +36,7 @@ public class ChangeWallHeightCommand extends MyAbstractUndoableEdit {
 		newValue = wall.getHeight();
 		wall.setHeight(oldValue, true);
 		Scene.getInstance().redrawAllWallsNow();
+		updateLinkedObjects();
 	}
 
 	@Override
@@ -39,6 +44,27 @@ public class ChangeWallHeightCommand extends MyAbstractUndoableEdit {
 		super.redo();
 		wall.setHeight(newValue, true);
 		Scene.getInstance().redrawAllWallsNow();
+		updateLinkedObjects();
+	}
+
+	private void updateLinkedObjects() {
+		final Foundation foundation = wall.getTopContainer();
+		if (foundation.hasSolarReceiver()) {
+			foundation.drawSolarReceiver();
+			for (final HousePart x : Scene.getInstance().getParts()) {
+				if (x instanceof FresnelReflector) {
+					final FresnelReflector reflector = (FresnelReflector) x;
+					if (foundation == reflector.getAbsorber() && reflector.isSunBeamVisible()) {
+						reflector.drawSunBeam();
+					}
+				} else if (x instanceof Mirror) {
+					final Mirror heliostat = (Mirror) x;
+					if (foundation == heliostat.getHeliostatTarget() && heliostat.isSunBeamVisible()) {
+						heliostat.drawSunBeam();
+					}
+				}
+			}
+		}
 	}
 
 	@Override
