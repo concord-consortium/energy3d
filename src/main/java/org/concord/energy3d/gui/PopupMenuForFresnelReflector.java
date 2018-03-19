@@ -45,6 +45,7 @@ import org.concord.energy3d.undo.ChangeFresnelReflectorAbsorberCommand;
 import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
+import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyForAllReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.LockEditPointsCommand;
@@ -1367,6 +1368,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 			final JMenuItem miConversionEfficiency = new JMenuItem("Absorber Conversion Efficiency...");
 			miConversionEfficiency.addActionListener(new ActionListener() {
 
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
@@ -1383,6 +1386,25 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 					final String title = "<html>Light-electricity conversion efficiency (%) of " + partInfo + "'s absorber</html>";
 					final String footnote = "<html><hr><font size=2><hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					gui.add(panel, BorderLayout.CENTER);
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Fresnel Reflector's Absorber", true);
+					final JRadioButton rb2 = new JRadioButton("All Fresnel Reflector Absorbers");
+					panel.add(rb1);
+					panel.add(rb2);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					}
 					final JTextField inputField = new JTextField(EnergyPanel.TWO_DECIMALS.format(absorber.getSolarReceiverEfficiency() * 100));
 					gui.add(inputField, BorderLayout.SOUTH);
 
@@ -1410,11 +1432,31 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								if (val < 5 || val > 50) {
 									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Light-electricity conversion efficiency must be between 5% and 50%.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
-									final boolean changed = Math.abs(val * 0.01 - absorber.getSolarReceiverEfficiency()) > 0.000001;
+									boolean changed = Math.abs(val * 0.01 - absorber.getSolarReceiverEfficiency()) > 0.000001;
+									if (rb1.isSelected()) {
+										if (changed) {
+											final ChangeSolarReceiverEfficiencyCommand c = new ChangeSolarReceiverEfficiencyCommand(absorber);
+											absorber.setSolarReceiverEfficiency(val * 0.01);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										if (!changed) {
+											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
+												if (Math.abs(val * 0.01 - x.getAbsorber().getSolarReceiverEfficiency()) > 0.000001) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeSolarReceiverEfficiencyForAllReflectorsCommand c = new ChangeSolarReceiverEfficiencyForAllReflectorsCommand(r.getClass());
+											Scene.getInstance().setSolarReceiverEfficiencyForAllSolarReflectors(val * 0.01, r.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 1;
+									}
 									if (changed) {
-										final ChangeSolarReceiverEfficiencyCommand c = new ChangeSolarReceiverEfficiencyCommand(absorber);
-										absorber.setSolarReceiverEfficiency(val * 0.01);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
 										updateAfterEdit();
 									}
 									if (choice == options[0]) {

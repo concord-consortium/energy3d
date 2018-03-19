@@ -1658,7 +1658,9 @@ public class MainFrame extends JFrame {
 			addModel(cspMenu, "Parabolic Dish Array", "tutorials/parabolic-dish-array.ng3");
 			cspMenu.addSeparator();
 			addModel(cspMenu, "Linear Fresnel Reflectors", "tutorials/linear-fresnel-reflectors.ng3");
-			addModel(cspMenu, "Compact Linear Fresnel Reflectors", "tutorials/compact-linear-fresnel-reflectors.ng3");
+			addModel(cspMenu, "Linear Fresnel Reflectors: The Effect of Absorber Height", "tutorials/linear-fresnel-reflectors-absorber-height.ng3");
+			addModel(cspMenu, "Linear Fresnel Reflectors: The Effect of Orientation", "tutorials/linear-fresnel-reflectors-orientation.ng3");
+			addModel(cspMenu, "Linear Fresnel Reflectors: Multiple Absorbers", "tutorials/compact-linear-fresnel-reflectors.ng3");
 			cspMenu.addSeparator();
 			addModel(cspMenu, "Concentrated Solar Power Tower", "tutorials/concentrated-solar-power-tower.ng3");
 			addModel(cspMenu, "Cosine Efficiency", "tutorials/csp-cosine-efficiency.ng3");

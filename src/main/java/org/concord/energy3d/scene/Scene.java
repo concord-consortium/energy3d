@@ -3278,6 +3278,14 @@ public class Scene implements Serializable {
 		}
 	}
 
+	public void setSolarReceiverEfficiencyForAllSolarReflectors(final double efficiency, final Class<?> c) {
+		for (final HousePart p : parts) {
+			if (p instanceof SolarReflector && c.isInstance(p)) {
+				p.getTopContainer().setSolarReceiverEfficiency(efficiency);
+			}
+		}
+	}
+
 	public void setOpticalEfficiencyForAllSolarReflectors(final double efficiency, final Class<?> c) {
 		for (final HousePart p : parts) {
 			if (p instanceof SolarReflector && c.isInstance(p)) {
