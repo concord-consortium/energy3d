@@ -188,14 +188,16 @@ public class FresnelReflectorAnnualAnalysis extends AnnualAnalysis {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		String s = null;
 		int cost = -1;
-		String title = "Annual Yield of All Fresnel Reflectors";
+		String title = "Annual Yield of All Fresnel Reflectors (" + Scene.getInstance().countParts(FresnelReflector.class) + " Fresnel Reflectors)";
 		if (selectedPart != null) {
 			if (selectedPart instanceof FresnelReflector) {
 				cost = (int) CspProjectCost.getPartCost(selectedPart);
 				s = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 				title = "Annual Yield";
-			} else if (selectedPart instanceof Foundation || selectedPart.getTopContainer() instanceof Foundation) {
-				title = "Annual Yield of Selected Foundation";
+			} else if (selectedPart instanceof Foundation) {
+				title = "Annual Yield of Selected Foundation (" + ((Foundation) selectedPart).countParts(FresnelReflector.class) + " Fresnel Reflectors)";
+			} else if (selectedPart.getTopContainer() instanceof Foundation) {
+				title = "Annual Yield of Selected Foundation (" + selectedPart.getTopContainer().countParts(FresnelReflector.class) + " Fresnel Reflectors)";
 			}
 		}
 		final JDialog dialog = createDialog(s == null ? title : title + ": " + s + " (Cost: $" + cost + ")");

@@ -718,8 +718,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								if (moduleLength < 1 || moduleLength > 50) {
-									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module length must be between 1 and 50 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								if (moduleLength < 1 || moduleLength > 100) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "Module length must be between 1 and 100 m.", "Range Error", JOptionPane.ERROR_MESSAGE);
 								} else {
 									boolean changed = moduleLength != r.getModuleLength();
 									if (rb1.isSelected()) {
