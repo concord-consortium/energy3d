@@ -290,12 +290,12 @@ public class SolarRadiation {
 		for (final HousePart part : Scene.getInstance().getParts()) {
 			if (part instanceof Mirror) {
 				final Mirror m = (Mirror) part;
-				if (m.getHeliostatTarget() != null) {
+				if (m.getReceiver() != null) {
 					m.draw();
 				}
 			} else if (part instanceof FresnelReflector) {
 				final FresnelReflector fr = (FresnelReflector) part;
-				if (fr.getAbsorber() != null) {
+				if (fr.getReceiver() != null) {
 					fr.draw();
 				}
 			} else if (part instanceof ParabolicTrough) {
@@ -680,7 +680,7 @@ public class SolarRadiation {
 
 		final int nx = Scene.getInstance().getMirrorNx();
 		final int ny = Scene.getInstance().getMirrorNy();
-		final Foundation target = mirror.getHeliostatTarget();
+		final Foundation target = mirror.getReceiver();
 		if (target != null) {
 			final Calendar calendar = Heliodon.getInstance().getCalendar();
 			calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));
@@ -803,7 +803,7 @@ public class SolarRadiation {
 
 		final int nx = reflector.getNSectionLength();
 		final int ny = reflector.getNSectionWidth();
-		final Foundation target = reflector.getAbsorber();
+		final Foundation target = reflector.getReceiver();
 		if (target != null) {
 			final Calendar calendar = Heliodon.getInstance().getCalendar();
 			calendar.set(Calendar.HOUR_OF_DAY, (int) ((double) minute / (double) SolarRadiation.MINUTES_OF_DAY * 24.0));

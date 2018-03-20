@@ -497,7 +497,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 						if (night) {
 							m.drawSunBeam(); // call this so that the light beams can be set invisible
 						} else {
-							if (m.getHeliostatTarget() != null) {
+							if (m.getReceiver() != null) {
 								m.draw();
 							}
 						}

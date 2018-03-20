@@ -211,8 +211,8 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 							comboBox.addItem(x.getId() + "");
 						}
 					}
-					if (m.getHeliostatTarget() != null) {
-						comboBox.setSelectedItem(m.getHeliostatTarget().getId() + "");
+					if (m.getReceiver() != null) {
+						comboBox.setSelectedItem(m.getReceiver().getId() + "");
 					}
 					gui.add(comboBox, BorderLayout.CENTER);
 
@@ -247,12 +247,12 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 									}
 								}
 							}
-							boolean changed = target != m.getHeliostatTarget();
+							boolean changed = target != m.getReceiver();
 							if (rb1.isSelected()) {
 								if (changed) {
-									final Foundation oldTarget = m.getHeliostatTarget();
+									final Foundation oldTarget = m.getReceiver();
 									final ChangeHeliostatTargetCommand c = new ChangeHeliostatTargetCommand(m);
-									m.setHeliostatTarget(target);
+									m.setReceiver(target);
 									m.draw();
 									if (oldTarget != null) {
 										oldTarget.drawSolarReceiver();
@@ -265,7 +265,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 								final Foundation foundation = m.getTopContainer();
 								if (!changed) {
 									for (final Mirror x : foundation.getHeliostats()) {
-										if (target != x.getHeliostatTarget()) {
+										if (target != x.getReceiver()) {
 											changed = true;
 											break;
 										}
@@ -280,7 +280,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 							} else if (rb3.isSelected()) {
 								if (!changed) {
 									for (final Mirror x : Scene.getInstance().getAllHeliostats()) {
-										if (target != x.getHeliostatTarget()) {
+										if (target != x.getReceiver()) {
 											changed = true;
 											break;
 										}
@@ -899,7 +899,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 						return;
 					}
 					final Mirror m = (Mirror) selectedPart;
-					if (m.getHeliostatTarget() == null) {
+					if (m.getReceiver() == null) {
 						miZenith.setEnabled(true);
 						miAzimuth.setEnabled(true);
 					} else {
@@ -1167,7 +1167,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 						return;
 					}
 					final Mirror m = (Mirror) selectedPart;
-					final Foundation receiver = m.getHeliostatTarget();
+					final Foundation receiver = m.getReceiver();
 					if (receiver == null) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "This heliostat does not link to a receiver.", "No Receiver", JOptionPane.ERROR_MESSAGE);
 						return;

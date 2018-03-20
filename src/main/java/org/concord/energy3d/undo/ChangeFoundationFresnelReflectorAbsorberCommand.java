@@ -23,7 +23,7 @@ public class ChangeFoundationFresnelReflectorAbsorberCommand extends MyAbstractU
 		final int n = reflectors.size();
 		oldValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = reflectors.get(i).getAbsorber();
+			oldValues[i] = reflectors.get(i).getReceiver();
 		}
 	}
 
@@ -38,8 +38,8 @@ public class ChangeFoundationFresnelReflectorAbsorberCommand extends MyAbstractU
 		newValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
 			final FresnelReflector r = reflectors.get(i);
-			newValues[i] = r.getAbsorber();
-			r.setAbsorber(oldValues[i]);
+			newValues[i] = r.getReceiver();
+			r.setReceiver(oldValues[i]);
 			r.draw();
 			if (oldValues[i] != null) {
 				oldValues[i].drawSolarReceiver();
@@ -57,7 +57,7 @@ public class ChangeFoundationFresnelReflectorAbsorberCommand extends MyAbstractU
 		final int n = reflectors.size();
 		for (int i = 0; i < n; i++) {
 			final FresnelReflector r = reflectors.get(i);
-			r.setAbsorber(newValues[i]);
+			r.setReceiver(newValues[i]);
 			r.draw();
 			if (oldValues[i] != null) {
 				oldValues[i].drawSolarReceiver();

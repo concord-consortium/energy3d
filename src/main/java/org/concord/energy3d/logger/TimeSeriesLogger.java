@@ -848,7 +848,7 @@ public class TimeSeriesLogger {
 					final List<Mirror> mirrors = f.getHeliostats();
 					long newValue = -1;
 					if (!mirrors.isEmpty()) {
-						final Foundation t = mirrors.get(0).getHeliostatTarget();
+						final Foundation t = mirrors.get(0).getReceiver();
 						if (t != null) {
 							newValue = t.getId();
 						}
@@ -858,7 +858,7 @@ public class TimeSeriesLogger {
 					final List<Mirror> mirrors = Scene.getInstance().getAllHeliostats();
 					long newValue = -1;
 					if (!mirrors.isEmpty()) {
-						final Foundation t = mirrors.get(0).getHeliostatTarget();
+						final Foundation t = mirrors.get(0).getReceiver();
 						if (t != null) {
 							newValue = t.getId();
 						}

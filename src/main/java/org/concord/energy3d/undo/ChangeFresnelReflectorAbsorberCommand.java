@@ -15,7 +15,7 @@ public class ChangeFresnelReflectorAbsorberCommand extends MyAbstractUndoableEdi
 
 	public ChangeFresnelReflectorAbsorberCommand(final FresnelReflector reflector) {
 		this.reflector = reflector;
-		oldValue = reflector.getAbsorber();
+		oldValue = reflector.getReceiver();
 	}
 
 	public FresnelReflector getFresnelReflector() {
@@ -27,15 +27,15 @@ public class ChangeFresnelReflectorAbsorberCommand extends MyAbstractUndoableEdi
 	}
 
 	public Foundation getNewValue() {
-		newValue = reflector.getAbsorber();
+		newValue = reflector.getReceiver();
 		return newValue;
 	}
 
 	@Override
 	public void undo() throws CannotUndoException {
 		super.undo();
-		newValue = reflector.getAbsorber();
-		reflector.setAbsorber(oldValue);
+		newValue = reflector.getReceiver();
+		reflector.setReceiver(oldValue);
 		reflector.draw();
 		if (oldValue != null) {
 			oldValue.drawSolarReceiver();
@@ -48,7 +48,7 @@ public class ChangeFresnelReflectorAbsorberCommand extends MyAbstractUndoableEdi
 	@Override
 	public void redo() throws CannotRedoException {
 		super.redo();
-		reflector.setAbsorber(newValue);
+		reflector.setReceiver(newValue);
 		reflector.draw();
 		if (oldValue != null) {
 			oldValue.drawSolarReceiver();

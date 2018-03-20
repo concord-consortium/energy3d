@@ -323,12 +323,12 @@ class PopupMenuForWall extends PopupMenuFactory {
 												for (final HousePart x : Scene.getInstance().getParts()) {
 													if (x instanceof FresnelReflector) {
 														final FresnelReflector reflector = (FresnelReflector) x;
-														if (foundation == reflector.getAbsorber() && reflector.isSunBeamVisible()) {
+														if (foundation == reflector.getReceiver() && reflector.isSunBeamVisible()) {
 															reflector.drawSunBeam();
 														}
 													} else if (x instanceof Mirror) {
 														final Mirror heliostat = (Mirror) x;
-														if (foundation == heliostat.getHeliostatTarget() && heliostat.isSunBeamVisible()) {
+														if (foundation == heliostat.getReceiver() && heliostat.isSunBeamVisible()) {
 															heliostat.drawSunBeam();
 														}
 													}

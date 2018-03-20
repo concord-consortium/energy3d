@@ -585,11 +585,11 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 		return tiltAngle;
 	}
 
-	public void setHeliostatTarget(final Foundation heliostatTarget) {
-		this.heliostatTarget = heliostatTarget;
+	public void setReceiver(final Foundation receiver) {
+		heliostatTarget = receiver;
 	}
 
-	public Foundation getHeliostatTarget() {
+	public Foundation getReceiver() {
 		return heliostatTarget;
 	}
 

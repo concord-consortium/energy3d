@@ -23,7 +23,7 @@ public class ChangeFoundationHeliostatTargetCommand extends MyAbstractUndoableEd
 		final int n = mirrors.size();
 		oldValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
-			oldValues[i] = mirrors.get(i).getHeliostatTarget();
+			oldValues[i] = mirrors.get(i).getReceiver();
 		}
 	}
 
@@ -38,8 +38,8 @@ public class ChangeFoundationHeliostatTargetCommand extends MyAbstractUndoableEd
 		newValues = new Foundation[n];
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
-			newValues[i] = m.getHeliostatTarget();
-			m.setHeliostatTarget(oldValues[i]);
+			newValues[i] = m.getReceiver();
+			m.setReceiver(oldValues[i]);
 			m.draw();
 			if (oldValues[i] != null) {
 				oldValues[i].drawSolarReceiver();
@@ -57,7 +57,7 @@ public class ChangeFoundationHeliostatTargetCommand extends MyAbstractUndoableEd
 		final int n = mirrors.size();
 		for (int i = 0; i < n; i++) {
 			final Mirror m = mirrors.get(i);
-			m.setHeliostatTarget(newValues[i]);
+			m.setReceiver(newValues[i]);
 			m.draw();
 			if (oldValues[i] != null) {
 				oldValues[i].drawSolarReceiver();

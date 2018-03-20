@@ -2923,11 +2923,11 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
-				final Foundation t = m.getHeliostatTarget();
+				final Foundation t = m.getReceiver();
 				if (t != null && !oldTargets.contains(t)) {
 					oldTargets.add(t);
 				}
-				m.setHeliostatTarget(target);
+				m.setReceiver(target);
 				p.draw();
 			}
 		}
@@ -3143,11 +3143,11 @@ public class Scene implements Serializable {
 		for (final HousePart p : parts) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
-				final Foundation t = r.getAbsorber();
+				final Foundation t = r.getReceiver();
 				if (t != null && !oldTargets.contains(t)) {
 					oldTargets.add(t);
 				}
-				r.setAbsorber(target);
+				r.setReceiver(target);
 				r.draw();
 			}
 		}
@@ -3280,8 +3280,12 @@ public class Scene implements Serializable {
 
 	public void setSolarReceiverEfficiencyForAllSolarReflectors(final double efficiency, final Class<?> c) {
 		for (final HousePart p : parts) {
-			if (p instanceof SolarReflector && c.isInstance(p)) {
-				p.getTopContainer().setSolarReceiverEfficiency(efficiency);
+			if (c.isInstance(p)) {
+				if (p instanceof FresnelReflector) {
+					((FresnelReflector) p).getReceiver().setSolarReceiverEfficiency(efficiency);
+				} else if (p instanceof Mirror) {
+					((Mirror) p).getReceiver().setSolarReceiverEfficiency(efficiency);
+				}
 			}
 		}
 	}
@@ -3338,12 +3342,12 @@ public class Scene implements Serializable {
 			for (final HousePart x : Scene.getInstance().getParts()) {
 				if (x instanceof FresnelReflector) {
 					final FresnelReflector reflector = (FresnelReflector) x;
-					if (foundation == reflector.getAbsorber() && reflector.isSunBeamVisible()) {
+					if (foundation == reflector.getReceiver() && reflector.isSunBeamVisible()) {
 						reflector.drawSunBeam();
 					}
 				} else if (x instanceof Mirror) {
 					final Mirror heliostat = (Mirror) x;
-					if (foundation == heliostat.getHeliostatTarget() && heliostat.isSunBeamVisible()) {
+					if (foundation == heliostat.getReceiver() && heliostat.isSunBeamVisible()) {
 						heliostat.drawSunBeam();
 					}
 				}

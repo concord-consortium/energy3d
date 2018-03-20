@@ -312,8 +312,8 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 							comboBox.addItem(x.getId() + "");
 						}
 					}
-					if (r.getAbsorber() != null) {
-						comboBox.setSelectedItem(r.getAbsorber().getId() + "");
+					if (r.getReceiver() != null) {
+						comboBox.setSelectedItem(r.getReceiver().getId() + "");
 					}
 					gui.add(comboBox, BorderLayout.CENTER);
 
@@ -348,12 +348,12 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 									}
 								}
 							}
-							boolean changed = absorber != r.getAbsorber();
+							boolean changed = absorber != r.getReceiver();
 							if (rb1.isSelected()) {
 								if (changed) {
-									final Foundation oldTarget = r.getAbsorber();
+									final Foundation oldTarget = r.getReceiver();
 									final ChangeFresnelReflectorAbsorberCommand c = new ChangeFresnelReflectorAbsorberCommand(r);
-									r.setAbsorber(absorber);
+									r.setReceiver(absorber);
 									r.draw();
 									if (oldTarget != null) {
 										oldTarget.drawSolarReceiver();
@@ -366,7 +366,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 								final Foundation foundation = r.getTopContainer();
 								if (!changed) {
 									for (final FresnelReflector x : foundation.getFresnelReflectors()) {
-										if (x.getAbsorber() != absorber) {
+										if (x.getReceiver() != absorber) {
 											changed = true;
 											break;
 										}
@@ -381,7 +381,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 							} else if (rb3.isSelected()) {
 								if (!changed) {
 									for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
-										if (x.getAbsorber() != absorber) {
+										if (x.getReceiver() != absorber) {
 											changed = true;
 											break;
 										}
@@ -1377,7 +1377,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 						return;
 					}
 					final FresnelReflector r = (FresnelReflector) selectedPart;
-					final Foundation absorber = r.getAbsorber();
+					final Foundation absorber = r.getReceiver();
 					if (absorber == null) {
 						JOptionPane.showMessageDialog(MainFrame.getInstance(), "This reflector does not link to an absorber.", "No Absorber", JOptionPane.ERROR_MESSAGE);
 						return;
@@ -1443,7 +1443,7 @@ class PopupMenuForFresnelReflector extends PopupMenuFactory {
 									} else if (rb2.isSelected()) {
 										if (!changed) {
 											for (final FresnelReflector x : Scene.getInstance().getAllFresnelReflectors()) {
-												if (Math.abs(val * 0.01 - x.getAbsorber().getSolarReceiverEfficiency()) > 0.000001) {
+												if (Math.abs(val * 0.01 - x.getReceiver().getSolarReceiverEfficiency()) > 0.000001) {
 													changed = true;
 													break;
 												}

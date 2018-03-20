@@ -945,7 +945,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
-				if (m.getHeliostatTarget() == this) {
+				if (m.getReceiver() == this) {
 					count++;
 				}
 			}
@@ -958,7 +958,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
-				if (m.getHeliostatTarget() == this) {
+				if (m.getReceiver() == this) {
 					output += m.getOutputToday();
 				}
 			}
@@ -971,7 +971,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
-				if (r.getAbsorber() == this) {
+				if (r.getReceiver() == this) {
 					count++;
 				}
 			}
@@ -984,7 +984,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
-				if (r.getAbsorber() == this) {
+				if (r.getReceiver() == this) {
 					output += r.getOutputToday();
 				}
 			}
@@ -1000,7 +1000,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
-				if (m.getHeliostatTarget() == this) {
+				if (m.getReceiver() == this) {
 					countHeliostats++;
 				}
 			}
@@ -1009,7 +1009,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
-				if (r.getAbsorber() == this) {
+				if (r.getReceiver() == this) {
 					countFresnelReflectors++;
 				}
 			}
@@ -1570,12 +1570,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (final HousePart x : Scene.getInstance().getParts()) {
 				if (x instanceof Mirror) {
 					final Mirror m = (Mirror) x;
-					if (m.getHeliostatTarget() == this) {
+					if (m.getReceiver() == this) {
 						m.draw();
 					}
 				} else if (x instanceof FresnelReflector) {
 					final FresnelReflector r = (FresnelReflector) x;
-					if (r.getAbsorber() == this) {
+					if (r.getReceiver() == this) {
 						r.draw();
 					}
 				}
@@ -3189,11 +3189,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : children) {
 			if (p instanceof Mirror) {
 				final Mirror m = (Mirror) p;
-				final Foundation t = m.getHeliostatTarget();
+				final Foundation t = m.getReceiver();
 				if (t != null && !oldTargets.contains(t)) {
 					oldTargets.add(t);
 				}
-				m.setHeliostatTarget(target);
+				m.setReceiver(target);
 				m.draw();
 			}
 		}
@@ -3396,11 +3396,11 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		for (final HousePart p : children) {
 			if (p instanceof FresnelReflector) {
 				final FresnelReflector r = (FresnelReflector) p;
-				final Foundation t = r.getAbsorber();
+				final Foundation t = r.getReceiver();
 				if (t != null && !oldTargets.contains(t)) {
 					oldTargets.add(t);
 				}
-				r.setAbsorber(target);
+				r.setReceiver(target);
 				r.draw();
 			}
 		}
@@ -3566,12 +3566,12 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 			for (final HousePart x : Scene.getInstance().getParts()) {
 				if (x instanceof FresnelReflector) {
 					final FresnelReflector reflector = (FresnelReflector) x;
-					if (this == reflector.getAbsorber() && reflector.isSunBeamVisible()) {
+					if (this == reflector.getReceiver() && reflector.isSunBeamVisible()) {
 						reflector.drawSunBeam();
 					}
 				} else if (x instanceof Mirror) {
 					final Mirror heliostat = (Mirror) x;
-					if (this == heliostat.getHeliostatTarget() && heliostat.isSunBeamVisible()) {
+					if (this == heliostat.getReceiver() && heliostat.isSunBeamVisible()) {
 						heliostat.drawSunBeam();
 					}
 				}

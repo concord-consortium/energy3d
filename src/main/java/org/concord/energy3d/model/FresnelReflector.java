@@ -873,11 +873,11 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		return (int) Math.round(length / moduleLength);
 	}
 
-	public void setAbsorber(final Foundation absorber) {
-		this.absorber = absorber;
+	public void setReceiver(final Foundation receiver) {
+		absorber = receiver;
 	}
 
-	public Foundation getAbsorber() {
+	public Foundation getReceiver() {
 		return absorber;
 	}
 

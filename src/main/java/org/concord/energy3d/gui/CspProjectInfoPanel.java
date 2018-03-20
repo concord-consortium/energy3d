@@ -171,9 +171,9 @@ public class CspProjectInfoPanel extends JPanel {
 						mirrorArea = m.getMirrorWidth() * m.getMirrorHeight();
 						cost += price.getHeliostatUnitPrice() * mirrorArea;
 						reflectingArea += mirrorArea;
-						if (m.getHeliostatTarget() != null) {
-							if (!towers.contains(m.getHeliostatTarget())) {
-								towers.add(m.getHeliostatTarget());
+						if (m.getReceiver() != null) {
+							if (!towers.contains(m.getReceiver())) {
+								towers.add(m.getReceiver());
 							}
 						}
 					}

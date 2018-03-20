@@ -124,9 +124,9 @@ public class CspProjectCost extends ProjectCost {
 						if (!mirrors.isEmpty()) {
 							final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 							for (final Mirror m : mirrors) {
-								if (m.getHeliostatTarget() != null) {
-									if (!towers.contains(m.getHeliostatTarget())) {
-										towers.add(m.getHeliostatTarget());
+								if (m.getReceiver() != null) {
+									if (!towers.contains(m.getReceiver())) {
+										towers.add(m.getReceiver());
 									}
 								}
 							}
@@ -140,9 +140,9 @@ public class CspProjectCost extends ProjectCost {
 							if (!reflectors.isEmpty()) {
 								final ArrayList<Foundation> absorbers = new ArrayList<Foundation>();
 								for (final FresnelReflector r : reflectors) {
-									if (r.getAbsorber() != null) {
-										if (!absorbers.contains(r.getAbsorber())) {
-											absorbers.add(r.getAbsorber());
+									if (r.getReceiver() != null) {
+										if (!absorbers.contains(r.getReceiver())) {
+											absorbers.add(r.getReceiver());
 										}
 									}
 								}
@@ -178,9 +178,9 @@ public class CspProjectCost extends ProjectCost {
 				if (!mirrors.isEmpty()) {
 					final ArrayList<Foundation> towers = new ArrayList<Foundation>();
 					for (final Mirror m : mirrors) {
-						if (m.getHeliostatTarget() != null) {
-							if (!towers.contains(m.getHeliostatTarget())) {
-								towers.add(m.getHeliostatTarget());
+						if (m.getReceiver() != null) {
+							if (!towers.contains(m.getReceiver())) {
+								towers.add(m.getReceiver());
 							}
 						}
 					}
@@ -194,9 +194,9 @@ public class CspProjectCost extends ProjectCost {
 					if (!reflectors.isEmpty()) {
 						final ArrayList<Foundation> absorbers = new ArrayList<Foundation>();
 						for (final FresnelReflector r : reflectors) {
-							if (r.getAbsorber() != null) {
-								if (!absorbers.contains(r.getAbsorber())) {
-									absorbers.add(r.getAbsorber());
+							if (r.getReceiver() != null) {
+								if (!absorbers.contains(r.getReceiver())) {
+									absorbers.add(r.getReceiver());
 								}
 							}
 						}

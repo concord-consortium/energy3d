@@ -1331,7 +1331,7 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  Angles:");
 								partProperty2TextField.setText(flat ? "tilt: " + ONE_DECIMAL.format(m.getTiltAngle()) + "\u00B0, azimuth: " + ONE_DECIMAL.format(az) + "\u00B0" : " --- ");
 								partProperty2TextField.putClientProperty("tooltip", "The angles of the heliostat");
-								final Foundation receiver = m.getHeliostatTarget();
+								final Foundation receiver = m.getReceiver();
 								final String s = "R=" + ONE_DECIMAL.format(m.getReflectance() * 100) + "%" + (receiver == null ? "" : ", \u03B7=" + ONE_DECIMAL.format(receiver.getSolarReceiverEfficiency() * 100) + "%");
 								if (energyViewShown) {
 									partProperty3Label.setText("  Properties & Yield:");
@@ -1443,7 +1443,7 @@ public class EnergyPanel extends JPanel {
 								partProperty2Label.setText("  Length & Width:");
 								partProperty2TextField.setText(TWO_DECIMALS.format(r.getLength() * meterToFoot) + lengthUnit + ", module:" + TWO_DECIMALS.format(r.getModuleLength() * meterToFoot) + lengthUnit + ", " + ONE_DECIMAL.format(r.getModuleWidth() * meterToFoot) + lengthUnit);
 								partProperty2TextField.putClientProperty("tooltip", "Assembly length, module length, and width of the Fresnel reflector");
-								final Foundation receiver = r.getAbsorber();
+								final Foundation receiver = r.getReceiver();
 								final String str = "R=" + ONE_DECIMAL.format(r.getReflectance() * 100) + "%, a=" + ONE_DECIMAL.format(r.getModuleWidth() * r.getLength() * meterToFoot * meterToFoot) + lengthUnit + "\u00B2" + (receiver == null ? "" : ", \u03B7=" + ONE_DECIMAL.format(receiver.getSolarReceiverEfficiency() * 100) + "%");
 								if (energyViewShown) {
 									partProperty3Label.setText("  Properties & Yield:");
