@@ -2719,6 +2719,20 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		return null;
 	}
 
+	Vector3 getPickedLocationOnFloor() {
+		if (pickMouseState != null) {
+			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+			if (selectedPart instanceof Floor) {
+				final PickedHousePart pick = SelectUtil.pickPart(pickMouseState.getX(), pickMouseState.getY(), selectedPart);
+				if (pick != null) {
+					return pick.getPoint().clone();
+				}
+			}
+			pickMouseState = null;
+		}
+		return null;
+	}
+
 	Vector3 getPickedLocationOnRack() {
 		if (pickMouseState != null) {
 			final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();

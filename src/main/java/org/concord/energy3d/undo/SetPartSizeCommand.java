@@ -10,6 +10,7 @@ import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.Window;
+import org.concord.energy3d.scene.SceneManager;
 
 public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 
@@ -109,6 +110,7 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 			w.getContainer().draw();
 		}
 		part.draw();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override
@@ -142,6 +144,7 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 			w.getContainer().draw();
 		}
 		part.draw();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

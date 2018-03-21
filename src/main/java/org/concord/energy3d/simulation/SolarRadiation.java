@@ -11,6 +11,7 @@ import java.util.concurrent.CancellationException;
 
 import org.concord.energy3d.gui.EnergyPanel;
 import org.concord.energy3d.model.Door;
+import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
@@ -172,6 +173,11 @@ public class SolarRadiation {
 				final Spatial s = door.getRadiationCollisionSpatial();
 				collidables.add(s);
 				collidablesToParts.put(s, door);
+			} else if (part instanceof Floor) {
+				final Floor floor = (Floor) part;
+				final Spatial s = floor.getRadiationCollisionSpatial();
+				collidables.add(s);
+				collidablesToParts.put(s, floor);
 			} else if (part instanceof Roof) {
 				final Roof roof = (Roof) part;
 				for (final Spatial roofPart : roof.getRoofPartsRoot().getChildren()) {
@@ -228,7 +234,7 @@ public class SolarRadiation {
 							if (((Wall) part).getType() == Wall.SOLID_WALL) {
 								computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 							}
-						} else if (part instanceof Door) {
+						} else if (part instanceof Door || part instanceof Floor) {
 							computeOnMesh(minute, directionTowardSun, part, part.getRadiationMesh(), (Mesh) part.getRadiationCollisionSpatial(), part.getNormal());
 						} else if (part instanceof Foundation) {
 							final Foundation foundation = (Foundation) part;
@@ -1976,7 +1982,7 @@ public class SolarRadiation {
 				applyTexture(part.getRadiationMesh());
 			} else {
 				if (!Scene.getInstance().getOnlySolarComponentsInSolarMap()) {
-					if (part instanceof Wall || part instanceof Door) {
+					if (part instanceof Wall || part instanceof Door || part instanceof Floor) {
 						applyTexture(part.getRadiationMesh());
 					} else if (part instanceof Foundation) {
 						final Foundation foundation = (Foundation) part;

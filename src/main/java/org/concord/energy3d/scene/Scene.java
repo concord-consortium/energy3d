@@ -1272,6 +1272,51 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
+	public void pasteToPickedLocationOnFloor() {
+		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (copyBuffer == null) {
+			return;
+		}
+		if (copyBuffer instanceof Foundation) {
+			return;
+		}
+		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+		if (!(selectedPart instanceof Floor)) {
+			return;
+		}
+		final HousePart c = copyBuffer.copy(false);
+		if (c == null) {
+			return;
+		}
+		Vector3 position = SceneManager.getInstance().getPickedLocationOnFloor();
+		if (position == null) {
+			return;
+		}
+		if (selectedPart != c.getContainer()) { // solar panels and racks can be pasted to a different parent
+			if (c instanceof SolarPanel) {
+				((SolarPanel) c).moveTo(selectedPart);
+			} else if (c instanceof Rack) {
+				((Rack) c).moveTo(selectedPart);
+			}
+		}
+		position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
+		final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+		position = position.subtractLocal(center);
+		final int n = c.getPoints().size();
+		for (int i = 0; i < n; i++) {
+			final Vector3 v = c.getPoints().get(i);
+			v.addLocal(position);
+		}
+		if (c instanceof Rack) {
+			((Rack) c).moveSolarPanels(position);
+			setIdOfChildren(c);
+		}
+		add(c, true);
+		copyBuffer = c;
+		SceneManager.getInstance().setSelectedPart(c);
+		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
+	}
+
 	public void pasteToPickedLocationOnRack() {
 		final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
 		if (!(selectedPart instanceof Rack)) {
@@ -2394,6 +2439,7 @@ public class Scene implements Serializable {
 				w.getContainer().draw();
 			}
 		}
+		SceneManager.getInstance().refresh();
 	}
 
 	public void setShutterColorOfBuilding(final HousePart part, final ReadOnlyColorRGBA color) {

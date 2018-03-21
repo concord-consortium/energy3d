@@ -893,6 +893,7 @@ class PopupMenuForWindow extends PopupMenuFactory {
 											window.setWindowHeight(h);
 											window.draw();
 											window.getContainer().draw();
+											SceneManager.getInstance().refresh();
 											SceneManager.getInstance().getUndoManager().addEdit(c);
 										}
 										selectedScopeIndex = 0;

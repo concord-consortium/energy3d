@@ -2,6 +2,7 @@ package org.concord.energy3d.model;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
@@ -29,10 +30,15 @@ import com.ardor3d.ui.text.BMText.Align;
 import com.ardor3d.util.geom.BufferUtils;
 
 public class Floor extends HousePart {
+
+	public static final int SOLID = 0;
+	public static final int TRANSPARENT = 1;
 	private static final long serialVersionUID = 1L;
 	private static final OffsetState offsetState = new OffsetState();
-	private transient ArrayList<PolygonPoint> wallUpperPoints;
+	private transient List<PolygonPoint> wallUpperPoints;
+	private transient List<ReadOnlyVector3> wallUpperVectors;
 	private transient Line outlineMesh;
+	private int type = SOLID;
 
 	static {
 		offsetState.setTypeEnabled(OffsetType.Fill, true);
@@ -41,12 +47,13 @@ public class Floor extends HousePart {
 	}
 
 	public Floor() {
-		super(1, 1, 5.0);
+		super(1, 1, 5);
 	}
 
 	@Override
 	protected void init() {
 		super.init();
+
 		mesh = new Mesh("Floor");
 		root.attachChild(mesh);
 
@@ -94,7 +101,7 @@ public class Floor extends HousePart {
 		}
 	}
 
-	private PolygonWithHoles makePolygon(final ArrayList<PolygonPoint> wallUpperPoints) {
+	private PolygonWithHoles makePolygon(final List<PolygonPoint> wallUpperPoints) {
 		for (final PolygonPoint p : wallUpperPoints) {
 			p.set(p.getX(), p.getY(), height);
 		}
@@ -104,19 +111,34 @@ public class Floor extends HousePart {
 	@Override
 	protected void drawMesh() {
 		if (container != null) {
+			if (wallUpperVectors == null) {
+				wallUpperVectors = new ArrayList<ReadOnlyVector3>();
+			} else {
+				wallUpperVectors.clear();
+			}
 			wallUpperPoints = exploreWallNeighbors((Wall) container);
 		}
 		if (!isDrawable()) {
 			mesh.getSceneHints().setCullHint(CullHint.Always);
 			return;
 		}
-		mesh.getSceneHints().setCullHint(CullHint.Inherit);
+		switch (type) {
+		case TRANSPARENT:
+			mesh.getSceneHints().setCullHint(CullHint.Always);
+			break;
+		default:
+			mesh.getSceneHints().setCullHint(CullHint.Inherit);
+		}
 		final double scale = Scene.getInstance().getTextureMode() == TextureMode.Simple ? 2.0 : 10.0;
 		MeshLib.fillMeshWithPolygon(mesh, makePolygon(wallUpperPoints), null, true, new TPoint(0, 0, 0), new TPoint(scale, 0, 0), new TPoint(0, scale, 0), false);
 		CollisionTreeManager.INSTANCE.removeCollisionTree(mesh);
 		drawOutline();
 		points.get(0).set(toRelative(getCenter()));
 		updateEditShapes();
+	}
+
+	protected boolean insideWallsPolygon(final Vector3 p) {
+		return Util.insidePolygon(p, wallUpperVectors);
 	}
 
 	protected ArrayList<PolygonPoint> exploreWallNeighbors(final Wall startWall) {
@@ -133,6 +155,8 @@ public class Floor extends HousePart {
 				final ReadOnlyVector3 p2 = currentWall.getAbsPoint(pointIndex);
 				addPointToPolygon(poly, p1);
 				addPointToPolygon(poly, p2);
+				wallUpperVectors.add(p1);
+				wallUpperVectors.add(p2);
 			}
 		});
 
@@ -152,7 +176,6 @@ public class Floor extends HousePart {
 			return;
 		}
 		int annotCounter = 0;
-
 		for (int i = 0; i < wallUpperPoints.size(); i++) {
 			PolygonPoint p = wallUpperPoints.get(i);
 			final Vector3 a = new Vector3(p.getX(), p.getY(), p.getZ());
@@ -250,6 +273,14 @@ public class Floor extends HousePart {
 	@Override
 	public boolean isCopyable() {
 		return false;
+	}
+
+	public void setType(final int type) {
+		this.type = type;
+	}
+
+	public int getType() {
+		return type;
 	}
 
 }

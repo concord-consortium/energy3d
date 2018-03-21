@@ -9,6 +9,7 @@ import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
 import org.concord.energy3d.model.Window;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.SceneManager;
 
 public class ChangeContainerWindowSizeCommand extends MyAbstractUndoableEdit {
 
@@ -49,6 +50,7 @@ public class ChangeContainerWindowSizeCommand extends MyAbstractUndoableEdit {
 			w.draw();
 		}
 		container.draw();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override
@@ -62,6 +64,7 @@ public class ChangeContainerWindowSizeCommand extends MyAbstractUndoableEdit {
 			w.draw();
 		}
 		container.draw();
+		SceneManager.getInstance().refresh();
 	}
 
 	@Override

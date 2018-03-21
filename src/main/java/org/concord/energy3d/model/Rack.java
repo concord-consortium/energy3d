@@ -206,7 +206,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 		if (editPointIndex <= 0) {
 			// isBaseZ = true;
-			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class, Wall.class });
+			final PickedHousePart picked = pickContainer(x, y, new Class<?>[] { Foundation.class, Roof.class, Wall.class, Floor.class });
 			if (picked != null && picked.getUserData() != null) { // when the user data is null, it picks the land
 				final Vector3 p = picked.getPoint().clone();
 				// isBaseZ = Util.isEqual(p.getZ(), baseZ);
@@ -792,6 +792,10 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				if (!isPositionLegal(c, (Roof) container, !Util.isZero(container.getHeight()))) {
 					return null;
 				}
+			} else if (container instanceof Floor) {
+				if (!isPositionLegal(c, (Floor) container)) {
+					return null;
+				}
 			}
 		}
 		return c;
@@ -877,6 +881,32 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		final boolean isOutside = !roof.insideWallsPolygon(rack.getAbsCenter());
 		if (isOutside) {
 			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel rack outside a roof.", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		final double o = rack.copyOverlap(); // TODO
+		if (o >= 0) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new rack is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		return true;
+	}
+
+	private boolean isPositionLegal(final Rack rack, final Floor floor) {
+		final Vector3 d = normal.cross(Vector3.UNIT_Z, null);
+		d.normalizeLocal();
+		if (Util.isZero(d.length())) {
+			d.set(1, 0, 0);
+		}
+		final double s = Math.signum(floor.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(d));
+		d.multiplyLocal((1 + copyLayoutGap) * rackHeight / Scene.getInstance().getAnnotationScale());
+		d.addLocal(getContainerRelative().getPoints().get(0));
+		final Vector3 v = toRelative(d);
+		rack.points.get(0).setX(points.get(0).getX() + s * v.getX());
+		rack.points.get(0).setY(points.get(0).getY() + s * v.getY());
+		rack.points.get(0).setZ(points.get(0).getZ() + s * v.getZ());
+		final boolean isOutside = !floor.insideWallsPolygon(rack.getAbsCenter());
+		if (isOutside) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, you are not allowed to paste a solar panel rack outside a floor.", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		final double o = rack.copyOverlap(); // TODO
@@ -1127,6 +1157,8 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				return Util.isEqualFaster(pickedNormal, Vector3.UNIT_Z);
 			}
 			return true;
+		} else if (container instanceof Floor) {
+			return true;
 		}
 		return false;
 	}
@@ -1188,7 +1220,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	}
 
 	public boolean checkContainerIntersection() {
-		final double z0 = container.getAbsCenter().getZ() + container.height + surround.getZExtent() * 2;
+		final double z0 = (container instanceof Floor ? container.getAbsCenter().getZ() : container.getAbsCenter().getZ() + container.height) + surround.getZExtent() * 2;
 		final FloatBuffer buf = mesh.getMeshData().getVertexBuffer();
 		final ReadOnlyTransform trans = mesh.getWorldTransform();
 		final Vector3 v1 = new Vector3();
