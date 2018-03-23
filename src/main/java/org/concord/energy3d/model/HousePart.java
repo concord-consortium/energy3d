@@ -769,7 +769,7 @@ public abstract class HousePart implements Serializable {
 		} else {
 			if (SceneManager.getInstance().getSolarHeatMap()) {
 				if (isDrawable()) {
-					if (this instanceof Foundation || this instanceof Wall || this instanceof Roof) {
+					if (this instanceof Foundation || this instanceof Wall || this instanceof Roof || this instanceof Floor) {
 						SolarRadiation.getInstance().initMeshTextureData(mesh, mesh, this instanceof Roof ? (ReadOnlyVector3) mesh.getParent().getUserData() : getNormal());
 					}
 				}
