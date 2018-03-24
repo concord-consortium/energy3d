@@ -760,24 +760,6 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		return -1;
 	}
 
-	private double checkCopyOverlap(final boolean inHeight) { // copy only in the direction of rack height
-		final double w1 = (inHeight ? rackHeight : rackWidth) / Scene.getInstance().getAnnotationScale();
-		final Vector3 center = getAbsCenter();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.container == container && p != this) {
-				if (p instanceof Rack) {
-					final Rack s2 = (Rack) p;
-					final double w2 = (inHeight ? s2.rackHeight : s2.rackWidth) / Scene.getInstance().getAnnotationScale();
-					final double distance = p.getAbsCenter().distance(center);
-					if (distance < (w1 + w2) * 0.499) {
-						return distance;
-					}
-				}
-			}
-		}
-		return -1;
-	}
-
 	@Override
 	public HousePart copy(final boolean check) {
 		final Rack c = (Rack) super.copy(false);
@@ -860,6 +842,24 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			return false;
 		}
 		return true;
+	}
+
+	private double checkCopyOverlap(final boolean inHeight) { // copy only in the direction of rack height
+		final double w1 = (inHeight ? rackHeight : rackWidth) / Scene.getInstance().getAnnotationScale();
+		final Vector3 center = getAbsCenter();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.container == container && p != this) {
+				if (p instanceof Rack) {
+					final Rack s2 = (Rack) p;
+					final double w2 = (inHeight ? s2.rackHeight : s2.rackWidth) / Scene.getInstance().getAnnotationScale();
+					final double distance = p.getAbsCenter().distance(center);
+					if (distance < (w1 + w2) * 0.499) {
+						return distance;
+					}
+				}
+			}
+		}
+		return -1;
 	}
 
 	private boolean isPositionLegal(final Rack rack, final Roof roof, final boolean nonFlatRoof) {

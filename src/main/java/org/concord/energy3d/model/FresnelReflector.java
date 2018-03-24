@@ -560,22 +560,6 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		return true;
 	}
 
-	private double checkCopyOverlap() { // copy only in the direction of reflector width (shorter side)
-		final double w1 = moduleWidth / Scene.getInstance().getAnnotationScale();
-		final Vector3 center = getAbsCenter();
-		for (final HousePart p : Scene.getInstance().getParts()) {
-			if (p.container == container && p != this && p instanceof FresnelReflector) {
-				final FresnelReflector s2 = (FresnelReflector) p;
-				final double w2 = s2.moduleWidth / Scene.getInstance().getAnnotationScale();
-				final double distance = p.getAbsCenter().distance(center);
-				if (distance < (w1 + w2) * 0.499) {
-					return distance;
-				}
-			}
-		}
-		return -1;
-	}
-
 	@Override
 	public HousePart copy(final boolean check) {
 		final FresnelReflector c = (FresnelReflector) super.copy(false);
@@ -590,39 +574,83 @@ public class FresnelReflector extends HousePart implements SolarReflector, Label
 		return c;
 	}
 
-	// reflectors align with the north-south axis, so copy and paste only in the x-direction (east-west axis)
 	private boolean isPositionLegal(final FresnelReflector reflector, final Foundation foundation) {
 		final Vector3 p0 = foundation.getAbsPoint(0);
+		final Vector3 p1 = foundation.getAbsPoint(1);
 		final Vector3 p2 = foundation.getAbsPoint(2);
-		double dx;
+		final double a = -Math.toRadians(relativeAzimuth) * Math.signum(p2.subtract(p0, null).getX() * p1.subtract(p0, null).getY());
+		final Vector3 v = new Vector3(Math.cos(Math.PI / 2 + a), Math.sin(Math.PI / 2 + a), 0);
+		double len;
 		double s;
+		boolean inWidth = true;
 		final FresnelReflector nearest = foundation.getNearestFresnelReflector(this);
 		if (nearest != null) { // use the nearest reflector as the reference to infer next position
 			final Vector3 d = getAbsCenter().subtractLocal(nearest.getAbsCenter());
-			dx = Math.abs(d.getX());
-			if (dx > moduleWidth * 5 / Scene.getInstance().getAnnotationScale()) {
-				dx = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
-				s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+			len = d.length();
+			if (moduleWidth > len * Scene.getInstance().getAnnotationScale()) {
+				inWidth = false;
+			}
+			if (len > Math.min(moduleWidth, length) * 5 / Scene.getInstance().getAnnotationScale()) {
+				len = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
+				s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 			} else {
-				s = Math.signum(d.getX());
+				final double vx = v.getX();
+				final double vy = v.getY();
+				if (Math.abs(d.getX()) > Math.abs(d.getY())) {
+					if (Math.abs(vx) < Math.abs(vy)) {
+						v.setX(vy);
+						v.setY(vx);
+					}
+				} else {
+					if (Math.abs(vx) > Math.abs(vy)) {
+						v.setX(vy);
+						v.setY(vx);
+					}
+				}
+				s = Math.signum(d.dot(v));
 			}
 		} else {
-			dx = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
-			s = Math.signum(foundation.getAbsCenter().getX() - Scene.getInstance().getOriginalCopy().getAbsCenter().getX());
+			len = (1 + copyLayoutGap) * moduleWidth / Scene.getInstance().getAnnotationScale();
+			s = Math.signum(foundation.getAbsCenter().subtractLocal(Scene.getInstance().getOriginalCopy().getAbsCenter()).dot(v));
 		}
-		s *= -Math.signum(Math.cos(Math.toRadians(foundation.getAzimuth())));
-		final double tx = dx / p0.distance(p2);
-		final double newX = points.get(0).getX() + s * tx;
+		final double tx = len / p0.distance(p2);
+		final double ty = len / p0.distance(p1);
+		final double lx = s * v.getX() * tx;
+		final double ly = s * v.getY() * ty;
+		final double newX = points.get(0).getX() + lx;
 		if (newX > 1 - tx || newX < tx) {
 			return false;
 		}
+		final double newY = points.get(0).getY() + ly;
+		if (newY > 1 - ty || newY < ty) {
+			return false;
+		}
 		reflector.points.get(0).setX(newX);
-		final double o = reflector.checkCopyOverlap();
+		reflector.points.get(0).setY(newY);
+		final double o = reflector.checkCopyOverlap(inWidth);
 		if (o >= 0) {
-			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new Fresnel reflector is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new reflector is too close to an existing one (" + o + ").", "Error", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		return true;
+	}
+
+	private double checkCopyOverlap(final boolean inWidth) { // copy only in the direction of module width
+		final double w1 = (inWidth ? moduleWidth : length) / Scene.getInstance().getAnnotationScale();
+		final Vector3 center = getAbsCenter();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p.container == container && p != this) {
+				if (p instanceof FresnelReflector) {
+					final FresnelReflector s2 = (FresnelReflector) p;
+					final double w2 = (inWidth ? s2.moduleWidth : s2.length) / Scene.getInstance().getAnnotationScale();
+					final double distance = p.getAbsCenter().distance(center);
+					if (distance < (w1 + w2) * 0.499) {
+						return distance;
+					}
+				}
+			}
+		}
+		return -1;
 	}
 
 	public double getSystemEfficiency() {
