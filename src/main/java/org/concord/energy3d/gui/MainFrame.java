@@ -255,6 +255,7 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem brickBuildingTextureMenuItem;
 	private JRadioButtonMenuItem grayShingleRoofBuildingTextureMenuItem;
 	private JRadioButtonMenuItem southernStyleBuildingTextureMenuItem;
+	private JRadioButtonMenuItem stoneWallTextureMenuItem;
 	private final ButtonGroup buildingTextureButtonGroup = new ButtonGroup();
 	private JMenu themeMenu;
 	private JRadioButtonMenuItem blueSkyMenuItem;
@@ -1771,6 +1772,7 @@ public class MainFrame extends JFrame {
 			buildingTextureMenu.add(getGrayShingleRoofBuildingTextureMenuItem());
 			buildingTextureMenu.add(getBrickBuildingTextureMenuItem());
 			buildingTextureMenu.add(getSouthernStyleBuildingTextureMenuItem());
+			buildingTextureMenu.add(getStoneWallTextureMenuItem());
 			buildingTextureMenu.addMenuListener(new MenuListener() {
 				@Override
 				public void menuCanceled(final MenuEvent e) {
@@ -1789,6 +1791,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(grayShingleRoofBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.GRAY_SHINGLE_ROOF);
 					Util.selectSilently(brickBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
 					Util.selectSilently(southernStyleBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.SOUTHERN);
+					Util.selectSilently(stoneWallTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.STONE);
 				}
 			});
 
@@ -3496,7 +3499,7 @@ public class MainFrame extends JFrame {
 		return zoomOutMenuItem;
 	}
 
-	public JRadioButtonMenuItem getHeliostat1MirrorTextureMenuItem() {
+	private JRadioButtonMenuItem getHeliostat1MirrorTextureMenuItem() {
 		if (heliostat1MirrorTextureMenuItem == null) {
 			heliostat1MirrorTextureMenuItem = new JRadioButtonMenuItem("Whole Mirror");
 			heliostat1MirrorTextureMenuItem.addItemListener(new ItemListener() {
@@ -3519,7 +3522,7 @@ public class MainFrame extends JFrame {
 		return heliostat1MirrorTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getHeliostat2X1MirrorsTextureMenuItem() {
+	private JRadioButtonMenuItem getHeliostat2X1MirrorsTextureMenuItem() {
 		if (heliostat2X1MirrorsTextureMenuItem == null) {
 			heliostat2X1MirrorsTextureMenuItem = new JRadioButtonMenuItem("2 \u00D7 1 Mirrors");
 			heliostat2X1MirrorsTextureMenuItem.addItemListener(new ItemListener() {
@@ -3542,7 +3545,7 @@ public class MainFrame extends JFrame {
 		return heliostat2X1MirrorsTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getHeliostat1X2MirrorsTextureMenuItem() {
+	private JRadioButtonMenuItem getHeliostat1X2MirrorsTextureMenuItem() {
 		if (heliostat1X2MirrorsTextureMenuItem == null) {
 			heliostat1X2MirrorsTextureMenuItem = new JRadioButtonMenuItem("1 \u00D7 2 Mirrors");
 			heliostat1X2MirrorsTextureMenuItem.addItemListener(new ItemListener() {
@@ -3565,7 +3568,7 @@ public class MainFrame extends JFrame {
 		return heliostat1X2MirrorsTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getHeliostat7X5MirrorsTextureMenuItem() {
+	private JRadioButtonMenuItem getHeliostat7X5MirrorsTextureMenuItem() {
 		if (heliostat7X5MirrorsTextureMenuItem == null) {
 			heliostat7X5MirrorsTextureMenuItem = new JRadioButtonMenuItem("7 \u00D7 5 Mirrors");
 			heliostat7X5MirrorsTextureMenuItem.addItemListener(new ItemListener() {
@@ -3588,7 +3591,7 @@ public class MainFrame extends JFrame {
 		return heliostat7X5MirrorsTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getNoBuildingTextureMenuItem() {
+	private JRadioButtonMenuItem getNoBuildingTextureMenuItem() {
 		if (noBuildingTextureMenuItem == null) {
 			noBuildingTextureMenuItem = new JRadioButtonMenuItem("No Texture");
 			noBuildingTextureMenuItem.setSelected(true);
@@ -3611,7 +3614,7 @@ public class MainFrame extends JFrame {
 		return noBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getSimpleBuildingTextureMenuItem() {
+	private JRadioButtonMenuItem getSimpleBuildingTextureMenuItem() {
 		if (simpleBuildingTextureMenuItem == null) {
 			simpleBuildingTextureMenuItem = new JRadioButtonMenuItem("Simple Texture");
 			simpleBuildingTextureMenuItem.addItemListener(new ItemListener() {
@@ -3633,7 +3636,7 @@ public class MainFrame extends JFrame {
 		return simpleBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getGraySidingShingleBuildingTextureMenuItem() {
+	private JRadioButtonMenuItem getGraySidingShingleBuildingTextureMenuItem() {
 		if (graySidingShingleBuildingTextureMenuItem == null) {
 			graySidingShingleBuildingTextureMenuItem = new JRadioButtonMenuItem("Gray Siding Shingle");
 			graySidingShingleBuildingTextureMenuItem.addItemListener(new ItemListener() {
@@ -3655,7 +3658,7 @@ public class MainFrame extends JFrame {
 		return graySidingShingleBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getBrickBuildingTextureMenuItem() {
+	private JRadioButtonMenuItem getBrickBuildingTextureMenuItem() {
 		if (brickBuildingTextureMenuItem == null) {
 			brickBuildingTextureMenuItem = new JRadioButtonMenuItem("Brick Wall");
 			brickBuildingTextureMenuItem.addItemListener(new ItemListener() {
@@ -3677,7 +3680,7 @@ public class MainFrame extends JFrame {
 		return brickBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getSouthernStyleBuildingTextureMenuItem() {
+	private JRadioButtonMenuItem getSouthernStyleBuildingTextureMenuItem() {
 		if (southernStyleBuildingTextureMenuItem == null) {
 			southernStyleBuildingTextureMenuItem = new JRadioButtonMenuItem("Southern Style");
 			southernStyleBuildingTextureMenuItem.addItemListener(new ItemListener() {
@@ -3699,7 +3702,7 @@ public class MainFrame extends JFrame {
 		return southernStyleBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getGrayShingleRoofBuildingTextureMenuItem() {
+	private JRadioButtonMenuItem getGrayShingleRoofBuildingTextureMenuItem() {
 		if (grayShingleRoofBuildingTextureMenuItem == null) {
 			grayShingleRoofBuildingTextureMenuItem = new JRadioButtonMenuItem("Gray Shingle Roof");
 			grayShingleRoofBuildingTextureMenuItem.addItemListener(new ItemListener() {
@@ -3721,7 +3724,29 @@ public class MainFrame extends JFrame {
 		return grayShingleRoofBuildingTextureMenuItem;
 	}
 
-	public JRadioButtonMenuItem getBlueSkyMenuItem() {
+	private JRadioButtonMenuItem getStoneWallTextureMenuItem() {
+		if (stoneWallTextureMenuItem == null) {
+			stoneWallTextureMenuItem = new JRadioButtonMenuItem("Stone Wall");
+			stoneWallTextureMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.STONE);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			buildingTextureButtonGroup.add(stoneWallTextureMenuItem);
+		}
+		return stoneWallTextureMenuItem;
+	}
+
+	private JRadioButtonMenuItem getBlueSkyMenuItem() {
 		if (blueSkyMenuItem == null) {
 			blueSkyMenuItem = new JRadioButtonMenuItem("Blue Sky");
 			blueSkyMenuItem.addItemListener(new ItemListener() {
@@ -3740,7 +3765,7 @@ public class MainFrame extends JFrame {
 		return blueSkyMenuItem;
 	}
 
-	public JRadioButtonMenuItem getDesertMenuItem() {
+	private JRadioButtonMenuItem getDesertMenuItem() {
 		if (desertMenuItem == null) {
 			desertMenuItem = new JRadioButtonMenuItem("Desert");
 			desertMenuItem.addItemListener(new ItemListener() {
@@ -3759,7 +3784,7 @@ public class MainFrame extends JFrame {
 		return desertMenuItem;
 	}
 
-	public JRadioButtonMenuItem getGrasslandMenuItem() {
+	private JRadioButtonMenuItem getGrasslandMenuItem() {
 		if (grasslandMenuItem == null) {
 			grasslandMenuItem = new JRadioButtonMenuItem("Grassland");
 			grasslandMenuItem.addItemListener(new ItemListener() {
@@ -3778,7 +3803,7 @@ public class MainFrame extends JFrame {
 		return grasslandMenuItem;
 	}
 
-	public JRadioButtonMenuItem getForestMenuItem() {
+	private JRadioButtonMenuItem getForestMenuItem() {
 		if (forestMenuItem == null) {
 			forestMenuItem = new JRadioButtonMenuItem("Forest");
 			forestMenuItem.addItemListener(new ItemListener() {

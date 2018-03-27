@@ -24,6 +24,7 @@ import com.ardor3d.bounding.CollisionTreeManager;
 import com.ardor3d.bounding.OrientedBoundingBox;
 import com.ardor3d.extension.effect.bloom.BloomRenderPass;
 import com.ardor3d.math.ColorRGBA;
+import com.ardor3d.math.MathUtils;
 import com.ardor3d.math.Matrix3;
 import com.ardor3d.math.Transform;
 import com.ardor3d.math.Vector3;
@@ -347,7 +348,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			break;
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			final Vector3 sunDirection = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal();
-			final Vector3 rotationAxis = new Vector3(Math.cos(az), Math.sin(az), 0); // by default, the rotation axis is in the east-west direction, so az = 0 maps to (1, 0, 0)
+			final Vector3 rotationAxis = Util.isZero(az) ? new Vector3(1, 0, 0) : new Vector3(MathUtils.cos(az), MathUtils.sin(az), 0); // by default, the rotation axis is in the east-west direction, so az = 0 maps to (1, 0, 0)
 			final double axisSunDot = sunDirection.dot(rotationAxis);
 			rotationAxis.multiplyLocal(Util.isZero(axisSunDot) ? 0.001 : axisSunDot); // avoid singularity when the direction of the sun is perpendicular to the rotation axis
 			normal = sunDirection.subtractLocal(rotationAxis).normalizeLocal();
@@ -628,6 +629,9 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		switch (trackerType) {
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			name = "HSAT";
+			break;
+		case TILTED_SINGLE_AXIS_TRACKER:
+			name = "TSAT";
 			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
 			name = "VSAT";

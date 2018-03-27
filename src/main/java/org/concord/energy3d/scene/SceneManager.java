@@ -2051,7 +2051,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			@Override
 			public Object call() {
 				try {
-					if (operation == Operation.SELECT) {
+					if (operation == Operation.SELECT || operation == Operation.RESIZE) {
 						final HousePart previousSelectedHousePart = selectedPart;
 						if (mouseState == null) {
 							mouseState = new MouseState(x, y, 0, 0, 0, null, null);

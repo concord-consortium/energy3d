@@ -516,6 +516,9 @@ public class SolarPanel extends HousePart implements Trackable, Meshable, Labela
 		case HORIZONTAL_SINGLE_AXIS_TRACKER:
 			name = "HSAT";
 			break;
+		case TILTED_SINGLE_AXIS_TRACKER:
+			name = "TSAT";
+			break;
 		case VERTICAL_SINGLE_AXIS_TRACKER:
 			name = "VSAT";
 			break;

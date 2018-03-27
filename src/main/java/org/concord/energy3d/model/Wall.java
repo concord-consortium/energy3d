@@ -1466,6 +1466,9 @@ public class Wall extends HousePart implements Thermal {
 		if (t == TextureMode.SOUTHERN) {
 			return "wall_04.png";
 		}
+		if (t == TextureMode.STONE) {
+			return "wall_05.png";
+		}
 		return null;
 	}
 
