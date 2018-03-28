@@ -1512,6 +1512,7 @@ public class MainFrame extends JFrame {
 			examplesMenu.add(complexMenu);
 			addModel(complexMenu, "Cape Cod with Front Porch", "templates/example-cape-cod-front-porch.ng3");
 			addModel(complexMenu, "Cape Cod with Garage", "templates/example-cape-cod-attached-garage.ng3");
+			addModel(complexMenu, "Cape Cod with Shed and Gable Dormers", "templates/example-cape-cod-shed-gable-dormers.ng3");
 			addModel(complexMenu, "Colonial with Fence", "templates/example-colonial-fence.ng3");
 			addModel(complexMenu, "Colonial with Front Porch", "templates/example-colonial-front-porch.ng3");
 			addModel(complexMenu, "L-Shaped Colonial", "templates/example-colonial-l-shaped.ng3");
