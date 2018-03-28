@@ -227,7 +227,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	private final java.util.Timer keyHolder = new java.util.Timer();
 	private KeyHolderTask arrowKeyHolderTask;
-	private final short keyHolderInterval = 100;
+	private final short keyHolderInterval = 200;
+	private volatile boolean arrowKeyBlock;
 
 	private class KeyHolderTask extends TimerTask {
 
@@ -242,13 +243,17 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 		@Override
 		public void run() {
-			SceneManager.getTaskManager().update(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					moveWithKey(keyboardState, direction);
-					return null;
-				}
-			});
+			if (!arrowKeyBlock) {
+				arrowKeyBlock = true;
+				SceneManager.getTaskManager().update(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						moveWithKey(keyboardState, direction);
+						arrowKeyBlock = false;
+						return null;
+					}
+				});
+			}
 		}
 
 	}
