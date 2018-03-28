@@ -223,7 +223,7 @@ public class Scene implements Serializable {
 	};
 
 	public static enum TextureMode {
-		None, Simple, Full, BRICK, SOUTHERN, GRAY_SHINGLE_ROOF, STONE
+		None, Simple, Full, BRICK, SOUTHERN, GRAY_SHINGLE_ROOF, STONE, WHITE_BRICK
 	};
 
 	public static Scene getInstance() {

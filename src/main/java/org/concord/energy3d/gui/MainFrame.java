@@ -252,7 +252,8 @@ public class MainFrame extends JFrame {
 	private JRadioButtonMenuItem noBuildingTextureMenuItem;
 	private JRadioButtonMenuItem simpleBuildingTextureMenuItem;
 	private JRadioButtonMenuItem graySidingShingleBuildingTextureMenuItem;
-	private JRadioButtonMenuItem brickBuildingTextureMenuItem;
+	private JRadioButtonMenuItem redBrickBuildingTextureMenuItem;
+	private JRadioButtonMenuItem whiteBrickBuildingTextureMenuItem;
 	private JRadioButtonMenuItem grayShingleRoofBuildingTextureMenuItem;
 	private JRadioButtonMenuItem southernStyleBuildingTextureMenuItem;
 	private JRadioButtonMenuItem stoneWallTextureMenuItem;
@@ -1771,7 +1772,8 @@ public class MainFrame extends JFrame {
 			buildingTextureMenu.add(getSimpleBuildingTextureMenuItem());
 			buildingTextureMenu.add(getGraySidingShingleBuildingTextureMenuItem());
 			buildingTextureMenu.add(getGrayShingleRoofBuildingTextureMenuItem());
-			buildingTextureMenu.add(getBrickBuildingTextureMenuItem());
+			buildingTextureMenu.add(getRedBrickBuildingTextureMenuItem());
+			buildingTextureMenu.add(getWhiteBrickBuildingTextureMenuItem());
 			buildingTextureMenu.add(getSouthernStyleBuildingTextureMenuItem());
 			buildingTextureMenu.add(getStoneWallTextureMenuItem());
 			buildingTextureMenu.addMenuListener(new MenuListener() {
@@ -1790,7 +1792,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(simpleBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Simple);
 					Util.selectSilently(graySidingShingleBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.Full);
 					Util.selectSilently(grayShingleRoofBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.GRAY_SHINGLE_ROOF);
-					Util.selectSilently(brickBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
+					Util.selectSilently(redBrickBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.BRICK);
 					Util.selectSilently(southernStyleBuildingTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.SOUTHERN);
 					Util.selectSilently(stoneWallTextureMenuItem, Scene.getInstance().getTextureMode() == TextureMode.STONE);
 				}
@@ -3659,10 +3661,10 @@ public class MainFrame extends JFrame {
 		return graySidingShingleBuildingTextureMenuItem;
 	}
 
-	private JRadioButtonMenuItem getBrickBuildingTextureMenuItem() {
-		if (brickBuildingTextureMenuItem == null) {
-			brickBuildingTextureMenuItem = new JRadioButtonMenuItem("Brick Wall");
-			brickBuildingTextureMenuItem.addItemListener(new ItemListener() {
+	private JRadioButtonMenuItem getRedBrickBuildingTextureMenuItem() {
+		if (redBrickBuildingTextureMenuItem == null) {
+			redBrickBuildingTextureMenuItem = new JRadioButtonMenuItem("Red Brick Wall");
+			redBrickBuildingTextureMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
 					if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -3676,9 +3678,31 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
-			buildingTextureButtonGroup.add(brickBuildingTextureMenuItem);
+			buildingTextureButtonGroup.add(redBrickBuildingTextureMenuItem);
 		}
-		return brickBuildingTextureMenuItem;
+		return redBrickBuildingTextureMenuItem;
+	}
+
+	private JRadioButtonMenuItem getWhiteBrickBuildingTextureMenuItem() {
+		if (whiteBrickBuildingTextureMenuItem == null) {
+			whiteBrickBuildingTextureMenuItem = new JRadioButtonMenuItem("White Brick Wall");
+			whiteBrickBuildingTextureMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.WHITE_BRICK);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			buildingTextureButtonGroup.add(whiteBrickBuildingTextureMenuItem);
+		}
+		return whiteBrickBuildingTextureMenuItem;
 	}
 
 	private JRadioButtonMenuItem getSouthernStyleBuildingTextureMenuItem() {

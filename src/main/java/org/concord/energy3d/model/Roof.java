@@ -725,6 +725,9 @@ public abstract class Roof extends HousePart implements Thermal {
 		if (t == TextureMode.STONE) {
 			return "roof_05.png";
 		}
+		if (t == TextureMode.WHITE_BRICK) {
+			return "roof_06.png";
+		}
 		return null;
 	}
 
