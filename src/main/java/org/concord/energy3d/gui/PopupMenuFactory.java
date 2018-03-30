@@ -117,7 +117,7 @@ public abstract class PopupMenuFactory {
 			return PopupMenuForDoor.getPopupMenu();
 		}
 		if (selectedPart instanceof Floor) {
-			return PopupMenuForFloor.getPopupMenu();
+			return PopupMenuForFloor.getPopupMenu(e);
 		}
 		if (selectedPart instanceof Foundation) {
 			final Foundation f = (Foundation) selectedPart;

@@ -3,6 +3,9 @@ package org.concord.energy3d.model;
 import java.nio.FloatBuffer;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
+import org.concord.energy3d.gui.MainFrame;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -284,6 +287,68 @@ public class Door extends HousePart implements Thermal {
 			return false;
 		}
 		return super.isDrawable();
+	}
+
+	public void setDoorWidth(final double width) {
+		final Vector3 a = toRelativeVector(getAbsPoint(2).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(0.5 * (width - getDoorWidth()) / Scene.getInstance().getAnnotationScale()));
+		points.get(0).subtractLocal(a);
+		points.get(1).subtractLocal(a);
+		points.get(2).addLocal(a);
+		points.get(3).addLocal(a);
+	}
+
+	public double getDoorWidth() {
+		return getAbsPoint(0).distance(getAbsPoint(2)) * Scene.getInstance().getAnnotationScale();
+	}
+
+	public void setDoorHeight(final double height) {
+		final Vector3 a = toRelativeVector(getAbsPoint(1).subtract(getAbsPoint(0), null).normalizeLocal().multiplyLocal(height / Scene.getInstance().getAnnotationScale()));
+		points.get(1).set(points.get(0).add(a, null));
+		points.get(3).set(points.get(2).add(a, null));
+	}
+
+	public double getDoorHeight() {
+		return getAbsPoint(0).distance(getAbsPoint(1)) * Scene.getInstance().getAnnotationScale();
+	}
+
+	private boolean overlap() {
+		final double w1 = getAbsPoint(0).distance(getAbsPoint(2));
+		final Vector3 center = getAbsCenter();
+		for (final HousePart p : container.getChildren()) {
+			if (p != this && (p instanceof Door || p instanceof Window)) {
+				final double w2 = p.getAbsPoint(0).distance(p.getAbsPoint(2));
+				if (p.getAbsCenter().distance(center) < (w1 + w2) * 0.55) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public HousePart copy(final boolean check) {
+		final Door c = (Door) super.copy(false);
+		if (check) {
+			if (container instanceof Wall) {
+				final double s = Math.signum(toRelative(container.getAbsCenter()).subtractLocal(toRelative(Scene.getInstance().getOriginalCopy().getAbsCenter())).dot(Vector3.UNIT_X));
+				final double shift = s * (points.get(0).distance(points.get(2)) * 2); // place the next door one width away
+				final int n = c.getPoints().size();
+				for (int i = 0; i < n; i++) {
+					final double newX = points.get(i).getX() + shift;
+					if (newX > 1 - shift / 20 || newX < shift / 20) {
+						return null;
+					}
+				}
+				for (int i = 0; i < n; i++) {
+					c.points.get(i).setX(points.get(i).getX() + shift);
+				}
+				if (c.overlap()) {
+					JOptionPane.showMessageDialog(MainFrame.getInstance(), "Sorry, your new door is too close to an existing door or window.", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				}
+			}
+		}
+		return c;
 	}
 
 	@Override

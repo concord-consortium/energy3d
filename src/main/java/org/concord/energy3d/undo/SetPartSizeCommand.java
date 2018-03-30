@@ -3,6 +3,7 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.FresnelReflector;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Mirror;
@@ -47,6 +48,10 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 			final Window w = (Window) part;
 			oldWidth = w.getWindowWidth();
 			oldHeight = w.getWindowHeight();
+		} else if (part instanceof Door) {
+			final Door d = (Door) part;
+			oldWidth = d.getDoorWidth();
+			oldHeight = d.getDoorHeight();
 		}
 	}
 
@@ -108,6 +113,13 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 			w.setWindowWidth(oldWidth);
 			w.setWindowHeight(oldHeight);
 			w.getContainer().draw();
+		} else if (part instanceof Door) {
+			final Door d = (Door) part;
+			newWidth = d.getDoorWidth();
+			newHeight = d.getDoorHeight();
+			d.setDoorWidth(oldWidth);
+			d.setDoorHeight(oldHeight);
+			d.getContainer().draw();
 		}
 		part.draw();
 		SceneManager.getInstance().refresh();
@@ -142,6 +154,11 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 			w.setWindowWidth(newWidth);
 			w.setWindowHeight(newHeight);
 			w.getContainer().draw();
+		} else if (part instanceof Door) {
+			final Door d = (Door) part;
+			d.setDoorWidth(newWidth);
+			d.setDoorHeight(newHeight);
+			d.getContainer().draw();
 		}
 		part.draw();
 		SceneManager.getInstance().refresh();
@@ -166,6 +183,9 @@ public class SetPartSizeCommand extends MyAbstractUndoableEdit {
 		}
 		if (part instanceof Window) {
 			return "Set Size for Selected Window";
+		}
+		if (part instanceof Door) {
+			return "Set Size for Selected Door";
 		}
 		return "Set Size";
 	}

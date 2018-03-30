@@ -7,6 +7,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.concurrent.Callable;
 
 import javax.swing.ButtonGroup;
@@ -31,7 +32,19 @@ class PopupMenuForFloor extends PopupMenuFactory {
 
 	private static JPopupMenu popupMenuForFloor;
 
-	static JPopupMenu getPopupMenu() {
+	static JPopupMenu getPopupMenu(final MouseEvent e) {
+
+		if (e.isShiftDown()) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					Scene.getInstance().pasteToPickedLocationOnFloor();
+					Scene.getInstance().setEdited(true);
+					return null;
+				}
+			});
+			return null;
+		}
 
 		if (popupMenuForFloor == null) {
 

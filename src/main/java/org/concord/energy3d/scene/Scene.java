@@ -980,7 +980,7 @@ public class Scene implements Serializable {
 				part.draw();
 			} else if (part instanceof Foundation) {
 				redrawFoundationNow((Foundation) part);
-			} else if (part instanceof Window) {
+			} else if (part instanceof Window || part instanceof Door) {
 				part.draw();
 				part.getContainer().draw();
 			} else {

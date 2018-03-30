@@ -1875,6 +1875,29 @@ public class Wall extends HousePart implements Thermal {
 		return windows;
 	}
 
+	public void setDoorSize(final double width, final double height) {
+		for (final HousePart p : children) {
+			if (p instanceof Door) {
+				final Door d = (Door) p;
+				d.setDoorWidth(width);
+				d.setDoorHeight(height);
+				d.draw();
+			}
+		}
+		draw();
+		SceneManager.getInstance().refresh();
+	}
+
+	public List<Door> getDoors() {
+		final List<Door> doors = new ArrayList<Door>();
+		for (final HousePart x : children) {
+			if (x instanceof Door) {
+				doors.add((Door) x);
+			}
+		}
+		return doors;
+	}
+
 	@Override
 	public void addPrintMeshes(final List<Mesh> list) {
 		addPrintMesh(list, mesh);

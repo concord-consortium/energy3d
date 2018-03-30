@@ -1896,6 +1896,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		return list;
 	}
 
+	public List<Door> getDoors() {
+		final List<Door> list = new ArrayList<Door>();
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Door && p.getTopContainer() == this) {
+				list.add((Door) p);
+			}
+		}
+		return list;
+	}
+
 	public int countParts(final Class<?> clazz) {
 		int count = 0;
 		for (final HousePart p : Scene.getInstance().getParts()) {
@@ -3599,6 +3609,19 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 				w.setWindowHeight(height);
 				w.draw();
 				w.getContainer().draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
+	public void setSizeForDoors(final double width, final double height) {
+		for (final HousePart p : Scene.getInstance().getParts()) {
+			if (p instanceof Door && p.getTopContainer() == this) {
+				final Door d = (Door) p;
+				d.setDoorWidth(width);
+				d.setDoorHeight(height);
+				d.draw();
+				d.getContainer().draw();
 			}
 		}
 		SceneManager.getInstance().refresh();
