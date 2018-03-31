@@ -42,6 +42,11 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Mirror extends HousePart implements SolarReflector, Labelable {
 
+	public static final int TEXTURE_ONE_MIRROR = 0;
+	public static final int TEXTURE_2X1_MIRRORS = 1;
+	public static final int TEXTURE_7X5_MIRRORS = 2;
+	public static final int TEXTURE_1X2_MIRRORS = 3;
+
 	private static final long serialVersionUID = 1L;
 	private transient ReadOnlyVector3 normal;
 	private transient Mesh outlineMesh;
@@ -357,11 +362,11 @@ public class Mirror extends HousePart implements SolarReflector, Labelable {
 	@Override
 	protected String getTextureFileName() {
 		switch (Scene.getInstance().getHeliostatTextureType()) {
-		case Scene.HELIOSTAT_TEXTURE_2X1_MIRRORS:
+		case TEXTURE_2X1_MIRRORS:
 			return "mirror2x1.png";
-		case Scene.HELIOSTAT_TEXTURE_1X2_MIRRORS:
+		case TEXTURE_1X2_MIRRORS:
 			return "mirror1x2.png";
-		case Scene.HELIOSTAT_TEXTURE_7X5_MIRRORS:
+		case TEXTURE_7X5_MIRRORS:
 			return "mirror7x5.png";
 		default:
 			return "mirror.png";

@@ -47,6 +47,13 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Wall extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
+	public static final int TEXTURE_01 = 0;
+	public static final int TEXTURE_02 = 1;
+	public static final int TEXTURE_03 = 2;
+	public static final int TEXTURE_04 = 3;
+	public static final int TEXTURE_05 = 4;
+	public static final int TEXTURE_06 = 5;
+
 	private static final double DEFAULT_WALL_HEIGHT = 30.0; // the recommended default wall height is 6m
 	private static double userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
 	private static int currentVisitStamp = 1;
@@ -1450,26 +1457,24 @@ public class Wall extends HousePart implements Thermal {
 
 	@Override
 	protected String getTextureFileName() {
-		final TextureMode t = Scene.getInstance().getTextureMode();
-		if (t == TextureMode.Simple) {
+		if (Scene.getInstance().getTextureMode() == TextureMode.None) { // backward compatibility
+			return null;
+		}
+		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
 			return "wall.png";
 		}
-		if (t == TextureMode.Full) {
+		switch (Scene.getInstance().getWallTextureType()) {
+		case TEXTURE_01:
 			return "wall_01.png";
-		}
-		if (t == TextureMode.GRAY_SHINGLE_ROOF) {
+		case TEXTURE_02:
 			return "wall_02.png";
-		}
-		if (t == TextureMode.BRICK) {
+		case TEXTURE_03:
 			return "wall_03.png";
-		}
-		if (t == TextureMode.SOUTHERN) {
+		case TEXTURE_04:
 			return "wall_04.png";
-		}
-		if (t == TextureMode.STONE) {
+		case TEXTURE_05:
 			return "wall_05.png";
-		}
-		if (t == TextureMode.WHITE_BRICK) {
+		case TEXTURE_06:
 			return "wall_06.png";
 		}
 		return null;

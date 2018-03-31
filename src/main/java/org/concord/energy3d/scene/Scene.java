@@ -101,11 +101,6 @@ public class Scene implements Serializable {
 	public static final int GRASSLAND_THEME = 2;
 	public static final int FOREST_THEME = 3;
 
-	public static final int HELIOSTAT_TEXTURE_ONE_MIRROR = 0;
-	public static final int HELIOSTAT_TEXTURE_2X1_MIRRORS = 1;
-	public static final int HELIOSTAT_TEXTURE_7X5_MIRRORS = 2;
-	public static final int HELIOSTAT_TEXTURE_1X2_MIRRORS = 3;
-
 	public static final int INSTRUCTION_SHEET_NUMBER = 5;
 
 	private static final long serialVersionUID = 1L;
@@ -188,7 +183,9 @@ public class Scene implements Serializable {
 	private String[] instructionSheetTextType;
 	private boolean instructionTabHeaderInvisible;
 	private boolean noSnapshotLogging;
-	private int heliostatTextureType = HELIOSTAT_TEXTURE_ONE_MIRROR;
+	private int heliostatTextureType = Mirror.TEXTURE_ONE_MIRROR;
+	private int wallTextureType = Wall.TEXTURE_01;
+	private int roofTextureType = Roof.TEXTURE_01;
 
 	/* the following parameters specify the resolution of discretization for a simulation */
 
@@ -223,7 +220,7 @@ public class Scene implements Serializable {
 	};
 
 	public static enum TextureMode {
-		None, Simple, Full, BRICK, SOUTHERN, GRAY_SHINGLE_ROOF, STONE, WHITE_BRICK
+		None, Simple, Full // BRICK, SOUTHERN, GRAY_SHINGLE_ROOF, STONE // all the capitalized names are deprecated
 	};
 
 	public static Scene getInstance() {
@@ -1541,6 +1538,22 @@ public class Scene implements Serializable {
 
 	public TextureMode getTextureMode() {
 		return textureMode;
+	}
+
+	public void setWallTextureType(final int wallTextureType) {
+		this.wallTextureType = wallTextureType;
+	}
+
+	public int getWallTextureType() {
+		return wallTextureType;
+	}
+
+	public void setRoofTextureType(final int roofTextureType) {
+		this.roofTextureType = roofTextureType;
+	}
+
+	public int getRoofTextureType() {
+		return roofTextureType;
 	}
 
 	public void setHeliostatTextureType(final int heliostatTextureType) {

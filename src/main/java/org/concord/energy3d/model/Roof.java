@@ -56,6 +56,13 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
+	public static final int TEXTURE_01 = 0;
+	public static final int TEXTURE_02 = 1;
+	public static final int TEXTURE_03 = 2;
+	public static final int TEXTURE_04 = 3;
+	public static final int TEXTURE_05 = 4;
+	public static final int TEXTURE_06 = 5;
+
 	public static final double OVERHANG_MIN = 0.01;
 	public static final int SOLID = 0;
 	public static final int TRANSPARENT = 1;
@@ -706,26 +713,24 @@ public abstract class Roof extends HousePart implements Thermal {
 
 	@Override
 	protected String getTextureFileName() {
-		final TextureMode t = Scene.getInstance().getTextureMode();
-		if (t == TextureMode.Simple) {
+		if (Scene.getInstance().getTextureMode() == TextureMode.None) { // backward compatibility
+			return null;
+		}
+		if (Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
 			return "roof.png";
 		}
-		if (t == TextureMode.Full) {
+		switch (Scene.getInstance().getRoofTextureType()) {
+		case TEXTURE_01:
 			return "roof_01.png";
-		}
-		if (t == TextureMode.GRAY_SHINGLE_ROOF) {
+		case TEXTURE_02:
 			return "roof_02.png";
-		}
-		if (t == TextureMode.BRICK) {
+		case TEXTURE_03:
 			return "roof_03.png";
-		}
-		if (t == TextureMode.SOUTHERN) {
+		case TEXTURE_04:
 			return "roof_04.png";
-		}
-		if (t == TextureMode.STONE) {
+		case TEXTURE_05:
 			return "roof_05.png";
-		}
-		if (t == TextureMode.WHITE_BRICK) {
+		case TEXTURE_06:
 			return "roof_06.png";
 		}
 		return null;
