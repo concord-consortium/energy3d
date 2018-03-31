@@ -2960,6 +2960,16 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setMonthlyTiltAnglesForRacks(final double[] angles) {
+		for (final HousePart p : Scene.getInstance().getParts()) { // don't just call children as a solar panel may not be a direct offspring of the foundation (e.g., it can be a child of a roof)
+			if (p instanceof Rack && p.getTopContainer() == this) {
+				((Rack) p).setMonthlyTiltAngles(angles);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public boolean checkContainerIntersectionForRacks() {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack && p.getTopContainer() == this) {

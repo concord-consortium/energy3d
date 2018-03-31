@@ -3,6 +3,8 @@ package org.concord.energy3d.model;
 import java.awt.EventQueue;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -67,9 +69,10 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 	private ReadOnlyVector3 previousNormal;
 	private double rackWidth = 4.95; // 5x1 0.99x1.65 solar panels by default (use only one row so that it can fit a small roof)
 	private double rackHeight = 1.65;
-	private double relativeAzimuth = 0;
+	private double relativeAzimuth;
 	private transient double oldRelativeAzimuth;
-	private double tiltAngle = 0;
+	private double tiltAngle; // fixed tilt angle
+	private double[] monthlyTiltAngles; // seasonally adjusted tilt angles
 	private double baseHeight = 15;
 	private double poleDistanceX = 4;
 	private double poleDistanceY = 2;
@@ -105,6 +108,10 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 		if (Util.isZero(rackHeight)) {
 			rackHeight = 1.65;
+		}
+		if (monthlyTiltAngles == null) {
+			monthlyTiltAngles = new double[12];
+			Arrays.fill(monthlyTiltAngles, tiltAngle);
 		}
 
 		mesh = new Mesh("Rack");
@@ -330,6 +337,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		}
 
 		final double az = Math.toRadians(relativeAzimuth);
+		final double currentTilt = monthlyTiltAngles[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)];
 		boolean onFlatSurface = onFlatSurface();
 		getEditPointShape(0).setDefaultColor(ColorRGBA.ORANGE);
 		final Mesh host = meshLocator == null ? null : meshLocator.find(); // if this rack rests on an imported mesh or not?
@@ -356,7 +364,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		case VERTICAL_SINGLE_AXIS_TRACKER:
 			final Vector3 a = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).multiplyLocal(1, 1, 0).normalizeLocal();
 			final Vector3 b = Vector3.UNIT_Z.cross(a, null);
-			Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - tiltAngle), b.getX(), b.getY(), b.getZ());
+			Matrix3 m = new Matrix3().applyRotation(Math.toRadians(90 - currentTilt), b.getX(), b.getY(), b.getZ());
 			normal = m.applyPost(a, null);
 			if (normal.getZ() < 0) {
 				normal = normal.negate(null);
@@ -366,7 +374,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			final double sunAngleX = Heliodon.getInstance().computeSunLocation(Heliodon.getInstance().getCalendar()).normalizeLocal().dot(Vector3.UNIT_X);
 			System.out.println("*** sun cosx = " + sunAngleX + ", " + Math.toDegrees(Math.asin(sunAngleX)));
 			// rotate the normal according to the tilt angle, at this point, the axis is still north-south
-			setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), az); // exactly 90 degrees will cause the solar panel to disappear
+			setNormal(Util.isZero(currentTilt) ? Math.PI / 2 * dotE : Math.toRadians(90 - currentTilt), az); // exactly 90 degrees will cause the solar panel to disappear
 			System.out.println("*** tilt normal = " + normal);
 			// the following vector should be the rack axis
 			final Vector3 rackAxis = Vector3.UNIT_X.cross(normal, null);
@@ -380,7 +388,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			break;
 		default:
 			if (onFlatSurface) {
-				setNormal(Util.isZero(tiltAngle) ? Math.PI / 2 * dotE : Math.toRadians(90 - tiltAngle), az); // exactly 90 degrees will cause the solar panel to disappear
+				setNormal(Util.isZero(currentTilt) ? Math.PI / 2 * dotE : Math.toRadians(90 - currentTilt), az); // exactly 90 degrees will cause the solar panel to disappear
 			}
 		}
 		if (Util.isEqual(normal, Vector3.UNIT_Z)) {
@@ -495,9 +503,9 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 				if (vDir.dot(normal) < 0) {
 					vDir.negateLocal();
 				}
-				final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(tiltAngle)));
+				final double tanTiltAngle = Math.abs(Math.tan(Math.toRadians(currentTilt)));
 				if (tanTiltAngle < 100) {
-					final double cosTiltAngle = Math.cos(Math.toRadians(tiltAngle));
+					final double cosTiltAngle = Math.cos(Math.toRadians(currentTilt));
 					final double poleDistanceYHorizontal = poleDistanceY * cosTiltAngle; // project to the horizontal direction
 					final double rackHeightHorizontal = rackHeight * cosTiltAngle;
 					final double halfRackHeightHorizontal = 0.5 * rackHeightHorizontal;
@@ -603,7 +611,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			text += (text.equals("") ? "" : "\n") + EnergyPanel.TWO_DECIMALS.format(100 * sampleSolarPanel.getCellEfficiency()) + "%";
 		}
 		if (labelTiltAngle) {
-			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(onFlatSurface ? tiltAngle : Math.toDegrees(Math.asin(normal.getY()))) + " \u00B0";
+			text += (text.equals("") ? "" : "\n") + EnergyPanel.ONE_DECIMAL.format(onFlatSurface ? monthlyTiltAngles[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)] : Math.toDegrees(Math.asin(normal.getY()))) + " \u00B0";
 		}
 		if (labelTracker) {
 			final String name = getTrackerName();
@@ -966,10 +974,6 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		return relativeAzimuth;
 	}
 
-	public void setTiltAngle(final double tiltAngle) {
-		this.tiltAngle = tiltAngle;
-	}
-
 	private void rotateSolarPanels(final Matrix3 matrix) {
 		if (children.isEmpty()) {
 			return;
@@ -990,8 +994,36 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 		return matrix;
 	}
 
+	public void setTiltAngle(final double tiltAngle) {
+		this.tiltAngle = tiltAngle;
+		Arrays.fill(monthlyTiltAngles, tiltAngle);
+	}
+
 	public double getTiltAngle() {
 		return tiltAngle;
+	}
+
+	public void setMonthlyTiltAngles(final double[] a) {
+		for (int i = 0; i < 12; i++) {
+			monthlyTiltAngles[i] = a[i];
+		}
+	}
+
+	public boolean areMonthlyTiltAnglesSet() {
+		for (int i = 1; i < 12; i++) {
+			if (!Util.isEqual(monthlyTiltAngles[0], monthlyTiltAngles[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public double[] getMonthlyTiltAngles() {
+		return monthlyTiltAngles;
+	}
+
+	public double getTiltAngleOfMonth(final int month) {
+		return monthlyTiltAngles[month];
 	}
 
 	@Override
@@ -1111,7 +1143,7 @@ public class Rack extends HousePart implements Trackable, Meshable, Labelable {
 			final Vector3 p0 = getAbsPoint(0);
 			final double w = a / Scene.getInstance().getAnnotationScale();
 			final double h = b / Scene.getInstance().getAnnotationScale();
-			final double costilt = Math.cos(Math.toRadians(tiltAngle));
+			final double costilt = Math.cos(Math.toRadians(monthlyTiltAngles[Heliodon.getInstance().getCalendar().get(Calendar.MONTH)]));
 			final double x0 = p0.getX() - 0.5 * (rackWidth - remainderX) / Scene.getInstance().getAnnotationScale();
 			final double y0 = p0.getY() - 0.5 * (rackHeight - remainderY) / Scene.getInstance().getAnnotationScale() * costilt;
 			for (int r = 0; r < rows; r++) {

@@ -1641,8 +1641,9 @@ public class MainFrame extends JFrame {
 			pvMenu.addSeparator();
 			addModel(pvMenu, "Rooftop Solar Power System", "tutorials/pv-rooftop-system.ng3");
 			addModel(pvMenu, "Parking Lot Solar Canopy", "tutorials/solar-canopy.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm: Fixed Rack Arrays", "tutorials/pv-fixed-rack-arrays.ng3");
-			addModel(pvMenu, "Photovoltaic Solar Farm: HSAT Rack Arrays", "tutorials/pv-hsat-rack-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: Arrays with Fixed Tilt Angles", "tutorials/pv-fixed-rack-arrays.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: Arrays with Seasonally Adjusted Tilt Angles", "tutorials/solar-rack-array-seasonal-tilt.ng3");
+			addModel(pvMenu, "Photovoltaic Solar Farm: Horizontal Single-Axis Tracker Arrays", "tutorials/pv-hsat-rack-arrays.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: Cost-Effectiveness", "tutorials/solar-rack-why-array.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: The Effect of Inter-Row Spacing", "tutorials/solar-rack-array-row-spacing.ng3");
 			addModel(pvMenu, "Photovoltaic Solar Farm: Landscape vs. Portrait Arrays", "tutorials/solar-rack-array-row-spacing-portrait.ng3");
@@ -2138,7 +2139,7 @@ public class MainFrame extends JFrame {
 					if (JOptionPane.showConfirmDialog(MainFrame.this, "Sorting IDs may break scripts. Do you want to continue?", "Confirmation", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION) {
 						return;
 					}
-					long id = 0;
+					long id = 1;
 					for (final HousePart x : Scene.getInstance().getParts()) {
 						x.setId(id++);
 					}

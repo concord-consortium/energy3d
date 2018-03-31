@@ -2738,6 +2738,16 @@ public class Scene implements Serializable {
 		SceneManager.getInstance().refresh();
 	}
 
+	public void setMonthlyTiltAnglesForAllRacks(final double[] angles) {
+		for (final HousePart p : parts) {
+			if (p instanceof Rack) {
+				((Rack) p).setMonthlyTiltAngles(angles);
+				p.draw();
+			}
+		}
+		SceneManager.getInstance().refresh();
+	}
+
 	public boolean checkContainerIntersectionForAllRacks() {
 		for (final HousePart p : Scene.getInstance().getParts()) {
 			if (p instanceof Rack) {

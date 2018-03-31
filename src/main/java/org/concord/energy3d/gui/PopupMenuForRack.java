@@ -39,6 +39,7 @@ import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.model.Trackable;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.simulation.AnnualGraph;
 import org.concord.energy3d.simulation.PvAnnualAnalysis;
 import org.concord.energy3d.simulation.PvDailyAnalysis;
 import org.concord.energy3d.simulation.PvModuleSpecs;
@@ -48,8 +49,11 @@ import org.concord.energy3d.undo.ChangeAzimuthForAllRacksCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightCommand;
 import org.concord.energy3d.undo.ChangeBaseHeightForAllSolarCollectorsCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackAzimuthCommand;
+import org.concord.energy3d.undo.ChangeFoundationRackMonthlyTiltAnglesCommand;
 import org.concord.energy3d.undo.ChangeFoundationRackTiltAngleCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand;
+import org.concord.energy3d.undo.ChangeMonthlyTiltAnglesCommand;
+import org.concord.energy3d.undo.ChangeMonthlyTiltAnglesForAllRacksCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForAllRacksCommand;
 import org.concord.energy3d.undo.ChangePoleSettingsForRacksOnFoundationCommand;
 import org.concord.energy3d.undo.ChangeRackPoleSettingsCommand;
@@ -158,8 +162,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 				}
 			});
 
-			final JMenuItem miTiltAngle = new JMenuItem("Tilt Angle...");
-			miTiltAngle.addActionListener(new ActionListener() {
+			final JMenuItem miFixedTiltAngle = new JMenuItem("Fixed Tilt Angle...");
+			miFixedTiltAngle.addActionListener(new ActionListener() {
 
 				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
 
@@ -169,8 +173,13 @@ class PopupMenuForRack extends PopupMenuFactory {
 					if (!(selectedPart instanceof Rack)) {
 						return;
 					}
-					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final Rack rack = (Rack) selectedPart;
+					if (rack.areMonthlyTiltAnglesSet()) {
+						if (JOptionPane.showConfirmDialog(MainFrame.getInstance(), "<html>Choosing the fixed tilt angle will remove existing settings for seasonal tilt angles.<br>Are you sure?", "Confirm", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.CANCEL_OPTION) {
+							return;
+						}
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
 					final String title = "<html>Tilt Angle of " + partInfo + " (&deg;)</html>";
 					final String footnote = "<html><hr><font size=2>The tilt angle of a rack is the angle between its surface and the ground surface.<br>The tilt angle must be between -90&deg; and 90&deg;.<hr></html>";
 					final JPanel gui = new JPanel(new BorderLayout());
@@ -294,6 +303,172 @@ class PopupMenuForRack extends PopupMenuFactory {
 									if (choice == options[0]) {
 										break;
 									}
+								}
+							}
+						}
+					}
+				}
+			});
+
+			final JMenuItem miSeasonalTiltAngle = new JMenuItem("Seasonally Adjusted Tilt Angles...");
+			miSeasonalTiltAngle.addActionListener(new ActionListener() {
+
+				private int selectedScopeIndex = 0; // remember the scope selection as the next action will likely be applied to the same scope
+
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Rack)) {
+						return;
+					}
+					final String partInfo = selectedPart.toString().substring(0, selectedPart.toString().indexOf(')') + 1);
+					final Rack rack = (Rack) selectedPart;
+					final String title = "<html>Seasonally Adjusted Tilt Angles of " + partInfo + " (&deg;)</html>";
+					final String footnote = "<html><hr><font size=2>The tilt angle of a rack is the angle between its surface and the ground surface.<br>The tilt angle must be between -90&deg; and 90&deg; and may be adjusted seasonally.<hr></html>";
+					final JPanel gui = new JPanel(new BorderLayout());
+					final JPanel panel = new JPanel();
+					panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+					panel.setBorder(BorderFactory.createTitledBorder("Apply to:"));
+					final JRadioButton rb1 = new JRadioButton("Only this Rack", true);
+					final JRadioButton rb2 = new JRadioButton("All Racks on This Foundation");
+					final JRadioButton rb3 = new JRadioButton("All Racks");
+					panel.add(rb1);
+					panel.add(rb2);
+					panel.add(rb3);
+					final ButtonGroup bg = new ButtonGroup();
+					bg.add(rb1);
+					bg.add(rb2);
+					bg.add(rb3);
+					switch (selectedScopeIndex) {
+					case 0:
+						rb1.setSelected(true);
+						break;
+					case 1:
+						rb2.setSelected(true);
+						break;
+					case 2:
+						rb3.setSelected(true);
+						break;
+					}
+					gui.add(panel, BorderLayout.CENTER);
+
+					final JPanel inputPanel = new JPanel(new SpringLayout());
+					final JTextField[] fields = new JTextField[12];
+					for (int i = 0; i < 12; i++) {
+						final JLabel l = new JLabel(AnnualGraph.THREE_LETTER_MONTH[i] + ": ", JLabel.LEFT);
+						inputPanel.add(l);
+						fields[i] = new JTextField(rack.getTiltAngleOfMonth(i) + "", 5);
+						l.setLabelFor(fields[i]);
+						inputPanel.add(fields[i]);
+					}
+					SpringUtilities.makeCompactGrid(inputPanel, 4, 6, 6, 6, 6, 6);
+					gui.add(inputPanel, BorderLayout.SOUTH);
+
+					final Object[] options = new Object[] { "OK", "Cancel", "Apply" };
+					final JOptionPane optionPane = new JOptionPane(new Object[] { title, footnote, gui }, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[2]);
+					final JDialog dialog = optionPane.createDialog(MainFrame.getInstance(), "Seasonally Adjusted Tilt Angles");
+
+					while (true) {
+						fields[0].selectAll();
+						fields[0].requestFocusInWindow();
+						dialog.setVisible(true);
+						final Object choice = optionPane.getValue();
+						if (choice == options[1] || choice == null) {
+							break;
+						} else {
+							final double[] val = new double[12];
+							boolean ok = true;
+							for (int i = 0; i < 12; i++) {
+								try {
+									val[i] = Double.parseDouble(fields[i].getText());
+								} catch (final NumberFormatException exception) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), AnnualGraph.THREE_LETTER_MONTH[i] + ": " + fields[i].getText() + " is an invalid value!", "Error", JOptionPane.ERROR_MESSAGE);
+									ok = false;
+								}
+								if (ok) {
+									if (val[i] < -90 || val[i] > 90) {
+										JOptionPane.showMessageDialog(MainFrame.getInstance(), AnnualGraph.THREE_LETTER_MONTH[i] + ": The tilt angle must be between -90 and 90 degrees.", "Range Error", JOptionPane.ERROR_MESSAGE);
+										ok = false;
+									}
+								}
+							}
+							if (ok) {
+								boolean changed = false;
+								for (int i = 0; i < 12; i++) {
+									if (Util.isZero(val[i] - 90)) {
+										val[i] = 89.999;
+									} else if (Util.isZero(val[i] + 90)) {
+										val[i] = -89.999;
+									}
+									if (!changed) {
+										changed = val[i] != rack.getTiltAngleOfMonth(i);
+									}
+								}
+								if (rb1.isSelected()) {
+									if (changed) {
+										final ChangeMonthlyTiltAnglesCommand c = new ChangeMonthlyTiltAnglesCommand(rack);
+										rack.setMonthlyTiltAngles(val);
+										rack.draw();
+										if (rack.checkContainerIntersection()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "The rack cannot be tilted at such an angle as it would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().refresh();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+									}
+									selectedScopeIndex = 0;
+								} else if (rb2.isSelected()) {
+									final Foundation foundation = rack.getTopContainer();
+									if (!changed) {
+										for (final Rack x : foundation.getRacks()) {
+											for (int i = 0; i < 12; i++) {
+												if (x.getTiltAngleOfMonth(i) != val[i]) {
+													changed = true;
+													break;
+												}
+											}
+										}
+									}
+									if (changed) {
+										final ChangeFoundationRackMonthlyTiltAnglesCommand c = new ChangeFoundationRackMonthlyTiltAnglesCommand(foundation);
+										foundation.setMonthlyTiltAnglesForRacks(val);
+										if (foundation.checkContainerIntersectionForRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+									}
+									selectedScopeIndex = 1;
+								} else if (rb3.isSelected()) {
+									if (!changed) {
+										for (final Rack x : Scene.getInstance().getAllRacks()) {
+											for (int i = 0; i < 12; i++) {
+												if (x.getTiltAngleOfMonth(i) != val[i]) {
+													changed = true;
+													break;
+												}
+											}
+										}
+									}
+									if (changed) {
+										final ChangeMonthlyTiltAnglesForAllRacksCommand c = new ChangeMonthlyTiltAnglesForAllRacksCommand();
+										Scene.getInstance().setMonthlyTiltAnglesForAllRacks(val);
+										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Racks cannot be tilted at such an angle as one or more would cut into the underlying surface.", "Illegal Tilt Angle", JOptionPane.ERROR_MESSAGE);
+											c.undo();
+										} else {
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+									}
+									selectedScopeIndex = 2;
+								}
+								if (changed) {
+									updateAfterEdit();
+								}
+								if (choice == options[0]) {
+									break;
 								}
 							}
 						}
@@ -3266,11 +3441,13 @@ class PopupMenuForRack extends PopupMenuFactory {
 						miVerticalSingleAxisTracker.setEnabled(flat);
 					}
 					if (rack.getTracker() != Trackable.NO_TRACKER) {
-						miTiltAngle.setEnabled(rack.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || rack.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
+						miFixedTiltAngle.setEnabled(rack.getTracker() == Trackable.VERTICAL_SINGLE_AXIS_TRACKER || rack.getTracker() == Trackable.TILTED_SINGLE_AXIS_TRACKER); // vertical and tilted single-axis trackers can adjust the tilt angle
+						miSeasonalTiltAngle.setEnabled(miFixedTiltAngle.isEnabled());
 						miAzimuth.setEnabled(rack.getTracker() != Trackable.ALTAZIMUTH_DUAL_AXIS_TRACKER && rack.getTracker() != Trackable.VERTICAL_SINGLE_AXIS_TRACKER); // any tracker that will alter the azimuth angle should disable the menu item
 						miRotate.setEnabled(miAzimuth.isEnabled());
 					} else {
-						miTiltAngle.setEnabled(true);
+						miFixedTiltAngle.setEnabled(true);
+						miSeasonalTiltAngle.setEnabled(true);
 						miAzimuth.setEnabled(true);
 						miRotate.setEnabled(true);
 						miBaseHeight.setEnabled(true);
@@ -3278,7 +3455,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 						if (rack.getContainer() instanceof Roof) {
 							final Roof roof = (Roof) rack.getContainer();
 							if (roof.getHeight() > 0) {
-								miTiltAngle.setEnabled(false);
+								miFixedTiltAngle.setEnabled(false);
+								miSeasonalTiltAngle.setEnabled(false);
 								miAzimuth.setEnabled(false);
 								miBaseHeight.setEnabled(false);
 								miPoleSpacing.setEnabled(false);
@@ -3313,7 +3491,8 @@ class PopupMenuForRack extends PopupMenuFactory {
 			popupMenuForRack.add(miSolarPanels);
 			popupMenuForRack.add(solarPanelMenu);
 			popupMenuForRack.addSeparator();
-			popupMenuForRack.add(miTiltAngle);
+			popupMenuForRack.add(miFixedTiltAngle);
+			popupMenuForRack.add(miSeasonalTiltAngle);
 			popupMenuForRack.add(miAzimuth);
 			popupMenuForRack.add(miRotate);
 			popupMenuForRack.add(miRackWidth);
