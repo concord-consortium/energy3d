@@ -205,6 +205,66 @@ class PopupMenuForRoof extends PopupMenuFactory {
 
 			});
 
+			final JMenu textureMenu = new JMenu("Texture");
+			final ButtonGroup textureGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_01, "icons/roof_01.png");
+			final JRadioButtonMenuItem rbmiTexture02 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_02, "icons/roof_02.png");
+			final JRadioButtonMenuItem rbmiTexture03 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_03, "icons/roof_03.png");
+			final JRadioButtonMenuItem rbmiTexture04 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_04, "icons/roof_04.png");
+			final JRadioButtonMenuItem rbmiTexture05 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_05, "icons/roof_05.png");
+			final JRadioButtonMenuItem rbmiTexture06 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_06, "icons/roof_06.png");
+			textureGroup.add(rbmiTexture01);
+			textureGroup.add(rbmiTexture02);
+			textureGroup.add(rbmiTexture03);
+			textureGroup.add(rbmiTexture04);
+			textureGroup.add(rbmiTexture05);
+			textureGroup.add(rbmiTexture06);
+			textureMenu.add(rbmiTexture01);
+			textureMenu.add(rbmiTexture02);
+			textureMenu.add(rbmiTexture03);
+			textureMenu.add(rbmiTexture04);
+			textureMenu.add(rbmiTexture05);
+			textureMenu.add(rbmiTexture06);
+
+			textureMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					switch (Scene.getInstance().getRoofTextureType()) {
+					case Roof.TEXTURE_01:
+						Util.selectSilently(rbmiTexture01, true);
+						break;
+					case Roof.TEXTURE_02:
+						Util.selectSilently(rbmiTexture02, true);
+						break;
+					case Roof.TEXTURE_03:
+						Util.selectSilently(rbmiTexture03, true);
+						break;
+					case Roof.TEXTURE_04:
+						Util.selectSilently(rbmiTexture04, true);
+						break;
+					case Roof.TEXTURE_05:
+						Util.selectSilently(rbmiTexture05, true);
+						break;
+					case Roof.TEXTURE_06:
+						Util.selectSilently(rbmiTexture06, true);
+						break;
+					}
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+			});
+
 			popupMenuForRoof = createPopupMenu(false, false, new Runnable() {
 				@Override
 				public void run() {
@@ -222,6 +282,7 @@ class PopupMenuForRoof extends PopupMenuFactory {
 			popupMenuForRoof.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForRoof.addSeparator();
 			popupMenuForRoof.add(typeMenu);
+			popupMenuForRoof.add(textureMenu);
 			popupMenuForRoof.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Energy Analysis...");

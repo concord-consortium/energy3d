@@ -516,6 +516,67 @@ class PopupMenuForWall extends PopupMenuFactory {
 			popupMenuForWall.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForWall.addSeparator();
 
+			final JMenu textureMenu = new JMenu("Texture");
+			popupMenuForWall.add(textureMenu);
+			final ButtonGroup textureGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_01, "icons/wall_01.png");
+			final JRadioButtonMenuItem rbmiTexture02 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_02, "icons/wall_02.png");
+			final JRadioButtonMenuItem rbmiTexture03 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_03, "icons/wall_03.png");
+			final JRadioButtonMenuItem rbmiTexture04 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_04, "icons/wall_04.png");
+			final JRadioButtonMenuItem rbmiTexture05 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_05, "icons/wall_05.png");
+			final JRadioButtonMenuItem rbmiTexture06 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_06, "icons/wall_06.png");
+			textureGroup.add(rbmiTexture01);
+			textureGroup.add(rbmiTexture02);
+			textureGroup.add(rbmiTexture03);
+			textureGroup.add(rbmiTexture04);
+			textureGroup.add(rbmiTexture05);
+			textureGroup.add(rbmiTexture06);
+			textureMenu.add(rbmiTexture01);
+			textureMenu.add(rbmiTexture02);
+			textureMenu.add(rbmiTexture03);
+			textureMenu.add(rbmiTexture04);
+			textureMenu.add(rbmiTexture05);
+			textureMenu.add(rbmiTexture06);
+
+			textureMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					switch (Scene.getInstance().getWallTextureType()) {
+					case Wall.TEXTURE_01:
+						Util.selectSilently(rbmiTexture01, true);
+						break;
+					case Wall.TEXTURE_02:
+						Util.selectSilently(rbmiTexture02, true);
+						break;
+					case Wall.TEXTURE_03:
+						Util.selectSilently(rbmiTexture03, true);
+						break;
+					case Wall.TEXTURE_04:
+						Util.selectSilently(rbmiTexture04, true);
+						break;
+					case Wall.TEXTURE_05:
+						Util.selectSilently(rbmiTexture05, true);
+						break;
+					case Wall.TEXTURE_06:
+						Util.selectSilently(rbmiTexture06, true);
+						break;
+					}
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+			});
+
 			final JMenu typeMenu = new JMenu("Type");
 			popupMenuForWall.add(typeMenu);
 			popupMenuForWall.addSeparator();

@@ -1103,7 +1103,9 @@ public class Scene implements Serializable {
 	}
 
 	public void pasteToPickedLocationOnLand() {
-		EnergyPanel.getInstance().updateRadiationHeatMap();
+		if (SceneManager.getInstance().getSolarHeatMap()) {
+			EnergyPanel.getInstance().updateRadiationHeatMap();
+		}
 		if (copyBuffer == null) {
 			return;
 		}
@@ -1154,6 +1156,7 @@ public class Scene implements Serializable {
 			setIdOfChildren(c);
 			SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 		}
+		SceneManager.getInstance().setSelectedPart(c);
 	}
 
 	private Wall getCopiedWall(final Wall oldWall, final Foundation oldFoundation, final Foundation newFoundation) {
@@ -1221,6 +1224,7 @@ public class Scene implements Serializable {
 		}
 		add(c, true);
 		copyBuffer = c;
+		SceneManager.getInstance().setSelectedPart(c);
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
@@ -1344,6 +1348,7 @@ public class Scene implements Serializable {
 		}
 		add(c, true);
 		copyBuffer = c;
+		SceneManager.getInstance().setSelectedPart(c);
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 
@@ -1469,6 +1474,7 @@ public class Scene implements Serializable {
 		}
 		add(c, true);
 		copyBuffer = c;
+		SceneManager.getInstance().setSelectedPart(c);
 		SceneManager.getInstance().getUndoManager().addEdit(new PastePartCommand(c));
 	}
 

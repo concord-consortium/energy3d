@@ -2025,7 +2025,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private JRadioButtonMenuItem createWallTextureMenuItem(final int type, final String imageFile) {
+	JRadioButtonMenuItem createWallTextureMenuItem(final int type, final String imageFile) {
 		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
 		m.addItemListener(new ItemListener() {
 			@Override
@@ -2045,7 +2045,7 @@ public class MainFrame extends JFrame {
 		return m;
 	}
 
-	private JRadioButtonMenuItem createRoofTextureMenuItem(final int type, final String imageFile) {
+	JRadioButtonMenuItem createRoofTextureMenuItem(final int type, final String imageFile) {
 		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
 		m.addItemListener(new ItemListener() {
 			@Override

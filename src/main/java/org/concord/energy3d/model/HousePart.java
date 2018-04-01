@@ -884,6 +884,9 @@ public abstract class HousePart implements Serializable {
 	}
 
 	public Vector3 getAbsPoint(final int index, final Vector3 result) {
+		if (index >= points.size()) {
+			return null;
+		}
 		return toAbsolute(points.get(index), result);
 	}
 
