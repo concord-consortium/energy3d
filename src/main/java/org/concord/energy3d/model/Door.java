@@ -23,6 +23,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Door extends HousePart implements Thermal {
 
+	public static final int TEXTURE_01 = 0;
 	private static final long serialVersionUID = 1L;
 	private static final double DEFAULT_DOOR_HEIGHT = 10;
 	private double volumetricHeatCapacity = 0.5; // unit: kWh/m^3/C (1 kWh = 3.6 MJ)

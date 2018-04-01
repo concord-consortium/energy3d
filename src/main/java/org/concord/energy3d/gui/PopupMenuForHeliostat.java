@@ -21,7 +21,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
@@ -41,6 +44,7 @@ import org.concord.energy3d.undo.ChangeFoundationSolarCollectorBaseHeightCommand
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorOpticalEfficiencyCommand;
 import org.concord.energy3d.undo.ChangeFoundationSolarReflectorReflectanceCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTargetCommand;
+import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
 import org.concord.energy3d.undo.ChangeOpticalEfficiencyForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeReflectanceForAllSolarReflectorsCommand;
 import org.concord.energy3d.undo.ChangeSolarReceiverEfficiencyCommand;
@@ -891,6 +895,115 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 			});
 			labelMenu.add(miLabelEnergyOutput);
 
+			final JMenu textureMenu = new JMenu("Texture");
+
+			final ButtonGroup textureButtonGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem texture1MenuItem = new JRadioButtonMenuItem("Whole Mirror");
+			texture1MenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_ONE_MIRROR);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureButtonGroup.add(texture1MenuItem);
+			textureMenu.add(texture1MenuItem);
+
+			final JRadioButtonMenuItem texture2MenuItem = new JRadioButtonMenuItem("2 \u00D7 1 Mirrors");
+			texture2MenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_2X1_MIRRORS);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureButtonGroup.add(texture2MenuItem);
+			textureMenu.add(texture2MenuItem);
+
+			final JRadioButtonMenuItem texture3MenuItem = new JRadioButtonMenuItem("1 \u00D7 2 Mirrors");
+			texture3MenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_1X2_MIRRORS);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureButtonGroup.add(texture3MenuItem);
+			textureMenu.add(texture3MenuItem);
+
+			final JRadioButtonMenuItem texture4MenuItem = new JRadioButtonMenuItem("7 \u00D7 5 Mirrors");
+			texture4MenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeHeliostatTextureCommand c = new ChangeHeliostatTextureCommand();
+						Scene.getInstance().setHeliostatTextureType(Mirror.TEXTURE_7X5_MIRRORS);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						Scene.getInstance().redrawAll();
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureButtonGroup.add(texture4MenuItem);
+			textureMenu.add(texture4MenuItem);
+
+			textureMenu.addMenuListener(new MenuListener() {
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					switch (Scene.getInstance().getHeliostatTextureType()) {
+					default:
+						Util.selectSilently(texture1MenuItem, true);
+						break;
+					case Mirror.TEXTURE_2X1_MIRRORS:
+						Util.selectSilently(texture2MenuItem, true);
+						break;
+					case Mirror.TEXTURE_1X2_MIRRORS:
+						Util.selectSilently(texture3MenuItem, true);
+						break;
+					case Mirror.TEXTURE_7X5_MIRRORS:
+						Util.selectSilently(texture4MenuItem, true);
+						break;
+					}
+				}
+			});
+
 			popupMenuForHeliostat = createPopupMenu(true, true, new Runnable() {
 				@Override
 				public void run() {
@@ -1234,6 +1347,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 			popupMenuForHeliostat.add(cbmiDisableEditPoint);
 			popupMenuForHeliostat.add(cbmiDrawSunBeam);
 			popupMenuForHeliostat.add(labelMenu);
+			popupMenuForHeliostat.add(textureMenu);
 			popupMenuForHeliostat.addSeparator();
 
 			JMenuItem mi = new JMenuItem("Daily Yield Analysis...");

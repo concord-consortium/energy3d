@@ -2021,12 +2021,14 @@ public class MainFrame extends JFrame {
 			});
 
 		}
+
 		return textureMenu;
 
 	}
 
 	JRadioButtonMenuItem createWallTextureMenuItem(final int type, final String imageFile) {
 		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + (type + 1));
 		m.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
@@ -2047,6 +2049,7 @@ public class MainFrame extends JFrame {
 
 	JRadioButtonMenuItem createRoofTextureMenuItem(final int type, final String imageFile) {
 		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + (type + 1));
 		m.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {

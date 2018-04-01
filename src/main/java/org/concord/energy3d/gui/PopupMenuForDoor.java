@@ -4,29 +4,39 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Foundation;
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Wall;
+import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
+import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeDoorSizeOnWallCommand;
 import org.concord.energy3d.undo.SetPartSizeCommand;
 import org.concord.energy3d.undo.SetSizeForDoorsOnFoundationCommand;
+import org.concord.energy3d.util.Util;
 
 class PopupMenuForDoor extends PopupMenuFactory {
 
@@ -182,10 +192,86 @@ class PopupMenuForDoor extends PopupMenuFactory {
 				}
 			});
 
+			final JMenu textureMenu = new JMenu("Texture");
+			final ButtonGroup textureGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiTextureNone = new JRadioButtonMenuItem("No Texture");
+			rbmiTextureNone.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.None);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureGroup.add(rbmiTextureNone);
+			textureMenu.add(rbmiTextureNone);
+
+			final JRadioButtonMenuItem rbmiTextureOutline = new JRadioButtonMenuItem("Outline Texture");
+			rbmiTextureOutline.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.Simple);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureGroup.add(rbmiTextureOutline);
+			textureMenu.add(rbmiTextureOutline);
+			textureMenu.addSeparator();
+
+			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createWallTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
+			textureGroup.add(rbmiTexture01);
+			textureMenu.add(rbmiTexture01);
+
+			textureMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+						Util.selectSilently(rbmiTextureNone, true);
+						return;
+					}
+					if (Scene.getInstance().getTextureMode() == TextureMode.Simple) {
+						Util.selectSilently(rbmiTextureOutline, true);
+						return;
+					}
+					switch (Scene.getInstance().getWallTextureType()) {
+					case Door.TEXTURE_01:
+						Util.selectSilently(rbmiTexture01, true);
+						break;
+					}
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+			});
+
 			popupMenuForDoor = createPopupMenu(false, false, null);
 			popupMenuForDoor.addSeparator();
 			popupMenuForDoor.add(miSize);
 			popupMenuForDoor.add(colorAction);
+			popupMenuForDoor.add(textureMenu);
 			popupMenuForDoor.add(createInsulationMenuItem(true));
 			popupMenuForDoor.add(createVolumetricHeatCapacityMenuItem());
 			popupMenuForDoor.addSeparator();
