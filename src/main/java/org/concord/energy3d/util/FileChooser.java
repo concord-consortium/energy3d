@@ -59,6 +59,7 @@ public class FileChooser {
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		if (Config.isMac()) {
 			fileDialog = new FileDialog(MainFrame.getInstance());
+			fileDialog.setDirectory(directoryPath);
 		}
 	}
 
@@ -119,7 +120,9 @@ public class FileChooser {
 			} else {
 				final String filenameFull = fileDialog.getDirectory() + filename + (filename.toLowerCase().endsWith(dotExtension) ? "" : dotExtension);
 				final File file = new File(filenameFull);
-				Preferences.userNodeForPackage(MainApplication.class).put("dir", fileDialog.getDirectory());
+				if (!MainApplication.runFromOnlyJar()) {
+					Preferences.userNodeForPackage(MainApplication.class).put("dir", fileDialog.getDirectory());
+				}
 				return file;
 			}
 		} else {
@@ -150,7 +153,9 @@ public class FileChooser {
 					file = new File(file.getParentFile(), Util.getFileName(file.toString()) + dotExtension);
 				}
 				if (!isSaveDialog || !file.exists() || JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(parent, "File \"" + file.getName() + "\" already exists. Overwrite?", "Save File", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE)) {
-					Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getCurrentDirectory().toString());
+					if (!MainApplication.runFromOnlyJar()) {
+						Preferences.userNodeForPackage(MainApplication.class).put("dir", fileChooser.getCurrentDirectory().toString());
+					}
 					return file;
 				}
 			}
