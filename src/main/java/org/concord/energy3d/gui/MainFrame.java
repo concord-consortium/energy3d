@@ -411,8 +411,6 @@ public class MainFrame extends JFrame {
 
 			@Override
 			public void windowActivated(final WindowEvent e) {
-				// EnergyPanel.getInstance().initJavaFXGUI();
-				// SceneManager.getInstance().refresh();
 			}
 		});
 	}
@@ -4122,13 +4120,15 @@ public class MainFrame extends JFrame {
 	}
 
 	public void exit() {
-		final String[] recentFiles = FileChooser.getInstance().getRecentFiles();
-		if (recentFiles != null) {
-			final int n = recentFiles.length;
-			if (n > 0) {
-				final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
-				for (int i = 0; i < n; i++) {
-					pref.put("Recent File " + i, recentFiles[n - i - 1]);
+		if (!MainApplication.runFromOnlyJar()) {
+			final String[] recentFiles = FileChooser.getInstance().getRecentFiles();
+			if (recentFiles != null) {
+				final int n = recentFiles.length;
+				if (n > 0) {
+					final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+					for (int i = 0; i < n; i++) {
+						pref.put("Recent File " + i, recentFiles[n - i - 1]);
+					}
 				}
 			}
 		}

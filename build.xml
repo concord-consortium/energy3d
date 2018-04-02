@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <project name="Energy3D" default="default" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	<property name="app.name" value="Energy3D"/>
-	<property name="app.version" value="7.x"/>
+	<property name="app.version" value="8.x"/>
 	<property name="build.src.dir" value="src" />
 	<property name="build.classes.dir" value="classes" />
 	<property name="build.dist.dir" value="${basedir}${file.separator}dist" />
@@ -111,6 +111,7 @@
 			<fx:platform basedir="${JAVA_HOME}">
 				<fx:property name="java.library.path" value="./lib/jogl/native/${os}" />
 				<fx:property name="java.ext.dirs" value="${ext}"/>
+				<fx:property name="app" value="true"/>
 			    <fx:jvmarg value="-Xmx512m"/>
 				<fx:jvmarg value="-Xdock:name=${app.name}"/>
 			</fx:platform>

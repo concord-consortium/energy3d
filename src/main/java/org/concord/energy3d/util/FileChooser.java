@@ -43,17 +43,18 @@ public class FileChooser {
 	}
 
 	public FileChooser() {
-		final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
-		addRecentFile(pref.get("Recent File 0", null));
-		addRecentFile(pref.get("Recent File 1", null));
-		addRecentFile(pref.get("Recent File 2", null));
-		addRecentFile(pref.get("Recent File 3", null));
-
-		String directoryPath = pref.get("dir", null);
+		String directoryPath = null;
+		if (!MainApplication.runFromOnlyJar()) {
+			final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
+			addRecentFile(pref.get("Recent File 0", null));
+			addRecentFile(pref.get("Recent File 1", null));
+			addRecentFile(pref.get("Recent File 2", null));
+			addRecentFile(pref.get("Recent File 3", null));
+			directoryPath = pref.get("dir", null);
+		}
 		if (!Config.isWebStart() && directoryPath == null) {
 			directoryPath = System.getProperties().getProperty("user.dir");
 		}
-
 		fileChooser = new JFileChooser(directoryPath);
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		if (Config.isMac()) {
@@ -155,4 +156,5 @@ public class FileChooser {
 			}
 		}
 	}
+
 }
