@@ -32,7 +32,7 @@ import org.concord.energy3d.util.Updater;
 
 public class MainApplication {
 
-	public static final String VERSION = "8.0.8";
+	public static final String VERSION = "8.0.9";
 	private static Thread sceneManagerThread;
 	public static boolean appDirectoryWritable = true;
 	public static boolean isMacOpeningFile;
@@ -124,7 +124,7 @@ public class MainApplication {
 							}
 							// somehow newFile() must be called to set up the scene before we can correctly load the content when an NG3 file is double-clicked without an open instance
 							if (Scene.getURL() == null) {
-								Scene.newFile();
+								Scene.newFile(true);
 							}
 							if (Config.isWebStart()) {
 								if (args.length > 1 && !args[args.length - 1].startsWith("-")) {

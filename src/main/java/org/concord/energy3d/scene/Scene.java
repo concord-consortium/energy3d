@@ -237,27 +237,25 @@ public class Scene implements Serializable {
 		return instance;
 	}
 
-	public static void newFile() {
-		newFile(80, 60); // by default, the foundation is 16 meters x 12 meters (192 square meters seem right for a house)
-	}
-
-	private static void newFile(final double xLength, final double yLength) {
+	public static void newFile(final boolean initContent) {
 		try {
 			open(null);
 			first = false;
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-		SceneManager.getTaskManager().update(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				instance.add(new Human(Human.JACK, 1));
-				final Foundation f = new Foundation(xLength, yLength);
-				f.setColor(instance.getFoundationColor());
-				instance.add(f, true);
-				return null;
-			}
-		});
+		if (initContent) { // by default, the foundation is 16 meters x 12 meters (192 square meters seem right for a house)
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					instance.add(new Human(Human.JACK, 1));
+					final Foundation f = new Foundation(80, 60);
+					f.setColor(instance.getFoundationColor());
+					instance.add(f, true);
+					return null;
+				}
+			});
+		}
 	}
 
 	public static void open(final URL file) throws Exception {
