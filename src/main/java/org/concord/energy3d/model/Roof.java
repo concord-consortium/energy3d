@@ -56,12 +56,13 @@ import com.ardor3d.util.geom.BufferUtils;
 public abstract class Roof extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
-	public static final int TEXTURE_01 = 0;
-	public static final int TEXTURE_02 = 1;
-	public static final int TEXTURE_03 = 2;
-	public static final int TEXTURE_04 = 3;
-	public static final int TEXTURE_05 = 4;
-	public static final int TEXTURE_06 = 5;
+	public static final int TEXTURE_01 = 1;
+	public static final int TEXTURE_02 = 2;
+	public static final int TEXTURE_03 = 3;
+	public static final int TEXTURE_04 = 4;
+	public static final int TEXTURE_05 = 5;
+	public static final int TEXTURE_06 = 6;
+	public static final int TEXTURE_07 = 7;
 
 	public static final double OVERHANG_MIN = 0.01;
 	public static final int SOLID = 0;
@@ -732,6 +733,8 @@ public abstract class Roof extends HousePart implements Thermal {
 			return "roof_05.png";
 		case TEXTURE_06:
 			return "roof_06.png";
+		case TEXTURE_07:
+			return "roof_07.png";
 		}
 		return null;
 	}

@@ -565,18 +565,21 @@ class PopupMenuForWall extends PopupMenuFactory {
 			final JRadioButtonMenuItem rbmiTexture04 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_04, "icons/wall_04.png");
 			final JRadioButtonMenuItem rbmiTexture05 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_05, "icons/wall_05.png");
 			final JRadioButtonMenuItem rbmiTexture06 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_06, "icons/wall_06.png");
+			final JRadioButtonMenuItem rbmiTexture07 = MainFrame.getInstance().createWallTextureMenuItem(Wall.TEXTURE_07, "icons/wall_07.png");
 			textureGroup.add(rbmiTexture01);
 			textureGroup.add(rbmiTexture02);
 			textureGroup.add(rbmiTexture03);
 			textureGroup.add(rbmiTexture04);
 			textureGroup.add(rbmiTexture05);
 			textureGroup.add(rbmiTexture06);
+			textureGroup.add(rbmiTexture07);
 			textureMenu.add(rbmiTexture01);
 			textureMenu.add(rbmiTexture02);
 			textureMenu.add(rbmiTexture03);
 			textureMenu.add(rbmiTexture04);
 			textureMenu.add(rbmiTexture05);
 			textureMenu.add(rbmiTexture06);
+			textureMenu.add(rbmiTexture07);
 
 			textureMenu.addMenuListener(new MenuListener() {
 
@@ -608,6 +611,9 @@ class PopupMenuForWall extends PopupMenuFactory {
 						break;
 					case Wall.TEXTURE_06:
 						Util.selectSilently(rbmiTexture06, true);
+						break;
+					case Wall.TEXTURE_07:
+						Util.selectSilently(rbmiTexture07, true);
 						break;
 					}
 				}

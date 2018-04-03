@@ -47,12 +47,13 @@ import com.ardor3d.util.geom.BufferUtils;
 public class Wall extends HousePart implements Thermal {
 
 	private static final long serialVersionUID = 1L;
-	public static final int TEXTURE_01 = 0;
-	public static final int TEXTURE_02 = 1;
-	public static final int TEXTURE_03 = 2;
-	public static final int TEXTURE_04 = 3;
-	public static final int TEXTURE_05 = 4;
-	public static final int TEXTURE_06 = 5;
+	public static final int TEXTURE_01 = 1;
+	public static final int TEXTURE_02 = 2;
+	public static final int TEXTURE_03 = 3;
+	public static final int TEXTURE_04 = 4;
+	public static final int TEXTURE_05 = 5;
+	public static final int TEXTURE_06 = 6;
+	public static final int TEXTURE_07 = 7;
 
 	private static final double DEFAULT_WALL_HEIGHT = 30.0; // the recommended default wall height is 6m
 	private static double userDefaultWallHeight = DEFAULT_WALL_HEIGHT;
@@ -1476,6 +1477,8 @@ public class Wall extends HousePart implements Thermal {
 			return "wall_05.png";
 		case TEXTURE_06:
 			return "wall_06.png";
+		case TEXTURE_07:
+			return "wall_07.png";
 		}
 		return null;
 	}

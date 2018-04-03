@@ -80,6 +80,8 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 	private static final long serialVersionUID = 1L;
 	private static final double GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
+	public static final int TEXTURE_01 = 1;
+
 	public static final int TYPE_AUTO_DETECTED = 0;
 	public static final int TYPE_BUILDING = 1;
 	public static final int TYPE_PV_PROJECT = 2;
@@ -1465,7 +1467,14 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Full ? "foundation.png" : null;
+		if (Scene.getInstance().getTextureMode() == TextureMode.None || Scene.getInstance().getTextureMode() == TextureMode.Simple) { // backward compatibility
+			return null;
+		}
+		switch (Scene.getInstance().getFoundationTextureType()) {
+		case TEXTURE_01:
+			return "foundation_01.png";
+		}
+		return null;
 	}
 
 	@Override

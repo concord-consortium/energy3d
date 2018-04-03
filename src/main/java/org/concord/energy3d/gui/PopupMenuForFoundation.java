@@ -28,6 +28,8 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.logger.TimeSeriesLogger;
 import org.concord.energy3d.model.Foundation;
@@ -43,6 +45,7 @@ import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
+import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
 import org.concord.energy3d.simulation.EnergyAnnualAnalysis;
 import org.concord.energy3d.simulation.EnergyDailyAnalysis;
@@ -60,6 +63,7 @@ import org.concord.energy3d.simulation.PvModuleSpecs;
 import org.concord.energy3d.simulation.PvModulesData;
 import org.concord.energy3d.simulation.UtilityBill;
 import org.concord.energy3d.undo.AddNodeCommand;
+import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeFoundationSizeCommand;
 import org.concord.energy3d.undo.DeleteUtilityBillCommand;
 import org.concord.energy3d.undo.SetFoundationLabelCommand;
@@ -1932,6 +1936,81 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			});
 			powerTowerLabelMenu.add(miLabelPowerTowerOutput);
 
+			final JMenu textureMenu = new JMenu("Texture");
+			final ButtonGroup textureGroup = new ButtonGroup();
+
+			final JRadioButtonMenuItem rbmiTextureNone = new JRadioButtonMenuItem("No Texture");
+			rbmiTextureNone.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.None);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureGroup.add(rbmiTextureNone);
+			textureMenu.add(rbmiTextureNone);
+
+			final JRadioButtonMenuItem rbmiTextureOutline = new JRadioButtonMenuItem("Outline Texture");
+			rbmiTextureOutline.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					if (e.getStateChange() == ItemEvent.SELECTED) {
+						final ChangeBuildingTextureCommand c = new ChangeBuildingTextureCommand();
+						Scene.getInstance().setTextureMode(TextureMode.Simple);
+						Scene.getInstance().setEdited(true);
+						if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+							MainPanel.getInstance().getEnergyButton().setSelected(false);
+						}
+						SceneManager.getInstance().getUndoManager().addEdit(c);
+					}
+				}
+			});
+			textureGroup.add(rbmiTextureOutline);
+			textureMenu.add(rbmiTextureOutline);
+			textureMenu.addSeparator();
+
+			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createFoundationTextureMenuItem(Foundation.TEXTURE_01, "icons/foundation_01.png");
+			textureGroup.add(rbmiTexture01);
+			textureMenu.add(rbmiTexture01);
+
+			textureMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					if (Scene.getInstance().getTextureMode() == TextureMode.None) {
+						Util.selectSilently(rbmiTextureNone, true);
+						return;
+					}
+					if (Scene.getInstance().getTextureMode() == TextureMode.Simple) {
+						Util.selectSilently(rbmiTextureOutline, true);
+						return;
+					}
+					switch (Scene.getInstance().getFoundationTextureType()) {
+					case Foundation.TEXTURE_01:
+						Util.selectSilently(rbmiTexture01, true);
+						break;
+					}
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+					textureMenu.setEnabled(true);
+				}
+
+			});
+
 			popupMenuForFoundation = createPopupMenu(false, true, new Runnable() {
 				@Override
 				public void run() {
@@ -2006,6 +2085,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 			popupMenuForFoundation.add(labelMenu);
 			popupMenuForFoundation.addSeparator();
 			popupMenuForFoundation.add(colorAction);
+			popupMenuForFoundation.add(textureMenu);
 			// floor insulation only for the first floor, so this U-value is associated with the Foundation class, not the Floor class
 			popupMenuForFoundation.add(createInsulationMenuItem(false));
 			popupMenuForFoundation.add(createVolumetricHeatCapacityMenuItem());

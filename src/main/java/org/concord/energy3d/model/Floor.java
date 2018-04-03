@@ -31,6 +31,7 @@ import com.ardor3d.util.geom.BufferUtils;
 
 public class Floor extends HousePart {
 
+	public static final int TEXTURE_01 = 1;
 	public static final int SOLID = 0;
 	public static final int TRANSPARENT = 1;
 	private static final long serialVersionUID = 1L;
@@ -220,7 +221,18 @@ public class Floor extends HousePart {
 
 	@Override
 	protected String getTextureFileName() {
-		return Scene.getInstance().getTextureMode() == TextureMode.Simple ? "floor.png" : "floor.jpg";
+		final TextureMode t = Scene.getInstance().getTextureMode();
+		if (t == TextureMode.None) {
+			return null;
+		}
+		if (t == TextureMode.Simple) {
+			return "floor.png";
+		}
+		switch (Scene.getInstance().getFloorTextureType()) {
+		case TEXTURE_01:
+			return "floor_01.png";
+		}
+		return null;
 	}
 
 	@Override

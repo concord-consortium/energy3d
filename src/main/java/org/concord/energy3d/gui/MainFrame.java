@@ -122,6 +122,9 @@ import org.concord.energy3d.undo.ChangeBuildingColorCommand;
 import org.concord.energy3d.undo.ChangeBuildingTextureCommand;
 import org.concord.energy3d.undo.ChangeColorOfAllPartsOfSameTypeCommand;
 import org.concord.energy3d.undo.ChangeColorOfConnectedWallsCommand;
+import org.concord.energy3d.undo.ChangeDoorTextureCommand;
+import org.concord.energy3d.undo.ChangeFloorTextureCommand;
+import org.concord.energy3d.undo.ChangeFoundationTextureCommand;
 import org.concord.energy3d.undo.ChangeHeliostatTextureCommand;
 import org.concord.energy3d.undo.ChangeLandColorCommand;
 import org.concord.energy3d.undo.ChangePartColorCommand;
@@ -1793,6 +1796,7 @@ public class MainFrame extends JFrame {
 			final JRadioButtonMenuItem wallTexture04MenuItem = createWallTextureMenuItem(Wall.TEXTURE_04, "icons/wall_04.png");
 			final JRadioButtonMenuItem wallTexture05MenuItem = createWallTextureMenuItem(Wall.TEXTURE_05, "icons/wall_05.png");
 			final JRadioButtonMenuItem wallTexture06MenuItem = createWallTextureMenuItem(Wall.TEXTURE_06, "icons/wall_06.png");
+			final JRadioButtonMenuItem wallTexture07MenuItem = createWallTextureMenuItem(Wall.TEXTURE_07, "icons/wall_07.png");
 			final ButtonGroup wallTextureButtonGroup = new ButtonGroup();
 			wallTextureButtonGroup.add(wallTexture01MenuItem);
 			wallTextureButtonGroup.add(wallTexture02MenuItem);
@@ -1800,13 +1804,14 @@ public class MainFrame extends JFrame {
 			wallTextureButtonGroup.add(wallTexture04MenuItem);
 			wallTextureButtonGroup.add(wallTexture05MenuItem);
 			wallTextureButtonGroup.add(wallTexture06MenuItem);
+			wallTextureButtonGroup.add(wallTexture07MenuItem);
 			wallTextureMenu.add(wallTexture01MenuItem);
 			wallTextureMenu.add(wallTexture02MenuItem);
 			wallTextureMenu.add(wallTexture03MenuItem);
 			wallTextureMenu.add(wallTexture04MenuItem);
 			wallTextureMenu.add(wallTexture05MenuItem);
 			wallTextureMenu.add(wallTexture06MenuItem);
-
+			wallTextureMenu.add(wallTexture07MenuItem);
 			wallTextureMenu.addMenuListener(new MenuListener() {
 
 				@Override
@@ -1820,6 +1825,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					wallTextureButtonGroup.clearSelection();
 					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
 						switch (Scene.getInstance().getWallTextureType()) {
 						case Wall.TEXTURE_01:
@@ -1840,6 +1846,9 @@ public class MainFrame extends JFrame {
 						case Wall.TEXTURE_06:
 							Util.selectSilently(wallTexture06MenuItem, true);
 							break;
+						case Wall.TEXTURE_07:
+							Util.selectSilently(wallTexture07MenuItem, true);
+							break;
 						}
 					}
 				}
@@ -1854,6 +1863,7 @@ public class MainFrame extends JFrame {
 			final JRadioButtonMenuItem roofTexture04MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_04, "icons/roof_04.png");
 			final JRadioButtonMenuItem roofTexture05MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_05, "icons/roof_05.png");
 			final JRadioButtonMenuItem roofTexture06MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_06, "icons/roof_06.png");
+			final JRadioButtonMenuItem roofTexture07MenuItem = createRoofTextureMenuItem(Wall.TEXTURE_07, "icons/roof_07.png");
 			final ButtonGroup roofTextureButtonGroup = new ButtonGroup();
 			roofTextureButtonGroup.add(roofTexture01MenuItem);
 			roofTextureButtonGroup.add(roofTexture02MenuItem);
@@ -1861,13 +1871,14 @@ public class MainFrame extends JFrame {
 			roofTextureButtonGroup.add(roofTexture04MenuItem);
 			roofTextureButtonGroup.add(roofTexture05MenuItem);
 			roofTextureButtonGroup.add(roofTexture06MenuItem);
+			roofTextureButtonGroup.add(roofTexture07MenuItem);
 			roofTextureMenu.add(roofTexture01MenuItem);
 			roofTextureMenu.add(roofTexture02MenuItem);
 			roofTextureMenu.add(roofTexture03MenuItem);
 			roofTextureMenu.add(roofTexture04MenuItem);
 			roofTextureMenu.add(roofTexture05MenuItem);
 			roofTextureMenu.add(roofTexture06MenuItem);
-
+			roofTextureMenu.add(roofTexture07MenuItem);
 			roofTextureMenu.addMenuListener(new MenuListener() {
 
 				@Override
@@ -1881,6 +1892,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					roofTextureButtonGroup.clearSelection();
 					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
 						switch (Scene.getInstance().getRoofTextureType()) {
 						case Roof.TEXTURE_01:
@@ -1900,6 +1912,102 @@ public class MainFrame extends JFrame {
 							break;
 						case Roof.TEXTURE_06:
 							Util.selectSilently(roofTexture06MenuItem, true);
+							break;
+						case Roof.TEXTURE_07:
+							Util.selectSilently(roofTexture07MenuItem, true);
+							break;
+						}
+					}
+				}
+			});
+
+			final JMenu doorTextureMenu = new JMenu("Doors");
+			textureMenu.add(doorTextureMenu);
+
+			final JRadioButtonMenuItem doorTexture01MenuItem = createDoorTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
+			final ButtonGroup doorTextureButtonGroup = new ButtonGroup();
+			doorTextureButtonGroup.add(doorTexture01MenuItem);
+			doorTextureMenu.add(doorTexture01MenuItem);
+			doorTextureMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					doorTextureButtonGroup.clearSelection();
+					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+						switch (Scene.getInstance().getDoorTextureType()) {
+						case Door.TEXTURE_01:
+							Util.selectSilently(doorTexture01MenuItem, true);
+							break;
+						}
+					}
+				}
+			});
+
+			final JMenu floorTextureMenu = new JMenu("Floors");
+			textureMenu.add(floorTextureMenu);
+
+			final JRadioButtonMenuItem floorTexture01MenuItem = createFloorTextureMenuItem(Floor.TEXTURE_01, "icons/floor_01.png");
+			final ButtonGroup floorTextureButtonGroup = new ButtonGroup();
+			floorTextureButtonGroup.add(floorTexture01MenuItem);
+			floorTextureMenu.add(floorTexture01MenuItem);
+			floorTextureMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					floorTextureButtonGroup.clearSelection();
+					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+						switch (Scene.getInstance().getFloorTextureType()) {
+						case Floor.TEXTURE_01:
+							Util.selectSilently(floorTexture01MenuItem, true);
+							break;
+						}
+					}
+				}
+			});
+
+			final JMenu foundationTextureMenu = new JMenu("Foundations");
+			textureMenu.add(foundationTextureMenu);
+
+			final JRadioButtonMenuItem foundationTexture01MenuItem = createFoundationTextureMenuItem(Foundation.TEXTURE_01, "icons/foundation_01.png");
+			final ButtonGroup foundationTextureButtonGroup = new ButtonGroup();
+			foundationTextureButtonGroup.add(foundationTexture01MenuItem);
+			foundationTextureMenu.add(foundationTexture01MenuItem);
+			foundationTextureMenu.addMenuListener(new MenuListener() {
+
+				@Override
+				public void menuCanceled(final MenuEvent e) {
+				}
+
+				@Override
+				public void menuDeselected(final MenuEvent e) {
+					SceneManager.getInstance().refresh();
+				}
+
+				@Override
+				public void menuSelected(final MenuEvent e) {
+					foundationTextureButtonGroup.clearSelection();
+					if (Scene.getInstance().getTextureMode() == TextureMode.Full) {
+						switch (Scene.getInstance().getFoundationTextureType()) {
+						case Foundation.TEXTURE_01:
+							Util.selectSilently(foundationTexture01MenuItem, true);
 							break;
 						}
 					}
@@ -2001,6 +2109,7 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					heliostatTextureButtonGroup.clearSelection();
 					switch (Scene.getInstance().getHeliostatTextureType()) {
 					default:
 						Util.selectSilently(heliostat1MirrorTextureMenuItem, true);
@@ -2026,14 +2135,105 @@ public class MainFrame extends JFrame {
 
 	JRadioButtonMenuItem createWallTextureMenuItem(final int type, final String imageFile) {
 		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + (type + 1));
+		m.setText("Texture #" + type);
 		m.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					final ChangeWallTextureCommand c = new ChangeWallTextureCommand();
-					Scene.getInstance().setTextureMode(TextureMode.Full);
 					Scene.getInstance().setWallTextureType(type);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().setTextureMode(TextureMode.Full);
+							SceneManager.getInstance().refresh();
+							return null;
+						}
+					});
+					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+						MainPanel.getInstance().getEnergyButton().setSelected(false);
+					}
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			}
+		});
+		return m;
+	}
+
+	JRadioButtonMenuItem createDoorTextureMenuItem(final int type, final String imageFile) {
+		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + type);
+		m.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final ChangeDoorTextureCommand c = new ChangeDoorTextureCommand();
+					Scene.getInstance().setDoorTextureType(type);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().setTextureMode(TextureMode.Full);
+							SceneManager.getInstance().refresh();
+							return null;
+						}
+					});
+					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+						MainPanel.getInstance().getEnergyButton().setSelected(false);
+					}
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			}
+		});
+		return m;
+	}
+
+	JRadioButtonMenuItem createFloorTextureMenuItem(final int type, final String imageFile) {
+		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + type);
+		m.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final ChangeFloorTextureCommand c = new ChangeFloorTextureCommand();
+					Scene.getInstance().setFloorTextureType(type);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().setTextureMode(TextureMode.Full);
+							SceneManager.getInstance().refresh();
+							return null;
+						}
+					});
+					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+						MainPanel.getInstance().getEnergyButton().setSelected(false);
+					}
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+				}
+			}
+		});
+		return m;
+	}
+
+	JRadioButtonMenuItem createFoundationTextureMenuItem(final int type, final String imageFile) {
+		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
+		m.setText("Texture #" + type);
+		m.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final ChangeFoundationTextureCommand c = new ChangeFoundationTextureCommand();
+					Scene.getInstance().setFoundationTextureType(type);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().setTextureMode(TextureMode.Full);
+							SceneManager.getInstance().refresh();
+							return null;
+						}
+					});
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
 						MainPanel.getInstance().getEnergyButton().setSelected(false);
@@ -2047,14 +2247,21 @@ public class MainFrame extends JFrame {
 
 	JRadioButtonMenuItem createRoofTextureMenuItem(final int type, final String imageFile) {
 		final JRadioButtonMenuItem m = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource(imageFile)));
-		m.setText("Texture #" + (type + 1));
+		m.setText("Texture #" + type);
 		m.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					final ChangeRoofTextureCommand c = new ChangeRoofTextureCommand();
-					Scene.getInstance().setTextureMode(TextureMode.Full);
 					Scene.getInstance().setRoofTextureType(type);
+					SceneManager.getTaskManager().update(new Callable<Object>() {
+						@Override
+						public Object call() throws Exception {
+							Scene.getInstance().setTextureMode(TextureMode.Full);
+							SceneManager.getInstance().refresh();
+							return null;
+						}
+					});
 					Scene.getInstance().setEdited(true);
 					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
 						MainPanel.getInstance().getEnergyButton().setSelected(false);

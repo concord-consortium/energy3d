@@ -232,7 +232,7 @@ class PopupMenuForDoor extends PopupMenuFactory {
 			textureMenu.add(rbmiTextureOutline);
 			textureMenu.addSeparator();
 
-			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createWallTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
+			final JRadioButtonMenuItem rbmiTexture01 = MainFrame.getInstance().createDoorTextureMenuItem(Door.TEXTURE_01, "icons/door_01.png");
 			textureGroup.add(rbmiTexture01);
 			textureMenu.add(rbmiTexture01);
 
