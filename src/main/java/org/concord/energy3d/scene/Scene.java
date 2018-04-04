@@ -248,7 +248,7 @@ public class Scene implements Serializable {
 			SceneManager.getTaskManager().update(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					instance.add(new Human(Human.JACK, 1));
+					instance.add(new Human(0, 1));
 					final Foundation f = new Foundation(80, 60);
 					f.setColor(instance.getFoundationColor());
 					instance.add(f, true);

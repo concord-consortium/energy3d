@@ -38,12 +38,14 @@ import org.concord.energy3d.model.HeliostatCircularFieldLayout;
 import org.concord.energy3d.model.HeliostatRectangularFieldLayout;
 import org.concord.energy3d.model.HeliostatSpiralFieldLayout;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Mirror;
 import org.concord.energy3d.model.ParabolicDish;
 import org.concord.energy3d.model.ParabolicTrough;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarCollector;
 import org.concord.energy3d.model.SolarPanel;
+import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.Scene.TextureMode;
 import org.concord.energy3d.scene.SceneManager;
@@ -2063,7 +2065,7 @@ class PopupMenuForFoundation extends PopupMenuFactory {
 					}
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
 					final Node copyNode = Scene.getInstance().getCopyNode();
-					miPaste.setEnabled(copyBuffer instanceof SolarCollector || copyNode != null);
+					miPaste.setEnabled(copyBuffer instanceof SolarCollector || copyBuffer instanceof Human || copyBuffer instanceof Tree || copyNode != null);
 				}
 			});
 

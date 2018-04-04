@@ -19,19 +19,34 @@ import com.ardor3d.scenegraph.shape.Quad;
 
 public class Human extends HousePart {
 
+	public final static Figure[] FIGURES = new Figure[] { new Figure("Jack", true, 2.8, 8.9), //
+			new Figure("Jade", false, 2.4, 8.0), // 1
+			new Figure("Jane", false, 2.0, 7.8), // 2
+			new Figure("Jaye", true, 3.0, 9.1), // 3
+			new Figure("Jean", false, 3.0, 9.0), // 4
+			new Figure("Jedi", true, 3.0, 8.8), // 5
+			new Figure("Jeff", true, 2.8, 8.7), // 6
+			new Figure("Jena", false, 1.9, 8.2), // 7
+			new Figure("Jeni", false, 2.8, 8.6), // 8
+			new Figure("Jess", false, 3.5, 7.8), // 9
+			new Figure("Jett", true, 2.9, 9.1), // 10
+			new Figure("Jill", false, 3.0, 8.2), // 11
+			new Figure("Joan", false, 2.5, 8.6), // 12
+			new Figure("Joel", true, 3.9, 8.5), // 13
+			new Figure("John", true, 3.8, 9.6), // 14
+			new Figure("Jose", true, 8.0, 8.0), // 15
+			new Figure("Judd", true, 2.8, 9.2), // 16
+			new Figure("Judy", false, 2.2, 8.4), // 17
+			new Figure("June", false, 1.6, 7.8), // 18
+			new Figure("Juro", true, 2.8, 8.9) };
+
 	private static final long serialVersionUID = 1L;
-	public static final int JANE = 0;
-	public static final int JENI = 1;
-	public static final int JACK = 2;
-	public static final int JOHN = 3;
-	public static final int JILL = 4;
-	public static final int JOSE = 5;
 	private transient BillboardNode billboard;
 	private int humanType;
 	private transient double feetHeight;
 
-	public Human(final int humanType) {
-		this(humanType, 0);
+	public Human() {
+		this(0, 0);
 	}
 
 	public Human(final int humanType, final double feetHeight) {
@@ -46,12 +61,11 @@ public class Human extends HousePart {
 	protected void init() {
 		super.init();
 
-		final double[] size = getSize();
-		mesh = new Quad("Human Quad", size[0], size[1]);
+		mesh = new Quad("Human Quad", FIGURES[humanType].getWidth(), FIGURES[humanType].getHeight());
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
-		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		translate(size[0], size[1], feetHeight); // stand on the ground by default
+		mesh.setRotation(new Matrix3().fromAngles(0.5 * Math.PI, 0, 0));
+		translate(FIGURES[humanType].getWidth(), FIGURES[humanType].getHeight(), feetHeight); // stand on the ground by default
 		mesh.setUserData(new UserData(this, 0, true));
 
 		final BlendState bs = new BlendState();
@@ -112,28 +126,12 @@ public class Human extends HousePart {
 	@Override
 	protected void drawMesh() {
 		billboard.setTranslation(getAbsPoint(0));
-		final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
-		billboard.setScale(scale);
+		billboard.setScale(0.2 / Scene.getInstance().getAnnotationScale());
 	}
 
 	@Override
 	protected String getTextureFileName() {
-		switch (humanType) {
-		case JANE:
-			return "jane.png";
-		case JENI:
-			return "jenny.png";
-		case JILL:
-			return "jill.png";
-		case JACK:
-			return "jack.png";
-		case JOHN:
-			return "john.png";
-		case JOSE:
-			return "jose.png";
-		default:
-			return "jane.png";
-		}
+		return getHumanName().toLowerCase() + ".png";
 	}
 
 	@Override
@@ -141,29 +139,11 @@ public class Human extends HousePart {
 		updateTextureAndColor(mesh, ColorRGBA.WHITE, TextureMode.Full);
 	}
 
-	private double[] getSize() {
-		switch (humanType) {
-		case JANE:
-			return new double[] { 2.5, 8 };
-		case JENI:
-			return new double[] { 3, 9 };
-		case JILL:
-			return new double[] { 3, 8 };
-		case JOHN:
-			return new double[] { 4, 10 };
-		case JOSE:
-			return new double[] { 8, 8 };
-		default: // Jack is the default
-			return new double[] { 2.8, 9 };
-		}
-	}
-
 	public void setHumanType(final int humanType) {
 		this.humanType = humanType;
 		if (mesh instanceof Quad) {
-			final double[] size = getSize();
-			((Quad) mesh).resize(size[0], size[1]);
-			translate(size[0], size[1], feetHeight); // stand on the ground by default
+			((Quad) mesh).resize(FIGURES[humanType].getWidth(), FIGURES[humanType].getHeight());
+			translate(FIGURES[humanType].getWidth(), FIGURES[humanType].getHeight(), feetHeight); // stand on the ground by default
 		}
 	}
 
@@ -172,22 +152,11 @@ public class Human extends HousePart {
 	}
 
 	public String getHumanName() {
-		switch (humanType) {
-		case JANE:
-			return "Jane";
-		case JENI:
-			return "Jeni";
-		case JILL:
-			return "Jill";
-		case JACK:
-			return "Jack";
-		case JOHN:
-			return "John";
-		case JOSE:
-			return "Jose";
-		default:
-			return "Unknown";
-		}
+		return getHumanName(humanType);
+	}
+
+	public static String getHumanName(final int who) {
+		return FIGURES[who].getName();
 	}
 
 	public void move(final Vector3 v, final double steplength) {

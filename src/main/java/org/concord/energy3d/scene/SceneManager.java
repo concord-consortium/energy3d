@@ -1594,7 +1594,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Tree(Tree.PINE);
 			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_JACK) {
-			drawn = new Human(Human.JACK);
+			drawn = new Human();
 			setGridsVisible(true);
 		} else {
 			return null;

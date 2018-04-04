@@ -987,6 +987,7 @@ class PopupMenuForHeliostat extends PopupMenuFactory {
 
 				@Override
 				public void menuSelected(final MenuEvent e) {
+					textureButtonGroup.clearSelection();
 					switch (Scene.getInstance().getHeliostatTextureType()) {
 					default:
 						Util.selectSilently(texture1MenuItem, true);

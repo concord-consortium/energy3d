@@ -13,12 +13,37 @@ import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.HousePart;
 import org.concord.energy3d.model.Human;
+import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
+import org.concord.energy3d.undo.ChangeFigureCommand;
 import org.concord.energy3d.util.Util;
 
 class PopupMenuForHuman extends PopupMenuFactory {
 
 	private static JPopupMenu popupMenuForHuman;
+
+	private static JRadioButtonMenuItem createMenuItem(final int humanType) {
+		final JRadioButtonMenuItem rbmi = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/" + Human.getHumanName(humanType).toLowerCase() + ".png")));
+		rbmi.setText(Human.getHumanName(humanType));
+		rbmi.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
+					if (!(selectedPart instanceof Human)) {
+						return;
+					}
+					final Human human = (Human) selectedPart;
+					final ChangeFigureCommand c = new ChangeFigureCommand(human);
+					human.setHumanType(humanType);
+					human.draw();
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+					Scene.getInstance().setEdited(true);
+				}
+			}
+		});
+		return rbmi;
+	}
 
 	static JPopupMenu getPopupMenu() {
 
@@ -31,113 +56,17 @@ class PopupMenuForHuman extends PopupMenuFactory {
 
 			final ButtonGroup personButtonGroup = new ButtonGroup();
 
-			final JRadioButtonMenuItem rbmiJack = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/jack.png")));
-			rbmiJack.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Human)) {
-							return;
-						}
-						final Human human = (Human) selectedPart;
-						human.setHumanType(Human.JACK);
-						human.draw();
-					}
-				}
-			});
-			personButtonGroup.add(rbmiJack);
-			personMenu.add(rbmiJack);
+			final JMenu menMenu = new JMenu("Men");
+			personMenu.add(menMenu);
+			final JMenu womenMenu = new JMenu("Women");
+			personMenu.add(womenMenu);
 
-			final JRadioButtonMenuItem rbmiJane = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/jane.png")));
-			rbmiJane.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Human)) {
-							return;
-						}
-						final Human human = (Human) selectedPart;
-						human.setHumanType(Human.JANE);
-						human.draw();
-					}
-				}
-			});
-			personButtonGroup.add(rbmiJane);
-			personMenu.add(rbmiJane);
-
-			final JRadioButtonMenuItem rbmiJeni = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/jenny.png")));
-			rbmiJeni.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Human)) {
-							return;
-						}
-						final Human human = (Human) selectedPart;
-						human.setHumanType(Human.JENI);
-						human.draw();
-					}
-				}
-			});
-			personButtonGroup.add(rbmiJeni);
-			personMenu.add(rbmiJeni);
-
-			final JRadioButtonMenuItem rbmiJill = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/jill.png")));
-			rbmiJill.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Human)) {
-							return;
-						}
-						final Human human = (Human) selectedPart;
-						human.setHumanType(Human.JILL);
-						human.draw();
-					}
-				}
-			});
-			personButtonGroup.add(rbmiJill);
-			personMenu.add(rbmiJill);
-
-			final JRadioButtonMenuItem rbmiJohn = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/john.png")));
-			rbmiJohn.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Human)) {
-							return;
-						}
-						final Human human = (Human) selectedPart;
-						human.setHumanType(Human.JOHN);
-						human.draw();
-					}
-				}
-			});
-			personButtonGroup.add(rbmiJohn);
-			personMenu.add(rbmiJohn);
-
-			final JRadioButtonMenuItem rbmiJose = new JRadioButtonMenuItem(new ImageIcon(MainPanel.class.getResource("icons/jose.png")));
-			rbmiJose.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(final ItemEvent e) {
-					if (e.getStateChange() == ItemEvent.SELECTED) {
-						final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-						if (!(selectedPart instanceof Human)) {
-							return;
-						}
-						final Human human = (Human) selectedPart;
-						human.setHumanType(Human.JOSE);
-						human.draw();
-					}
-				}
-			});
-			personButtonGroup.add(rbmiJose);
-			personMenu.add(rbmiJose);
+			final JRadioButtonMenuItem[] rbmi = new JRadioButtonMenuItem[Human.FIGURES.length];
+			for (int i = 0; i < rbmi.length; i++) {
+				rbmi[i] = createMenuItem(i);
+				(Human.FIGURES[i].isMale() ? menMenu : womenMenu).add(rbmi[i]);
+				personButtonGroup.add(rbmi[i]);
+			}
 
 			personMenu.addMenuListener(new MenuListener() {
 
@@ -148,27 +77,7 @@ class PopupMenuForHuman extends PopupMenuFactory {
 						return;
 					}
 					personButtonGroup.clearSelection();
-					final Human human = (Human) selectedPart;
-					switch (human.getHumanType()) {
-					case Human.JACK:
-						Util.selectSilently(rbmiJack, true);
-						break;
-					case Human.JANE:
-						Util.selectSilently(rbmiJane, true);
-						break;
-					case Human.JENI:
-						Util.selectSilently(rbmiJeni, true);
-						break;
-					case Human.JILL:
-						Util.selectSilently(rbmiJill, true);
-						break;
-					case Human.JOHN:
-						Util.selectSilently(rbmiJohn, true);
-						break;
-					case Human.JOSE:
-						Util.selectSilently(rbmiJose, true);
-						break;
-					}
+					Util.selectSilently(rbmi[((Human) selectedPart).getHumanType()], true);
 				}
 
 				@Override

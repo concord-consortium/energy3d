@@ -22,6 +22,7 @@ import javax.swing.event.MenuListener;
 import org.concord.energy3d.model.Door;
 import org.concord.energy3d.model.Floor;
 import org.concord.energy3d.model.HousePart;
+import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Rack;
 import org.concord.energy3d.model.SolarPanel;
 import org.concord.energy3d.scene.Scene;
@@ -242,7 +243,7 @@ class PopupMenuForFloor extends PopupMenuFactory {
 				@Override
 				public void run() {
 					final HousePart copyBuffer = Scene.getInstance().getCopyBuffer();
-					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Rack);
+					miPaste.setEnabled(copyBuffer instanceof SolarPanel || copyBuffer instanceof Rack || copyBuffer instanceof Human);
 				}
 			});
 

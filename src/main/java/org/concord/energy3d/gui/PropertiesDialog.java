@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -37,11 +39,24 @@ class PropertiesDialog extends JDialog {
 		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 		getContentPane().add(panel, BorderLayout.CENTER);
 
+		final JComboBox<String> onlySolarAnalysisComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
 		final JTextField designerNameField = new JTextField(Scene.getInstance().getDesigner() == null ? "User" : Scene.getInstance().getDesigner().getName());
 		final JTextField designerEmailField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getEmail());
 		final JTextField designerOrganizationField = new JTextField(Scene.getInstance().getDesigner() == null ? "" : Scene.getInstance().getDesigner().getOrganization());
 		final JComboBox<String> projectTypeComboBox = new JComboBox<String>(new String[] { "Building", "Photovoltaic Solar Power System", "Concentrated Solar Power System" });
 		projectTypeComboBox.setSelectedIndex(Scene.getInstance().getProjectType() - 1);
+		projectTypeComboBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(final ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					if (projectTypeComboBox.getSelectedIndex() == 0) {
+						onlySolarAnalysisComboBox.setSelectedIndex(0);
+					} else {
+						onlySolarAnalysisComboBox.setSelectedIndex(1);
+					}
+				}
+			}
+		});
 		final JComboBox<String> unitSystemComboBox = new JComboBox<String>(new String[] { "International System of Units", "United States Customary Units" });
 		if (Scene.getInstance().getUnit() == Scene.Unit.USCustomaryUnits) {
 			unitSystemComboBox.setSelectedIndex(1);
@@ -57,7 +72,6 @@ class PropertiesDialog extends JDialog {
 		if (!Scene.getInstance().getDisallowFoundationOverlap()) {
 			foundationOverlapComboBox.setSelectedIndex(1);
 		}
-		final JComboBox<String> onlySolarAnalysisComboBox = new JComboBox<String>(new String[] { "No", "Yes" });
 		if (Scene.getInstance().getOnlySolarAnalysis()) {
 			onlySolarAnalysisComboBox.setSelectedIndex(1);
 		}
