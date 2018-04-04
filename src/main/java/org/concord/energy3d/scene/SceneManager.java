@@ -259,7 +259,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_RACK, DRAW_MIRROR, DRAW_PARABOLIC_TROUGH, DRAW_PARABOLIC_DISH, DRAW_FRESNEL_REFLECTOR, DRAW_SOLAR_WATER_HEATER, DRAW_TAPE_MEASURE, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JANE, DRAW_JENI, DRAW_JILL, DRAW_JACK, DRAW_JOHN, DRAW_JOSE
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_RACK, DRAW_MIRROR, DRAW_PARABOLIC_TROUGH, DRAW_PARABOLIC_DISH, DRAW_FRESNEL_REFLECTOR, DRAW_SOLAR_WATER_HEATER, DRAW_TAPE_MEASURE, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JACK
 	}
 
 	public enum CameraMode {
@@ -1593,23 +1593,8 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 		} else if (operation == Operation.DRAW_PINE) {
 			drawn = new Tree(Tree.PINE);
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_JANE) {
-			drawn = new Human(Human.JANE);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_JENI) {
-			drawn = new Human(Human.JENI);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_JILL) {
-			drawn = new Human(Human.JILL);
-			setGridsVisible(true);
 		} else if (operation == Operation.DRAW_JACK) {
 			drawn = new Human(Human.JACK);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_JOHN) {
-			drawn = new Human(Human.JOHN);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_JOSE) {
-			drawn = new Human(Human.JOSE);
 			setGridsVisible(true);
 		} else {
 			return null;

@@ -27,7 +27,7 @@ public class Human extends HousePart {
 	public static final int JILL = 4;
 	public static final int JOSE = 5;
 	private transient BillboardNode billboard;
-	private final int humanType;
+	private int humanType;
 	private transient double feetHeight;
 
 	public Human(final int humanType) {
@@ -46,42 +46,12 @@ public class Human extends HousePart {
 	protected void init() {
 		super.init();
 
-		final double h;
-		final double w;
-		switch (humanType) {
-		case JANE:
-			w = 2.5;
-			h = 8;
-			break;
-		case JENI:
-			w = 3;
-			h = 9;
-			break;
-		case JILL:
-			w = 3;
-			h = 8;
-			break;
-		case JACK:
-			w = 2.8;
-			h = 9;
-			break;
-		case JOHN:
-			w = 4;
-			h = 10;
-			break;
-		case JOSE:
-			w = 8;
-			h = 8;
-			break;
-		default:
-			w = 2.5;
-			h = 8;
-		}
-		mesh = new Quad("Human Quad", w, h);
+		final double[] size = getSize();
+		mesh = new Quad("Human Quad", size[0], size[1]);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
 		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		translate(w, h, feetHeight); // stand on the ground by default
+		translate(size[0], size[1], feetHeight); // stand on the ground by default
 		mesh.setUserData(new UserData(this, 0, true));
 
 		final BlendState bs = new BlendState();
@@ -169,6 +139,32 @@ public class Human extends HousePart {
 	@Override
 	public void updateTextureAndColor() {
 		updateTextureAndColor(mesh, ColorRGBA.WHITE, TextureMode.Full);
+	}
+
+	private double[] getSize() {
+		switch (humanType) {
+		case JANE:
+			return new double[] { 2.5, 8 };
+		case JENI:
+			return new double[] { 3, 9 };
+		case JILL:
+			return new double[] { 3, 8 };
+		case JOHN:
+			return new double[] { 4, 10 };
+		case JOSE:
+			return new double[] { 8, 8 };
+		default: // Jack is the default
+			return new double[] { 2.8, 9 };
+		}
+	}
+
+	public void setHumanType(final int humanType) {
+		this.humanType = humanType;
+		if (mesh instanceof Quad) {
+			final double[] size = getSize();
+			((Quad) mesh).resize(size[0], size[1]);
+			translate(size[0], size[1], feetHeight); // stand on the ground by default
+		}
 	}
 
 	public int getHumanType() {

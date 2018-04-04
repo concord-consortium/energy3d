@@ -273,12 +273,7 @@ public class MainPanel extends JPanel {
 		// create misc menu
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
 		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
-		final JCheckBoxMenuItem miJane = new JCheckBoxMenuItem("Jane", new ImageIcon(getClass().getResource("icons/jane.png")));
-		final JCheckBoxMenuItem miJeni = new JCheckBoxMenuItem("Jeni", new ImageIcon(getClass().getResource("icons/jenny.png")));
-		final JCheckBoxMenuItem miJill = new JCheckBoxMenuItem("Jill", new ImageIcon(getClass().getResource("icons/jill.png")));
 		final JCheckBoxMenuItem miJack = new JCheckBoxMenuItem("Jack", new ImageIcon(getClass().getResource("icons/jack.png")));
-		final JCheckBoxMenuItem miJohn = new JCheckBoxMenuItem("John", new ImageIcon(getClass().getResource("icons/john.png")));
-		final JCheckBoxMenuItem miJose = new JCheckBoxMenuItem("Jose", new ImageIcon(getClass().getResource("icons/jose.png")));
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -287,24 +282,9 @@ public class MainPanel extends JPanel {
 				if (selected == miDoor) {
 					miscCommand = SceneManager.Operation.DRAW_DOOR;
 					miscButton.setToolTipText("Draw door");
-				} else if (selected == miJane) {
-					miscCommand = SceneManager.Operation.DRAW_JANE;
-					miscButton.setToolTipText("Draw Jane");
-				} else if (selected == miJeni) {
-					miscCommand = SceneManager.Operation.DRAW_JENI;
-					miscButton.setToolTipText("Draw Jeni");
-				} else if (selected == miJill) {
-					miscCommand = SceneManager.Operation.DRAW_JILL;
-					miscButton.setToolTipText("Draw Jill");
 				} else if (selected == miJack) {
 					miscCommand = SceneManager.Operation.DRAW_JACK;
-					miscButton.setToolTipText("Draw Jack");
-				} else if (selected == miJohn) {
-					miscCommand = SceneManager.Operation.DRAW_JOHN;
-					miscButton.setToolTipText("Draw John");
-				} else if (selected == miJose) {
-					miscCommand = SceneManager.Operation.DRAW_JOSE;
-					miscButton.setToolTipText("Draw Jose");
+					miscButton.setToolTipText("Draw Human");
 				} else {
 					miscCommand = SceneManager.Operation.DRAW_FLOOR;
 					miscButton.setToolTipText("Draw floor");
@@ -316,31 +296,16 @@ public class MainPanel extends JPanel {
 		};
 		miDoor.addActionListener(miscAction);
 		miFloor.addActionListener(miscAction);
-		miJane.addActionListener(miscAction);
-		miJeni.addActionListener(miscAction);
-		miJill.addActionListener(miscAction);
 		miJack.addActionListener(miscAction);
-		miJohn.addActionListener(miscAction);
-		miJose.addActionListener(miscAction);
 		miscMenu = new JPopupMenu();
 		miscMenu.add(miDoor);
 		miscMenu.add(miFloor);
 		miscMenu.addSeparator();
-		miscMenu.add(miJane);
-		miscMenu.add(miJeni);
-		miscMenu.add(miJill);
 		miscMenu.add(miJack);
-		miscMenu.add(miJohn);
-		miscMenu.add(miJose);
 		bg = new ButtonGroup();
 		bg.add(miDoor);
 		bg.add(miFloor);
-		bg.add(miJane);
-		bg.add(miJeni);
-		bg.add(miJill);
 		bg.add(miJack);
-		bg.add(miJohn);
-		bg.add(miJose);
 
 		// create solar menu
 		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Panel Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);

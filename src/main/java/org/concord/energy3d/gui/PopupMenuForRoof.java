@@ -208,7 +208,7 @@ class PopupMenuForRoof extends PopupMenuFactory {
 			});
 
 			final JMenu textureMenu = new JMenu("Texture");
-			final ButtonGroup textureGroup = new ButtonGroup();
+			final ButtonGroup textureButtonGroup = new ButtonGroup();
 
 			final JRadioButtonMenuItem rbmiTextureNone = new JRadioButtonMenuItem("No Texture");
 			rbmiTextureNone.addItemListener(new ItemListener() {
@@ -225,7 +225,7 @@ class PopupMenuForRoof extends PopupMenuFactory {
 					}
 				}
 			});
-			textureGroup.add(rbmiTextureNone);
+			textureButtonGroup.add(rbmiTextureNone);
 			textureMenu.add(rbmiTextureNone);
 
 			final JRadioButtonMenuItem rbmiTextureOutline = new JRadioButtonMenuItem("Outline Texture");
@@ -243,7 +243,7 @@ class PopupMenuForRoof extends PopupMenuFactory {
 					}
 				}
 			});
-			textureGroup.add(rbmiTextureOutline);
+			textureButtonGroup.add(rbmiTextureOutline);
 			textureMenu.add(rbmiTextureOutline);
 			textureMenu.addSeparator();
 
@@ -254,13 +254,13 @@ class PopupMenuForRoof extends PopupMenuFactory {
 			final JRadioButtonMenuItem rbmiTexture05 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_05, "icons/roof_05.png");
 			final JRadioButtonMenuItem rbmiTexture06 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_06, "icons/roof_06.png");
 			final JRadioButtonMenuItem rbmiTexture07 = MainFrame.getInstance().createRoofTextureMenuItem(Roof.TEXTURE_07, "icons/roof_07.png");
-			textureGroup.add(rbmiTexture01);
-			textureGroup.add(rbmiTexture02);
-			textureGroup.add(rbmiTexture03);
-			textureGroup.add(rbmiTexture04);
-			textureGroup.add(rbmiTexture05);
-			textureGroup.add(rbmiTexture06);
-			textureGroup.add(rbmiTexture07);
+			textureButtonGroup.add(rbmiTexture01);
+			textureButtonGroup.add(rbmiTexture02);
+			textureButtonGroup.add(rbmiTexture03);
+			textureButtonGroup.add(rbmiTexture04);
+			textureButtonGroup.add(rbmiTexture05);
+			textureButtonGroup.add(rbmiTexture06);
+			textureButtonGroup.add(rbmiTexture07);
 			textureMenu.add(rbmiTexture01);
 			textureMenu.add(rbmiTexture02);
 			textureMenu.add(rbmiTexture03);
@@ -281,6 +281,7 @@ class PopupMenuForRoof extends PopupMenuFactory {
 						Util.selectSilently(rbmiTextureOutline, true);
 						return;
 					}
+					textureButtonGroup.clearSelection();
 					switch (Scene.getInstance().getRoofTextureType()) {
 					case Roof.TEXTURE_01:
 						Util.selectSilently(rbmiTexture01, true);
