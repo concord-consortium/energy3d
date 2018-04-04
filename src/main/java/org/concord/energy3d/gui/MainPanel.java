@@ -273,7 +273,7 @@ public class MainPanel extends JPanel {
 		// create misc menu
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
 		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
-		final JCheckBoxMenuItem miJack = new JCheckBoxMenuItem("Jack", new ImageIcon(getClass().getResource("icons/jack.png")));
+		final JCheckBoxMenuItem miJack = new JCheckBoxMenuItem("Human", new ImageIcon(getClass().getResource("icons/jack.png")));
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
