@@ -9,6 +9,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.concurrent.Callable;
 
@@ -48,7 +49,19 @@ class PopupMenuForLand extends PopupMenuFactory {
 
 	private static JPopupMenu popupMenuForLand;
 
-	static JPopupMenu getPopupMenu() {
+	static JPopupMenu getPopupMenu(final MouseEvent e) {
+
+		if (e.isShiftDown()) {
+			SceneManager.getTaskManager().update(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					Scene.getInstance().pasteToPickedLocationOnLand();
+					Scene.getInstance().setEdited(true);
+					return null;
+				}
+			});
+			return null;
+		}
 
 		if (popupMenuForLand == null) {
 

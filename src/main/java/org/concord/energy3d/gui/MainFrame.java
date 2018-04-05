@@ -187,7 +187,6 @@ public class MainFrame extends JFrame {
 	private JMenuItem submitToVsgMenuItem;
 	private JMenu viewMenu;
 	private JMenu analysisMenu;
-	private JMenuItem rescaleMenuItem;
 	private JMenuItem sortIdMenuItem;
 	private JMenuItem overallUtilityBillMenuItem;
 	private JMenuItem simulationSettingsMenuItem;
@@ -230,7 +229,6 @@ public class MainFrame extends JFrame {
 	private JMenu helpMenu;
 	private JMenuItem aboutMenuItem;
 	private JDialog aboutDialog;
-	private MainPanel mainPanel;
 	private JCheckBoxMenuItem annotationsInwardMenuItem;
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
@@ -312,14 +310,6 @@ public class MainFrame extends JFrame {
 		return instance;
 	}
 
-	public MainPanel getMainPanel() {
-		if (mainPanel == null) {
-			mainPanel = MainPanel.getInstance();
-			mainPanel.setMainFrame(this);
-		}
-		return mainPanel;
-	}
-
 	private MainFrame() {
 		super();
 		System.out.print("Initiating GUI...");
@@ -359,7 +349,7 @@ public class MainFrame extends JFrame {
 		setTitle("Energy3D V" + MainApplication.VERSION);
 
 		setJMenuBar(getAppMenuBar());
-		setContentPane(getMainPanel());
+		setContentPane(MainPanel.getInstance());
 
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		final Preferences pref = Preferences.userNodeForPackage(MainApplication.class);
@@ -993,7 +983,7 @@ public class MainFrame extends JFrame {
 			previewMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					mainPanel.getPreviewButton().setSelected(previewMenuItem.isSelected());
+					MainPanel.getInstance().getPreviewButton().setSelected(previewMenuItem.isSelected());
 				}
 			});
 		}
@@ -1128,6 +1118,8 @@ public class MainFrame extends JFrame {
 			if (!Config.isMac()) {
 				helpMenu.add(getPreferencesMenuItem());
 			}
+			helpMenu.add(getFixProblemsMenuItem());
+			helpMenu.add(getSortIdMenuItem());
 			helpMenu.add(getRecoveryMenuItem());
 
 			final JMenuItem miUpdate = new JMenuItem("Check Update..."); // the automatic updater can fail sometimes. This provides an independent check.
@@ -1183,10 +1175,22 @@ public class MainFrame extends JFrame {
 					}.execute();
 				}
 			});
+
+			helpMenu.addSeparator();
+			helpMenu.add(getInfoPanelCheckBoxMenuItem());
+			helpMenu.add(getNoteCheckBoxMenuItem());
 			helpMenu.addSeparator();
 
 			// Energy3D web pages
 
+			mi = new JMenuItem("Visit Home Page...");
+			mi.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					Util.openBrowser("http://energy3d.concord.org");
+				}
+			});
+			helpMenu.add(mi);
 			mi = new JMenuItem("Visit Virtual Solar Grid...");
 			mi.addActionListener(new ActionListener() {
 				@Override
@@ -1195,37 +1199,11 @@ public class MainFrame extends JFrame {
 				}
 			});
 			helpMenu.add(mi);
-			mi = new JMenuItem("View Building Examples...");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d/styles.html");
-				}
-			});
-			helpMenu.add(mi);
-			mi = new JMenuItem("View User Work...");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy.concord.org/energy3d/models.html");
-				}
-			});
-			helpMenu.add(mi);
-			helpMenu.addSeparator();
-
 			mi = new JMenuItem("Visit User Forum...");
 			mi.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
 					Util.openBrowser("https://energy.concord.org/energy3d/forum/");
-				}
-			});
-			helpMenu.add(mi);
-			mi = new JMenuItem("Visit Home Page...");
-			mi.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					Util.openBrowser("http://energy3d.concord.org");
 				}
 			});
 			helpMenu.add(mi);
@@ -1741,9 +1719,6 @@ public class MainFrame extends JFrame {
 			// viewMenu.add(getWallThicknessMenuItem());
 			viewMenu.add(getTextureMenu());
 			viewMenu.add(getThemeMenu());
-			viewMenu.addSeparator();
-			viewMenu.add(getInfoPanelCheckBoxMenuItem());
-			viewMenu.add(getNoteCheckBoxMenuItem());
 
 		}
 		return viewMenu;
@@ -2544,26 +2519,6 @@ public class MainFrame extends JFrame {
 			});
 		}
 		return shadowMenuItem;
-	}
-
-	private JMenuItem getRescaleMenuItem() {
-		if (rescaleMenuItem == null) {
-			rescaleMenuItem = new JMenuItem("Rescale...");
-			rescaleMenuItem.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					final HousePart selectedPart = SceneManager.getInstance().getSelectedPart();
-					if (selectedPart instanceof Foundation) {
-						new RescaleBuildingDialog((Foundation) selectedPart).setVisible(true);
-						return;
-					}
-					if (selectedPart == null) {
-						new ScaleDialog().setVisible(true);
-					}
-				}
-			});
-		}
-		return rescaleMenuItem;
 	}
 
 	private JMenuItem getSortIdMenuItem() {
@@ -3444,7 +3399,6 @@ public class MainFrame extends JFrame {
 					removeAllEditLocksMenuItem.setEnabled(true);
 					specificationsMenuItem.setEnabled(true);
 					autoRecomputeEnergyMenuItem.setEnabled(true);
-					rescaleMenuItem.setEnabled(true);
 					sortIdMenuItem.setEnabled(true);
 				}
 
@@ -3477,10 +3431,7 @@ public class MainFrame extends JFrame {
 						removeAllEditLocksMenuItem.setEnabled(false);
 						specificationsMenuItem.setEnabled(false);
 						autoRecomputeEnergyMenuItem.setEnabled(false);
-						rescaleMenuItem.setEnabled(false);
 						sortIdMenuItem.setEnabled(false);
-					} else {
-						rescaleMenuItem.setEnabled(selectedPart instanceof Foundation || selectedPart == null);
 					}
 					refreshUndoRedo();
 				}
@@ -3529,12 +3480,9 @@ public class MainFrame extends JFrame {
 			editMenu.addSeparator();
 			editMenu.add(getEnableAllEditPointsMenuItem());
 			editMenu.add(getDisableAllEditPointsMenuItem());
-			editMenu.add(getFixProblemsMenuItem());
-			editMenu.add(getSortIdMenuItem());
 			editMenu.add(getSnapToGridsMenuItem());
 			editMenu.add(getSnapMenuItem());
 			editMenu.add(getAutoRecomputeEnergyMenuItem());
-			editMenu.add(getRescaleMenuItem());
 			editMenu.addSeparator();
 			editMenu.add(getSetRegionMenuItem());
 			editMenu.add(getCustomPricesMenuItem());

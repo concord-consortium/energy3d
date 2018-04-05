@@ -153,7 +153,7 @@ public abstract class PopupMenuFactory {
 		if (selectedPart instanceof Human) {
 			return PopupMenuForHuman.getPopupMenu();
 		}
-		return onLand ? PopupMenuForLand.getPopupMenu() : PopupMenuForSky.getPopupMenu();
+		return onLand ? PopupMenuForLand.getPopupMenu(e) : PopupMenuForSky.getPopupMenu();
 	}
 
 	static void addPrefabMenuItem(final String type, final String url, final JMenu menu) {

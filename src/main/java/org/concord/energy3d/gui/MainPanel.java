@@ -63,7 +63,6 @@ public class MainPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private static final MainPanel instance = new MainPanel();
-	private MainFrame mainFrame;
 	private JToolBar appToolbar;
 	private JToggleButton selectButton;
 	private JToggleButton wallButton;
@@ -127,18 +126,10 @@ public class MainPanel extends JPanel {
 		return instance;
 	}
 
-	public void setMainFrame(final MainFrame mainFrame) {
-		this.mainFrame = mainFrame;
-	}
-
-	public MainFrame getMainFrame() {
-		return mainFrame;
-	}
-
 	private MainPanel() {
 		super();
 		System.out.println("Version: " + MainApplication.VERSION);
-		System.out.print("Initiating GUI Panel...");
+		System.out.print("Initiating MainPanel...");
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
@@ -345,7 +336,7 @@ public class MainPanel extends JPanel {
 		this.add(getEnergyCanvasNoteSplitPane(), BorderLayout.CENTER);
 	}
 
-	public JToolBar getAppToolbar() {
+	JToolBar getAppToolbar() {
 		if (appToolbar == null) {
 			appToolbar = new JToolBar();
 			appToolbar.setFloatable(false);
@@ -403,7 +394,7 @@ public class MainPanel extends JPanel {
 		}
 	}
 
-	public JToggleButton getSelectButton() {
+	private JToggleButton getSelectButton() {
 		if (selectButton == null) {
 			selectButton = new JToggleButton();
 			selectButton.addMouseListener(refreshUponMouseExit);
@@ -616,10 +607,8 @@ public class MainPanel extends JPanel {
 			previewButton.addItemListener(new ItemListener() { // must be ItemListner to be triggered when selection is changed by code
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
-					if (mainFrame != null) {
-						mainFrame.getPreviewMenuItem().setSelected(previewButton.isSelected());
-						mainFrame.getEditMenu().setEnabled(!previewButton.isSelected());
-					}
+					MainFrame.getInstance().getPreviewMenuItem().setSelected(previewButton.isSelected());
+					MainFrame.getInstance().getEditMenu().setEnabled(!previewButton.isSelected());
 					defaultTool();
 					PrintController.getInstance().setPrintPreview(previewButton.isSelected());
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
@@ -975,7 +964,7 @@ public class MainPanel extends JPanel {
 		return resizeButton;
 	}
 
-	public JButton getRotateButton() {
+	JButton getRotateButton() {
 		if (rotateButton == null) {
 			rotateButton = new JButton();
 			if (Config.isMac()) { // for some reason, the newer version of Mac draws border for JButton (but not JToggleButton)
@@ -1084,7 +1073,7 @@ public class MainPanel extends JPanel {
 		return rotateButton;
 	}
 
-	public JToggleButton getNoteButton() {
+	JToggleButton getNoteButton() {
 		if (noteButton == null) {
 			noteButton = new JToggleButton();
 			noteButton.setToolTipText("Show note");
