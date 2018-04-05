@@ -87,19 +87,15 @@ public class MainPanel extends JPanel {
 	private JScrollPane noteScrollPane;
 	private JTextArea noteTextArea;
 	private JToggleButton solarButton;
-	private JToggleButton treeButton;
 	private JToggleButton miscButton;
 	private JButton rotateButton;
-	private JButton treeArrowButton;
 	private JButton roofArrowButton;
 	private JButton miscArrowButton;
 	private JButton solaArrowButton;
 	private int defaultDividerSize = -1;
-	private final JPopupMenu treeMenu;
 	private final JPopupMenu roofMenu;
 	private final JPopupMenu miscMenu;
 	private final JPopupMenu solaMenu;
-	private Operation treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
 	private Operation solaCommand = SceneManager.Operation.DRAW_RACK;
@@ -206,74 +202,11 @@ public class MainPanel extends JPanel {
 		bg.add(miCustomRoof);
 		bg.add(miGableRoof);
 
-		// create tree menu
-		final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Dogwood (Deciduous, Height=8m)", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
-		final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Maple (Deciduous, Height=12m)", new ImageIcon(getClass().getResource("icons/maple.png")));
-		final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Elm (Deciduous, Height=15m)", new ImageIcon(getClass().getResource("icons/elm.png")));
-		final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Oak (Deciduous, Height=16m)", new ImageIcon(getClass().getResource("icons/oak.png")));
-		final JCheckBoxMenuItem miTree5 = new JCheckBoxMenuItem("Linden (Deciduous, Height=24m)", new ImageIcon(getClass().getResource("icons/linden.png")));
-		final JCheckBoxMenuItem miTree6 = new JCheckBoxMenuItem("Cottonwood (Deciduous, Height=20m)", new ImageIcon(getClass().getResource("icons/cottonwood.png")));
-		final JCheckBoxMenuItem miTree7 = new JCheckBoxMenuItem("Pine (Evergreen, Height=16m)", new ImageIcon(getClass().getResource("icons/pine.png")));
-		final ActionListener treeAction = new ActionListener() {
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
-				treeButton.setIcon(selected.getIcon());
-				if (selected == miTree1) {
-					treeCommand = SceneManager.Operation.DRAW_DOGWOOD;
-					treeButton.setToolTipText("Insert a dogwood tree (deciduous, height=8m)");
-				} else if (selected == miTree2) {
-					treeCommand = SceneManager.Operation.DRAW_MAPLE;
-					treeButton.setToolTipText("Insert a maple tree (deciduous, height=12m)");
-				} else if (selected == miTree3) {
-					treeCommand = SceneManager.Operation.DRAW_ELM;
-					treeButton.setToolTipText("Insert an elm tree (deciduous, height=15m)");
-				} else if (selected == miTree4) {
-					treeCommand = SceneManager.Operation.DRAW_OAK;
-					treeButton.setToolTipText("Insert an oak tree (deciduous, height=16m)");
-				} else if (selected == miTree5) {
-					treeCommand = SceneManager.Operation.DRAW_LINDEN;
-					treeButton.setToolTipText("Insert a linden tree (deciduous, height=24m)");
-				} else if (selected == miTree6) {
-					treeCommand = SceneManager.Operation.DRAW_COTTONWOOD;
-					treeButton.setToolTipText("Insert a cottonwood tree (deciduous, height=20m)");
-				} else {
-					treeCommand = SceneManager.Operation.DRAW_PINE;
-					treeButton.setToolTipText("Insert a pine tree (evergreen, height=16m)");
-				}
-				SceneManager.getInstance().setOperation(treeCommand);
-				treeButton.setSelected(true);
-				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-			}
-		};
-		miTree1.addActionListener(treeAction);
-		miTree2.addActionListener(treeAction);
-		miTree3.addActionListener(treeAction);
-		miTree4.addActionListener(treeAction);
-		miTree5.addActionListener(treeAction);
-		miTree6.addActionListener(treeAction);
-		miTree7.addActionListener(treeAction);
-		treeMenu = new JPopupMenu();
-		treeMenu.add(miTree1);
-		treeMenu.add(miTree2);
-		treeMenu.add(miTree3);
-		treeMenu.add(miTree4);
-		treeMenu.add(miTree5);
-		treeMenu.add(miTree6);
-		treeMenu.add(miTree7);
-		bg = new ButtonGroup();
-		bg.add(miTree1);
-		bg.add(miTree2);
-		bg.add(miTree3);
-		bg.add(miTree4);
-		bg.add(miTree5);
-		bg.add(miTree6);
-		bg.add(miTree7);
-
 		// create misc menu
+		final JCheckBoxMenuItem miPlant = new JCheckBoxMenuItem("Plant", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
 		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
-		final JCheckBoxMenuItem miJack = new JCheckBoxMenuItem("Human", new ImageIcon(getClass().getResource("icons/jack.png")));
+		final JCheckBoxMenuItem miHuman = new JCheckBoxMenuItem("Human", new ImageIcon(getClass().getResource("icons/jack.png")));
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -282,9 +215,12 @@ public class MainPanel extends JPanel {
 				if (selected == miDoor) {
 					miscCommand = SceneManager.Operation.DRAW_DOOR;
 					miscButton.setToolTipText("Draw door");
-				} else if (selected == miJack) {
-					miscCommand = SceneManager.Operation.DRAW_JACK;
-					miscButton.setToolTipText("Draw Human");
+				} else if (selected == miPlant) {
+					miscCommand = SceneManager.Operation.DRAW_PLANT;
+					miscButton.setToolTipText("Insert a plant");
+				} else if (selected == miHuman) {
+					miscCommand = SceneManager.Operation.DRAW_HUMAN;
+					miscButton.setToolTipText("Insert a human");
 				} else {
 					miscCommand = SceneManager.Operation.DRAW_FLOOR;
 					miscButton.setToolTipText("Draw floor");
@@ -296,16 +232,18 @@ public class MainPanel extends JPanel {
 		};
 		miDoor.addActionListener(miscAction);
 		miFloor.addActionListener(miscAction);
-		miJack.addActionListener(miscAction);
+		miPlant.addActionListener(miscAction);
+		miHuman.addActionListener(miscAction);
 		miscMenu = new JPopupMenu();
 		miscMenu.add(miDoor);
 		miscMenu.add(miFloor);
-		miscMenu.addSeparator();
-		miscMenu.add(miJack);
+		miscMenu.add(miPlant);
+		miscMenu.add(miHuman);
 		bg = new ButtonGroup();
 		bg.add(miDoor);
 		bg.add(miFloor);
-		bg.add(miJack);
+		bg.add(miPlant);
+		bg.add(miHuman);
 
 		// create solar menu
 		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Panel Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
@@ -421,8 +359,6 @@ public class MainPanel extends JPanel {
 			appToolbar.add(getRoofArrowButton());
 			appToolbar.add(getMiscButton());
 			appToolbar.add(getMiscArrowButton());
-			appToolbar.add(getTreeButton());
-			appToolbar.add(getTreeArrowButton());
 			appToolbar.add(getSolarButton());
 			appToolbar.add(getSolaArrowButton());
 			appToolbar.addSeparator();
@@ -439,7 +375,6 @@ public class MainPanel extends JPanel {
 			bg.add(windowButton);
 			bg.add(roofButton);
 			bg.add(solarButton);
-			bg.add(treeButton);
 			bg.add(miscButton);
 		}
 		return appToolbar;
@@ -991,44 +926,6 @@ public class MainPanel extends JPanel {
 			solaArrowButton.setFocusPainted(false);
 		}
 		return solaArrowButton;
-	}
-
-	private JToggleButton getTreeButton() {
-		if (treeButton == null) {
-			treeButton = new JToggleButton();
-			treeButton.setToolTipText("Insert a dogwood tree");
-			treeButton.setIcon(new ImageIcon(getClass().getResource("icons/dogwood.png")));
-			treeButton.setFocusable(false);
-			treeButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(treeCommand);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			treeButton.addMouseListener(operationStickAndRefreshUponExit);
-			addMouseOverEffect(treeButton);
-		}
-		return treeButton;
-	}
-
-	private JButton getTreeArrowButton() {
-		if (treeArrowButton == null) {
-			treeArrowButton = new JButton();
-			treeArrowButton.setFocusable(false);
-			final Dimension d = new Dimension(12, treeButton.getMaximumSize().height);
-			treeArrowButton.setMaximumSize(d);
-			treeArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
-			treeArrowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					treeMenu.show(treeButton, 0, treeButton.getHeight());
-				}
-			});
-			treeArrowButton.setBorder(BorderFactory.createEmptyBorder());
-			treeArrowButton.setFocusPainted(false);
-		}
-		return treeArrowButton;
 	}
 
 	private JToggleButton getRoofButton() {

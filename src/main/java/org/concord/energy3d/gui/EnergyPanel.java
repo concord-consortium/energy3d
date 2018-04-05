@@ -1180,7 +1180,7 @@ public class EnergyPanel extends JPanel {
 					EventQueue.invokeLater(new Runnable() {
 						@Override
 						public void run() {
-							partPanelBorder.setTitle("Tree (" + tree.getId() + "): " + tree.getTreeName());
+							partPanelBorder.setTitle("Tree (" + tree.getId() + "): " + tree.getPlantName());
 							partProperty1Label.setText("  Spread & Height:");
 							partProperty2Label.setText("  Type:");
 							partProperty3Label.setText("  Position:");
@@ -1193,7 +1193,7 @@ public class EnergyPanel extends JPanel {
 								a = 0;
 							}
 							partProperty1TextField.setText(ONE_DECIMAL.format(tree.getWidth() * scale) + lengthUnit + ", " + ONE_DECIMAL.format(tree.getHeight() * scale) + lengthUnit);
-							partProperty2TextField.setText(tree.getTreeName() + " (" + (tree.getTreeType() == Tree.PINE ? "Evergreen" : "Deciduous") + ")");
+							partProperty2TextField.setText(tree.getPlantName() + " (" + (Tree.PLANTS[tree.getPlantType()].isEvergreen() ? "Evergreen" : "Deciduous") + ")");
 							partProperty3TextField.setText("(" + ONE_DECIMAL.format(v.getX() * scale) + ", " + ONE_DECIMAL.format(v.getY() * scale) + ")" + lengthUnit + " or (" + ONE_DECIMAL.format(l * scale) + lengthUnit + ", " + ONE_DECIMAL.format(a) + "\u00B0)");
 							partProperty1TextField.putClientProperty("tooltip", "The spread and height of the tree");
 							partProperty2TextField.putClientProperty("tooltip", "The type of the tree");

@@ -259,7 +259,7 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 	}
 
 	public enum Operation {
-		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_RACK, DRAW_MIRROR, DRAW_PARABOLIC_TROUGH, DRAW_PARABOLIC_DISH, DRAW_FRESNEL_REFLECTOR, DRAW_SOLAR_WATER_HEATER, DRAW_TAPE_MEASURE, DRAW_SENSOR, DRAW_DOGWOOD, DRAW_ELM, DRAW_OAK, DRAW_LINDEN, DRAW_MAPLE, DRAW_COTTONWOOD, DRAW_PINE, DRAW_JACK
+		SELECT, RESIZE, ROTATE, DRAW_WALL, DRAW_DOOR, DRAW_ROOF_PYRAMID, DRAW_ROOF_HIP, DRAW_ROOF_SHED, DRAW_ROOF_GAMBREL, DRAW_ROOF_CUSTOM, DRAW_ROOF_GABLE, DRAW_WINDOW, DRAW_FOUNDATION, DRAW_FLOOR, DRAW_SOLAR_PANEL, DRAW_RACK, DRAW_MIRROR, DRAW_PARABOLIC_TROUGH, DRAW_PARABOLIC_DISH, DRAW_FRESNEL_REFLECTOR, DRAW_SOLAR_WATER_HEATER, DRAW_TAPE_MEASURE, DRAW_SENSOR, DRAW_PLANT, DRAW_HUMAN
 	}
 
 	public enum CameraMode {
@@ -1572,28 +1572,10 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 			drawn = new Foundation();
 			setGridsVisible(Scene.getInstance().isSnapToGrids());
 			drawn.setColor(Scene.getInstance().getFoundationColor());
-		} else if (operation == Operation.DRAW_DOGWOOD) {
-			drawn = new Tree(Tree.DOGWOOD);
+		} else if (operation == Operation.DRAW_PLANT) {
+			drawn = new Tree();
 			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_ELM) {
-			drawn = new Tree(Tree.ELM);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_OAK) {
-			drawn = new Tree(Tree.OAK);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_LINDEN) {
-			drawn = new Tree(Tree.LINDEN);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_COTTONWOOD) {
-			drawn = new Tree(Tree.COTTONWOOD);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_MAPLE) {
-			drawn = new Tree(Tree.MAPLE);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_PINE) {
-			drawn = new Tree(Tree.PINE);
-			setGridsVisible(true);
-		} else if (operation == Operation.DRAW_JACK) {
+		} else if (operation == Operation.DRAW_HUMAN) {
 			drawn = new Human();
 			setGridsVisible(true);
 		} else {
@@ -1608,10 +1590,6 @@ public class SceneManager implements com.ardor3d.framework.Scene, Runnable, Upda
 
 	public Operation getOperation() {
 		return operation;
-	}
-
-	public boolean isOperationAddTree() {
-		return operation == Operation.DRAW_DOGWOOD || operation == Operation.DRAW_COTTONWOOD || operation == Operation.DRAW_ELM || operation == Operation.DRAW_LINDEN || operation == Operation.DRAW_OAK || operation == Operation.DRAW_MAPLE || operation == Operation.DRAW_PINE;
 	}
 
 	public void setShading(final boolean enable) {

@@ -67,7 +67,7 @@ class LoggerUtil {
 		if (p instanceof Human) {
 			s = "{\"Name\": \"" + ((Human) p).getHumanName() + "\", ";
 		} else if (p instanceof Tree) {
-			s = "{\"Species\": \"" + ((Tree) p).getTreeName() + "\", ";
+			s = "{\"Species\": \"" + ((Tree) p).getPlantName() + "\", ";
 		} else {
 			s = "{\"Type\": \"" + p.getClass().getSimpleName() + "\", ";
 		}

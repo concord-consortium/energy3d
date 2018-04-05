@@ -127,22 +127,7 @@ public class BuildingCost extends ProjectCost {
 		}
 
 		if (part instanceof Tree) {
-			switch (((Tree) part).getTreeType()) {
-			case Tree.LINDEN:
-				return 3000;
-			case Tree.COTTONWOOD:
-				return 2500;
-			case Tree.ELM:
-				return 2000;
-			case Tree.OAK:
-				return 2000;
-			case Tree.PINE:
-				return 1500;
-			case Tree.MAPLE:
-				return 1000;
-			default:
-				return 500;
-			}
+			return Tree.PLANTS[((Tree) part).getPlantType()].getCost();
 		}
 
 		return 0;

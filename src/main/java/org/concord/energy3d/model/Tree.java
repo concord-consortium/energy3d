@@ -31,19 +31,28 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public class Tree extends HousePart {
 
+	public final static Plant[] PLANTS = new Plant[] { new Plant("Dogwood", false, 30, 40, 500), //
+			new Plant("Elm", false, 60, 75, 2000), // 1
+			new Plant("Maple", false, 30, 60, 1000), // 2
+			new Plant("Pine", true, 30, 80, 1500), // 3
+			new Plant("Oak", false, 70, 80, 2000), // 4
+			new Plant("Linden", false, 90, 120, 3000), // 5
+			new Plant("Cottonwood", false, 80, 100, 2500) };
+
+	// final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Dogwood (Deciduous, Height=8m)", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
+	// final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Maple (Deciduous, Height=12m)", new ImageIcon(getClass().getResource("icons/maple.png")));
+	// final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Elm (Deciduous, Height=15m)", new ImageIcon(getClass().getResource("icons/elm.png")));
+	// final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Oak (Deciduous, Height=16m)", new ImageIcon(getClass().getResource("icons/oak.png")));
+	// final JCheckBoxMenuItem miTree5 = new JCheckBoxMenuItem("Linden (Deciduous, Height=24m)", new ImageIcon(getClass().getResource("icons/linden.png")));
+	// final JCheckBoxMenuItem miTree6 = new JCheckBoxMenuItem("Cottonwood (Deciduous, Height=20m)", new ImageIcon(getClass().getResource("icons/cottonwood.png")));
+	// final JCheckBoxMenuItem miTree7 = new JCheckBoxMenuItem("Pine (Evergreen, Height=16m)", new ImageIcon(getClass().getResource("icons/pine.png")));
+
 	private static final long serialVersionUID = 1L;
-	public static final int DOGWOOD = 0;
-	public static final int ELM = 1;
-	public static final int MAPLE = 2;
-	public static final int PINE = 3;
-	public static final int OAK = 4;
-	public static final int LINDEN = 5;
-	public static final int COTTONWOOD = 6;
 	private double treeWidth, treeHeight;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Mesh crown;
-	private final int treeType;
+	private int treeType = 0;
 	private boolean showPolygons;
 	private static Calendar leaf_shed_northern_hemisphere, leaf_grow_northern_hemisphere;
 	private static Calendar leaf_shed_southern_hemisphere, leaf_grow_southern_hemisphere;
@@ -64,9 +73,8 @@ public class Tree extends HousePart {
 		leaf_shed_southern_hemisphere.set(Calendar.DAY_OF_MONTH, 1);
 	}
 
-	public Tree(final int treeType) {
+	public Tree() {
 		super(1, 1, 1);
-		this.treeType = treeType;
 		init();
 		root.getSceneHints().setCullHint(CullHint.Always);
 	}
@@ -75,40 +83,14 @@ public class Tree extends HousePart {
 	protected void init() {
 		super.init();
 
-		switch (treeType) {
-		case COTTONWOOD:
-			treeWidth = 80;
-			treeHeight = 100;
-			break;
-		case LINDEN:
-			treeWidth = 90;
-			treeHeight = 120;
-			break;
-		case OAK:
-			treeWidth = 70;
-			treeHeight = 80;
-			break;
-		case ELM:
-			treeWidth = 60;
-			treeHeight = 75;
-			break;
-		case MAPLE:
-			treeWidth = 30;
-			treeHeight = 60;
-			break;
-		case PINE:
-			treeWidth = 30;
-			treeHeight = 80;
-			break;
-		default:
-			treeWidth = 30;
-			treeHeight = 40;
-		}
+		treeWidth = PLANTS[treeType].getWidth();
+		treeHeight = PLANTS[treeType].getHeight();
+
 		mesh = new Quad("Tree Quad", treeWidth, treeHeight);
 		mesh.setModelBound(new BoundingBox());
 		mesh.updateModelBound();
-		mesh.setRotation(new Matrix3().fromAngles(Math.PI / 2, 0, 0));
-		mesh.setTranslation(0, 0, treeHeight / 2.0);
+		mesh.setRotation(new Matrix3().fromAngles(0.5 * Math.PI, 0, 0));
+		mesh.setTranslation(0, 0, 0.5 * treeHeight);
 		mesh.getSceneHints().setPickingHint(PickingHint.Pickable, false);
 
 		final BlendState bs = new BlendState();
@@ -125,11 +107,9 @@ public class Tree extends HousePart {
 		billboard.attachChild(mesh);
 		root.attachChild(billboard);
 
-		switch (treeType) {
-		case PINE:
+		if (PLANTS[treeType].getName().equals("Pine")) {
 			crown = new Cone("Tree Crown", 2, 6, 18, 20, false); // axis samples, radial samples, radius, height, closed
-			break;
-		default:
+		} else {
 			crown = new Sphere("Tree Crown", 4, 8, 14); // z samples, radial samples, radius
 		}
 		crown.setModelBound(new BoundingSphere());
@@ -139,41 +119,41 @@ public class Tree extends HousePart {
 		trunk.updateModelBound();
 
 		switch (treeType) {
-		case COTTONWOOD:
+		case 6: // cottonwood
 			crown.setScale(3, 3, 3.5);
 			crown.setTranslation(0, 0, 55);
 			trunk.setScale(8, 8, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
-		case LINDEN:
+		case 5: // linden
 			crown.setScale(3.5, 3.5, 4);
 			crown.setTranslation(0, 0, 65);
 			trunk.setScale(5, 5, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
-		case OAK:
+		case 4: // oak
 			crown.setScale(2.5, 2.5, 3);
 			crown.setTranslation(0, 0, 45);
 			trunk.setScale(5, 5, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
-		case ELM:
+		case 1: // elm
 			crown.setScale(2, 2, 2.5);
 			crown.setTranslation(0, 0, 40);
 			trunk.setScale(2, 2, 2);
 			trunk.setTranslation(0, 0, 20);
 			break;
-		case MAPLE:
+		case 2: // maple
 			crown.setScale(1, 1, 2.1);
 			crown.setTranslation(0, 0, 32);
 			trunk.setTranslation(0, 0, 10);
 			break;
-		case PINE:
+		case 3: // pine
 			crown.setScale(1, 1, -4.0);
 			crown.setTranslation(0, 0, 45);
 			trunk.setTranslation(0, 0, 10);
 			break;
-		default:
+		default: // dogwood
 			crown.setScale(1, 1, 1.2);
 			crown.setTranslation(0, 0, 24);
 			trunk.setTranslation(0, 0, 10);
@@ -256,33 +236,26 @@ public class Tree extends HousePart {
 	protected void drawMesh() {
 		billboard.setTranslation(getAbsPoint(0));
 		collisionRoot.setTranslation(getAbsPoint(0));
-		final double scale = 1 / (Scene.getInstance().getAnnotationScale() / 0.2);
+		final double scale = 0.2 / Scene.getInstance().getAnnotationScale();
 		billboard.setScale(scale);
 		collisionRoot.setScale(scale);
 	}
 
 	@Override
 	protected String getTextureFileName() {
-		switch (treeType) {
-		case COTTONWOOD:
-			return isShedded() ? "cottonwood_shedded.png" : "cottonwood.png";
-		case LINDEN:
-			return isShedded() ? "linden_shedded.png" : "linden.png";
-		case OAK:
-			return isShedded() ? "oak_shedded.png" : "oak.png";
-		case ELM:
-			return isShedded() ? "elm_shedded.png" : "elm.png";
-		case MAPLE:
-			return isShedded() ? "maple_shedded.png" : "maple.png";
-		case DOGWOOD:
-			return isShedded() ? "dogwood_shedded.png" : "dogwood.png";
-		default:
-			return "pine.png";
-		}
+		return PLANTS[treeType].getName().toLowerCase() + (isShedded() ? "_shedded.png" : ".png");
+	}
+
+	public String getPlantName() {
+		return getPlantName(treeType);
+	}
+
+	public static String getPlantName(final int which) {
+		return PLANTS[which].getName();
 	}
 
 	private boolean isShedded() {
-		if (treeType == PINE) {
+		if (PLANTS[treeType].isEvergreen()) {
 			return false;
 		}
 		final Calendar c = Heliodon.getInstance().getCalendar();
@@ -326,27 +299,12 @@ public class Tree extends HousePart {
 		return collisionRoot;
 	}
 
-	public int getTreeType() {
+	public int getPlantType() {
 		return treeType;
 	}
 
-	public String getTreeName() {
-		switch (treeType) {
-		case COTTONWOOD:
-			return "Cottonwood";
-		case LINDEN:
-			return "Linden";
-		case OAK:
-			return "Oak";
-		case ELM:
-			return "Elm";
-		case MAPLE:
-			return "Maple";
-		case PINE:
-			return "Pine";
-		default:
-			return "Dogwood";
-		}
+	public void setPlantType(final int plantType) {
+		treeType = plantType;
 	}
 
 	@Override
