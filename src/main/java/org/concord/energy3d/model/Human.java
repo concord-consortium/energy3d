@@ -165,6 +165,10 @@ public class Human extends HousePart {
 		points.get(0).set(toRelative(p));
 	}
 
+	public void setLocation(final Vector3 v) {
+		points.get(0).set(toRelative(v));
+	}
+
 	@Override
 	public void drawHeatFlux() {
 		// this method is left empty on purpose -- don't draw heat flux
