@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +34,7 @@ import javax.swing.JTextPane;
 import javax.swing.SwingWorker;
 
 import org.concord.energy3d.simulation.LocationData;
+import org.concord.energy3d.util.Config;
 
 class GlobalMap extends JDialog {
 
@@ -98,6 +100,11 @@ class GlobalMap extends JDialog {
 		final JComboBox<String> regionsComboBox = new JComboBox<String>();
 		final JComboBox<String> countriesComboBox = new JComboBox<String>();
 		final JLabel regionsLabel = new JLabel("Regions:");
+		if (Config.isMac()) {
+			regionsLabel.setFont(new Font(regionsLabel.getFont().getName(), Font.PLAIN, regionsLabel.getFont().getSize() - 2));
+			regionsComboBox.setFont(new Font(regionsComboBox.getFont().getName(), Font.PLAIN, regionsComboBox.getFont().getSize() - 2));
+			countriesComboBox.setFont(regionsComboBox.getFont());
+		}
 		final ItemListener listener = new ItemListener() {
 			@Override
 			public void itemStateChanged(final ItemEvent e) {
