@@ -68,7 +68,6 @@ public class MainPanel extends JPanel {
 	private JToggleButton selectButton;
 	private JToggleButton wallButton;
 	private JToggleButton roofButton;
-	private JToggleButton windowButton;
 	private JToggleButton foundationButton;
 	private JToggleButton shadowButton;
 	private JToggleButton spinViewButton;
@@ -97,7 +96,7 @@ public class MainPanel extends JPanel {
 	private final JPopupMenu miscMenu;
 	private final JPopupMenu solaMenu;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
-	private Operation miscCommand = SceneManager.Operation.DRAW_DOOR;
+	private Operation miscCommand = SceneManager.Operation.DRAW_WINDOW;
 	private Operation solaCommand = SceneManager.Operation.DRAW_RACK;
 	private final double rotationAngleAbsolute = 5 * Math.PI / 180;
 	private double rotationAngle = -rotationAngleAbsolute;
@@ -203,47 +202,71 @@ public class MainPanel extends JPanel {
 		bg.add(miGableRoof);
 
 		// create misc menu
-		final JCheckBoxMenuItem miPlant = new JCheckBoxMenuItem("Plant", new ImageIcon(getClass().getResource("icons/plant.png")), true);
+		final JCheckBoxMenuItem miWindow = new JCheckBoxMenuItem("Window", new ImageIcon(getClass().getResource("icons/window.png")), true);
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
 		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
+		final JCheckBoxMenuItem miPlant = new JCheckBoxMenuItem("Plant", new ImageIcon(getClass().getResource("icons/plant.png")), true);
 		final JCheckBoxMenuItem miHuman = new JCheckBoxMenuItem("Human", new ImageIcon(getClass().getResource("icons/human.png")));
+		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
+		final JCheckBoxMenuItem miTapeMeasure = new JCheckBoxMenuItem("Tape Measure", new ImageIcon(getClass().getResource("icons/tape_measure.png")));
+		miTapeMeasure.setEnabled(false);
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
 				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
 				miscButton.setIcon(selected.getIcon());
-				if (selected == miDoor) {
+				if (selected == miWindow) {
+					miscCommand = SceneManager.Operation.DRAW_WINDOW;
+					miscButton.setToolTipText("Draw window");
+				} else if (selected == miDoor) {
 					miscCommand = SceneManager.Operation.DRAW_DOOR;
 					miscButton.setToolTipText("Draw door");
+				} else if (selected == miFloor) {
+					miscCommand = SceneManager.Operation.DRAW_FLOOR;
+					miscButton.setToolTipText("Draw floor");
 				} else if (selected == miPlant) {
 					miscCommand = SceneManager.Operation.DRAW_PLANT;
 					miscButton.setToolTipText("Insert a plant");
 				} else if (selected == miHuman) {
 					miscCommand = SceneManager.Operation.DRAW_HUMAN;
 					miscButton.setToolTipText("Insert a human");
-				} else {
-					miscCommand = SceneManager.Operation.DRAW_FLOOR;
-					miscButton.setToolTipText("Draw floor");
+				} else if (selected == miSensor) {
+					miscCommand = SceneManager.Operation.DRAW_SENSOR;
+					miscButton.setToolTipText("Insert a sensor module");
+				} else if (selected == miTapeMeasure) {
+					miscCommand = SceneManager.Operation.DRAW_TAPE_MEASURE;
+					miscButton.setToolTipText("Insert a tape measure");
 				}
 				SceneManager.getInstance().setOperation(miscCommand);
 				miscButton.setSelected(true);
 				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 			}
 		};
+		miWindow.addActionListener(miscAction);
 		miDoor.addActionListener(miscAction);
 		miFloor.addActionListener(miscAction);
 		miPlant.addActionListener(miscAction);
 		miHuman.addActionListener(miscAction);
+		miSensor.addActionListener(miscAction);
+		miTapeMeasure.addActionListener(miscAction);
 		miscMenu = new JPopupMenu();
+		miscMenu.add(miWindow);
 		miscMenu.add(miDoor);
 		miscMenu.add(miFloor);
+		miscMenu.addSeparator();
 		miscMenu.add(miPlant);
 		miscMenu.add(miHuman);
+		miscMenu.addSeparator();
+		miscMenu.add(miSensor);
+		miscMenu.add(miTapeMeasure);
 		bg = new ButtonGroup();
+		bg.add(miWindow);
 		bg.add(miDoor);
 		bg.add(miFloor);
 		bg.add(miPlant);
 		bg.add(miHuman);
+		bg.add(miSensor);
+		bg.add(miTapeMeasure);
 
 		// create solar menu
 		final JCheckBoxMenuItem miRack = new JCheckBoxMenuItem("Solar Panel Rack", new ImageIcon(getClass().getResource("icons/rack.png")), true);
@@ -251,12 +274,9 @@ public class MainPanel extends JPanel {
 		final JCheckBoxMenuItem miHeliostat = new JCheckBoxMenuItem("Heliostat", new ImageIcon(getClass().getResource("icons/mirror.png")));
 		final JCheckBoxMenuItem miParabolicTrough = new JCheckBoxMenuItem("Parabolic Trough", new ImageIcon(getClass().getResource("icons/parabolic_trough.png")));
 		final JCheckBoxMenuItem miParabolicDish = new JCheckBoxMenuItem("Parabolic Dish", new ImageIcon(getClass().getResource("icons/parabolic_dish.png")));
-		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
-		final JCheckBoxMenuItem miTapeMeasure = new JCheckBoxMenuItem("Tape Measure", new ImageIcon(getClass().getResource("icons/tape_measure.png")));
-		miSolarWaterHeater.setEnabled(false);
-		miTapeMeasure.setEnabled(false);
 		final JCheckBoxMenuItem miFresnelReflector = new JCheckBoxMenuItem("Linear Fresnel Reflector", new ImageIcon(getClass().getResource("icons/fresnel_reflector.png")));
-		final JCheckBoxMenuItem miSensor = new JCheckBoxMenuItem("Sensor Module", new ImageIcon(getClass().getResource("icons/sensor.png")));
+		final JCheckBoxMenuItem miSolarWaterHeater = new JCheckBoxMenuItem("Solar Water Heater", new ImageIcon(getClass().getResource("icons/solar_water_heater.png")));
+		miSolarWaterHeater.setEnabled(false);
 		final ActionListener solarAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {
@@ -283,12 +303,6 @@ public class MainPanel extends JPanel {
 				} else if (selected == miSolarWaterHeater) {
 					solaCommand = SceneManager.Operation.DRAW_SOLAR_WATER_HEATER;
 					solarButton.setToolTipText("Insert a solar water heater");
-				} else if (selected == miTapeMeasure) {
-					solaCommand = SceneManager.Operation.DRAW_TAPE_MEASURE;
-					solarButton.setToolTipText("Insert a tape measure");
-				} else if (selected == miSensor) {
-					solaCommand = SceneManager.Operation.DRAW_SENSOR;
-					solarButton.setToolTipText("Insert a sensor module");
 				}
 				SceneManager.getInstance().setOperation(solaCommand);
 				solarButton.setSelected(true);
@@ -297,35 +311,28 @@ public class MainPanel extends JPanel {
 		};
 		miSolarPanel.addActionListener(solarAction);
 		miRack.addActionListener(solarAction);
+		miSolarWaterHeater.addActionListener(solarAction);
 		miHeliostat.addActionListener(solarAction);
 		miParabolicTrough.addActionListener(solarAction);
 		miParabolicDish.addActionListener(solarAction);
 		miFresnelReflector.addActionListener(solarAction);
-		miSolarWaterHeater.addActionListener(solarAction);
-		miTapeMeasure.addActionListener(solarAction);
-		miSensor.addActionListener(solarAction);
 		solaMenu = new JPopupMenu();
 		solaMenu.add(miRack);
 		solaMenu.add(miSolarPanel);
 		solaMenu.addSeparator();
+		solaMenu.add(miSolarWaterHeater);
 		solaMenu.add(miHeliostat);
 		solaMenu.add(miParabolicTrough);
 		solaMenu.add(miParabolicDish);
 		solaMenu.add(miFresnelReflector);
-		solaMenu.addSeparator();
-		solaMenu.add(miSolarWaterHeater);
-		solaMenu.add(miTapeMeasure);
-		solaMenu.add(miSensor);
 		bg = new ButtonGroup();
 		bg.add(miSolarPanel);
 		bg.add(miRack);
+		bg.add(miSolarWaterHeater);
 		bg.add(miHeliostat);
 		bg.add(miParabolicTrough);
 		bg.add(miParabolicDish);
 		bg.add(miFresnelReflector);
-		bg.add(miSolarWaterHeater);
-		bg.add(miTapeMeasure);
-		bg.add(miSensor);
 
 		System.out.println("done");
 	}
@@ -354,7 +361,6 @@ public class MainPanel extends JPanel {
 			appToolbar.addSeparator();
 			appToolbar.add(getFoundationButton());
 			appToolbar.add(getWallButton());
-			appToolbar.add(getWindowButton());
 			appToolbar.add(getRoofButton());
 			appToolbar.add(getRoofArrowButton());
 			appToolbar.add(getMiscButton());
@@ -372,7 +378,6 @@ public class MainPanel extends JPanel {
 			bg.add(resizeButton);
 			bg.add(foundationButton);
 			bg.add(wallButton);
-			bg.add(windowButton);
 			bg.add(roofButton);
 			bg.add(solarButton);
 			bg.add(miscButton);
@@ -440,8 +445,8 @@ public class MainPanel extends JPanel {
 		if (miscButton == null) {
 			miscButton = new JToggleButton();
 			miscButton.setText("");
-			miscButton.setToolTipText("Draw door");
-			miscButton.setIcon(new ImageIcon(getClass().getResource("icons/door.png")));
+			miscButton.setToolTipText("Draw window");
+			miscButton.setIcon(new ImageIcon(getClass().getResource("icons/window.png")));
 			miscButton.setFocusable(false);
 			miscButton.addActionListener(new ActionListener() {
 				@Override
@@ -473,25 +478,6 @@ public class MainPanel extends JPanel {
 			miscArrowButton.setFocusPainted(false);
 		}
 		return miscArrowButton;
-	}
-
-	private JToggleButton getWindowButton() {
-		if (windowButton == null) {
-			windowButton = new JToggleButton();
-			windowButton.setIcon(new ImageIcon(getClass().getResource("icons/window.png")));
-			windowButton.setToolTipText("Draw window");
-			windowButton.setFocusable(false);
-			windowButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WINDOW);
-					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
-				}
-			});
-			windowButton.addMouseListener(operationStickAndRefreshUponExit);
-			addMouseOverEffect(windowButton);
-		}
-		return windowButton;
 	}
 
 	private JToggleButton getFoundationButton() {

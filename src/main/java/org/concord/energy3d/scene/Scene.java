@@ -447,7 +447,7 @@ public class Scene implements Serializable {
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						MainPanel.getInstance().getSunAnimationButton().setEnabled(isHeliodonVisible);
+						MainPanel.getInstance().getSunAnimationButton().setEnabled(isHeliodonVisible || SceneManager.getInstance().isShadowEnabled());
 					}
 				});
 			}
@@ -1419,18 +1419,24 @@ public class Scene implements Serializable {
 				if (position == null) {
 					return;
 				}
-				c.setContainer(foundation); // move to this foundation
-				position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
-				final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
-				position = position.subtractLocal(center);
-				final int n = c.getPoints().size();
-				for (int i = 0; i < n; i++) {
-					final Vector3 v = c.getPoints().get(i);
-					v.addLocal(position);
-				}
-				if (c instanceof Rack) {
-					((Rack) c).moveSolarPanels(position);
-					setIdOfChildren(c);
+				if (c instanceof Human) { // humans do not belong to a foundation
+					((Human) c).setLocation(position);
+				} else if (c instanceof Tree) { // trees do not belong to a foundation
+					((Tree) c).setLocation(position);
+				} else {
+					c.setContainer(foundation); // move to this foundation
+					position = c.toRelative(position.subtractLocal(c.getContainer().getAbsPoint(0)));
+					final Vector3 center = c.toRelative(c.getAbsCenter().subtractLocal(c.getContainer().getAbsPoint(0)));
+					position = position.subtractLocal(center);
+					final int n = c.getPoints().size();
+					for (int i = 0; i < n; i++) {
+						final Vector3 v = c.getPoints().get(i);
+						v.addLocal(position);
+					}
+					if (c instanceof Rack) {
+						((Rack) c).moveSolarPanels(position);
+						setIdOfChildren(c);
+					}
 				}
 				add(c, true);
 				copyBuffer = c;

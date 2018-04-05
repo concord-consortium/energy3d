@@ -153,7 +153,7 @@ public class Tree extends HousePart {
 		if (lockEdit) {
 			return;
 		}
-		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, null });
+		final PickedHousePart pick = SelectUtil.pickPart(x, y, new Class<?>[] { Foundation.class, Roof.class, Floor.class, null });
 		if (pick != null) {
 			final Vector3 p = pick.getPoint().clone();
 			snapToGrid(p, getAbsPoint(0), getGridSize(), false);
@@ -289,23 +289,11 @@ public class Tree extends HousePart {
 
 	private void setPlantGeometry() {
 		switch (treeType) {
-		case 6: // cottonwood
-			crown.setScale(3, 3, 3.5);
-			crown.setTranslation(0, 0, 55);
-			trunk.setScale(8, 8, 2);
-			trunk.setTranslation(0, 0, 20);
-			break;
-		case 5: // linden
-			crown.setScale(3.5, 3.5, 4);
-			crown.setTranslation(0, 0, 65);
-			trunk.setScale(5, 5, 2);
-			trunk.setTranslation(0, 0, 20);
-			break;
-		case 4: // oak
-			crown.setScale(2.5, 2.5, 3);
-			crown.setTranslation(0, 0, 45);
-			trunk.setScale(5, 5, 2);
-			trunk.setTranslation(0, 0, 20);
+		default: // dogwood
+			crown.setScale(1, 1, 1.2);
+			crown.setTranslation(0, 0, 24);
+			trunk.setScale(2, 2, 1);
+			trunk.setTranslation(0, 0, 10);
 			break;
 		case 1: // elm
 			crown.setScale(2, 2, 2.5);
@@ -325,11 +313,23 @@ public class Tree extends HousePart {
 			trunk.setScale(2, 2, 1);
 			trunk.setTranslation(0, 0, 10);
 			break;
-		default: // dogwood
-			crown.setScale(1, 1, 1.2);
-			crown.setTranslation(0, 0, 24);
-			trunk.setScale(2, 2, 1);
-			trunk.setTranslation(0, 0, 10);
+		case 4: // oak
+			crown.setScale(2.5, 2.5, 3);
+			crown.setTranslation(0, 0, 45);
+			trunk.setScale(5, 5, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
+		case 5: // linden
+			crown.setScale(3.5, 3.5, 4);
+			crown.setTranslation(0, 0, 65);
+			trunk.setScale(5, 5, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
+		case 6: // cottonwood
+			crown.setScale(3, 3, 3.5);
+			crown.setTranslation(0, 0, 55);
+			trunk.setScale(8, 8, 2);
+			trunk.setTranslation(0, 0, 20);
 			break;
 		}
 	}
@@ -360,6 +360,10 @@ public class Tree extends HousePart {
 		v.normalizeLocal().multiplyLocal(steplength);
 		final Vector3 p = getAbsPoint(0).addLocal(v);
 		points.get(0).set(toRelative(p));
+	}
+
+	public void setLocation(final Vector3 v) {
+		points.get(0).set(toRelative(v));
 	}
 
 	@Override
