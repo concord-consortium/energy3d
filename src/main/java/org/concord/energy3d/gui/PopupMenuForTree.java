@@ -13,7 +13,6 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import org.concord.energy3d.model.HousePart;
-import org.concord.energy3d.model.Human;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.Scene;
 import org.concord.energy3d.scene.SceneManager;
@@ -41,7 +40,7 @@ class PopupMenuForTree extends PopupMenuFactory {
 				}
 			});
 
-			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Lock");
+			final JCheckBoxMenuItem miLock = new JCheckBoxMenuItem("Disable Edit Point");
 			miLock.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {
@@ -74,6 +73,7 @@ class PopupMenuForTree extends PopupMenuFactory {
 			popupMenuForTree.addSeparator();
 			popupMenuForTree.add(miLock);
 			popupMenuForTree.add(miPolygon);
+			popupMenuForTree.addSeparator();
 
 			final JMenu treeMenu = new JMenu("Select Tree");
 			popupMenuForTree.add(treeMenu);
@@ -96,7 +96,7 @@ class PopupMenuForTree extends PopupMenuFactory {
 						return;
 					}
 					treeButtonGroup.clearSelection();
-					Util.selectSilently(rbmi[((Human) selectedPart).getHumanType()], true);
+					Util.selectSilently(rbmi[((Tree) selectedPart).getPlantType()], true);
 				}
 
 				@Override
@@ -132,6 +132,9 @@ class PopupMenuForTree extends PopupMenuFactory {
 					plant.draw();
 					SceneManager.getInstance().getUndoManager().addEdit(c);
 					Scene.getInstance().setEdited(true);
+					if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+						MainPanel.getInstance().getEnergyButton().setSelected(false);
+					}
 				}
 			}
 		});

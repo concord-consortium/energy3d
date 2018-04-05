@@ -203,10 +203,10 @@ public class MainPanel extends JPanel {
 		bg.add(miGableRoof);
 
 		// create misc menu
-		final JCheckBoxMenuItem miPlant = new JCheckBoxMenuItem("Plant", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
+		final JCheckBoxMenuItem miPlant = new JCheckBoxMenuItem("Plant", new ImageIcon(getClass().getResource("icons/plant.png")), true);
 		final JCheckBoxMenuItem miDoor = new JCheckBoxMenuItem("Door", new ImageIcon(getClass().getResource("icons/door.png")), true);
 		final JCheckBoxMenuItem miFloor = new JCheckBoxMenuItem("Floor", new ImageIcon(getClass().getResource("icons/floor.png")));
-		final JCheckBoxMenuItem miHuman = new JCheckBoxMenuItem("Human", new ImageIcon(getClass().getResource("icons/jack.png")));
+		final JCheckBoxMenuItem miHuman = new JCheckBoxMenuItem("Human", new ImageIcon(getClass().getResource("icons/human.png")));
 		final ActionListener miscAction = new ActionListener() {
 			@Override
 			public void actionPerformed(final ActionEvent e) {

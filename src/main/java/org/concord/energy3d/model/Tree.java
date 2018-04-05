@@ -31,27 +31,20 @@ import com.ardor3d.scenegraph.shape.Sphere;
 
 public class Tree extends HousePart {
 
-	public final static Plant[] PLANTS = new Plant[] { new Plant("Dogwood", false, 30, 40, 500), //
-			new Plant("Elm", false, 60, 75, 2000), // 1
-			new Plant("Maple", false, 30, 60, 1000), // 2
-			new Plant("Pine", true, 30, 80, 1500), // 3
-			new Plant("Oak", false, 70, 80, 2000), // 4
-			new Plant("Linden", false, 90, 120, 3000), // 5
-			new Plant("Cottonwood", false, 80, 100, 2500) };
-
-	// final JCheckBoxMenuItem miTree1 = new JCheckBoxMenuItem("Dogwood (Deciduous, Height=8m)", new ImageIcon(getClass().getResource("icons/dogwood.png")), true);
-	// final JCheckBoxMenuItem miTree2 = new JCheckBoxMenuItem("Maple (Deciduous, Height=12m)", new ImageIcon(getClass().getResource("icons/maple.png")));
-	// final JCheckBoxMenuItem miTree3 = new JCheckBoxMenuItem("Elm (Deciduous, Height=15m)", new ImageIcon(getClass().getResource("icons/elm.png")));
-	// final JCheckBoxMenuItem miTree4 = new JCheckBoxMenuItem("Oak (Deciduous, Height=16m)", new ImageIcon(getClass().getResource("icons/oak.png")));
-	// final JCheckBoxMenuItem miTree5 = new JCheckBoxMenuItem("Linden (Deciduous, Height=24m)", new ImageIcon(getClass().getResource("icons/linden.png")));
-	// final JCheckBoxMenuItem miTree6 = new JCheckBoxMenuItem("Cottonwood (Deciduous, Height=20m)", new ImageIcon(getClass().getResource("icons/cottonwood.png")));
-	// final JCheckBoxMenuItem miTree7 = new JCheckBoxMenuItem("Pine (Evergreen, Height=16m)", new ImageIcon(getClass().getResource("icons/pine.png")));
+	public final static Plant[] PLANTS = new Plant[] { new Plant("Dogwood", false, 6.0, 8.0, 500), //
+			new Plant("Elm", false, 12, 15, 2000), // 1
+			new Plant("Maple", false, 6, 12, 1000), // 2
+			new Plant("Pine", true, 6, 16, 1500), // 3
+			new Plant("Oak", false, 14, 16, 2000), // 4
+			new Plant("Linden", false, 18, 24, 3000), // 5
+			new Plant("Cottonwood", false, 16, 20, 2500) };
 
 	private static final long serialVersionUID = 1L;
 	private double treeWidth, treeHeight;
 	private transient BillboardNode billboard;
 	private transient Node collisionRoot;
 	private transient Mesh crown;
+	private transient Cylinder trunk;
 	private int treeType = 0;
 	private boolean showPolygons;
 	private static Calendar leaf_shed_northern_hemisphere, leaf_grow_northern_hemisphere;
@@ -83,8 +76,8 @@ public class Tree extends HousePart {
 	protected void init() {
 		super.init();
 
-		treeWidth = PLANTS[treeType].getWidth();
-		treeHeight = PLANTS[treeType].getHeight();
+		treeWidth = PLANTS[treeType].getWidth() / Scene.getInstance().getAnnotationScale();
+		treeHeight = PLANTS[treeType].getHeight() / Scene.getInstance().getAnnotationScale();
 
 		mesh = new Quad("Tree Quad", treeWidth, treeHeight);
 		mesh.setModelBound(new BoundingBox());
@@ -114,51 +107,10 @@ public class Tree extends HousePart {
 		}
 		crown.setModelBound(new BoundingSphere());
 		crown.updateModelBound();
-		final Cylinder trunk = new Cylinder("Tree Trunk", 10, 10, 1, 20);
+		trunk = new Cylinder("Tree Trunk", 10, 10, 1, 20);
 		trunk.setModelBound(new BoundingBox());
 		trunk.updateModelBound();
-
-		switch (treeType) {
-		case 6: // cottonwood
-			crown.setScale(3, 3, 3.5);
-			crown.setTranslation(0, 0, 55);
-			trunk.setScale(8, 8, 2);
-			trunk.setTranslation(0, 0, 20);
-			break;
-		case 5: // linden
-			crown.setScale(3.5, 3.5, 4);
-			crown.setTranslation(0, 0, 65);
-			trunk.setScale(5, 5, 2);
-			trunk.setTranslation(0, 0, 20);
-			break;
-		case 4: // oak
-			crown.setScale(2.5, 2.5, 3);
-			crown.setTranslation(0, 0, 45);
-			trunk.setScale(5, 5, 2);
-			trunk.setTranslation(0, 0, 20);
-			break;
-		case 1: // elm
-			crown.setScale(2, 2, 2.5);
-			crown.setTranslation(0, 0, 40);
-			trunk.setScale(2, 2, 2);
-			trunk.setTranslation(0, 0, 20);
-			break;
-		case 2: // maple
-			crown.setScale(1, 1, 2.1);
-			crown.setTranslation(0, 0, 32);
-			trunk.setTranslation(0, 0, 10);
-			break;
-		case 3: // pine
-			crown.setScale(1, 1, -4.0);
-			crown.setTranslation(0, 0, 45);
-			trunk.setTranslation(0, 0, 10);
-			break;
-		default: // dogwood
-			crown.setScale(1, 1, 1.2);
-			crown.setTranslation(0, 0, 24);
-			trunk.setTranslation(0, 0, 10);
-			break;
-		}
+		setPlantGeometry();
 
 		collisionRoot = new Node("Tree Collision Root");
 		collisionRoot.attachChild(crown);
@@ -305,6 +257,81 @@ public class Tree extends HousePart {
 
 	public void setPlantType(final int plantType) {
 		treeType = plantType;
+		if (PLANTS[treeType].getName().equals("Pine")) {
+			if (!(crown instanceof Cone)) {
+				crown.removeFromParent();
+				collisionRoot.detachChild(crown);
+				crown = new Cone("Tree Crown", 2, 6, 18, 20, false); // axis samples, radial samples, radius, height, closed
+				crown.setModelBound(new BoundingSphere());
+				crown.updateModelBound();
+				crown.setUserData(new UserData(this));
+				collisionRoot.attachChild(crown);
+			}
+		} else {
+			if (!(crown instanceof Sphere)) {
+				crown.removeFromParent();
+				collisionRoot.detachChild(crown);
+				crown = new Sphere("Tree Crown", 4, 8, 14); // z samples, radial samples, radius
+				crown.setModelBound(new BoundingSphere());
+				crown.updateModelBound();
+				crown.setUserData(new UserData(this));
+				collisionRoot.attachChild(crown);
+			}
+		}
+		treeWidth = PLANTS[treeType].getWidth() / Scene.getInstance().getAnnotationScale();
+		treeHeight = PLANTS[treeType].getHeight() / Scene.getInstance().getAnnotationScale();
+		if (mesh instanceof Quad) {
+			((Quad) mesh).resize(treeWidth, treeHeight);
+		}
+		mesh.setTranslation(0, 0, 0.5 * treeHeight);
+		setPlantGeometry();
+	}
+
+	private void setPlantGeometry() {
+		switch (treeType) {
+		case 6: // cottonwood
+			crown.setScale(3, 3, 3.5);
+			crown.setTranslation(0, 0, 55);
+			trunk.setScale(8, 8, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
+		case 5: // linden
+			crown.setScale(3.5, 3.5, 4);
+			crown.setTranslation(0, 0, 65);
+			trunk.setScale(5, 5, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
+		case 4: // oak
+			crown.setScale(2.5, 2.5, 3);
+			crown.setTranslation(0, 0, 45);
+			trunk.setScale(5, 5, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
+		case 1: // elm
+			crown.setScale(2, 2, 2.5);
+			crown.setTranslation(0, 0, 40);
+			trunk.setScale(2, 2, 2);
+			trunk.setTranslation(0, 0, 20);
+			break;
+		case 2: // maple
+			crown.setScale(1, 1, 2.1);
+			crown.setTranslation(0, 0, 32);
+			trunk.setScale(2, 2, 1);
+			trunk.setTranslation(0, 0, 10);
+			break;
+		case 3: // pine
+			crown.setScale(1, 1, -4.0);
+			crown.setTranslation(0, 0, 45);
+			trunk.setScale(2, 2, 1);
+			trunk.setTranslation(0, 0, 10);
+			break;
+		default: // dogwood
+			crown.setScale(1, 1, 1.2);
+			crown.setTranslation(0, 0, 24);
+			trunk.setScale(2, 2, 1);
+			trunk.setTranslation(0, 0, 10);
+			break;
+		}
 	}
 
 	@Override

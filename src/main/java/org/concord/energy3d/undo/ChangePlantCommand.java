@@ -3,6 +3,7 @@ package org.concord.energy3d.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.concord.energy3d.gui.MainPanel;
 import org.concord.energy3d.model.Tree;
 import org.concord.energy3d.scene.SceneManager;
 
@@ -33,6 +34,9 @@ public class ChangePlantCommand extends MyAbstractUndoableEdit {
 		plant.setPlantType(oldValue);
 		plant.draw();
 		SceneManager.getInstance().refresh();
+		if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+			MainPanel.getInstance().getEnergyButton().setSelected(false);
+		}
 	}
 
 	@Override
@@ -41,6 +45,9 @@ public class ChangePlantCommand extends MyAbstractUndoableEdit {
 		plant.setPlantType(newValue);
 		plant.draw();
 		SceneManager.getInstance().refresh();
+		if (MainPanel.getInstance().getEnergyButton().isSelected()) {
+			MainPanel.getInstance().getEnergyButton().setSelected(false);
+		}
 	}
 
 	@Override
