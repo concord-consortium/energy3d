@@ -4275,7 +4275,7 @@ public class Foundation extends HousePart implements Thermal, Labelable {
 		}
 		if (walls != null && !walls.isEmpty()) {
 			for (final Wall w : walls) {
-				w.connectWithOtherWalls(this, true);
+				w.connectWithOtherWalls(this);
 			}
 			for (final Wall w : walls) {
 				w.computeInsideDirectionOfAttachedWalls(false);

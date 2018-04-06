@@ -458,6 +458,12 @@ public class MainPanel extends JPanel {
 					button.setBackground(SystemColor.controlLtHighlight);
 				}
 			});
+			button.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					button.setBackground(button.isSelected() ? SystemColor.controlShadow : defaultColor);
+				}
+			});
 		}
 	}
 
