@@ -704,52 +704,56 @@ class PopupMenuForParabolicDish extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								boolean changed = Math.abs(val - d.getBaseHeight()) > 0.000001;
-								if (rb1.isSelected()) {
-									if (changed) {
-										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(d);
-										d.setBaseHeight(val);
-										d.draw();
-										SceneManager.getInstance().refresh();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-									}
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									if (!changed) {
-										for (final ParabolicDish x : foundation.getParabolicDishes()) {
-											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
-												changed = true;
-												break;
+								if (val < 0 || val * Scene.getInstance().getAnnotationScale() > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									boolean changed = Math.abs(val - d.getBaseHeight()) > 0.000001;
+									if (rb1.isSelected()) {
+										if (changed) {
+											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(d);
+											d.setBaseHeight(val);
+											d.draw();
+											SceneManager.getInstance().refresh();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										if (!changed) {
+											for (final ParabolicDish x : foundation.getParabolicDishes()) {
+												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
 											}
 										}
-									}
-									if (changed) {
-										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, d.getClass());
-										foundation.setBaseHeightForParabolicDishes(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-									}
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									if (!changed) {
-										for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
-											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
-												changed = true;
-												break;
+										if (changed) {
+											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, d.getClass());
+											foundation.setBaseHeightForParabolicDishes(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										if (!changed) {
+											for (final ParabolicDish x : Scene.getInstance().getAllParabolicDishes()) {
+												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
 											}
 										}
+										if (changed) {
+											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(d.getClass());
+											Scene.getInstance().setBaseHeightForAllParabolicDishes(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 2;
 									}
 									if (changed) {
-										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(d.getClass());
-										Scene.getInstance().setBaseHeightForAllParabolicDishes(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										updateAfterEdit();
 									}
-									selectedScopeIndex = 2;
-								}
-								if (changed) {
-									updateAfterEdit();
-								}
-								if (choice == options[0]) {
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
 							}
 						}

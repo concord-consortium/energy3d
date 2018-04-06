@@ -133,6 +133,7 @@ import org.concord.energy3d.undo.ChangeThemeCommand;
 import org.concord.energy3d.undo.ChangeWallTextureCommand;
 import org.concord.energy3d.undo.MyAbstractUndoableEdit;
 import org.concord.energy3d.undo.MyUndoManager;
+import org.concord.energy3d.undo.ShowAnnotationCommand;
 import org.concord.energy3d.undo.ShowAxesCommand;
 import org.concord.energy3d.undo.ShowHeatFluxCommand;
 import org.concord.energy3d.undo.ShowReflectorLightBeamsCommand;
@@ -229,6 +230,7 @@ public class MainFrame extends JFrame {
 	private JMenu helpMenu;
 	private JMenuItem aboutMenuItem;
 	private JDialog aboutDialog;
+	private JCheckBoxMenuItem annotationsMenuItem;
 	private JCheckBoxMenuItem annotationsInwardMenuItem;
 	private JMenu editMenu;
 	private JMenuItem undoMenuItem;
@@ -1673,6 +1675,7 @@ public class MainFrame extends JFrame {
 					Util.selectSilently(disableShadowInActionMenuItem, Scene.getInstance().getDisableShadowInAction());
 					Util.selectSilently(roofDashedLineMenuItem, Scene.getInstance().areDashedLinesOnRoofShown());
 					Util.selectSilently(lightBeamsMenuItem, Scene.getInstance().areLightBeamsVisible());
+					Util.selectSilently(annotationsMenuItem, Scene.getInstance().areAnnotationsVisible());
 					MainPanel.getInstance().defaultTool();
 					sunAnglesMenuItem.setEnabled(Heliodon.getInstance().isVisible());
 				}
@@ -1701,6 +1704,9 @@ public class MainFrame extends JFrame {
 			viewMenu.add(getZoomInMenuItem());
 			viewMenu.add(getZoomOutMenuItem());
 			viewMenu.addSeparator();
+			viewMenu.add(getThemeMenu());
+			viewMenu.add(getTextureMenu());
+			viewMenu.addSeparator();
 			viewMenu.add(getVisualizationSettingsMenuItem());
 			viewMenu.add(getGroundImageMenu());
 			viewMenu.add(weatherMenu);
@@ -1715,10 +1721,8 @@ public class MainFrame extends JFrame {
 			viewMenu.addSeparator();
 			viewMenu.add(getAxesMenuItem());
 			viewMenu.add(getRoofDashedLineMenuItem());
+			viewMenu.add(getAnnotationsMenuItem());
 			viewMenu.add(getAnnotationsInwardMenuItem());
-			// viewMenu.add(getWallThicknessMenuItem());
-			viewMenu.add(getTextureMenu());
-			viewMenu.add(getThemeMenu());
 
 		}
 		return viewMenu;
@@ -3373,9 +3377,28 @@ public class MainFrame extends JFrame {
 		return dailyEnvironmentalTemperatureMenuItem;
 	}
 
+	private JCheckBoxMenuItem getAnnotationsMenuItem() {
+		if (annotationsMenuItem == null) {
+			annotationsMenuItem = new JCheckBoxMenuItem("Annotations");
+			annotationsMenuItem.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(final ItemEvent e) {
+					final ShowAnnotationCommand c = new ShowAnnotationCommand();
+					Scene.getInstance().setAnnotationsVisible(annotationsMenuItem.isSelected());
+					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+					Scene.getInstance().setEdited(true);
+					SceneManager.getInstance().getUndoManager().addEdit(c);
+					Util.selectSilently(MainPanel.getInstance().getAnnotationButton(), annotationsMenuItem.isSelected());
+				}
+			});
+
+		}
+		return annotationsMenuItem;
+	}
+
 	private JCheckBoxMenuItem getAnnotationsInwardMenuItem() {
 		if (annotationsInwardMenuItem == null) {
-			annotationsInwardMenuItem = new JCheckBoxMenuItem("Annotations Inward");
+			annotationsInwardMenuItem = new JCheckBoxMenuItem("Annotations for Cutouts");
 			annotationsInwardMenuItem.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(final ItemEvent e) {

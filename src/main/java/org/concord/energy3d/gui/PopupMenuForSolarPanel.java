@@ -1433,91 +1433,95 @@ class PopupMenuForSolarPanel extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								boolean changed = Math.abs(val - sp.getBaseHeight()) > 0.000001;
-								if (rb1.isSelected()) {
-									if (changed) {
-										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
-										sp.setBaseHeight(val);
-										sp.draw();
-										if (sp.checkContainerIntersection()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().refresh();
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+								if (val < 0 || val * Scene.getInstance().getAnnotationScale() > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									boolean changed = Math.abs(val - sp.getBaseHeight()) > 0.000001;
+									if (rb1.isSelected()) {
+										if (changed) {
+											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(sp);
+											sp.setBaseHeight(val);
+											sp.draw();
+											if (sp.checkContainerIntersection()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as the solar panel would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().refresh();
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
-									}
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									final List<SolarPanel> row = sp.getRow();
-									for (final SolarPanel x : row) {
-										if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
-											changed = true;
-											break;
-										}
-									}
-									if (changed) {
-										final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
-										boolean intersected = false;
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										final List<SolarPanel> row = sp.getRow();
 										for (final SolarPanel x : row) {
-											x.setBaseHeight(val);
-											x.draw();
-											if (x.checkContainerIntersection()) {
-												intersected = true;
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
 												break;
 											}
 										}
-										if (intersected) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().refresh();
-											SceneManager.getInstance().getUndoManager().addEdit(c);
+										if (changed) {
+											final ChangeBaseHeightForSolarPanelRowCommand c = new ChangeBaseHeightForSolarPanelRowCommand(row);
+											boolean intersected = false;
+											for (final SolarPanel x : row) {
+												x.setBaseHeight(val);
+												x.draw();
+												if (x.checkContainerIntersection()) {
+													intersected = true;
+													break;
+												}
+											}
+											if (intersected) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels in the row would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().refresh();
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
 										}
-									}
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									for (final SolarPanel x : foundation.getSolarPanels()) {
-										if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
-											changed = true;
-											break;
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										for (final SolarPanel x : foundation.getSolarPanels()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
 										}
+										if (changed) {
+											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, sp.getClass());
+											foundation.setBaseHeightForSolarPanels(val);
+											if (foundation.checkContainerIntersectionForSolarPanels()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
+										}
+										selectedScopeIndex = 2;
+									} else if (rb4.isSelected()) {
+										for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
+											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+												changed = true;
+												break;
+											}
+										}
+										if (changed) {
+											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(sp.getClass());
+											Scene.getInstance().setBaseHeightForAllSolarPanels(val);
+											if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
+										}
+										selectedScopeIndex = 3;
 									}
 									if (changed) {
-										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, sp.getClass());
-										foundation.setBaseHeightForSolarPanels(val);
-										if (foundation.checkContainerIntersectionForSolarPanels()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
+										updateAfterEdit();
 									}
-									selectedScopeIndex = 2;
-								} else if (rb4.isSelected()) {
-									for (final SolarPanel x : Scene.getInstance().getAllSolarPanels()) {
-										if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
-											changed = true;
-											break;
-										}
+									if (choice == options[0]) {
+										break;
 									}
-									if (changed) {
-										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(sp.getClass());
-										Scene.getInstance().setBaseHeightForAllSolarPanels(val);
-										if (Scene.getInstance().checkContainerIntersectionForAllSolarPanels()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "This base height cannot be set as one or more solar panels would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
-									}
-									selectedScopeIndex = 3;
-								}
-								if (changed) {
-									updateAfterEdit();
-								}
-								if (choice == options[0]) {
-									break;
 								}
 							}
 						}

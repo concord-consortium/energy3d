@@ -1037,67 +1037,71 @@ class PopupMenuForRack extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								boolean changed = val != rack.getBaseHeight();
-								if (rb1.isSelected()) {
-									if (changed) {
-										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
-										rack.setBaseHeight(val);
-										rack.draw();
-										if (rack.checkContainerIntersection()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().refresh();
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
-									}
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									if (!changed) {
-										for (final Rack x : foundation.getRacks()) {
-											if (x.getBaseHeight() != val) {
-												changed = true;
-												break;
+								if (val < 0 || val * Scene.getInstance().getAnnotationScale() > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									boolean changed = val != rack.getBaseHeight();
+									if (rb1.isSelected()) {
+										if (changed) {
+											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(rack);
+											rack.setBaseHeight(val);
+											rack.draw();
+											if (rack.checkContainerIntersection()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height cannot be set this low as the rack would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().refresh();
+												SceneManager.getInstance().getUndoManager().addEdit(c);
 											}
 										}
-									}
-									if (changed) {
-										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, rack.getClass());
-										foundation.setBaseHeightForRacks(val);
-										if (foundation.checkContainerIntersectionForRacks()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
-									}
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									if (!changed) {
-										for (final Rack x : Scene.getInstance().getAllRacks()) {
-											if (x.getBaseHeight() != val) {
-												changed = true;
-												break;
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										if (!changed) {
+											for (final Rack x : foundation.getRacks()) {
+												if (x.getBaseHeight() != val) {
+													changed = true;
+													break;
+												}
 											}
 										}
+										if (changed) {
+											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, rack.getClass());
+											foundation.setBaseHeightForRacks(val);
+											if (foundation.checkContainerIntersectionForRacks()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
+										}
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										if (!changed) {
+											for (final Rack x : Scene.getInstance().getAllRacks()) {
+												if (x.getBaseHeight() != val) {
+													changed = true;
+													break;
+												}
+											}
+										}
+										if (changed) {
+											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(rack.getClass());
+											Scene.getInstance().setBaseHeightForAllRacks(val);
+											if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
+												JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
+												c.undo();
+											} else {
+												SceneManager.getInstance().getUndoManager().addEdit(c);
+											}
+										}
+										selectedScopeIndex = 2;
 									}
 									if (changed) {
-										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(rack.getClass());
-										Scene.getInstance().setBaseHeightForAllRacks(val);
-										if (Scene.getInstance().checkContainerIntersectionForAllRacks()) {
-											JOptionPane.showMessageDialog(MainFrame.getInstance(), "Base heights cannot be set this low as one or more racks would cut into the underlying surface.", "Illegal Base Height", JOptionPane.ERROR_MESSAGE);
-											c.undo();
-										} else {
-											SceneManager.getInstance().getUndoManager().addEdit(c);
-										}
+										updateAfterEdit();
 									}
-									selectedScopeIndex = 2;
-								}
-								if (changed) {
-									updateAfterEdit();
-								}
-								if (choice == options[0]) {
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
 							}
 						}

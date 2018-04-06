@@ -824,52 +824,56 @@ class PopupMenuForParabolicTrough extends PopupMenuFactory {
 								ok = false;
 							}
 							if (ok) {
-								boolean changed = Math.abs(val - t.getBaseHeight()) > 0.000001;
-								if (rb1.isSelected()) {
-									if (changed) {
-										final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(t);
-										t.setBaseHeight(val);
-										t.draw();
-										SceneManager.getInstance().refresh();
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-									}
-									selectedScopeIndex = 0;
-								} else if (rb2.isSelected()) {
-									if (!changed) {
-										for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
-											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
-												changed = true;
-												break;
+								if (val < 0 || val * Scene.getInstance().getAnnotationScale() > 10) {
+									JOptionPane.showMessageDialog(MainFrame.getInstance(), "The base height must be between 0 and 10 meters.", "Range Error", JOptionPane.ERROR_MESSAGE);
+								} else {
+									boolean changed = Math.abs(val - t.getBaseHeight()) > 0.000001;
+									if (rb1.isSelected()) {
+										if (changed) {
+											final ChangeBaseHeightCommand c = new ChangeBaseHeightCommand(t);
+											t.setBaseHeight(val);
+											t.draw();
+											SceneManager.getInstance().refresh();
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 0;
+									} else if (rb2.isSelected()) {
+										if (!changed) {
+											for (final ParabolicTrough x : foundation.getParabolicTroughs()) {
+												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
 											}
 										}
-									}
-									if (changed) {
-										final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, t.getClass());
-										foundation.setBaseHeightForSolarCollectors(val, t.getClass());
-										SceneManager.getInstance().getUndoManager().addEdit(c);
-									}
-									selectedScopeIndex = 1;
-								} else if (rb3.isSelected()) {
-									if (!changed) {
-										for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
-											if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
-												changed = true;
-												break;
+										if (changed) {
+											final ChangeFoundationSolarCollectorBaseHeightCommand c = new ChangeFoundationSolarCollectorBaseHeightCommand(foundation, t.getClass());
+											foundation.setBaseHeightForSolarCollectors(val, t.getClass());
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 1;
+									} else if (rb3.isSelected()) {
+										if (!changed) {
+											for (final ParabolicTrough x : Scene.getInstance().getAllParabolicTroughs()) {
+												if (Math.abs(val - x.getBaseHeight()) > 0.000001) {
+													changed = true;
+													break;
+												}
 											}
 										}
+										if (changed) {
+											final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(t.getClass());
+											Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
+											SceneManager.getInstance().getUndoManager().addEdit(c);
+										}
+										selectedScopeIndex = 2;
 									}
 									if (changed) {
-										final ChangeBaseHeightForAllSolarCollectorsCommand c = new ChangeBaseHeightForAllSolarCollectorsCommand(t.getClass());
-										Scene.getInstance().setBaseHeightForAllParabolicTroughs(val);
-										SceneManager.getInstance().getUndoManager().addEdit(c);
+										updateAfterEdit();
 									}
-									selectedScopeIndex = 2;
-								}
-								if (changed) {
-									updateAfterEdit();
-								}
-								if (choice == options[0]) {
-									break;
+									if (choice == options[0]) {
+										break;
+									}
 								}
 							}
 						}

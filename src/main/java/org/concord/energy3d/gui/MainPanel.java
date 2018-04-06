@@ -87,13 +87,16 @@ public class MainPanel extends JPanel {
 	private JToggleButton solarButton;
 	private JToggleButton miscButton;
 	private JButton rotateButton;
+	private JButton wallArrowButton;
 	private JButton roofArrowButton;
 	private JButton miscArrowButton;
 	private JButton solaArrowButton;
 	private int defaultDividerSize = -1;
+	private final JPopupMenu wallMenu;
 	private final JPopupMenu roofMenu;
 	private final JPopupMenu miscMenu;
 	private final JPopupMenu solaMenu;
+	private Operation wallCommand = SceneManager.Operation.DRAW_EXTERIOR_WALL;
 	private Operation roofCommand = SceneManager.Operation.DRAW_ROOF_PYRAMID;
 	private Operation miscCommand = SceneManager.Operation.DRAW_WINDOW;
 	private Operation solaCommand = SceneManager.Operation.DRAW_RACK;
@@ -133,6 +136,36 @@ public class MainPanel extends JPanel {
 		ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 		ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE);
 		initialize();
+
+		// create wall menu
+		final JCheckBoxMenuItem miExteriorWall = new JCheckBoxMenuItem("Exterior Wall", new ImageIcon(getClass().getResource("icons/exterior_wall.png")), true);
+		final JCheckBoxMenuItem miInteriorWall = new JCheckBoxMenuItem("Interior Wall", new ImageIcon(getClass().getResource("icons/interior_wall.png")), true);
+		miInteriorWall.setEnabled(false);
+		final ActionListener wallAction = new ActionListener() {
+			@Override
+			public void actionPerformed(final ActionEvent e) {
+				final JCheckBoxMenuItem selected = (JCheckBoxMenuItem) e.getSource();
+				wallButton.setIcon(selected.getIcon());
+				if (selected == miExteriorWall) {
+					wallCommand = SceneManager.Operation.DRAW_EXTERIOR_WALL;
+					wallButton.setToolTipText("Draw exterior wall");
+				} else if (selected == miInteriorWall) {
+					wallCommand = SceneManager.Operation.DRAW_INTERIOR_WALL;
+					wallButton.setToolTipText("Draw interior wall");
+				}
+				SceneManager.getInstance().setOperation(wallCommand);
+				wallButton.setSelected(true);
+				((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
+			}
+		};
+		miExteriorWall.addActionListener(wallAction);
+		miInteriorWall.addActionListener(wallAction);
+		wallMenu = new JPopupMenu();
+		wallMenu.add(miExteriorWall);
+		wallMenu.add(miInteriorWall);
+		ButtonGroup bg = new ButtonGroup();
+		bg.add(miExteriorWall);
+		bg.add(miInteriorWall);
 
 		// create roof menu
 		final JCheckBoxMenuItem miPyramidRoof = new JCheckBoxMenuItem("Pyramid Roof", new ImageIcon(getClass().getResource("icons/pyramid_roof.png")), true);
@@ -184,7 +217,7 @@ public class MainPanel extends JPanel {
 		roofMenu.add(miCustomRoof);
 		roofMenu.addSeparator();
 		roofMenu.add(miGableRoof);
-		ButtonGroup bg = new ButtonGroup();
+		bg = new ButtonGroup();
 		bg.add(miPyramidRoof);
 		bg.add(miHipRoof);
 		bg.add(miShedRoof);
@@ -352,6 +385,7 @@ public class MainPanel extends JPanel {
 			appToolbar.addSeparator();
 			appToolbar.add(getFoundationButton());
 			appToolbar.add(getWallButton());
+			appToolbar.add(getWallArrowButton());
 			appToolbar.add(getRoofButton());
 			appToolbar.add(getRoofArrowButton());
 			appToolbar.add(getMiscButton());
@@ -416,13 +450,13 @@ public class MainPanel extends JPanel {
 	private JToggleButton getWallButton() {
 		if (wallButton == null) {
 			wallButton = new JToggleButton();
-			wallButton.setIcon(new ImageIcon(getClass().getResource("icons/wall.png")));
-			wallButton.setToolTipText("Draw wall");
+			wallButton.setIcon(new ImageIcon(getClass().getResource("icons/exterior_wall.png")));
+			wallButton.setToolTipText("Draw exterior wall");
 			wallButton.setFocusable(false);
 			wallButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(final ActionEvent e) {
-					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_WALL);
+					SceneManager.getInstance().setOperation(SceneManager.Operation.DRAW_EXTERIOR_WALL);
 					((Component) SceneManager.getInstance().getCanvas()).requestFocusInWindow();
 				}
 			});
@@ -430,6 +464,25 @@ public class MainPanel extends JPanel {
 			addMouseOverEffect(wallButton);
 		}
 		return wallButton;
+	}
+
+	private JButton getWallArrowButton() {
+		if (wallArrowButton == null) {
+			wallArrowButton = new JButton();
+			wallArrowButton.setFocusable(false);
+			final Dimension d = new Dimension(12, wallButton.getMaximumSize().height);
+			wallArrowButton.setMaximumSize(d);
+			wallArrowButton.setIcon(new Symbol.Arrow(Color.BLACK, d.width, d.height));
+			wallArrowButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(final ActionEvent e) {
+					wallMenu.show(wallButton, 0, wallButton.getHeight());
+				}
+			});
+			wallArrowButton.setBorder(BorderFactory.createEmptyBorder());
+			wallArrowButton.setFocusPainted(false);
+		}
+		return wallArrowButton;
 	}
 
 	private JToggleButton getMiscButton() {
